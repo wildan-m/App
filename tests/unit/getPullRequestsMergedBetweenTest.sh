@@ -1,15 +1,5 @@
 #!/bin/bash
 
-TEST_DIR=$(dirname "$(dirname "$(realpath "$0")")")
-DUMMY_DIR="$HOME/DumDumRepo"
-getPullRequestsMergedBetween="$TEST_DIR/utils/getPullRequestsMergedBetween.js"
-
-source "$TEST_DIR/../shellUtils.sh"
-
-function print_version {
-  < package.json  jq -r .version
-}
-
 ### Phase 0: Verify necessary tools are installed (all tools should be pre-installed on all GitHub Actions runners)
 
 if ! command -v jq &> /dev/null
@@ -24,6 +14,21 @@ then
   exit 1
 fi
 
+if ! command -v realpath &> /dev/null
+then
+  error "command realpath could not be found, install it and re-run this script. (hint: on macOS use \`brew install coreutils\`)"
+  exit 1
+fi
+
+TEST_DIR=$(dirname "$(dirname "$(realpath "$0")")")
+DUMMY_DIR="$HOME/DumDumRepo"
+getPullRequestsMergedBetween="$TEST_DIR/utils/getPullRequestsMergedBetween.js"
+
+source "$TEST_DIR/../shellUtils.sh"
+
+function print_version {
+  < package.json  jq -r .version
+}
 
 ### Setup
 title "Starting setup"
