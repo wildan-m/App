@@ -1,30 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
-import PropTypes from 'prop-types';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
-import styles from '../../../styles/styles';
-import ReportActionItemFragment from './ReportActionItemFragment';
-import reportActionPropTypes from './reportActionPropTypes';
-import withLocalize, {withLocalizePropTypes} from '../../../components/withLocalize';
-
-const propTypes = {
-    /** The report action */
-    action: PropTypes.shape(reportActionPropTypes).isRequired,
-
-    /** Additional styles to add after local styles. */
-    style: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.object),
-        PropTypes.object,
-    ]),
-
-    /** localization props */
-    ...withLocalizePropTypes,
-};
-
-const defaultProps = {
-    style: [],
-};
+import styles from '../../../../styles/styles';
+import ReportActionItemFragment from '../ReportActionItemFragment';
+import {propTypes, defaultProps} from './reportActionItemMessagePropTypes';
+import withLocalize from '../../../../components/withLocalize';
 
 const ReportActionItemMessage = props => (
     <View style={[styles.chatItemMessage, ...props.style]}>
