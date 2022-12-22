@@ -1,6 +1,8 @@
 import React from 'react';
+import {Image} from 'react-native';
 import CONST from '../../CONST';
 import {propTypes, defaultProps} from './attachmentPickerPropTypes';
+import imageCompression from 'browser-image-compression';
 
 /**
  * Returns acceptable FileTypes based on ATTACHMENT_PICKER_TYPE
@@ -23,6 +25,23 @@ function getAcceptableFileTypes(type) {
  * and listen to onChange event.
  */
 class AttachmentPicker extends React.Component {
+
+    compressImage(imageFile) {
+        return new Promise((resolve)=>{
+            const options = {
+                maxWidthOrHeight: CONST.AVATAR_MAX_WIDTH_PX,
+            };
+
+            try {
+                const compressedFile = imageCompression(imageFile, options);
+                console.log(compressedFile.size / 1024 / 1024);
+                resolve(compressedFile);
+            } catch (error) {
+                console.log(error);
+            }
+        })
+    }
+
     render() {
         return (
             <>
@@ -35,7 +54,22 @@ class AttachmentPicker extends React.Component {
 
                         if (file) {
                             file.uri = URL.createObjectURL(file);
-                            this.onPicked(file);
+                            Image.getSize(file.uri, (width, height) => {
+                                const isExceedMaxResolution = height > CONST.AVATAR_MAX_HEIGHT_PX || width > CONST.AVATAR_MAX_WIDTH_PX;
+                                    
+                                if(CONST.FILE_TYPE_REGEX.IMAGE.test(file.name) && isExceedMaxResolution)
+                                {
+                                    this.props.onCompressing(true);
+                                    this.compressImage(file).then(compressedFile =>{
+                                        compressedFile.uri = URL.createObjectURL(compressedFile);
+                                        this.onPicked(compressedFile);
+                                        this.props.onCompressing(false);
+                                    })
+                                }else{
+                                    this.onPicked(file);
+                                }
+                            });
+                           
                         }
 
                         // Cleanup after selecting a file to start from a fresh state

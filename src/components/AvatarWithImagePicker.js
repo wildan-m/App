@@ -263,7 +263,10 @@ class AvatarWithImagePicker extends React.Component {
                             : (
                                 <DefaultAvatar />
                             )}
-                        <AttachmentPicker type={CONST.ATTACHMENT_PICKER_TYPE.IMAGE}>
+                        <AttachmentPicker 
+                            type={CONST.ATTACHMENT_PICKER_TYPE.IMAGE}
+                            onCompressing={this.props.onCompressing}
+                        >
                             {({openPicker}) => (
                                 <>
                                     <Tooltip absolute text={this.props.translate('avatarWithImagePicker.editImage')}>

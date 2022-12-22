@@ -28,6 +28,8 @@ import * as ValidationUtils from '../../../libs/ValidationUtils';
 import * as ReportUtils from '../../../libs/ReportUtils';
 import Form from '../../../components/Form';
 import OfflineWithFeedback from '../../../components/OfflineWithFeedback';
+import FullscreenLoadingIndicator from '../../../components/FullscreenLoadingIndicator';
+
 
 const propTypes = {
     /* Onyx Props */
@@ -73,6 +75,7 @@ class ProfilePage extends Component {
             selectedTimezone: lodashGet(props.currentUserPersonalDetails.timezone, 'selected', CONST.DEFAULT_TIME_ZONE.selected),
             isAutomaticTimezone: lodashGet(props.currentUserPersonalDetails.timezone, 'automatic', CONST.DEFAULT_TIME_ZONE.automatic),
             hasSelfSelectedPronouns: !_.isEmpty(props.currentUserPersonalDetails.pronouns) && !props.currentUserPersonalDetails.pronouns.startsWith(CONST.PRONOUNS.PREFIX),
+            isImageCompressing: false,
         };
 
         this.getLogins = this.getLogins.bind(this);
@@ -80,6 +83,7 @@ class ProfilePage extends Component {
         this.updatePersonalDetails = this.updatePersonalDetails.bind(this);
         this.setPronouns = this.setPronouns.bind(this);
         this.setAutomaticTimezone = this.setAutomaticTimezone.bind(this);
+        this.handleImageCompressing = this.handleImageCompressing.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -212,6 +216,11 @@ class ProfilePage extends Component {
         return errors;
     }
 
+    handleImageCompressing(isImageCompressing)
+    {
+        this.setState({isImageCompressing})
+    }
+
     render() {
         const pronounsList = _.map(this.props.translate('pronouns'), (value, key) => ({
             label: value,
@@ -222,6 +231,9 @@ class ProfilePage extends Component {
 
         return (
             <ScreenWrapper>
+                {this.state.isImageCompressing ? <FullscreenLoadingIndicator
+                    style={[styles.opacity1, styles.bgTransparent]}
+                /> : null}
                 <HeaderWithCloseButton
                     title={this.props.translate('common.profile')}
                     shouldShowBackButton
@@ -244,6 +256,7 @@ class ProfilePage extends Component {
                     >
                         <AvatarWithImagePicker
                             isUsingDefaultAvatar={lodashGet(currentUserDetails, 'avatar', '').includes('/images/avatars/avatar')}
+                            onCompressing={this.handleImageCompressing}
                             avatarURL={currentUserDetails.avatar}
                             onImageSelected={PersonalDetails.updateAvatar}
                             onImageRemoved={PersonalDetails.deleteAvatar}

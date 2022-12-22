@@ -34,6 +34,8 @@ const imagePickerOptions = {
     saveToPhotos: false,
     selectionLimit: 1,
     includeExtra: false,
+    maxWidth: CONST.AVATAR_MAX_WIDTH_PX,
+    maxHeight: CONST.AVATAR_MAX_HEIGHT_PX,
 };
 
 /**
@@ -204,7 +206,7 @@ class AttachmentPicker extends Component {
 
                     return reject(new Error(`Error during attachment selection: ${response.errorMessage}`));
                 }
-
+                
                 return resolve(response.assets);
             });
         });
