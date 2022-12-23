@@ -126,61 +126,6 @@ class ProfilePage extends Component {
         });
     }
 
-    /**
-     * Submit form to update personal details
-     * @param {Object} values
-     * @param {String} values.firstName
-     * @param {String} values.lastName
-     * @param {String} values.pronouns
-     * @param {Boolean} values.isAutomaticTimezone
-     * @param {String} values.timezone
-     * @param {String} values.selfSelectedPronoun
-     */
-    updatePersonalDetails(values) {
-        PersonalDetails.updateProfile(
-            values.firstName.trim(),
-            values.lastName.trim(),
-            (this.state.hasSelfSelectedPronouns) ? values.selfSelectedPronoun.trim() : values.pronouns.trim(),
-            {
-                automatic: values.isAutomaticTimezone,
-                selected: values.timezone,
-            },
-        );
-    }
-
-    /**
-     * @param {Object} values - An object containing the value of each inputID
-     * @param {String} values.firstName
-     * @param {String} values.lastName
-     * @param {String} values.pronouns
-     * @param {Boolean} values.isAutomaticTimezone
-     * @param {String} values.timezone
-     * @param {String} values.selfSelectedPronoun
-     * @returns {Object} - An object containing the errors for each inputID
-     */
-    validate(values) {
-        const errors = {};
-
-        const [hasFirstNameError, hasLastNameError, hasPronounError] = ValidationUtils.doesFailCharacterLimitAfterTrim(
-            CONST.FORM_CHARACTER_LIMIT,
-            [values.firstName, values.lastName, values.pronouns],
-        );
-
-        if (hasFirstNameError) {
-            errors.firstName = Localize.translateLocal('personalDetails.error.characterLimit', {limit: CONST.FORM_CHARACTER_LIMIT});
-        }
-
-        if (hasLastNameError) {
-            errors.lastName = Localize.translateLocal('personalDetails.error.characterLimit', {limit: CONST.FORM_CHARACTER_LIMIT});
-        }
-
-        if (hasPronounError) {
-            errors.pronouns = Localize.translateLocal('personalDetails.error.characterLimit', {limit: CONST.FORM_CHARACTER_LIMIT});
-        }
-
-        return errors;
-    }
-
     handleImageCompressing(isImageCompressing)
     {
         this.setState({isImageCompressing})
