@@ -67,6 +67,7 @@
     "@react-navigation/stack": "6.3.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-polyfill": "^6.26.0",
+    "browser-image-compression": "^2.0.0",
     "dom-serializer": "^0.2.2",
     "domhandler": "^4.3.0",
     "dotenv": "^8.2.0",
