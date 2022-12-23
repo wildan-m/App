@@ -46,7 +46,6 @@ function getImagePickerOptions(type, imageMaxWidthOrHeight = 0) {
     const mediaType = type === CONST.ATTACHMENT_PICKER_TYPE.IMAGE ? 'photo' : 'mixed';
     const maxWidth = imageMaxWidthOrHeight;
     const maxHeight = imageMaxWidthOrHeight
-    console.log('adfsadf', maxWidth);
     return {
         mediaType,
         maxWidth,
@@ -209,7 +208,7 @@ class AttachmentPicker extends Component {
 
                     return reject(new Error(`Error during attachment selection: ${response.errorMessage}`));
                 }
-                
+
                 return resolve(response.assets);
             });
         });
