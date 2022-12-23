@@ -60,14 +60,7 @@ class ProfilePage extends Component {
         };
 
         this.getLogins = this.getLogins.bind(this);
-        this.validate = this.validate.bind(this);
-        this.updatePersonalDetails = this.updatePersonalDetails.bind(this);
-        this.setPronouns = this.setPronouns.bind(this);
-        this.setAutomaticTimezone = this.setAutomaticTimezone.bind(this);
         this.handleImageCompressing = this.handleImageCompressing.bind(this);
-        };
-
-        this.getLogins = this.getLogins.bind(this);
     }
 
     componentDidUpdate(prevProps) {
