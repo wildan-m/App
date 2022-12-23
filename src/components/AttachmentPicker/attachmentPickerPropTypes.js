@@ -24,10 +24,13 @@ const propTypes = {
 
     /** The types of files that can be selected with this picker. */
     type: PropTypes.oneOf([CONST.ATTACHMENT_PICKER_TYPE.FILE, CONST.ATTACHMENT_PICKER_TYPE.IMAGE]),
+
+    imageMaxWidthOrHeight: PropTypes.number,
 };
 
 const defaultProps = {
     type: CONST.ATTACHMENT_PICKER_TYPE.FILE,
+    imageMaxWidthOrHeight: 0,
 };
 
 export {

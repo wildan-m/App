@@ -34,8 +34,6 @@ const imagePickerOptions = {
     saveToPhotos: false,
     selectionLimit: 1,
     includeExtra: false,
-    maxWidth: CONST.AVATAR_MAX_WIDTH_PX,
-    maxHeight: CONST.AVATAR_MAX_HEIGHT_PX,
 };
 
 /**
@@ -43,11 +41,16 @@ const imagePickerOptions = {
  * @param {String} type
  * @returns {Object}
  */
-function getImagePickerOptions(type) {
+function getImagePickerOptions(type, imageMaxWidthOrHeight = 0) {
     // mediaType property is one of the ImagePicker configuration to restrict types'
     const mediaType = type === CONST.ATTACHMENT_PICKER_TYPE.IMAGE ? 'photo' : 'mixed';
+    const maxWidth = imageMaxWidthOrHeight;
+    const maxHeight = imageMaxWidthOrHeight
+    console.log('adfsadf', maxWidth);
     return {
         mediaType,
+        maxWidth,
+        maxHeight,
         ...imagePickerOptions,
     };
 }
@@ -189,7 +192,7 @@ class AttachmentPicker extends Component {
       */
     showImagePicker(imagePickerFunc) {
         return new Promise((resolve, reject) => {
-            imagePickerFunc(getImagePickerOptions(this.props.type), (response) => {
+            imagePickerFunc(getImagePickerOptions(this.props.type, this.props.imageMaxWidthOrHeight), (response) => {
                 if (response.didCancel) {
                     // When the user cancelled resolve with no attachment
                     return resolve();
@@ -283,13 +286,17 @@ class AttachmentPicker extends Component {
       * @param {{pickAttachment: function}} item - an item from this.menuItemData
       */
     selectItem(item) {
+        this.props.onCompressing(true);
         /* setTimeout delays execution to the frame after the modal closes
          * without this on iOS closing the modal closes the gallery/camera as well */
         this.onModalHide = () => setTimeout(
             () => item.pickAttachment()
                 .then(this.pickAttachment)
                 .catch(console.error)
-                .finally(() => delete this.onModalHide),
+                .finally(() => {
+                    delete this.onModalHide;
+                    this.props.onCompressing(false);
+                }),
             200,
         );
 

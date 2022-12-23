@@ -265,6 +265,7 @@ class AvatarWithImagePicker extends React.Component {
                             )}
                         <AttachmentPicker 
                             type={CONST.ATTACHMENT_PICKER_TYPE.IMAGE}
+                            imageMaxWidthOrHeight={CONST.AVATAR_MAX_WIDTH_OR_HEIGHT_PX}
                             onCompressing={this.props.onCompressing}
                         >
                             {({openPicker}) => (
