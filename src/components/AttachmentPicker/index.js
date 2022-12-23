@@ -29,15 +29,15 @@ class AttachmentPicker extends React.Component {
     compressImage(imageFile) {
         return new Promise((resolve)=>{
             const options = {
-                maxWidthOrHeight: CONST.AVATAR_MAX_WIDTH_PX,
+                maxWidthOrHeight: this.props.imageMaxWidthOrHeight ? this.props.imageMaxWidthOrHeight : undefined,
+                useWebWorker: true,
             };
 
             try {
                 const compressedFile = imageCompression(imageFile, options);
-                console.log(compressedFile.size / 1024 / 1024);
                 resolve(compressedFile);
             } catch (error) {
-                console.log(error);
+                throw new Error(error);
             }
         })
     }
@@ -55,16 +55,14 @@ class AttachmentPicker extends React.Component {
                         if (file) {
                             file.uri = URL.createObjectURL(file);
                             Image.getSize(file.uri, (width, height) => {
-                                const isExceedMaxResolution = height > CONST.AVATAR_MAX_HEIGHT_PX || width > CONST.AVATAR_MAX_WIDTH_PX;
-                                    
+                                const isExceedMaxResolution = height > this.props.imageMaxWidthOrHeight || width > this.props.imageMaxWidthOrHeight;
                                 if(CONST.FILE_TYPE_REGEX.IMAGE.test(file.name) && isExceedMaxResolution)
                                 {
                                     this.props.onCompressing(true);
                                     this.compressImage(file).then(compressedFile =>{
                                         compressedFile.uri = URL.createObjectURL(compressedFile);
                                         this.onPicked(compressedFile);
-                                        this.props.onCompressing(false);
-                                    })
+                                    }).finally(()=>this.props.onCompressing(false));
                                 }else{
                                     this.onPicked(file);
                                 }
