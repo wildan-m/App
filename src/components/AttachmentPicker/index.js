@@ -56,13 +56,13 @@ class AttachmentPicker extends React.Component {
                             file.uri = URL.createObjectURL(file);
                             Image.getSize(file.uri, (width, height) => {
                                 const isExceedMaxResolution = height > this.props.imageMaxWidthOrHeight || width > this.props.imageMaxWidthOrHeight;
-                                if(CONST.FILE_TYPE_REGEX.IMAGE.test(file.name) && isExceedMaxResolution)
+                                if(this.props.imageMaxWidthOrHeight && CONST.FILE_TYPE_REGEX.IMAGE.test(file.name) && isExceedMaxResolution)
                                 {
-                                    this.props.onCompressing(true);
+                                    this.props.onCompressing ? this.props.onCompressing(true) : null;
                                     this.compressImage(file).then(compressedFile =>{
                                         compressedFile.uri = URL.createObjectURL(compressedFile);
                                         this.onPicked(compressedFile);
-                                    }).finally(()=>this.props.onCompressing(false));
+                                    }).finally(()=> this.props.onCompressing ? this.props.onCompressing(false) : null);
                                 }else{
                                     this.onPicked(file);
                                 }

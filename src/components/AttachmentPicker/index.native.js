@@ -285,7 +285,7 @@ class AttachmentPicker extends Component {
       * @param {{pickAttachment: function}} item - an item from this.menuItemData
       */
     selectItem(item) {
-        this.props.onCompressing(true);
+        this.props.onCompressing ? this.props.onCompressing(true) : null;
         /* setTimeout delays execution to the frame after the modal closes
          * without this on iOS closing the modal closes the gallery/camera as well */
         this.onModalHide = () => setTimeout(
@@ -294,7 +294,7 @@ class AttachmentPicker extends Component {
                 .catch(console.error)
                 .finally(() => {
                     delete this.onModalHide;
-                    this.props.onCompressing(false);
+                    this.props.onCompressing ? this.props.onCompressing(false) : null;
                 }),
             200,
         );
