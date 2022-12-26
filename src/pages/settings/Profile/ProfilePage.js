@@ -22,7 +22,7 @@ import ONYXKEYS from '../../../ONYXKEYS';
 import ROUTES from '../../../ROUTES';
 import styles from '../../../styles/styles';
 import LoginField from './LoginField';
-import FullscreenLoadingIndicator from '../../../components/FullscreenLoadingIndicator';
+import FullScreenLoadingIndicator from '../../../components/FullscreenLoadingIndicator';
 
 const propTypes = {
     /* Onyx Props */
@@ -142,56 +142,54 @@ class ProfilePage extends Component {
         ];
         return (
             <ScreenWrapper>
-                {this.state.isImageCompressing ? <FullscreenLoadingIndicator
-                    style={[styles.opacity1, styles.bgTransparent]}
-                /> : null}
                 <HeaderWithCloseButton
                     title={this.props.translate('common.profile')}
                     shouldShowBackButton
                     onBackButtonPress={() => Navigation.navigate(ROUTES.SETTINGS)}
                     onCloseButtonPress={() => Navigation.dismissModal(true)}
                 />
-                <ScrollView>
-                    <OfflineWithFeedback
-                        pendingAction={lodashGet(this.props.currentUserPersonalDetails, 'pendingFields.avatar', null)}
-                        errors={lodashGet(this.props.currentUserPersonalDetails, 'errorFields.avatar', null)}
-                        errorRowStyles={[styles.mt6]}
-                        onClose={PersonalDetails.clearAvatarErrors}
-                    >
-                        <AvatarWithImagePicker
-                            isUsingDefaultAvatar={lodashGet(currentUserDetails, 'avatar', '').includes('/images/avatars/avatar')}
-                            onCompressing={this.handleImageCompressing}
-                            avatarURL={currentUserDetails.avatar}
-                            onImageSelected={PersonalDetails.updateAvatar}
-                            onImageRemoved={PersonalDetails.deleteAvatar}
-                            anchorPosition={styles.createMenuPositionProfile}
-                            size={CONST.AVATAR_SIZE.LARGE}
-                        />
-                    </OfflineWithFeedback>
-                    <View style={[styles.mt4]}>
-                        {_.map(profileSettingsOptions, (detail, index) => (
-                            <MenuItemWithTopDescription
-                                key={`${detail.title}_${index}`}
-                                shouldShowRightIcon
-                                title={detail.title}
-                                description={detail.description}
-                                onPress={() => Navigation.navigate(detail.pageRoute)}
+                    <ScrollView contentContainerStyle={styles.flex1}>
+                        <OfflineWithFeedback
+                            pendingAction={lodashGet(this.props.currentUserPersonalDetails, 'pendingFields.avatar', null)}
+                            errors={lodashGet(this.props.currentUserPersonalDetails, 'errorFields.avatar', null)}
+                            errorRowStyles={[styles.mt6]}
+                            onClose={PersonalDetails.clearAvatarErrors}
+                        >
+                            <AvatarWithImagePicker
+                                isUsingDefaultAvatar={lodashGet(currentUserDetails, 'avatar', '').includes('/images/avatars/avatar')}
+                                onCompressing={this.handleImageCompressing}
+                                avatarURL={currentUserDetails.avatar}
+                                onImageSelected={PersonalDetails.updateAvatar}
+                                onImageRemoved={PersonalDetails.deleteAvatar}
+                                anchorPosition={styles.createMenuPositionProfile}
+                                size={CONST.AVATAR_SIZE.LARGE}
                             />
-                        ))}
-                    </View>
-                    <LoginField
-                        label={this.props.translate('profilePage.emailAddress')}
-                        type="email"
-                        login={this.state.logins.email}
-                        defaultValue={this.state.logins.email}
-                    />
-                    <LoginField
-                        label={this.props.translate('common.phoneNumber')}
-                        type="phone"
-                        login={this.state.logins.phone}
-                        defaultValue={this.state.logins.phone}
-                    />
-                </ScrollView>
+                        </OfflineWithFeedback>
+                        <View style={[styles.mt4]}>
+                            {_.map(profileSettingsOptions, (detail, index) => (
+                                <MenuItemWithTopDescription
+                                    key={`${detail.title}_${index}`}
+                                    shouldShowRightIcon
+                                    title={detail.title}
+                                    description={detail.description}
+                                    onPress={() => Navigation.navigate(detail.pageRoute)}
+                                />
+                            ))}
+                        </View>
+                        <LoginField
+                            label={this.props.translate('profilePage.emailAddress')}
+                            type="email"
+                            login={this.state.logins.email}
+                            defaultValue={this.state.logins.email}
+                        />
+                        <LoginField
+                            label={this.props.translate('common.phoneNumber')}
+                            type="phone"
+                            login={this.state.logins.phone}
+                            defaultValue={this.state.logins.phone}
+                        />
+                        {this.state.isImageCompressing && <FullScreenLoadingIndicator style={styles.opacity1} />}
+                    </ScrollView>
             </ScreenWrapper>
         );
     }
