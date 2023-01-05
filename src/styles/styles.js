@@ -923,6 +923,11 @@ const styles = {
     signInPageContentTopSpacer: {
         maxHeight: 132,
         minHeight: 24,
+        flexBasis: '11.10%',
+    },
+
+    signInPageFormContainer: {
+        flexBasis: 'calc(75.04% - 20px)',
     },
 
     signInPageLeftContainer: {
