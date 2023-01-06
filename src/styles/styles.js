@@ -927,7 +927,8 @@ const styles = {
     },
 
     signInPageFormContainer: {
-        flexBasis: 'calc(75.04% - 20px)',
+        flexBasis: '75.04%',
+        marginBottom: -40,
     },
 
     signInPageLeftContainer: {
