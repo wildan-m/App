@@ -201,6 +201,7 @@ class ReportActionCompose extends React.Component {
             isEmojiPickerLarge: false,
             composerHeight: 0,
             hasExceededMaxCommentLength: false,
+            attachmentPickerOpened: false,
         };
     }
 
@@ -228,7 +229,7 @@ class ReportActionCompose extends React.Component {
         this.updateComment(this.comment);
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevStates) {
         const sidebarOpened = !prevProps.isDrawerOpen && this.props.isDrawerOpen;
         if (sidebarOpened) {
             toggleReportActionComposeView(true);
@@ -237,8 +238,10 @@ class ReportActionCompose extends React.Component {
         // We want to focus or refocus the input when a modal has been closed and the underlying screen is focused.
         // We avoid doing this on native platforms since the software keyboard popping
         // open creates a jarring and broken UX.
+        const modalHasBeenClosed = prevProps.modal.isVisible && !this.props.modal.isVisible && !this.state.attachmentPickerOpened;
+        const pickerHasBeenClosed = prevStates.attachmentPickerOpened && !this.state.attachmentPickerOpened;
         if (this.willBlurTextInputOnTapOutside && this.props.isFocused
-            && prevProps.modal.isVisible && !this.props.modal.isVisible) {
+            && (modalHasBeenClosed || pickerHasBeenClosed)) {
             this.focus();
         }
 
@@ -482,6 +485,10 @@ class ReportActionCompose extends React.Component {
             },
         }));
         this.updateComment(newComment);
+    }
+
+    attachmentPickerOnFocusBack() {
+        this.setState({attachmentPickerOpened: false});
     }
 
     /**
@@ -794,8 +801,11 @@ class ReportActionCompose extends React.Component {
                                                         icon: Expensicons.Paperclip,
                                                         text: this.props.translate('reportActionCompose.addAttachment'),
                                                         onSelected: () => {
-                                                            openPicker({
-                                                                onPicked: displayFileInModal,
+                                                            this.setState({attachmentPickerOpened: true}, () => {
+                                                                openPicker({
+                                                                    onPicked: displayFileInModal,
+                                                                    onFocusBack: () => this.attachmentPickerOnFocusBack(),
+                                                                });
                                                             });
                                                         },
                                                     },

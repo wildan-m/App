@@ -45,16 +45,24 @@ class AttachmentPicker extends React.Component {
 
                         // Cleanup after selecting a file to start from a fresh state
                         this.fileInput.value = null;
+                        window.removeEventListener('focus', this.onFocusBack);
                     }}
 
                     // We are stopping the event propagation because triggering the `click()` on the hidden input
                     // causes the event to unexpectedly bubble up to anything wrapping this component e.g. Pressable
-                    onClick={e => e.stopPropagation()}
+                    onClick={e => {
+                        window.addEventListener('focus', this.onFocusBack);
+                        e.stopPropagation();
+                    }}
                     accept={getAcceptableFileTypes(this.props.type)}
                 />
                 {this.props.children({
-                    openPicker: ({onPicked}) => {
+                    openPicker: ({onPicked, onFocusBack}) => {
                         this.onPicked = onPicked;
+                        this.onFocusBack = ()=>{
+                            window.removeEventListener('focus', this.onFocusBack);
+                            onFocusBack();
+                        }
                         this.fileInput.click();
                     },
                 })}
