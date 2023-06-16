@@ -18,6 +18,8 @@ import MenuItem from '../../components/MenuItem';
 import reportPropTypes from '../reportPropTypes';
 import * as TaskUtils from '../../libs/actions/Task';
 import * as OptionsListUtils from '../../libs/OptionsListUtils';
+import * as ReportUtils from '../../libs/ReportUtils';
+import * as Report from '../../libs/actions/Report';
 import FormAlertWithSubmitButton from '../../components/FormAlertWithSubmitButton';
 
 const propTypes = {
@@ -98,20 +100,22 @@ function NewTaskPage(props) {
         if (props.task.parentReportID) {
             TaskUtils.setShareDestinationValue(props.task.parentReportID);
         }
-
         // If we have a share destination, we want to set the parent report and
         // the share destination data
         if (props.task.shareDestination) {
-            setParentReport(lodashGet(props.reports, `report_${props.task.shareDestination}`, {}));
-            const displayDetails = TaskUtils.getShareDestination(props.task.shareDestination, props.reports, props.personalDetails);
-            setShareDestination(displayDetails);
+            const shareDestinationValue = props.task.shareDestination;
+            setParentReport(lodashGet(props.reports, `report_${shareDestinationValue}`, {}));
+            setShareDestination(TaskUtils.getShareDestination(shareDestinationValue, props.reports, props.personalDetails));
+        } else if (props.task.shareDestinationParticipant) {
+            const shareDestinationParticipant = props.task.shareDestinationParticipant;
+            setShareDestination(TaskUtils.getShareDestinationByParticipant(shareDestinationParticipant, props.personalDetails));
         }
     }, [props]);
 
     // On submit, we want to call the createTask function and wait to validate
     // the response
     function onSubmit() {
-        if (!props.task.title && !props.task.shareDestination) {
+        if (!props.task.title && !(props.task.shareDestination || props.task.shareDestinationParticipant)) {
             setErrorMessage(props.translate('newTaskPage.confirmError'));
             return;
         }
@@ -121,15 +125,33 @@ function NewTaskPage(props) {
             return;
         }
 
-        if (!props.task.shareDestination) {
+        if (!(props.task.shareDestination || props.task.shareDestinationParticipant)) {
             setErrorMessage(props.translate('newTaskPage.pleaseEnterTaskDestination'));
             return;
         }
 
+        const assigneeAccountID = props.task.assigneeAccountID;
+        const assignee = props.task.assignee;
+        let parentReportID;
+        let newChat = {};
+        
+        if (props.task.shareDestination) {
+          parentReportID = props.task.shareDestination;
+          setParentReport(lodashGet(props.reports, `report_${parentReportID}`, {}));
+        } else if (props.task.shareDestinationParticipant) {
+          newChat = ReportUtils.buildOptimisticChatReport([assigneeAccountID]);
+          parentReportID = newChat.reportID;
+          setParentReport(lodashGet(props.reports, `report_${parentReportID}`, {}));
+        }
+        
+        const chat = ReportUtils.getChatByParticipants([assigneeAccountID]);
+        const assigneeReportID = chat ? chat.reportID : newChat.reportID;
+        Report.openReport(assigneeReportID, [assignee], newChat);
+
         TaskUtils.createTaskAndNavigate(
             props.session.email,
             props.session.accountID,
-            parentReport.reportID,
+            parentReportID,
             props.task.title,
             props.task.description,
             props.task.assignee,

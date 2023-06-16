@@ -445,6 +445,15 @@ function setShareDestinationValue(shareDestination) {
 }
 
 /**
+ * Sets the shareDestination participant for the task
+ * @param {string} shareDestinationParticipant
+ */
+function setShareDestinationParticipant(shareDestinationParticipant) {
+    // This is only needed for creation of a new task and so it should only be stored locally
+    Onyx.merge(ONYXKEYS.TASK, {shareDestinationParticipant});
+}
+
+/**
  * Auto-assign participant when creating a task in a DM
  * @param {String} reportID
  */
@@ -478,19 +487,17 @@ function setAssigneeValue(assignee, assigneeAccountID, shareDestination, isCurre
     if (!newAssigneeAccountID) {
         newAssigneeAccountID = UserUtils.generateAccountID();
     }
+ 
     if (!isCurrentUser) {
-        let newChat = {};
         const chat = ReportUtils.getChatByParticipants([newAssigneeAccountID]);
-        if (!chat) {
-            newChat = ReportUtils.buildOptimisticChatReport([newAssigneeAccountID]);
-        }
-        const reportID = chat ? chat.reportID : newChat.reportID;
-
+        const reportID = chat?.reportID;
         if (!shareDestination) {
-            setShareDestinationValue(reportID);
+            if(reportID)
+                setShareDestinationValue(reportID);
+            else
+                setShareDestinationParticipant(newAssigneeAccountID);
         }
 
-        Report.openReport(reportID, [assignee], newChat);
     }
 
     // This is only needed for creation of a new task and so it should only be stored locally
@@ -551,6 +558,15 @@ function getShareDestination(reportID, reports, personalDetails) {
         icons: ReportUtils.getIcons(report, personalDetails),
         displayName: ReportUtils.getReportName(report),
         subtitle: ReportUtils.getChatRoomSubtitle(report),
+    };
+}
+
+function getShareDestinationByParticipant(participant, personalDetails) {
+    const participantPersonalDetail = lodashGet(personalDetails, [participant]);
+    return {
+        icons: ReportUtils.getIconsForParticipants([participant]),
+        displayName: participantPersonalDetail.displayName,
+        subtitle: participantPersonalDetail.login,
     };
 }
 
@@ -637,12 +653,14 @@ export {
     setAssigneeValue,
     setAssigneeValueWithParentReportID,
     setShareDestinationValue,
+    setShareDestinationParticipant,
     clearOutTaskInfo,
     reopenTask,
     completeTask,
     clearOutTaskInfoAndNavigate,
     getAssignee,
     getShareDestination,
+    getShareDestinationByParticipant,
     cancelTask,
     isTaskCanceled,
     dismissModalAndClearOutTaskInfo,

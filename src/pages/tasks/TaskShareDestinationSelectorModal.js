@@ -124,17 +124,21 @@ function TaskShareDestinationSelectorModal(props) {
         return sections;
     };
 
-    const selectReport = (option) => {
+    const selectReport = (option) => 
+    {
         if (!option) {
             return;
         }
 
         if (option.reportID) {
-            // Clear out the state value, set the assignee and navigate back to the NewTaskPage
-            setSearchValue('');
             TaskUtils.setShareDestinationValue(option.reportID);
-            Navigation.goBack();
+        } else if (option.accountID) {
+            TaskUtils.setShareDestinationParticipant(option.accountID);
         }
+        
+        // Clear out the state value, set the assignee, and navigate back to the NewTaskPage
+        setSearchValue('');
+        Navigation.goBack();
     };
 
     const sections = getSections();
