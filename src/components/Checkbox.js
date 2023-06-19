@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Pressable} from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+import {View, Pressable, Animated} from 'react-native';
 import PropTypes from 'prop-types';
 import styles from '../styles/styles';
 import themeColors from '../styles/themes/default';
@@ -48,6 +48,61 @@ const defaultProps = {
 };
 
 function Checkbox(props) {
+    const [isFocused, setIsFocused] = useState(false);
+    const borderColorValue = useRef(new Animated.Value(0)).current;
+    const blinkingAnimation = useRef(Animated.loop(
+        Animated.sequence([
+          Animated.timing(borderColorValue, {
+            toValue: 1,
+            duration: 0,
+            useNativeDriver: false,
+          }),
+          Animated.delay(500),
+          Animated.timing(borderColorValue, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: false,
+          }),
+          Animated.delay(500),
+        ]),
+        { iterations: -1 }
+      )).current;
+
+
+    
+    useEffect(() => {
+      if (props.hasError && isFocused) {
+        startBlinking();
+      } else {
+        stopBlinking();
+      }
+    }, [props.hasError, isFocused]);
+  
+    const startBlinking = () => {
+        blinkingAnimation.start();
+    };
+  
+    const stopBlinking = () => {
+        blinkingAnimation.stop();
+        blinkingAnimation.reset();
+        borderColorValue.setValue(0);
+    };
+  
+    const handleFocus = () => {
+      setIsFocused(true);
+    };
+  
+    const handleBlur = () => {
+      setIsFocused(false);
+    };
+  
+    const interpolatedColor = borderColorValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [styles.borderFocus, styles.borderColorDanger.borderColor], // Customize the border color here
+    });
+  
+
+    
     const handleSpaceKey = (event) => {
         if (event.code !== 'Space') {
             return;
@@ -76,18 +131,21 @@ function Checkbox(props) {
             onKeyDown={handleSpaceKey}
             accessibilityRole="checkbox"
             accessibilityState={{checked: props.isChecked}}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
         >
             {props.children ? (
                 props.children
             ) : (
-                <View
+                <Animated.View
                     style={[
                         styles.checkboxContainer,
                         props.containerStyle,
                         props.isChecked && styles.checkedContainer,
-                        props.hasError && styles.borderColorDanger,
+                        //props.hasError && styles.borderColorDanger,
                         props.disabled && styles.cursorDisabled,
                         props.isChecked && styles.borderColorFocus,
+                        {borderColor: interpolatedColor},
                     ]}
                     // Used as CSS selector to customize focus-visible style
                     dataSet={{checkbox: true}}
@@ -100,7 +158,7 @@ function Checkbox(props) {
                             width={14}
                         />
                     )}
-                </View>
+                </Animated.View>
             )}
         </Pressable>
     );
