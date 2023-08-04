@@ -426,6 +426,7 @@ function MoneyRequestAmountPage(props) {
             <ScreenWrapper
                 includeSafeAreaPaddingBottom={false}
                 onEntryTransitionEnd={focusTextInput}
+                code={'moneyrequestpage'}
             >
                 {({safeAreaPaddingBottomStyle}) => (
                     <View style={[styles.flex1, safeAreaPaddingBottomStyle]}>

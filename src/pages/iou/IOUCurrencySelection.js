@@ -132,7 +132,9 @@ function IOUCurrencySelection(props) {
     }, [currencyList, searchValue, selectedCurrencyCode, translate]);
 
     return (
-        <ScreenWrapper includeSafeAreaPaddingBottom={false}>
+        <ScreenWrapper includeSafeAreaPaddingBottom={false}
+        code={'IOUCurrencyPage'}
+        >
             {({safeAreaPaddingBottomStyle}) => (
                 <>
                     <HeaderWithBackButton

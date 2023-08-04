@@ -1,4 +1,4 @@
-import {Keyboard, View, PanResponder} from 'react-native';
+import {Keyboard, View, PanResponder, InteractionManager} from 'react-native';
 import React from 'react';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
@@ -19,6 +19,7 @@ import withWindowDimensions from '../withWindowDimensions';
 import withEnvironment from '../withEnvironment';
 import toggleTestToolsModal from '../../libs/actions/TestTool';
 import CustomDevMenu from '../CustomDevMenu';
+import withNavigationFocus from '../withNavigationFocus';
 
 class ScreenWrapper extends React.Component {
     constructor(props) {
@@ -31,30 +32,69 @@ class ScreenWrapper extends React.Component {
 
         this.state = {
             didScreenTransitionEnd: false,
+            minHeight: props.initialWindowHeight,
         };
+console.log('[debug] constructor',this.props.code)
+    }
+
+    static getDerivedStateFromProps(props){
+        console.log('[debug] getDerivedStateFromProps',props.code)
+
+        console.log('[debug] props', props)
+        if (!props.isFocused)
+        {
+            return { minHeight: props.initialWindowHeight }
+        }
+
+        return null;
     }
 
     componentDidMount() {
+        console.log('[debug] componentDidMount',this.props.code)
         this.unsubscribeTransitionEnd = this.props.navigation.addListener('transitionEnd', (event) => {
+        console.log('[debug] transitionEnd',this.props.code)
+
             // Prevent firing the prop callback when user is exiting the page.
             if (lodashGet(event, 'data.closing')) {
                 return;
             }
             this.setState({didScreenTransitionEnd: true});
+
             this.props.onEntryTransitionEnd();
         });
+
+
 
         // We need to have this prop to remove keyboard before going away from the screen, to avoid previous screen look weird for a brief moment,
         // also we need to have generic control in future - to prevent closing keyboard for some rare cases in which beforeRemove has limitations
         // described here https://reactnavigation.org/docs/preventing-going-back/#limitations
         if (this.props.shouldDismissKeyboardBeforeClose) {
             this.beforeRemoveSubscription = this.props.navigation.addListener('beforeRemove', () => {
+        console.log('[debug] beforeRemove',this.props.code)
+
                 if (!this.props.isKeyboardShown) {
                     return;
                 }
                 Keyboard.dismiss();
             });
         }
+    }
+    componentDidUpdate(prevProps, prevState){
+console.log(`[debug] compare ${this.props.code}`, [prevProps, this.props])
+console.log(`[debug] focus compare ${this.props.code}`, [prevProps.navigation.isFocused(), this.props.navigation.isFocused()])
+        console.log('[debug] componentDidUpdate',this.props.code)
+
+        if(!prevProps.isFocused && this.props.isFocused)
+        {
+            console.log(`[debug] this.state.minHeight ${this.props.code}`, this.state.minHeight)
+            console.log('[debug] create InteractionManager.runAfterInteractions', this.props.code)
+            InteractionManager.runAfterInteractions(() => {
+                console.log('[debug] runAfterInteractions',this.props.code)
+                        console.log('[debug] setStateMinHeight', this.props.code)
+                        this.setState({minHeight : undefined});
+                });
+        }
+       
     }
 
     /**
@@ -65,10 +105,14 @@ class ScreenWrapper extends React.Component {
      * @returns {boolean}
      */
     shouldComponentUpdate(nextProps, nextState) {
+        console.log('[debug] shouldComponentUpdate',this.props.code)
+
         return !_.isEqual(this.state, nextState) || !_.isEqual(_.omit(this.props, 'modal'), _.omit(nextProps, 'modal'));
     }
 
     componentWillUnmount() {
+        console.log('[debug] componentWillUnmount',this.props.code)
+
         if (this.unsubscribeTransitionEnd) {
             this.unsubscribeTransitionEnd();
         }
@@ -78,8 +122,11 @@ class ScreenWrapper extends React.Component {
     }
 
     render() {
-        const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
+        console.log('[debug] render',this.props.code)
 
+        const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
+        const {minHeight} = this.state;
+        console.log(`[debug] minHeight ${this.props.code}`, minHeight)
         return (
             <SafeAreaConsumer>
                 {({insets, paddingTop, paddingBottom, safeAreaPaddingBottomStyle}) => {
@@ -97,11 +144,13 @@ class ScreenWrapper extends React.Component {
                     return (
                         <View
                             style={[...this.props.style, styles.flex1, paddingStyle]}
+                            // style={[...this.props.style, styles.flex1, paddingStyle, {minHeight}]}
                             // eslint-disable-next-line react/jsx-props-no-spreading
                             {...(this.props.environment === CONST.ENVIRONMENT.DEV ? this.panResponder.panHandlers : {})}
                         >
                             <KeyboardAvoidingView
                                 style={[styles.w100, styles.h100, {maxHeight}]}
+                                // style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
                                 behavior={this.props.keyboardAvoidingViewBehavior}
                                 enabled={this.props.shouldEnableKeyboardAvoidingView}
                             >
@@ -136,4 +185,4 @@ class ScreenWrapper extends React.Component {
 ScreenWrapper.propTypes = propTypes;
 ScreenWrapper.defaultProps = defaultProps;
 
-export default compose(withNavigation, withEnvironment, withWindowDimensions, withKeyboardState, withNetwork())(ScreenWrapper);
+export default compose(withNavigation, withNavigationFocus, withEnvironment, withWindowDimensions, withKeyboardState, withNetwork())(ScreenWrapper);

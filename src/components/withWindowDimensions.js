@@ -9,10 +9,12 @@ import getWindowHeightAdjustment from '../libs/getWindowHeightAdjustment';
 const WindowDimensionsContext = createContext(null);
 const windowDimensionsPropTypes = {
     // Width of the window
+    initialWindowWidth: PropTypes.number,
     windowWidth: PropTypes.number.isRequired,
 
     // Height of the window
     windowHeight: PropTypes.number.isRequired,
+    initialWindowHeight: PropTypes.number,
 
     // Is the window width extra narrow, like on a Fold mobile device?
     isExtraSmallScreenWidth: PropTypes.bool.isRequired,
@@ -33,19 +35,50 @@ const windowDimensionsProviderPropTypes = {
 };
 
 function WindowDimensionsProvider(props) {
+    const initialDimensions = Dimensions.get('window');
+    const screenWindowHeightDifference = Dimensions.get('screen').height-initialDimensions.height;
+
     const [windowDimension, setWindowDimension] = useState(() => {
-        const initialDimensions = Dimensions.get('window');
         return {
+            initialWindowHeight: initialDimensions.height,
+            initialWindowWidth: initialDimensions.width,
             windowHeight: initialDimensions.height,
             windowWidth: initialDimensions.width,
         };
     });
+    /**
+     * Check if its a landscape mode of mobile device
+     *
+     * @returns {Boolean}
+     */
+    const isLandscape = (dimension) => {
+        return dimension.width >= dimension.height;
+    };
 
     useEffect(() => {
         const onDimensionChange = (newDimensions) => {
-            const {window} = newDimensions;
+            console.log('[debug] newDimensions',newDimensions)
+            console.log('[debug] initialDimensions',initialDimensions)
+            const {window, screen} = newDimensions;
+            const isNewDimensionMobileLandscape =  isLandscape(window);
+            const isPrevInitialDimensionMobileLandscape =  isLandscape(initialDimensions);
+
+            const isOrientationChange = isNewDimensionMobileLandscape !== isPrevInitialDimensionMobileLandscape;
+            console.log('[debug] isNewDimensionMobileLandscape', isNewDimensionMobileLandscape)
+            console.log('[debug] isPrevInitialDimensionMobileLandscape', isPrevInitialDimensionMobileLandscape)
+            console.log('[debug] isOrientationChange', isOrientationChange)
+            if(isOrientationChange)
+            {
+                // const tmp = initialDimensions.width;
+                // initialDimensions.width = initialDimensions.height;
+                // initialDimensions.height = tmp;
+                initialDimensions.width = screen.width;
+                initialDimensions.height = screen.height-screenWindowHeightDifference;
+            }
 
             setWindowDimension({
+                initialWindowHeight: initialDimensions.height,
+                initialWindowWidth:  initialDimensions.width,
                 windowHeight: window.height,
                 windowWidth: window.width,
             });
@@ -71,7 +104,9 @@ function WindowDimensionsProvider(props) {
                 return (
                     <WindowDimensionsContext.Provider
                         value={{
+                            initialWindowHeight: windowDimension.initialWindowHeight,
                             windowHeight: windowDimension.windowHeight + getWindowHeightAdjustment(insets),
+                            initialWindowWidth: windowDimension.initialWindowWidth,
                             windowWidth: windowDimension.windowWidth,
                             isExtraSmallScreenWidth,
                             isSmallScreenWidth,
