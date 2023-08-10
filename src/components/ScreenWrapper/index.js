@@ -17,9 +17,9 @@ import TestToolsModal from '../TestToolsModal';
 import withKeyboardState from '../withKeyboardState';
 import withWindowDimensions from '../withWindowDimensions';
 import withEnvironment from '../withEnvironment';
+import withNavigationFocus from '../withNavigationFocus';
 import toggleTestToolsModal from '../../libs/actions/TestTool';
 import CustomDevMenu from '../CustomDevMenu';
-import withNavigationFocus from '../withNavigationFocus';
 
 class ScreenWrapper extends React.Component {
     constructor(props) {
@@ -33,32 +33,51 @@ class ScreenWrapper extends React.Component {
         this.state = {
             didScreenTransitionEnd: false,
             minHeight: props.initialWindowHeight,
+            isKeyboardCompletelyClosed: false,
         };
-console.log('[debug] constructor',this.props.code)
     }
 
-    static getDerivedStateFromProps(props){
-        console.log('[debug] getDerivedStateFromProps',props.code)
-
-        console.log('[debug] props', props)
+    static getDerivedStateFromProps(props, state){
+// //// console.log('[debug] getDerivedStateFromProps ${props.code}`)
+// //// console.log('[debug] props ${props.code}`, props)
+// //// console.log('[debug] state ${props.code}`, state)
+// //// console.log('[debug] props.isFocused ${props.code}`, props.isFocused)
         if (!props.isFocused)
         {
-            return { minHeight: props.initialWindowHeight }
-        }
+// //// console.log('[debug] return { minHeight: props.initialWindowHeight} ${props.code}`, props.initialWindowHeight)
 
+            // return { minHeight: props.initialWindowHeight}
+            return { minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false}
+        }
         return null;
     }
 
     componentDidMount() {
-        console.log('[debug] componentDidMount',this.props.code)
-        this.unsubscribeTransitionEnd = this.props.navigation.addListener('transitionEnd', (event) => {
-        console.log('[debug] transitionEnd',this.props.code)
+// //// console.log('[debug] componentDidMount ${this.props.code}`)
 
-            // Prevent firing the prop callback when user is exiting the page.
+        this.unsubscribeTransitionEnd = this.props.navigation.addListener('transitionEnd', (event) => {
+            // //// console.log('[debug] smkdms transitionEnd ${this.props.code}`)
+
+// Prevent firing the prop callback when user is exiting the page.
             if (lodashGet(event, 'data.closing')) {
                 return;
             }
-            this.setState({didScreenTransitionEnd: true});
+
+            // // Restore min-height to allow floating button when keyboard appeared
+            // if (!this.props.isFocused
+            //     // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
+            //     || (this.props.windowHeight - this.props.keyboardHeight !== this.props.initialWindowHeight)
+            // ) {
+            //     return;
+            // }
+
+            const newState = { didScreenTransitionEnd: true };
+            // if (this.state.minHeight !== this.props.style.minHeight) {
+            //     newState.minHeight = this.props.style.minHeight;
+            // }
+
+
+            this.setState(newState);
 
             this.props.onEntryTransitionEnd();
         });
@@ -70,7 +89,7 @@ console.log('[debug] constructor',this.props.code)
         // described here https://reactnavigation.org/docs/preventing-going-back/#limitations
         if (this.props.shouldDismissKeyboardBeforeClose) {
             this.beforeRemoveSubscription = this.props.navigation.addListener('beforeRemove', () => {
-        console.log('[debug] beforeRemove',this.props.code)
+// //// console.log('[debug] smkdms beforeRemove ${this.props.code}`)
 
                 if (!this.props.isKeyboardShown) {
                     return;
@@ -78,23 +97,39 @@ console.log('[debug] constructor',this.props.code)
                 Keyboard.dismiss();
             });
         }
-    }
-    componentDidUpdate(prevProps, prevState){
-console.log(`[debug] compare ${this.props.code}`, [prevProps, this.props])
-console.log(`[debug] focus compare ${this.props.code}`, [prevProps.navigation.isFocused(), this.props.navigation.isFocused()])
-        console.log('[debug] componentDidUpdate',this.props.code)
 
-        if(!prevProps.isFocused && this.props.isFocused)
-        {
-            console.log(`[debug] this.state.minHeight ${this.props.code}`, this.state.minHeight)
-            console.log('[debug] create InteractionManager.runAfterInteractions', this.props.code)
-            InteractionManager.runAfterInteractions(() => {
-                console.log('[debug] runAfterInteractions',this.props.code)
-                        console.log('[debug] setStateMinHeight', this.props.code)
-                        this.setState({minHeight : undefined});
-                });
+        // this.transitionStartSubscription = this.props.navigation.addListener('transitionStart', () => {
+        //     // //// console.log('[debug] smkdms transitionStart ${this.props.code}`)
+        // });
+        // this.focusSubscription = this.props.navigation.addListener('focus', () => {
+        //     // //// console.log('[debug] smkdms focus ${this.props.code}`)
+        // });
+            
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // //// console.log('[debug] componentDidUpdate ${this.props.code}`)
+        // //// console.log('[debug] prevProps ${this.props.code}`, prevProps)
+        // //// console.log('[debug] this.props ${this.props.code}`, this.props)
+        // //// console.log('[debug] prevState ${this.props.code}`, prevState)
+        // //// console.log('[debug] this.state ${this.props.code}`, this.state)
+        // //// console.log('[debug] this.state.didScreenTransitionEnd ${this.props.code}`, this.state.didScreenTransitionEnd)
+
+
+        // Restore min-height to allow floating button when keyboard appeared
+        if (this.props.isFocused
+        // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
+            && (this.props.windowHeight - this.props.keyboardHeight === this.props.initialWindowHeight)
+           
+        ) {
+            const state = {isKeyboardCompletelyClosed: true};
+
+            if(this.state.minHeight !== this.props.style.minHeight)
+            {
+                state.minHeight = this.props.style.minHeight;
+            }
+            this.setState(state);
         }
-       
     }
 
     /**
@@ -105,13 +140,17 @@ console.log(`[debug] focus compare ${this.props.code}`, [prevProps.navigation.is
      * @returns {boolean}
      */
     shouldComponentUpdate(nextProps, nextState) {
-        console.log('[debug] shouldComponentUpdate',this.props.code)
+        // //// console.log('[debug] shouldComponentUpdate ${this.props.code}`)
+        // //// console.log('[debug] this.props ${this.props.code}`, this.props)
+        // //// console.log('[debug] nextProps ${this.props.code}`, nextProps)
+        // //// console.log('[debug] this.state ${this.props.code}`, this.state)
+        // //// console.log('[debug] nextState ${this.props.code}`, nextState)
 
         return !_.isEqual(this.state, nextState) || !_.isEqual(_.omit(this.props, 'modal'), _.omit(nextProps, 'modal'));
     }
 
     componentWillUnmount() {
-        console.log('[debug] componentWillUnmount',this.props.code)
+        // //// console.log('[debug] componentWillUnmount ${this.props.code}`)
 
         if (this.unsubscribeTransitionEnd) {
             this.unsubscribeTransitionEnd();
@@ -119,14 +158,18 @@ console.log(`[debug] focus compare ${this.props.code}`, [prevProps.navigation.is
         if (this.beforeRemoveSubscription) {
             this.beforeRemoveSubscription();
         }
+        if (this.transitionStartSubscription) {
+            this.transitionStartSubscription();
+        }
+        if (this.focusSubscription) {
+            this.focusSubscription();
+        }
     }
 
     render() {
-        console.log('[debug] render',this.props.code)
+        // //// console.log('[debug] render ${this.props.code}`)
 
         const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
-        const {minHeight} = this.state;
-        console.log(`[debug] minHeight ${this.props.code}`, minHeight)
         return (
             <SafeAreaConsumer>
                 {({insets, paddingTop, paddingBottom, safeAreaPaddingBottomStyle}) => {
@@ -141,18 +184,30 @@ console.log(`[debug] focus compare ${this.props.code}`, [prevProps.navigation.is
                         paddingStyle.paddingBottom = paddingBottom;
                     }
 
+                    // we should also add vertical padding to the min height
+                    const minHeight = this.state.minHeight === undefined? undefined: this.state.minHeight - paddingStyle.paddingTop || 0 - paddingStyle.paddingBottom || 0;
+// //// console.log('[debug] minHeight ${this.props.code}`, minHeight)
+// //// console.log('[debug] this.props.isFocused ${this.props.code}`, this.props.isFocused)
+// //// console.log('[debug] this.props.isKeyboardShown ${this.props.code}`, this.props.isKeyboardShown)
+// //// console.log('[debug] this.state.didScreenTransitionEnd ${this.props.code}`, this.state.didScreenTransitionEnd)
+//// console.log('[debug] maxHeight', maxHeight)
                     return (
                         <View
+                            nativeID='naishodias'
+                            // style={[...this.props.style, styles.flex1, paddingStyle, {maxHeight, minHeight}]}
                             style={[...this.props.style, styles.flex1, paddingStyle]}
-                            // style={[...this.props.style, styles.flex1, paddingStyle, {minHeight}]}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
                             {...(this.props.environment === CONST.ENVIRONMENT.DEV ? this.panResponder.panHandlers : {})}
                         >
                             <KeyboardAvoidingView
-                                style={[styles.w100, styles.h100, {maxHeight}]}
-                                // style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
+                                style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
+                                // style={[styles.w100, styles.h100, {maxHeight}]}
+                                // style={[styles.w100, styles.h100]}
                                 behavior={this.props.keyboardAvoidingViewBehavior}
-                                enabled={this.props.shouldEnableKeyboardAvoidingView}
+                                enabled={this.props.shouldEnableKeyboardAvoidingView 
+                                    // It's required for native iOS, otherwise the screen might be shrinked during transition
+                                    && this.state.isKeyboardCompletelyClosed
+                                    && this.state.didScreenTransitionEnd
+                                }
                             >
                                 <PickerAvoidingView
                                     style={styles.flex1}

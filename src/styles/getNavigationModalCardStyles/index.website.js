@@ -9,6 +9,7 @@ export default ({windowHeight, isSmallScreenWidth}) => ({
     // https://github.com/Expensify/App/issues/17824
     // https://github.com/Expensify/App/issues/20709
 
-    height: `${windowHeight}px`,
-    minHeight: `${windowHeight}px`,
+    position: 'fixed',
+    // height: `${windowHeight}px`,
+    // minHeight: `${windowHeight}px`,
 });

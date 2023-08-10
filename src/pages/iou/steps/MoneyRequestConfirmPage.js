@@ -213,7 +213,8 @@ function MoneyRequestConfirmPage(props) {
     );
 
     return (
-        <ScreenWrapper includeSafeAreaPaddingBottom={false}>
+        <ScreenWrapper includeSafeAreaPaddingBottom={false}
+        code='moneyrequestconfirm'>
             {({safeAreaPaddingBottomStyle}) => (
                 <View style={[styles.flex1, safeAreaPaddingBottomStyle]}>
                     <HeaderWithBackButton

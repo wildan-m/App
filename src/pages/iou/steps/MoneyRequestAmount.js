@@ -479,7 +479,7 @@ function MoneyRequestAmount(props) {
         <ScreenWrapper
             includeSafeAreaPaddingBottom={false}
             onEntryTransitionEnd={focusTextInput}
-            code={'moneyrequestpage'}
+            code={'moneyrequestamountpage'}
         >
             {({safeAreaPaddingBottomStyle}) => (
                 <FullPageNotFoundView shouldShow={!IOUUtils.isValidMoneyRequestType(iouType.current)}>

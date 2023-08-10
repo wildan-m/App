@@ -37,7 +37,6 @@ const windowDimensionsProviderPropTypes = {
 function WindowDimensionsProvider(props) {
     const initialDimensions = Dimensions.get('window');
     const screenWindowHeightDifference = Dimensions.get('screen').height-initialDimensions.height;
-
     const [windowDimension, setWindowDimension] = useState(() => {
         return {
             initialWindowHeight: initialDimensions.height,
@@ -57,16 +56,16 @@ function WindowDimensionsProvider(props) {
 
     useEffect(() => {
         const onDimensionChange = (newDimensions) => {
-            console.log('[debug] newDimensions',newDimensions)
-            console.log('[debug] initialDimensions',initialDimensions)
+           // console.log('[debug] newDimensions',newDimensions)
+           // console.log('[debug] initialDimensions',initialDimensions)
             const {window, screen} = newDimensions;
             const isNewDimensionMobileLandscape =  isLandscape(window);
             const isPrevInitialDimensionMobileLandscape =  isLandscape(initialDimensions);
 
             const isOrientationChange = isNewDimensionMobileLandscape !== isPrevInitialDimensionMobileLandscape;
-            console.log('[debug] isNewDimensionMobileLandscape', isNewDimensionMobileLandscape)
-            console.log('[debug] isPrevInitialDimensionMobileLandscape', isPrevInitialDimensionMobileLandscape)
-            console.log('[debug] isOrientationChange', isOrientationChange)
+           // console.log('[debug] isNewDimensionMobileLandscape', isNewDimensionMobileLandscape)
+           // console.log('[debug] isPrevInitialDimensionMobileLandscape', isPrevInitialDimensionMobileLandscape)
+           // console.log('[debug] isOrientationChange', isOrientationChange)
             if(isOrientationChange)
             {
                 // const tmp = initialDimensions.width;
@@ -104,7 +103,7 @@ function WindowDimensionsProvider(props) {
                 return (
                     <WindowDimensionsContext.Provider
                         value={{
-                            initialWindowHeight: windowDimension.initialWindowHeight,
+                            initialWindowHeight: windowDimension.initialWindowHeight + getWindowHeightAdjustment(insets),
                             windowHeight: windowDimension.windowHeight + getWindowHeightAdjustment(insets),
                             initialWindowWidth: windowDimension.initialWindowWidth,
                             windowWidth: windowDimension.windowWidth,
