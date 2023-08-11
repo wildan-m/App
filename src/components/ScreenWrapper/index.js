@@ -25,6 +25,7 @@ import * as Browser from '../../libs/Browser';
 class ScreenWrapper extends React.Component {
     constructor(props) {
         super(props);
+
         this.panResponder = PanResponder.create({
             onStartShouldSetPanResponderCapture: (e, gestureState) => gestureState.numberActiveTouches === CONST.TEST_TOOL.NUMBER_OF_TAPS,
             onPanResponderRelease: toggleTestToolsModal,
@@ -116,6 +117,7 @@ class ScreenWrapper extends React.Component {
 
     render() {
         const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
+        
         return (
             <SafeAreaConsumer>
                 {({insets, paddingTop, paddingBottom, safeAreaPaddingBottomStyle}) => {
