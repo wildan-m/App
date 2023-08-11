@@ -91,7 +91,7 @@ class MoneyRequestDescriptionPage extends Component {
     render() {
         return (
             <ScreenWrapper
-            code='MoneyRequestDescriptionPage'
+                code="MoneyRequestDescriptionPage"
                 includeSafeAreaPaddingBottom={false}
                 shouldEnableMaxHeight
                 onEntryTransitionEnd={() => this.descriptionInputRef && this.descriptionInputRef.focus()}

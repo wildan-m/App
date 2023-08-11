@@ -77,8 +77,9 @@ function MoneyRequestSelectorPage(props) {
     };
 
     return (
-        <ScreenWrapper includeSafeAreaPaddingBottom={false}
-            code='MoneyRequestSelectorPage'
+        <ScreenWrapper
+            includeSafeAreaPaddingBottom={false}
+            code="MoneyRequestSelectorPage"
         >
             {({safeAreaPaddingBottomStyle}) => (
                 <FullPageNotFoundView shouldShow={!IOUUtils.isValidMoneyRequestType(iouType)}>
