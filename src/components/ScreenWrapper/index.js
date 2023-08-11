@@ -21,6 +21,7 @@ import withNavigationFocus from '../withNavigationFocus';
 import toggleTestToolsModal from '../../libs/actions/TestTool';
 import CustomDevMenu from '../CustomDevMenu';
 import * as Browser from '../../libs/Browser';
+import * as DeviceCapabilities from '../../libs/DeviceCapabilities';
 
 class ScreenWrapper extends React.Component {
     constructor(props) {
@@ -39,17 +40,21 @@ class ScreenWrapper extends React.Component {
             },
             onPanResponderGrant: Keyboard.dismiss,
         });
-
         this.initalKeyboardAvoidingMinHeight = undefined;
         this.state = {
             didScreenTransitionEnd: false,
-            minHeight: this.initalKeyboardAvoidingMinHeight,
             isKeyboardCompletelyClosed: false,
+            canUseTouchScreen: DeviceCapabilities.canUseTouchScreen(),
         };
+
+        if(this.state.canUseTouchScreen)
+        {
+            this.state.minHeight =  this.initalKeyboardAvoidingMinHeight;
+        }
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (!props.isFocused) {
+        if (!props.isFocused && state.canUseTouchScreen) {
             return {minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false};
         }
         return null;
@@ -78,9 +83,9 @@ class ScreenWrapper extends React.Component {
         }
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate() {
         // Restore min-height to allow floating button when keyboard appeared
-        if (
+        if (this.state.canUseTouchScreen &&
             this.props.isFocused &&
             // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
             this.props.windowHeight - this.props.keyboardHeight === this.props.initialWindowHeight
@@ -117,7 +122,7 @@ class ScreenWrapper extends React.Component {
 
     render() {
         const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
-        
+
         return (
             <SafeAreaConsumer>
                 {({insets, paddingTop, paddingBottom, safeAreaPaddingBottomStyle}) => {
@@ -133,7 +138,7 @@ class ScreenWrapper extends React.Component {
                     }
 
                     // we should also add vertical padding to the min height
-                    const minHeight = this.state.minHeight === undefined ? undefined : this.state.minHeight - paddingStyle.paddingTop || 0 - paddingStyle.paddingBottom || 0;
+                    const minHeight = this.state.minHeight === undefined || !this.state.canUseTouchScreen? undefined : this.state.minHeight - paddingStyle.paddingTop || 0 - paddingStyle.paddingBottom || 0;
                     return (
                         <View
                             style={styles.flex1}
@@ -148,7 +153,7 @@ class ScreenWrapper extends React.Component {
                                 <KeyboardAvoidingView
                                     style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
                                     behavior={this.props.keyboardAvoidingViewBehavior}
-                                    enabled={this.props.shouldEnableKeyboardAvoidingView && this.state.didScreenTransitionEnd && this.state.isKeyboardCompletelyClosed}
+                                    enabled={this.props.shouldEnableKeyboardAvoidingView && this.state.canUseTouchScreen && this.state.didScreenTransitionEnd && this.state.isKeyboardCompletelyClosed}
                                 >
                                     <PickerAvoidingView
                                         style={styles.flex1}
