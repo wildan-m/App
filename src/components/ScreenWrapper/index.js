@@ -1,4 +1,4 @@
-import {Keyboard, View, PanResponder, InteractionManager} from 'react-native';
+import {Keyboard, View, PanResponder} from 'react-native';
 import React from 'react';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
@@ -60,9 +60,7 @@ class ScreenWrapper extends React.Component {
             if (lodashGet(event, 'data.closing')) {
                 return;
             }
-
             this.setState({didScreenTransitionEnd: true});
-
             this.props.onEntryTransitionEnd();
         });
 
@@ -117,8 +115,6 @@ class ScreenWrapper extends React.Component {
     }
 
     render() {
-        // //// console.log('[debug] render ${this.props.code}`)
-
         const maxHeight = this.props.shouldEnableMaxHeight ? this.props.windowHeight : undefined;
         return (
             <SafeAreaConsumer>
@@ -148,7 +144,6 @@ class ScreenWrapper extends React.Component {
                                 {...this.keyboardDissmissPanResponder.panHandlers}
                             >
                                 <KeyboardAvoidingView
-                                    innerRef={this.keyboardAvoidingViewRef}
                                     style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
                                     behavior={this.props.keyboardAvoidingViewBehavior}
                                     enabled={this.props.shouldEnableKeyboardAvoidingView && this.state.didScreenTransitionEnd && this.state.isKeyboardCompletelyClosed}

@@ -87,7 +87,6 @@ function MoneyRequestParticipantsPage(props) {
         <ScreenWrapper
             includeSafeAreaPaddingBottom={false}
             shouldEnableMaxHeight={DeviceCapabilities.canUseTouchScreen()}
-            code="moneyrequestparticipant"
         >
             {({safeAreaPaddingBottomStyle}) => (
                 <View style={styles.flex1}>

@@ -56,20 +56,11 @@ function WindowDimensionsProvider(props) {
 
     useEffect(() => {
         const onDimensionChange = (newDimensions) => {
-            // console.log('[debug] newDimensions',newDimensions)
-            // console.log('[debug] initialDimensions',initialDimensions)
             const {window, screen} = newDimensions;
             const isNewDimensionMobileLandscape = isLandscape(window);
             const isPrevInitialDimensionMobileLandscape = isLandscape(initialDimensions);
-
             const isOrientationChange = isNewDimensionMobileLandscape !== isPrevInitialDimensionMobileLandscape;
-            // console.log('[debug] isNewDimensionMobileLandscape', isNewDimensionMobileLandscape)
-            // console.log('[debug] isPrevInitialDimensionMobileLandscape', isPrevInitialDimensionMobileLandscape)
-            // console.log('[debug] isOrientationChange', isOrientationChange)
             if (isOrientationChange) {
-                // const tmp = initialDimensions.width;
-                // initialDimensions.width = initialDimensions.height;
-                // initialDimensions.height = tmp;
                 initialDimensions.width = screen.width;
                 initialDimensions.height = screen.height - screenWindowHeightDifference;
             }
