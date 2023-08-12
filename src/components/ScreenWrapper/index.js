@@ -57,6 +57,17 @@ class ScreenWrapper extends React.Component {
         if (!props.isFocused && state.canUseTouchScreen) {
             return {minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false};
         }
+
+        // Restore min-height to allow floating button when keyboard appeared
+        if (
+            state.canUseTouchScreen &&
+            props.isFocused &&
+            // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
+            props.windowHeight - props.keyboardHeight === props.initialWindowHeight
+        ) {
+            return {isKeyboardCompletelyClosed: true, minHeight: state.initalKeyboardAvoidingMinHeight};
+        }
+
         return null;
     }
 
@@ -80,24 +91,6 @@ class ScreenWrapper extends React.Component {
                 }
                 Keyboard.dismiss();
             });
-        }
-    }
-
-    componentDidUpdate() {
-        // Restore min-height to allow floating button when keyboard appeared
-        if (
-            this.state.canUseTouchScreen &&
-            this.props.isFocused &&
-            // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
-            this.props.windowHeight - this.props.keyboardHeight === this.props.initialWindowHeight
-        ) {
-            const state = {isKeyboardCompletelyClosed: true};
-
-            if (this.state.minHeight !== this.state.initalKeyboardAvoidingMinHeight) {
-                state.minHeight = this.state.initalKeyboardAvoidingMinHeight;
-            }
-
-            this.setState(state);
         }
     }
 
