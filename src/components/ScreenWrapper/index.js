@@ -151,9 +151,7 @@ class ScreenWrapper extends React.Component {
                                     behavior={this.props.keyboardAvoidingViewBehavior}
                                     enabled={
                                         this.props.shouldEnableKeyboardAvoidingView &&
-                                        this.state.canUseTouchScreen &&
-                                        this.state.didScreenTransitionEnd &&
-                                        this.state.isKeyboardCompletelyClosed
+                                        (!this.state.canUseTouchScreen ? true : this.state.didScreenTransitionEnd && this.state.isKeyboardCompletelyClosed)
                                     }
                                 >
                                     <PickerAvoidingView
