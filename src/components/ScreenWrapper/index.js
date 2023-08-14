@@ -1,4 +1,4 @@
-import {Keyboard, View, PanResponder} from 'react-native';
+import {Keyboard, View, PanResponder, InteractionManager} from 'react-native';
 import React from 'react';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
@@ -22,7 +22,6 @@ import toggleTestToolsModal from '../../libs/actions/TestTool';
 import CustomDevMenu from '../CustomDevMenu';
 import * as Browser from '../../libs/Browser';
 import * as DeviceCapabilities from '../../libs/DeviceCapabilities';
-import StatusBar from '../../libs/StatusBar';
 
 class ScreenWrapper extends React.Component {
     constructor(props) {
@@ -43,19 +42,20 @@ class ScreenWrapper extends React.Component {
         });
         this.state = {
             didScreenTransitionEnd: false,
-            isKeyboardCompletelyClosed: false,
             canUseTouchScreen: DeviceCapabilities.canUseTouchScreen(),
         };
 
         if (this.state.canUseTouchScreen) {
             this.state.initalKeyboardAvoidingMinHeight = undefined;
             this.state.minHeight = props.initialWindowHeight;
+            this.state.isKeyboardCompletelyClosed = false;
+            this.state.didInteractionsComplete = false;
         }
     }
 
     static getDerivedStateFromProps(props, state) {
         if (!props.isFocused && state.canUseTouchScreen) {
-            return {minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false};
+            return {minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false, didInteractionsComplete: false};
         }
 
         // Restore min-height to allow floating button when keyboard appeared
@@ -105,6 +105,13 @@ class ScreenWrapper extends React.Component {
         return !_.isEqual(this.state, nextState) || !_.isEqual(_.omit(this.props, 'modal'), _.omit(nextProps, 'modal'));
     }
 
+    componentDidUpdate() {
+        if (this.props.isFocused && !this.state.didInteractionsComplete) {
+            InteractionManager.runAfterInteractions(() => {
+                this.setState({didInteractionsComplete: true});
+            });
+        }
+    }
     componentWillUnmount() {
         if (this.unsubscribeTransitionEnd) {
             this.unsubscribeTransitionEnd();
@@ -132,9 +139,9 @@ class ScreenWrapper extends React.Component {
                     }
 
                     // we should also calculate vertical padding and status bar height to minHeight
-                    const verticalPadding = paddingStyle.paddingTop || 0 - paddingStyle.paddingBottom || 0;
-                    const minHeight =
-                        this.state.minHeight === undefined || !this.state.canUseTouchScreen ? undefined : this.state.minHeight - verticalPadding - (StatusBar.currentHeight || 0);
+                    const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
+                    const verticalInsets = insets.top + insets.bottom;
+                    const minHeight = this.state.minHeight === undefined || !this.state.canUseTouchScreen ? undefined : this.state.minHeight - verticalPadding - verticalInsets;
                     return (
                         <View
                             style={styles.flex1}
@@ -151,7 +158,7 @@ class ScreenWrapper extends React.Component {
                                     behavior={this.props.keyboardAvoidingViewBehavior}
                                     enabled={
                                         this.props.shouldEnableKeyboardAvoidingView &&
-                                        (!this.state.canUseTouchScreen ? true : this.state.didScreenTransitionEnd && this.state.isKeyboardCompletelyClosed)
+                                        (!this.state.canUseTouchScreen ? true : this.state.didInteractionsComplete && this.state.isKeyboardCompletelyClosed)
                                     }
                                 >
                                     <PickerAvoidingView
