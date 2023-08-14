@@ -138,7 +138,7 @@ class ScreenWrapper extends React.Component {
                         paddingStyle.paddingBottom = paddingBottom;
                     }
 
-                    // we should also calculate vertical padding and status bar height to minHeight
+                    // we should also calculate vertical padding and vertical insets to minHeight
                     const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
                     const verticalInsets = insets.top + insets.bottom;
                     const minHeight = this.state.minHeight === undefined || !this.state.canUseTouchScreen ? undefined : this.state.minHeight - verticalPadding - verticalInsets;
