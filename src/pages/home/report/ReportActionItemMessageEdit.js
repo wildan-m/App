@@ -40,6 +40,7 @@ import useReportScrollManager from '../../../hooks/useReportScrollManager';
 import * as EmojiPickerAction from '../../../libs/actions/EmojiPickerAction';
 import focusWithDelay from '../../../libs/focusWithDelay';
 import ONYXKEYS from '../../../ONYXKEYS';
+import withPreviousFocusedInput, {withPreviousFocusedInputDefaultProps, withPreviousFocusedInputPropTypes} from '../../../components/withPreviousFocusedInput';
 
 const propTypes = {
     /** All the data of the action */
@@ -72,6 +73,7 @@ const propTypes = {
     preferredSkinTone: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 
     ...withLocalizePropTypes,
+    ...withPreviousFocusedInputPropTypes,
 };
 
 const defaultProps = {
@@ -80,6 +82,7 @@ const defaultProps = {
     shouldDisableEmojiPicker: false,
     preferredSkinTone: CONST.EMOJI_DEFAULT_SKIN_TONE,
     drafts: {},
+    ...withPreviousFocusedInputDefaultProps,
 };
 
 // native ids
@@ -89,6 +92,7 @@ const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
 
 function ReportActionItemMessageEdit(props) {
+    console.log('[debug] props', props)
     const reportScrollManager = useReportScrollManager();
     const {translate} = useLocalize();
     const {isKeyboardShown} = useKeyboardState();
@@ -288,6 +292,9 @@ function ReportActionItemMessageEdit(props) {
      */
     const triggerSaveOrCancel = useCallback(
         (e) => {
+            console.log('[debug] props.previousFocusedInput.focus();')
+            props.previousFocusedInput.focus();
+
             if (!e || ComposerUtils.canSkipTriggerHotkeys(isSmallScreenWidth, isKeyboardShown)) {
                 return;
             }
@@ -362,6 +369,11 @@ function ReportActionItemMessageEdit(props) {
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
+                                console.log('[debug] event.target', event.target)
+                                console.log('[debug] event.relatedTarget', event.relatedTarget)
+                                console.log('[debug] textInputRef.current', textInputRef.current)
+                                
+                                props.updatePreviousFocusedInput(event.target);
                                 setIsFocused(false);
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
@@ -427,6 +439,7 @@ ReportActionItemMessageEdit.displayName = 'ReportActionItemMessageEdit';
 
 export default compose(
     withLocalize,
+    withPreviousFocusedInput,
     withReportActionsDrafts({
         propName: 'drafts',
     }),
