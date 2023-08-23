@@ -176,9 +176,9 @@ function ReportActionItemMessageEdit(props) {
     const debouncedSaveDraft = useMemo(
         () =>
             _.debounce((newDraft) => {
-                Report.saveReportActionDraft(props.reportID, props.action, newDraft);
+                Report.saveReportActionDraft(props.reportID, props.action.reportActionID, newDraft);
             }, 1000),
-        [props.reportID, props.action],
+        [props.reportID, props.action.reportActionID],
     );
 
     /**
@@ -202,7 +202,7 @@ function ReportActionItemMessageEdit(props) {
     const updateDraft = useCallback(
         (newDraftInput) => {
             console.log('[debug] updateDraft')
-            const {text: newDraft = '', emojis = []} = EmojiUtils.replaceEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
+            const {text: newDraft, emojis} = EmojiUtils.replaceAndExtractEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
 
             if (!_.isEmpty(emojis)) {
                 insertedEmojis.current = [...insertedEmojis.current, ...emojis];
@@ -247,12 +247,13 @@ function ReportActionItemMessageEdit(props) {
 
 
         debouncedSaveDraft.cancel();
-        Report.saveReportActionDraft(props.reportID, props.action, '');
+        Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
 
         if (_.contains([messageEditInput], previousFocusedInputId)) {
             props.previousFocusedInput.focus();
         }else{
             ComposerActions.setShouldShowComposeInput(true);
+            ReportActionComposeFocusManager.clear();
             ReportActionComposeFocusManager.focus();
         }
 
@@ -263,7 +264,7 @@ function ReportActionItemMessageEdit(props) {
                 keyboardDidHideListener.remove();
             });
         }
-    }, [props.action, debouncedSaveDraft, props.index, props.reportID, reportScrollManager]);
+    }, [props.action.reportActionID, debouncedSaveDraft, props.index, props.reportID, reportScrollManager]);
 
     /**
      * Save the draft of the comment to be the new comment message. This will take the comment out of "edit mode" with
