@@ -87,6 +87,7 @@ const saveButtonID = 'saveButton';
 const cancelButtonID = 'cancelButton';
 const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
+let isEmojiSelected = false;
 
 function ReportActionItemMessageEdit(props) {
     const reportScrollManager = useReportScrollManager();
@@ -212,7 +213,6 @@ function ReportActionItemMessageEdit(props) {
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
         ComposerActions.setShouldShowComposeInput(true);
-        ReportActionComposeFocusManager.clear();
         ReportActionComposeFocusManager.focus();
 
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
@@ -268,6 +268,7 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        isEmojiSelected = true;
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
             end: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
@@ -377,8 +378,13 @@ function ReportActionItemMessageEdit(props) {
                         <EmojiPickerButton
                             isDisabled={props.shouldDisableEmojiPicker}
                             onModalHide={() => {
-                                setIsFocused(true);
-                                focus(true);
+                                if (!isEmojiSelected) {
+                                    _.defer(ReportActionComposeFocusManager.focus);
+                                } else {
+                                    setIsFocused(true);
+                                    focus(true);
+                                }
+                                isEmojiSelected = false;
                             }}
                             onEmojiSelected={addEmojiToTextBox}
                             nativeID={emojiButtonID}
