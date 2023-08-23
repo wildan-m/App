@@ -70,6 +70,7 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {Boolean} isNavigating
      */
     const hideEmojiPicker = (isNavigating) => {
+        console.log('[debug] hideEmojiPicker')
         if (isNavigating) {
             onModalHide.current = () => {};
         }
@@ -99,6 +100,7 @@ const EmojiPicker = forwardRef((props, ref) => {
         if (!isEmojiPickerVisible) {
             return;
         }
+        
 
         hideEmojiPicker(false);
         if (_.isFunction(onEmojiSelected.current)) {

@@ -90,9 +90,10 @@ const saveButtonID = 'saveButton';
 const cancelButtonID = 'cancelButton';
 const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
+let isEmojiSelected = false;
 
 function ReportActionItemMessageEdit(props) {
-    console.log('[debug] props', props)
+    // console.log('[debug] props', props)
     const reportScrollManager = useReportScrollManager();
     const {translate} = useLocalize();
     const {isKeyboardShown} = useKeyboardState();
@@ -114,6 +115,21 @@ function ReportActionItemMessageEdit(props) {
     const textInputRef = useRef(null);
     const isFocusedRef = useRef(false);
     const insertedEmojis = useRef([]);
+
+    useEffect(() => {
+        console.log('[debug] props.previousFocusedInput', props.previousFocusedInput)
+    })
+
+    useEffect(() => {
+        return () => {
+            console.log('[debug] componentWillUnmount')
+            if(textInputRef === props.previousFocusedInput)
+            {
+                props.updatePreviousFocusedInput(null);
+            }
+            console.log('[debug] props.previousFocusedInput', props.previousFocusedInput)
+        }
+    }, []);
 
     useEffect(() => {
         if (props.draftMessage === props.action.message[0].html) {
@@ -185,6 +201,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const updateDraft = useCallback(
         (newDraftInput) => {
+            console.log('[debug] updateDraft')
             const {text: newDraft = '', emojis = []} = EmojiUtils.replaceEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
 
             if (!_.isEmpty(emojis)) {
@@ -212,6 +229,7 @@ function ReportActionItemMessageEdit(props) {
             } else {
                 debouncedSaveDraft(props.action.message[0].html);
             }
+
         },
         [props.action.message, debouncedSaveDraft, debouncedUpdateFrequentlyUsedEmojis, props.preferredSkinTone, props.preferredLocale],
     );
@@ -220,10 +238,23 @@ function ReportActionItemMessageEdit(props) {
      * Delete the draft of the comment being edited. This will take the comment out of "edit mode" with the old content.
      */
     const deleteDraft = useCallback(() => {
+        console.log('[debug] deleteDraft')
+
+        console.log('[debug] props.previousFocusedInput', props.previousFocusedInput)
+
+        const previousFocusedInputId = lodashGet(props, 'previousFocusedInput.id');
+
+
+
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action, '');
-        ComposerActions.setShouldShowComposeInput(true);
-        ReportActionComposeFocusManager.focus();
+
+        if (_.contains([messageEditInput], previousFocusedInputId)) {
+            props.previousFocusedInput.focus();
+        }else{
+            ComposerActions.setShouldShowComposeInput(true);
+            ReportActionComposeFocusManager.focus();
+        }
 
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
         if (props.index === 0) {
@@ -239,6 +270,8 @@ function ReportActionItemMessageEdit(props) {
      * the new content.
      */
     const publishDraft = useCallback(() => {
+        console.log('[debug] publishDraft')
+
         // Do nothing if draft exceed the character limit
         if (ReportUtils.getCommentLength(draft) > CONST.MAX_COMMENT_LENGTH) {
             return;
@@ -278,6 +311,8 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        console.log('[debug] addEmojiToTextBox')
+        isEmojiSelected = true;
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
             end: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
@@ -292,8 +327,6 @@ function ReportActionItemMessageEdit(props) {
      */
     const triggerSaveOrCancel = useCallback(
         (e) => {
-            console.log('[debug] props.previousFocusedInput.focus();')
-            props.previousFocusedInput.focus();
 
             if (!e || ComposerUtils.canSkipTriggerHotkeys(isSmallScreenWidth, isKeyboardShown)) {
                 return;
@@ -369,22 +402,33 @@ function ReportActionItemMessageEdit(props) {
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
-                                console.log('[debug] event.target', event.target)
+                                console.log('[debug] onBlur', event.target)
+                                // console.log('[debug] event.target', event.target)
                                 console.log('[debug] event.relatedTarget', event.relatedTarget)
-                                console.log('[debug] textInputRef.current', textInputRef.current)
+                                // console.log('[debug] textInputRef.current', textInputRef.current)
+                                console.log('[debug] insertedEmojis', insertedEmojis)
                                 
-                                props.updatePreviousFocusedInput(event.target);
                                 setIsFocused(false);
-                                const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
+                                const targetId = lodashGet(event, 'nativeEvent.target.id');
+
+                                if (_.contains([messageEditInput], targetId)) {
+                                    props.updatePreviousFocusedInput(event.target);
+                                }
+
+                                const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
                                 if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {
                                     return;
                                 }
 
+
+
                                 if (messageEditInput === relatedTargetId) {
                                     return;
                                 }
+
+
                                 openReportActionComposeViewWhenClosingMessageEdit();
                             }}
                             selection={selection}
@@ -395,8 +439,25 @@ function ReportActionItemMessageEdit(props) {
                         <EmojiPickerButton
                             isDisabled={props.shouldDisableEmojiPicker}
                             onModalHide={() => {
-                                setIsFocused(true);
-                                focus(true);
+                                console.log('[debug] onModalHide')
+                                console.log('[debug] props.previousFocusedInput', props.previousFocusedInput)
+                                console.log('[debug] textInputRef.current', textInputRef.current)
+                                console.log('[debug] props.previousFocusedInput !== textInputRef.current', props.previousFocusedInput !== textInputRef.current)
+                                console.log('[debug] !_.isEqual(props.previousFocusedInput, textInputRef.current', !_.isEqual(props.previousFocusedInput, textInputRef.current))
+                                console.log('[debug] props.draftMessage', props.draftMessage)
+                                console.log('[debug] props.drafts', props.drafts)
+                                console.log('[debug] isEmojiSelected', isEmojiSelected)
+                                
+                                const previousFocusedInputId = lodashGet(props, 'previousFocusedInput.id');                        
+                                // if (_.contains([messageEditInput], previousFocusedInputId) && props.previousFocusedInput !== textInputRef.current) {
+                                if (_.contains([messageEditInput], previousFocusedInputId) && !isEmojiSelected) {
+                                    console.log('[debug] props.previousFocusedInput.focus();', props.previousFocusedInput.focus());
+                                    _.defer(()=>props.previousFocusedInput.focus());
+                                } else {
+                                    setIsFocused(true);
+                                    focus(true);
+                                }
+                                isEmojiSelected = false;
                             }}
                             onEmojiSelected={addEmojiToTextBox}
                             nativeID={emojiButtonID}
