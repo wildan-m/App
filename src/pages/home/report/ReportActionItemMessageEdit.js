@@ -236,9 +236,10 @@ function ReportActionItemMessageEdit(props) {
             ComposerActions.setShouldShowComposeInput(true);
             deleteDraftFocusToMainComposer = true;
             ReportActionComposeFocusManager.clear();
-            ReportActionComposeFocusManager.focus();
         }
- 
+
+        ReportActionComposeFocusManager.focus();
+
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
         if (props.index === 0) {
             const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
@@ -423,8 +424,8 @@ function ReportActionItemMessageEdit(props) {
                                 console.log('[debug] onModalHide')
                                 if (!isEmojiSelected) {
                                     // _.defer(ReportActionComposeFocusManager.focus);
-                                    InteractionManager.runAfterInteractions(ReportActionComposeFocusManager.focus);
-                                    // ReportActionComposeFocusManager.focus();
+                                    // InteractionManager.runAfterInteractions(ReportActionComposeFocusManager.focus);
+                                    ReportActionComposeFocusManager.focus();
                                 } else {
                                     setIsFocused(true);
                                     focus(true);

@@ -20,6 +20,7 @@ import CONST from '../../CONST';
 import withNavigation from '../withNavigation';
 import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
 import focusWithDelay from '../../libs/focusWithDelay';
+import * as ComposerActions from '../../libs/actions/Composer';
 
 const propTypes = {
     /** Maximum number of lines in the text input */
