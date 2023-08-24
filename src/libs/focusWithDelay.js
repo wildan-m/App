@@ -7,6 +7,7 @@ import ComposerFocusManager from './ComposerFocusManager';
  * @returns {Function} a function that focuses the text input with a configurable delay
  */
 function focusWithDelay(textInput) {
+    console.log('[debug] function focusWithDelay(textInput)')
     /**
      * Focus the text input
      * @param {Boolean} [shouldDelay=false] Impose delay before focusing the text input
@@ -15,6 +16,7 @@ function focusWithDelay(textInput) {
         // There could be other animations running while we trigger manual focus.
         // This prevents focus from making those animations janky.
         InteractionManager.runAfterInteractions(() => {
+            console.log('[debug] textInput', textInput)
             if (!textInput) {
                 return;
             }

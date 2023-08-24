@@ -665,11 +665,13 @@ function ReportActionCompose({
         // This callback is used in the contextMenuActions to manage giving focus back to the compose input.
         // TODO: we should clean up this convoluted code and instead move focus management to something like ReportFooter.js or another higher up component
         ReportActionComposeFocusManager.onComposerFocus(() => {
+
+            console.log('[debug] setUpComposeFocusManager ReportActionComposeFocusManager.onComposerFocus(() => {')
             if (!willBlurTextInputOnTapOutside || !isFocusedProp) {
                 return;
             }
 
-            focus(false);
+            focus(true);
         }, true);
     }, [focus, isFocusedProp]);
 
@@ -982,6 +984,7 @@ function ReportActionCompose({
         }
 
         return () => {
+            console.log('[debug] ReportActionCompose componentWillUnmount')
             ReportActionComposeFocusManager.clear(true);
 
             KeyDownListener.removeKeyDownPressListner(focusComposerOnKeyPress);

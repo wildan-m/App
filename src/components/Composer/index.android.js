@@ -5,6 +5,9 @@ import _ from 'underscore';
 import RNTextInput from '../RNTextInput';
 import themeColors from '../../styles/themes/default';
 import * as ComposerUtils from '../../libs/ComposerUtils';
+import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
+import focusWithDelay from '../../libs/focusWithDelay';
+import * as ComposerActions from '../../libs/actions/Composer';
 
 const propTypes = {
     /** Maximum number of lines in the text input */
@@ -71,6 +74,8 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
      * @param {Element} el
      */
     const setTextInputRef = useCallback((el) => {
+        ReportActionComposeFocusManager.nonMainComposerRef.current = el;
+
         textInput.current = el;
         if (!_.isFunction(forwardedRef) || textInput.current === null) {
             return;
@@ -105,6 +110,9 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
         StyleSheet.flatten(props.style);
     }, [props.style]);
 
+   
+      
+
     return (
         <RNTextInput
             autoComplete="off"
@@ -122,6 +130,25 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
             /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...props}
             editable={!isDisabled}
+            onFocus={(e) => {
+                ReportActionComposeFocusManager.onComposerFocus(() => {
+                    console.log('[debug] ReportActionComposeFocusManager.onComposerFocus')
+                    console.log('[debug] textInput.current', textInput.current)
+
+                    ComposerActions.setShouldShowComposeInput(false);
+
+                    if (!textInput.current) {
+                        return;
+                    }
+
+                    const focus = focusWithDelay(textInput.current);
+                    focus(true);
+                    // textInput.current.focus();
+                });
+                if (props.onFocus) {
+                    props.onFocus(e);
+                }
+            }}
         />
     );
 }

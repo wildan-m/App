@@ -2,6 +2,7 @@ import _ from 'underscore';
 import React from 'react';
 
 const composerRef = React.createRef();
+const nonMainComposerRef = React.createRef();
 // There are two types of composer: general composer (edit composer) and main composer.
 // The general composer callback will take priority if it exists.
 let focusCallback = null;
@@ -27,6 +28,8 @@ function onComposerFocus(callback, isMainComposer = false) {
  *
  */
 function focus() {
+    console.log('[debug] focusCallback', focusCallback)
+    console.log('[debug] mainComposerFocusCallback', mainComposerFocusCallback)
     if (!_.isFunction(focusCallback)) {
         if (!_.isFunction(mainComposerFocusCallback)) {
             return;
@@ -62,6 +65,7 @@ function isFocused() {
 
 export default {
     composerRef,
+    nonMainComposerRef,
     onComposerFocus,
     focus,
     clear,
