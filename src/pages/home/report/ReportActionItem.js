@@ -134,6 +134,15 @@ function ReportActionItem(props) {
     const originalReportID = ReportUtils.getOriginalReportID(props.report.reportID, props.action);
     const originalReport = props.report.reportID === originalReportID ? props.report : ReportUtils.getReport(originalReportID);
 
+    useEffect(() => {
+        console.log('[debug] ReportActionItem useEffect')
+        return () => {
+            console.log('[debug] ReportActionItem umounted')
+
+        }
+    })
+
+
     useEffect(
         () => () => {
             // ReportActionContextMenu, EmojiPicker and PopoverReactionList are global components,

@@ -88,7 +88,7 @@ const cancelButtonID = 'cancelButton';
 const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
 let isEmojiSelected = false;
-let deleteDraftFocusToMainComposer = false;
+let hasFocusAndDraftDeleted = false;
 
 function ReportActionItemMessageEdit(props) {
     const reportScrollManager = useReportScrollManager();
@@ -114,13 +114,14 @@ function ReportActionItemMessageEdit(props) {
     const insertedEmojis = useRef([]);
 
     useEffect(() => {
+        console.log('[debug] ReportActionItemMessageEdit useEffect')
         return () => {
-            console.log('[debug] reporteditmessage umounted')
+            console.log('[debug] ReportActionItemMessageEdit umounted')
 
             // ReportActionComposeFocusManager.clear();
             // ReportActionComposeFocusManager.focus();
         }
-    }, [])
+    })
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -140,6 +141,7 @@ function ReportActionItemMessageEdit(props) {
         });
 
         return () => {
+            console.log('[debug] useEffect  [props.action.reportActionID])')
             // Skip if this is not the focused message so the other edit composer stays focused.
             // In small screen devices, when EmojiPicker is shown, the current edit message will lose focus, we need to check this case as well.
             if (!isFocusedRef.current && !EmojiPickerAction.isActive(props.action.reportActionID)) {
@@ -234,7 +236,7 @@ function ReportActionItemMessageEdit(props) {
         {
             console.log('[debug]  if(isFocused)')
             ComposerActions.setShouldShowComposeInput(true);
-            deleteDraftFocusToMainComposer = true;
+            hasFocusAndDraftDeleted = true;
             ReportActionComposeFocusManager.clear();
         }
 
@@ -406,7 +408,7 @@ function ReportActionItemMessageEdit(props) {
                                     return;
                                 }
 
-                                if(!deleteDraftFocusToMainComposer)
+                                if(!hasFocusAndDraftDeleted)
                                 {
                                     return;
                                 }
