@@ -314,6 +314,8 @@ function ReportActionCompose({
 
     const insertedEmojisRef = useRef([]);
 
+    const containerRef = useRef(null);
+
     /**
      * Update frequently used emojis list. We debounce this method in the constructor so that UpdateFrequentlyUsedEmojis
      * API is not called too often.
@@ -978,6 +980,10 @@ function ReportActionCompose({
             KeyDownListener.removeKeyDownPressListner(focusComposerOnKeyPress);
             unsubscribeNavigationBlur();
             unsubscribeNavigationFocus();
+
+            if (EmojiPickerActions.isActive(report.reportID)) {
+                EmojiPickerActions.hideEmojiPicker();
+            }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -1041,7 +1047,10 @@ function ReportActionCompose({
         });
 
     return (
-        <View style={[shouldShowReportRecipientLocalTime && !lodashGet(network, 'isOffline') && styles.chatItemComposeWithFirstRow, isComposerFullSize && styles.chatItemFullComposeRow]}>
+        <View
+            style={[shouldShowReportRecipientLocalTime && !lodashGet(network, 'isOffline') && styles.chatItemComposeWithFirstRow, isComposerFullSize && styles.chatItemFullComposeRow]}
+            ref={containerRef}
+        >
             <OfflineWithFeedback
                 pendingAction={pendingAction}
                 style={isComposerFullSize ? styles.chatItemFullComposeRow : {}}
@@ -1257,6 +1266,7 @@ function ReportActionCompose({
                             isDisabled={isBlockedFromConcierge || disabled}
                             onModalHide={() => focus(true)}
                             onEmojiSelected={replaceSelectionWithText}
+                            emojiPickerID={report.reportID}
                         />
                     )}
                     <View
@@ -1317,6 +1327,7 @@ function ReportActionCompose({
                     isEmojiPickerLarge={suggestionValues.isAutoSuggestionPickerLarge}
                     composerHeight={composerHeight}
                     shouldIncludeReportRecipientLocalTimeHeight={shouldShowReportRecipientLocalTime}
+                    containerRef={containerRef}
                 />
             )}
             {isMentionSuggestionsMenuVisible && (
@@ -1333,6 +1344,7 @@ function ReportActionCompose({
                     isMentionPickerLarge={suggestionValues.isAutoSuggestionPickerLarge}
                     composerHeight={composerHeight}
                     shouldIncludeReportRecipientLocalTimeHeight={shouldShowReportRecipientLocalTime}
+                    containerRef={containerRef}
                 />
             )}
         </View>
