@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
-import {InteractionManager, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ExpensiMark from 'expensify-common/lib/ExpensiMark';
@@ -473,9 +473,7 @@ function Composer({
                             return;
                         }
 
-                        const focus = focusWithDelay(textInput.current);
-                        focus(true);
-                        // textInput.current.focus();
+                        textInput.current.focus();
                     });
                     if (props.onFocus) {
                         props.onFocus(e);
