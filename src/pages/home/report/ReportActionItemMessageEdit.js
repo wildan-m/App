@@ -411,7 +411,8 @@ function ReportActionItemMessageEdit(props) {
                                 console.log('[debug] ReportActionComposeFocusManager.composerRef', ReportActionComposeFocusManager.composerRef)
                                 if(!isEmojiSelected)
                                 {
-                                    ReportActionComposeFocusManager.focus();
+                                    const currentFocusedComposer = ReportActionComposeFocusManager.currentFocusedComposerRef.current;
+                                    focusWithDelay(currentFocusedComposer)(true);
                                 }else
                                 {
                                     setIsFocused(true);
