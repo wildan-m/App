@@ -150,6 +150,7 @@ class ReportScreen extends React.Component {
         });
 
         this.fetchReportIfNeeded();
+        console.log('[debug] this.fetchReportIfNeeded() oiajdsjf')
         ComposerActions.setShouldShowComposeInput(true);
     }
 
@@ -165,6 +166,7 @@ class ReportScreen extends React.Component {
         }
 
         this.fetchReportIfNeeded();
+        console.log('[debug] this.fetchReportIfNeeded(); asjdiajsd')
         ComposerActions.setShouldShowComposeInput(true);
     }
 

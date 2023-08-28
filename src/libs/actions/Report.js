@@ -1083,7 +1083,9 @@ const handleUserDeletedLinksInHtml = (newCommentText, originalHtml) => {
  * @param {String} textForNewComment
  */
 function editReportComment(reportID, originalReportAction, textForNewComment) {
+    console.log('[debug] editReportComment')
     const parser = new ExpensiMark();
+
     const originalReportID = ReportUtils.getOriginalReportID(reportID, originalReportAction);
 
     // Do not autolink if someone explicitly tries to remove a link from message.
