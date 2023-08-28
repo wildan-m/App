@@ -378,10 +378,11 @@ function ReportActionItemMessageEdit(props) {
                             onFocus={() => {
                                 console.log('[debug] onFocus={() => { oiajsdofo')
                                 setIsFocused(true);
-                                isFocusMove = false;
+                                // isFocusMove = false;
                                 ReportActionComposeFocusManager.currentFocusedComposerRef.current = textInputRef.current;
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
+
                             }}
                             onBlur={(event) => {
                                 console.log(`[debug] onBlur ${textInputRef.current.value}`)
@@ -415,7 +416,7 @@ function ReportActionItemMessageEdit(props) {
                             onModalHide={() => {
                                 console.log('[debug] onModalHide')
                                 console.log('[debug] ReportActionComposeFocusManager.composerRef', ReportActionComposeFocusManager.composerRef)
-                                if(isEmojiSelected)
+                                if(!isEmojiSelected)
                                 {
                                     ReportActionComposeFocusManager.focus();
                                 }else

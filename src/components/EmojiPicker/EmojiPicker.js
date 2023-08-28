@@ -71,7 +71,7 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {Boolean} isNavigating
      */
     const hideEmojiPicker = (isNavigating) => {
-        console.log('[debug] hideEmojiPicker', onModalHide.current)
+        console.log('[debug] hideEmojiPicker')
         if (isNavigating) {
             onModalHide.current = () => {};
         }

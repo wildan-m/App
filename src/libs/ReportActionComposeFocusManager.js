@@ -33,10 +33,12 @@ function focus() {
             return;
         }
 
+        console.log('[debug] mainComposerFocusCallback')
         mainComposerFocusCallback();
         return;
     }
 
+    console.log('[debug] focusCallback')
     focusCallback();
 }
 

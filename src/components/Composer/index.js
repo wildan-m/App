@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {InteractionManager, StyleSheet, View} from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ExpensiMark from 'expensify-common/lib/ExpensiMark';
@@ -20,6 +20,7 @@ import CONST from '../../CONST';
 import withNavigation from '../withNavigation';
 import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
 import * as ComposerActions from '../../libs/actions/Composer';
+import focusWithDelay from '../../libs/focusWithDelay';
 
 const propTypes = {
     /** Maximum number of lines in the text input */
@@ -472,7 +473,9 @@ function Composer({
                             return;
                         }
 
-                        textInput.current.focus();
+                        const focus = focusWithDelay(textInput.current);
+                        focus(true);
+                        // textInput.current.focus();
                     });
                     if (props.onFocus) {
                         props.onFocus(e);
