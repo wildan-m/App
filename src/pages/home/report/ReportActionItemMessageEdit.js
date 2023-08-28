@@ -291,6 +291,7 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        console.log('[debug] addEmojiToTextBox')
         isEmojiSelected = true;
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,

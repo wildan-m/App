@@ -45,6 +45,7 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {String} id - Unique id for EmojiPicker
      */
     const showEmojiPicker = (onModalHideValue, onEmojiSelectedValue, emojiPopoverAnchorValue, anchorOrigin, onWillShow = () => {}, id) => {
+        console.log('[debug] onModalHideValue', onModalHideValue)
         onModalHide.current = onModalHideValue;
         onEmojiSelected.current = onEmojiSelectedValue;
         emojiPopoverAnchor.current = emojiPopoverAnchorValue;
@@ -70,6 +71,7 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {Boolean} isNavigating
      */
     const hideEmojiPicker = (isNavigating) => {
+        console.log('[debug] hideEmojiPicker', onModalHide.current)
         if (isNavigating) {
             onModalHide.current = () => {};
         }
