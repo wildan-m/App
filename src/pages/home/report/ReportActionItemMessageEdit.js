@@ -87,7 +87,6 @@ const saveButtonID = 'saveButton';
 const cancelButtonID = 'cancelButton';
 const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
-let isFocusMove = false;
 let isEmojiSelected = false;
 
 function ReportActionItemMessageEdit(props) {
@@ -112,13 +111,8 @@ function ReportActionItemMessageEdit(props) {
     const textInputRef = useRef(null);
     const isFocusedRef = useRef(false);
     const insertedEmojis = useRef([]);
-    let isLostFocus = false;
 
     useEffect(() => {
-        if(isFocusedRef.current && !isFocused)
-        {
-            isLostFocus = true;
-        }
         // required for keeping last state of isFocused variable
         isFocusedRef.current = isFocused;
     }, [isFocused]);
@@ -378,7 +372,6 @@ function ReportActionItemMessageEdit(props) {
                             onFocus={() => {
                                 console.log('[debug] onFocus={() => { oiajsdofo')
                                 setIsFocused(true);
-                                // isFocusMove = false;
                                 ReportActionComposeFocusManager.currentFocusedComposerRef.current = textInputRef.current;
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
