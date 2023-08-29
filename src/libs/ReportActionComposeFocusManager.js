@@ -2,7 +2,7 @@ import _ from 'underscore';
 import React from 'react';
 
 const composerRef = React.createRef();
-const currentFocusedComposerRef = React.createRef();
+const lastFocusedComposerRef = React.createRef();
 // There are two types of composer: general composer (edit composer) and main composer.
 // The general composer callback will take priority if it exists.
 let focusCallback = null;
@@ -65,7 +65,7 @@ function isFocused() {
 
 export default {
     composerRef,
-    currentFocusedComposerRef,
+    lastFocusedComposerRef,
     onComposerFocus,
     focus,
     clear,

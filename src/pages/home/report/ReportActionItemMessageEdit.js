@@ -133,11 +133,11 @@ function ReportActionItemMessageEdit(props) {
 
         return () => {
         console.log('[debug] useEffect unmount [props.action.reportActionID]')
-        if(ReportActionComposeFocusManager.currentFocusedComposerRef.current === textInputRef.current)
-        {
-            console.log('[debug] if(ReportActionComposeFocusManager.currentFocusedComposerRef.current === textInputRef.current)')
-            ReportActionComposeFocusManager.currentFocusedComposerRef.current = null;
-        } 
+        // if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current)
+        // {
+        //     console.log('[debug] if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current)')
+        //     ReportActionComposeFocusManager.lastFocusedComposerRef.current = null;
+        // } 
 
 
             // Skip if this is not the focused message so the other edit composer stays focused.
@@ -148,6 +148,7 @@ function ReportActionItemMessageEdit(props) {
 
             // Show the main composer when the focused message is deleted from another client
             // to prevent the main composer stays hidden until we swtich to another chat.
+            console.log('[debug] // to prevent the main composer stays hidden until we swtich to another chat.')
             ComposerActions.setShouldShowComposeInput(true);
         };
     }, [props.action.reportActionID]);
@@ -227,10 +228,11 @@ function ReportActionItemMessageEdit(props) {
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
         console.log('[debug] isFocusedRef.current', isFocusedRef.current)
-        console.log('[debug] ReportActionComposeFocusManager.currentFocusedComposerRef.current', ReportActionComposeFocusManager.currentFocusedComposerRef.current)
+        console.log('[debug] ReportActionComposeFocusManager.lastFocusedComposerRef.current', ReportActionComposeFocusManager.lastFocusedComposerRef.current)
 
-        if(ReportActionComposeFocusManager.currentFocusedComposerRef.current === textInputRef.current){
-            console.log('[debug]  if(ReportActionComposeFocusManager.currentFocusedComposerRef.current === textInputRef.current){')
+        console.log('[debug] ReportActionContextMenu.isActiveReportAction(props.action.reportActionID)', ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
+        if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current){
+            console.log('[debug]  if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current){')
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
             ReportActionComposeFocusManager.focus();
@@ -337,12 +339,12 @@ function ReportActionItemMessageEdit(props) {
     const restoreFocus = (shouldDelay = false) => {
         console.log('[debug] restoreFocus')
         console.log('[debug] ReportActionComposeFocusManager.composerRef', ReportActionComposeFocusManager.composerRef)
-        console.log('[debug] ReportActionComposeFocusManager.currentFocusedComposerRef', ReportActionComposeFocusManager.currentFocusedComposerRef)
+        console.log('[debug] ReportActionComposeFocusManager.lastFocusedComposerRef', ReportActionComposeFocusManager.lastFocusedComposerRef)
         console.log('[debug] shouldDelay', shouldDelay)
         
         if(!isEmojiSelected)
         {
-            const currentFocusedComposer = ReportActionComposeFocusManager.currentFocusedComposerRef.current;
+            const currentFocusedComposer = ReportActionComposeFocusManager.lastFocusedComposerRef.current;
             ReportActionComposeFocusManager.focus();
             // focusWithDelay(currentFocusedComposer)(shouldDelay);
         }else
@@ -407,10 +409,8 @@ function ReportActionItemMessageEdit(props) {
                             onFocus={() => {
                                 console.log('[debug] onFocus={() => { oiajsdofo')
                                 setIsFocused(true);
-                                ReportActionComposeFocusManager.currentFocusedComposerRef.current = textInputRef.current;
+                                ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInputRef.current;
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
-                                ComposerActions.setShouldShowComposeInput(false);
-
                             }}
                             onBlur={(event) => {
                                 console.log(`[debug] onBlur ${textInputRef.current.value}`)
@@ -427,12 +427,18 @@ function ReportActionItemMessageEdit(props) {
                                 }
 
                                 if (messageEditInput === relatedTargetId) {
-                                    ReportActionComposeFocusManager.currentFocusedComposerRef.current = lodashGet(event, 'nativeEvent.relatedTarget');
+                                    // ReportActionComposeFocusManager.lastFocusedComposerRef.current = lodashGet(event, 'nativeEvent.relatedTarget');
     
                                     return;
                                 }
+
+                                if(ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
+                                {
+                                    return;
+                                }
+
                                 console.log('[debug] openReportActionComposeViewWhenClosingMessageEdit')
-                                openReportActionComposeViewWhenClosingMessageEdit();
+                                openReportActionComposeViewWhenClosingMessageEdit(props.action.reportActionID);
                             }}
                             selection={selection}
                             onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}

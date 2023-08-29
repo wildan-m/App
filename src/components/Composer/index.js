@@ -396,6 +396,13 @@ function Composer({
                 return;
             }
             textInput.current.removeEventListener('wheel', handleWheel);
+
+            if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInput.current)
+            {
+                console.log('[debug] if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current)')
+                ReportActionComposeFocusManager.lastFocusedComposerRef.current = null;
+            } 
+    
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -475,6 +482,9 @@ function Composer({
 
                         textInput.current.focus();
                     });
+
+                    ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInput.current;
+
                     if (props.onFocus) {
                         props.onFocus(e);
                     }
