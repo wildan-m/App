@@ -253,6 +253,7 @@ function ReportScreen({
         });
 
         fetchReportIfNeeded();
+        console.log('[debug] fetchReportIfNeeded(); oiasdf')
         ComposerActions.setShouldShowComposeInput(true);
         return () => {
             if (!unsubscribeVisibilityListener) {
@@ -281,6 +282,7 @@ function ReportScreen({
         }
 
         fetchReportIfNeeded();
+        console.log('[debug] fetchReportIfNeeded(); oiahsodyfhwe')
         ComposerActions.setShouldShowComposeInput(true);
     }, [route, report, errors, fetchReportIfNeeded, prevReport.reportID]);
 

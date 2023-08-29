@@ -235,9 +235,9 @@ function ReportActionItemMessageEdit(props) {
             console.log('[debug]  if(ReportActionComposeFocusManager.lastFocusedComposerRef.current === textInputRef.current){')
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
-            ReportActionComposeFocusManager.focus();
         }
 
+        ReportActionComposeFocusManager.focus();
         
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
         if (props.index === 0) {
@@ -336,17 +336,17 @@ function ReportActionItemMessageEdit(props) {
      */
     const focus = focusWithDelay(textInputRef.current);
 
-    const restoreFocus = (shouldDelay = false) => {
+    const restoreFocus = () => {
         console.log('[debug] restoreFocus')
         console.log('[debug] ReportActionComposeFocusManager.composerRef', ReportActionComposeFocusManager.composerRef)
         console.log('[debug] ReportActionComposeFocusManager.lastFocusedComposerRef', ReportActionComposeFocusManager.lastFocusedComposerRef)
-        console.log('[debug] shouldDelay', shouldDelay)
         
         if(!isEmojiSelected)
         {
-            const currentFocusedComposer = ReportActionComposeFocusManager.lastFocusedComposerRef.current;
+            const lastFocusedComposer = ReportActionComposeFocusManager.lastFocusedComposerRef.current;
+            // lastFocusedComposer.focus();
             ReportActionComposeFocusManager.focus();
-            // focusWithDelay(currentFocusedComposer)(shouldDelay);
+            // focusWithDelay(lastFocusedComposer)(true);
         }else
         {
             setIsFocused(true);
@@ -411,11 +411,12 @@ function ReportActionItemMessageEdit(props) {
                                 setIsFocused(true);
                                 ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInputRef.current;
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
+                                //ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
                                 console.log(`[debug] onBlur ${textInputRef.current.value}`)
                                 console.log(`[debug] event.nativeEvent.relatedTarget ${textInputRef.current.value}`, event.nativeEvent.relatedTarget)
-
+                                console.log('[debug] props', props)
                                 setIsFocused(false);
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
@@ -432,10 +433,10 @@ function ReportActionItemMessageEdit(props) {
                                     return;
                                 }
 
-                                if(ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
-                                {
-                                    return;
-                                }
+                                // if(ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
+                                // {
+                                //     return;
+                                // }
 
                                 console.log('[debug] openReportActionComposeViewWhenClosingMessageEdit')
                                 openReportActionComposeViewWhenClosingMessageEdit(props.action.reportActionID);

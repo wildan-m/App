@@ -20,6 +20,7 @@ import reportPropTypes from '../../reportPropTypes';
 import PopoverReactionList from './ReactionList/PopoverReactionList';
 import getIsReportFullyVisible from '../../../libs/getIsReportFullyVisible';
 import ReportScreenContext from '../ReportScreenContext';
+import ReportActionComposeFocusManager from '../../../libs/ReportActionComposeFocusManager';
 
 const propTypes = {
     /** The report currently being looked at */
@@ -84,8 +85,12 @@ function ReportActionsView(props) {
     };
 
     useEffect(() => {
+        console.log('[debug] reportactionsview component did mount')
+ReportActionComposeFocusManager.lastFocusedComposerRef.current = null;
         openReportIfNecessary();
         // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    
     }, []);
 
     useEffect(() => {

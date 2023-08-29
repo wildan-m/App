@@ -385,6 +385,8 @@ function Composer({
         }
 
         return () => {
+            console.log('[debug] composerunmount aisodjiaf')
+
             if (!isReportActionCompose) {
                 ReportActionComposeFocusManager.clear();
             }
@@ -474,16 +476,17 @@ function Composer({
                 disabled={isDisabled}
                 onKeyPress={handleKeyPress}
                 onFocus={(e) => {
+                    console.log('[debug] onFocus={(e) => { ioajdsofijadfp')
                     ReportActionComposeFocusManager.onComposerFocus(() => {
                         console.log('[debug] ReportActionComposeFocusManager.onComposerFocus( oijaiodjf')
                         if (!textInput.current) {
                             return;
                         }
+                        ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInput.current;
 
                         textInput.current.focus();
                     });
 
-                    ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInput.current;
 
                     if (props.onFocus) {
                         props.onFocus(e);

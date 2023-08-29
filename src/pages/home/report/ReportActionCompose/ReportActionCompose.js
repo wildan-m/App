@@ -190,6 +190,7 @@ function ReportActionCompose({
         if (!isKeyboardVisibleWhenShowingModalRef.current) {
             return;
         }
+        console.log('[debug] llkkjalsdkfa')
         focus();
         isKeyboardVisibleWhenShowingModalRef.current = false;
     }, []);

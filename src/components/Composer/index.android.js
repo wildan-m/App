@@ -5,6 +5,9 @@ import _ from 'underscore';
 import RNTextInput from '../RNTextInput';
 import themeColors from '../../styles/themes/default';
 import * as ComposerUtils from '../../libs/ComposerUtils';
+import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
+import * as ComposerActions from '../../libs/actions/Composer';
+
 
 const propTypes = {
     /** Maximum number of lines in the text input */
@@ -122,6 +125,25 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
             /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...props}
             editable={!isDisabled}
+            onFocus={(e) => {
+                console.log('[debug] onFocus={(e) => { ioajdsofijadfp')
+                console.log('[debug] ReportActionComposeFocusManager.lastFocusedComposerRef.current oijaijdfw', ReportActionComposeFocusManager.lastFocusedComposerRef.current)
+                ReportActionComposeFocusManager.onComposerFocus(() => {
+                    console.log('[debug] ReportActionComposeFocusManager.onComposerFocus( oijaiodjf')
+                    if (!textInput.current) {
+                        return;
+                    }
+                    ComposerActions.setShouldShowComposeInput(false);
+                    ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInput.current;
+                    textInput.current.focus();
+                });
+console.log('[debug] textInput.current aijosdf', textInput.current)
+                ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInput.current;
+                if (props.onFocus) {
+                    props.onFocus(e);
+                }
+            }}
+
         />
     );
 }
