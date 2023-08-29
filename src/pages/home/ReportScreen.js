@@ -168,19 +168,16 @@ function ReportScreen({
         />
     );
 
-    componentDidUpdate(prevProps) {
-        // If you already have a report open and are deeplinking to a new report on native,
-        // the ReportScreen never actually unmounts and the reportID in the route also doesn't change.
-        // Therefore, we need to compare if the existing reportID is the same as the one in the route
-        // before deciding that we shouldn't call OpenReport.
-        const onyxReportID = this.props.report.reportID;
-        const routeReportID = getReportID(this.props.route);
-        if (onyxReportID === prevProps.report.reportID && (!onyxReportID || onyxReportID === routeReportID)) {
-            return;
-        }
-
-        this.fetchReportIfNeeded();
-        ComposerActions.setShouldShowComposeInput(true);
+    if (isSingleTransactionView && !isDeletedParentAction) {
+        headerView = (
+            <MoneyRequestHeader
+                report={report}
+                policy={policy}
+                personalDetails={personalDetails}
+                isSingleTransactionView={isSingleTransactionView}
+                parentReportAction={parentReportAction}
+            />
+        );
     }
 
     if (ReportUtils.isMoneyRequestReport(report)) {
