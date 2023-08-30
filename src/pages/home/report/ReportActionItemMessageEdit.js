@@ -411,7 +411,7 @@ function ReportActionItemMessageEdit(props) {
                                 setIsFocused(true);
                                 ReportActionComposeFocusManager.lastFocusedComposerRef.current = textInputRef.current;
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
-                                //ComposerActions.setShouldShowComposeInput(false);
+                                ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
                                 console.log(`[debug] onBlur ${textInputRef.current.value}`)
