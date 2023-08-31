@@ -60,7 +60,7 @@ const EmojiPicker = forwardRef((props, ref) => {
             setIsEmojiPickerVisible(true);
             setEmojiPopoverAnchorPosition(value);
             setEmojiPopoverAnchorOrigin(anchorOriginValue);
-            console.log('[debug] setActiveID id asdfasdf', id)
+            // console.log('[debug] setActiveID id asdfasdf', id)
             setActiveID(id);
         });
     };
@@ -114,8 +114,8 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @return {Boolean}
      */
     const isActive = (id) => {
-        console.log('[debug] id ajisdfwe', id)
-        console.log('[debug] activeID ajisdfwe', activeID)
+        // console.log('[debug] id ajisdfwe', id)
+        // console.log('[debug] activeID ajisdfwe', activeID)
         return Boolean(id) && id === activeID};
 
     const resetEmojiPopoverAnchor = () => (emojiPopoverAnchor.current = null);

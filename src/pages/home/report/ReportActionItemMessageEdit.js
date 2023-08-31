@@ -383,6 +383,7 @@ function ReportActionItemMessageEdit(props) {
                             onBlur={(event) => {
                                 console.log(`[debug] onBlur nacusodnc`);
                                 console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+                                console.log(`[debug] event.nativeEvent.target`, event.nativeEvent.target);
                                 console.log(`[debug] event.nativeEvent.relatedTarget`, event.nativeEvent.relatedTarget);
 
                                 setIsFocused(false);
@@ -390,6 +391,7 @@ function ReportActionItemMessageEdit(props) {
 
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
                                 if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {
+                                    textInputRef.current.focus();
                                     return;
                                 }
 
