@@ -50,7 +50,7 @@ const EmojiPicker = forwardRef((props, ref) => {
         emojiPopoverAnchor.current = emojiPopoverAnchorValue;
         if (emojiPopoverAnchor.current && emojiPopoverAnchor.current.blur) {
             // Drop focus to avoid blue focus ring.
-            emojiPopoverAnchor.current.blur();
+            // emojiPopoverAnchor.current.blur();
         }
 
         const anchorOriginValue = anchorOrigin || DEFAULT_ANCHOR_ORIGIN;
@@ -60,6 +60,7 @@ const EmojiPicker = forwardRef((props, ref) => {
             setIsEmojiPickerVisible(true);
             setEmojiPopoverAnchorPosition(value);
             setEmojiPopoverAnchorOrigin(anchorOriginValue);
+            console.log('[debug] setActiveID id asdfasdf', id)
             setActiveID(id);
         });
     };
@@ -112,7 +113,10 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {String} id
      * @return {Boolean}
      */
-    const isActive = (id) => Boolean(id) && id === activeID;
+    const isActive = (id) => {
+        console.log('[debug] id ajisdfwe', id)
+        console.log('[debug] activeID ajisdfwe', activeID)
+        return Boolean(id) && id === activeID};
 
     const resetEmojiPopoverAnchor = () => (emojiPopoverAnchor.current = null);
 

@@ -55,7 +55,10 @@ const defaultProps = {
 
 function AddReactionBubble(props) {
     const ref = useRef();
-    useEffect(() => EmojiPickerAction.resetEmojiPopoverAnchor, []);
+    useEffect(() => {
+console.log('[debut] nauosndc')
+        
+        EmojiPickerAction.resetEmojiPopoverAnchor()}, []);
 
     const onPress = () => {
         const openPicker = (refParam, anchorOrigin) => {

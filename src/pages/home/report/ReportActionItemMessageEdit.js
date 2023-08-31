@@ -111,6 +111,18 @@ function ReportActionItemMessageEdit(props) {
     const isFocusedRef = useRef(false);
     const insertedEmojis = useRef([]);
 
+    const isActive = () => {
+        console.log('[debug] isFocused', isFocused)
+        console.log('[debug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID))
+        console.log('[debug] ReportActionContextMenu.isActiveReportAction(props.action.reportActionID)', ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
+        return isFocused || EmojiPickerAction.isActive(props.action.reportActionID) || ReportActionContextMenu.isActiveReportAction(props.action.reportActionID);
+    }
+
+    useEffect(()=>{
+        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+    });
+
+
     useEffect(() => {
         // required for keeping last state of isFocused variable
         isFocusedRef.current = isFocused;
@@ -209,6 +221,10 @@ function ReportActionItemMessageEdit(props) {
      * Delete the draft of the comment being edited. This will take the comment out of "edit mode" with the old content.
      */
     const deleteDraft = useCallback(() => {
+        console.log(`[debug] deleteDraft noaihdaf`);
+        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        console.log('[debug] isFocused', isFocused)
+        console.log('[debug] isFocusedRef.current', isFocusedRef.current)
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
         ComposerActions.setShouldShowComposeInput(true);
@@ -229,6 +245,9 @@ function ReportActionItemMessageEdit(props) {
      * the new content.
      */
     const publishDraft = useCallback(() => {
+        console.log(`[debug] publishDraft moaiafsdf`);
+        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+
         // Do nothing if draft exceed the character limit
         if (ReportUtils.getCommentLength(draft) > CONST.MAX_COMMENT_LENGTH) {
             return;
@@ -268,6 +287,9 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        console.log(`[debug] addEmojiToTextBox moijascds`);
+        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
             end: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
@@ -351,11 +373,18 @@ function ReportActionItemMessageEdit(props) {
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
                             onFocus={() => {
+                                console.log(`[debug] onFocus oaijdfioaw`);
+                                console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+
                                 setIsFocused(true);
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
+                                console.log(`[debug] onBlur nacusodnc`);
+                                console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+                                console.log(`[debug] event.nativeEvent.relatedTarget`, event.nativeEvent.relatedTarget);
+
                                 setIsFocused(false);
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 

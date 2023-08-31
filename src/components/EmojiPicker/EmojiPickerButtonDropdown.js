@@ -26,7 +26,10 @@ const defaultProps = {
 
 function EmojiPickerButtonDropdown(props) {
     const emojiPopoverAnchor = useRef(null);
-    useEffect(() => EmojiPickerAction.resetEmojiPopoverAnchor, []);
+    useEffect(() => {
+console.log('[debut] mownoecwe')
+        
+        EmojiPickerAction.resetEmojiPopoverAnchor()}, []);
 
     const onPress = () =>
         EmojiPickerAction.showEmojiPicker(props.onModalHide, (emoji) => props.onInputChange(emoji), emojiPopoverAnchor.current, {
