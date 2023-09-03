@@ -9,6 +9,7 @@ import Icon from '../Icon';
 import withLocalize, {withLocalizePropTypes} from '../withLocalize';
 import * as EmojiPickerAction from '../../libs/actions/EmojiPickerAction';
 import PressableWithoutFeedback from '../Pressable/PressableWithoutFeedback';
+import { Keyboard } from 'react-native';
 
 const propTypes = {
     /** Flag to disable the emoji picker button */

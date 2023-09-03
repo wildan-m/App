@@ -56,6 +56,7 @@ function setModalVisibility(isVisible) {
  * @param {Boolean} isVisible
  */
 function willAlertModalBecomeVisible(isVisible) {
+    console.log('[debug] willAlertModalBecomeVisible(isVisible) {', isVisible)
     Onyx.merge(ONYXKEYS.MODAL, {willAlertModalBecomeVisible: isVisible});
 }
 

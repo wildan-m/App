@@ -134,21 +134,16 @@ function ReportActionItemMessageEdit(props) {
         console.log('[debug] insertedEmojis.current.length', insertedEmojis.current.length)
         console.log('[debug] draft', draft)
         console.log('[debug] selection', selection)
-        console.log('[debug] isEmojiSelected.current', isEmojiSelected.current)
-        console.log('[debug] EmojiPickerAction.emojiPickerRef.current', EmojiPickerAction.emojiPickerRef.current)
-        console.log('[debug] EmojiPickerAction.isEmojiPickerVisible()', EmojiPickerAction.isEmojiPickerVisible())
-        console.log('[debug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID))
-
+     
         if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {
-            console.log('[debug]  if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {');
+            console.log('[debug]  if (props.modal.isVisible || !isFocusedRef.current) {');
             return;
         }
 
         setIsFocused(false);
         console.log('[debug] ReportActionComposeFocusManager.focus(true);', draft);
         ReportActionComposeFocusManager.focus(true);
-    }, [props.modal.willAlertModalBecomeVisible]);
-
+    }, [props.modal]);
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -250,7 +245,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const deleteDraft = useCallback(() => {
         console.log(`[debug] deleteDraft noaihdaf`);
-        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
         console.log('[debug] isFocused', isFocused)
         console.log('[debug] isFocusedRef.current', isFocusedRef.current)
         debouncedSaveDraft.cancel();
@@ -260,7 +255,7 @@ function ReportActionItemMessageEdit(props) {
         {
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
-          //  setIsFocused(false);
+        //    setIsFocused(false);
         }
 
         ReportActionComposeFocusManager.focus();
@@ -280,7 +275,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const publishDraft = useCallback(() => {
         console.log(`[debug] publishDraft moaiafsdf`);
-        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
 
         // Do nothing if draft exceed the character limit
         if (ReportUtils.getCommentLength(draft) > CONST.MAX_COMMENT_LENGTH) {
@@ -329,7 +324,7 @@ function ReportActionItemMessageEdit(props) {
     const addEmojiToTextBox = (emoji) => {
         // isEmojiSelected.current = true;
         console.log(`[debug] addEmojiToTextBox moijascds`);
-        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
 
         if(!isFocusedRef.current)
         {

@@ -1,5 +1,5 @@
 import React, {forwardRef, useCallback, useEffect, useMemo} from 'react';
-import {View} from 'react-native';
+import {Keyboard, View} from 'react-native';
 import PropTypes from 'prop-types';
 import ReactNativeModal from 'react-native-modal';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -75,8 +75,8 @@ function BaseModal({
     );
 
     useEffect(() => {
+        console.log('[debug] useEffect iojasdfjaf')
         Modal.willAlertModalBecomeVisible(isVisible);
-
         // To handle closing any modal already visible when this modal is mounted, i.e. PopoverReportActionContextMenu
         Modal.setCloseModal(isVisible ? onClose : null);
     }, [isVisible, onClose]);
@@ -86,6 +86,8 @@ function BaseModal({
             // Only trigger onClose and setModalVisibility if the modal is unmounting while visible.
             if (isVisible) {
                 hideModal(true);
+                console.log('useEffect joiashcdsc')
+
                 Modal.willAlertModalBecomeVisible(false);
             }
 

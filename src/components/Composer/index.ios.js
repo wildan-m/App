@@ -5,6 +5,8 @@ import _ from 'underscore';
 import RNTextInput from '../RNTextInput';
 import themeColors from '../../styles/themes/default';
 import * as ComposerUtils from '../../libs/ComposerUtils';
+import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
+import focusWithDelay from '../../libs/focusWithDelay';
 
 const propTypes = {
     /** If the input should clear, it actually gets intercepted instead of .clear() */
@@ -123,6 +125,27 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
             /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...propsToPass}
             editable={!isDisabled}
+            onFocus={(e) => {
+                ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
+                    if (!textInput.current) {
+                        return;
+                    }
+
+                    console.log('[debug] shouldDelay', shouldDelay)
+                    console.log('[debug] textInput.current', textInput.current)
+                    if(shouldDelay)
+                    {
+                        const focus = focusWithDelay(textInput.current);
+                        focus(true);
+                        return;
+                    }
+                
+                    textInput.current.focus();
+                });
+                if (props.onFocus) {
+                    props.onFocus(e);
+                }
+            }}
         />
     );
 }
