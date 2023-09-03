@@ -19,6 +19,7 @@ import isEnterWhileComposition from '../../libs/KeyboardShortcut/isEnterWhileCom
 import CONST from '../../CONST';
 import withNavigation from '../withNavigation';
 import ReportActionComposeFocusManager from '../../libs/ReportActionComposeFocusManager';
+import focusWithDelay from '../../libs/focusWithDelay';
 
 const propTypes = {
     /** Maximum number of lines in the text input */
@@ -465,11 +466,20 @@ function Composer({
                 disabled={isDisabled}
                 onKeyPress={handleKeyPress}
                 onFocus={(e) => {
-                    ReportActionComposeFocusManager.onComposerFocus(() => {
+                    ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
                         if (!textInput.current) {
                             return;
                         }
 
+                        console.log('[debug] shouldDelay', shouldDelay)
+                        console.log('[debug] textInput.current', textInput.current)
+                        if(shouldDelay)
+                        {
+                            const focus = focusWithDelay(textInput.current);
+                            focus(true);
+                            return;
+                        }
+                    
                         textInput.current.focus();
                     });
                     if (props.onFocus) {

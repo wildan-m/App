@@ -40,6 +40,7 @@ import useReportScrollManager from '../../../hooks/useReportScrollManager';
 import * as EmojiPickerAction from '../../../libs/actions/EmojiPickerAction';
 import focusWithDelay from '../../../libs/focusWithDelay';
 import ONYXKEYS from '../../../ONYXKEYS';
+import { withOnyx } from 'react-native-onyx';
 
 const propTypes = {
     /** All the data of the action */
@@ -71,6 +72,12 @@ const propTypes = {
     /** Stores user's preferred skin tone */
     preferredSkinTone: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 
+    /** Details about any modals being used */
+    modal: PropTypes.shape({
+        /** Indicates if there is a modal currently visible or not */
+        isVisible: PropTypes.bool,
+    }),
+
     ...withLocalizePropTypes,
 };
 
@@ -80,6 +87,7 @@ const defaultProps = {
     shouldDisableEmojiPicker: false,
     preferredSkinTone: CONST.EMOJI_DEFAULT_SKIN_TONE,
     drafts: {},
+    modal: {},
 };
 
 // native ids
@@ -110,6 +118,7 @@ function ReportActionItemMessageEdit(props) {
     const textInputRef = useRef(null);
     const isFocusedRef = useRef(false);
     const insertedEmojis = useRef([]);
+    const isEmojiSelected = useRef(false);
 
     const isActive = () => {
         console.log('[debug] isFocused', isFocused)
@@ -118,9 +127,27 @@ function ReportActionItemMessageEdit(props) {
         return isFocused || EmojiPickerAction.isActive(props.action.reportActionID) || ReportActionContextMenu.isActiveReportAction(props.action.reportActionID);
     }
 
-    useEffect(()=>{
-        console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
-    });
+    useEffect(() => {
+        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        console.log(`[debug] props.modal.willAlertModalBecomeVisible`, props.modal.willAlertModalBecomeVisible);
+        console.log(`[debug] isFocusedRef.current`, isFocusedRef.current);
+        console.log('[debug] insertedEmojis.current.length', insertedEmojis.current.length)
+        console.log('[debug] draft', draft)
+        console.log('[debug] selection', selection)
+        console.log('[debug] isEmojiSelected.current', isEmojiSelected.current)
+        console.log('[debug] EmojiPickerAction.emojiPickerRef.current', EmojiPickerAction.emojiPickerRef.current)
+        console.log('[debug] EmojiPickerAction.isEmojiPickerVisible()', EmojiPickerAction.isEmojiPickerVisible())
+        console.log('[debug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID))
+
+        if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {
+            console.log('[debug]  if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {');
+            return;
+        }
+
+        setIsFocused(false);
+        console.log('[debug] ReportActionComposeFocusManager.focus(true);', draft);
+        ReportActionComposeFocusManager.focus(true);
+    }, [props.modal.willAlertModalBecomeVisible]);
 
 
     useEffect(() => {
@@ -186,6 +213,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const updateDraft = useCallback(
         (newDraftInput) => {
+            console.log('[debug] updateDraft')
             const {text: newDraft, emojis} = EmojiUtils.replaceAndExtractEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
 
             if (!_.isEmpty(emojis)) {
@@ -227,8 +255,14 @@ function ReportActionItemMessageEdit(props) {
         console.log('[debug] isFocusedRef.current', isFocusedRef.current)
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
-        ComposerActions.setShouldShowComposeInput(true);
-        ReportActionComposeFocusManager.clear();
+
+        if(isFocusedRef.current)
+        {
+            ComposerActions.setShouldShowComposeInput(true);
+            ReportActionComposeFocusManager.clear();
+          //  setIsFocused(false);
+        }
+
         ReportActionComposeFocusManager.focus();
 
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
@@ -276,7 +310,13 @@ function ReportActionItemMessageEdit(props) {
 
         // When user tries to save the empty message, it will delete it. Prompt the user to confirm deleting.
         if (!trimmedNewDraft) {
-            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => InteractionManager.runAfterInteractions(() => textInputRef.current.focus()));
+            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => {
+                if(!isFocusedRef.current){
+                    return;
+                }
+
+                InteractionManager.runAfterInteractions(() => textInputRef.current.focus())
+            });
             return;
         }
         Report.editReportComment(props.reportID, props.action, trimmedNewDraft);
@@ -287,14 +327,35 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        // isEmojiSelected.current = true;
         console.log(`[debug] addEmojiToTextBox moijascds`);
         console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+
+        if(!isFocusedRef.current)
+        {
+            ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
+                if (!textInputRef.current) {
+                    return;
+                }
+
+                console.log('[debug] shouldDelay', shouldDelay)
+                console.log('[debug] textInputRef.current', textInputRef.current)
+                if (shouldDelay) {
+                    const focus = focusWithDelay(textInputRef.current);
+                    focus(true);
+                    return;
+                }
+
+                textInputRef.current.focus();
+            });
+        }
 
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
             end: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
         }));
         updateDraft(ComposerUtils.insertText(draft, selection, `${emoji} `));
+
     };
 
     /**
@@ -385,19 +446,29 @@ function ReportActionItemMessageEdit(props) {
                                 console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
                                 console.log(`[debug] event.nativeEvent.target`, event.nativeEvent.target);
                                 console.log(`[debug] event.nativeEvent.relatedTarget`, event.nativeEvent.relatedTarget);
-
-                                setIsFocused(false);
+                                
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
+                             
+
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
-                                if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {
+                                if (_.contains([saveButtonID, cancelButtonID], relatedTargetId)) {
+                                    console.log('[debug] if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {')
                                     textInputRef.current.focus();
                                     return;
                                 }
 
+                                if (emojiButtonID === relatedTargetId) {
+                                    return;
+                                }
+
+                                console.log('[debug] setIsFocused(false);')
+                                setIsFocused(false);
+
                                 if (messageEditInput === relatedTargetId) {
                                     return;
                                 }
+
                                 openReportActionComposeViewWhenClosingMessageEdit();
                             }}
                             selection={selection}
@@ -407,10 +478,14 @@ function ReportActionItemMessageEdit(props) {
                     <View style={styles.editChatItemEmojiWrapper}>
                         <EmojiPickerButton
                             isDisabled={props.shouldDisableEmojiPicker}
-                            onModalHide={() => {
-                                setIsFocused(true);
-                                focus(true);
-                            }}
+                            // onModalHide={() => {
+                            //     if(!isFocusedRef.current){
+                            //         return;
+                            //     }
+
+                            //     setIsFocused(true);
+                            //     focus(true);
+                            // }}
                             onEmojiSelected={addEmojiToTextBox}
                             nativeID={emojiButtonID}
                             emojiPickerID={props.action.reportActionID}
@@ -454,6 +529,11 @@ export default compose(
     withLocalize,
     withReportActionsDrafts({
         propName: 'drafts',
+    }),
+    withOnyx({
+        modal: {
+            key: ONYXKEYS.MODAL,
+        },
     }),
 )(
     React.forwardRef((props, ref) => (

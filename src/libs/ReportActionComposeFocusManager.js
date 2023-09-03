@@ -26,17 +26,18 @@ function onComposerFocus(callback, isMainComposer = false) {
  * Request focus on the ReportActionComposer
  *
  */
-function focus() {
+function focus(shouldDelay) {
     if (!_.isFunction(focusCallback)) {
         if (!_.isFunction(mainComposerFocusCallback)) {
             return;
         }
-
+console.log('[debug] mainComposerFocusCallback')
         mainComposerFocusCallback();
         return;
     }
+    console.log('[debug] focusCallback', focusCallback)
 
-    focusCallback();
+    focusCallback(shouldDelay);
 }
 
 /**
