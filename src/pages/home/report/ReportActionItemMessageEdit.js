@@ -140,8 +140,8 @@ function ReportActionItemMessageEdit(props) {
         console.log('[wildebug] insertedEmojis.current.length', insertedEmojis.current.length)
         console.log('[wildebug] draft', draft)
         console.log('[wildebug] selection', selection)
-        console.log('[wildebug] prevProps', prevProps)
-        console.log('[wildebug] props', props)
+        // console.log('[wildebug] prevProps', prevProps)
+        // console.log('[wildebug] props', props)
      
 
         if (props.modal.isVisible || !isFocusedRef.current) {
@@ -149,10 +149,14 @@ function ReportActionItemMessageEdit(props) {
             return;
         }
 
+        // if(isFocusedRef.current)
+        // {
+        //     textInputRef.current.blur();
+        // }
+
         setIsFocused(false);
         console.log('[wildebug] ReportActionComposeFocusManager.focus(true);', draft);
         ReportActionComposeFocusManager.focus(true);
-        // ReportActionComposeFocusManager.focus(true);
     }, [props.modal.isVisible]);
 
     useEffect(() => {
@@ -181,6 +185,7 @@ function ReportActionItemMessageEdit(props) {
 
             // Show the main composer when the focused message is deleted from another client
             // to prevent the main composer stays hidden until we swtich to another chat.
+            console.log('[wildebug] to prevent the main composer stays ihasohdfowe')
             ComposerActions.setShouldShowComposeInput(true);
         };
     }, [props.action.reportActionID]);
@@ -263,6 +268,8 @@ function ReportActionItemMessageEdit(props) {
 
         if(isFocusedRef.current)
         {
+            console.log('[wildebug] if(isFocusedRef.current) oijoaisdfasf')
+
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
             //setIsFocused(false);
@@ -328,32 +335,37 @@ function ReportActionItemMessageEdit(props) {
         deleteDraft();
     }, [props.action, debouncedSaveDraft, deleteDraft, draft, props.reportID, props.drafts]);
 
+    const handleFocus = (shouldDelay) => {
+        console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
+        if (!textInputRef.current) {
+            return;
+        }
+        console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
+        console.log('[wildebug] shouldDelay', shouldDelay)
+        ReportActionComposeFocusManager.onComposerFocus(handleFocus);
+        setIsFocused(true);
+        console.log('[wildebug] reportScrollManager.scrollToIndex({animated ohaosidhfiafeopj')
+
+        ComposerActions.setShouldShowComposeInput(false);
+        reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
+
+
+        if (shouldDelay) {
+            const focus = focusWithDelay(textInputRef.current);
+            focus(true);
+            return;
+        }
+        textInputRef.current.focus();
+    }
+
     /**
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
-        // isEmojiSelected.current = true;
         console.log(`[wildebug] addEmojiToTextBox moijascds`);
-        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
-
         if(!isFocusedRef.current)
         {
-            ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
-                console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
-                if (!textInputRef.current) {
-                    return;
-                }
-                console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
-                console.log('[wildebug] shouldDelay', shouldDelay)
-                console.log('[wildebug] textInputRef.current', textInputRef.current)
-                if (shouldDelay) {
-                    const focus = focusWithDelay(textInputRef.current);
-                    focus(true);
-                    return;
-                }
-
-                textInputRef.current.focus();
-            });
+            ReportActionComposeFocusManager.onComposerFocus(handleFocus);
         }
 
         setSelection((prevSelection) => ({
@@ -440,14 +452,7 @@ function ReportActionItemMessageEdit(props) {
                             value={draft}
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
-                            onFocus={() => {
-                                console.log(`[wildebug] onFocus oaijdfioaw`);
-                                console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
-
-                                setIsFocused(true);
-                                reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
-                                ComposerActions.setShouldShowComposeInput(false);
-                            }}
+                            onFocus={handleFocus}
                             onBlur={(event) => {
                                 console.log(`[wildebug] onBlur nacusodnc`);
                                 console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
@@ -461,7 +466,7 @@ function ReportActionItemMessageEdit(props) {
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
                                 if (_.contains([saveButtonID, cancelButtonID], relatedTargetId)) {
                                     console.log('[wildebug] if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {')
-                                    textInputRef.current.focus();
+                                    handleFocus();
                                     return;
                                 }
 
@@ -476,6 +481,8 @@ function ReportActionItemMessageEdit(props) {
                                     return;
                                 }
 
+                                console.log('[wildebug] props.modal iojsidfsdf', props.modal)
+                                console.log('[wildebug] openReportActionComposeViewWhenClosingMessageEdit ohaosuidhf')
                                 openReportActionComposeViewWhenClosingMessageEdit();
                             }}
                             selection={selection}

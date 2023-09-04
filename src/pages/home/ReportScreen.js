@@ -37,6 +37,7 @@ import ReportScreenContext from './ReportScreenContext';
 import TaskHeaderActionButton from '../../components/TaskHeaderActionButton';
 import DragAndDropProvider from '../../components/DragAndDrop/Provider';
 import usePrevious from '../../hooks/usePrevious';
+import withKeyboardState, { keyboardStatePropTypes } from '../../components/withKeyboardState';
 
 const propTypes = {
     /** Navigation route context info provided by react navigation */
@@ -86,6 +87,7 @@ const propTypes = {
     /** All of the personal details for everyone */
     personalDetails: PropTypes.objectOf(personalDetailsPropType),
 
+    ...keyboardStatePropTypes,
     ...windowDimensionsPropTypes,
     ...viewportOffsetTopPropTypes,
 };
@@ -131,6 +133,8 @@ function ReportScreen({
     viewportOffsetTop,
     isComposerFullSize,
     errors,
+    isKeyboardShown,
+    shouldShowComposeInput,
 }) {
     const firstRenderRef = useRef(true);
     const flatListRef = useRef();
@@ -284,6 +288,15 @@ function ReportScreen({
         ComposerActions.setShouldShowComposeInput(true);
     }, [route, report, errors, fetchReportIfNeeded, prevReport.reportID]);
 
+    // useEffect(() => {
+    //     if(isKeyboardShown || shouldShowComposeInput)
+    //     {
+    //         return;
+    //     }
+
+    //     ComposerActions.setShouldShowComposeInput(true);
+    // }, [isKeyboardShown]);
+
     return (
         <ReportScreenContext.Provider
             value={{
@@ -396,6 +409,7 @@ export default compose(
     withLocalize,
     withWindowDimensions,
     withNetwork(),
+    withKeyboardState,
     withOnyx({
         isSidebarLoaded: {
             key: ONYXKEYS.IS_SIDEBAR_LOADED,
@@ -423,5 +437,8 @@ export default compose(
         personalDetails: {
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
         },
+        shouldShowComposeInput: {
+            key: ONYXKEYS.SHOULD_SHOW_COMPOSE_INPUT,
+        }
     }),
 )(ReportScreen);

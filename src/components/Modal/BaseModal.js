@@ -76,8 +76,8 @@ function BaseModal({
     );
 
     useEffect(() => {
-        console.log('[wildebug] useEffect iojasdfjaf')
-        console.log('[wildebug] code', code)
+        // console.log('[wildebug] useEffect iojasdfjaf')
+        // console.log('[wildebug] code', code)
         Modal.willAlertModalBecomeVisible(isVisible);
         // To handle closing any modal already visible when this modal is mounted, i.e. PopoverReportActionContextMenu
         Modal.setCloseModal(isVisible ? onClose : null);
@@ -85,13 +85,13 @@ function BaseModal({
 
     useEffect(
         () => () => {
-            console.log('[wildebug] useEffect aiodsfsadf')
-            console.log('[wildebug] code', code)
-            console.log('[wildebug] isVisible', isVisible)
+            // console.log('[wildebug] useEffect aiodsfsadf')
+            // console.log('[wildebug] code', code)
+            // console.log('[wildebug] isVisible', isVisible)
             // Only trigger onClose and setModalVisibility if the modal is unmounting while visible.
             if (isVisible) {
                 hideModal(true);
-                console.log('useEffect joiashcdsc')
+                // console.log('useEffect joiashcdsc')
 
                 Modal.willAlertModalBecomeVisible(false);
             }

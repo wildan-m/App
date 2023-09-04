@@ -2,7 +2,7 @@ import _ from 'underscore';
 import lodashGet from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, {useCallback, useState, useEffect, useRef, useLayoutEffect, useMemo} from 'react';
-import {AppState, Linking} from 'react-native';
+import {AppState, Linking, LogBox} from 'react-native';
 import Onyx, {withOnyx} from 'react-native-onyx';
 import * as Report from './libs/actions/Report';
 import BootSplash from './libs/BootSplash';
@@ -40,7 +40,7 @@ import UnreadIndicatorUpdater from './libs/UnreadIndicatorUpdater';
 // eslint-disable-next-line no-unused-vars
 import subscribePushNotification from './libs/Notification/PushNotification/subscribePushNotification';
 
-console.disableYellowBox = true;
+LogBox.ignoreAllLogs()
 
 Onyx.registerLogger(({level, message}) => {
     if (level === 'alert') {

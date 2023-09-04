@@ -33,7 +33,7 @@ const defaultProps = {
 function EmojiPickerButton(props) {
     const emojiPopoverAnchor = useRef(null);
     useEffect(() => {
-console.log('[debut] anosdihfia')
+        console.log('[wildebug] anosdihfia')
         
         EmojiPickerAction.resetEmojiPopoverAnchor()}, []);
 
