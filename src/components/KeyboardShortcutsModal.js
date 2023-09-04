@@ -153,6 +153,7 @@ function KeyboardShortcutsModal({isShortcutsModalOpen = false, isSmallScreenWidt
 
     return (
         <Modal
+            code='KeyboardShortcutModal'
             isVisible={isShortcutsModalOpen}
             type={modalType}
             innerContainerStyle={{...styles.keyboardShortcutModalContainer, ...StyleUtils.getKeyboardShortcutsModalWidth(isSmallScreenWidth)}}

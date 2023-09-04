@@ -148,7 +148,7 @@ const EmojiPicker = forwardRef((props, ref) => {
             onModalShow={focusEmojiSearchInput}
             onModalHide={onModalHide.current}
             hideModalContentWhileAnimating
-            shouldSetModalVisibility={false}
+            shouldSetModalVisibility={true}
             animationInTiming={1}
             animationOutTiming={1}
             anchorPosition={{

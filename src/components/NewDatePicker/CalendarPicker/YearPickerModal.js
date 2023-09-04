@@ -53,6 +53,8 @@ function YearPickerModal(props) {
 
     return (
         <Modal
+        code='YearPickerModal'
+
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
             isVisible={props.isVisible}
             onClose={props.onClose}

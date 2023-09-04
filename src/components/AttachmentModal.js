@@ -320,6 +320,8 @@ function AttachmentModal(props) {
     return (
         <>
             <Modal
+            code='AttachmentModal'
+
                 type={modalType}
                 onSubmit={submitAndClose}
                 onClose={closeModal}

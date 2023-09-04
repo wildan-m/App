@@ -92,6 +92,7 @@ const defaultProps = {
 function ConfirmModal(props) {
     return (
         <Modal
+            code='ConfirmModal'
             onSubmit={props.onConfirm}
             onClose={props.onCancel}
             isVisible={props.isVisible}

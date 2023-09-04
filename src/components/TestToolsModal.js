@@ -28,6 +28,8 @@ const defaultProps = {
 function TestToolsModal(props) {
     return (
         <Modal
+        code='TestToolsModal'
+
             isVisible={props.isTestToolsModalOpen}
             type={CONST.MODAL.MODAL_TYPE.CENTERED_SMALL}
             onClose={toggleTestToolsModal}

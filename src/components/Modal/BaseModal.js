@@ -49,6 +49,7 @@ function BaseModal({
     avoidKeyboard,
     forwardedRef,
     children,
+    code,
 }) {
     const {windowWidth, windowHeight, isSmallScreenWidth} = useWindowDimensions();
 
@@ -76,14 +77,16 @@ function BaseModal({
 
     useEffect(() => {
         console.log('[wildebug] useEffect iojasdfjaf')
+        console.log('[wildebug] code', code)
         Modal.willAlertModalBecomeVisible(isVisible);
         // To handle closing any modal already visible when this modal is mounted, i.e. PopoverReportActionContextMenu
-        // Modal.setCloseModal(isVisible ? onClose : null);
+        Modal.setCloseModal(isVisible ? onClose : null);
     }, [isVisible, onClose]);
 
     useEffect(
         () => () => {
             console.log('[wildebug] useEffect aiodsfsadf')
+            console.log('[wildebug] code', code)
             console.log('[wildebug] isVisible', isVisible)
             // Only trigger onClose and setModalVisibility if the modal is unmounting while visible.
             if (isVisible) {

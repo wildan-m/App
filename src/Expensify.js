@@ -40,6 +40,8 @@ import UnreadIndicatorUpdater from './libs/UnreadIndicatorUpdater';
 // eslint-disable-next-line no-unused-vars
 import subscribePushNotification from './libs/Notification/PushNotification/subscribePushNotification';
 
+console.disableYellowBox = true;
+
 Onyx.registerLogger(({level, message}) => {
     if (level === 'alert') {
         Log.alert(message);

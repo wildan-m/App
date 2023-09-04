@@ -357,6 +357,8 @@ function AvatarCropModal(props) {
 
     return (
         <Modal
+        code='AvatarCropModal'
+
             onClose={props.onClose}
             isVisible={props.isVisible}
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}

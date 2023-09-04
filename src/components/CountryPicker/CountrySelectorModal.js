@@ -64,6 +64,8 @@ function CountrySelectorModal({currentCountry, isVisible, onClose, onCountrySele
 
     return (
         <Modal
+        code='CountrySelectorModal'
+
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
             isVisible={isVisible}
             onClose={onClose}

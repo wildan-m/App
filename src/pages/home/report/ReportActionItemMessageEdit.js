@@ -143,15 +143,17 @@ function ReportActionItemMessageEdit(props) {
         console.log('[wildebug] prevProps', prevProps)
         console.log('[wildebug] props', props)
      
-        if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {
-            console.log('[wildebug]  if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {');
+
+        if (props.modal.isVisible || !isFocusedRef.current) {
+            console.log('[wildebug]  if (props.modal.isVisible || !isFocusedRef.current) {');
             return;
         }
 
         setIsFocused(false);
         console.log('[wildebug] ReportActionComposeFocusManager.focus(true);', draft);
         ReportActionComposeFocusManager.focus(true);
-    }, [props.modal]);
+        // ReportActionComposeFocusManager.focus(true);
+    }, [props.modal.isVisible]);
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -313,12 +315,12 @@ function ReportActionItemMessageEdit(props) {
 
         // When user tries to save the empty message, it will delete it. Prompt the user to confirm deleting.
         if (!trimmedNewDraft) {
-            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => {
-                if(!isFocusedRef.current){
-                    return;
-                }
+            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, true, deleteDraft, () => {
+                // if(!isFocusedRef.current){
+                //     return;
+                // }
 
-                InteractionManager.runAfterInteractions(() => textInputRef.current.focus())
+                // InteractionManager.runAfterInteractions(() => textInputRef.current.focus())
             });
             return;
         }

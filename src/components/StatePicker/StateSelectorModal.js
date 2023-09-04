@@ -68,12 +68,15 @@ function StateSelectorModal({currentState, isVisible, onClose, onStateSelected, 
 
     return (
         <Modal
+        code='StateSelectorModal'
+
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
             isVisible={isVisible}
             onClose={onClose}
             onModalHide={onClose}
             hideModalContentWhileAnimating
             useNativeDriver
+
         >
             <ScreenWrapper
                 style={[styles.pb0]}
