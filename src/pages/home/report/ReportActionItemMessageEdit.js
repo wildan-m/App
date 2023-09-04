@@ -41,6 +41,8 @@ import * as EmojiPickerAction from '../../../libs/actions/EmojiPickerAction';
 import focusWithDelay from '../../../libs/focusWithDelay';
 import ONYXKEYS from '../../../ONYXKEYS';
 import { withOnyx } from 'react-native-onyx';
+import Navigation from '../../../libs/Navigation/Navigation';
+import usePrevious from '../../../hooks/usePrevious';
 
 const propTypes = {
     /** All the data of the action */
@@ -96,11 +98,13 @@ const cancelButtonID = 'cancelButton';
 const emojiButtonID = 'emojiButton';
 const messageEditInput = 'messageEditInput';
 
+
 function ReportActionItemMessageEdit(props) {
     const reportScrollManager = useReportScrollManager();
     const {translate} = useLocalize();
     const {isKeyboardShown} = useKeyboardState();
     const {isSmallScreenWidth} = useWindowDimensions();
+    const prevProps = usePrevious(props);
 
     const [draft, setDraft] = useState(() => {
         if (props.draftMessage === props.action.message[0].html) {
@@ -121,27 +125,31 @@ function ReportActionItemMessageEdit(props) {
     const isEmojiSelected = useRef(false);
 
     const isActive = () => {
-        console.log('[debug] isFocused', isFocused)
-        console.log('[debug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID))
-        console.log('[debug] ReportActionContextMenu.isActiveReportAction(props.action.reportActionID)', ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
+        console.log('[wildebug] isFocused', isFocused)
+        console.log('[wildebug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID))
+        console.log('[wildebug] ReportActionContextMenu.isActiveReportAction(props.action.reportActionID)', ReportActionContextMenu.isActiveReportAction(props.action.reportActionID))
         return isFocused || EmojiPickerAction.isActive(props.action.reportActionID) || ReportActionContextMenu.isActiveReportAction(props.action.reportActionID);
     }
 
     useEffect(() => {
-        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
-        console.log(`[debug] props.modal.willAlertModalBecomeVisible`, props.modal.willAlertModalBecomeVisible);
-        console.log(`[debug] isFocusedRef.current`, isFocusedRef.current);
-        console.log('[debug] insertedEmojis.current.length', insertedEmojis.current.length)
-        console.log('[debug] draft', draft)
-        console.log('[debug] selection', selection)
+        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
+        console.log(`[wildebug] props.modal.willAlertModalBecomeVisible`, props.modal.willAlertModalBecomeVisible);
+        console.log(`[wildebug] props.modal.isVisible`, props.modal.isVisible);
+        console.log(`[wildebug] isFocusedRef.current`, isFocusedRef.current);
+        console.log(`[wildebug] isFocused`, isFocused);
+        console.log('[wildebug] insertedEmojis.current.length', insertedEmojis.current.length)
+        console.log('[wildebug] draft', draft)
+        console.log('[wildebug] selection', selection)
+        console.log('[wildebug] prevProps', prevProps)
+        console.log('[wildebug] props', props)
      
         if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {
-            console.log('[debug]  if (props.modal.isVisible || !isFocusedRef.current) {');
+            console.log('[wildebug]  if (props.modal.willAlertModalBecomeVisible || !isFocusedRef.current) {');
             return;
         }
 
         setIsFocused(false);
-        console.log('[debug] ReportActionComposeFocusManager.focus(true);', draft);
+        console.log('[wildebug] ReportActionComposeFocusManager.focus(true);', draft);
         ReportActionComposeFocusManager.focus(true);
     }, [props.modal]);
 
@@ -208,7 +216,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const updateDraft = useCallback(
         (newDraftInput) => {
-            console.log('[debug] updateDraft')
+            console.log('[wildebug] updateDraft')
             const {text: newDraft, emojis} = EmojiUtils.replaceAndExtractEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
 
             if (!_.isEmpty(emojis)) {
@@ -244,10 +252,10 @@ function ReportActionItemMessageEdit(props) {
      * Delete the draft of the comment being edited. This will take the comment out of "edit mode" with the old content.
      */
     const deleteDraft = useCallback(() => {
-        console.log(`[debug] deleteDraft noaihdaf`);
-        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
-        console.log('[debug] isFocused', isFocused)
-        console.log('[debug] isFocusedRef.current', isFocusedRef.current)
+        console.log(`[wildebug] deleteDraft noaihdaf`);
+        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
+        console.log('[wildebug] isFocused', isFocused)
+        console.log('[wildebug] isFocusedRef.current', isFocusedRef.current)
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
 
@@ -255,7 +263,7 @@ function ReportActionItemMessageEdit(props) {
         {
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
-        //    setIsFocused(false);
+            //setIsFocused(false);
         }
 
         ReportActionComposeFocusManager.focus();
@@ -274,8 +282,8 @@ function ReportActionItemMessageEdit(props) {
      * the new content.
      */
     const publishDraft = useCallback(() => {
-        console.log(`[debug] publishDraft moaiafsdf`);
-        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        console.log(`[wildebug] publishDraft moaiafsdf`);
+        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
 
         // Do nothing if draft exceed the character limit
         if (ReportUtils.getCommentLength(draft) > CONST.MAX_COMMENT_LENGTH) {
@@ -323,18 +331,19 @@ function ReportActionItemMessageEdit(props) {
      */
     const addEmojiToTextBox = (emoji) => {
         // isEmojiSelected.current = true;
-        console.log(`[debug] addEmojiToTextBox moijascds`);
-        // console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+        console.log(`[wildebug] addEmojiToTextBox moijascds`);
+        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
 
         if(!isFocusedRef.current)
         {
             ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
+                console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
                 if (!textInputRef.current) {
                     return;
                 }
-
-                console.log('[debug] shouldDelay', shouldDelay)
-                console.log('[debug] textInputRef.current', textInputRef.current)
+                console.log('[wildebug] ReportActionComposeFocusManager.onComposerFocus((shouldDela')
+                console.log('[wildebug] shouldDelay', shouldDelay)
+                console.log('[wildebug] textInputRef.current', textInputRef.current)
                 if (shouldDelay) {
                     const focus = focusWithDelay(textInputRef.current);
                     focus(true);
@@ -360,6 +369,7 @@ function ReportActionItemMessageEdit(props) {
      */
     const triggerSaveOrCancel = useCallback(
         (e) => {
+            console.log('[wildebug] triggerSaveOrCancel')
             if (!e || ComposerUtils.canSkipTriggerHotkeys(isSmallScreenWidth, isKeyboardShown)) {
                 return;
             }
@@ -429,18 +439,18 @@ function ReportActionItemMessageEdit(props) {
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
                             onFocus={() => {
-                                console.log(`[debug] onFocus oaijdfioaw`);
-                                console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
+                                console.log(`[wildebug] onFocus oaijdfioaw`);
+                                console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
 
                                 setIsFocused(true);
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
-                                console.log(`[debug] onBlur nacusodnc`);
-                                console.log(`[debug] isActive ${props.action.message[0].html}`, isActive());
-                                console.log(`[debug] event.nativeEvent.target`, event.nativeEvent.target);
-                                console.log(`[debug] event.nativeEvent.relatedTarget`, event.nativeEvent.relatedTarget);
+                                console.log(`[wildebug] onBlur nacusodnc`);
+                                console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
+                                console.log(`[wildebug] event.nativeEvent.target`, event.nativeEvent.target);
+                                console.log(`[wildebug] event.nativeEvent.relatedTarget`, event.nativeEvent.relatedTarget);
                                 
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
@@ -448,7 +458,7 @@ function ReportActionItemMessageEdit(props) {
 
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
                                 if (_.contains([saveButtonID, cancelButtonID], relatedTargetId)) {
-                                    console.log('[debug] if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {')
+                                    console.log('[wildebug] if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {')
                                     textInputRef.current.focus();
                                     return;
                                 }
@@ -457,7 +467,7 @@ function ReportActionItemMessageEdit(props) {
                                     return;
                                 }
 
-                                console.log('[debug] setIsFocused(false);')
+                                console.log('[wildebug] setIsFocused(false);')
                                 setIsFocused(false);
 
                                 if (messageEditInput === relatedTargetId) {
@@ -491,7 +501,10 @@ function ReportActionItemMessageEdit(props) {
                         <Tooltip text={translate('common.saveChanges')}>
                             <PressableWithFeedback
                                 style={[styles.chatItemSubmitButton, hasExceededMaxCommentLength ? {} : styles.buttonSuccess]}
-                                onPress={publishDraft}
+                                onPress={()=>{
+                                    console.log('[wildebug] onPress jaoischoiahsc')
+                                    publishDraft();
+                                }}
                                 nativeID={saveButtonID}
                                 disabled={hasExceededMaxCommentLength}
                                 accessibilityRole={CONST.ACCESSIBILITY_ROLE.BUTTON}

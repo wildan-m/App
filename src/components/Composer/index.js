@@ -471,8 +471,8 @@ function Composer({
                             return;
                         }
 
-                        console.log('[debug] shouldDelay', shouldDelay)
-                        console.log('[debug] textInput.current', textInput.current)
+                        console.log('[wildebug] shouldDelay', shouldDelay)
+                        console.log('[wildebug] textInput.current', textInput.current)
                         if(shouldDelay)
                         {
                             const focus = focusWithDelay(textInput.current);

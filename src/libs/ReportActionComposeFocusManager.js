@@ -31,11 +31,11 @@ function focus(shouldDelay) {
         if (!_.isFunction(mainComposerFocusCallback)) {
             return;
         }
-console.log('[debug] mainComposerFocusCallback')
+console.log('[wildebug] mainComposerFocusCallback')
         mainComposerFocusCallback();
         return;
     }
-    console.log('[debug] focusCallback', focusCallback)
+    console.log('[wildebug] focusCallback', focusCallback)
 
     focusCallback(shouldDelay);
 }

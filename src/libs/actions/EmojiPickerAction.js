@@ -53,8 +53,8 @@ function isEmojiPickerVisible() {
 }
 
 function resetEmojiPopoverAnchor() {
-    // console.log('[debug] resetEmojiPopoverAnchor')
-    // console.log('[debug] emojiPickerRef.current', emojiPickerRef.current)
+    // console.log('[wildebug] resetEmojiPopoverAnchor')
+    // console.log('[wildebug] emojiPickerRef.current', emojiPickerRef.current)
     if (!emojiPickerRef.current) {
         return;
     }

@@ -37,7 +37,7 @@ function Popover(props) {
             close(props.anchorRef);
             Modal.onModalDidClose();
         }
-        console.log('[debug]  React.useEffect(()  iahcasd')
+        console.log('[wildebug]  React.useEffect(()  iahcasd')
 
         Modal.willAlertModalBecomeVisible(props.isVisible);
         Modal.setCloseModal(props.isVisible ? () => props.onClose(props.anchorRef) : null);

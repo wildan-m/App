@@ -44,7 +44,7 @@ console.log('[debut] anosdihfia')
                 style={({hovered, pressed}) => [styles.chatItemEmojiButton, StyleUtils.getButtonBackgroundColorStyle(getButtonState(hovered, pressed))]}
                 disabled={props.isDisabled}
                 onPress={() => {
-                    console.log('[debug] onPress daojdio')
+                    console.log('[wildebug] onPress daojdio')
                     if (!EmojiPickerAction.emojiPickerRef.current.isEmojiPickerVisible) {
                         EmojiPickerAction.showEmojiPicker(props.onModalHide, props.onEmojiSelected, emojiPopoverAnchor.current, undefined, () => {}, props.emojiPickerID);
                     } else {
