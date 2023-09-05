@@ -26,7 +26,7 @@ function onComposerFocus(callback, isMainComposer = false) {
  * Request focus on the ReportActionComposer
  *
  */
-function focus() {
+function focus(shouldDelay) {
     if (!_.isFunction(focusCallback)) {
         if (!_.isFunction(mainComposerFocusCallback)) {
             return;
@@ -36,7 +36,7 @@ function focus() {
         return;
     }
 
-    focusCallback();
+    focusCallback(shouldDelay);
 }
 
 /**

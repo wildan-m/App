@@ -211,8 +211,13 @@ function ReportActionItemMessageEdit(props) {
     const deleteDraft = useCallback(() => {
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
-        ComposerActions.setShouldShowComposeInput(true);
-        ReportActionComposeFocusManager.clear();
+
+        if(isFocusedRef.current)
+        {
+            ComposerActions.setShouldShowComposeInput(true);
+            ReportActionComposeFocusManager.clear();
+        }
+
         ReportActionComposeFocusManager.focus();
 
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
@@ -257,7 +262,8 @@ function ReportActionItemMessageEdit(props) {
 
         // When user tries to save the empty message, it will delete it. Prompt the user to confirm deleting.
         if (!trimmedNewDraft) {
-            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => InteractionManager.runAfterInteractions(() => textInputRef.current.focus()));
+            // ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => InteractionManager.runAfterInteractions(() => textInputRef.current.focus()));
+            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, ()=> ReportActionComposeFocusManager.focus(true));
             return;
         }
         Report.editReportComment(props.reportID, props.action, trimmedNewDraft);
@@ -268,6 +274,7 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        ReportActionComposeFocusManager.onComposerFocus(handleFocus);
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
             end: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
@@ -300,6 +307,12 @@ function ReportActionItemMessageEdit(props) {
      * Focus the composer text input
      */
     const focus = focusWithDelay(textInputRef.current);
+
+    const handleFocus = (shouldDelay) => {
+        setIsFocused(true);
+        focus(shouldDelay);
+        ComposerActions.setShouldShowComposeInput(false);
+    }
 
     return (
         <>
@@ -351,22 +364,30 @@ function ReportActionItemMessageEdit(props) {
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
                             onFocus={() => {
+                                ReportActionComposeFocusManager.onComposerFocus(handleFocus);
                                 setIsFocused(true);
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
-                                setIsFocused(false);
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
-                                if (_.contains([saveButtonID, cancelButtonID, emojiButtonID], relatedTargetId)) {
+                                if (_.contains([saveButtonID, cancelButtonID], relatedTargetId)) {
+                                    textInputRef.current.focus();
                                     return;
                                 }
+
+                                if (emojiButtonID === relatedTargetId) {
+                                    return;
+                                }
+
+                                setIsFocused(false);
 
                                 if (messageEditInput === relatedTargetId) {
                                     return;
                                 }
+
                                 openReportActionComposeViewWhenClosingMessageEdit();
                             }}
                             selection={selection}
@@ -377,8 +398,7 @@ function ReportActionItemMessageEdit(props) {
                         <EmojiPickerButton
                             isDisabled={props.shouldDisableEmojiPicker}
                             onModalHide={() => {
-                                setIsFocused(true);
-                                focus(true);
+                                ReportActionComposeFocusManager.focus(true);
                             }}
                             onEmojiSelected={addEmojiToTextBox}
                             nativeID={emojiButtonID}
