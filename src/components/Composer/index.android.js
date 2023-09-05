@@ -124,27 +124,6 @@ function Composer({shouldClear, onClear, isDisabled, maxLines, forwardedRef, isC
             /* eslint-disable-next-line react/jsx-props-no-spreading */
             {...props}
             editable={!isDisabled}
-            onFocus={(e) => {
-                ReportActionComposeFocusManager.onComposerFocus((shouldDelay) => {
-                    if (!textInput.current) {
-                        return;
-                    }
-
-                    console.log('[wildebug] shouldDelay', shouldDelay)
-                    console.log('[wildebug] textInput.current', textInput.current)
-                    if(shouldDelay)
-                    {
-                        const focus = focusWithDelay(textInput.current);
-                        focus(true);
-                        return;
-                    }
-                
-                    textInput.current.focus();
-                });
-                if (props.onFocus) {
-                    props.onFocus(e);
-                }
-            }}
         />
     );
 }
