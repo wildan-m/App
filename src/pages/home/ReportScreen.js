@@ -253,6 +253,7 @@ function ReportScreen({
         });
 
         fetchReportIfNeeded();
+        console.log('[wildebug] fetchReportIfNeeded oiasdjfa')
         ComposerActions.setShouldShowComposeInput(true);
         return () => {
             if (!unsubscribeVisibilityListener) {
@@ -281,6 +282,8 @@ function ReportScreen({
         }
 
         fetchReportIfNeeded();
+        console.log('[wildebug] fetchReportIfNeeded uahdufuiaisdf')
+
         ComposerActions.setShouldShowComposeInput(true);
     }, [route, report, errors, fetchReportIfNeeded, prevReport.reportID]);
 

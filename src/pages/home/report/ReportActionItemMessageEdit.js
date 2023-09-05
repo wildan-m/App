@@ -129,11 +129,16 @@ function ReportActionItemMessageEdit(props) {
         });
 
         return () => {
+            console.log('[wildebug] unmount jaiosdfhaosd')
+
             // Skip if this is not the focused message so the other edit composer stays focused.
             // In small screen devices, when EmojiPicker is shown, the current edit message will lose focus, we need to check this case as well.
             if (!isFocusedRef.current && !EmojiPickerAction.isActive(props.action.reportActionID)) {
                 return;
             }
+
+            // clear the callback to prevent focus to the deleted reportAction
+            ReportActionComposeFocusManager.clear();
 
             // Show the main composer when the focused message is deleted from another client
             // to prevent the main composer stays hidden until we swtich to another chat.
@@ -174,6 +179,9 @@ function ReportActionItemMessageEdit(props) {
      */
     const updateDraft = useCallback(
         (newDraftInput) => {
+            console.log('[wildebug] updateDraft oaihsfoia')
+            console.log('[wildebug] newDraftInput', newDraftInput)
+
             const {text: newDraft, emojis} = EmojiUtils.replaceAndExtractEmojis(newDraftInput, props.preferredSkinTone, props.preferredLocale);
 
             if (!_.isEmpty(emojis)) {
@@ -209,13 +217,17 @@ function ReportActionItemMessageEdit(props) {
      * Delete the draft of the comment being edited. This will take the comment out of "edit mode" with the old content.
      */
     const deleteDraft = useCallback(() => {
+        console.log('[wildebug] deleteDraft ohisfsd')
+
         debouncedSaveDraft.cancel();
         Report.saveReportActionDraft(props.reportID, props.action.reportActionID, '');
 
         if(isFocusedRef.current)
         {
+            console.log('[wildebug] if(isFocusedRef.current) joshdhsf')
             ComposerActions.setShouldShowComposeInput(true);
             ReportActionComposeFocusManager.clear();
+            setIsFocused(false);
         }
 
         ReportActionComposeFocusManager.focus();
@@ -263,7 +275,11 @@ function ReportActionItemMessageEdit(props) {
         // When user tries to save the empty message, it will delete it. Prompt the user to confirm deleting.
         if (!trimmedNewDraft) {
             // ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => InteractionManager.runAfterInteractions(() => textInputRef.current.focus()));
-            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, ()=> ReportActionComposeFocusManager.focus(true));
+            ReportActionContextMenu.showDeleteModal(props.reportID, props.action, false, deleteDraft, () => { 
+                console.log('[wildebug] cancel show delete'); 
+                console.log('[wildebug] error ReportActionComposeFocusManager.focus(true); '); 
+                ReportActionComposeFocusManager.focus(true); 
+            });
             return;
         }
         Report.editReportComment(props.reportID, props.action, trimmedNewDraft);
@@ -274,6 +290,8 @@ function ReportActionItemMessageEdit(props) {
      * @param {String} emoji
      */
     const addEmojiToTextBox = (emoji) => {
+        console.log('[wildebug] addEmojiToTextBox jhiusfhsdf')
+
         ReportActionComposeFocusManager.onComposerFocus(handleFocus);
         setSelection((prevSelection) => ({
             start: prevSelection.start + emoji.length + CONST.SPACE_LENGTH,
@@ -309,6 +327,9 @@ function ReportActionItemMessageEdit(props) {
     const focus = focusWithDelay(textInputRef.current);
 
     const handleFocus = (shouldDelay) => {
+        console.log('[wildebug] handleFocus oihasasdf')
+        console.log('[wildebug] shouldDelay', shouldDelay)
+
         setIsFocused(true);
         focus(shouldDelay);
         ComposerActions.setShouldShowComposeInput(false);
@@ -364,12 +385,15 @@ function ReportActionItemMessageEdit(props) {
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
                             onFocus={() => {
+                                console.log('[wildebug] onFocus oaijdifa')
                                 ReportActionComposeFocusManager.onComposerFocus(handleFocus);
                                 setIsFocused(true);
                                 reportScrollManager.scrollToIndex({animated: true, index: props.index}, true);
                                 ComposerActions.setShouldShowComposeInput(false);
                             }}
                             onBlur={(event) => {
+                                console.log('[wildebug] onBlur oiahsdif')
+
                                 const relatedTargetId = lodashGet(event, 'nativeEvent.relatedTarget.id');
 
                                 // Return to prevent re-render when save/cancel button is pressed which cancels the onPress event by re-rendering
@@ -388,6 +412,8 @@ function ReportActionItemMessageEdit(props) {
                                     return;
                                 }
 
+                                console.log('[wildebug] openReportActionComposeViewWhenClosingMessageEdit juiahdf')
+
                                 openReportActionComposeViewWhenClosingMessageEdit();
                             }}
                             selection={selection}
@@ -398,6 +424,8 @@ function ReportActionItemMessageEdit(props) {
                         <EmojiPickerButton
                             isDisabled={props.shouldDisableEmojiPicker}
                             onModalHide={() => {
+                                console.log('[wildebug] onModalHide emoji picker iohasdf')
+                                setIsFocused(false);
                                 ReportActionComposeFocusManager.focus(true);
                             }}
                             onEmojiSelected={addEmojiToTextBox}
