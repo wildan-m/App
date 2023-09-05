@@ -132,27 +132,22 @@ function ReportActionItemMessageEdit(props) {
     }
 
     useEffect(() => {
-        // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
-        console.log(`[wildebug] props.modal.willAlertModalBecomeVisible`, props.modal.willAlertModalBecomeVisible);
-        console.log(`[wildebug] props.modal.isVisible`, props.modal.isVisible);
-        console.log(`[wildebug] isFocusedRef.current`, isFocusedRef.current);
-        console.log(`[wildebug] isFocused`, isFocused);
-        console.log('[wildebug] insertedEmojis.current.length', insertedEmojis.current.length)
-        console.log('[wildebug] draft', draft)
-        console.log('[wildebug] selection', selection)
-        // console.log('[wildebug] prevProps', prevProps)
-        // console.log('[wildebug] props', props)
+        // console.log('[wildebug] EmojiPickerAction.isActive(props.action.reportActionID)', EmojiPickerAction.isActive(props.action.reportActionID));
+        // console.log('[wildebug] EmojiPickerAction.isEmojiPickerVisible()', EmojiPickerAction.isEmojiPickerVisible());
+        // // console.log(`[wildebug] isActive ${props.action.message[0].html}`, isActive());
+        // console.log(`[wildebug] props.modal.willAlertModalBecomeVisible`, props.modal.willAlertModalBecomeVisible);
+        // console.log(`[wildebug] props.modal.isVisible`, props.modal.isVisible);
+        // console.log(`[wildebug] isFocusedRef.current`, isFocusedRef.current);
+        // console.log(`[wildebug] isFocused`, isFocused);
+        // console.log('[wildebug] insertedEmojis.current.length', insertedEmojis.current.length)
+        // console.log('[wildebug] draft', draft)
+        // console.log('[wildebug] selection', selection)
      
 
         if (props.modal.isVisible || !isFocusedRef.current) {
             console.log('[wildebug]  if (props.modal.isVisible || !isFocusedRef.current) {');
             return;
         }
-
-        // if(isFocusedRef.current)
-        // {
-        //     textInputRef.current.blur();
-        // }
 
         setIsFocused(false);
         console.log('[wildebug] ReportActionComposeFocusManager.focus(true);', draft);

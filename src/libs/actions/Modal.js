@@ -46,6 +46,7 @@ function onModalDidClose() {
  * @param {Boolean} isVisible
  */
 function setModalVisibility(isVisible) {
+    console.log('[wildebug] setModalVisibility(isVisible) {', isVisible)
     Onyx.merge(ONYXKEYS.MODAL, {isVisible});
 }
 
