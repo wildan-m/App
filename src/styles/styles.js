@@ -3694,6 +3694,10 @@ const styles = {
         paddingBottom: 12,
     },
 
+    tabSelectorItemHover: {
+        backgroundColor: themeColors.sidebarHover,
+    },
+
     tabText: (isSelected) => ({
         marginLeft: 8,
         fontFamily: isSelected ? fontFamily.EXP_NEUE_BOLD : fontFamily.EXP_NEUE,
