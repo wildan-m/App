@@ -116,15 +116,15 @@ function TabSelectorItem({
                         {({ pressed }) => (
                             <>
                                 <Icon
-                                src={icon}
-                                fill={StyleUtils.getIconFillColor(getButtonState(focused || isHovered, pressed, success, disabled, interactive), true)}
-                            />
+                                    src={icon}
+                                    fill={StyleUtils.getIconFillColor(getButtonState(focused || isHovered, pressed, success, disabled, interactive), CONST.COMPONENT_TYPE.TAB)}
+                                />
 
-                                <TabIcon
+                                {/* <TabIcon
                                     icon={icon}
                                     activeOpacity={activeOpacity}
                                     inactiveOpacity={inactiveOpacity}
-                                />
+                                /> */}
                                 <TabLabel
                                     title={title}
                                     activeOpacity={activeOpacity}

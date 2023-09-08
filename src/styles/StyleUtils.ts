@@ -37,6 +37,7 @@ type AvatarSizeValue = ValueOf<
 type ButtonSizeValue = ValueOf<typeof CONST.DROPDOWN_BUTTON_SIZE>;
 type EmptyAvatarSizeName = ValueOf<Pick<typeof CONST.AVATAR_SIZE, 'SMALL' | 'MEDIUM' | 'LARGE'>>;
 type ButtonStateName = ValueOf<typeof CONST.BUTTON_STATES>;
+type ComponentTypeName = ValueOf<typeof CONST.COMPONENT_TYPE>;
 type AvatarSize = {width: number};
 type ParsableStyle = ViewStyle | CSSProperties | ((state: PressableStateCallbackType) => ViewStyle | CSSProperties);
 
@@ -474,20 +475,29 @@ function getButtonBackgroundColorStyle(buttonState: ButtonStateName = CONST.BUTT
  * @param buttonState - One of {'default', 'hovered', 'pressed'}
  * @param isMenuIcon - whether this icon is apart of a list
  */
-function getIconFillColor(buttonState: ButtonStateName = CONST.BUTTON_STATES.DEFAULT, isMenuIcon = false): string {
+function getIconFillColor(buttonState: ButtonStateName = CONST.BUTTON_STATES.DEFAULT, componentType: ComponentTypeName): string {
     switch (buttonState) {
         case CONST.BUTTON_STATES.ACTIVE:
         case CONST.BUTTON_STATES.PRESSED:
+            if(componentType === CONST.COMPONENT_TYPE.TAB)
+            {
+                return themeColors.iconTabHovered;
+            }
             return themeColors.iconHovered;
         case CONST.BUTTON_STATES.COMPLETE:
             return themeColors.iconSuccessFill;
         case CONST.BUTTON_STATES.DEFAULT:
         case CONST.BUTTON_STATES.DISABLED:
         default:
-            if (isMenuIcon) {
-                return themeColors.iconMenu;
+            switch(componentType)
+            {
+                case CONST.COMPONENT_TYPE.TAB:
+                    return themeColors.iconTab;
+                case CONST.COMPONENT_TYPE.MENU:
+                    return themeColors.iconMenu
+                default:
+                    return themeColors.icon;
             }
-            return themeColors.icon;
     }
 }
 

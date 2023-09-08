@@ -173,7 +173,7 @@ const MenuItem = React.forwardRef((props, ref) => {
                                                         props.iconFill ||
                                                         StyleUtils.getIconFillColor(
                                                             getButtonState(props.focused || isHovered, pressed, props.success, props.disabled, props.interactive),
-                                                            true,
+                                                            CONST.COMPONENT_TYPE.MENU,
                                                         )
                                                     }
                                                 />
@@ -206,7 +206,7 @@ const MenuItem = React.forwardRef((props, ref) => {
                                                 height={props.iconHeight}
                                                 fill={
                                                     props.secondaryIconFill ||
-                                                    StyleUtils.getIconFillColor(getButtonState(props.focused || isHovered, pressed, props.success, props.disabled, props.interactive), true)
+                                                    StyleUtils.getIconFillColor(getButtonState(props.focused || isHovered, pressed, props.success, props.disabled, props.interactive), CONST.COMPONENT_TYPE.MENU)
                                                 }
                                             />
                                         </View>

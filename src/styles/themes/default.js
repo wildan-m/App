@@ -13,6 +13,8 @@ const darkTheme = {
     borderFocus: colors.green,
     icon: colors.greenIcons,
     iconMenu: colors.green,
+    iconTab: colors.white,
+    iconTabHovered: colors.green,
     iconHovered: colors.white,
     iconSuccessFill: colors.green,
     iconReversed: colors.greenAppBackground,
