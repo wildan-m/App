@@ -45,7 +45,7 @@ class ScreenWrapper extends React.Component {
             canUseTouchScreen: DeviceCapabilities.canUseTouchScreen(),
         };
 
-        if (this.state.canUseTouchScreen) {
+        if (this.state.canUseTouchScreen && this.props.shouldEnableLockHeightWhileNavigate) {
             this.state.initalKeyboardAvoidingMinHeight = undefined;
             this.state.minHeight = props.initialWindowHeight;
             this.state.isKeyboardCompletelyClosed = false;
@@ -54,13 +54,14 @@ class ScreenWrapper extends React.Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (!props.isFocused && state.canUseTouchScreen) {
+        if (!props.isFocused && state.canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
             return {minHeight: props.initialWindowHeight, isKeyboardCompletelyClosed: false, didInteractionsComplete: false};
         }
 
         // Restore min-height to allow floating button when keyboard appeared
         if (
             state.canUseTouchScreen &&
+            props.shouldEnableLockHeightWhileNavigate &&
             props.isFocused &&
             // keyboardHeight is for native device. Native device doesn't resize windowHeight when keyboard shown
             props.windowHeight - props.keyboardHeight === props.initialWindowHeight
@@ -106,12 +107,15 @@ class ScreenWrapper extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this.props.isFocused && !this.state.didInteractionsComplete) {
-            InteractionManager.runAfterInteractions(() => {
-                this.setState({didInteractionsComplete: true});
-            });
+        if (!this.props.isFocused || this.state.didInteractionsComplete) {
+            return;
         }
+
+        InteractionManager.runAfterInteractions(() => {
+            this.setState({didInteractionsComplete: true});
+        });
     }
+
     componentWillUnmount() {
         if (this.unsubscribeTransitionEnd) {
             this.unsubscribeTransitionEnd();
@@ -141,7 +145,11 @@ class ScreenWrapper extends React.Component {
                     // we should also calculate vertical padding and vertical insets to minHeight
                     const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
                     const verticalInsets = insets.top + insets.bottom;
-                    const minHeight = this.state.minHeight === undefined || !this.state.canUseTouchScreen ? undefined : this.state.minHeight - verticalPadding - verticalInsets;
+                    const minHeight =
+                        this.state.minHeight === undefined || !this.state.canUseTouchScreen || !this.props.shouldEnableLockHeightWhileNavigate
+                            ? undefined
+                            : this.state.minHeight - verticalPadding - verticalInsets;
+
                     return (
                         <View
                             style={styles.flex1}
@@ -154,11 +162,14 @@ class ScreenWrapper extends React.Component {
                                 {...this.keyboardDissmissPanResponder.panHandlers}
                             >
                                 <KeyboardAvoidingView
+                                    // style={[styles.w100, styles.h100, {maxHeight}]}
                                     style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
                                     behavior={this.props.keyboardAvoidingViewBehavior}
                                     enabled={
                                         this.props.shouldEnableKeyboardAvoidingView &&
-                                        (!this.state.canUseTouchScreen ? true : this.state.didInteractionsComplete && this.state.isKeyboardCompletelyClosed)
+                                        (!this.state.canUseTouchScreen || !this.props.shouldEnableLockHeightWhileNavigate
+                                            ? true
+                                            : this.state.didInteractionsComplete && this.state.isKeyboardCompletelyClosed)
                                     }
                                 >
                                     <PickerAvoidingView

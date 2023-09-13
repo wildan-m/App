@@ -48,6 +48,9 @@ const propTypes = {
 
     /** Styles for the offline indicator */
     offlineIndicatorStyle: stylePropTypes,
+
+    /** Whether to lock the screen height while navigate */
+    shouldEnableLockHeightWhileNavigate: PropTypes.bool,
 };
 
 const defaultProps = {
@@ -63,6 +66,7 @@ const defaultProps = {
     shouldShowOfflineIndicator: true,
     offlineIndicatorStyle: [],
     headerGapStyles: [],
+    shouldEnableLockHeightWhileNavigate: true,
 };
 
 export {propTypes, defaultProps};

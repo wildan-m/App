@@ -8,13 +8,17 @@ import getWindowHeightAdjustment from '../../libs/getWindowHeightAdjustment';
 
 const WindowDimensionsContext = createContext(null);
 const windowDimensionsPropTypes = {
-    // Width of the window
+    // Initial width of the window
     initialWindowWidth: PropTypes.number,
+
+    // Width of the window
     windowWidth: PropTypes.number.isRequired,
+
+    // Initial height of the window
+    initialWindowHeight: PropTypes.number,
 
     // Height of the window
     windowHeight: PropTypes.number.isRequired,
-    initialWindowHeight: PropTypes.number,
 
     // Is the window width extra narrow, like on a Fold mobile device?
     isExtraSmallScreenWidth: PropTypes.bool.isRequired,
@@ -37,22 +41,22 @@ const windowDimensionsProviderPropTypes = {
 function WindowDimensionsProvider(props) {
     const initialDimensions = Dimensions.get('window');
     const screenWindowHeightDifference = Dimensions.get('screen').height - initialDimensions.height;
-    const [windowDimension, setWindowDimension] = useState(() => {
-        return {
-            initialWindowHeight: initialDimensions.height,
-            initialWindowWidth: initialDimensions.width,
-            windowHeight: initialDimensions.height,
-            windowWidth: initialDimensions.width,
-        };
+    const [windowDimension, setWindowDimension] = useState({
+        initialWindowHeight: initialDimensions.height,
+        initialWindowWidth: initialDimensions.width,
+        windowHeight: initialDimensions.height,
+        windowWidth: initialDimensions.width,
     });
+    
     /**
-     * Check if its a landscape mode of mobile device
+     * Determines if a given dimension represents a landscape orientation.
      *
-     * @returns {Boolean}
+     * @param {Object} dimension - The dimension to check.
+     * @param {number} dimension.width - The width of the dimension.
+     * @param {number} dimension.height - The height of the dimension.
+     * @returns {boolean} Returns `true` if the dimension is in landscape orientation, `false` otherwise.
      */
-    const isLandscape = (dimension) => {
-        return dimension.width >= dimension.height;
-    };
+    const isLandscape = (dimension) => dimension.width >= dimension.height;
 
     useEffect(() => {
         const onDimensionChange = (newDimensions) => {
