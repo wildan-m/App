@@ -1,4 +1,4 @@
-import {Animated} from 'react-native';
+import {Animated, View, Pressable} from 'react-native';
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from '../../styles/styles';
@@ -91,27 +91,19 @@ function TabSelectorItem({
     focused,
 }) {
     return (
-        <Hoverable>
-            {(isHovered) => (
-                <Animated.View style={[styles.flex1]}>
+        <View style={[styles.flex1]}>
+            <Hoverable>
+                {(isHovered) => (
                     <PressableWithFeedback
                         accessibilityLabel={title}
                         style={({ pressed }) => [
-                            { backgroundColor },
                             style,
                             !interactive && styles.cursorDefault,
                             StyleUtils.getButtonBackgroundColorStyle(getButtonState(focused || isHovered, pressed, success, disabled, interactive), true),
                             (isHovered || pressed) && hoverAndPressStyle,
                             shouldGreyOutWhenDisabled && disabled && styles.buttonOpacityDisabled,
                         ]}
-
-                        wrapperStyle={[styles.flex1]}
                         onPress={onPress}
-
-                    // hoverDimmingValue={1}
-                    // pressDimmingValue={1}
-                    // hoverStyle={StyleUtils.getButtonBackgroundColorStyle(CONST.BUTTON_STATES.ACTIVE)}
-                    // pressStyle={StyleUtils.getButtonBackgroundColorStyle(CONST.BUTTON_STATES.PRESSED)}
                     >
                         {({ pressed }) => (
                             <>
@@ -119,23 +111,17 @@ function TabSelectorItem({
                                     src={icon}
                                     fill={StyleUtils.getIconFillColor(getButtonState(focused || isHovered, pressed, success, disabled, interactive), CONST.COMPONENT_TYPE.TAB)}
                                 />
-
-                                {/* <TabIcon
-                                    icon={icon}
-                                    activeOpacity={activeOpacity}
-                                    inactiveOpacity={inactiveOpacity}
-                                /> */}
                                 <TabLabel
                                     title={title}
                                     activeOpacity={activeOpacity}
                                     inactiveOpacity={inactiveOpacity}
                                 />
-                            </>)}
-
+                            </>
+                        )}
                     </PressableWithFeedback>
-                </Animated.View>
-            )}
-        </Hoverable>
+                )}
+            </Hoverable>
+        </View>
     );
 }
 
