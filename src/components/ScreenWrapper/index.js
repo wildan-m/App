@@ -162,7 +162,6 @@ class ScreenWrapper extends React.Component {
                                 {...this.keyboardDissmissPanResponder.panHandlers}
                             >
                                 <KeyboardAvoidingView
-                                    // style={[styles.w100, styles.h100, {maxHeight}]}
                                     style={[styles.w100, styles.h100, {maxHeight, minHeight}]}
                                     behavior={this.props.keyboardAvoidingViewBehavior}
                                     enabled={
