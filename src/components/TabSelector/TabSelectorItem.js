@@ -1,10 +1,12 @@
-import {Animated} from 'react-native';
+import {Animated, View, StyleSheet} from 'react-native';
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from '../../styles/styles';
 import PressableWithFeedback from '../Pressable/PressableWithFeedback';
 import TabIcon from './TabIcon';
 import TabLabel from './TabLabel';
+import Hoverable from '../Hoverable';
+import themeColors from '../../styles/themes/default';
 
 const propTypes = {
     /** Function to call when onPress */
@@ -40,25 +42,40 @@ const defaultProps = {
 
 const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(PressableWithFeedback);
 
-function TabSelectorItem({icon, title, onPress, backgroundColor, activeOpacity, inactiveOpacity}) {
+function TabSelectorItem({ icon, title, onPress, backgroundColor, activeOpacity, inactiveOpacity }) {
+    const hoveredBackgroundColor = { backgroundColor: themeColors.midtone };
+    const interpolatedBackgroundColor = { backgroundColor };
     return (
-        <AnimatedPressableWithFeedback
-            accessibilityLabel={title}
-            style={[styles.tabSelectorButton, {backgroundColor}]}
-            wrapperStyle={[styles.flex1]}
-            onPress={onPress}
-        >
-            <TabIcon
-                icon={icon}
-                activeOpacity={activeOpacity}
-                inactiveOpacity={inactiveOpacity}
-            />
-            <TabLabel
-                title={title}
-                activeOpacity={activeOpacity}
-                inactiveOpacity={inactiveOpacity}
-            />
-        </AnimatedPressableWithFeedback>
+        <View style={[styles.flex1]}>
+            <Hoverable>
+                {(hovered) => {
+                    console.log(`[wildebug] hovered ${title}`, hovered);
+                    return (
+                        <AnimatedPressableWithFeedback
+                            key={'hoveredSelectorItem'}
+                            accessibilityLabel={title}
+                            style={[
+                                styles.tabSelectorButton,
+                                hovered ? hoveredBackgroundColor : { backgroundColor },
+                            ]}
+                            onPress={onPress}
+                        >
+                            <TabIcon
+                                icon={icon}
+                                activeOpacity={activeOpacity}
+                                inactiveOpacity={inactiveOpacity}
+                            />
+                            <TabLabel
+                                title={title}
+                                activeOpacity={activeOpacity}
+                                inactiveOpacity={inactiveOpacity}
+                            />
+                        </AnimatedPressableWithFeedback>
+                    )
+                }
+                }
+            </Hoverable>
+        </View>
     );
 }
 

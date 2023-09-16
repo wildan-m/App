@@ -113,6 +113,7 @@ class Hoverable extends Component {
                 }
             },
             onMouseEnter: (el) => {
+                console.log('[wildebug] onMouseEnter')
                 this.setIsHovered(true);
 
                 if (_.isFunction(child.props.onMouseEnter)) {
@@ -120,6 +121,7 @@ class Hoverable extends Component {
                 }
             },
             onMouseLeave: (el) => {
+                console.log('[wildebug] onMouseLeave')
                 this.setIsHovered(false);
 
                 if (_.isFunction(child.props.onMouseLeave)) {
