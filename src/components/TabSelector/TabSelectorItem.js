@@ -29,6 +29,8 @@ const propTypes = {
     /** Animated opacity value while the label is in active state */
     // eslint-disable-next-line
     activeOpacity: PropTypes.any,
+
+    routesLength: PropTypes.number,
 };
 
 const defaultProps = {
@@ -38,26 +40,65 @@ const defaultProps = {
     backgroundColor: '',
     inactiveOpacity: 1,
     activeOpacity: 0,
+    routesLength: 0,
+    position: {
+        interpolate: () => {},
+    },
 };
 
 const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(PressableWithFeedback);
+const getBackgroundColor = (position, routesLength, tabIndex, hovered) => {
+    if (routesLength > 1) {
+        const inputRange = Array.from({length: routesLength}, (v, i) => i);
+console.log('[wildebug], inputRange', inputRange)
+console.log('[wildebug], outputRange', _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)))
+console.log('[wildebug], hovered', hovered)
+        return position.interpolate({
+            inputRange,
+            outputRange: _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)),
+        });
+    }
+    return themeColors.border;
+};
 
-function TabSelectorItem({ icon, title, onPress, backgroundColor, activeOpacity, inactiveOpacity }) {
-    const hoveredBackgroundColor = { backgroundColor: themeColors.midtone };
-    const interpolatedBackgroundColor = { backgroundColor };
+const getOpacity = (position, routesLength, tabIndex, active, hovered) => {
+    const activeValue = active ? 1 : 0;
+    const inactiveValue = active ? 0 : 1;
+
+    if (routesLength > 1) {
+        const inputRange = Array.from({length: routesLength}, (v, i) => i);
+
+        return position.interpolate({
+            inputRange,
+            outputRange: _.map(inputRange, (i) => (i === tabIndex || hovered? activeValue : inactiveValue)),
+        });
+    }
+    return activeValue;
+};
+
+function TabSelectorItem({ icon, title, onPress, backgroundColor, position, routesLength, tabIndex }) {
+    // const hoveredBackgroundColor = { backgroundColor: themeColors.midtone };
+    // const interpolatedBackgroundColor = { backgroundColor };
+
     return (
         <View style={[styles.flex1]}>
             <Hoverable>
                 {(hovered) => {
                     console.log(`[wildebug] hovered ${title}`, hovered);
+                    const backgroundColor = getBackgroundColor(position, routesLength, tabIndex, hovered);
+                    const activeOpacity = getOpacity(position, routesLength, tabIndex, true, hovered);
+                    const inactiveOpacity = getOpacity(position, routesLength, tabIndex, false, hovered);
+    
                     return (
                         <AnimatedPressableWithFeedback
                             key={'hoveredSelectorItem'}
                             accessibilityLabel={title}
                             style={[
                                 styles.tabSelectorButton,
-                                hovered ? hoveredBackgroundColor : { backgroundColor },
+                                { backgroundColor },
+                                // hovered ? hoveredBackgroundColor : { backgroundColor },
                             ]}
+                            // wrapperStyle={[styles.flex1]}
                             onPress={onPress}
                         >
                             <TabIcon

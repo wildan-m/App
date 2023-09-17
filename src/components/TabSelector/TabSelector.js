@@ -8,6 +8,7 @@ import CONST from '../../CONST';
 import useLocalize from '../../hooks/useLocalize';
 import styles from '../../styles/styles';
 import themeColors from '../../styles/themes/default';
+import Hoverable from '../Hoverable';
 
 const propTypes = {
     /* Navigation state provided by React Navigation */
@@ -68,13 +69,15 @@ const getOpacity = (position, routesLength, tabIndex, active) => {
     return activeValue;
 };
 
-const getBackgroundColor = (position, routesLength, tabIndex) => {
+const getBackgroundColor = (position, routesLength, tabIndex, hovered) => {
     if (routesLength > 1) {
         const inputRange = Array.from({length: routesLength}, (v, i) => i);
-
+console.log('[wildebug], inputRange', inputRange)
+console.log('[wildebug], outputRange', _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)))
+console.log('[wildebug], hovered', hovered)
         return position.interpolate({
             inputRange,
-            outputRange: _.map(inputRange, (i) => (i === tabIndex ? themeColors.border : themeColors.appBG)),
+            outputRange: _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)),
         });
     }
     return themeColors.border;
@@ -86,9 +89,6 @@ function TabSelector({state, navigation, onTabPress, position}) {
     return (
         <View style={styles.tabSelector}>
             {_.map(state.routes, (route, index) => {
-                const activeOpacity = getOpacity(position, state.routes.length, index, true);
-                const inactiveOpacity = getOpacity(position, state.routes.length, index, false);
-                const backgroundColor = getBackgroundColor(position, state.routes.length, index);
                 const isFocused = index === state.index;
                 const {icon, title} = getIconAndTitle(route.name, translate);
 
@@ -117,11 +117,14 @@ function TabSelector({state, navigation, onTabPress, position}) {
                         icon={icon}
                         title={title}
                         onPress={onPress}
-                        activeOpacity={activeOpacity}
-                        inactiveOpacity={inactiveOpacity}
-                        backgroundColor={backgroundColor}
+                        // activeOpacity={activeOpacity}
+                        // inactiveOpacity={inactiveOpacity}
+                        // backgroundColor={backgroundColor}
+                        position={position}
+                        routesLength={state.routes.length}
+                        tabIndex={index}
                     />
-                );
+                )
             })}
         </View>
     );
