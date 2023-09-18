@@ -54,36 +54,7 @@ const getIconAndTitle = (route, translate) => {
     }
 };
 
-const getOpacity = (position, routesLength, tabIndex, active) => {
-    const activeValue = active ? 1 : 0;
-    const inactiveValue = active ? 0 : 1;
-
-    if (routesLength > 1) {
-        const inputRange = Array.from({length: routesLength}, (v, i) => i);
-
-        return position.interpolate({
-            inputRange,
-            outputRange: _.map(inputRange, (i) => (i === tabIndex ? activeValue : inactiveValue)),
-        });
-    }
-    return activeValue;
-};
-
-const getBackgroundColor = (position, routesLength, tabIndex, hovered) => {
-    if (routesLength > 1) {
-        const inputRange = Array.from({length: routesLength}, (v, i) => i);
-console.log('[wildebug], inputRange', inputRange)
-console.log('[wildebug], outputRange', _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)))
-console.log('[wildebug], hovered', hovered)
-        return position.interpolate({
-            inputRange,
-            outputRange: _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)),
-        });
-    }
-    return themeColors.border;
-};
-
-function TabSelector({state, navigation, onTabPress, position}) {
+function TabSelector({state, navigation, onTabPress, position, jumpTo}) {
     const {translate} = useLocalize();
 
     return (
@@ -96,7 +67,7 @@ function TabSelector({state, navigation, onTabPress, position}) {
                     if (isFocused) {
                         return;
                     }
-
+                    jumpTo(index);
                     const event = navigation.emit({
                         type: 'tabPress',
                         target: route.key,
@@ -117,9 +88,6 @@ function TabSelector({state, navigation, onTabPress, position}) {
                         icon={icon}
                         title={title}
                         onPress={onPress}
-                        // activeOpacity={activeOpacity}
-                        // inactiveOpacity={inactiveOpacity}
-                        // backgroundColor={backgroundColor}
                         position={position}
                         routesLength={state.routes.length}
                         tabIndex={index}

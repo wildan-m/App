@@ -85,6 +85,7 @@ function TabSelectorItem({ icon, title, onPress, backgroundColor, position, rout
             <Hoverable>
                 {(hovered) => {
                     console.log(`[wildebug] hovered ${title}`, hovered);
+                    console.log(`[wildebug] position ${title}`, position);
                     const backgroundColor = getBackgroundColor(position, routesLength, tabIndex, hovered);
                     const activeOpacity = getOpacity(position, routesLength, tabIndex, true, hovered);
                     const inactiveOpacity = getOpacity(position, routesLength, tabIndex, false, hovered);
