@@ -14,6 +14,7 @@ const darkTheme = {
     icon: colors.darkIcons,
     iconMenu: colors.green400,
     iconTab: colors.white,
+    iconTabHovered: colors.green,
     iconHovered: colors.darkPrimaryText,
     iconSuccessFill: colors.green400,
     iconReversed: colors.darkAppBackground,
