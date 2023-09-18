@@ -7,6 +7,7 @@ import TabIcon from './TabIcon';
 import TabLabel from './TabLabel';
 import Hoverable from '../Hoverable';
 import themeColors from '../../styles/themes/default';
+import _ from 'underscore';
 
 const propTypes = {
     /** Function to call when onPress */
