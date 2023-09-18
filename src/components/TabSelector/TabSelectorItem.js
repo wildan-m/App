@@ -49,11 +49,12 @@ const defaultProps = {
 
 const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(PressableWithFeedback);
 const getBackgroundColor = (position, routesLength, tabIndex, hovered) => {
+    console.log('[wildebug], position', position)
+    console.log('[wildebug], hovered', hovered)
+    console.log('[wildebug], tabIndex', tabIndex)
+
     if (routesLength > 1) {
         const inputRange = Array.from({length: routesLength}, (v, i) => i);
-console.log('[wildebug], inputRange', inputRange)
-console.log('[wildebug], outputRange', _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)))
-console.log('[wildebug], hovered', hovered)
         return position.interpolate({
             inputRange,
             outputRange: _.map(inputRange, (i) => (i === tabIndex || hovered ? themeColors.border : themeColors.appBG)),
@@ -85,8 +86,6 @@ function TabSelectorItem({ icon, title, onPress, backgroundColor, position, rout
         <View style={[styles.flex1]}>
             <Hoverable>
                 {(hovered) => {
-                    console.log(`[wildebug] hovered ${title}`, hovered);
-                    console.log(`[wildebug] position ${title}`, position);
                     const backgroundColor = getBackgroundColor(position, routesLength, tabIndex, hovered);
                     const activeOpacity = getOpacity(position, routesLength, tabIndex, true, hovered);
                     const inactiveOpacity = getOpacity(position, routesLength, tabIndex, false, hovered);

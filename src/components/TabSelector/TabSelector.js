@@ -67,7 +67,6 @@ function TabSelector({state, navigation, onTabPress, position, jumpTo}) {
                     if (isFocused) {
                         return;
                     }
-                    jumpTo(index);
                     const event = navigation.emit({
                         type: 'tabPress',
                         target: route.key,
