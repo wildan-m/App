@@ -1,5 +1,6 @@
 import React, {forwardRef, createContext, useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import lodashDebounce from 'lodash/debounce';
 import {Dimensions} from 'react-native';
 import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
 import getComponentDisplayName from '../../libs/getComponentDisplayName';
@@ -47,7 +48,7 @@ function WindowDimensionsProvider(props) {
         windowHeight: initialDimensions.height,
         windowWidth: initialDimensions.width,
     });
-    
+
     /**
      * Determines if a given dimension represents a landscape orientation.
      *
@@ -64,6 +65,7 @@ function WindowDimensionsProvider(props) {
             const isNewDimensionMobileLandscape = isLandscape(window);
             const isPrevInitialDimensionMobileLandscape = isLandscape(initialDimensions);
             const isOrientationChange = isNewDimensionMobileLandscape !== isPrevInitialDimensionMobileLandscape;
+
             if (isOrientationChange) {
                 initialDimensions.width = screen.width;
                 initialDimensions.height = screen.height - screenWindowHeightDifference;
@@ -77,7 +79,9 @@ function WindowDimensionsProvider(props) {
             });
         };
 
-        const dimensionsEventListener = Dimensions.addEventListener('change', onDimensionChange);
+        const onDimensionChangeDebounce = lodashDebounce(onDimensionChange, 300);
+
+        const dimensionsEventListener = Dimensions.addEventListener('change', onDimensionChangeDebounce);
 
         return () => {
             if (!dimensionsEventListener) {
