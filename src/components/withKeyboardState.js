@@ -18,7 +18,7 @@ const keyboardStateProviderPropTypes = {
 class KeyboardStateProvider extends React.Component {
     constructor(props) {
         super(props);
-
+asdfasdf
         this.state = {
             isKeyboardShown: false,
         };
