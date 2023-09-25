@@ -5,7 +5,7 @@ import {Keyboard} from 'react-native';
 import getComponentDisplayName from '../libs/getComponentDisplayName';
 
 const KeyboardStateContext = createContext(null);
-const keyboardStatePropTypes = {
+const keyboardStatadsfsdePropTypes = {
     /** Whether or not the keyboard is open */
     isKeyboardShown: PropTypes.bool.isRequired,
 };
