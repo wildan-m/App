@@ -3433,11 +3433,11 @@ const styles = (theme) => ({
         paddingBottom: 12,
     },
 
-    tabText: (isSelected) => ({
+    tabText: (isSelected, isHovered) => ({
         marginLeft: 8,
         fontFamily: fontFamily.EXP_NEUE_BOLD,
         fontWeight: fontWeightBold,
-        color: isSelected ? theme.textLight : theme.textSupporting,
+        color: isSelected || isHovered ? theme.textLight : theme.textSupporting,
     }),
 
     /**

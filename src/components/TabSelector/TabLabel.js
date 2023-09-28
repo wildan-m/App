@@ -22,14 +22,14 @@ const defaultProps = {
     activeOpacity: 0,
 };
 
-function TabLabel({title, activeOpacity, inactiveOpacity}) {
+function TabLabel({title, activeOpacity, inactiveOpacity, isHovered}) {
     return (
         <View>
             <Animated.View style={[{opacity: activeOpacity}]}>
-                <Text style={styles.tabText(true)}>{title}</Text>
+                <Text style={styles.tabText(true, isHovered)}>{title}</Text>
             </Animated.View>
             <Animated.View style={[StyleSheet.absoluteFill, {opacity: inactiveOpacity}]}>
-                <Text style={styles.tabText(false)}>{title}</Text>
+                <Text style={styles.tabText(false, isHovered)}>{title}</Text>
             </Animated.View>
         </View>
     );

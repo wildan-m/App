@@ -5,6 +5,7 @@ import styles from '../../styles/styles';
 import PressableWithFeedback from '../Pressable/PressableWithFeedback';
 import TabIcon from './TabIcon';
 import TabLabel from './TabLabel';
+import Hoverable from '../Hoverable';
 
 const propTypes = {
     /** Function to call when onPress */
@@ -50,29 +51,29 @@ const AnimatedPressableWithFeedback = Animated.createAnimatedComponent(Pressable
 
 function TabSelectorItem({icon, title, onPress, backgroundColor, hoverBackgroundColor, activeOpacity, inactiveOpacity, isFocused}) {
     return (
-        <AnimatedPressableWithFeedback
-            accessibilityLabel={title}
-            style={[styles.tabSelectorButton, {backgroundColor}]}
-            wrapperStyle={[styles.flex1]}
-            onPress={onPress}
-        >
-            {({hovered}) => (
-                <View
-                    style={[styles.tabSelectorButton, StyleSheet.absoluteFill, {backgroundColor: Boolean(hoverBackgroundColor) && hovered && !isFocused ? hoverBackgroundColor : undefined}]}
+        <View style={[styles.flex1]}>
+            <Hoverable>{(hovered) => (
+                <AnimatedPressableWithFeedback
+                    accessibilityLabel={title}
+                    style={[styles.tabSelectorButton, Boolean(hoverBackgroundColor) && hovered && !isFocused ? { backgroundColor: hoverBackgroundColor } : { backgroundColor }]}
+                    onPress={onPress}
                 >
                     <TabIcon
                         icon={icon}
-                        activeOpacity={hovered && !isFocused ? 1 : activeOpacity}
-                        inactiveOpacity={hovered && !isFocused ? 0 : inactiveOpacity}
+                        activeOpacity={activeOpacity}
+                        inactiveOpacity={inactiveOpacity}
+                        isHovered={hovered}
                     />
                     <TabLabel
                         title={title}
-                        activeOpacity={hovered && !isFocused ? 1 : activeOpacity}
-                        inactiveOpacity={hovered && !isFocused ? 0 : inactiveOpacity}
+                        activeOpacity={activeOpacity}
+                        inactiveOpacity={inactiveOpacity}
+                        isHovered={hovered}
                     />
-                </View>
+                </AnimatedPressableWithFeedback>
             )}
-        </AnimatedPressableWithFeedback>
+            </Hoverable>
+        </View>
     );
 }
 
