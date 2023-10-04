@@ -145,4 +145,4 @@ export default function withWindowDimensions(WrappedComponent) {
     return WithWindowDimensions;
 }
 
-export {WindowDimensionsProvider, windowDimensionsPropTypes};
+export {WindowDimensionsProvider, windowDimensionsPropTypes, WindowDimensionsContext};

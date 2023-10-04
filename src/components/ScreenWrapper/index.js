@@ -36,7 +36,7 @@ function ScreenWrapper({
     onEntryTransitionEnd,
     testID,
 }) {
-    const {windowHeight, isSmallScreenWidth} = useWindowDimensions();
+    const {windowHeight, isSmallScreenWidth, initialWindowHeight} = useWindowDimensions();
     const keyboardState = useKeyboardState();
     const {isDevelopment} = useEnvironment();
     const {isOffline} = useNetwork();
@@ -105,27 +105,27 @@ function ScreenWrapper({
 
     useEffect(() => {
         if (canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(props.initialWindowHeight);
+            setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [props.shouldEnableLockHeightWhileNavigate, props.initialWindowHeight]);
+    }, [props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
         if (!isFocused && canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(props.initialWindowHeight);
+            setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, props.initialWindowHeight]);
+    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
         if (!isFocused && canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(props.initialWindowHeight);
+            setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, props.initialWindowHeight]);
+    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
 
     return (
