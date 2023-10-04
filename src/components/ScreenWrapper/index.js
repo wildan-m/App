@@ -19,6 +19,7 @@ import useWindowDimensions from '../../hooks/useWindowDimensions';
 import useKeyboardState from '../../hooks/useKeyboardState';
 import useEnvironment from '../../hooks/useEnvironment';
 import useNetwork from '../../hooks/useNetwork';
+import * as DeviceCapabilities from '../../libs/DeviceCapabilities';
 
 function ScreenWrapper({
     shouldEnableMaxHeight,
@@ -35,6 +36,7 @@ function ScreenWrapper({
     shouldDismissKeyboardBeforeClose,
     onEntryTransitionEnd,
     testID,
+    shouldEnableLockHeightWhileNavigate,
 }) {
     const {windowHeight, isSmallScreenWidth, initialWindowHeight} = useWindowDimensions();
     const keyboardState = useKeyboardState();
@@ -104,28 +106,28 @@ function ScreenWrapper({
     }, []);
 
     useEffect(() => {
-        if (canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
+        if (canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
             setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
+    }, [shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
-        if (!isFocused && canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
+        if (!isFocused && canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
             setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
+    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
-        if (!isFocused && canUseTouchScreen && props.shouldEnableLockHeightWhileNavigate) {
+        if (!isFocused && canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
             setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
             setDidInteractionsComplete(false);
         }
-    }, [isFocused, props.shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
+    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
 
     return (
@@ -146,7 +148,7 @@ function ScreenWrapper({
                 const verticalInsets = insets.top + insets.bottom;
 
                 const calculatedMinHeight =
-                    minHeight === undefined || !canUseTouchScreen || !props.shouldEnableLockHeightWhileNavigate
+                    minHeight === undefined || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate
                         ? undefined
                         : minHeight - verticalPadding - verticalInsets;
 
@@ -166,8 +168,8 @@ function ScreenWrapper({
                                 style={[styles.w100, styles.h100, { maxHeight, minHeight: calculatedMinHeight }]}
                                 behavior={keyboardAvoidingViewBehavior}
                                 enabled={
-                                    props.shouldEnableKeyboardAvoidingView &&
-                                    (!canUseTouchScreen || !props.shouldEnableLockHeightWhileNavigate
+                                    shouldEnableKeyboardAvoidingView &&
+                                    (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate
                                         ? true
                                         : didInteractionsComplete && isKeyboardCompletelyClosed)
                                 }
@@ -180,7 +182,7 @@ function ScreenWrapper({
                                     {isDevelopment && <TestToolsModal />}
                                     {isDevelopment && <CustomDevMenu />}
                                     {
-                                        // If props.children is a function, call it to provide the insets to the children.
+                                        // If children is a function, call it to provide the insets to the children.
                                         _.isFunction(children)
                                             ? children({
                                                   insets,
