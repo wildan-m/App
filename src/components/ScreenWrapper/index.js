@@ -48,7 +48,7 @@ function ScreenWrapper({
     const isKeyboardShown = lodashGet(keyboardState, 'isKeyboardShown', false);
     const keyboardHeight = lodashGet(keyboardState, 'keyboardHeight', false);
     const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
-    const [minHeight, setMinHeight] = useState(undefined);
+    const [minHeight, setMinHeight] = useState(initialWindowHeight);
     const [isKeyboardCompletelyClosed, setIsKeyboardCompletelyClosed] = useState(false);
     const [didInteractionsComplete, setDidInteractionsComplete] = useState(false);
     const isFocused = useIsFocused();
@@ -183,6 +183,7 @@ function ScreenWrapper({
                                         ? true
                                         : didInteractionsComplete && isKeyboardCompletelyClosed)
                                 }
+                                testID={'aoisdjhfhaosdfa'}
                             >
                                 <PickerAvoidingView
                                     style={styles.flex1}
