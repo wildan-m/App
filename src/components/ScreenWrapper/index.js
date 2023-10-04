@@ -115,14 +115,6 @@ function ScreenWrapper({
     }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
-        if (!isFocused && canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(initialWindowHeight);
-            setIsKeyboardCompletelyClosed(false);
-            setDidInteractionsComplete(false);
-        }
-    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
-
-    useEffect(() => {
         if (
             canUseTouchScreen &&
             shouldEnableLockHeightWhileNavigate &&
