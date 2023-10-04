@@ -25,6 +25,7 @@ function KeyboardStateProvider(props) {
         });
         const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
             setIsKeyboardShown(false);
+            setKeyboardHeight(0);
         });
 
         return () => {
