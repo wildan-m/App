@@ -106,14 +106,6 @@ function ScreenWrapper({
     }, []);
 
     useEffect(() => {
-        if (canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(initialWindowHeight);
-            setIsKeyboardCompletelyClosed(false);
-            setDidInteractionsComplete(false);
-        }
-    }, [shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
-
-    useEffect(() => {
         if (!isFocused && canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
             setMinHeight(initialWindowHeight);
             setIsKeyboardCompletelyClosed(false);
@@ -129,6 +121,17 @@ function ScreenWrapper({
         }
     }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
+    useEffect(() => {
+        if (
+            canUseTouchScreen &&
+            shouldEnableLockHeightWhileNavigate &&
+            isFocused &&
+            windowHeight - keyboardHeight === initialWindowHeight
+        ) {
+            setIsKeyboardCompletelyClosed(true);
+            setMinHeight(undefined);
+        }
+    }, [shouldEnableLockHeightWhileNavigate, isFocused, windowHeight, keyboardHeight, initialWindowHeight]);
 
     return (
         <SafeAreaConsumer>
