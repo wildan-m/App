@@ -115,12 +115,7 @@ function ScreenWrapper({
     }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
 
     useEffect(() => {
-        if (
-            canUseTouchScreen &&
-            shouldEnableLockHeightWhileNavigate &&
-            isFocused &&
-            windowHeight - keyboardHeight === initialWindowHeight
-        ) {
+        if (canUseTouchScreen && shouldEnableLockHeightWhileNavigate && isFocused && windowHeight - keyboardHeight === initialWindowHeight) {
             setIsKeyboardCompletelyClosed(true);
             setMinHeight(undefined);
         }
@@ -128,17 +123,16 @@ function ScreenWrapper({
 
     useEffect(() => {
         if (isFocused && !didInteractionsComplete) {
-          const interactionTask = InteractionManager.runAfterInteractions(() => {
-            setDidInteractionsComplete(true);
-          });
-    
-          return () => {
-            // Cancel the interaction task if the component unmounts or if the dependencies change
-            interactionTask.cancel();
-          };
+            const interactionTask = InteractionManager.runAfterInteractions(() => {
+                setDidInteractionsComplete(true);
+            });
+
+            return () => {
+                // Cancel the interaction task if the component unmounts or if the dependencies change
+                interactionTask.cancel();
+            };
         }
-      }, [isFocused, didInteractionsComplete]);
-    
+    }, [isFocused, didInteractionsComplete]);
 
     return (
         <SafeAreaConsumer>
@@ -157,10 +151,7 @@ function ScreenWrapper({
                 const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
                 const verticalInsets = insets.top + insets.bottom;
 
-                const calculatedMinHeight =
-                    minHeight === undefined || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate
-                        ? undefined
-                        : minHeight - verticalPadding - verticalInsets;
+                const calculatedMinHeight = minHeight === undefined || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? undefined : minHeight - verticalPadding - verticalInsets;
 
                 return (
                     <View
@@ -175,13 +166,11 @@ function ScreenWrapper({
                             {...keyboardDissmissPanResponder.panHandlers}
                         >
                             <KeyboardAvoidingView
-                                style={[styles.w100, styles.h100, { maxHeight, minHeight: calculatedMinHeight }]}
+                                style={[styles.w100, styles.h100, {maxHeight, minHeight: calculatedMinHeight}]}
                                 behavior={keyboardAvoidingViewBehavior}
                                 enabled={
                                     shouldEnableKeyboardAvoidingView &&
-                                    (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate
-                                        ? true
-                                        : didInteractionsComplete && isKeyboardCompletelyClosed)
+                                    (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? true : didInteractionsComplete && isKeyboardCompletelyClosed)
                                 }
                                 testID={'aoisdjhfhaosdfa'}
                             >

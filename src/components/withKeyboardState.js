@@ -21,7 +21,7 @@ function KeyboardStateProvider(props) {
     useEffect(() => {
         const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
             setIsKeyboardShown(true);
-            setKeyboardHeight(e.endCoordinates.height)
+            setKeyboardHeight(e.endCoordinates.height);
         });
         const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
             setIsKeyboardShown(false);
