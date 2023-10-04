@@ -1,4 +1,4 @@
-import {Keyboard, View, PanResponder} from 'react-native';
+import {Keyboard, View, PanResponder, InteractionManager} from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
@@ -46,6 +46,7 @@ function ScreenWrapper({
     const [didScreenTransitionEnd, setDidScreenTransitionEnd] = useState(false);
     const maxHeight = shouldEnableMaxHeight ? windowHeight : undefined;
     const isKeyboardShown = lodashGet(keyboardState, 'isKeyboardShown', false);
+    const keyboardHeight = lodashGet(keyboardState, 'keyboardHeight', false);
     const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
     const [minHeight, setMinHeight] = useState(undefined);
     const [isKeyboardCompletelyClosed, setIsKeyboardCompletelyClosed] = useState(false);
@@ -132,6 +133,20 @@ function ScreenWrapper({
             setMinHeight(undefined);
         }
     }, [shouldEnableLockHeightWhileNavigate, isFocused, windowHeight, keyboardHeight, initialWindowHeight]);
+
+    useEffect(() => {
+        if (isFocused && !didInteractionsComplete) {
+          const interactionTask = InteractionManager.runAfterInteractions(() => {
+            setDidInteractionsComplete(true);
+          });
+    
+          return () => {
+            // Cancel the interaction task if the component unmounts or if the dependencies change
+            interactionTask.cancel();
+          };
+        }
+      }, [isFocused, didInteractionsComplete]);
+    
 
     return (
         <SafeAreaConsumer>
