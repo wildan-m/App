@@ -3,7 +3,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import _ from 'underscore';
 import lodashGet from 'lodash/get';
 import {PickerAvoidingView} from 'react-native-picker-select';
-import {useNavigation, useIsFocused} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import KeyboardAvoidingView from '../KeyboardAvoidingView';
 import CONST from '../../CONST';
 import styles from '../../styles/styles';
@@ -46,12 +46,9 @@ function ScreenWrapper({
     const [didScreenTransitionEnd, setDidScreenTransitionEnd] = useState(false);
     const maxHeight = shouldEnableMaxHeight ? windowHeight : undefined;
     const isKeyboardShown = lodashGet(keyboardState, 'isKeyboardShown', false);
-    const keyboardHeight = lodashGet(keyboardState, 'keyboardHeight', false);
     const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
     const [minHeight, setMinHeight] = useState(initialWindowHeight);
-    const [isKeyboardCompletelyClosed, setIsKeyboardCompletelyClosed] = useState(false);
     const [didInteractionsComplete, setDidInteractionsComplete] = useState(false);
-    const isFocused = useIsFocused();
 
     const panResponder = useRef(
         PanResponder.create({
@@ -106,39 +103,26 @@ function ScreenWrapper({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        if (!isFocused || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate) {
-            return;
-        }
+    useFocusEffect(
+        React.useCallback(() => {
+            const task = InteractionManager.runAfterInteractions(() => {
+                setMinHeight(undefined);
+                setDidInteractionsComplete(true);
+            });
 
-        setMinHeight(initialWindowHeight);
-        setIsKeyboardCompletelyClosed(false);
-        setDidInteractionsComplete(false);
-    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight, canUseTouchScreen]);
-
-    useEffect(() => {
-        if (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate || !isFocused || windowHeight - keyboardHeight !== initialWindowHeight) {
-            return;
-        }
-
-        setIsKeyboardCompletelyClosed(true);
-        setMinHeight(undefined);
-    }, [shouldEnableLockHeightWhileNavigate, isFocused, windowHeight, keyboardHeight, initialWindowHeight, canUseTouchScreen, didInteractionsComplete]);
+            return () => {
+                task.cancel();
+            };
+        }, []),
+    );
 
     useEffect(() => {
-        if (!isFocused || didInteractionsComplete || !canUseTouchScreen) {
-            return;
-        }
-
-        const interactionTask = InteractionManager.runAfterInteractions(() => {
-            setDidInteractionsComplete(true);
+        const unsubscribe = navigation.addListener('blur', () => {
+            setMinHeight(initialWindowHeight);
+            setDidInteractionsComplete(false);
         });
-
-        return () => {
-            // Cancel the interaction task if the component unmounts or if the dependencies change
-            interactionTask.cancel();
-        };
-    }, [isFocused, didInteractionsComplete, canUseTouchScreen]);
+        return unsubscribe;
+    }, [navigation, initialWindowHeight]);
 
     return (
         <SafeAreaConsumer>
@@ -156,7 +140,6 @@ function ScreenWrapper({
 
                 const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
                 const verticalInsets = insets.top + insets.bottom;
-
                 const calculatedMinHeight = minHeight === undefined || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? undefined : minHeight - verticalPadding - verticalInsets;
 
                 return (
@@ -174,10 +157,7 @@ function ScreenWrapper({
                             <KeyboardAvoidingView
                                 style={[styles.w100, styles.h100, {maxHeight, minHeight: calculatedMinHeight}]}
                                 behavior={keyboardAvoidingViewBehavior}
-                                enabled={
-                                    shouldEnableKeyboardAvoidingView &&
-                                    (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? true : didInteractionsComplete && isKeyboardCompletelyClosed)
-                                }
+                                enabled={shouldEnableKeyboardAvoidingView && (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? true : didInteractionsComplete)}
                             >
                                 <PickerAvoidingView
                                     style={styles.flex1}

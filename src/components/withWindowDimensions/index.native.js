@@ -85,6 +85,8 @@ function WindowDimensionsProvider(props) {
             }
             dimensionsEventListener.remove();
         };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
