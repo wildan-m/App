@@ -34,7 +34,7 @@ function KeyboardStateProvider(props) {
         };
     }, []);
 
-    return <KeyboardStateContext.Provider value={{isKeyboardShown}}>{children}</KeyboardStateContext.Provider>;
+    return <KeyboardStateContext.Provider value={{isKeyboardShown, keyboardHeight}}>{children}</KeyboardStateContext.Provider>;
 }
 
 KeyboardStateProvider.propTypes = keyboardStateProviderPropTypes;
