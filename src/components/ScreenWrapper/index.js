@@ -107,32 +107,38 @@ function ScreenWrapper({
     }, []);
 
     useEffect(() => {
-        if (!isFocused && canUseTouchScreen && shouldEnableLockHeightWhileNavigate) {
-            setMinHeight(initialWindowHeight);
-            setIsKeyboardCompletelyClosed(false);
-            setDidInteractionsComplete(false);
+        if (!isFocused || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate) {
+            return;
         }
-    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight]);
+
+        setMinHeight(initialWindowHeight);
+        setIsKeyboardCompletelyClosed(false);
+        setDidInteractionsComplete(false);
+    }, [isFocused, shouldEnableLockHeightWhileNavigate, initialWindowHeight, canUseTouchScreen]);
 
     useEffect(() => {
-        if (canUseTouchScreen && shouldEnableLockHeightWhileNavigate && isFocused && windowHeight - keyboardHeight === initialWindowHeight) {
-            setIsKeyboardCompletelyClosed(true);
-            setMinHeight(undefined);
+        if (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate || !isFocused || windowHeight - keyboardHeight !== initialWindowHeight) {
+            return;
         }
-    }, [shouldEnableLockHeightWhileNavigate, isFocused, windowHeight, keyboardHeight, initialWindowHeight]);
+
+        setIsKeyboardCompletelyClosed(true);
+        setMinHeight(undefined);
+    }, [shouldEnableLockHeightWhileNavigate, isFocused, windowHeight, keyboardHeight, initialWindowHeight, canUseTouchScreen, didInteractionsComplete]);
 
     useEffect(() => {
-        if (isFocused && !didInteractionsComplete) {
-            const interactionTask = InteractionManager.runAfterInteractions(() => {
-                setDidInteractionsComplete(true);
-            });
-
-            return () => {
-                // Cancel the interaction task if the component unmounts or if the dependencies change
-                interactionTask.cancel();
-            };
+        if (!isFocused || didInteractionsComplete || !canUseTouchScreen) {
+            return;
         }
-    }, [isFocused, didInteractionsComplete]);
+
+        const interactionTask = InteractionManager.runAfterInteractions(() => {
+            setDidInteractionsComplete(true);
+        });
+
+        return () => {
+            // Cancel the interaction task if the component unmounts or if the dependencies change
+            interactionTask.cancel();
+        };
+    }, [isFocused, didInteractionsComplete, canUseTouchScreen]);
 
     return (
         <SafeAreaConsumer>
@@ -172,7 +178,6 @@ function ScreenWrapper({
                                     shouldEnableKeyboardAvoidingView &&
                                     (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? true : didInteractionsComplete && isKeyboardCompletelyClosed)
                                 }
-                                testID={'aoisdjhfhaosdfa'}
                             >
                                 <PickerAvoidingView
                                     style={styles.flex1}
