@@ -102,10 +102,17 @@ function ScreenWrapper({
         // Rule disabled because this effect is only for component did mount & will component unmount lifecycle event
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     useFocusEffect(
         React.useCallback(() => {
+            if (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate) {
+                return;
+            }
+
+            console.log(`[wildebug] React.useCallback( ${testID}`)
+
             const task = InteractionManager.runAfterInteractions(() => {
+                console.log(`[wildebug] runAfterInteractions ${testID}`)
+
                 setMinHeight(undefined);
                 setDidInteractionsComplete(true);
             });
@@ -117,9 +124,19 @@ function ScreenWrapper({
     );
 
     useEffect(() => {
+        if (!canUseTouchScreen || !shouldEnableLockHeightWhileNavigate) {
+            return;
+        }
+
         const unsubscribe = navigation.addListener('blur', () => {
             setMinHeight(initialWindowHeight);
             setDidInteractionsComplete(false);
+
+            if (!isKeyboardShown) {
+                return;
+            }
+
+            Keyboard.dismiss();
         });
         return unsubscribe;
     }, [navigation, initialWindowHeight]);
@@ -141,7 +158,7 @@ function ScreenWrapper({
                 const verticalPadding = paddingStyle.paddingTop || 0 + paddingStyle.paddingBottom || 0;
                 const verticalInsets = insets.top + insets.bottom;
                 const calculatedMinHeight = minHeight === undefined || !canUseTouchScreen || !shouldEnableLockHeightWhileNavigate ? undefined : minHeight - verticalPadding - verticalInsets;
-
+                console.log(`[wildebug] calculatedMinHeight ${testID}`, calculatedMinHeight)
                 return (
                     <View
                         style={styles.flex1}
