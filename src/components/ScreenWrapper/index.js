@@ -139,7 +139,7 @@ function ScreenWrapper({
             Keyboard.dismiss();
         });
         return unsubscribe;
-    }, [navigation, initialWindowHeight]);
+    }, [navigation, initialWindowHeight, canUseTouchScreen, shouldEnableLockHeightWhileNavigate]);
 
     return (
         <SafeAreaConsumer>
