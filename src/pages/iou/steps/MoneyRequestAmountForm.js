@@ -76,7 +76,8 @@ function MoneyRequestAmountForm({amount, currency, isEditing, forwardedRef, onCu
     const [currentAmount, setCurrentAmount] = useState(selectedAmountAsString);
     const [formError, setFormError] = useState('');
     const [shouldUpdateSelection, setShouldUpdateSelection] = useState(true);
-
+    const [textAmountContainerMinHeight, setTextAmountContainerHeight] = useState(undefined);
+ 
     const [selection, setSelection] = useState({
         start: selectedAmountAsString.length,
         end: selectedAmountAsString.length,
@@ -229,13 +230,25 @@ function MoneyRequestAmountForm({amount, currency, isEditing, forwardedRef, onCu
     const formattedAmount = MoneyRequestUtils.replaceAllDigits(currentAmount, toLocaleDigit);
     const buttonText = isEditing ? translate('common.save') : translate('common.next');
     const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
-
     return (
         <ScrollView contentContainerStyle={styles.flexGrow1}>
             <View
                 nativeID={AMOUNT_VIEW_ID}
                 onMouseDown={(event) => onMouseDown(event, [AMOUNT_VIEW_ID])}
-                style={[styles.flex1, styles.flexRow, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter]}
+                style={[styles.flex1, styles.flexRow, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter, { minHeight: textAmountContainerMinHeight }]}
+                onLayout={(event) => {
+                    if (!canUseTouchScreen) {
+                        return;
+                    }
+
+                    if(textAmountContainerMinHeight !== undefined)
+                    {
+                        return;
+                    }
+
+                    const layout = event.nativeEvent.layout;
+                    setTextAmountContainerHeight(layout.height);
+                }}
             >
                 <TextInputWithCurrencySymbol
                     formattedAmount={formattedAmount}
