@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback, useRef} from 'react';
-import {ScrollView, View} from 'react-native';
+import {ScrollView} from 'react-native';
 import PropTypes from 'prop-types';
 import lodashGet from 'lodash/get';
 import _ from 'underscore';
@@ -17,6 +17,7 @@ import refPropTypes from '../../../components/refPropTypes';
 import getOperatingSystem from '../../../libs/getOperatingSystem';
 import * as Browser from '../../../libs/Browser';
 import useWindowDimensions from '../../../hooks/useWindowDimensions';
+import View from '../../../components/View';
 
 const propTypes = {
     /** IOU amount saved in Onyx */
@@ -231,24 +232,26 @@ function MoneyRequestAmountForm({amount, currency, isEditing, forwardedRef, onCu
     const buttonText = isEditing ? translate('common.save') : translate('common.next');
     const canUseTouchScreen = DeviceCapabilities.canUseTouchScreen();
     return (
-        <ScrollView contentContainerStyle={styles.flexGrow1}>
+        <ScrollView contentContainerStyle={styles.flexGrow1} showsVerticalScrollIndicator={false}>
             <View
                 nativeID={AMOUNT_VIEW_ID}
                 onMouseDown={(event) => onMouseDown(event, [AMOUNT_VIEW_ID])}
-                style={[styles.flex1, styles.flexRow, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter, { minHeight: textAmountContainerMinHeight }]}
-                onLayout={(event) => {
-                    if (!canUseTouchScreen) {
-                        return;
-                    }
+                style={[styles.flex1, styles.flexRow, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter]}
+                // style={[styles.flex1, styles.flexRow, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter, { minHeight: textAmountContainerMinHeight }]}
+                shouldKeepMinHeight={canUseTouchScreen}
+                // onLayout={(event) => {
+                //     if (!canUseTouchScreen) {
+                //         return;
+                //     }
 
-                    if(textAmountContainerMinHeight !== undefined)
-                    {
-                        return;
-                    }
+                //     if(textAmountContainerMinHeight !== undefined)
+                //     {
+                //         return;
+                //     }
 
-                    const layout = event.nativeEvent.layout;
-                    setTextAmountContainerHeight(layout.height);
-                }}
+                //     const layout = event.nativeEvent.layout;
+                //     setTextAmountContainerHeight(layout.height);
+                // }}
             >
                 <TextInputWithCurrencySymbol
                     formattedAmount={formattedAmount}

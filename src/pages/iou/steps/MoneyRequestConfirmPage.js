@@ -63,6 +63,7 @@ const defaultProps = {
 function MoneyRequestConfirmPage(props) {
     const {isOffline} = useNetwork();
     const {windowHeight, windowWidth} = useWindowDimensions();
+    const initialWindowHeight = useRef(windowHeight);
     const prevMoneyRequestId = useRef(props.iou.id);
     const iouType = useRef(lodashGet(props.route, 'params.iouType', ''));
     const isDistanceRequest = MoneyRequestUtils.isDistanceRequest(iouType.current, props.selectedTab);
@@ -291,6 +292,9 @@ function MoneyRequestConfirmPage(props) {
         return props.translate('tabSelector.manual');
     };
 
+console.log('[wildebug] windowHeight', windowHeight)
+console.log('[wildebug] initialWindowHeight', initialWindowHeight)
+
     return (
         <ScreenWrapper
             includeSafeAreaPaddingBottom={false}
@@ -359,7 +363,7 @@ function MoneyRequestConfirmPage(props) {
                                 iouMerchant={props.iou.merchant}
                                 iouCreated={props.iou.created}
                                 isDistanceRequest={isDistanceRequest}
-                                listStyles={[StyleUtils.getMaximumHeight(windowHeight / 3)]}
+                                listStyles={[StyleUtils.getMaximumHeight(initialWindowHeight.current / 3)]}
                             />
                         </ScrollView>
                     </ScrollView>
