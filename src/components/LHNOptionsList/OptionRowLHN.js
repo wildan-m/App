@@ -97,7 +97,11 @@ function OptionRowLHN(props) {
 
     const textStyle = props.isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
     const textUnreadStyle = optionItem.isUnread ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
-    const displayNameStyle = StyleUtils.combineStyles([styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, ...textUnreadStyle], props.style);
+                                    {backgroundColor:'yellow'}
+    const displayNameStyle = StyleUtils.combineStyles([styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, ...textUnreadStyle], props.style, 
+        {backgroundColor:'green'}
+        
+        );
     const alternateTextStyle = StyleUtils.combineStyles(
         props.viewMode === CONST.OPTION_MODE.COMPACT
             ? [textStyle, styles.optionAlternateText, styles.pre, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2]
@@ -234,18 +238,25 @@ function OptionRowLHN(props) {
                                         />
                                     ))}
                                 <View style={contentContainerStyles}>
-                                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
-                                        <DisplayNames
-                                            accessibilityLabel={translate('accessibilityHints.chatUserDisplayNames')}
-                                            fullTitle={fullTitle}
-                                            displayNamesWithTooltips={optionItem.displayNamesWithTooltips}
-                                            tooltipEnabled
-                                            numberOfLines={1}
-                                            textStyles={displayNameStyle}
-                                            shouldUseFullTitle={
-                                                optionItem.isChatRoom || optionItem.isPolicyExpenseChat || optionItem.isTaskReport || optionItem.isThread || optionItem.isMoneyRequestReport
-                                            }
-                                        />
+                                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden, 
+                                    {backgroundColor:'yellow'}
+                                    ]}>
+                                        <View style={[props.viewMode === CONST.OPTION_MODE.COMPACT ? {} : styles.flex1,
+                                        { backgroundColor: 'red' }
+
+                                        ]}>
+                                            <DisplayNames
+                                                accessibilityLabel={translate('accessibilityHints.chatUserDisplayNames')}
+                                                fullTitle={fullTitle}
+                                                displayNamesWithTooltips={optionItem.displayNamesWithTooltips}
+                                                tooltipEnabled
+                                                numberOfLines={1}
+                                                textStyles={displayNameStyle}
+                                                shouldUseFullTitle={
+                                                    optionItem.isChatRoom || optionItem.isPolicyExpenseChat || optionItem.isTaskReport || optionItem.isThread || optionItem.isMoneyRequestReport
+                                                }
+                                            />
+                                        </View>
                                         {isStatusVisible && (
                                             <Tooltip
                                                 text={statusContent}
@@ -256,13 +267,17 @@ function OptionRowLHN(props) {
                                         )}
                                     </View>
                                     {optionItem.alternateText ? (
-                                        <Text
-                                            style={alternateTextStyle}
-                                            numberOfLines={1}
-                                            accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
-                                        >
-                                            {optionItem.alternateText}
-                                        </Text>
+                                        <View style={[styles.flex1,
+                                        {backgroundColor:'purple'}
+                                        ]}>
+                                            <Text
+                                                style={alternateTextStyle}
+                                                numberOfLines={1}
+                                                accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
+                                            >
+                                                {optionItem.alternateText}
+                                            </Text>
+                                        </View>
                                     ) : null}
                                 </View>
                                 {optionItem.descriptiveText ? (
