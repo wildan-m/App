@@ -156,6 +156,20 @@ function OptionRowLHN(props) {
     const isGroupChat =
         optionItem.type === CONST.REPORT.TYPE.CHAT && _.isEmpty(optionItem.chatType) && !optionItem.isThread && lodashGet(optionItem, 'displayNamesWithTooltips.length', 0) > 2;
     const fullTitle = isGroupChat ? ReportUtils.getDisplayNamesStringFromTooltips(optionItem.displayNamesWithTooltips) : optionItem.text;
+    
+    const insertZeroWidthSpace = (text) => {
+        const result = [];
+        const zeroWidthSpace = '\u200B';
+
+        for (let i = 0; i < text.length; i++) {
+            result.push(text[i]);
+            if (i < text.length - 1) {
+                result.push(zeroWidthSpace);
+            }
+        }
+
+        return result.join('');
+    };
 
     return (
         <OfflineWithFeedback
@@ -236,7 +250,7 @@ function OptionRowLHN(props) {
                                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
                                         <DisplayNames
                                             accessibilityLabel={translate('accessibilityHints.chatUserDisplayNames')}
-                                            fullTitle={fullTitle}
+                                            fullTitle={insertZeroWidthSpace(fullTitle)}
                                             displayNamesWithTooltips={optionItem.displayNamesWithTooltips}
                                             tooltipEnabled
                                             numberOfLines={1}
