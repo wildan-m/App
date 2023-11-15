@@ -26,6 +26,7 @@ import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import _ from 'underscore';
 
 /**
  * @param {Object} [policy]
@@ -154,6 +155,7 @@ function FloatingActionButtonAndPopover(props) {
     };
 
     useEffect(() => {
+        console.log('[wildebug] props.chatReports', props.chatReports)
         const navigationState = props.navigation.getState();
         const routes = lodashGet(navigationState, 'routes', []);
         const currentRoute = routes[navigationState.index];
@@ -163,9 +165,14 @@ function FloatingActionButtonAndPopover(props) {
         if (lodashGet(props.demoInfo, 'money2020.isBeginningDemo', false)) {
             return;
         }
+        if (_.isEmpty(props.chatReports) || !props.isFocused)
+        {
+            return;
+        }
+
         Welcome.show({routes, showCreateMenu});
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.isLoading]);
+    }, [props.isLoading, props.isFocused]);
 
     useEffect(() => {
         if (!didScreenBecomeInactive()) {
@@ -285,6 +292,9 @@ export default compose(
         },
         demoInfo: {
             key: ONYXKEYS.DEMO_INFO,
+        },
+        chatReports: {
+            key: ONYXKEYS.COLLECTION.REPORT,
         },
     }),
 )(FloatingActionButtonAndPopoverWithRef);
