@@ -155,7 +155,6 @@ function FloatingActionButtonAndPopover(props) {
     };
 
     useEffect(() => {
-        console.log('[wildebug] props.chatReports', props.chatReports)
         const navigationState = props.navigation.getState();
         const routes = lodashGet(navigationState, 'routes', []);
         const currentRoute = routes[navigationState.index];
@@ -165,8 +164,7 @@ function FloatingActionButtonAndPopover(props) {
         if (lodashGet(props.demoInfo, 'money2020.isBeginningDemo', false)) {
             return;
         }
-        if (_.isEmpty(props.chatReports) || !props.isFocused)
-        {
+        if ((_.isEmpty(props.chatReports) || !props.isFocused) && props.isSmallScreenWidth) {
             return;
         }
 
