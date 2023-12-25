@@ -4,6 +4,7 @@ import React from 'react';
 import {ScrollView} from 'react-native';
 import {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import getBankIcon from '@components/Icon/BankIcons';
@@ -69,57 +70,59 @@ function EnableStep(props) {
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
                 onBackButtonPress={props.onBackButtonPress}
             />
-            <ScrollView style={[styles.flex1]}>
-                <Section
-                    title={!isUsingExpensifyCard ? props.translate('workspace.bankAccount.oneMoreThing') : props.translate('workspace.bankAccount.allSet')}
-                    icon={!isUsingExpensifyCard ? Illustrations.ConciergeNew : Illustrations.ThumbsUpStars}
-                >
-                    <OfflineWithFeedback
-                        pendingAction={pendingAction}
-                        errors={errors}
-                        shouldShowErrorMessage
-                        onClose={BankAccounts.resetReimbursementAccount}
+            <FullPageOfflineBlockingView>
+                <ScrollView style={[styles.flex1]}>
+                    <Section
+                        title={!isUsingExpensifyCard ? props.translate('workspace.bankAccount.oneMoreThing') : props.translate('workspace.bankAccount.allSet')}
+                        icon={!isUsingExpensifyCard ? Illustrations.ConciergeNew : Illustrations.ThumbsUpStars}
                     >
-                        <MenuItem
-                            title={bankName}
-                            description={formattedBankAccountNumber}
-                            icon={icon}
-                            iconWidth={iconSize}
-                            iconHeight={iconSize}
-                            interactive={false}
-                            wrapperStyle={[styles.cardMenuItem, styles.mv3]}
-                        />
-                        <Text style={[styles.mv3]}>
-                            {!isUsingExpensifyCard
-                                ? props.translate('workspace.bankAccount.accountDescriptionNoCards')
-                                : props.translate('workspace.bankAccount.accountDescriptionWithCards')}
-                        </Text>
-                        {!isUsingExpensifyCard && (
-                            <Button
-                                text={props.translate('workspace.bankAccount.addWorkEmail')}
-                                onPress={() => {
-                                    Link.openOldDotLink(CONST.ADD_SECONDARY_LOGIN_URL);
-                                }}
-                                icon={Expensicons.Mail}
-                                style={[styles.mt4]}
-                                iconStyles={[styles.buttonCTAIcon]}
-                                shouldShowRightIcon
-                                large
-                                success
+                        <OfflineWithFeedback
+                            pendingAction={pendingAction}
+                            errors={errors}
+                            shouldShowErrorMessage
+                            onClose={BankAccounts.resetReimbursementAccount}
+                        >
+                            <MenuItem
+                                title={bankName}
+                                description={formattedBankAccountNumber}
+                                icon={icon}
+                                iconWidth={iconSize}
+                                iconHeight={iconSize}
+                                interactive={false}
+                                wrapperStyle={[styles.cardMenuItem, styles.mv3]}
                             />
-                        )}
-                        <MenuItem
-                            title={props.translate('workspace.bankAccount.disconnectBankAccount')}
-                            icon={Expensicons.Close}
-                            onPress={BankAccounts.requestResetFreePlanBankAccount}
-                            wrapperStyle={[styles.cardMenuItem, styles.mv3]}
-                            disabled={Boolean(pendingAction) || !_.isEmpty(errors)}
-                        />
-                    </OfflineWithFeedback>
-                </Section>
-                {Boolean(props.user.isCheckingDomain) && <Text style={[styles.formError, styles.mh5]}>{props.translate('workspace.card.checkingDomain')}</Text>}
-            </ScrollView>
-            {props.reimbursementAccount.shouldShowResetModal && <WorkspaceResetBankAccountModal reimbursementAccount={props.reimbursementAccount} />}
+                            <Text style={[styles.mv3]}>
+                                {!isUsingExpensifyCard
+                                    ? props.translate('workspace.bankAccount.accountDescriptionNoCards')
+                                    : props.translate('workspace.bankAccount.accountDescriptionWithCards')}
+                            </Text>
+                            {!isUsingExpensifyCard && (
+                                <Button
+                                    text={props.translate('workspace.bankAccount.addWorkEmail')}
+                                    onPress={() => {
+                                        Link.openOldDotLink(CONST.ADD_SECONDARY_LOGIN_URL);
+                                    }}
+                                    icon={Expensicons.Mail}
+                                    style={[styles.mt4]}
+                                    iconStyles={[styles.buttonCTAIcon]}
+                                    shouldShowRightIcon
+                                    large
+                                    success
+                                />
+                            )}
+                            <MenuItem
+                                title={props.translate('workspace.bankAccount.disconnectBankAccount')}
+                                icon={Expensicons.Close}
+                                onPress={BankAccounts.requestResetFreePlanBankAccount}
+                                wrapperStyle={[styles.cardMenuItem, styles.mv3]}
+                                disabled={Boolean(pendingAction) || !_.isEmpty(errors)}
+                            />
+                        </OfflineWithFeedback>
+                    </Section>
+                    {Boolean(props.user.isCheckingDomain) && <Text style={[styles.formError, styles.mh5]}>{props.translate('workspace.card.checkingDomain')}</Text>}
+                </ScrollView>
+                {props.reimbursementAccount.shouldShowResetModal && <WorkspaceResetBankAccountModal reimbursementAccount={props.reimbursementAccount} />}
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

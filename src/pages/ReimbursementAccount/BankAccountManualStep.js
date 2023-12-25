@@ -1,6 +1,7 @@
 import lodashGet from 'lodash/get';
 import React, {useCallback} from 'react';
 import _ from 'underscore';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import CheckboxWithLabel from '@components/CheckboxWithLabel';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -86,57 +87,59 @@ function BankAccountManualStep(props) {
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
                 onBackButtonPress={props.onBackButtonPress}
             />
-            <FormProvider
-                formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                onSubmit={submit}
-                validate={validate}
-                submitButtonText={translate('common.continue')}
-                style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-            >
-                <Text style={[styles.mb5]}>{translate('bankAccount.checkHelpLine')}</Text>
-                <ExampleCheck />
-                <InputWrapper
-                    InputComponent={TextInput}
-                    autoFocus
-                    shouldDelayFocus={shouldDelayFocus}
-                    inputID="routingNumber"
-                    label={translate('bankAccount.routingNumber')}
-                    aria-label={translate('bankAccount.routingNumber')}
-                    role={CONST.ROLE.PRESENTATION}
-                    defaultValue={props.getDefaultStateForField('routingNumber', '')}
-                    inputMode={CONST.INPUT_MODE.NUMERIC}
-                    disabled={shouldDisableInputs}
-                    shouldSaveDraft
-                    shouldUseDefaultValue={shouldDisableInputs}
-                />
-                <InputWrapper
-                    InputComponent={TextInput}
-                    inputID="accountNumber"
-                    containerStyles={[styles.mt4]}
-                    label={translate('bankAccount.accountNumber')}
-                    aria-label={translate('bankAccount.accountNumber')}
-                    role={CONST.ROLE.PRESENTATION}
-                    defaultValue={props.getDefaultStateForField('accountNumber', '')}
-                    inputMode={CONST.INPUT_MODE.NUMERIC}
-                    disabled={shouldDisableInputs}
-                    shouldSaveDraft
-                    shouldUseDefaultValue={shouldDisableInputs}
-                />
-                <InputWrapper
-                    InputComponent={CheckboxWithLabel}
-                    aria-label={`${translate('common.iAcceptThe')} ${translate('common.expensifyTermsOfService')}`}
-                    style={styles.mt4}
-                    inputID="acceptTerms"
-                    LabelComponent={() => (
-                        <Text>
-                            {translate('common.iAcceptThe')}
-                            <TextLink href={CONST.TERMS_URL}>{translate('common.expensifyTermsOfService')}</TextLink>
-                        </Text>
-                    )}
-                    defaultValue={props.getDefaultStateForField('acceptTerms', false)}
-                    shouldSaveDraft
-                />
-            </FormProvider>
+            <FullPageOfflineBlockingView>
+                <FormProvider
+                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                    onSubmit={submit}
+                    validate={validate}
+                    submitButtonText={translate('common.continue')}
+                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
+                >
+                    <Text style={[styles.mb5]}>{translate('bankAccount.checkHelpLine')}</Text>
+                    <ExampleCheck />
+                    <InputWrapper
+                        InputComponent={TextInput}
+                        autoFocus
+                        shouldDelayFocus={shouldDelayFocus}
+                        inputID="routingNumber"
+                        label={translate('bankAccount.routingNumber')}
+                        aria-label={translate('bankAccount.routingNumber')}
+                        role={CONST.ROLE.PRESENTATION}
+                        defaultValue={props.getDefaultStateForField('routingNumber', '')}
+                        inputMode={CONST.INPUT_MODE.NUMERIC}
+                        disabled={shouldDisableInputs}
+                        shouldSaveDraft
+                        shouldUseDefaultValue={shouldDisableInputs}
+                    />
+                    <InputWrapper
+                        InputComponent={TextInput}
+                        inputID="accountNumber"
+                        containerStyles={[styles.mt4]}
+                        label={translate('bankAccount.accountNumber')}
+                        aria-label={translate('bankAccount.accountNumber')}
+                        role={CONST.ROLE.PRESENTATION}
+                        defaultValue={props.getDefaultStateForField('accountNumber', '')}
+                        inputMode={CONST.INPUT_MODE.NUMERIC}
+                        disabled={shouldDisableInputs}
+                        shouldSaveDraft
+                        shouldUseDefaultValue={shouldDisableInputs}
+                    />
+                    <InputWrapper
+                        InputComponent={CheckboxWithLabel}
+                        aria-label={`${translate('common.iAcceptThe')} ${translate('common.expensifyTermsOfService')}`}
+                        style={styles.mt4}
+                        inputID="acceptTerms"
+                        LabelComponent={() => (
+                            <Text>
+                                {translate('common.iAcceptThe')}
+                                <TextLink href={CONST.TERMS_URL}>{translate('common.expensifyTermsOfService')}</TextLink>
+                            </Text>
+                        )}
+                        defaultValue={props.getDefaultStateForField('acceptTerms', false)}
+                        shouldSaveDraft
+                    />
+                </FormProvider>
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

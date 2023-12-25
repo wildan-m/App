@@ -2,6 +2,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import CheckboxWithLabel from '@components/CheckboxWithLabel';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -142,69 +143,71 @@ const RequestorStep = React.forwardRef(({reimbursementAccount, shouldShowOnfido,
                 onBackButtonPress={onBackButtonPress}
                 shouldShowGetAssistanceButton
             />
-            <FormProvider
-                formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                submitButtonText={translate('common.saveAndContinue')}
-                validate={validate}
-                onSubmit={submit}
-                style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-                scrollContextEnabled
-            >
-                <Text>{translate('requestorStep.subtitle')}</Text>
-                <View style={[styles.mb5, styles.mt1, styles.dFlex, styles.flexRow]}>
-                    <TextLink
-                        style={[styles.textMicro]}
-                        href={CONST.BANK_ACCOUNT_PERSONAL_DOCUMENTATION_INFO_URL}
-                    >
-                        {translate('requestorStep.learnMore')}
-                    </TextLink>
-                    <Text style={[styles.textMicroSupporting]}>{' | '}</Text>
-                    <TextLink
-                        style={[styles.textMicro, styles.textLink]}
-                        href={CONST.PERSONAL_DATA_PROTECTION_INFO_URL}
-                    >
-                        {translate('requestorStep.isMyDataSafe')}
-                    </TextLink>
-                </View>
-                <IdentityForm
-                    translate={translate}
-                    defaultValues={defaultValues}
-                    inputKeys={INPUT_KEYS}
-                    shouldSaveDraft
-                />
-                <InputWrapper
-                    InputComponent={CheckboxWithLabel}
-                    accessibilityLabel={translate('requestorStep.isControllingOfficer')}
-                    inputID="isControllingOfficer"
-                    defaultValue={getDefaultStateForField('isControllingOfficer', false)}
-                    LabelComponent={renderLabelComponent}
-                    style={[styles.mt4]}
-                    shouldSaveDraft
-                />
-                <Text style={[styles.mt3, styles.textMicroSupporting]}>
-                    {translate('requestorStep.onFidoConditions')}
-                    <TextLink
-                        href={CONST.ONFIDO_FACIAL_SCAN_POLICY_URL}
-                        style={[styles.textMicro]}
-                    >
-                        {translate('onfidoStep.facialScan')}
-                    </TextLink>
-                    {', '}
-                    <TextLink
-                        href={CONST.ONFIDO_PRIVACY_POLICY_URL}
-                        style={[styles.textMicro]}
-                    >
-                        {translate('common.privacy')}
-                    </TextLink>
-                    {` ${translate('common.and')} `}
-                    <TextLink
-                        href={CONST.ONFIDO_TERMS_OF_SERVICE_URL}
-                        style={[styles.textMicro]}
-                    >
-                        {translate('common.termsOfService')}
-                    </TextLink>
-                </Text>
-            </FormProvider>
+            <FullPageOfflineBlockingView>
+                <FormProvider
+                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                    submitButtonText={translate('common.saveAndContinue')}
+                    validate={validate}
+                    onSubmit={submit}
+                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
+                    scrollContextEnabled
+                >
+                    <Text>{translate('requestorStep.subtitle')}</Text>
+                    <View style={[styles.mb5, styles.mt1, styles.dFlex, styles.flexRow]}>
+                        <TextLink
+                            style={[styles.textMicro]}
+                            href={CONST.BANK_ACCOUNT_PERSONAL_DOCUMENTATION_INFO_URL}
+                        >
+                            {translate('requestorStep.learnMore')}
+                        </TextLink>
+                        <Text style={[styles.textMicroSupporting]}>{' | '}</Text>
+                        <TextLink
+                            style={[styles.textMicro, styles.textLink]}
+                            href={CONST.PERSONAL_DATA_PROTECTION_INFO_URL}
+                        >
+                            {translate('requestorStep.isMyDataSafe')}
+                        </TextLink>
+                    </View>
+                    <IdentityForm
+                        translate={translate}
+                        defaultValues={defaultValues}
+                        inputKeys={INPUT_KEYS}
+                        shouldSaveDraft
+                    />
+                    <InputWrapper
+                        InputComponent={CheckboxWithLabel}
+                        accessibilityLabel={translate('requestorStep.isControllingOfficer')}
+                        inputID="isControllingOfficer"
+                        defaultValue={getDefaultStateForField('isControllingOfficer', false)}
+                        LabelComponent={renderLabelComponent}
+                        style={[styles.mt4]}
+                        shouldSaveDraft
+                    />
+                    <Text style={[styles.mt3, styles.textMicroSupporting]}>
+                        {translate('requestorStep.onFidoConditions')}
+                        <TextLink
+                            href={CONST.ONFIDO_FACIAL_SCAN_POLICY_URL}
+                            style={[styles.textMicro]}
+                        >
+                            {translate('onfidoStep.facialScan')}
+                        </TextLink>
+                        {', '}
+                        <TextLink
+                            href={CONST.ONFIDO_PRIVACY_POLICY_URL}
+                            style={[styles.textMicro]}
+                        >
+                            {translate('common.privacy')}
+                        </TextLink>
+                        {` ${translate('common.and')} `}
+                        <TextLink
+                            href={CONST.ONFIDO_TERMS_OF_SERVICE_URL}
+                            style={[styles.textMicro]}
+                        >
+                            {translate('common.termsOfService')}
+                        </TextLink>
+                    </Text>
+                </FormProvider>
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 });

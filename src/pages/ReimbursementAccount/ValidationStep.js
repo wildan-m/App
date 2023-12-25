@@ -5,6 +5,7 @@ import React from 'react';
 import {ScrollView, View} from 'react-native';
 import {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -136,91 +137,93 @@ function ValidationStep({reimbursementAccount, translate, onBackButtonPress, acc
                 shouldShowGetAssistanceButton
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
             />
-            {maxAttemptsReached && (
-                <View style={[styles.m5, styles.flex1]}>
-                    <Text>
-                        {translate('validationStep.maxAttemptsReached')} {translate('common.please')}{' '}
-                        <TextLink onPress={Report.navigateToConciergeChat}>{translate('common.contactUs')}</TextLink>.
-                    </Text>
-                </View>
-            )}
-            {!maxAttemptsReached && state === BankAccount.STATE.PENDING && (
-                <FormProvider
-                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                    submitButtonText={translate('validationStep.buttonText')}
-                    onSubmit={submit}
-                    validate={validate}
-                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-                >
-                    <View style={[styles.mb2]}>
-                        <Text style={[styles.mb5]}>{translate('validationStep.description')}</Text>
-                        <Text style={[styles.mb2]}>{translate('validationStep.descriptionCTA')}</Text>
+            <FullPageOfflineBlockingView>
+                {maxAttemptsReached && (
+                    <View style={[styles.m5, styles.flex1]}>
+                        <Text>
+                            {translate('validationStep.maxAttemptsReached')} {translate('common.please')}{' '}
+                            <TextLink onPress={Report.navigateToConciergeChat}>{translate('common.contactUs')}</TextLink>.
+                        </Text>
                     </View>
-                    <View style={[styles.mv5]}>
-                        <InputWrapper
-                            InputComponent={TextInput}
-                            inputID="amount1"
-                            shouldSaveDraft
-                            containerStyles={[styles.mb1]}
-                            placeholder="1.52"
-                            inputMode={CONST.INPUT_MODE.DECIMAL}
-                            role={CONST.ROLE.PRESENTATION}
-                        />
-                        <InputWrapper
-                            InputComponent={TextInput}
-                            inputID="amount2"
-                            shouldSaveDraft
-                            containerStyles={[styles.mb1]}
-                            placeholder="1.53"
-                            inputMode={CONST.INPUT_MODE.DECIMAL}
-                            role={CONST.ROLE.PRESENTATION}
-                        />
-                        <InputWrapper
-                            InputComponent={TextInput}
-                            shouldSaveDraft
-                            inputID="amount3"
-                            containerStyles={[styles.mb1]}
-                            placeholder="1.54"
-                            inputMode={CONST.INPUT_MODE.DECIMAL}
-                            role={CONST.ROLE.PRESENTATION}
-                        />
-                    </View>
-                    {!requiresTwoFactorAuth && (
-                        <View style={[styles.mln5, styles.mrn5]}>
-                            <Enable2FAPrompt policyID={policyID} />
-                        </View>
-                    )}
-                </FormProvider>
-            )}
-            {isVerifying && (
-                <ScrollView style={[styles.flex1]}>
-                    <Section
-                        title={translate('workspace.bankAccount.letsFinishInChat')}
-                        icon={Illustrations.ConciergeBubble}
+                )}
+                {!maxAttemptsReached && state === BankAccount.STATE.PENDING && (
+                    <FormProvider
+                        formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                        submitButtonText={translate('validationStep.buttonText')}
+                        onSubmit={submit}
+                        validate={validate}
+                        style={[styles.mh5, styles.mt3, styles.flexGrow1]}
                     >
-                        <Text>{translate('validationStep.letsChatText')}</Text>
-                        <Button
-                            text={translate('validationStep.letsChatCTA')}
-                            onPress={Report.navigateToConciergeChat}
-                            icon={Expensicons.ChatBubble}
-                            style={[styles.mt4]}
-                            iconStyles={[styles.buttonCTAIcon]}
-                            shouldShowRightIcon
-                            large
-                            success
-                        />
-                        <MenuItem
-                            title={translate('workspace.bankAccount.noLetsStartOver')}
-                            icon={Expensicons.RotateLeft}
-                            onPress={BankAccounts.requestResetFreePlanBankAccount}
-                            shouldShowRightIcon
-                            wrapperStyle={[styles.cardMenuItem, styles.mv3]}
-                        />
-                    </Section>
-                    {reimbursementAccount.shouldShowResetModal && <WorkspaceResetBankAccountModal reimbursementAccount={reimbursementAccount} />}
-                    {!requiresTwoFactorAuth && <Enable2FAPrompt policyID={policyID} />}
-                </ScrollView>
-            )}
+                        <View style={[styles.mb2]}>
+                            <Text style={[styles.mb5]}>{translate('validationStep.description')}</Text>
+                            <Text style={[styles.mb2]}>{translate('validationStep.descriptionCTA')}</Text>
+                        </View>
+                        <View style={[styles.mv5]}>
+                            <InputWrapper
+                                InputComponent={TextInput}
+                                inputID="amount1"
+                                shouldSaveDraft
+                                containerStyles={[styles.mb1]}
+                                placeholder="1.52"
+                                inputMode={CONST.INPUT_MODE.DECIMAL}
+                                role={CONST.ROLE.PRESENTATION}
+                            />
+                            <InputWrapper
+                                InputComponent={TextInput}
+                                inputID="amount2"
+                                shouldSaveDraft
+                                containerStyles={[styles.mb1]}
+                                placeholder="1.53"
+                                inputMode={CONST.INPUT_MODE.DECIMAL}
+                                role={CONST.ROLE.PRESENTATION}
+                            />
+                            <InputWrapper
+                                InputComponent={TextInput}
+                                shouldSaveDraft
+                                inputID="amount3"
+                                containerStyles={[styles.mb1]}
+                                placeholder="1.54"
+                                inputMode={CONST.INPUT_MODE.DECIMAL}
+                                role={CONST.ROLE.PRESENTATION}
+                            />
+                        </View>
+                        {!requiresTwoFactorAuth && (
+                            <View style={[styles.mln5, styles.mrn5]}>
+                                <Enable2FAPrompt policyID={policyID} />
+                            </View>
+                        )}
+                    </FormProvider>
+                )}
+                {isVerifying && (
+                    <ScrollView style={[styles.flex1]}>
+                        <Section
+                            title={translate('workspace.bankAccount.letsFinishInChat')}
+                            icon={Illustrations.ConciergeBubble}
+                        >
+                            <Text>{translate('validationStep.letsChatText')}</Text>
+                            <Button
+                                text={translate('validationStep.letsChatCTA')}
+                                onPress={Report.navigateToConciergeChat}
+                                icon={Expensicons.ChatBubble}
+                                style={[styles.mt4]}
+                                iconStyles={[styles.buttonCTAIcon]}
+                                shouldShowRightIcon
+                                large
+                                success
+                            />
+                            <MenuItem
+                                title={translate('workspace.bankAccount.noLetsStartOver')}
+                                icon={Expensicons.RotateLeft}
+                                onPress={BankAccounts.requestResetFreePlanBankAccount}
+                                shouldShowRightIcon
+                                wrapperStyle={[styles.cardMenuItem, styles.mv3]}
+                            />
+                        </Section>
+                        {reimbursementAccount.shouldShowResetModal && <WorkspaceResetBankAccountModal reimbursementAccount={reimbursementAccount} />}
+                        {!requiresTwoFactorAuth && <Enable2FAPrompt policyID={policyID} />}
+                    </ScrollView>
+                )}
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

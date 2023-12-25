@@ -6,6 +6,7 @@ import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import CheckboxWithLabel from '@components/CheckboxWithLabel';
 import DatePicker from '@components/DatePicker';
 import FormProvider from '@components/Form/FormProvider';
@@ -153,135 +154,137 @@ function CompanyStep({reimbursementAccount, reimbursementAccountDraft, getDefaul
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
                 onBackButtonPress={onBackButtonPress}
             />
-            <FormProvider
-                formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                validate={validate}
-                onSubmit={submit}
-                scrollContextEnabled
-                submitButtonText={translate('common.saveAndContinue')}
-                style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-            >
-                <Text>{translate('companyStep.subtitle')}</Text>
-                <InputWrapper
-                    InputComponent={TextInput}
-                    label={translate('companyStep.legalBusinessName')}
-                    accessibilityLabel={translate('companyStep.legalBusinessName')}
-                    role={CONST.ROLE.PRESENTATION}
-                    inputID="companyName"
-                    containerStyles={[styles.mt4]}
-                    disabled={shouldDisableCompanyName}
-                    defaultValue={getDefaultStateForField('companyName')}
-                    shouldSaveDraft
-                    shouldUseDefaultValue={shouldDisableCompanyName}
-                />
-                <AddressForm
-                    translate={translate}
-                    defaultValues={{
-                        street: getDefaultStateForField('addressStreet'),
-                        city: getDefaultStateForField('addressCity'),
-                        state: getDefaultStateForField('addressState'),
-                        zipCode: getDefaultStateForField('addressZipCode'),
-                    }}
-                    inputKeys={{
-                        street: 'addressStreet',
-                        city: 'addressCity',
-                        state: 'addressState',
-                        zipCode: 'addressZipCode',
-                    }}
-                    shouldSaveDraft
-                    streetTranslationKey="common.companyAddress"
-                />
-                <InputWrapper
-                    InputComponent={TextInput}
-                    inputID="companyPhone"
-                    label={translate('common.phoneNumber')}
-                    accessibilityLabel={translate('common.phoneNumber')}
-                    role={CONST.ROLE.PRESENTATION}
-                    containerStyles={[styles.mt4]}
-                    inputMode={CONST.INPUT_MODE.TEL}
-                    placeholder={translate('common.phoneNumberPlaceholder')}
-                    defaultValue={getDefaultStateForField('companyPhone')}
-                    shouldSaveDraft
-                />
-                <InputWrapper
-                    InputComponent={TextInput}
-                    inputID="website"
-                    label={translate('companyStep.companyWebsite')}
-                    accessibilityLabel={translate('companyStep.companyWebsite')}
-                    role={CONST.ROLE.PRESENTATION}
-                    containerStyles={[styles.mt4]}
-                    defaultValue={getDefaultStateForField('website', defaultWebsite)}
-                    shouldSaveDraft
-                    hint={translate('common.websiteExample')}
-                    inputMode={CONST.INPUT_MODE.URL}
-                />
-                <InputWrapper
-                    InputComponent={TextInput}
-                    inputID="companyTaxID"
-                    label={translate('companyStep.taxIDNumber')}
-                    accessibilityLabel={translate('companyStep.taxIDNumber')}
-                    role={CONST.ROLE.PRESENTATION}
-                    containerStyles={[styles.mt4]}
-                    inputMode={CONST.INPUT_MODE.NUMERIC}
-                    disabled={shouldDisableCompanyTaxID}
-                    placeholder={translate('companyStep.taxIDNumberPlaceholder')}
-                    defaultValue={getDefaultStateForField('companyTaxID')}
-                    shouldSaveDraft
-                    shouldUseDefaultValue={shouldDisableCompanyTaxID}
-                />
-                <View style={styles.mt4}>
+            <FullPageOfflineBlockingView>
+                <FormProvider
+                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                    validate={validate}
+                    onSubmit={submit}
+                    scrollContextEnabled
+                    submitButtonText={translate('common.saveAndContinue')}
+                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
+                >
+                    <Text>{translate('companyStep.subtitle')}</Text>
                     <InputWrapper
-                        InputComponent={Picker}
-                        inputID="incorporationType"
-                        label={translate('companyStep.companyType')}
-                        items={_.map(_.keys(CONST.INCORPORATION_TYPES), (key) => ({
-                            value: key,
-                            label: translate(`companyStep.incorporationTypes.${key}`),
-                        }))}
-                        placeholder={{value: '', label: '-'}}
-                        defaultValue={getDefaultStateForField('incorporationType')}
+                        InputComponent={TextInput}
+                        label={translate('companyStep.legalBusinessName')}
+                        accessibilityLabel={translate('companyStep.legalBusinessName')}
+                        role={CONST.ROLE.PRESENTATION}
+                        inputID="companyName"
+                        containerStyles={[styles.mt4]}
+                        disabled={shouldDisableCompanyName}
+                        defaultValue={getDefaultStateForField('companyName')}
+                        shouldSaveDraft
+                        shouldUseDefaultValue={shouldDisableCompanyName}
+                    />
+                    <AddressForm
+                        translate={translate}
+                        defaultValues={{
+                            street: getDefaultStateForField('addressStreet'),
+                            city: getDefaultStateForField('addressCity'),
+                            state: getDefaultStateForField('addressState'),
+                            zipCode: getDefaultStateForField('addressZipCode'),
+                        }}
+                        inputKeys={{
+                            street: 'addressStreet',
+                            city: 'addressCity',
+                            state: 'addressState',
+                            zipCode: 'addressZipCode',
+                        }}
+                        shouldSaveDraft
+                        streetTranslationKey="common.companyAddress"
+                    />
+                    <InputWrapper
+                        InputComponent={TextInput}
+                        inputID="companyPhone"
+                        label={translate('common.phoneNumber')}
+                        accessibilityLabel={translate('common.phoneNumber')}
+                        role={CONST.ROLE.PRESENTATION}
+                        containerStyles={[styles.mt4]}
+                        inputMode={CONST.INPUT_MODE.TEL}
+                        placeholder={translate('common.phoneNumberPlaceholder')}
+                        defaultValue={getDefaultStateForField('companyPhone')}
                         shouldSaveDraft
                     />
-                </View>
-                <View style={styles.mt4}>
                     <InputWrapper
-                        InputComponent={DatePicker}
-                        inputID="incorporationDate"
-                        label={translate('companyStep.incorporationDate')}
-                        placeholder={translate('companyStep.incorporationDatePlaceholder')}
-                        defaultValue={getDefaultStateForField('incorporationDate')}
+                        InputComponent={TextInput}
+                        inputID="website"
+                        label={translate('companyStep.companyWebsite')}
+                        accessibilityLabel={translate('companyStep.companyWebsite')}
+                        role={CONST.ROLE.PRESENTATION}
+                        containerStyles={[styles.mt4]}
+                        defaultValue={getDefaultStateForField('website', defaultWebsite)}
+                        shouldSaveDraft
+                        hint={translate('common.websiteExample')}
+                        inputMode={CONST.INPUT_MODE.URL}
+                    />
+                    <InputWrapper
+                        InputComponent={TextInput}
+                        inputID="companyTaxID"
+                        label={translate('companyStep.taxIDNumber')}
+                        accessibilityLabel={translate('companyStep.taxIDNumber')}
+                        role={CONST.ROLE.PRESENTATION}
+                        containerStyles={[styles.mt4]}
+                        inputMode={CONST.INPUT_MODE.NUMERIC}
+                        disabled={shouldDisableCompanyTaxID}
+                        placeholder={translate('companyStep.taxIDNumberPlaceholder')}
+                        defaultValue={getDefaultStateForField('companyTaxID')}
+                        shouldSaveDraft
+                        shouldUseDefaultValue={shouldDisableCompanyTaxID}
+                    />
+                    <View style={styles.mt4}>
+                        <InputWrapper
+                            InputComponent={Picker}
+                            inputID="incorporationType"
+                            label={translate('companyStep.companyType')}
+                            items={_.map(_.keys(CONST.INCORPORATION_TYPES), (key) => ({
+                                value: key,
+                                label: translate(`companyStep.incorporationTypes.${key}`),
+                            }))}
+                            placeholder={{value: '', label: '-'}}
+                            defaultValue={getDefaultStateForField('incorporationType')}
+                            shouldSaveDraft
+                        />
+                    </View>
+                    <View style={styles.mt4}>
+                        <InputWrapper
+                            InputComponent={DatePicker}
+                            inputID="incorporationDate"
+                            label={translate('companyStep.incorporationDate')}
+                            placeholder={translate('companyStep.incorporationDatePlaceholder')}
+                            defaultValue={getDefaultStateForField('incorporationDate')}
+                            shouldSaveDraft
+                        />
+                    </View>
+                    <View style={[styles.mt4, styles.mhn5]}>
+                        <InputWrapper
+                            InputComponent={StatePicker}
+                            inputID="incorporationState"
+                            label={translate('companyStep.incorporationState')}
+                            defaultValue={getDefaultStateForField('incorporationState')}
+                            shouldSaveDraft
+                        />
+                    </View>
+                    <InputWrapper
+                        InputComponent={CheckboxWithLabel}
+                        accessibilityLabel={`${translate('companyStep.confirmCompanyIsNot')} ${translate('companyStep.listOfRestrictedBusinesses')}`}
+                        inputID="hasNoConnectionToCannabis"
+                        defaultValue={getDefaultStateForField('hasNoConnectionToCannabis', false)}
+                        LabelComponent={() => (
+                            <Text>
+                                {`${translate('companyStep.confirmCompanyIsNot')} `}
+                                <TextLink
+                                    // eslint-disable-next-line max-len
+                                    href="https://community.expensify.com/discussion/6191/list-of-restricted-businesses"
+                                >
+                                    {`${translate('companyStep.listOfRestrictedBusinesses')}.`}
+                                </TextLink>
+                            </Text>
+                        )}
+                        style={[styles.mt4]}
                         shouldSaveDraft
                     />
-                </View>
-                <View style={[styles.mt4, styles.mhn5]}>
-                    <InputWrapper
-                        InputComponent={StatePicker}
-                        inputID="incorporationState"
-                        label={translate('companyStep.incorporationState')}
-                        defaultValue={getDefaultStateForField('incorporationState')}
-                        shouldSaveDraft
-                    />
-                </View>
-                <InputWrapper
-                    InputComponent={CheckboxWithLabel}
-                    accessibilityLabel={`${translate('companyStep.confirmCompanyIsNot')} ${translate('companyStep.listOfRestrictedBusinesses')}`}
-                    inputID="hasNoConnectionToCannabis"
-                    defaultValue={getDefaultStateForField('hasNoConnectionToCannabis', false)}
-                    LabelComponent={() => (
-                        <Text>
-                            {`${translate('companyStep.confirmCompanyIsNot')} `}
-                            <TextLink
-                                // eslint-disable-next-line max-len
-                                href="https://community.expensify.com/discussion/6191/list-of-restricted-businesses"
-                            >
-                                {`${translate('companyStep.listOfRestrictedBusinesses')}.`}
-                            </TextLink>
-                        </Text>
-                    )}
-                    style={[styles.mt4]}
-                    shouldSaveDraft
-                />
-            </FormProvider>
+                </FormProvider>
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

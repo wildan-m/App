@@ -5,6 +5,7 @@ import React, {useCallback, useEffect} from 'react';
 import {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
 import AddPlaidBankAccount from '@components/AddPlaidBankAccount';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import CheckboxWithLabel from '@components/CheckboxWithLabel';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -100,45 +101,47 @@ function BankAccountPlaidStep(props) {
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
                 onBackButtonPress={onBackButtonPress}
             />
-            <FormProvider
-                formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                validate={validate}
-                onSubmit={submit}
-                scrollContextEnabled
-                submitButtonText={translate('common.saveAndContinue')}
-                style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-                isSubmitButtonVisible={Boolean(selectedPlaidAccountID) && !_.isEmpty(lodashGet(plaidData, 'bankAccounts'))}
-            >
-                <AddPlaidBankAccount
-                    text={translate('bankAccount.plaidBodyCopy')}
-                    onSelect={(plaidAccountID) => {
-                        ReimbursementAccount.updateReimbursementAccountDraft({plaidAccountID});
-                    }}
-                    plaidData={plaidData}
-                    onExitPlaid={() => BankAccounts.setBankAccountSubStep(null)}
-                    receivedRedirectURI={receivedRedirectURI}
-                    plaidLinkOAuthToken={plaidLinkOAuthToken}
-                    allowDebit
-                    bankAccountID={bankAccountID}
-                    selectedPlaidAccountID={selectedPlaidAccountID}
-                />
-                {Boolean(selectedPlaidAccountID) && !_.isEmpty(lodashGet(plaidData, 'bankAccounts')) && (
-                    <InputWrapper
-                        InputComponent={CheckboxWithLabel}
-                        accessibilityLabel={`${translate('common.iAcceptThe')} ${translate('common.expensifyTermsOfService')}`}
-                        style={styles.mt4}
-                        inputID="acceptTerms"
-                        LabelComponent={() => (
-                            <Text>
-                                {translate('common.iAcceptThe')}
-                                <TextLink href={CONST.TERMS_URL}>{translate('common.expensifyTermsOfService')}</TextLink>
-                            </Text>
-                        )}
-                        defaultValue={getDefaultStateForField('acceptTerms', false)}
-                        shouldSaveDraft
+            <FullPageOfflineBlockingView>
+                <FormProvider
+                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                    validate={validate}
+                    onSubmit={submit}
+                    scrollContextEnabled
+                    submitButtonText={translate('common.saveAndContinue')}
+                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
+                    isSubmitButtonVisible={Boolean(selectedPlaidAccountID) && !_.isEmpty(lodashGet(plaidData, 'bankAccounts'))}
+                >
+                    <AddPlaidBankAccount
+                        text={translate('bankAccount.plaidBodyCopy')}
+                        onSelect={(plaidAccountID) => {
+                            ReimbursementAccount.updateReimbursementAccountDraft({plaidAccountID});
+                        }}
+                        plaidData={plaidData}
+                        onExitPlaid={() => BankAccounts.setBankAccountSubStep(null)}
+                        receivedRedirectURI={receivedRedirectURI}
+                        plaidLinkOAuthToken={plaidLinkOAuthToken}
+                        allowDebit
+                        bankAccountID={bankAccountID}
+                        selectedPlaidAccountID={selectedPlaidAccountID}
                     />
-                )}
-            </FormProvider>
+                    {Boolean(selectedPlaidAccountID) && !_.isEmpty(lodashGet(plaidData, 'bankAccounts')) && (
+                        <InputWrapper
+                            InputComponent={CheckboxWithLabel}
+                            accessibilityLabel={`${translate('common.iAcceptThe')} ${translate('common.expensifyTermsOfService')}`}
+                            style={styles.mt4}
+                            inputID="acceptTerms"
+                            LabelComponent={() => (
+                                <Text>
+                                    {translate('common.iAcceptThe')}
+                                    <TextLink href={CONST.TERMS_URL}>{translate('common.expensifyTermsOfService')}</TextLink>
+                                </Text>
+                            )}
+                            defaultValue={getDefaultStateForField('acceptTerms', false)}
+                            shouldSaveDraft
+                        />
+                    )}
+                </FormProvider>
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

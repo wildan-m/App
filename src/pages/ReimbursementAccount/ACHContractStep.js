@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import _ from 'underscore';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import CheckboxWithLabel from '@components/CheckboxWithLabel';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -158,133 +159,135 @@ function ACHContractStep(props) {
                 shouldShowGetAssistanceButton
                 guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
             />
-            <FormProvider
-                formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
-                validate={validate}
-                onSubmit={submit}
-                submitButtonText={props.translate('common.saveAndContinue')}
-                style={[styles.mh5, styles.mt3, styles.flexGrow1]}
-            >
-                {({inputValues}) => (
-                    <>
-                        <Text style={[styles.mb5]}>
-                            <Text>{props.translate('beneficialOwnersStep.checkAllThatApply')}</Text>
-                        </Text>
-                        <InputWrapper
-                            InputComponent={CheckboxWithLabel}
-                            accessibilityLabel={props.translate('beneficialOwnersStep.iOwnMoreThan25Percent')}
-                            inputID="ownsMoreThan25Percent"
-                            style={[styles.mb2]}
-                            LabelComponent={() => (
-                                <Text>
-                                    {props.translate('beneficialOwnersStep.iOwnMoreThan25Percent')}
-                                    <Text style={[styles.textStrong]}>{props.companyName}</Text>
-                                </Text>
-                            )}
-                            // eslint-disable-next-line rulesdir/prefer-early-return
-                            onValueChange={(ownsMoreThan25Percent) => {
-                                if (ownsMoreThan25Percent && beneficialOwners.length > 3) {
-                                    // If the user owns more than 25% of the company, then there can only be a maximum of 3 other beneficial owners who owns more than 25%.
-                                    // We have to remove the 4th beneficial owner if the checkbox is checked.
-                                    setBeneficialOwners((previousBeneficialOwners) => previousBeneficialOwners.slice(0, -1));
-                                }
-                            }}
-                            defaultValue={props.getDefaultStateForField('ownsMoreThan25Percent', false)}
-                            shouldSaveDraft
-                        />
-                        <InputWrapper
-                            InputComponent={CheckboxWithLabel}
-                            accessibilityLabel={props.translate('beneficialOwnersStep.someoneOwnsMoreThan25Percent')}
-                            inputID="hasOtherBeneficialOwners"
-                            style={[styles.mb2]}
-                            LabelComponent={() => (
-                                <Text>
-                                    {props.translate('beneficialOwnersStep.someoneOwnsMoreThan25Percent')}
-                                    <Text style={[styles.textStrong]}>{props.companyName}</Text>
-                                </Text>
-                            )}
-                            // eslint-disable-next-line rulesdir/prefer-early-return
-                            onValueChange={(hasOtherBeneficialOwners) => {
-                                if (hasOtherBeneficialOwners && beneficialOwners.length === 0) {
-                                    addBeneficialOwner();
-                                }
-                            }}
-                            defaultValue={props.getDefaultStateForField('hasOtherBeneficialOwners', false)}
-                            shouldSaveDraft
-                        />
-                        {Boolean(inputValues.hasOtherBeneficialOwners) && (
-                            <View style={[styles.mb2]}>
-                                {_.map(beneficialOwners, (ownerKey, index) => (
-                                    <View
-                                        key={index}
-                                        style={[styles.p5, styles.border, styles.mb2]}
-                                    >
-                                        <Text style={[styles.headerText, styles.mb2]}>{props.translate('beneficialOwnersStep.additionalOwner')}</Text>
-                                        <IdentityForm
-                                            translate={props.translate}
-                                            style={[styles.mb2]}
-                                            defaultValues={{
-                                                firstName: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_firstName`, ''),
-                                                lastName: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_lastName`, ''),
-                                                street: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_street`, ''),
-                                                city: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_city`, ''),
-                                                state: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_state`, ''),
-                                                zipCode: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_zipCode`, ''),
-                                                dob: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_dob`, ''),
-                                                ssnLast4: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_ssnLast4`, ''),
-                                            }}
-                                            inputKeys={{
-                                                firstName: `beneficialOwner_${ownerKey}_firstName`,
-                                                lastName: `beneficialOwner_${ownerKey}_lastName`,
-                                                dob: `beneficialOwner_${ownerKey}_dob`,
-                                                ssnLast4: `beneficialOwner_${ownerKey}_ssnLast4`,
-                                                street: `beneficialOwner_${ownerKey}_street`,
-                                                city: `beneficialOwner_${ownerKey}_city`,
-                                                state: `beneficialOwner_${ownerKey}_state`,
-                                                zipCode: `beneficialOwner_${ownerKey}_zipCode`,
-                                            }}
-                                            shouldSaveDraft
-                                        />
-                                        {beneficialOwners.length > 1 && (
-                                            <TextLink onPress={() => removeBeneficialOwner(ownerKey)}>{props.translate('beneficialOwnersStep.removeOwner')}</TextLink>
-                                        )}
-                                    </View>
-                                ))}
-                                {canAddMoreBeneficialOwners(inputValues.ownsMoreThan25Percent) && (
-                                    <TextLink onPress={addBeneficialOwner}>
-                                        {props.translate('beneficialOwnersStep.addAnotherIndividual')}
-                                        <Text style={[styles.textStrong, styles.link]}>{props.companyName}</Text>
-                                    </TextLink>
+            <FullPageOfflineBlockingView>
+                <FormProvider
+                    formID={ONYXKEYS.REIMBURSEMENT_ACCOUNT}
+                    validate={validate}
+                    onSubmit={submit}
+                    submitButtonText={props.translate('common.saveAndContinue')}
+                    style={[styles.mh5, styles.mt3, styles.flexGrow1]}
+                >
+                    {({inputValues}) => (
+                        <>
+                            <Text style={[styles.mb5]}>
+                                <Text>{props.translate('beneficialOwnersStep.checkAllThatApply')}</Text>
+                            </Text>
+                            <InputWrapper
+                                InputComponent={CheckboxWithLabel}
+                                accessibilityLabel={props.translate('beneficialOwnersStep.iOwnMoreThan25Percent')}
+                                inputID="ownsMoreThan25Percent"
+                                style={[styles.mb2]}
+                                LabelComponent={() => (
+                                    <Text>
+                                        {props.translate('beneficialOwnersStep.iOwnMoreThan25Percent')}
+                                        <Text style={[styles.textStrong]}>{props.companyName}</Text>
+                                    </Text>
                                 )}
-                            </View>
-                        )}
-                        <Text style={[styles.mv5]}>{props.translate('beneficialOwnersStep.agreement')}</Text>
-                        <InputWrapper
-                            InputComponent={CheckboxWithLabel}
-                            accessibilityLabel={`${props.translate('common.iAcceptThe')} ${props.translate('beneficialOwnersStep.termsAndConditions')}`}
-                            inputID="acceptTermsAndConditions"
-                            style={[styles.mt4]}
-                            LabelComponent={() => (
-                                <Text>
-                                    {props.translate('common.iAcceptThe')}
-                                    <TextLink href="https://use.expensify.com/achterms">{`${props.translate('beneficialOwnersStep.termsAndConditions')}`}</TextLink>
-                                </Text>
+                                // eslint-disable-next-line rulesdir/prefer-early-return
+                                onValueChange={(ownsMoreThan25Percent) => {
+                                    if (ownsMoreThan25Percent && beneficialOwners.length > 3) {
+                                        // If the user owns more than 25% of the company, then there can only be a maximum of 3 other beneficial owners who owns more than 25%.
+                                        // We have to remove the 4th beneficial owner if the checkbox is checked.
+                                        setBeneficialOwners((previousBeneficialOwners) => previousBeneficialOwners.slice(0, -1));
+                                    }
+                                }}
+                                defaultValue={props.getDefaultStateForField('ownsMoreThan25Percent', false)}
+                                shouldSaveDraft
+                            />
+                            <InputWrapper
+                                InputComponent={CheckboxWithLabel}
+                                accessibilityLabel={props.translate('beneficialOwnersStep.someoneOwnsMoreThan25Percent')}
+                                inputID="hasOtherBeneficialOwners"
+                                style={[styles.mb2]}
+                                LabelComponent={() => (
+                                    <Text>
+                                        {props.translate('beneficialOwnersStep.someoneOwnsMoreThan25Percent')}
+                                        <Text style={[styles.textStrong]}>{props.companyName}</Text>
+                                    </Text>
+                                )}
+                                // eslint-disable-next-line rulesdir/prefer-early-return
+                                onValueChange={(hasOtherBeneficialOwners) => {
+                                    if (hasOtherBeneficialOwners && beneficialOwners.length === 0) {
+                                        addBeneficialOwner();
+                                    }
+                                }}
+                                defaultValue={props.getDefaultStateForField('hasOtherBeneficialOwners', false)}
+                                shouldSaveDraft
+                            />
+                            {Boolean(inputValues.hasOtherBeneficialOwners) && (
+                                <View style={[styles.mb2]}>
+                                    {_.map(beneficialOwners, (ownerKey, index) => (
+                                        <View
+                                            key={index}
+                                            style={[styles.p5, styles.border, styles.mb2]}
+                                        >
+                                            <Text style={[styles.headerText, styles.mb2]}>{props.translate('beneficialOwnersStep.additionalOwner')}</Text>
+                                            <IdentityForm
+                                                translate={props.translate}
+                                                style={[styles.mb2]}
+                                                defaultValues={{
+                                                    firstName: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_firstName`, ''),
+                                                    lastName: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_lastName`, ''),
+                                                    street: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_street`, ''),
+                                                    city: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_city`, ''),
+                                                    state: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_state`, ''),
+                                                    zipCode: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_zipCode`, ''),
+                                                    dob: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_dob`, ''),
+                                                    ssnLast4: props.getDefaultStateForField(`beneficialOwner_${ownerKey}_ssnLast4`, ''),
+                                                }}
+                                                inputKeys={{
+                                                    firstName: `beneficialOwner_${ownerKey}_firstName`,
+                                                    lastName: `beneficialOwner_${ownerKey}_lastName`,
+                                                    dob: `beneficialOwner_${ownerKey}_dob`,
+                                                    ssnLast4: `beneficialOwner_${ownerKey}_ssnLast4`,
+                                                    street: `beneficialOwner_${ownerKey}_street`,
+                                                    city: `beneficialOwner_${ownerKey}_city`,
+                                                    state: `beneficialOwner_${ownerKey}_state`,
+                                                    zipCode: `beneficialOwner_${ownerKey}_zipCode`,
+                                                }}
+                                                shouldSaveDraft
+                                            />
+                                            {beneficialOwners.length > 1 && (
+                                                <TextLink onPress={() => removeBeneficialOwner(ownerKey)}>{props.translate('beneficialOwnersStep.removeOwner')}</TextLink>
+                                            )}
+                                        </View>
+                                    ))}
+                                    {canAddMoreBeneficialOwners(inputValues.ownsMoreThan25Percent) && (
+                                        <TextLink onPress={addBeneficialOwner}>
+                                            {props.translate('beneficialOwnersStep.addAnotherIndividual')}
+                                            <Text style={[styles.textStrong, styles.link]}>{props.companyName}</Text>
+                                        </TextLink>
+                                    )}
+                                </View>
                             )}
-                            defaultValue={props.getDefaultStateForField('acceptTermsAndConditions', false)}
-                            shouldSaveDraft
-                        />
-                        <InputWrapper
-                            InputComponent={CheckboxWithLabel}
-                            accessibilityLabel={props.translate('beneficialOwnersStep.certifyTrueAndAccurate')}
-                            inputID="certifyTrueInformation"
-                            style={[styles.mt4]}
-                            LabelComponent={() => <Text>{props.translate('beneficialOwnersStep.certifyTrueAndAccurate')}</Text>}
-                            defaultValue={props.getDefaultStateForField('certifyTrueInformation', false)}
-                            shouldSaveDraft
-                        />
-                    </>
-                )}
-            </FormProvider>
+                            <Text style={[styles.mv5]}>{props.translate('beneficialOwnersStep.agreement')}</Text>
+                            <InputWrapper
+                                InputComponent={CheckboxWithLabel}
+                                accessibilityLabel={`${props.translate('common.iAcceptThe')} ${props.translate('beneficialOwnersStep.termsAndConditions')}`}
+                                inputID="acceptTermsAndConditions"
+                                style={[styles.mt4]}
+                                LabelComponent={() => (
+                                    <Text>
+                                        {props.translate('common.iAcceptThe')}
+                                        <TextLink href="https://use.expensify.com/achterms">{`${props.translate('beneficialOwnersStep.termsAndConditions')}`}</TextLink>
+                                    </Text>
+                                )}
+                                defaultValue={props.getDefaultStateForField('acceptTermsAndConditions', false)}
+                                shouldSaveDraft
+                            />
+                            <InputWrapper
+                                InputComponent={CheckboxWithLabel}
+                                accessibilityLabel={props.translate('beneficialOwnersStep.certifyTrueAndAccurate')}
+                                inputID="certifyTrueInformation"
+                                style={[styles.mt4]}
+                                LabelComponent={() => <Text>{props.translate('beneficialOwnersStep.certifyTrueAndAccurate')}</Text>}
+                                defaultValue={props.getDefaultStateForField('certifyTrueInformation', false)}
+                                shouldSaveDraft
+                            />
+                        </>
+                    )}
+                </FormProvider>
+            </FullPageOfflineBlockingView>
         </ScreenWrapper>
     );
 }

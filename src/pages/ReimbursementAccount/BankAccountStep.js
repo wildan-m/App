@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {ScrollView, View} from 'react-native';
 import {withOnyx} from 'react-native-onyx';
+import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
@@ -116,85 +117,87 @@ function BankAccountStep(props) {
                     shouldShowGetAssistanceButton
                     guidesCallTaskID={CONST.GUIDES_CALL_TASK_IDS.WORKSPACE_BANK_ACCOUNT}
                 />
-                <ScrollView style={[styles.flex1]}>
-                    <Section
-                        icon={Illustrations.MoneyWings}
-                        title={props.translate('workspace.bankAccount.streamlinePayments')}
-                    >
-                        <View style={[styles.mv3]}>
-                            <Text>{props.translate('bankAccount.toGetStarted')}</Text>
-                        </View>
-                        {Boolean(plaidDesktopMessage) && (
-                            <View style={[styles.mv3, styles.flexRow, styles.justifyContentBetween]}>
-                                <TextLink href={bankAccountRoute}>{props.translate(plaidDesktopMessage)}</TextLink>
-                            </View>
-                        )}
-                        <Button
-                            icon={Expensicons.Bank}
-                            text={props.translate('bankAccount.connectOnlineWithPlaid')}
-                            onPress={() => {
-                                if (props.isPlaidDisabled || !props.user.validated) {
-                                    return;
-                                }
-                                BankAccounts.openPlaidView();
-                            }}
-                            isDisabled={props.isPlaidDisabled || !props.user.validated}
-                            style={[styles.mt4]}
-                            iconStyles={[styles.buttonCTAIcon]}
-                            shouldShowRightIcon
-                            success
-                            large
-                        />
-                        {Boolean(props.error) && <Text style={[styles.formError, styles.mh5]}>{props.error}</Text>}
-                        <View style={[styles.mv3]}>
-                            <MenuItem
-                                icon={Expensicons.Connect}
-                                title={props.translate('bankAccount.connectManually')}
-                                disabled={!props.user.validated}
-                                onPress={() => BankAccounts.setBankAccountSubStep(CONST.BANK_ACCOUNT.SETUP_TYPE.MANUAL)}
-                                shouldShowRightIcon
-                                wrapperStyle={[styles.cardMenuItem]}
-                            />
-                        </View>
-                    </Section>
-                    {!props.user.validated && (
-                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.m4]}>
-                            <Icon
-                                src={Expensicons.Exclamation}
-                                fill={theme.danger}
-                            />
-
-                            <Text style={[styles.mutedTextLabel, styles.ml4, styles.flex1]}>
-                                {props.translate('bankAccount.validateAccountError.phrase1')}
-                                <TextLink
-                                    fontSize={variables.fontSizeLabel}
-                                    onPress={Session.signOutAndRedirectToSignIn}
-                                >
-                                    {props.translate('bankAccount.validateAccountError.phrase2')}
-                                </TextLink>
-                                .
-                            </Text>
-                        </View>
-                    )}
-                    <View style={[styles.mv0, styles.mh5, styles.flexRow, styles.justifyContentBetween]}>
-                        <TextLink href="https://use.expensify.com/privacy">{props.translate('common.privacy')}</TextLink>
-                        <PressableWithoutFeedback
-                            onPress={() => Link.openExternalLink('https://community.expensify.com/discussion/5677/deep-dive-how-expensify-protects-your-information/')}
-                            style={[styles.flexRow, styles.alignItemsCenter]}
-                            accessibilityLabel={props.translate('bankAccount.yourDataIsSecure')}
+                <FullPageOfflineBlockingView>
+                    <ScrollView style={[styles.flex1]}>
+                        <Section
+                            icon={Illustrations.MoneyWings}
+                            title={props.translate('workspace.bankAccount.streamlinePayments')}
                         >
-                            <TextLink href="https://community.expensify.com/discussion/5677/deep-dive-how-expensify-protects-your-information/">
-                                {props.translate('bankAccount.yourDataIsSecure')}
-                            </TextLink>
-                            <View style={[styles.ml1]}>
-                                <Icon
-                                    src={Expensicons.Lock}
-                                    fill={theme.link}
+                            <View style={[styles.mv3]}>
+                                <Text>{props.translate('bankAccount.toGetStarted')}</Text>
+                            </View>
+                            {Boolean(plaidDesktopMessage) && (
+                                <View style={[styles.mv3, styles.flexRow, styles.justifyContentBetween]}>
+                                    <TextLink href={bankAccountRoute}>{props.translate(plaidDesktopMessage)}</TextLink>
+                                </View>
+                            )}
+                            <Button
+                                icon={Expensicons.Bank}
+                                text={props.translate('bankAccount.connectOnlineWithPlaid')}
+                                onPress={() => {
+                                    if (props.isPlaidDisabled || !props.user.validated) {
+                                        return;
+                                    }
+                                    BankAccounts.openPlaidView();
+                                }}
+                                isDisabled={props.isPlaidDisabled || !props.user.validated}
+                                style={[styles.mt4]}
+                                iconStyles={[styles.buttonCTAIcon]}
+                                shouldShowRightIcon
+                                success
+                                large
+                            />
+                            {Boolean(props.error) && <Text style={[styles.formError, styles.mh5]}>{props.error}</Text>}
+                            <View style={[styles.mv3]}>
+                                <MenuItem
+                                    icon={Expensicons.Connect}
+                                    title={props.translate('bankAccount.connectManually')}
+                                    disabled={!props.user.validated}
+                                    onPress={() => BankAccounts.setBankAccountSubStep(CONST.BANK_ACCOUNT.SETUP_TYPE.MANUAL)}
+                                    shouldShowRightIcon
+                                    wrapperStyle={[styles.cardMenuItem]}
                                 />
                             </View>
-                        </PressableWithoutFeedback>
-                    </View>
-                </ScrollView>
+                        </Section>
+                        {!props.user.validated && (
+                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.m4]}>
+                                <Icon
+                                    src={Expensicons.Exclamation}
+                                    fill={theme.danger}
+                                />
+
+                                <Text style={[styles.mutedTextLabel, styles.ml4, styles.flex1]}>
+                                    {props.translate('bankAccount.validateAccountError.phrase1')}
+                                    <TextLink
+                                        fontSize={variables.fontSizeLabel}
+                                        onPress={Session.signOutAndRedirectToSignIn}
+                                    >
+                                        {props.translate('bankAccount.validateAccountError.phrase2')}
+                                    </TextLink>
+                                    .
+                                </Text>
+                            </View>
+                        )}
+                        <View style={[styles.mv0, styles.mh5, styles.flexRow, styles.justifyContentBetween]}>
+                            <TextLink href="https://use.expensify.com/privacy">{props.translate('common.privacy')}</TextLink>
+                            <PressableWithoutFeedback
+                                onPress={() => Link.openExternalLink('https://community.expensify.com/discussion/5677/deep-dive-how-expensify-protects-your-information/')}
+                                style={[styles.flexRow, styles.alignItemsCenter]}
+                                accessibilityLabel={props.translate('bankAccount.yourDataIsSecure')}
+                            >
+                                <TextLink href="https://community.expensify.com/discussion/5677/deep-dive-how-expensify-protects-your-information/">
+                                    {props.translate('bankAccount.yourDataIsSecure')}
+                                </TextLink>
+                                <View style={[styles.ml1]}>
+                                    <Icon
+                                        src={Expensicons.Lock}
+                                        fill={theme.link}
+                                    />
+                                </View>
+                            </PressableWithoutFeedback>
+                        </View>
+                    </ScrollView>
+                </FullPageOfflineBlockingView>
             </View>
         </ScreenWrapper>
     );
