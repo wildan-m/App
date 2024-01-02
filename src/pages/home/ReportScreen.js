@@ -3,7 +3,7 @@ import lodashGet from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
-import {withOnyx} from 'react-native-onyx';
+import Onyx, {withOnyx} from 'react-native-onyx';
 import _ from 'underscore';
 import Banner from '@components/Banner';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
@@ -379,7 +379,16 @@ function ReportScreen({
         // the ReportScreen never actually unmounts and the reportID in the route also doesn't change.
         // Therefore, we need to compare if the existing reportID is the same as the one in the route
         // before deciding that we shouldn't call OpenReport.
-        if (onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID)) {
+        if ((onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID))) {
+            console.log('[wildebug] onyxReportID', onyxReportID)
+            console.log('[wildebug] prevReport.reportID', prevReport.reportID)
+            console.log('[wildebug] routeReportID', routeReportID)
+            console.log('[wildebug] if (onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID)) {')
+            if(!onyxReportID)
+            {
+                wasReportAccessibleRef.current = false;
+                Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {isLoadingInitialReportActions: false});
+            }
             return;
         }
 
