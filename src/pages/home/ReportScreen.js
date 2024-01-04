@@ -379,16 +379,11 @@ function ReportScreen({
         // the ReportScreen never actually unmounts and the reportID in the route also doesn't change.
         // Therefore, we need to compare if the existing reportID is the same as the one in the route
         // before deciding that we shouldn't call OpenReport.
-        if ((onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID))) {
+        if ((onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID)) && !reportMetadata.isLoadingInitialReportActions) {
             console.log('[wildebug] onyxReportID', onyxReportID)
             console.log('[wildebug] prevReport.reportID', prevReport.reportID)
             console.log('[wildebug] routeReportID', routeReportID)
             console.log('[wildebug] if (onyxReportID === prevReport.reportID && (!onyxReportID || onyxReportID === routeReportID)) {')
-            if(!onyxReportID)
-            {
-                wasReportAccessibleRef.current = false;
-                Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {isLoadingInitialReportActions: false});
-            }
             return;
         }
 
@@ -406,6 +401,7 @@ function ReportScreen({
         prevReport.parentReportID,
         prevReport.chatType,
         prevReport,
+        reportMetadata.isLoadingInitialReportActions,
     ]);
 
     useEffect(() => {
@@ -436,14 +432,25 @@ function ReportScreen({
     // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = useMemo(
         () =>
-            (!wasReportAccessibleRef.current &&
+        {
+
+            console.log('[wildebug] !wasReportAccessibleRef.current', !wasReportAccessibleRef.current)
+            console.log('[wildebug] !firstRenderRef.current', !firstRenderRef.current)
+            console.log('[wildebug] !report.reportID', !report.reportID)
+            console.log('[wildebug] !isOptimisticDelete', !isOptimisticDelete)
+            console.log('[wildebug] !reportMetadata.isLoadingInitialReportActions', !reportMetadata.isLoadingInitialReportActions)
+            console.log('[wildebug] !isLoading', !isLoading)
+            console.log('[wildebug] !userLeavingStatus', !userLeavingStatus)
+            return  (!wasReportAccessibleRef.current &&
                 !firstRenderRef.current &&
                 !report.reportID &&
                 !isOptimisticDelete &&
                 !reportMetadata.isLoadingInitialReportActions &&
                 !isLoading &&
                 !userLeavingStatus) ||
-            shouldHideReport,
+            shouldHideReport
+        }
+           ,
         [report, reportMetadata, isLoading, shouldHideReport, isOptimisticDelete, userLeavingStatus],
     );
 
