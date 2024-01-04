@@ -202,6 +202,7 @@ function ReportScreen({
 
     useEffect(() => {
         if (!report || !report.reportID || shouldHideReport) {
+            wasReportAccessibleRef.current = false;
             return;
         }
         wasReportAccessibleRef.current = true;
@@ -433,7 +434,6 @@ function ReportScreen({
     const shouldShowNotFoundPage = useMemo(
         () =>
         {
-
             console.log('[wildebug] !wasReportAccessibleRef.current', !wasReportAccessibleRef.current)
             console.log('[wildebug] !firstRenderRef.current', !firstRenderRef.current)
             console.log('[wildebug] !report.reportID', !report.reportID)
