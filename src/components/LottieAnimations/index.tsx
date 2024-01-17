@@ -16,11 +16,6 @@ const DotLottieAnimations: Record<string, DotLottieAnimation> = {
         w: 360,
         h: 360,
     },
-    Hands: {
-        file: require('@assets/animations/Hands.lottie'),
-        w: 375,
-        h: 375,
-    },
     PreferencesDJ: {
         file: require('@assets/animations/PreferencesDJ.lottie'),
         w: 375,

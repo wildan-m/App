@@ -1,11 +1,10 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import Lottie from '@components/Lottie';
 import LottieAnimations from '@components/LottieAnimations';
 import withWindowDimensions, {windowDimensionsPropTypes} from '@components/withWindowDimensions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
-
 const propTypes = {
     ...windowDimensionsPropTypes,
 
@@ -17,6 +16,7 @@ const defaultProps = {
 };
 
 function SignInHeroImage(props) {
+    
     const styles = useThemeStyles();
     let imageSize;
     if (props.isSmallScreenWidth || props.shouldShowSmallScreen) {
@@ -36,9 +36,16 @@ function SignInHeroImage(props) {
         };
     }
 
+    const [animationData, setAnimationData] = useState();
+
+    useEffect(() => {
+        import('../../../assets/animations/Hands.json').then((res) => setAnimationData(res.default));
+    }, []);
+
+
     return (
-        <Lottie
-            source={LottieAnimations.Hands}
+        animationData && <Lottie
+            source={{file: animationData, w: 375, h: 375}}
             loop
             autoPlay
             style={[styles.alignSelfCenter, imageSize]}
