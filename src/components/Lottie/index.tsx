@@ -20,7 +20,7 @@ function Lottie({source, webStyle, ...props}: Props, ref: ForwardedRef<LottieVie
     const aspectRatioStyle = styles.aspectRatioLottie(source);
 
     // If the image fails to load, we'll just render an empty view
-    if (isError) {
+    if (isError || !source.file) {
         return <View style={aspectRatioStyle} />;
     }
 

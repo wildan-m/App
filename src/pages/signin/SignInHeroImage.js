@@ -42,9 +42,8 @@ function SignInHeroImage(props) {
         import('../../../assets/animations/Hands.json').then((res) => setAnimationData(res.default));
     }, []);
 
-
     return (
-        animationData && <Lottie
+        <Lottie
             source={{file: animationData, w: 375, h: 375}}
             loop
             autoPlay
