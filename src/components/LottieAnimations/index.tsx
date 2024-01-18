@@ -11,6 +11,12 @@ const DotLottieAnimations: Record<string, DotLottieAnimation> = {
         w: 375,
         h: 240,
     },
+    Hands: {
+        file: require('@assets/animations/Hands.lottie'),
+        importPromise: import('../../../assets/animations/Hands.json'),
+        w: 375,
+        h: 240,
+    },
     Fireworks: {
         file: require('@assets/animations/Fireworks.lottie'),
         w: 360,

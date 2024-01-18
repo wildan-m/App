@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import Lottie from '@components/Lottie';
 import LottieAnimations from '@components/LottieAnimations';
 import withWindowDimensions, {windowDimensionsPropTypes} from '@components/withWindowDimensions';
@@ -36,15 +36,9 @@ function SignInHeroImage(props) {
         };
     }
 
-    const [animationData, setAnimationData] = useState();
-
-    useEffect(() => {
-        import('../../../assets/animations/Hands.json').then((res) => setAnimationData(res.default));
-    }, []);
-
     return (
         <Lottie
-            source={{file: animationData, w: 375, h: 375}}
+            source={LottieAnimations.Hands}
             loop
             autoPlay
             style={[styles.alignSelfCenter, imageSize]}

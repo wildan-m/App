@@ -1,7 +1,7 @@
 import type {LottieViewProps} from 'lottie-react-native';
 import LottieView from 'lottie-react-native';
 import type {ForwardedRef} from 'react';
-import React, {forwardRef} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
 import useNetwork from '@hooks/useNetwork';
@@ -19,8 +19,13 @@ function Lottie({source, webStyle, ...props}: Props, ref: ForwardedRef<LottieVie
 
     const aspectRatioStyle = styles.aspectRatioLottie(source);
 
+    const [animationData, setAnimationData] = useState();
+    useEffect(() => {
+        Promise.resolve(source.importPromise).then((res) => setAnimationData(res.default));
+    }, []);
+
     // If the image fails to load, we'll just render an empty view
-    if (isError || !source.file) {
+    if (isError || (source.importPromise && !animationData)) {
         return <View style={aspectRatioStyle} />;
     }
 
@@ -28,7 +33,7 @@ function Lottie({source, webStyle, ...props}: Props, ref: ForwardedRef<LottieVie
         <LottieView
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
-            source={source.file}
+            source={animationData ? animationData : source.file}
             ref={ref}
             style={[aspectRatioStyle, props.style]}
             webStyle={{...aspectRatioStyle, ...webStyle}}
