@@ -1578,11 +1578,12 @@ function getOptions(
     ) {
         // Generates an optimistic account ID for new users not yet saved in Onyx
         const optimisticAccountID = UserUtils.generateAccountID(searchValue);
+        const login = addSMSDomainIfPhoneNumber(searchValue)
         const personalDetailsExtended = {
             ...personalDetails,
             [optimisticAccountID]: {
                 accountID: optimisticAccountID,
-                login: searchValue,
+                login: login,
                 avatar: UserUtils.getDefaultAvatar(optimisticAccountID),
             },
         };
@@ -1590,15 +1591,15 @@ function getOptions(
             showChatPreviewLine,
         });
         userToInvite.isOptimisticAccount = true;
-        userToInvite.login = searchValue;
-        userToInvite.text = userToInvite.text || searchValue;
-        userToInvite.alternateText = userToInvite.alternateText || searchValue;
+        userToInvite.login = login;
+        userToInvite.text = userToInvite.text || login;
+        userToInvite.alternateText = userToInvite.alternateText || login;
 
         // If user doesn't exist, use a default avatar
         userToInvite.icons = [
             {
                 source: UserUtils.getAvatar('', optimisticAccountID),
-                name: searchValue,
+                name: login,
                 type: CONST.ICON_TYPE_AVATAR,
             },
         ];
