@@ -383,7 +383,7 @@ IOURequestStepConfirmation.displayName = 'IOURequestStepConfirmation';
 
 export default compose(
     withCurrentUserPersonalDetails,
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(),
     withFullTransactionOrNotFound,
     withOnyx({
         personalDetails: {

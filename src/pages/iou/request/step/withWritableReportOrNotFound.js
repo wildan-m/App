@@ -10,6 +10,7 @@ import reportPropTypes from '@pages/reportPropTypes';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import IOURequestStepRoutePropTypes from './IOURequestStepRoutePropTypes';
+import ScreenWrapper from '@components/ScreenWrapper';
 
 const propTypes = {
     /** The HOC takes an optional ref as a prop and passes it as a ref to the wrapped component.
@@ -27,7 +28,7 @@ const defaultProps = {
     report: {},
 };
 
-export default function (WrappedComponent) {
+export default (shouldShowWrapper = false) => (WrappedComponent) => {
     // eslint-disable-next-line rulesdir/no-negated-variables
     function WithWritableReportOrNotFound({forwardedRef, ...props}) {
         const {
@@ -40,6 +41,10 @@ export default function (WrappedComponent) {
         const iouTypeParamIsInvalid = !_.contains(_.values(CONST.IOU.TYPE), iouType);
         const canUserPerformWriteAction = ReportUtils.canUserPerformWriteAction(report);
         if (iouTypeParamIsInvalid || !canUserPerformWriteAction) {
+            if(shouldShowWrapper)
+            {
+                return <ScreenWrapper><FullPageNotFoundView shouldShow /></ScreenWrapper>;
+            }
             return <FullPageNotFoundView shouldShow />;
         }
 

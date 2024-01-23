@@ -112,4 +112,4 @@ IOURequestStepMerchant.propTypes = propTypes;
 IOURequestStepMerchant.defaultProps = defaultProps;
 IOURequestStepMerchant.displayName = 'IOURequestStepMerchant';
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepMerchant);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepMerchant);

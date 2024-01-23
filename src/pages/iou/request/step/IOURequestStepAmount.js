@@ -154,7 +154,7 @@ IOURequestStepAmount.defaultProps = defaultProps;
 IOURequestStepAmount.displayName = 'IOURequestStepAmount';
 
 export default compose(
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(),
     withFullTransactionOrNotFound,
     withOnyx({
         policyTaxRates: {

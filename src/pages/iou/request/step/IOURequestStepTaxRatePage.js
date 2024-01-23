@@ -96,7 +96,7 @@ IOURequestStepTaxRatePage.defaultProps = defaultProps;
 IOURequestStepTaxRatePage.displayName = 'IOURequestStepTaxRatePage';
 
 export default compose(
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(),
     withFullTransactionOrNotFound,
     withOnyx({
         policyTaxRates: {

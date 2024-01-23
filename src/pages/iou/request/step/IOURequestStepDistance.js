@@ -237,4 +237,4 @@ IOURequestStepDistance.displayName = 'IOURequestStepDistance';
 IOURequestStepDistance.propTypes = propTypes;
 IOURequestStepDistance.defaultProps = defaultProps;
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepDistance);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepDistance);

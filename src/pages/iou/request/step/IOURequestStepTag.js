@@ -95,7 +95,7 @@ IOURequestStepTag.propTypes = propTypes;
 IOURequestStepTag.defaultProps = defaultProps;
 
 export default compose(
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(),
     withFullTransactionOrNotFound,
     withOnyx({
         policyTags: {

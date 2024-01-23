@@ -79,4 +79,4 @@ IOURequestStepCategory.displayName = 'IOURequestStepCategory';
 IOURequestStepCategory.propTypes = propTypes;
 IOURequestStepCategory.defaultProps = defaultProps;
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepCategory);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepCategory);

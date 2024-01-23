@@ -271,7 +271,7 @@ IOURequestStepWaypoint.propTypes = propTypes;
 IOURequestStepWaypoint.defaultProps = defaultProps;
 
 export default compose(
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(true),
     withFullTransactionOrNotFound,
     withOnyx({
         userLocation: {

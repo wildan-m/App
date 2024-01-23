@@ -102,4 +102,4 @@ IOURequestStepParticipants.displayName = 'IOURequestStepParticipants';
 IOURequestStepParticipants.propTypes = propTypes;
 IOURequestStepParticipants.defaultProps = defaultProps;
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepParticipants);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepParticipants);

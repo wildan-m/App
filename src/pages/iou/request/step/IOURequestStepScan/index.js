@@ -350,4 +350,4 @@ IOURequestStepScan.defaultProps = defaultProps;
 IOURequestStepScan.propTypes = propTypes;
 IOURequestStepScan.displayName = 'IOURequestStepScan';
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepScan);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepScan);

@@ -84,4 +84,4 @@ IOURequestStepDate.propTypes = propTypes;
 IOURequestStepDate.defaultProps = defaultProps;
 IOURequestStepDate.displayName = 'IOURequestStepDate';
 
-export default compose(withWritableReportOrNotFound, withFullTransactionOrNotFound)(IOURequestStepDate);
+export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepDate);

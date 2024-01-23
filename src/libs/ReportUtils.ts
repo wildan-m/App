@@ -4111,6 +4111,18 @@ function isMoneyRequestReportPendingDeletion(report: OnyxEntry<Report>): boolean
     return parentReportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 }
 
+/**
+ * Return true if the chat report is marked for addition.
+ */
+function isChatReportPendingAddition(report: OnyxEntry<Report>): boolean {
+    if (!isChatReport(report)) {
+        return false;
+    }
+
+    const parentReportAction = ReportActionsUtils.getReportAction(report?.parentReportID ?? '', report?.parentReportActionID ?? '');
+    return parentReportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
+}
+
 function canUserPerformWriteAction(report: OnyxEntry<Report>) {
     const reportErrors = getAddWorkspaceRoomOrChatReportErrors(report);
 
@@ -4119,7 +4131,7 @@ function canUserPerformWriteAction(report: OnyxEntry<Report>) {
         return false;
     }
 
-    return !isArchivedRoom(report) && isEmptyObject(reportErrors) && report && isAllowedToComment(report) && !isAnonymousUser;
+    return !isArchivedRoom(report) && (isEmptyObject(reportErrors) || isChatReportPendingAddition(report)) && report && isAllowedToComment(report) && !isAnonymousUser;
 }
 
 /**
