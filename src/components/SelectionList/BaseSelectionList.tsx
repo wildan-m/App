@@ -385,6 +385,10 @@ function BaseSelectionList<TItem extends User | RadioItem>(
         isActive: !disableKeyboardShortcuts && !!onConfirm && isFocused,
     });
 
+    useEffect(() => {
+        setFocusedIndex(flattenedSections.allOptions.findIndex((option) => option.keyForList === initiallyFocusedOptionKey));
+    }, [initiallyFocusedOptionKey, flattenedSections.allOptions]);
+
     return (
         <ArrowKeyFocusManager
             disabledIndexes={flattenedSections.disabledOptionsIndexes}
