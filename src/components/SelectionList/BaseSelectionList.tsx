@@ -365,7 +365,8 @@ function BaseSelectionList<TItem extends User | RadioItem>(
 
         // set the focus on the first item when the sections list is changed
         if (sections.length > 0) {
-            updateAndScrollToFocusedIndex(0);
+            const initialFocusIndex = initiallyFocusedOptionKey ? flattenedSections.allOptions.findIndex((option) => option.keyForList === initiallyFocusedOptionKey) : 0;
+            updateAndScrollToFocusedIndex(initialFocusIndex);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sections]);
@@ -385,9 +386,9 @@ function BaseSelectionList<TItem extends User | RadioItem>(
         isActive: !disableKeyboardShortcuts && !!onConfirm && isFocused,
     });
 
-    useEffect(() => {
-        setFocusedIndex(flattenedSections.allOptions.findIndex((option) => option.keyForList === initiallyFocusedOptionKey));
-    }, [initiallyFocusedOptionKey, flattenedSections.allOptions]);
+    // useEffect(() => {
+    //     setFocusedIndex(flattenedSections.allOptions.findIndex((option) => option.keyForList === initiallyFocusedOptionKey));
+    // }, [initiallyFocusedOptionKey, flattenedSections.allOptions]);
 
     return (
         <ArrowKeyFocusManager
