@@ -1,10 +1,11 @@
 import React from 'react';
 import {withOnyx} from 'react-native-onyx';
-import type {OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import AttachmentView from '@components/Attachments/AttachmentView';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import {ShowContextMenuContext, showContextMenuForReport} from '@components/ShowContextMenuContext';
 import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
+import * as Browser from '@libs/Browser';
 import fileDownload from '@libs/fileDownload';
 import * as ReportUtils from '@libs/ReportUtils';
 import * as Download from '@userActions/Download';
@@ -16,6 +17,8 @@ import type AnchorForAttachmentsOnlyProps from './types';
 type BaseAnchorForAttachmentsOnlyOnyxProps = {
     /** If a file download is happening */
     download: OnyxEntry<OnyxDownload>;
+    /** List of recent downloads and their status */
+    downloads: OnyxCollection<OnyxDownload>;
 };
 
 type BaseAnchorForAttachmentsOnlyProps = AnchorForAttachmentsOnlyProps &
@@ -27,12 +30,12 @@ type BaseAnchorForAttachmentsOnlyProps = AnchorForAttachmentsOnlyProps &
         onPressOut?: () => void;
     };
 
-function BaseAnchorForAttachmentsOnly({style, source = '', displayName = '', download, onPressIn, onPressOut}: BaseAnchorForAttachmentsOnlyProps) {
+function BaseAnchorForAttachmentsOnly({style, source = '', displayName = '', download, onPressIn, onPressOut, downloads}: BaseAnchorForAttachmentsOnlyProps) {
     const sourceURLWithAuth = addEncryptedAuthTokenToURL(source);
     const sourceID = (source.match(CONST.REGEX.ATTACHMENT_ID) ?? [])[1];
 
     const isDownloading = download?.isDownloading ?? false;
-
+    const isAnyDownloadInProgress = Object.values(downloads ?? {}).some((item) => item?.isDownloading === true);
     return (
         <ShowContextMenuContext.Consumer>
             {({anchor, report, action, checkIfContextMenuActive}) => (
@@ -51,12 +54,13 @@ function BaseAnchorForAttachmentsOnly({style, source = '', displayName = '', dow
                     onLongPress={(event) => showContextMenuForReport(event, anchor, report.reportID, action, checkIfContextMenuActive, ReportUtils.isArchivedRoom(report))}
                     accessibilityLabel={displayName}
                     role={CONST.ROLE.BUTTON}
+                    disabled={Browser.isMobileSafari() && isAnyDownloadInProgress}
                 >
                     <AttachmentView
                         // @ts-expect-error TODO: Remove this once AttachmentView (https://github.com/Expensify/App/issues/25150) is migrated to TypeScript.
                         source={sourceURLWithAuth}
                         file={{name: displayName}}
-                        shouldShowDownloadIcon
+                        shouldShowDownloadIcon={!Browser.isMobileSafari() || !isAnyDownloadInProgress}
                         shouldShowLoadingSpinnerIcon={isDownloading}
                     />
                 </PressableWithoutFeedback>
@@ -73,5 +77,8 @@ export default withOnyx<BaseAnchorForAttachmentsOnlyProps, BaseAnchorForAttachme
             const sourceID = (source?.match(CONST.REGEX.ATTACHMENT_ID) ?? [])[1];
             return `${ONYXKEYS.COLLECTION.DOWNLOAD}${sourceID}`;
         },
+    },
+    downloads: {
+        key: `${ONYXKEYS.COLLECTION.DOWNLOAD}`,
     },
 })(BaseAnchorForAttachmentsOnly);
