@@ -9,6 +9,11 @@ import type {FileDownload} from './types';
  * The function downloads an attachment on web/desktop platforms.
  */
 const fileDownload: FileDownload = (url, fileName) => {
+    window.electron.send('download', {url, fileName});
+    return Promise.resolve();
+
+
+
     const resolvedUrl = tryResolveUrlFromApiRoot(url);
     if (!resolvedUrl.startsWith(ApiUtils.getApiRoot()) && !CONST.ATTACHMENT_LOCAL_URL_PREFIX.some((prefix) => resolvedUrl.startsWith(prefix))) {
         // Different origin URLs might pose a CORS issue during direct downloads.

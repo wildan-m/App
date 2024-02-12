@@ -1,4 +1,5 @@
 const {app, dialog, clipboard, BrowserWindow, Menu, MenuItem, shell, ipcMain} = require('electron');
+const fs = require('fs');
 const _ = require('underscore');
 const serve = require('electron-serve');
 const contextMenu = require('electron-context-menu');
@@ -10,7 +11,7 @@ const checkForUpdates = require('../src/libs/checkForUpdates');
 const CONFIG = require('../src/CONFIG').default;
 const CONST = require('../src/CONST').default;
 const Localize = require('../src/libs/Localize');
-
+const electronDl= require('electron-dl');
 const port = process.env.PORT || 8082;
 const {DESKTOP_SHORTCUT_ACCELERATOR, LOCALES} = CONST;
 
@@ -20,6 +21,8 @@ const {DESKTOP_SHORTCUT_ACCELERATOR, LOCALES} = CONST;
 process.env.GOOGLE_API_KEY = CONFIG.GOOGLE_GEOLOCATION_API_KEY;
 
 app.setName('New Expensify');
+
+electronDl({saveAs: true});
 
 /**
  * Electron main process that handles wrapping the web application.
@@ -580,6 +583,50 @@ const mainWindow = () => {
                         app.setBadgeCount(totalCount);
                     }
                 });
+
+                class DownloadQueue extends Array {
+                    constructor(...args) {
+                        super(...args);
+                    }
+                    push(item) {
+                        const len = super.push(item);
+                        if (this.length === 1) {
+                            this.download(item);
+                        }
+                        return len;
+                    }
+                    shift() {
+                        const item = super.shift();
+                        if (this.length > 0) {
+                            this.download(this[0]);
+                        }
+                        return item;
+                    }
+                    download(item) {
+                        item.options.onCompleted = () => {
+                            this.shift();
+                        };
+
+                        item.options.onCancel = item.options.onCompleted;
+
+                        console.log('[wildebug] this Download queue', this)
+                        electronDl.download(item.win, item.url, item.options);
+                    }
+                }
+                const downloadQueue = new DownloadQueue();
+
+                ipcMain.on(ELECTRON_EVENTS.DOWNLOAD, async (event, info) => {
+                    console.log('[wildebug] info', info)
+
+                    const downloadItem ={
+                        win: browserWindow,
+                        url: info.url,
+                        options: { saveAs: true, filename: info.fileName }
+                    }
+                    // info.win = BrowserWindow.getFocusedWindow();
+console.log('[wildebug] downloadItem', downloadItem)
+                    downloadQueue.push(downloadItem);
+                })
 
                 return browserWindow;
             })
