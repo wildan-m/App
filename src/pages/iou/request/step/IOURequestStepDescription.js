@@ -185,9 +185,6 @@ IOURequestStepDescription.propTypes = propTypes;
 IOURequestStepDescription.defaultProps = defaultProps;
 IOURequestStepDescription.displayName = 'IOURequestStepDescription';
 
-<<<<<<< HEAD
-export default compose(withWritableReportOrNotFound(), withFullTransactionOrNotFound)(IOURequestStepDescription);
-=======
 export default compose(
     withWritableReportOrNotFound,
     withFullTransactionOrNotFound,
@@ -209,4 +206,3 @@ export default compose(
         },
     }),
 )(IOURequestStepDescription);
->>>>>>> 06c7dac74ad5bcc8009c614570625afe4006f621
