@@ -186,7 +186,7 @@ IOURequestStepDescription.defaultProps = defaultProps;
 IOURequestStepDescription.displayName = 'IOURequestStepDescription';
 
 export default compose(
-    withWritableReportOrNotFound,
+    withWritableReportOrNotFound(),
     withFullTransactionOrNotFound,
     withOnyx({
         splitDraftTransaction: {
