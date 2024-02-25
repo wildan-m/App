@@ -1,3 +1,4 @@
+import lodashGet from 'lodash/get';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {withOnyx} from 'react-native-onyx';
@@ -31,6 +32,9 @@ const propTypes = {
     /** Holds data related to Money Request view state, rather than the underlying Money Request data. */
     transaction: transactionPropTypes,
 
+    /** The draft transaction that holds data to be persisted on the current transaction */
+    splitDraftTransaction: transactionPropTypes,
+
     /** The report currently being used */
     report: reportPropTypes,
 
@@ -50,6 +54,7 @@ const defaultProps = {
     policyTags: null,
     policyCategories: null,
     transaction: {},
+    splitDraftTransaction: {},
 };
 
 function IOURequestStepTag({
@@ -61,16 +66,18 @@ function IOURequestStepTag({
         params: {action, tagIndex: rawTagIndex, transactionID, backTo, iouType},
     },
     transaction,
+    splitDraftTransaction,
 }) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const tagIndex = Number(rawTagIndex);
     const policyTagListName = PolicyUtils.getTagListName(policyTags, tagIndex);
-    const transactionTag = TransactionUtils.getTag(transaction);
-    const tag = TransactionUtils.getTag(transaction, tagIndex);
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isSplitBill = iouType === CONST.IOU.TYPE.SPLIT;
+    const transactionToUse = isEditing && isSplitBill ? splitDraftTransaction : transaction;
+    const transactionTag = TransactionUtils.getTag(transactionToUse);
+    const tag = TransactionUtils.getTag(transactionToUse, tagIndex);    
 
     const navigateBack = () => {
         Navigation.goBack(backTo);
@@ -130,6 +137,12 @@ export default compose(
     withWritableReportOrNotFound,
     withFullTransactionOrNotFound,
     withOnyx({
+        splitDraftTransaction: {
+            key: ({route}) => {
+                const transactionID = lodashGet(route, 'params.transactionID', 0);
+                return `${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`;
+            },
+        },
         policy: {
             key: ({report}) => `${ONYXKEYS.COLLECTION.POLICY}${report ? report.policyID : '0'}`,
         },
