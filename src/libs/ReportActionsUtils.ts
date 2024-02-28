@@ -217,10 +217,16 @@ function getSortedReportActions(reportActions: ReportAction[] | null, shouldSort
 
     const invertedMultiplier = shouldSortInDescendingOrder ? -1 : 1;
 
+    const getTimestamp = (reportAction: ReportAction) =>
+        reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.REPORTPREVIEW && reportAction.lastModified
+            ? reportAction.lastModified
+            : reportAction.created;
+
     const sortedActions = reportActions?.filter(Boolean).sort((first, second) => {
-        // First sort by timestamp
-        if (first.created !== second.created) {
-            return (first.created < second.created ? -1 : 1) * invertedMultiplier;
+        const firstTimestamp = getTimestamp(first);
+        const secondTimestamp = getTimestamp(second);
+        if (firstTimestamp !== secondTimestamp) {
+            return (firstTimestamp < secondTimestamp ? -1 : 1) * invertedMultiplier;
         }
 
         // Then by action type, ensuring that `CREATED` actions always come first if they have the same timestamp as another action type

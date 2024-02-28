@@ -3314,6 +3314,7 @@ function updateReportPreview(iouReport: OnyxEntry<Report>, reportPreviewAction: 
     const message = getReportPreviewMessage(iouReport, reportPreviewAction);
     return {
         ...reportPreviewAction,
+        lastModified: DateUtils.getDBTime(),
         message: [
             {
                 html: message,
