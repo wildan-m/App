@@ -189,7 +189,7 @@ function ComposerWithSuggestions({
         () =>
             _.debounce((selectedReportID, newComment) => {
                 Report.saveReportComment(selectedReportID, newComment || '');
-            }, 1000),
+            }, 100),
         [],
     );
 
@@ -234,50 +234,39 @@ function ComposerWithSuggestions({
         [selection.start, selection.end],
     );
 
-    /**
-     * Update the value of the comment in Onyx
-     *
-     * @param {String} comment
-     * @param {Boolean} shouldDebounceSaveComment
-     */
     const updateComment = useCallback(
         (commentValue, shouldDebounceSaveComment) => {
-            raiseIsScrollLikelyLayoutTriggered();
-            const {startIndex, endIndex, diff} = findNewlyAddedChars(lastTextRef.current, commentValue);
-            const isEmojiInserted = diff.length && endIndex > startIndex && diff.trim() === diff && EmojiUtils.containsOnlyEmojis(diff);
-            const {
-                text: newComment,
-                emojis,
-                cursorPosition,
-            } = EmojiUtils.replaceAndExtractEmojis(isEmojiInserted ? ComposerUtils.insertWhiteSpaceAtIndex(commentValue, endIndex) : commentValue, preferredSkinTone, preferredLocale);
-            if (!_.isEmpty(emojis)) {
-                const newEmojis = EmojiUtils.getAddedEmojis(emojis, emojisPresentBefore.current);
-                if (!_.isEmpty(newEmojis)) {
-                    // Ensure emoji suggestions are hidden after inserting emoji even when the selection is not changed
-                    if (suggestionsRef.current) {
-                        suggestionsRef.current.resetSuggestions();
-                    }
-                    insertedEmojisRef.current = [...insertedEmojisRef.current, ...newEmojis];
-                    debouncedUpdateFrequentlyUsedEmojis();
-                }
-            }
-            const newCommentConverted = convertToLTRForComposer(newComment);
-            const isNewCommentEmpty = !!newCommentConverted.match(/^(\s)*$/);
-            const isPrevCommentEmpty = !!commentRef.current.match(/^(\s)*$/);
+            const updatedComment = getUpdatedComment(commentValue, true);
 
-            /** Only update isCommentEmpty state if it's different from previous one */
+            if(!updatedComment){
+                console.log('[wildebug]  if(!updatedComment){', )
+                return;
+            }
+
+            const {
+                isNewCommentEmpty,
+                isPrevCommentEmpty,
+                newCommentConverted,
+                newComment,
+                selection,
+                commentRef,
+                // setIsCommentEmpty,
+                // setValue,
+                // setSelection,
+                position,
+            } = updatedComment;
+
+            console.log('[wildebug] updatedComment', updatedComment)
+
             if (isNewCommentEmpty !== isPrevCommentEmpty) {
+                console.log('[wildebug] if (isNewCommentEmpty !== isPrevCommentEmpty) {', )
                 setIsCommentEmpty(isNewCommentEmpty);
             }
-            emojisPresentBefore.current = emojis;
+
             setValue(newCommentConverted);
+
             if (commentValue !== newComment) {
-                const position = Math.max(selection.end + (newComment.length - commentRef.current.length), cursorPosition || 0);
-
-                if (isIOSNative) {
-                    syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
-                }
-
+                console.log('[wildebug] if (commentValue !== newComment) {',)
                 setSelection({
                     start: position,
                     end: position,
@@ -286,23 +275,22 @@ function ComposerWithSuggestions({
 
             // Indicate that draft has been created.
             if (commentRef.current.length === 0 && newCommentConverted.length !== 0) {
+                console.log('[wildebug] if (commentRef.current.length === 0 && newCommentConverted.length !== 0) {', )
                 Report.setReportWithDraft(reportID, true);
             }
 
             // The draft has been deleted.
             if (newCommentConverted.length === 0) {
+                console.log('[wildebug] if (newCommentConverted.length === 0) {', )
                 Report.setReportWithDraft(reportID, false);
             }
 
-            commentRef.current = newCommentConverted;
-            if (shouldDebounceSaveComment) {
-                debouncedSaveReportComment(reportID, newCommentConverted);
-            } else {
-                Report.saveReportComment(reportID, newCommentConverted || '');
-            }
-            if (newCommentConverted) {
-                debouncedBroadcastUserIsTyping(reportID);
-            }
+
+           
+
+            console.log('[wildebug] Report.saveReportComment(reportID, newCommentConverted || )', [reportID, newCommentConverted])
+            
+            Report.saveReportComment(reportID, newCommentConverted || '');
         },
         [
             debouncedUpdateFrequentlyUsedEmojis,
@@ -317,6 +305,221 @@ function ComposerWithSuggestions({
             selection.end,
         ],
     );
+
+    // /**
+    //  * Update the value of the comment in Onyx
+    //  *
+    //  * @param {String} comment
+    //  * @param {Boolean} shouldDebounceSaveComment
+    //  */
+    // const updateComment = useCallback(
+    //     (commentValue, shouldDebounceSaveComment) => {
+    //         raiseIsScrollLikelyLayoutTriggered();
+    //         const {startIndex, endIndex, diff} = findNewlyAddedChars(lastTextRef.current, commentValue);
+    //         const isEmojiInserted = diff.length && endIndex > startIndex && diff.trim() === diff && EmojiUtils.containsOnlyEmojis(diff);
+    //         const {
+    //             text: newComment,
+    //             emojis,
+    //             cursorPosition,
+    //         } = EmojiUtils.replaceAndExtractEmojis(isEmojiInserted ? ComposerUtils.insertWhiteSpaceAtIndex(commentValue, endIndex) : commentValue, preferredSkinTone, preferredLocale);
+    //         if (!_.isEmpty(emojis)) {
+    //             const newEmojis = EmojiUtils.getAddedEmojis(emojis, emojisPresentBefore.current);
+    //             if (!_.isEmpty(newEmojis)) {
+    //                 // Ensure emoji suggestions are hidden after inserting emoji even when the selection is not changed
+    //                 if (suggestionsRef.current) {
+    //                     suggestionsRef.current.resetSuggestions();
+    //                 }
+    //                 insertedEmojisRef.current = [...insertedEmojisRef.current, ...newEmojis];
+    //                 debouncedUpdateFrequentlyUsedEmojis();
+    //             }
+    //         }
+    //         const newCommentConverted = convertToLTRForComposer(newComment);
+    //         const isNewCommentEmpty = !!newCommentConverted.match(/^(\s)*$/);
+    //         const isPrevCommentEmpty = !!commentRef.current.match(/^(\s)*$/);
+
+    //         /** Only update isCommentEmpty state if it's different from previous one */
+    //         if (isNewCommentEmpty !== isPrevCommentEmpty) {
+    //             setIsCommentEmpty(isNewCommentEmpty);
+    //         }
+    //         emojisPresentBefore.current = emojis;
+    //         setValue(newCommentConverted);
+    //         if (commentValue !== newComment) {
+    //             const position = Math.max(selection.end + (newComment.length - commentRef.current.length), cursorPosition || 0);
+
+    //             if (isIOSNative) {
+    //                 syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
+    //             }
+
+    //             setSelection({
+    //                 start: position,
+    //                 end: position,
+    //             });
+    //         }
+
+    //         // Indicate that draft has been created.
+    //         if (commentRef.current.length === 0 && newCommentConverted.length !== 0) {
+    //             Report.setReportWithDraft(reportID, true);
+    //         }
+
+    //         // The draft has been deleted.
+    //         if (newCommentConverted.length === 0) {
+    //             Report.setReportWithDraft(reportID, false);
+    //         }
+
+    //         commentRef.current = newCommentConverted;
+    //         if (shouldDebounceSaveComment) {
+    //             debouncedSaveReportComment(reportID, newCommentConverted);
+    //         } else {
+    //             Report.saveReportComment(reportID, newCommentConverted || '');
+    //         }
+    //         if (newCommentConverted) {
+    //             debouncedBroadcastUserIsTyping(reportID);
+    //         }
+    //     },
+    //     [
+    //         debouncedUpdateFrequentlyUsedEmojis,
+    //         findNewlyAddedChars,
+    //         preferredLocale,
+    //         preferredSkinTone,
+    //         reportID,
+    //         setIsCommentEmpty,
+    //         suggestionsRef,
+    //         raiseIsScrollLikelyLayoutTriggered,
+    //         debouncedSaveReportComment,
+    //         selection.end,
+    //     ],
+    // );
+
+
+    /**
+     * Update the value of the comment in Onyx
+     *
+     * @param {String} comment
+     * @param {Boolean} shouldDebounceSaveComment
+     */
+    const getUpdatedComment = //useCallback(
+       _.debounce(
+            (commentValue, shouldDebounceSaveComment) => {
+                console.log('[wildebug] getUpdatedComment', commentValue, shouldDebounceSaveComment)
+                raiseIsScrollLikelyLayoutTriggered();
+                const { startIndex, endIndex, diff } = findNewlyAddedChars(lastTextRef.current, commentValue);
+                const isEmojiInserted = diff.length && endIndex > startIndex && diff.trim() === diff && EmojiUtils.containsOnlyEmojis(diff);
+                const {
+                    text: newComment,
+                    emojis,
+                    cursorPosition,
+                } = EmojiUtils.replaceAndExtractEmojis(isEmojiInserted ? ComposerUtils.insertWhiteSpaceAtIndex(commentValue, endIndex) : commentValue, preferredSkinTone, preferredLocale);
+                if (!_.isEmpty(emojis)) {
+                    const newEmojis = EmojiUtils.getAddedEmojis(emojis, emojisPresentBefore.current);
+                    if (!_.isEmpty(newEmojis)) {
+                        // Ensure emoji suggestions are hidden after inserting emoji even when the selection is not changed
+                        if (suggestionsRef.current) {
+                            suggestionsRef.current.resetSuggestions();
+                        }
+                        insertedEmojisRef.current = [...insertedEmojisRef.current, ...newEmojis];
+                        debouncedUpdateFrequentlyUsedEmojis();
+                    }
+                }
+                const newCommentConverted = convertToLTRForComposer(newComment);
+                const isNewCommentEmpty = !!newCommentConverted.match(/^(\s)*$/);
+                const isPrevCommentEmpty = !!commentRef.current.match(/^(\s)*$/);
+
+                /** Only update isCommentEmpty state if it's different from previous one */
+                // if (isNewCommentEmpty !== isNewCommentEmpty) {
+                //     setIsCommentEmpty(isNewCommentEmpty);
+                // }
+
+                emojisPresentBefore.current = emojis;
+                //setValue(newCommentConverted);
+
+                let position = 0;
+                if (commentValue !== newComment) {
+                    position = Math.max(selection.end + (newComment.length - commentRef.current.length), cursorPosition || 0);
+
+                    if (isIOSNative) {
+                        syncSelectionWithOnChangeTextRef.current = { position, value: newComment };
+                    }
+
+                    // setSelection({
+                    //     start: position,
+                    //     end: position,
+                    // });
+
+
+
+                }
+
+                // Indicate that draft has been created.
+                // if (commentRef.current.length === 0 && newCommentConverted.length !== 0) {
+                //     Report.setReportWithDraft(reportID, true);
+                // }
+
+
+
+                // // The draft has been deleted.
+                // if (newCommentConverted.length === 0) {
+                //     Report.setReportWithDraft(reportID, false);
+                // }
+
+                commentRef.current = newCommentConverted;
+                // if (shouldDebounceSaveComment) {
+                //     debouncedSaveReportComment(reportID, newCommentConverted);
+                // } else {
+                //     Report.saveReportComment(reportID, newCommentConverted || '');
+                // }
+                if (newCommentConverted) {
+                    debouncedBroadcastUserIsTyping(reportID);
+                }
+
+
+                console.log('[wildebug] result', {
+                    isNewCommentEmpty,
+                    isPrevCommentEmpty,
+                    newCommentConverted,
+                    commentValue,
+                    newComment,
+                    selection: {
+                        start: position,
+                        end: position,
+                    },
+                    commentRef,
+                    setIsCommentEmpty,
+                    setValue,
+                    setSelection,
+                    position,
+                })
+                return {
+                    isNewCommentEmpty,
+                    isPrevCommentEmpty,
+                    newCommentConverted,
+                    commentValue,
+                    newComment,
+                    selection: {
+                        start: position,
+                        end: position,
+                    },
+                    commentRef,
+                    setIsCommentEmpty,
+                    setValue,
+                    setSelection,
+                    position,
+                }
+            }
+           , 100)
+        //     ,
+        // [
+        //     debouncedUpdateFrequentlyUsedEmojis,
+        //     findNewlyAddedChars,
+        //     preferredLocale,
+        //     preferredSkinTone,
+        //     reportID,
+        //     setIsCommentEmpty,
+        //     suggestionsRef,
+        //     raiseIsScrollLikelyLayoutTriggered,
+        //     debouncedSaveReportComment,
+        //     selection.end,
+        // ]);
+
 
     /**
      * Update the number of lines for a comment in Onyx
