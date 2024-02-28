@@ -519,15 +519,11 @@ function getChatType(report: OnyxEntry<Report> | Participant | EmptyObject): Val
  * Get the report given a reportID
  */
 function getReport(reportID: string | undefined): OnyxEntry<Report> | EmptyObject {
-    /**
-     * Using typical string concatenation here due to performance issues
-     * with template literals.
-     */
     if (!allReports) {
         return {};
     }
 
-    return allReports?.[ONYXKEYS.COLLECTION.REPORT + reportID] ?? {};
+    return allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] ?? {};
 }
 
 /**
@@ -1483,11 +1479,9 @@ function getIconsForParticipants(participants: number[], personalDetails: OnyxCo
  */
 function getWorkspaceIcon(report: OnyxEntry<Report>, policy: OnyxEntry<Policy> = null): Icon {
     const workspaceName = getPolicyName(report, false, policy);
-    const rootParentReport = getRootParentReport(report);
-    const hasCustomAvatar =
-        !(isEmptyObject(rootParentReport) || isDefaultRoom(rootParentReport) || isChatRoom(rootParentReport) || isArchivedRoom(rootParentReport)) &&
-        allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatar;
-    const policyExpenseChatAvatarSource = hasCustomAvatar ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatar : getDefaultWorkspaceAvatar(workspaceName);
+    const policyExpenseChatAvatarSource = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatar
+        ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatar
+        : getDefaultWorkspaceAvatar(workspaceName);
 
     const workspaceIcon: Icon = {
         source: policyExpenseChatAvatarSource ?? '',
@@ -1928,11 +1922,7 @@ function getPolicyExpenseChatName(report: OnyxEntry<Report>, policy: OnyxEntry<P
     }
 
     let policyExpenseChatRole = 'user';
-    /**
-     * Using typical string concatenation here due to performance issues
-     * with template literals.
-     */
-    const policyItem = allPolicies?.[ONYXKEYS.COLLECTION.POLICY + report?.policyID];
+    const policyItem = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`];
     if (policyItem) {
         policyExpenseChatRole = policyItem.role || 'user';
     }
@@ -3996,10 +3986,10 @@ function shouldReportBeInOptionList({
 /**
  * Attempts to find a report in onyx with the provided list of participants. Does not include threads, task, money request, room, and policy expense chat.
  */
-function getChatByParticipants(newParticipantList: number[]): OnyxEntry<Report> {
+function getChatByParticipants(newParticipantList: number[], reports: OnyxCollection<Report> = allReports): OnyxEntry<Report> {
     const sortedNewParticipantList = newParticipantList.sort();
     return (
-        Object.values(allReports ?? {}).find((report) => {
+        Object.values(reports ?? {}).find((report) => {
             // If the report has been deleted, or there are no participants (like an empty #admins room) then skip it
             if (
                 !report ||
