@@ -10,7 +10,7 @@ import type {SilentCommentUpdaterOnyxProps, SilentCommentUpdaterProps} from './t
  * It is connected to the actual draft comment in onyx. The comment in onyx might updates multiple times, and we want to avoid
  * re-rendering a UI component for that. That's why the side effect was moved down to a separate component.
  */
-function SilentCommentUpdater({comment, commentRef, reportID, value, updateComment}: SilentCommentUpdaterProps) {
+function SilentCommentUpdater({comment, commentRef, reportID, value, updateComment, isCurrentUserTypingRef}: SilentCommentUpdaterProps) {
     const prevCommentProp = usePrevious(comment);
     const prevReportId = usePrevious(reportID);
     const {preferredLocale} = useLocalize();
@@ -22,9 +22,11 @@ function SilentCommentUpdater({comment, commentRef, reportID, value, updateComme
     }, []);
 
     useEffect(() => {
+        const newComment = isCurrentUserTypingRef.current ? commentRef.current : comment;
+
         // Value state does not have the same value as comment props when the comment gets changed from another tab.
         // In this case, we should synchronize the value between tabs.
-        const shouldSyncComment = prevCommentProp !== comment && value !== comment;
+        const shouldSyncComment = prevCommentProp !== newComment && value !== newComment;
 
         // As the report IDs change, make sure to update the composer comment as we need to make sure
         // we do not show incorrect data in there (ie. draft of message from other report).
@@ -32,8 +34,8 @@ function SilentCommentUpdater({comment, commentRef, reportID, value, updateComme
             return;
         }
 
-        updateComment(comment ?? '');
-    }, [prevCommentProp, prevPreferredLocale, prevReportId, comment, preferredLocale, reportID, updateComment, value, commentRef]);
+        updateComment(newComment ?? '');
+    }, [prevCommentProp, prevPreferredLocale, prevReportId, comment, preferredLocale, reportID, updateComment, value, commentRef, isCurrentUserTypingRef]);
 
     return null;
 }

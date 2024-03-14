@@ -288,6 +288,18 @@ function ComposerWithSuggestions(
 
     const isAutoSuggestionPickerLarge = !isSmallScreenWidth || (isSmallScreenWidth && hasEnoughSpaceForLargeSuggestion);
 
+    const isCurrentUserTypingRef = React.useRef(false);
+
+    const setTypingStateFalse = lodashDebounce(() => {
+        isCurrentUserTypingRef.current = false;
+    }, 1000);
+
+
+    const setTypingStateTrue = lodashDebounce(() => {
+        isCurrentUserTypingRef.current = true;
+        setTypingStateFalse.cancel(); // Cancel any debounced calls
+        setTypingStateFalse();
+    }, 1000, { leading: true, trailing: false });
     /**
      * Update frequently used emojis list. We debounce this method in the constructor so that UpdateFrequentlyUsedEmojis
      * API is not called too often.
@@ -533,6 +545,7 @@ function ComposerWithSuggestions(
 
     const onChangeText = useCallback(
         (commentValue: string) => {
+            setTypingStateTrue();
             updateComment(commentValue, true);
 
             if (isIOSNative && syncSelectionWithOnChangeTextRef.current) {
@@ -732,7 +745,10 @@ function ComposerWithSuggestions(
                     placeholder={inputPlaceholder}
                     placeholderTextColor={theme.placeholderText}
                     onChangeText={onChangeText}
-                    onKeyPress={triggerHotkeyActions}
+                    onKeyPress={(event)=>{
+                        setTypingStateTrue()
+                        triggerHotkeyActions(event)
+                    }}
                     textAlignVertical="top"
                     style={[styles.textInputCompose, isComposerFullSize ? styles.textInputFullCompose : styles.textInputCollapseCompose]}
                     maxLines={maxComposerLines}
@@ -782,6 +798,7 @@ function ComposerWithSuggestions(
                     value={value}
                     updateComment={updateComment}
                     commentRef={commentRef}
+                    isCurrentUserTypingRef={isCurrentUserTypingRef}
                 />
             )}
 
