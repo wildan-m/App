@@ -41,6 +41,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import * as ReportActionContextMenu from './ContextMenu/ReportActionContextMenu';
+import { set } from 'lodash';
+import { useTypingStatus } from '@hooks/useTypingStatus';
 
 type ReportActionItemMessageEditProps = {
     /** All the data of the action */
@@ -124,30 +126,62 @@ function ReportActionItemMessageEdit(
     const draftRef = useRef(draft);
 
     const isCurrentUserTypingRef = useRef(false);
-    let isCurrentUserTypingTimeoutId: NodeJS.Timeout | null = null;
+    const isCurrentUserTypingTimeoutId = useRef<NodeJS.Timeout>();
 
     const setTypingStateFalse = () => {
+        console.log('[wildebug] setTypingStateFalse')
         isCurrentUserTypingRef.current = false;
     };
 
-    const setTypingStateTrue = lodashDebounce(
-        () => {
-            isCurrentUserTypingRef.current = true;
-            if (isCurrentUserTypingTimeoutId) {
-                clearTimeout(isCurrentUserTypingTimeoutId);
-            }
-            isCurrentUserTypingTimeoutId = setTimeout(setTypingStateFalse, 1000);
-        },
-        1000,
-        {leading: true, trailing: false},
-    );
+    const setTypingStateTrue = () => {
+        console.log('[wildebug] setTypingStateTrue')
+        console.log('[wildebug] isCurrentUserTypingTimeoutId.current', isCurrentUserTypingTimeoutId.current)
+
+        isCurrentUserTypingRef.current = true;
+        if (isCurrentUserTypingTimeoutId.current) {
+            console.log('[wildebug] if (isCurrentUserTypingTimeoutId.current) {')
+
+            clearTimeout(isCurrentUserTypingTimeoutId.current);
+        }
+        isCurrentUserTypingTimeoutId.current = setTimeout(setTypingStateFalse, 1000);
+    }
+
+
+    // const debouncedUpdateFrequentlyUsedEmojis = useMemo(
+    //     () =>
+    //         lodashDebounce(() => {
+    //             User.updateFrequentlyUsedEmojis(EmojiUtils.getFrequentlyUsedEmojis(insertedEmojis.current));
+    //             insertedEmojis.current = [];
+    //         }, 1000),
+    //     [],
+    // );
+
+
+
+    // const debouncedSetTypingStateTrue = useMemo(
+    //     () =>
+    //         lodashDebounce(
+    //             () => {
+    //                 setTypingStateTrue()
+    //             },
+    //             500,
+    //             { leading: true, trailing: false, maxWait: 500},
+    //         )
+    //     , 
+    //     // [],
+    //     [],
+    //     // [isCurrentUserTypingTimeoutId, setTypingStateFalse, isCurrentUserTypingRef],
+    // );
+
+    const { isTypingRef, handleUserTyping } = useTypingStatus();
 
     useEffect(() => {
         if (ReportActionsUtils.isDeletedAction(action) || (action.message && draftMessage === action.message[0].html)) {
             return;
         }
 
-        const newDraft = (isCurrentUserTypingRef.current ? textInputRef.current?.value : draftMessage) ?? '';
+        console.log('[wildebug] isTypingRef.current asdasd', isTypingRef.current)
+        const newDraft = (isTypingRef.current ? textInputRef.current?.value : draftMessage) ?? '';
 
         setDraft(Str.htmlDecode(newDraft));
     }, [draftMessage, action, isCurrentUserTypingRef]);
@@ -187,7 +221,7 @@ function ReportActionItemMessageEdit(
             if (!isCurrentUserTypingTimeoutId) {
                 return;
             }
-            clearTimeout(isCurrentUserTypingTimeoutId);
+            clearTimeout(isCurrentUserTypingTimeoutId.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -445,13 +479,10 @@ function ReportActionItemMessageEdit(
                             }}
                             id={messageEditInput}
                             onChangeText={(newText) => {
-                                setTypingStateTrue();
+                                handleUserTyping()
                                 updateDraft(newText);
                             }} // Debounced saveDraftComment
-                            onKeyPress={(event) => {
-                                setTypingStateTrue();
-                                triggerSaveOrCancel(event);
-                            }}
+                            onKeyPress={triggerSaveOrCancel}
                             value={draft}
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}
