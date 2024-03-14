@@ -1,6 +1,6 @@
-import { useRef, useCallback } from 'react';
 import lodashDebounce from 'lodash/debounce';
 import lodashThrottle from 'lodash/throttle';
+import {useCallback, useRef} from 'react';
 
 type UseTypingStatusProps = {
     delay?: number;
@@ -17,31 +17,31 @@ type UseTypingStatusReturn = {
  * @returns isTypingRef - A mutable ref object indicating if user is typing
  * @returns handleUserTyping - Function to handle user typing event
  */
-export const useTypingStatus = ({
-    delay = 1000,
-}: UseTypingStatusProps = {}): UseTypingStatusReturn => {
+const useTypingStatus = ({delay = 1000}: UseTypingStatusProps = {}): UseTypingStatusReturn => {
     const isTypingRef = useRef(false);
 
-    const setTypingFalse = useCallback(
-        lodashDebounce(() => {
+    const setTypingFalse = useCallback(() => {
+        const debouncedFunc = lodashDebounce(() => {
             isTypingRef.current = false;
             /* The +500 difference in the setTypingFalse debounce function is added
-            to ensure that the typing status is not set to false immediately after 
-            the user starts typing. It allows a small buffer period after the delay 
+            to ensure that the typing status is not set to false immediately right after 
+            the user starts typing delay ended. It allows a small buffer period after the delay 
             before considering the user as not typing anymore. */
-        }, delay + 500),
-        [delay]
-    );
+        }, delay + 500);
+        debouncedFunc();
+    }, [delay]);
 
-    const handleUserTyping = useCallback(
-        lodashThrottle(() => {
+    const handleUserTyping = useCallback(() => {
+        const throttledFunc = lodashThrottle(() => {
             if (!isTypingRef.current) {
                 isTypingRef.current = true;
             }
             setTypingFalse();
-        }, delay),
-        [delay]
-    );
+        }, delay);
+        throttledFunc();
+    }, [delay, setTypingFalse]);
 
-    return { isTypingRef, handleUserTyping };
+    return {isTypingRef, handleUserTyping};
 };
+
+export default useTypingStatus;

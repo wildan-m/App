@@ -21,6 +21,7 @@ import useReportScrollManager from '@hooks/useReportScrollManager';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useTypingStatus from '@hooks/useTypingStatus';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import * as Browser from '@libs/Browser';
 import * as ComposerUtils from '@libs/ComposerUtils';
@@ -41,8 +42,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import * as ReportActionContextMenu from './ContextMenu/ReportActionContextMenu';
-import { set } from 'lodash';
-import { useTypingStatus } from '@hooks/useTypingStatus';
 
 type ReportActionItemMessageEditProps = {
     /** All the data of the action */
@@ -124,40 +123,17 @@ function ReportActionItemMessageEdit(
     const isFocusedRef = useRef<boolean>(false);
     const insertedEmojis = useRef<Emoji[]>([]);
     const draftRef = useRef(draft);
-
-    const isCurrentUserTypingRef = useRef(false);
-    const isCurrentUserTypingTimeoutId = useRef<NodeJS.Timeout>();
-
-    const setTypingStateFalse = () => {
-        console.log('[wildebug] setTypingStateFalse')
-        isCurrentUserTypingRef.current = false;
-    };
-
-    const setTypingStateTrue = () => {
-        console.log('[wildebug] setTypingStateTrue')
-        console.log('[wildebug] isCurrentUserTypingTimeoutId.current', isCurrentUserTypingTimeoutId.current)
-
-        isCurrentUserTypingRef.current = true;
-        if (isCurrentUserTypingTimeoutId.current) {
-            console.log('[wildebug] if (isCurrentUserTypingTimeoutId.current) {')
-
-            clearTimeout(isCurrentUserTypingTimeoutId.current);
-        }
-        isCurrentUserTypingTimeoutId.current = setTimeout(setTypingStateFalse, 1000);
-    }
-
-    const { isTypingRef, handleUserTyping } = useTypingStatus();
+    const {isTypingRef, handleUserTyping} = useTypingStatus();
 
     useEffect(() => {
         if (ReportActionsUtils.isDeletedAction(action) || (action.message && draftMessage === action.message[0].html)) {
             return;
         }
 
-        console.log('[wildebug] isTypingRef.current asdasd', isTypingRef.current)
         const newDraft = (isTypingRef.current ? textInputRef.current?.value : draftMessage) ?? '';
 
         setDraft(Str.htmlDecode(newDraft));
-    }, [draftMessage, action, isCurrentUserTypingRef]);
+    }, [draftMessage, action, isTypingRef]);
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -191,10 +167,6 @@ function ReportActionItemMessageEdit(
         return () => {
             unsubscribeOnyxModal();
             unsubscribeOnyxFocused();
-            if (!isCurrentUserTypingTimeoutId) {
-                return;
-            }
-            clearTimeout(isCurrentUserTypingTimeoutId.current);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -452,7 +424,7 @@ function ReportActionItemMessageEdit(
                             }}
                             id={messageEditInput}
                             onChangeText={(newText) => {
-                                handleUserTyping()
+                                handleUserTyping();
                                 updateDraft(newText);
                             }} // Debounced saveDraftComment
                             onKeyPress={triggerSaveOrCancel}

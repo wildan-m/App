@@ -24,6 +24,7 @@ import usePrevious from '@hooks/usePrevious';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useTypingStatus from '@hooks/useTypingStatus';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import * as Browser from '@libs/Browser';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
@@ -51,7 +52,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
-import { useTypingStatus } from '@hooks/useTypingStatus';
 
 type SyncSelection = {
     position: number;
@@ -289,7 +289,7 @@ function ComposerWithSuggestions(
 
     const isAutoSuggestionPickerLarge = !isSmallScreenWidth || (isSmallScreenWidth && hasEnoughSpaceForLargeSuggestion);
 
-    const { isTypingRef, handleUserTyping } = useTypingStatus();
+    const {isTypingRef, handleUserTyping} = useTypingStatus();
 
     /**
      * Update frequently used emojis list. We debounce this method in the constructor so that UpdateFrequentlyUsedEmojis
@@ -551,7 +551,7 @@ function ComposerWithSuggestions(
                 });
             }
         },
-        [updateComment],
+        [updateComment, handleUserTyping],
     );
 
     const onSelectionChange = useCallback(
