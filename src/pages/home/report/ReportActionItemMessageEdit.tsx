@@ -146,33 +146,6 @@ function ReportActionItemMessageEdit(
         isCurrentUserTypingTimeoutId.current = setTimeout(setTypingStateFalse, 1000);
     }
 
-
-    // const debouncedUpdateFrequentlyUsedEmojis = useMemo(
-    //     () =>
-    //         lodashDebounce(() => {
-    //             User.updateFrequentlyUsedEmojis(EmojiUtils.getFrequentlyUsedEmojis(insertedEmojis.current));
-    //             insertedEmojis.current = [];
-    //         }, 1000),
-    //     [],
-    // );
-
-
-
-    // const debouncedSetTypingStateTrue = useMemo(
-    //     () =>
-    //         lodashDebounce(
-    //             () => {
-    //                 setTypingStateTrue()
-    //             },
-    //             500,
-    //             { leading: true, trailing: false, maxWait: 500},
-    //         )
-    //     , 
-    //     // [],
-    //     [],
-    //     // [isCurrentUserTypingTimeoutId, setTypingStateFalse, isCurrentUserTypingRef],
-    // );
-
     const { isTypingRef, handleUserTyping } = useTypingStatus();
 
     useEffect(() => {

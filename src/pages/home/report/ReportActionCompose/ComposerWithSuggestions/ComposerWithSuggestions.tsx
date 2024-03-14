@@ -51,6 +51,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
+import { useTypingStatus } from '@hooks/useTypingStatus';
 
 type SyncSelection = {
     position: number;
@@ -288,25 +289,7 @@ function ComposerWithSuggestions(
 
     const isAutoSuggestionPickerLarge = !isSmallScreenWidth || (isSmallScreenWidth && hasEnoughSpaceForLargeSuggestion);
 
-    const isCurrentUserTypingRef = useRef(false);
-
-    let isCurrentUserTypingTimeoutId: NodeJS.Timeout | null = null;
-
-    const setTypingStateFalse = () => {
-        isCurrentUserTypingRef.current = false;
-    };
-
-    const setTypingStateTrue = lodashDebounce(
-        () => {
-            isCurrentUserTypingRef.current = true;
-            if (isCurrentUserTypingTimeoutId) {
-                clearTimeout(isCurrentUserTypingTimeoutId);
-            }
-            isCurrentUserTypingTimeoutId = setTimeout(setTypingStateFalse, 1000);
-        },
-        1000,
-        {leading: true, trailing: false},
-    );
+    const { isTypingRef, handleUserTyping } = useTypingStatus();
 
     /**
      * Update frequently used emojis list. We debounce this method in the constructor so that UpdateFrequentlyUsedEmojis
@@ -553,7 +536,7 @@ function ComposerWithSuggestions(
 
     const onChangeText = useCallback(
         (commentValue: string) => {
-            setTypingStateTrue();
+            handleUserTyping();
             updateComment(commentValue, true);
 
             if (isIOSNative && syncSelectionWithOnChangeTextRef.current) {
@@ -568,7 +551,7 @@ function ComposerWithSuggestions(
                 });
             }
         },
-        [updateComment, setTypingStateTrue],
+        [updateComment],
     );
 
     const onSelectionChange = useCallback(
@@ -698,16 +681,11 @@ function ComposerWithSuggestions(
         // Scrolls the composer to the bottom and sets the selection to the end, so that longer drafts are easier to edit
         updateMultilineInputRange(textInputRef.current, !!shouldAutoFocus);
 
-        if (value.length !== 0) {
-            Report.setReportWithDraft(reportID, true);
+        if (value.length === 0) {
+            return;
         }
 
-        return () => {
-            if (isCurrentUserTypingTimeoutId) {
-                clearTimeout(isCurrentUserTypingTimeoutId);
-            }
-        };
-
+        Report.setReportWithDraft(reportID, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -758,10 +736,7 @@ function ComposerWithSuggestions(
                     placeholder={inputPlaceholder}
                     placeholderTextColor={theme.placeholderText}
                     onChangeText={onChangeText}
-                    onKeyPress={(event) => {
-                        setTypingStateTrue();
-                        triggerHotkeyActions(event);
-                    }}
+                    onKeyPress={triggerHotkeyActions}
                     textAlignVertical="top"
                     style={[styles.textInputCompose, isComposerFullSize ? styles.textInputFullCompose : styles.textInputCollapseCompose]}
                     maxLines={maxComposerLines}
@@ -811,7 +786,7 @@ function ComposerWithSuggestions(
                     value={value}
                     updateComment={updateComment}
                     commentRef={commentRef}
-                    isCurrentUserTypingRef={isCurrentUserTypingRef}
+                    isTypingRef={isTypingRef}
                 />
             )}
 
