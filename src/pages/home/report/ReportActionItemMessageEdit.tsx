@@ -123,12 +123,34 @@ function ReportActionItemMessageEdit(
     const insertedEmojis = useRef<Emoji[]>([]);
     const draftRef = useRef(draft);
 
+    const isCurrentUserTypingRef = useRef(false);
+    let isCurrentUserTypingTimeoutId: NodeJS.Timeout | null = null;
+
+    const setTypingStateFalse = () => {
+        isCurrentUserTypingRef.current = false;
+    };
+
+    const setTypingStateTrue = lodashDebounce(
+        () => {
+            isCurrentUserTypingRef.current = true;
+            if (isCurrentUserTypingTimeoutId) {
+                clearTimeout(isCurrentUserTypingTimeoutId);
+            }
+            isCurrentUserTypingTimeoutId = setTimeout(setTypingStateFalse, 1000);
+        },
+        1000,
+        {leading: true, trailing: false},
+    );
+
     useEffect(() => {
         if (ReportActionsUtils.isDeletedAction(action) || (action.message && draftMessage === action.message[0].html)) {
             return;
         }
-        setDraft(Str.htmlDecode(draftMessage));
-    }, [draftMessage, action]);
+
+        const newDraft = (isCurrentUserTypingRef.current ? textInputRef.current?.value : draftMessage) ?? '';
+
+        setDraft(Str.htmlDecode(newDraft));
+    }, [draftMessage, action, isCurrentUserTypingRef]);
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -162,7 +184,12 @@ function ReportActionItemMessageEdit(
         return () => {
             unsubscribeOnyxModal();
             unsubscribeOnyxFocused();
+            if (!isCurrentUserTypingTimeoutId) {
+                return;
+            }
+            clearTimeout(isCurrentUserTypingTimeoutId);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // We consider the report action active if it's focused, its emoji picker is open or its context menu is open
@@ -417,8 +444,14 @@ function ReportActionItemMessageEdit(
                                 }
                             }}
                             id={messageEditInput}
-                            onChangeText={updateDraft} // Debounced saveDraftComment
-                            onKeyPress={triggerSaveOrCancel}
+                            onChangeText={(newText) => {
+                                setTypingStateTrue();
+                                updateDraft(newText);
+                            }} // Debounced saveDraftComment
+                            onKeyPress={(event) => {
+                                setTypingStateTrue();
+                                triggerSaveOrCancel(event);
+                            }}
                             value={draft}
                             maxLines={isSmallScreenWidth ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES} // This is the same that slack has
                             style={[styles.textInputCompose, styles.flex1, styles.bgTransparent]}

@@ -288,18 +288,26 @@ function ComposerWithSuggestions(
 
     const isAutoSuggestionPickerLarge = !isSmallScreenWidth || (isSmallScreenWidth && hasEnoughSpaceForLargeSuggestion);
 
-    const isCurrentUserTypingRef = React.useRef(false);
+    const isCurrentUserTypingRef = useRef(false);
 
-    const setTypingStateFalse = lodashDebounce(() => {
+    let isCurrentUserTypingTimeoutId: NodeJS.Timeout | null = null;
+
+    const setTypingStateFalse = () => {
         isCurrentUserTypingRef.current = false;
-    }, 1000);
+    };
 
+    const setTypingStateTrue = lodashDebounce(
+        () => {
+            isCurrentUserTypingRef.current = true;
+            if (isCurrentUserTypingTimeoutId) {
+                clearTimeout(isCurrentUserTypingTimeoutId);
+            }
+            isCurrentUserTypingTimeoutId = setTimeout(setTypingStateFalse, 1000);
+        },
+        1000,
+        {leading: true, trailing: false},
+    );
 
-    const setTypingStateTrue = lodashDebounce(() => {
-        isCurrentUserTypingRef.current = true;
-        setTypingStateFalse.cancel(); // Cancel any debounced calls
-        setTypingStateFalse();
-    }, 1000, { leading: true, trailing: false });
     /**
      * Update frequently used emojis list. We debounce this method in the constructor so that UpdateFrequentlyUsedEmojis
      * API is not called too often.
@@ -560,7 +568,7 @@ function ComposerWithSuggestions(
                 });
             }
         },
-        [updateComment],
+        [updateComment, setTypingStateTrue],
     );
 
     const onSelectionChange = useCallback(
@@ -690,14 +698,19 @@ function ComposerWithSuggestions(
         // Scrolls the composer to the bottom and sets the selection to the end, so that longer drafts are easier to edit
         updateMultilineInputRange(textInputRef.current, !!shouldAutoFocus);
 
-        if (value.length === 0) {
-            return;
+        if (value.length !== 0) {
+            Report.setReportWithDraft(reportID, true);
         }
 
-        Report.setReportWithDraft(reportID, true);
+        return () => {
+            if (isCurrentUserTypingTimeoutId) {
+                clearTimeout(isCurrentUserTypingTimeoutId);
+            }
+        };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     useImperativeHandle(
         ref,
         () => ({
@@ -745,9 +758,9 @@ function ComposerWithSuggestions(
                     placeholder={inputPlaceholder}
                     placeholderTextColor={theme.placeholderText}
                     onChangeText={onChangeText}
-                    onKeyPress={(event)=>{
-                        setTypingStateTrue()
-                        triggerHotkeyActions(event)
+                    onKeyPress={(event) => {
+                        setTypingStateTrue();
+                        triggerHotkeyActions(event);
                     }}
                     textAlignVertical="top"
                     style={[styles.textInputCompose, isComposerFullSize ? styles.textInputFullCompose : styles.textInputCollapseCompose]}

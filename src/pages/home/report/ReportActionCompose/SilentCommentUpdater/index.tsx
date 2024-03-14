@@ -22,11 +22,9 @@ function SilentCommentUpdater({comment, commentRef, reportID, value, updateComme
     }, []);
 
     useEffect(() => {
-        const newComment = isCurrentUserTypingRef.current ? commentRef.current : comment;
-
         // Value state does not have the same value as comment props when the comment gets changed from another tab.
         // In this case, we should synchronize the value between tabs.
-        const shouldSyncComment = prevCommentProp !== newComment && value !== newComment;
+        const shouldSyncComment = prevCommentProp !== comment && value !== comment;
 
         // As the report IDs change, make sure to update the composer comment as we need to make sure
         // we do not show incorrect data in there (ie. draft of message from other report).
@@ -34,6 +32,7 @@ function SilentCommentUpdater({comment, commentRef, reportID, value, updateComme
             return;
         }
 
+        const newComment = isCurrentUserTypingRef.current ? commentRef.current : comment;
         updateComment(newComment ?? '');
     }, [prevCommentProp, prevPreferredLocale, prevReportId, comment, preferredLocale, reportID, updateComment, value, commentRef, isCurrentUserTypingRef]);
 
