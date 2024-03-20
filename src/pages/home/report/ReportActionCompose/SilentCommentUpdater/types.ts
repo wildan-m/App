@@ -17,6 +17,8 @@ type SilentCommentUpdaterProps = SilentCommentUpdaterOnyxProps & {
 
     /** The ref of the comment */
     commentRef: React.RefObject<string>;
+
+    isCommentPendingSaved: React.RefObject<boolean>;
 };
 
 export type {SilentCommentUpdaterProps, SilentCommentUpdaterOnyxProps};

@@ -270,6 +270,9 @@ function ComposerWithSuggestions(
     const shouldAutoFocus =
         !modal?.isVisible && isFocused && (shouldFocusInputOnScreenFocus || (isEmptyChat && !ReportActionsUtils.isTransactionThread(parentReportAction))) && shouldShowComposeInput;
 
+
+        const isCommentPendingSaved = useRef(false);
+
     const valueRef = useRef(value);
     valueRef.current = value;
 
@@ -322,6 +325,7 @@ function ComposerWithSuggestions(
     const debouncedSaveReportComment = useMemo(
         () =>
             lodashDebounce((selectedReportID, newComment) => {
+                isCommentPendingSaved.current = true;
                 Report.saveReportComment(selectedReportID, newComment || '');
             }, 1000),
         [],
@@ -481,6 +485,7 @@ function ComposerWithSuggestions(
         // We don't really care about saving the draft the user was typing
         // We need to make sure an empty draft gets saved instead
         debouncedSaveReportComment.cancel();
+        isCommentPendingSaved.current = false;
 
         updateComment('');
         setTextInputShouldClear(true);
@@ -782,6 +787,7 @@ function ComposerWithSuggestions(
                     value={value}
                     updateComment={updateComment}
                     commentRef={commentRef}
+                    isCommentPendingSaved = {isCommentPendingSaved}
                 />
             )}
 
