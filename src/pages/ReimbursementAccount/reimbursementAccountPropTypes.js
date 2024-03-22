@@ -36,7 +36,7 @@ const reimbursementAccountPropTypes = PropTypes.shape({
 const reimbursementAccountDefaultProps = {
     achData: {
         state: BankAccount.STATE.SETUP,
-        // subStep: null,
+        subStep: null,
     },
     isLoading: false,
     errorFields: {},
