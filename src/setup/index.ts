@@ -8,6 +8,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import addUtilsToWindow from './addUtilsToWindow';
 import initializeLastVisitedPath from './initializeLastVisitedPath';
 import platformSetup from './platformSetup';
+import { reimbursementAccountDefaultProps } from '@pages/ReimbursementAccount/reimbursementAccountPropTypes';
 
 export default function () {
     /*
@@ -43,6 +44,8 @@ export default function () {
             },
             // Always open the home route on app startup for native platforms by clearing the lastVisitedPath
             [ONYXKEYS.LAST_VISITED_PATH]: initializeLastVisitedPath(),
+            // @ts-expect-error: ONYXKEYS.REIMBURSEMENT_ACCOUNT is conflicting with ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM
+            [ONYXKEYS.REIMBURSEMENT_ACCOUNT]: reimbursementAccountDefaultProps,
         },
     });
 

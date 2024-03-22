@@ -36,12 +36,14 @@ const reimbursementAccountPropTypes = PropTypes.shape({
 const reimbursementAccountDefaultProps = {
     achData: {
         state: BankAccount.STATE.SETUP,
+        // subStep: null,
     },
     isLoading: false,
     errorFields: {},
     errors: {},
     maxAttemptsReached: false,
     shouldShowResetModal: false,
+    
 };
 
 export {reimbursementAccountPropTypes, reimbursementAccountDefaultProps};
