@@ -385,7 +385,7 @@ function InitialSettingsPage({session, userWallet, bankAccountList, fundList, wa
                             >
                                 <View style={styles.primaryMediumIcon}>
                                     {emojiCode ? (
-                                        <Text style={styles.primaryMediumText}>{emojiCode}</Text>
+                                            <Text style={[styles.primaryMediumText, styles.lh0, { transform: [{scale: 0.25}], fontSize: 80}]}>{emojiCode}</Text>
                                     ) : (
                                         <Icon
                                             src={Expensicons.Emoji}
