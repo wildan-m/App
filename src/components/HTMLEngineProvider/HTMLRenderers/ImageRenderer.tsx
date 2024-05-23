@@ -16,6 +16,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {User} from '@src/types/onyx';
+import fileDownload from '@libs/fileDownload';
+import addEncryptedAuthTokenToURL from '@libs/addEncryptedAuthTokenToURL';
 
 type ImageRendererWithOnyxProps = {
     /** Current user */
@@ -56,6 +58,7 @@ function ImageRenderer({tnode}: ImageRendererProps) {
     const previewSource = tryResolveUrlFromApiRoot(htmlAttribs.src);
     const source = tryResolveUrlFromApiRoot(isAttachmentOrReceipt ? attachmentSourceAttribute : htmlAttribs.src);
 
+    const imageName = htmlAttribs['data-name'] && htmlAttribs['data-name'] || '';
     const imageWidth = (htmlAttribs['data-expensify-width'] && parseInt(htmlAttribs['data-expensify-width'], 10)) || undefined;
     const imageHeight = (htmlAttribs['data-expensify-height'] && parseInt(htmlAttribs['data-expensify-height'], 10)) || undefined;
     const imagePreviewModalDisabled = htmlAttribs['data-expensify-preview-modal-disabled'] === 'true';
@@ -81,6 +84,12 @@ function ImageRenderer({tnode}: ImageRendererProps) {
                 <PressableWithoutFocus
                     style={[styles.noOutline]}
                     onPress={() => {
+                        if ((imageWidth ?? 0) > 8000 || (imageHeight ?? 0) > 8000) {
+                            const sourceURLWithAuth = addEncryptedAuthTokenToURL(source);
+                            fileDownload(sourceURLWithAuth, imageName);
+                            return;
+                        }
+
                         const route = ROUTES.REPORT_ATTACHMENTS.getRoute(report?.reportID ?? '', source);
                         Navigation.navigate(route);
                     }}

@@ -4,6 +4,7 @@ import type {GestureResponderEvent, StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {withOnyx} from 'react-native-onyx';
+import {FileObject, ImagePickerResponse} from '@components/AttachmentModal';
 import type {Attachment, AttachmentSource} from '@components/Attachments/types';
 import DistanceEReceipt from '@components/DistanceEReceipt';
 import EReceipt from '@components/EReceipt';
@@ -197,20 +198,23 @@ function AttachmentView({
     // both PDFs and images will appear as images when pasted into the text field.
     // We also check for numeric source since this is how static images (used for preview) are represented in RN.
     const isImage = typeof source === 'number' || (typeof source === 'string' && Str.isImage(source));
-    if (isImage || (file?.name && Str.isImage(file.name))) {
-        if (imageError) {
-            // AttachmentViewImage can't handle icon fallbacks, so we need to handle it here
-            if (typeof fallbackSource === 'number' || typeof fallbackSource === 'function') {
-                return (
-                    <Icon
-                        src={fallbackSource}
-                        height={variables.defaultAvatarPreviewSize}
-                        width={variables.defaultAvatarPreviewSize}
-                        additionalStyles={[styles.alignItemsCenter, styles.justifyContentCenter, styles.flex1]}
-                        fill={theme.border}
-                    />
-                );
-            }
+
+    const isFileHaveDimension = (file: FileObject): file is ImagePickerResponse => {
+        return 'width' in file && 'height' in file;
+    };
+    const isResolutionValid = file && isFileHaveDimension(file) && (file?.height ?? 0) <= 8000 && (file?.width ?? 0) <= 8000;
+
+    if ((isImage || (file?.name && Str.isImage(file.name))) && isResolutionValid) {
+        if (imageError && (typeof fallbackSource === 'number' || typeof fallbackSource === 'function')) {
+            return (
+                <Icon
+                    src={fallbackSource}
+                    height={variables.defaultAvatarPreviewSize}
+                    width={variables.defaultAvatarPreviewSize}
+                    additionalStyles={[styles.alignItemsCenter, styles.justifyContentCenter, styles.flex1]}
+                    fill={theme.border}
+                />
+            );
         }
 
         return (
