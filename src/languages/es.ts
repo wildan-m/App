@@ -353,6 +353,8 @@ export default {
         sizeExceeded: 'El archivo adjunto supera el límite de 24 MB.',
         attachmentTooSmall: 'Archivo adjunto demasiado pequeño',
         sizeNotMet: 'El archivo adjunto debe ser más grande que 240 bytes.',
+        attachmentResolutionTooLarge: 'Attachment resolution too large',
+        resolutionSizeExceeded: 'Attachment resolution size is larger than 8000px limit.',
         wrongFileType: 'Tipo de archivo inválido',
         notAllowedExtension: 'Este tipo de archivo no es compatible',
         folderNotAllowedMessage: 'Subir una carpeta no está permitido. Prueba con otro archivo.',

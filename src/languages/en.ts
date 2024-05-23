@@ -359,6 +359,8 @@ export default {
         sizeExceeded: 'Attachment size is larger than 24 MB limit.',
         attachmentTooSmall: 'Attachment too small',
         sizeNotMet: 'Attachment size must be greater than 240 bytes.',
+        attachmentResolutionTooLarge: 'Attachment resolution too large',
+        resolutionSizeExceeded: 'Attachment resolution size is larger than 8000px limit.',
         wrongFileType: 'Invalid file type',
         notAllowedExtension: 'This file type is not allowed',
         folderNotAllowedMessage: 'Uploading a folder is not allowed. Try a different file.',

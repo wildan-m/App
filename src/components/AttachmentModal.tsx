@@ -42,6 +42,7 @@ import * as Expensicons from './Icon/Expensicons';
 import * as Illustrations from './Icon/Illustrations';
 import Modal from './Modal';
 import SafeAreaConsumer from './SafeAreaConsumer';
+import getImageResolution from '@libs/fileDownload/getImageResolution';
 
 /**
  * Modal render prop component that exposes modal launching triggers that can be used
@@ -276,23 +277,56 @@ function AttachmentModal({
         Navigation.goBack(ROUTES.REPORT_WITH_ID_DETAILS.getRoute(report?.reportID ?? ''));
     }, [transaction, report]);
 
-    const isValidFile = useCallback((fileObject: FileObject) => {
-        if (fileObject.size && fileObject.size > CONST.API_ATTACHMENT_VALIDATIONS.MAX_SIZE) {
-            setIsAttachmentInvalid(true);
-            setAttachmentInvalidReasonTitle('attachmentPicker.attachmentTooLarge');
-            setAttachmentInvalidReason('attachmentPicker.sizeExceeded');
-            return false;
-        }
+    /**
+     * Check if the attachment resolution matches constraints.
+     */
+    const isValidResolution = (image: FileObject): Promise<boolean> =>
+        getImageResolution(image).then(
+            ({height, width}) => height <= 8000 && width <= 8000,
+        );
 
-        if (fileObject.size && fileObject.size < CONST.API_ATTACHMENT_VALIDATIONS.MIN_SIZE) {
-            setIsAttachmentInvalid(true);
-            setAttachmentInvalidReasonTitle('attachmentPicker.attachmentTooSmall');
-            setAttachmentInvalidReason('attachmentPicker.sizeNotMet');
-            return false;
-        }
 
-        return true;
-    }, []);
+        const isValidFile = useCallback((fileObject: FileObject) => {
+            return new Promise<void>((resolve, reject) => {
+                if (fileObject.size && fileObject.size > CONST.API_ATTACHMENT_VALIDATIONS.MAX_SIZE) {
+                    setIsAttachmentInvalid(true);
+                    setAttachmentInvalidReasonTitle('attachmentPicker.attachmentTooLarge');
+                    setAttachmentInvalidReason('attachmentPicker.sizeExceeded');
+                    reject();
+                }
+        
+                if (fileObject.size && fileObject.size < CONST.API_ATTACHMENT_VALIDATIONS.MIN_SIZE) {
+                    setIsAttachmentInvalid(true);
+                    setAttachmentInvalidReasonTitle('attachmentPicker.attachmentTooSmall');
+                    setAttachmentInvalidReason('attachmentPicker.sizeNotMet');
+                    reject();
+                }
+        
+                type AttachmentPickerType = typeof CONST.ATTACHMENT_PICKER_TYPE[keyof typeof CONST.ATTACHMENT_PICKER_TYPE];
+                let fileType: AttachmentPickerType = CONST.ATTACHMENT_PICKER_TYPE.FILE;
+
+                if (fileObject.type && fileObject.type.startsWith('image/')) {
+                    fileType = CONST.ATTACHMENT_PICKER_TYPE.IMAGE;
+                }
+        
+                if (fileType === CONST.ATTACHMENT_FILE_TYPE.IMAGE) {
+                    isValidResolution(fileObject)
+                        .then((isValid) => {
+                            if (!isValid) {
+                                setIsAttachmentInvalid(true);
+                                setAttachmentInvalidReasonTitle('attachmentPicker.attachmentResolutionTooLarge');
+                                setAttachmentInvalidReason('attachmentPicker.resolutionSizeExceeded');
+                                reject();
+                            } else {
+                                resolve();
+                            }
+                        })
+                        .catch(reject);
+                } else {
+                    resolve();
+                }
+            });
+        }, []);
 
     const isDirectoryCheck = useCallback((data: FileObject) => {
         if ('webkitGetAsEntry' in data && typeof data.webkitGetAsEntry === 'function' && data.webkitGetAsEntry().isDirectory) {
@@ -317,33 +351,35 @@ function AttachmentModal({
                 return;
             }
 
-            if (!isValidFile(fileObject)) {
-                return;
-            }
-
-            if (fileObject instanceof File) {
-                /**
-                 * Cleaning file name, done here so that it covers all cases:
-                 * upload, drag and drop, copy-paste
-                 */
-                let updatedFile = fileObject;
-                const cleanName = FileUtils.cleanFileName(updatedFile.name);
-                if (updatedFile.name !== cleanName) {
-                    updatedFile = new File([updatedFile], cleanName, {type: updatedFile.type});
-                }
-                const inputSource = URL.createObjectURL(updatedFile);
-                const inputModalType = getModalType(inputSource, updatedFile);
-                setIsModalOpen(true);
-                setSourceState(inputSource);
-                setFile(updatedFile);
-                setModalType(inputModalType);
-            } else if (fileObject.uri) {
-                const inputModalType = getModalType(fileObject.uri, fileObject);
-                setIsModalOpen(true);
-                setSourceState(fileObject.uri);
-                setFile(fileObject);
-                setModalType(inputModalType);
-            }
+            isValidFile(fileObject)
+                .then(() => {
+                    if (fileObject instanceof File) {
+                        /**
+                         * Cleaning file name, done here so that it covers all cases:
+                         * upload, drag and drop, copy-paste
+                         */
+                        let updatedFile = fileObject;
+                        const cleanName = FileUtils.cleanFileName(updatedFile.name);
+                        if (updatedFile.name !== cleanName) {
+                            updatedFile = new File([updatedFile], cleanName, { type: updatedFile.type });
+                        }
+                        const inputSource = URL.createObjectURL(updatedFile);
+                        const inputModalType = getModalType(inputSource, updatedFile);
+                        setIsModalOpen(true);
+                        setSourceState(inputSource);
+                        setFile(updatedFile);
+                        setModalType(inputModalType);
+                    } else if (fileObject.uri) {
+                        const inputModalType = getModalType(fileObject.uri, fileObject);
+                        setIsModalOpen(true);
+                        setSourceState(fileObject.uri);
+                        setFile(fileObject);
+                        setModalType(inputModalType);
+                    }
+                })
+                .catch(() => {
+                    console.log('something wrong')
+                });
         },
         [isValidFile, getModalType, isDirectoryCheck],
     );
