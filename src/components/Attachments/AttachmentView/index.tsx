@@ -27,6 +27,8 @@ import AttachmentViewImage from './AttachmentViewImage';
 import AttachmentViewPdf from './AttachmentViewPdf';
 import AttachmentViewVideo from './AttachmentViewVideo';
 import DefaultAttachmentView from './DefaultAttachmentView';
+import getImageResolution from '@libs/fileDownload/getImageResolution';
+import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 
 type AttachmentViewOnyxProps = {
     transaction: OnyxEntry<Transaction>;
@@ -100,6 +102,8 @@ function AttachmentView({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const [loadComplete, setLoadComplete] = useState(false);
+    const [isResolutionValid, setIsResolutionValid] = useState(false);
+    const [isCalculatingDimension, setIsCalculatingDimension] = useState(true);
     const [hasPDFFailedToLoad, setHasPDFFailedToLoad] = useState(false);
     const isVideo = (typeof source === 'string' && Str.isVideo(source)) || (file?.name && Str.isVideo(file.name));
 
@@ -113,6 +117,39 @@ function AttachmentView({
     const [imageError, setImageError] = useState(false);
 
     useNetwork({onReconnect: () => setImageError(false)});
+
+    const isFileHaveDimension = (file: FileObject): Promise<boolean> => {
+        if ('width' in file && 'height' in file) {
+            return Promise.resolve(true);
+        } else {
+            return getImageResolution(file)
+                .then(resolution => {
+                    file.width = resolution.width;
+                    file.height = resolution.height;
+                    return Promise.resolve(true);;
+                })
+                .catch(error => {
+                    console.error('Failed to get image resolution:', error);
+                    return Promise.resolve(false);
+                });
+        }
+    };
+
+
+    useEffect(() => {
+        setIsCalculatingDimension(true);
+        isFileHaveDimension(file)
+            .then(isDimensionAvailable => {
+                const isValid = file && isDimensionAvailable && (file?.height ?? 0) <= 8000 && (file?.width ?? 0) <= 8000;
+                setIsResolutionValid(isValid);
+                setIsCalculatingDimension(false);
+            })
+            .catch(error => {
+                console.error('Failed to get image resolution:', error);
+                setIsCalculatingDimension(false);
+            });
+    }, [file]);
+    
 
     // Handles case where source is a component (ex: SVG) or a number
     // Number may represent a SVG or an image
@@ -197,14 +234,18 @@ function AttachmentView({
     // For this check we use both source and file.name since temporary file source is a blob
     // both PDFs and images will appear as images when pasted into the text field.
     // We also check for numeric source since this is how static images (used for preview) are represented in RN.
-    const isImage = typeof source === 'number' || (typeof source === 'string' && Str.isImage(source));
+    const isSourceImage = typeof source === 'number' || (typeof source === 'string' && Str.isImage(source));
+    const isFileNameImage = file?.name && Str.isImage(file.name);
+    const isFileImage = isSourceImage || isFileNameImage;
 
-    const isFileHaveDimension = (file: FileObject): file is ImagePickerResponse => {
-        return 'width' in file && 'height' in file;
-    };
-    const isResolutionValid = file && isFileHaveDimension(file) && (file?.height ?? 0) <= 8000 && (file?.width ?? 0) <= 8000;
+    const isFileNameVideo = file?.name && Str.isVideo(file.name);
+    const isFileVideo = isVideo || isFileNameVideo;
 
-    if ((isImage || (file?.name && Str.isImage(file.name))) && isResolutionValid) {
+    if (isFileImage && isCalculatingDimension) {
+        return <FullScreenLoadingIndicator />
+    }
+
+    if (isFileImage && isResolutionValid) {
         if (imageError && (typeof fallbackSource === 'number' || typeof fallbackSource === 'function')) {
             return (
                 <Icon
@@ -223,7 +264,7 @@ function AttachmentView({
                 file={file}
                 isAuthTokenRequired={isAuthTokenRequired}
                 loadComplete={loadComplete}
-                isImage={isImage}
+                isImage={isFileImage}
                 onPress={onPress}
                 onError={() => {
                     setImageError(true);
@@ -232,7 +273,7 @@ function AttachmentView({
         );
     }
 
-    if ((isVideo ?? (file?.name && Str.isVideo(file.name))) && typeof source === 'string') {
+    if (isFileVideo && typeof source === 'string') {
         return (
             <AttachmentViewVideo
                 source={source}
@@ -251,6 +292,7 @@ function AttachmentView({
             containerStyles={containerStyles}
         />
     );
+
 }
 
 AttachmentView.displayName = 'AttachmentView';
