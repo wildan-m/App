@@ -152,6 +152,7 @@ function KeyboardShortcutComponent({isDisabled = false, isLoading = false, onPre
     );
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, keyboardShortcutCallback, config);
+    useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.CTRL_ENTER, keyboardShortcutCallback, config);
 
     return null;
 }

@@ -1251,6 +1251,7 @@ function MoneyRequestConfirmationList({
                 footerContent={footerContent}
                 listFooterContent={listFooterContent}
                 containerStyle={[styles.flexBasisAuto]}
+                disableKeyboardShortcuts
             />
         </MouseProvider>
     );
