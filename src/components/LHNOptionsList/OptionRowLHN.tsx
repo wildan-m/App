@@ -79,7 +79,7 @@ function OptionRowLHN({reportID, isFocused = false, onSelectRow = () => {}, opti
     const hasBrickError = optionItem.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
     const shouldShowGreenDotIndicator = !hasBrickError && ReportUtils.requiresAttentionFromCurrentUser(optionItem, optionItem.parentReportAction);
     const textStyle = isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
-    const textUnreadStyle = optionItem?.isUnread && optionItem.notificationPreference !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
+    const textUnreadStyle = optionItem?.isUnread && (optionItem.notificationPreference !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE || optionItem.chatType === CONST.REPORT.CHAT_TYPE.SELF_DM) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
     const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, style];
     const alternateTextStyle = isInFocusMode
         ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2, style]
