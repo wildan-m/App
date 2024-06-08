@@ -24,6 +24,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
+import { useFileRef } from '@hooks/useFileRef';
 
 type NewChatConfirmPageOnyxProps = {
     /** New group chat draft data */
@@ -45,7 +46,10 @@ function navigateToEditChatName() {
 
 function NewChatConfirmPage({newGroupDraft, allPersonalDetails}: NewChatConfirmPageProps) {
     const optimisticReportID = useRef<string>(ReportUtils.generateReportID());
-    const fileRef = useRef<File | CustomRNImageManipulatorResult | undefined>();
+    // const fileRef = useRef<File | CustomRNImageManipulatorResult | undefined>();
+    const fileRef = useFileRef();
+console.log('[wildebug] fileRef', fileRef)
+
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const personalData = useCurrentUserPersonalDetails();
@@ -104,7 +108,10 @@ function NewChatConfirmPage({newGroupDraft, allPersonalDetails}: NewChatConfirmP
         }
 
         const logins: string[] = (newGroupDraft.participants ?? []).map((participant) => participant.login);
-        Report.navigateToAndOpenReport(logins, true, newGroupDraft.reportName ?? '', newGroupDraft.avatarUri ?? '', fileRef.current, optimisticReportID.current, true);
+        Report.navigateToAndOpenReport(logins, true, newGroupDraft.reportName ?? '', newGroupDraft.avatarUri ?? '', fileRef &&fileRef.current, optimisticReportID.current, true);
+        if (fileRef) {
+            fileRef.current = undefined;
+        }
     }, [newGroupDraft]);
 
     const stashedLocalAvatarImage = newGroupDraft?.avatarUri;
@@ -119,11 +126,15 @@ function NewChatConfirmPage({newGroupDraft, allPersonalDetails}: NewChatConfirmP
                     isUsingDefaultAvatar={!stashedLocalAvatarImage}
                     source={stashedLocalAvatarImage ?? ReportUtils.getDefaultGroupAvatar(optimisticReportID.current)}
                     onImageSelected={(image) => {
-                        fileRef.current = image;
+                        if (fileRef) {
+                            fileRef.current = image;
+                        }
                         Report.setGroupDraft({avatarUri: image?.uri ?? ''});
                     }}
                     onImageRemoved={() => {
-                        fileRef.current = undefined;
+                        if (fileRef) {
+                            fileRef.current = undefined;
+                        }
                         Report.setGroupDraft({avatarUri: null});
                     }}
                     size={CONST.AVATAR_SIZE.XLARGE}
