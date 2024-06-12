@@ -308,6 +308,7 @@ Onyx.connect({
                     reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
                     !ReportActionUtils.isResolvedActionTrackExpense(reportAction),
             );
+            console.log('[wildebug] reportActionsForDisplay', reportActionsForDisplay)
             visibleReportActionItems[reportID] = reportActionsForDisplay[0];
         });
     },

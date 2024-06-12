@@ -117,7 +117,12 @@ function SidebarLinks({onLinkClick, insets, optionListItems, isLoading, priority
             if ((option.reportID === Navigation.getTopmostReportId() && !reportActionID) || (isSmallScreenWidth && isActiveReport(option.reportID) && !reportActionID)) {
                 return;
             }
-            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(option.reportID));
+
+            if (false && option.reportID === '2991117292047662') {
+                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(option.reportID, '2687932846969014319'));
+            } else {
+                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(option.reportID));
+            }
             onLinkClick();
         },
         [isSmallScreenWidth, isActiveReport, onLinkClick],

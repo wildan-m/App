@@ -136,8 +136,6 @@ function isMessageUnread(message: OnyxTypes.ReportAction, lastReadTime?: string)
     return !!(message && lastReadTime && message.created && lastReadTime < message.created);
 }
 
-const onScrollToIndexFailed = () => {};
-
 function ReportActionsList({
     report,
     transactionThreadReport,
@@ -174,6 +172,22 @@ function ReportActionsList({
 
     const [isVisible, setIsVisible] = useState(false);
     const isFocused = useIsFocused();
+
+
+    const onScrollToIndexFailed = () => {
+        console.log('[wildebug] onScrollToIndexFailed')
+        if (report.reportID === '2991117292047662') {
+            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report.reportID, '2687932846969014319'));
+            console.log('[wildebug] cacheUnreadMarkers', cacheUnreadMarkers);
+    
+            // Report.openReport(report.reportID);
+            // setIsMounted(true);
+    
+            return;
+        }
+    
+    };
+    
 
     useEffect(() => {
         const unsubscriber = Visibility.onVisibilityChange(() => {
@@ -329,13 +343,41 @@ function ReportActionsList({
         };
     }, [report.reportID]);
 
+    const [isMounted, setIsMounted] = useState(false);
+
     useEffect(() => {
         if (linkedReportActionID) {
+            // setIsMounted(true);
             return;
         }
-        InteractionManager.runAfterInteractions(() => {
-            reportScrollManager.scrollToBottom();
-        });
+
+        const scrollToFirstUnreadMessage = () => {
+            // if (!currentUnreadMarker) {
+            //     return;
+            // }
+
+            const unreadMessageIndex = sortedVisibleReportActions.findIndex((action) => action.reportActionID === '2687932846969014319');
+
+            if (unreadMessageIndex !== -1) {
+                // We're passing viewPosition: 1 since we're using an InvertedFlatList.
+                reportScrollManager?.scrollToIndex(unreadMessageIndex, false);
+            }
+        };
+
+        InteractionManager.runAfterInteractions(scrollToFirstUnreadMessage)
+
+
+        // InteractionManager.runAfterInteractions(() => {
+
+        // //     reportScrollManager.scrollToBottom();
+        // });
+
+        // setIsMounted(true);
+
+        // InteractionManager.runAfterInteractions(() => {
+
+        // //     reportScrollManager.scrollToBottom();
+        // });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -659,7 +701,7 @@ function ReportActionsList({
         return (
             <ListBoundaryLoader
                 type={CONST.LIST_COMPONENTS.HEADER}
-                isLoadingNewerReportActions={isLoadingNewerReportActions}
+                isLoadingNewerReportActions={true}
                 hasError={hasLoadingNewerReportActionsError}
                 onRetry={retryLoadNewerChatsError}
             />
@@ -673,6 +715,10 @@ function ReportActionsList({
     const onEndReached = useCallback(() => {
         loadOlderChats(false);
     }, [loadOlderChats]);
+
+    // if (!isMounted) {
+    //     return <></>
+    // }
 
     // When performing comment linking, initially 25 items are added to the list. Subsequent fetches add 15 items from the cache or 50 items from the server.
     // This is to ensure that the user is able to see the 'scroll to newer comments' button when they do comment linking and have not reached the end of the list yet.
