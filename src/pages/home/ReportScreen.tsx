@@ -138,10 +138,16 @@ function ReportScreen({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const reportIDFromRoute = getReportID(route);
+    const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '');
+
     //top
-    const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '5654954439368152951');
+    // const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '5654954439368152951');
     //middle
     // const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '2687932846969014319');
+    const handleUnreadReportAction = (unreadReportAction: string) => {
+        setReportActionIDFromRoute(unreadReportAction);
+      };
+    
     const isFocused = useIsFocused();
     const prevIsFocused = usePrevious(isFocused);
     const firstRenderRef = useRef(true);
@@ -800,6 +806,7 @@ console.log('[wildebug] reportActionIDFromRoute', reportActionIDFromRoute)
                                         transactionThreadReportID={transactionThreadReportID}
                                         linkedReportActionID={reportActionIDFromRoute}
                                         // sortedVisibleReportActions={sortedVisibleReportActions}
+                                        onUnreadReportActionDetermined={handleUnreadReportAction}
                                     />
                                 )}
 

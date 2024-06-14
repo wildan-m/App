@@ -80,6 +80,8 @@ type ReportActionsViewProps = ReportActionsViewOnyxProps & {
     linkedReportActionID?: string | null;
 
     sortedVisibleReportActions: OnyxTypes.ReportAction[];
+
+    onUnreadReportActionDetermined: (unreadReportAction: string) => void;
 };
 
 const DIFF_BETWEEN_SCREEN_HEIGHT_AND_LIST = 120;
@@ -101,7 +103,8 @@ function ReportActionsView({
     hasLoadingNewerReportActionsError = false,
     isReadyForCommentLinking = false,
     linkedReportActionID,
-    sortedVisibleReportActions
+    sortedVisibleReportActions,
+    onUnreadReportActionDetermined,
 }: ReportActionsViewProps) {
     useCopySelectionHelper();
     const reactionListRef = useContext(ReactionListContext);
@@ -555,6 +558,7 @@ function ReportActionsView({
                 shouldEnableAutoScrollToTopThreshold={shouldEnableAutoScroll}
                 linkedReportActionID={linkedReportActionID}
                 sortedVisibleReportActions={sortedVisibleReportActions}
+                onUnreadReportActionDetermined={onUnreadReportActionDetermined}
             />
             <UserTypingEventListener report={report} />
             <PopoverReactionList ref={reactionListRef} />

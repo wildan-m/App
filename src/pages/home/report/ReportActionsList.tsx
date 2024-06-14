@@ -2,7 +2,8 @@ import type {ListRenderItemInfo} from '@react-native/virtualized-lists/Lists/Vir
 import {useIsFocused, useRoute} from '@react-navigation/native';
 import type {RouteProp} from '@react-navigation/native';
 import type {DebouncedFunc} from 'lodash';
-import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import lodashFindLast from 'lodash/findLast';
+import React, {memo, useCallback, useEffect, useMemo, useRef, useState, useLayoutEffect} from 'react';
 import {DeviceEventEmitter, InteractionManager} from 'react-native';
 import type {LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, StyleProp, ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -101,6 +102,8 @@ type ReportActionsListProps = WithCurrentUserPersonalDetailsProps & {
     linkedReportActionID?: string | null;
 
     sortedVisibleReportActions: OnyxTypes.ReportAction[];
+
+    onUnreadReportActionDetermined: (unreadReportAction: string) => void;
 };
 
 const VERTICAL_OFFSET_THRESHOLD = 200;
@@ -166,7 +169,7 @@ function ReportActionsList({
     parentReportActionForTransactionThread,
     linkedReportActionID,
     // sortedVisibleReportActions,
-
+    onUnreadReportActionDetermined,
 }: ReportActionsListProps) {
     const personalDetailsList = usePersonalDetails() || CONST.EMPTY_OBJECT;
     const styles = useThemeStyles();
@@ -216,6 +219,18 @@ console.log('[wildebug] linkedReportActionID', linkedReportActionID)
             ),
         [sortedReportActions, isOffline],
     );
+
+    // const oldestUnreadReportAction = sortedVisibleReportActions.find(
+    //     (reportAction) => new Date(reportAction.created) > new Date(report?.lastReadTime ?? '')
+    // )?.reportActionID;
+
+
+    const oldestUnreadReportAction = lodashFindLast(
+        sortedVisibleReportActions,
+        (reportAction) => new Date(reportAction.created) > new Date(report?.lastReadTime ?? '')
+    )?.reportActionID;
+
+console.log('[wildebug] oldestUnreadReportAction', oldestUnreadReportAction)
 
     console.log('[wildebug] sortedVisibleReportActions', sortedVisibleReportActions)
     const lastActionIndex = sortedVisibleReportActions[0]?.reportActionID;
@@ -337,10 +352,17 @@ console.log('[wildebug] linkedReportActionID', linkedReportActionID)
         };
     }, [report.reportID]);
 
+    // useLayoutEffect(() => {
+    //     if (linkedReportActionID) {
+    //         return;
+    //     }
+
+    // })
     useEffect(() => {
         if (linkedReportActionID) {
             return;
         }
+        onUnreadReportActionDetermined(oldestUnreadReportAction)
         InteractionManager.runAfterInteractions(() => {
             reportScrollManager.scrollToBottom();
         });
