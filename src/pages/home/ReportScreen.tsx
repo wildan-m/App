@@ -54,6 +54,8 @@ import ReportActionsView from './report/ReportActionsView';
 import ReportFooter from './report/ReportFooter';
 import type {ActionListContextType, ReactionListRef, ScrollPosition} from './ReportScreenContext';
 import {ActionListContext, ReactionListContext} from './ReportScreenContext';
+import DateUtils from '@libs/DateUtils';
+import * as NumberUtils from '@libs/NumberUtils';
 
 type ReportScreenOnyxProps = {
     /** Tells us if the sidebar has rendered */
@@ -73,6 +75,9 @@ type ReportScreenOnyxProps = {
 
     /** The report metadata loading states */
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>;
+
+        /** The transaction thread report associated with the current report, if any */
+        transactionThreadReport: OnyxEntry<OnyxTypes.Report>;
 };
 
 type OnyxHOCProps = {
@@ -133,7 +138,10 @@ function ReportScreen({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const reportIDFromRoute = getReportID(route);
-    const reportActionIDFromRoute = route?.params?.reportActionID ?? '';
+    //top
+    const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '5654954439368152951');
+    //middle
+    // const [reportActionIDFromRoute, setReportActionIDFromRoute] = useState(route?.params?.reportActionID ?? '2687932846969014319');
     const isFocused = useIsFocused();
     const prevIsFocused = usePrevious(isFocused);
     const firstRenderRef = useRef(true);
@@ -143,7 +151,7 @@ function ReportScreen({
     const isReportOpenInRHP = useIsReportOpenInRHP();
     const {isSmallScreenWidth} = useWindowDimensions();
     const shouldUseNarrowLayout = isSmallScreenWidth || isReportOpenInRHP;
-
+console.log('[wildebug] reportActionIDFromRoute', reportActionIDFromRoute)
     const [modal] = useOnyx(ONYXKEYS.MODAL);
     const [isComposerFullSize] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${getReportID(route)}`, {initialValue: false});
     const [accountManagerReportID] = useOnyx(ONYXKEYS.ACCOUNT_MANAGER_REPORT_ID, {initialValue: ''});
@@ -306,6 +314,79 @@ function ReportScreen({
     const isTopMostReportId = currentReportID === reportIDFromRoute;
     const didSubscribeToReportLeavingEvents = useRef(false);
 
+
+    // // When we are offline before opening an IOU/Expense report,
+    // // the total of the report and sometimes the expense aren't displayed because these actions aren't returned until `OpenReport` API is complete.
+    // // We generate a fake created action here if it doesn't exist to display the total whenever possible because the total just depends on report data
+    // // and we also generate an expense action if the number of expenses in reportActions is less than the total number of expenses
+    // // to display at least one expense action to match the total data.
+    // const reportActionsToDisplay = useMemo(() => {
+    //     if (!ReportUtils.isMoneyRequestReport(report) || !reportActions.length) {
+    //         return reportActions;
+    //     }
+
+    //     const actions = [...reportActions];
+    //     const lastAction = reportActions[reportActions.length - 1];
+
+    //     if (!ReportActionsUtils.isCreatedAction(lastAction)) {
+    //         const optimisticCreatedAction = ReportUtils.buildOptimisticCreatedReportAction(String(report?.ownerAccountID), DateUtils.subtractMillisecondsFromDateTime(lastAction.created, 1));
+    //         optimisticCreatedAction.pendingAction = null;
+    //         actions.push(optimisticCreatedAction);
+    //     }
+
+    //     const reportPreviewAction = ReportActionsUtils.getReportPreviewAction(report.chatReportID ?? '-1', report.reportID);
+    //     const moneyRequestActions = reportActions.filter(
+    //         (action) =>
+    //             action.actionName === CONST.REPORT.ACTIONS.TYPE.IOU &&
+    //             action.originalMessage &&
+    //             (action.originalMessage.type === CONST.IOU.REPORT_ACTION_TYPE.CREATE ||
+    //                 !!(action.originalMessage.type === CONST.IOU.REPORT_ACTION_TYPE.PAY && action.originalMessage.IOUDetails) ||
+    //                 action.originalMessage.type === CONST.IOU.REPORT_ACTION_TYPE.TRACK),
+    //     );
+
+    //     if (report.total && moneyRequestActions.length < (reportPreviewAction?.childMoneyRequestCount ?? 0) && isEmptyObject(transactionThreadReport)) {
+    //         const optimisticIOUAction = ReportUtils.buildOptimisticIOUReportAction(
+    //             CONST.IOU.REPORT_ACTION_TYPE.CREATE,
+    //             0,
+    //             CONST.CURRENCY.USD,
+    //             '',
+    //             [],
+    //             NumberUtils.rand64(),
+    //             undefined,
+    //             report.reportID,
+    //             false,
+    //             false,
+    //             {},
+    //             false,
+    //             DateUtils.subtractMillisecondsFromDateTime(actions[actions.length - 1].created, 1),
+    //         ) as OnyxTypes.ReportAction;
+    //         moneyRequestActions.push(optimisticIOUAction);
+    //         actions.splice(actions.length - 1, 0, optimisticIOUAction);
+    //     }
+
+    //     // Update pending action of created action if we have some requests that are pending
+    //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    //     const createdAction = actions.pop()!;
+    //     if (moneyRequestActions.filter((action) => !!action.pendingAction).length > 0) {
+    //         createdAction.pendingAction = CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
+    //     }
+
+    //     return [...actions, createdAction];
+    // }, [reportActions, report, transactionThreadReport]);
+
+    // const sortedVisibleReportActions = useMemo(
+    //     () =>
+    //         reportActionsToDisplay.filter(
+    //             (reportAction) =>
+    //                 (isOffline ||
+    //                     ReportActionsUtils.isDeletedParentAction(reportAction) ||
+    //                     reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ||
+    //                     reportAction.errors) &&
+    //                 ReportActionsUtils.shouldReportActionBeVisible(reportAction, reportAction.reportActionID),
+    //         ),
+    //     [reportActionsToDisplay, isOffline],
+    // );
+
     useEffect(() => {
         if (!report.reportID || shouldHideReport) {
             wasReportAccessibleRef.current = false;
@@ -350,11 +431,11 @@ function ReportScreen({
     }
 
     useEffect(() => {
-        if (!transactionThreadReportID || !route.params.reportActionID) {
+        if (!transactionThreadReportID || !reportActionIDFromRoute) {
             return;
         }
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(route.params.reportID));
-    }, [transactionThreadReportID, route.params.reportActionID, route.params.reportID]);
+    }, [transactionThreadReportID, reportActionIDFromRoute, route.params.reportID]);
 
     if (ReportUtils.isMoneyRequestReport(report) || ReportUtils.isInvoiceReport(report)) {
         headerView = (
@@ -387,7 +468,7 @@ function ReportScreen({
             isLoading ||
             (!!reportActionIDFromRoute && reportMetadata?.isLoadingInitialReportActions));
     const shouldShowReportActionList = isCurrentReportLoadedFromOnyx && !isLoading;
-    const currentReportIDFormRoute = route.params?.reportID;
+    const currentReportIDFormRoute = reportActionIDFromRoute;
     // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = useMemo(
         (): boolean =>
@@ -717,6 +798,8 @@ function ReportScreen({
                                         hasLoadingOlderReportActionsError={reportMetadata?.hasLoadingOlderReportActionsError}
                                         isReadyForCommentLinking={!shouldShowSkeleton}
                                         transactionThreadReportID={transactionThreadReportID}
+                                        linkedReportActionID={reportActionIDFromRoute}
+                                        // sortedVisibleReportActions={sortedVisibleReportActions}
                                     />
                                 )}
 
@@ -783,6 +866,11 @@ export default withCurrentReportID(
                 key: ONYXKEYS.COLLECTION.POLICY,
                 allowStaleData: true,
             },
+            // transactionThreadReport: {
+            //     key: ({}) => `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`,
+            //     initialValue: {} as OnyxTypes.Report,
+            // },
+    
         },
         true,
     )(

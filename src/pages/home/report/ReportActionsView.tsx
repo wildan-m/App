@@ -76,6 +76,10 @@ type ReportActionsViewProps = ReportActionsViewOnyxProps & {
     /** The reportID of the transaction thread report associated with this current report, if any */
     // eslint-disable-next-line react/no-unused-prop-types
     transactionThreadReportID?: string | null;
+
+    linkedReportActionID?: string | null;
+
+    sortedVisibleReportActions: OnyxTypes.ReportAction[];
 };
 
 const DIFF_BETWEEN_SCREEN_HEIGHT_AND_LIST = 120;
@@ -96,11 +100,14 @@ function ReportActionsView({
     isLoadingNewerReportActions = false,
     hasLoadingNewerReportActionsError = false,
     isReadyForCommentLinking = false,
+    linkedReportActionID,
+    sortedVisibleReportActions
 }: ReportActionsViewProps) {
     useCopySelectionHelper();
     const reactionListRef = useContext(ReactionListContext);
     const route = useRoute<RouteProp<CentralPaneNavigatorParamList, typeof SCREENS.REPORT>>();
-    const reportActionID = route?.params?.reportActionID;
+    // const reportActionID = route?.params?.reportActionID;
+    const reportActionID = linkedReportActionID;
     const didLayout = useRef(false);
     const didLoadOlderChats = useRef(false);
     const didLoadNewerChats = useRef(false);
@@ -546,6 +553,8 @@ function ReportActionsView({
                 listID={listID}
                 onContentSizeChange={onContentSizeChange}
                 shouldEnableAutoScrollToTopThreshold={shouldEnableAutoScroll}
+                linkedReportActionID={linkedReportActionID}
+                sortedVisibleReportActions={sortedVisibleReportActions}
             />
             <UserTypingEventListener report={report} />
             <PopoverReactionList ref={reactionListRef} />
