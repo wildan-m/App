@@ -1491,6 +1491,7 @@ function buildPolicyData(policyOwnerEmail = '', makeMeAdmin = false, policyName 
                     approvalMode: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                     reimbursementChoice: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                 },
+                isLoadingWorkspaceReimbursement: true,
             },
         },
         {
@@ -1566,6 +1567,7 @@ function buildPolicyData(policyOwnerEmail = '', makeMeAdmin = false, policyName 
                     approvalMode: null,
                     reimbursementChoice: null,
                 },
+                isLoadingWorkspaceReimbursement: false,
             },
         },
         {
@@ -1632,7 +1634,11 @@ function buildPolicyData(policyOwnerEmail = '', makeMeAdmin = false, policyName 
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-            value: {employeeList: null},
+                
+                value: {employeeList: null, 
+                    isLoadingWorkspaceReimbursement: false,
+
+                },
         },
         {
             onyxMethod: Onyx.METHOD.SET,
