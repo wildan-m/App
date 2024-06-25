@@ -1,5 +1,5 @@
 /* eslint-disable rulesdir/no-negated-variables */
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {withOnyx} from 'react-native-onyx';
 import type {FullPageNotFoundViewProps} from '@components/BlockingViews/FullPageNotFoundView';
@@ -20,6 +20,8 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {PolicyFeatureName} from '@src/types/onyx/Policy';
 import callOrReturn from '@src/types/utils/callOrReturn';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import usePrevious from '@hooks/usePrevious';
+import useNetwork from '@hooks/useNetwork';
 
 const ACCESS_VARIANTS = {
     [CONST.POLICY.ACCESS_VARIANTS.PAID]: (policy: OnyxEntry<OnyxTypes.Policy>) => PolicyUtils.isPaidGroupPolicy(policy),
@@ -102,12 +104,49 @@ function PageNotFoundFallback({policyID, shouldShowFullScreenFallback, fullPageN
     );
 }
 
+type PolicyFeatureStates = Record<PolicyFeatureName, boolean>;
+
 function AccessOrNotFoundWrapper({accessVariants = [], fullPageNotFoundViewProps, shouldBeBlocked, ...props}: AccessOrNotFoundWrapperProps) {
     const {policy, policyID, report, iouType, allPolicies, featureName, isLoadingReportData} = props;
     const {login = ''} = useCurrentUserPersonalDetails();
     const isPolicyIDInRoute = !!policyID?.length;
     const isMoneyRequest = !!iouType && IOUUtils.isValidMoneyRequestType(iouType);
     const isFromGlobalCreate = isEmptyObject(report?.reportID);
+    const {isOffline} = useNetwork();
+
+
+    // Add feature states logic
+    const policyFeatureStates = useMemo(
+        () => ({
+            [CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED]: policy?.areDistanceRatesEnabled,
+            [CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED]: policy?.areWorkflowsEnabled,
+            [CONST.POLICY.MORE_FEATURES.ARE_CATEGORIES_ENABLED]: policy?.areCategoriesEnabled,
+            [CONST.POLICY.MORE_FEATURES.ARE_TAGS_ENABLED]: policy?.areTagsEnabled,
+            [CONST.POLICY.MORE_FEATURES.ARE_TAXES_ENABLED]: policy?.tax?.trackingEnabled,
+            [CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED]: policy?.areConnectionsEnabled,
+        }),
+        [policy]
+    ) as PolicyFeatureStates;
+
+    const [featureStates, setFeatureStates] = useState(policyFeatureStates);
+    const prevPendingFields = usePrevious(policy?.pendingFields);
+
+    useEffect(() => {
+        setFeatureStates((currentFeatureStates) => {
+            const newFeatureStates = {} as PolicyFeatureStates;
+            (Object.keys(policy?.pendingFields ?? {}) as PolicyFeatureName[]).forEach((key) => {
+                const isFeatureEnabled = PolicyUtils.isPolicyFeatureEnabled(policy, key);
+                newFeatureStates[key] =
+                    prevPendingFields?.[key] !== policy?.pendingFields?.[key] || isOffline || !policy?.pendingFields?.[key]
+                        ? isFeatureEnabled
+                        : currentFeatureStates[key];
+            });
+            return {
+                ...policyFeatureStates,
+                ...newFeatureStates,
+            };
+        });
+    }, [policy, isOffline, policyFeatureStates, prevPendingFields]);
 
     useEffect(() => {
         if (!isPolicyIDInRoute || !isEmptyObject(policy)) {
@@ -121,7 +160,7 @@ function AccessOrNotFoundWrapper({accessVariants = [], fullPageNotFoundViewProps
 
     const shouldShowFullScreenLoadingIndicator = !isMoneyRequest && isLoadingReportData !== false && (!Object.entries(policy ?? {}).length || !policy?.id);
 
-    const isFeatureEnabled = featureName ? PolicyUtils.isPolicyFeatureEnabled(policy, featureName) : true;
+    const isFeatureEnabled = featureName ? featureStates[featureName] : true;
 
     const isPageAccessible = accessVariants.reduce((acc, variant) => {
         const accessFunction = ACCESS_VARIANTS[variant];
