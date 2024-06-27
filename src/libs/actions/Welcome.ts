@@ -4,10 +4,8 @@ import type {OnboardingPurposeType} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type Onboarding from '@src/types/onyx/Onboarding';
 import type OnyxPolicy from '@src/types/onyx/Policy';
-import type {EmptyObject} from '@src/types/utils/EmptyObject';
 
 let onboarding: Onboarding | [] | undefined;
-let hasDismissedModal: boolean | undefined;
 let isLoadingReportData = true;
 
 type HasCompletedOnboardingFlowProps = {
@@ -58,7 +56,7 @@ function checkOnboardingDataReady() {
  * Check if user dismissed modal and if report data are loaded
  */
 function checkServerDataReady() {
-    if (isLoadingReportData || hasDismissedModal === undefined) {
+    if (isLoadingReportData) {
         return;
     }
 
@@ -81,23 +79,13 @@ Onyx.connect({
     key: ONYXKEYS.NVP_ONBOARDING,
     initWithStoredValues: false,
     callback: (value) => {
-        if (value === null) {
+        if (value === undefined) {
             return;
         }
 
         onboarding = value;
 
         checkOnboardingDataReady();
-    },
-});
-
-Onyx.connect({
-    key: ONYXKEYS.NVP_HAS_DISMISSED_IDLE_PANEL,
-    initWithStoredValues: true,
-    callback: (value) => {
-        hasDismissedModal = value ?? false;
-
-        checkServerDataReady();
     },
 });
 
@@ -110,7 +98,7 @@ Onyx.connect({
     },
 });
 
-const allPolicies: OnyxCollection<OnyxPolicy> | EmptyObject = {};
+const allPolicies: OnyxCollection<OnyxPolicy> = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY,
     callback: (val, key) => {
