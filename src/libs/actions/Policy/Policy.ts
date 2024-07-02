@@ -3051,7 +3051,6 @@ export {
     generateCustomUnitID,
     clearQBOErrorField,
     clearXeroErrorField,
-    clearNetSuiteErrorField,
     clearWorkspaceReimbursementErrors,
     setWorkspaceCurrencyDefault,
     setForeignCurrencyDefault,
