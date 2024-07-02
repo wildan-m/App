@@ -1,7 +1,7 @@
 import {PUBLIC_DOMAINS, Str} from 'expensify-common';
 import {escapeRegExp} from 'lodash';
 import lodashClone from 'lodash/clone';
-import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
+import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import * as API from '@libs/API';
@@ -944,6 +944,19 @@ function clearAvatarErrors(policyID: string) {
         },
     });
 }
+/**
+ * Set the policy currency so that it happens right away, instead of when the API command is processed.
+ */
+function updateCurrency(policyID: string, currencyValue?: string) {
+    const policyKey: OnyxKey = `${ONYXKEYS.COLLECTION.POLICY}${policyID}`;
+    const policy = allPolicies?.[policyKey];
+    
+    // Directly use currencyValue if provided, otherwise fallback to policy's currency or USD
+    const currency = currencyValue || policy?.outputCurrency || CONST.CURRENCY.USD;
+    
+    Onyx.merge(policyKey, { outputCurrency: currency });
+}
+
 
 /**
  * Optimistically update the general settings. Set the general settings as pending until the response succeeds.
@@ -2841,6 +2854,7 @@ function setPolicyCustomTaxName(policyID: string, customTaxName: string) {
     API.write(WRITE_COMMANDS.SET_POLICY_CUSTOM_TAX_NAME, parameters, onyxData);
 }
 
+
 function setWorkspaceCurrencyDefault(policyID: string, taxCode: string) {
     const policy = getPolicy(policyID);
     const originalDefaultExternalID = policy?.taxRates?.defaultExternalID;
@@ -3008,6 +3022,7 @@ export {
     buildPolicyData,
     createPolicyExpenseChats,
     clearNetSuiteErrorField,
+    updateCurrency,
 };
 
 export type {NewCustomUnit};

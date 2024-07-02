@@ -249,10 +249,10 @@ function ReimbursementAccountPage({
     }, []); // The empty dependency array ensures this runs only once after the component mounts.
 
     useEffect(() => {
-        if (typeof reimbursementAccount?.isLoading !== 'boolean' || reimbursementAccount.isLoading === prevIsReimbursementAccountLoading) {
+        if (!reimbursementAccount || reimbursementAccount.isLoading === prevIsReimbursementAccountLoading) {
             return;
         }
-        setIsReimbursementAccountLoading(reimbursementAccount.isLoading);
+        setIsReimbursementAccountLoading(reimbursementAccount.isLoading ?? false);
     }, [prevIsReimbursementAccountLoading, reimbursementAccount?.isLoading]);
 
     useEffect(
@@ -375,7 +375,10 @@ function ReimbursementAccountPage({
         }
     };
 
+    console.log('[wildebug] isReimbursementAccountLoading', isReimbursementAccountLoading)
+    console.log('[wildebug] reimbursementAccount?.isLoading', reimbursementAccount?.isLoading)
     const isLoading = (!!isLoadingApp || !!account?.isLoading || isReimbursementAccountLoading) && (!plaidCurrentEvent || plaidCurrentEvent === CONST.BANK_ACCOUNT.PLAID.EVENTS_NAME.EXIT);
+    // const isLoading = (!!isLoadingApp || !!account?.isLoading || isReimbursementAccountLoading || policy?.pendingFields?.generalSettings) && (!plaidCurrentEvent || plaidCurrentEvent === CONST.BANK_ACCOUNT.PLAID.EVENTS_NAME.EXIT);
 
     const shouldShowOfflineLoader = !(
         isOffline &&

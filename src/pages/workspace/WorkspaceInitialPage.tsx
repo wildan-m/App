@@ -147,6 +147,7 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, reimbursementAcc
 
     /** Call update workspace currency and hide the modal */
     const confirmCurrencyChangeAndHideModal = useCallback(() => {
+        Policy.updateCurrency(policyID, CONST.CURRENCY.USD);
         Policy.updateGeneralSettings(policyID, policyName, CONST.CURRENCY.USD);
         setIsCurrencyModalOpen(false);
         ReimbursementAccount.navigateToBankAccountRoute(policyID);
