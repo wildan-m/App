@@ -31,15 +31,6 @@ This project and everyone participating in it is governed by the Expensify [Code
 ## Restrictions
 At this time, we are not hiring contractors in Crimea, North Korea, Russia, Iran, Cuba, or Syria.
 
-## Slack channels
-All contributors should be a member of a shared Slack channel called [#expensify-open-source](https://expensify.slack.com/archives/C01GTK53T8Q) -- this channel is used to ask **general questions**, facilitate **discussions**, and make **feature requests**.
-
-Before requesting an invite to Slack, please ensure your Upwork account is active, since we only pay via Upwork (see [below](https://github.com/Expensify/App/blob/main/contributingGuides/CONTRIBUTING.md#payment-for-contributions)). To request an invite to Slack, email contributors@expensify.com with the subject `Slack Channel Invites`. We'll send you an invite! 
-
-Note: Do not send direct messages to the Expensify team in Slack or Expensify Chat, they will not be able to respond. 
-
-Note: if you are hired for an Upwork job and have any job-specific questions, please ask in the GitHub issue or pull request. This will ensure that the person addressing your question has as much context as possible.
-
 ## Reporting Vulnerabilities
 If you've found a vulnerability, please email security@expensify.com with the subject `Vulnerability Report` instead of creating an issue.
 
@@ -48,7 +39,7 @@ We hire and pay external contributors via [Upwork.com](https://www.upwork.com). 
 
 Payment for your contributions will be made no less than 7 days after the pull request is deployed to production to allow for [regression](https://github.com/Expensify/App/blob/main/contributingGuides/CONTRIBUTING.md#regressions) testing. If you have not received payment after 8 days of the PR being deployed to production, and there are no [regressions](https://github.com/Expensify/App/blob/main/contributingGuides/CONTRIBUTING.md#regressions), please add a comment to the issue mentioning the BugZero team member (Look for the melvin-bot "Triggered auto assignment to... (`Bug`)" to see who this is).
 
-New contributors are limited to working on one job at a time, however experienced contributors may work on numerous jobs simultaneously.
+New contributors are limited to working on one job at a time, **do not submit proposals for new jobs until your first PR has been merged**. Experienced contributors may work on numerous jobs simultaneously.
 
 Please be aware that compensation for any support in solving an issue is provided **entirely at Expensify’s discretion**. Personal time or resources applied towards investigating a proposal **will not guarantee compensation**. Compensation is only guaranteed to those who **[propose a solution and get hired for that job](https://github.com/Expensify/App/blob/main/contributingGuides/CONTRIBUTING.md#propose-a-solution-for-the-job)**. We understand there may be cases where a selected proposal may take inspiration from a previous proposal. Unfortunately, it’s not possible for us to evaluate every individual case and we have no process that can efficiently do so. Issues with higher rewards come with higher risk factors so try to keep things civil and make the best proposal you can. Once again, **any information provided may not necessarily lead to you getting hired for that issue or compensated in any way.**
 

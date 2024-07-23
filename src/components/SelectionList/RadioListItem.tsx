@@ -13,7 +13,6 @@ function RadioListItem<TItem extends ListItem>({
     isDisabled,
     onSelectRow,
     onDismissError,
-    shouldPreventDefaultFocusOnSelectRow,
     shouldPreventEnterKeySubmit,
     rightHandSideComponent,
     isMultilineSupported = false,
@@ -34,7 +33,6 @@ function RadioListItem<TItem extends ListItem>({
             showTooltip={showTooltip}
             onSelectRow={onSelectRow}
             onDismissError={onDismissError}
-            shouldPreventDefaultFocusOnSelectRow={shouldPreventDefaultFocusOnSelectRow}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
             rightHandSideComponent={rightHandSideComponent}
             keyForList={item.keyForList}
@@ -43,6 +41,7 @@ function RadioListItem<TItem extends ListItem>({
             pendingAction={item.pendingAction}
         >
             <>
+                {!!item.leftElement && item.leftElement}
                 <View style={[styles.flex1, styles.alignItemsStart]}>
                     <TextWithTooltip
                         shouldShowTooltip={showTooltip}

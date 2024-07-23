@@ -1,7 +1,7 @@
 import lodashIsEqual from 'lodash/isEqual';
 import type {RefObject} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import type {ModalProps} from 'react-native-modal';
 import useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
@@ -12,6 +12,7 @@ import CONST from '@src/CONST';
 import type {AnchorPosition} from '@src/styles';
 import type AnchorAlignment from '@src/types/utils/AnchorAlignment';
 import FocusableMenuItem from './FocusableMenuItem';
+import FocusTrapForModal from './FocusTrap/FocusTrapForModal';
 import * as Expensicons from './Icon/Expensicons';
 import type {MenuItemProps} from './MenuItem';
 import MenuItem from './MenuItem';
@@ -108,16 +109,18 @@ function PopoverMenu({
     const selectedItemIndex = useRef<number | null>(null);
 
     const [currentMenuItems, setCurrentMenuItems] = useState(menuItems);
+    const currentMenuItemsFocusedIndex = currentMenuItems?.findIndex((option) => option.isSelected);
     const [enteredSubMenuIndexes, setEnteredSubMenuIndexes] = useState<number[]>([]);
 
-    const [focusedIndex, setFocusedIndex] = useArrowKeyFocusManager({initialFocusedIndex: -1, maxIndex: currentMenuItems.length - 1, isActive: isVisible});
+    const [focusedIndex, setFocusedIndex] = useArrowKeyFocusManager({initialFocusedIndex: currentMenuItemsFocusedIndex, maxIndex: currentMenuItems.length - 1, isActive: isVisible});
 
     const selectItem = (index: number) => {
         const selectedItem = currentMenuItems[index];
         if (selectedItem?.subMenuItems) {
             setCurrentMenuItems([...selectedItem.subMenuItems]);
             setEnteredSubMenuIndexes([...enteredSubMenuIndexes, index]);
-            setFocusedIndex(-1);
+            const selectedSubMenuItemIndex = selectedItem?.subMenuItems.findIndex((option) => option.isSelected);
+            setFocusedIndex(selectedSubMenuItemIndex);
         } else {
             selectedItemIndex.current = index;
             onItemSelected(selectedItem, index);
@@ -159,6 +162,13 @@ function PopoverMenu({
                 }}
             />
         );
+    };
+
+    const renderHeaderText = () => {
+        if (!headerText || enteredSubMenuIndexes.length !== 0) {
+            return;
+        }
+        return <Text style={[styles.createMenuHeaderText, styles.ph5, styles.pv3]}>{headerText}</Text>;
     };
 
     useKeyboardShortcut(
@@ -210,39 +220,49 @@ function PopoverMenu({
             shouldSetModalVisibility={shouldSetModalVisibility}
             shouldEnableNewFocusManagement={shouldEnableNewFocusManagement}
         >
-            <View style={isSmallScreenWidth ? {} : styles.createMenuContainer}>
-                {!!headerText && enteredSubMenuIndexes.length === 0 && <Text style={[styles.createMenuHeaderText, styles.ph5, styles.pv3]}>{headerText}</Text>}
-                {enteredSubMenuIndexes.length > 0 && renderBackButtonItem()}
-                {currentMenuItems.map((item, menuIndex) => (
-                    <FocusableMenuItem
-                        key={item.text}
-                        icon={item.icon}
-                        iconWidth={item.iconWidth}
-                        iconHeight={item.iconHeight}
-                        iconFill={item.iconFill}
-                        contentFit={item.contentFit}
-                        title={item.text}
-                        shouldCheckActionAllowedOnPress={false}
-                        description={item.description}
-                        numberOfLinesDescription={item.numberOfLinesDescription}
-                        onPress={() => selectItem(menuIndex)}
-                        focused={focusedIndex === menuIndex}
-                        displayInDefaultIconColor={item.displayInDefaultIconColor}
-                        shouldShowRightIcon={item.shouldShowRightIcon}
-                        iconRight={item.iconRight}
-                        shouldPutLeftPaddingWhenNoIcon={item.shouldPutLeftPaddingWhenNoIcon}
-                        label={item.label}
-                        isLabelHoverable={item.isLabelHoverable}
-                        floatRightAvatars={item.floatRightAvatars}
-                        floatRightAvatarSize={item.floatRightAvatarSize}
-                        shouldShowSubscriptRightAvatar={item.shouldShowSubscriptRightAvatar}
-                        disabled={item.disabled}
-                        onFocus={() => setFocusedIndex(menuIndex)}
-                        success={item.success}
-                        containerStyle={item.containerStyle}
-                    />
-                ))}
-            </View>
+            <FocusTrapForModal active={isVisible}>
+                <View style={isSmallScreenWidth ? {} : styles.createMenuContainer}>
+                    {renderHeaderText()}
+                    {enteredSubMenuIndexes.length > 0 && renderBackButtonItem()}
+                    {currentMenuItems.map((item, menuIndex) => (
+                        <FocusableMenuItem
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`${item.text}_${menuIndex}`}
+                            icon={item.icon}
+                            iconWidth={item.iconWidth}
+                            iconHeight={item.iconHeight}
+                            iconFill={item.iconFill}
+                            contentFit={item.contentFit}
+                            title={item.text}
+                            titleStyle={StyleSheet.flatten([styles.flex1, item.titleStyle])}
+                            shouldCheckActionAllowedOnPress={false}
+                            description={item.description}
+                            numberOfLinesDescription={item.numberOfLinesDescription}
+                            onPress={() => selectItem(menuIndex)}
+                            focused={focusedIndex === menuIndex}
+                            displayInDefaultIconColor={item.displayInDefaultIconColor}
+                            shouldShowRightIcon={item.shouldShowRightIcon}
+                            iconRight={item.iconRight}
+                            shouldPutLeftPaddingWhenNoIcon={item.shouldPutLeftPaddingWhenNoIcon}
+                            label={item.label}
+                            isLabelHoverable={item.isLabelHoverable}
+                            floatRightAvatars={item.floatRightAvatars}
+                            floatRightAvatarSize={item.floatRightAvatarSize}
+                            shouldShowSubscriptRightAvatar={item.shouldShowSubscriptRightAvatar}
+                            disabled={item.disabled}
+                            onFocus={() => setFocusedIndex(menuIndex)}
+                            success={item.success}
+                            containerStyle={item.containerStyle}
+                            shouldRenderTooltip={item.shouldRenderTooltip}
+                            shouldForceRenderingTooltipLeft={item.shouldForceRenderingTooltipLeft}
+                            tooltipWrapperStyle={item.tooltipWrapperStyle}
+                            renderTooltipContent={item.renderTooltipContent}
+                            numberOfLinesTitle={item.numberOfLinesTitle}
+                            interactive={item.interactive}
+                        />
+                    ))}
+                </View>
+            </FocusTrapForModal>
         </PopoverWithMeasuredContent>
     );
 }

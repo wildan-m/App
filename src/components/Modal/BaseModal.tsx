@@ -2,6 +2,7 @@ import React, {forwardRef, useCallback, useEffect, useMemo, useRef} from 'react'
 import {View} from 'react-native';
 import ReactNativeModal from 'react-native-modal';
 import ColorSchemeWrapper from '@components/ColorSchemeWrapper';
+import FocusTrapForModal from '@components/FocusTrap/FocusTrapForModal';
 import useKeyboardState from '@hooks/useKeyboardState';
 import usePrevious from '@hooks/usePrevious';
 import useSafeAreaInsets from '@hooks/useSafeAreaInsets';
@@ -49,6 +50,7 @@ function BaseModal(
         shouldEnableNewFocusManagement = false,
         restoreFocusType,
         shouldUseModalPaddingStyle = true,
+        initialFocus = false,
     }: BaseModalProps,
     ref: React.ForwardedRef<View>,
 ) {
@@ -117,7 +119,7 @@ function BaseModal(
             }
             hideModal(true);
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
         [],
     );
 
@@ -214,7 +216,7 @@ function BaseModal(
                 // a conflict between RN core and Reanimated shadow tree operations
                 // position absolute is needed to prevent the view from interfering with flex layout
                 collapsable={false}
-                style={[styles.pAbsolute]}
+                style={[styles.pAbsolute, {zIndex: 1}]}
             >
                 <ReactNativeModal
                     // Prevent the parent element to capture a click. This is useful when the modal component is put inside a pressable.
@@ -241,7 +243,9 @@ function BaseModal(
                     deviceWidth={windowWidth}
                     animationIn={animationIn ?? modalStyleAnimationIn}
                     animationOut={animationOut ?? modalStyleAnimationOut}
+                    // eslint-disable-next-line react-compiler/react-compiler
                     useNativeDriver={useNativeDriverProp && useNativeDriver}
+                    // eslint-disable-next-line react-compiler/react-compiler
                     useNativeDriverForBackdrop={useNativeDriverForBackdrop && useNativeDriver}
                     hideModalContentWhileAnimating={hideModalContentWhileAnimating}
                     animationInTiming={animationInTiming}
@@ -252,12 +256,17 @@ function BaseModal(
                     customBackdrop={shouldUseCustomBackdrop ? <Overlay onPress={handleBackdropPress} /> : undefined}
                 >
                     <ModalContent onDismiss={handleDismissModal}>
-                        <View
-                            style={[styles.defaultModalContainer, modalPaddingStyles, modalContainerStyle, !isVisible && styles.pointerEventsNone]}
-                            ref={ref}
+                        <FocusTrapForModal
+                            active={isVisible}
+                            initialFocus={initialFocus}
                         >
-                            <ColorSchemeWrapper>{children}</ColorSchemeWrapper>
-                        </View>
+                            <View
+                                style={[styles.defaultModalContainer, modalPaddingStyles, modalContainerStyle, !isVisible && styles.pointerEventsNone]}
+                                ref={ref}
+                            >
+                                <ColorSchemeWrapper>{children}</ColorSchemeWrapper>
+                            </View>
+                        </FocusTrapForModal>
                     </ModalContent>
                 </ReactNativeModal>
             </View>

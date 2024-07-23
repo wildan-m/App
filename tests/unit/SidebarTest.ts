@@ -1,5 +1,6 @@
 import {screen} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
+import DateUtils from '@libs/DateUtils';
 import CONST from '@src/CONST';
 import * as Localize from '@src/libs/Localize';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -42,6 +43,8 @@ describe('Sidebar', () => {
                 chatType: CONST.REPORT.CHAT_TYPE.POLICY_ROOM,
                 statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
                 stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                private_isArchived: DateUtils.getDBTime(),
                 lastMessageText: 'test',
             };
 
@@ -55,9 +58,9 @@ describe('Sidebar', () => {
 
             // Given the user is in all betas
             const betas = [CONST.BETAS.DEFAULT_ROOMS];
-            LHNTestUtils.getDefaultRenderedSidebarLinks('0');
             return (
                 waitForBatchedUpdates()
+                    .then(() => LHNTestUtils.getDefaultRenderedSidebarLinks('0'))
                     // When Onyx is updated with the data and the sidebar re-renders
                     .then(() => {
                         const reportCollection: ReportCollectionDataSet = {
@@ -95,6 +98,8 @@ describe('Sidebar', () => {
                 chatType: CONST.REPORT.CHAT_TYPE.POLICY_ROOM,
                 statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
                 stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                private_isArchived: DateUtils.getDBTime(),
                 lastMessageText: 'test',
             };
             const action = {
@@ -108,9 +113,9 @@ describe('Sidebar', () => {
 
             // Given the user is in all betas
             const betas = [CONST.BETAS.DEFAULT_ROOMS];
-            LHNTestUtils.getDefaultRenderedSidebarLinks('0');
             return (
                 waitForBatchedUpdates()
+                    .then(() => LHNTestUtils.getDefaultRenderedSidebarLinks('0'))
                     // When Onyx is updated with the data and the sidebar re-renders
                     .then(() => {
                         const reportCollection: ReportCollectionDataSet = {
