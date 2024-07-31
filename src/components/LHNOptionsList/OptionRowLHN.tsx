@@ -100,6 +100,11 @@ function OptionRowLHN({reportID, isFocused = false, onSelectRow = () => {}, opti
      * @param [event] - A press event.
      */
     const showPopover = (event: MouseEvent | GestureResponderEvent) => {
+        // Ensure that we blur the composer when opening context menu, so that only one component is focused at a time
+        if (DomUtils.getActiveElement()) {
+            (DomUtils.getActiveElement() as HTMLElement | null)?.blur();
+        }
+
         if (!isFocusedRef.current && shouldUseNarrowLayout) {
             return;
         }
@@ -164,10 +169,6 @@ function OptionRowLHN({reportID, isFocused = false, onSelectRow = () => {}, opti
                         testID={optionItem.reportID}
                         onSecondaryInteraction={(event) => {
                             showPopover(event);
-                            // Ensure that we blur the composer when opening context menu, so that only one component is focused at a time
-                            if (DomUtils.getActiveElement()) {
-                                (DomUtils.getActiveElement() as HTMLElement | null)?.blur();
-                            }
                         }}
                         withoutFocusOnSecondaryInteraction
                         activeOpacity={0.8}

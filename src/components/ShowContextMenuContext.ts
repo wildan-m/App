@@ -8,6 +8,7 @@ import * as ReportActionContextMenu from '@pages/home/report/ContextMenu/ReportA
 import type {ContextMenuAnchor} from '@pages/home/report/ContextMenu/ReportActionContextMenu';
 import CONST from '@src/CONST';
 import type {Report, ReportAction, ReportNameValuePairs} from '@src/types/onyx';
+import DomUtils from '@libs/DomUtils';
 
 type ShowContextMenuContextProps = {
     anchor: ContextMenuAnchor;
@@ -49,6 +50,11 @@ function showContextMenuForReport(
 ) {
     if (!DeviceCapabilities.canUseTouchScreen()) {
         return;
+    }
+
+    // Ensure that we blur the composer when opening context menu, so that only one component is focused at a time
+    if (DomUtils.getActiveElement()) {
+        (DomUtils.getActiveElement() as HTMLElement | null)?.blur();
     }
 
     ReportActionContextMenu.showContextMenu(

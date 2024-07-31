@@ -24,6 +24,7 @@ import shouldReplayVideo from './shouldReplayVideo';
 import type {VideoPlayerProps, VideoWithOnFullScreenUpdate} from './types';
 import * as VideoUtils from './utils';
 import VideoPlayerControls from './VideoPlayerControls';
+import DomUtils from '@libs/DomUtils';
 
 function BaseVideoPlayer({
     url,
@@ -97,6 +98,11 @@ function BaseVideoPlayer({
     }, [isCurrentlyURLSet, isPlaying, pauseVideo, playVideo, updateCurrentlyPlayingURL, url, videoResumeTryNumberRef]);
 
     const showPopoverMenu = (event?: GestureResponderEvent | KeyboardEvent) => {
+        // Ensure that we blur the composer when opening context menu, so that only one component is focused at a time
+        if (DomUtils.getActiveElement()) {
+            (DomUtils.getActiveElement() as HTMLElement | null)?.blur();
+        }
+        
         videoPopoverMenuPlayerRef.current = videoPlayerRef.current;
         videoPlayerRef.current?.getStatusAsync().then((status) => {
             if (!('rate' in status && status.rate)) {
