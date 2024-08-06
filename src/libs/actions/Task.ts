@@ -574,6 +574,7 @@ function editTaskAssignee(report: OnyxTypes.Report, ownerAccountID: number, assi
     const reportName = report.reportName?.trim();
 
     let assigneeChatReportOnyxData;
+
     const assigneeChatReportID = assigneeChatReport ? assigneeChatReport.reportID : '-1';
     const optimisticReport: OptimisticReport = {
         reportName,
@@ -661,7 +662,9 @@ function editTaskAssignee(report: OnyxTypes.Report, ownerAccountID: number, assi
 
     // If we make a change to the assignee, we want to add a comment to the assignee's chat
     // Check if the assignee actually changed
-    if (assigneeAccountID && assigneeAccountID !== report.managerID && assigneeAccountID !== ownerAccountID && assigneeChatReport) {
+    const assigneeChatReportActions = ReportActionsUtils.getAllReportActions(assigneeChatReportID);
+    const hasMatchingChildReportID = Object.values(assigneeChatReportActions).some(action => action.childReportID === report.reportID);
+    if (assigneeAccountID && assigneeAccountID !== report.managerID && assigneeAccountID !== ownerAccountID && assigneeChatReport && !hasMatchingChildReportID) {
         optimisticReport.participants = {[assigneeAccountID]: {hidden: false}};
 
         assigneeChatReportOnyxData = ReportUtils.getTaskAssigneeChatOnyxData(

@@ -6536,18 +6536,9 @@ function getTaskAssigneeChatOnyxData(
             },
         );
     }
-
-    console.log('[wildebug] assigneeChatReportID', assigneeChatReportID)
-    console.log('[wildebug] parentReportID', parentReportID)
-    console.log('[wildebug] taskReportID', taskReportID)
-    console.log('[wildebug] ReportActionsUtils.getAllReportActions', ReportActionsUtils.getAllReportActions(assigneeChatReportID))
-
-    const assigneeChatReportActions = ReportActionsUtils.getAllReportActions(assigneeChatReportID);
-    const hasMatchingChildReportID = Object.values(assigneeChatReportActions).some(action => action.childReportID === taskReportID);
-
     
     // If you're choosing to share the task in the same DM as the assignee then we don't need to create another reportAction indicating that you've been assigned
-    if (assigneeChatReportID !== parentReportID && !hasMatchingChildReportID) {
+    if (assigneeChatReportID !== parentReportID) {
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         const displayname = allPersonalDetails?.[assigneeAccountID]?.displayName || allPersonalDetails?.[assigneeAccountID]?.login || '';
         optimisticAssigneeAddComment = buildOptimisticTaskCommentReportAction(taskReportID, title, assigneeAccountID, `assigned to ${displayname}`, parentReportID);
