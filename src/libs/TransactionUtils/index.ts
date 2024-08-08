@@ -782,6 +782,13 @@ function calculateAmountForUpdatedWaypointOrRate(
         modifiedAmount: updatedAmount,
         modifiedMerchant: updatedMerchant,
         modifiedCurrency: updatedCurrency,
+
+        pendingFields: {
+            ...transaction?.pendingFields,
+            ...(!lodashIsEqual(updatedAmount, transaction?.modifiedAmount ?? transaction?.amount) && { amount: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE }),
+            ...(!lodashIsEqual(updatedMerchant, transaction?.modifiedMerchant ?? transaction?.merchant) && { merchant: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE }),
+            ...(!lodashIsEqual(updatedCurrency, transaction?.modifiedCurrency ?? transaction?.currency) && { currency: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE })
+        },
     };
 }
 

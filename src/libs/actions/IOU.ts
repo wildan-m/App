@@ -2532,11 +2532,6 @@ function getUpdateMoneyRequestParams(
     const successData: OnyxUpdate[] = [];
     const failureData: OnyxUpdate[] = [];
 
-    // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
-    const pendingFields = Object.fromEntries(Object.keys(transactionChanges).map((key) => [key, CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE]));
-    const clearedPendingFields = Object.fromEntries(Object.keys(transactionChanges).map((key) => [key, null]));
-    const errorFields = Object.fromEntries(Object.keys(pendingFields).map((key) => [key, {[DateUtils.getMicroseconds()]: Localize.translateLocal('iou.error.genericEditFailureMessage')}]));
-
     const allReports = ReportConnection.getAllReports();
     // Step 2: Get all the collections being updated
     const transactionThread = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`] ?? null;
@@ -2680,6 +2675,12 @@ function getUpdateMoneyRequestParams(
         key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`,
         value: {pendingAction: null},
     });
+
+    // Set any "pending fields"  (ones updated while the user was offline), includes the fields that affected to have error messages in the failureData
+    const allTransactionChanges = { ...transactionChanges, ...(updatedTransaction ? updatedTransaction.pendingFields : {}) }
+    const pendingFields = Object.fromEntries(Object.keys(allTransactionChanges).map((key) => [key, CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE]));
+    const clearedPendingFields = Object.fromEntries(Object.keys(allTransactionChanges).map((key) => [key, null]));
+    const errorFields = Object.fromEntries(Object.keys(allTransactionChanges).map((key) => [key, {[DateUtils.getMicroseconds()]: Localize.translateLocal('iou.error.genericEditFailureMessage')}]));
 
     // Optimistically modify the transaction and the transaction thread
     optimisticData.push({
