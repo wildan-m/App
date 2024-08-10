@@ -1134,6 +1134,7 @@ type FullScreenNavigatorParamList = {
     };
     [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_MONTHLY_OFFSET]: {
         policyID: string;
+        backTo: Routes;
     };
     [SCREENS.WORKSPACE.REIMBURSE]: {
         policyID: string;

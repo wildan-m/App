@@ -79,7 +79,6 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
 
         return translate(`workflowsPage.frequencies.${policy?.autoReportingOffset}`);
     };
-
     const monthlyFrequencyDetails = () => (
         <OfflineWithFeedback
             pendingAction={policy?.pendingFields?.autoReportingOffset}
@@ -93,7 +92,7 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
                 description={getDescriptionText()}
                 descriptionTextStyle={styles.textNormalThemeText}
                 wrapperStyle={styles.pr3}
-                onPress={() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_MONTHLY_OFFSET.getRoute(policy?.id ?? ''))}
+                onPress={() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_MONTHLY_OFFSET.getRoute(policy?.id ?? '', ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_FREQUENCY.getRoute(policy?.id ?? '')))}
                 shouldShowRightIcon
             />
         </OfflineWithFeedback>

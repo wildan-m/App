@@ -37,6 +37,8 @@ function WorkspaceAutoReportingMonthlyOffsetPage({policy, route}: WorkspaceAutoR
     const [searchText, setSearchText] = useState('');
     const trimmedText = searchText.trim().toLowerCase();
 
+    const navigateBackTo = route?.params?.backTo;
+
     const daysOfMonth: WorkspaceAutoReportingMonthlyOffsetPageItem[] = Array.from({length: DAYS_OF_MONTH}, (value, index) => {
         const day = index + 1;
 
@@ -67,7 +69,7 @@ function WorkspaceAutoReportingMonthlyOffsetPage({policy, route}: WorkspaceAutoR
 
     const onSelectDayOfMonth = (item: WorkspaceAutoReportingMonthlyOffsetPageItem) => {
         Policy.setWorkspaceAutoReportingMonthlyOffset(policy?.id ?? '-1', item.isNumber ? parseInt(item.keyForList, 10) : (item.keyForList as AutoReportingOffsetKeys));
-        Navigation.goBack();
+        Navigation.goBack(navigateBackTo);
     };
 
     return (
@@ -87,7 +89,7 @@ function WorkspaceAutoReportingMonthlyOffsetPage({policy, route}: WorkspaceAutoR
                 >
                     <HeaderWithBackButton
                         title={translate('workflowsPage.submissionFrequency')}
-                        onBackButtonPress={Navigation.goBack}
+                        onBackButtonPress={() => Navigation.goBack(navigateBackTo)}
                     />
 
                     <SelectionList
