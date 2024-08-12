@@ -625,6 +625,10 @@ const mainWindow = (): Promise<void> => {
                     downloadQueue.enqueueDownloadItem(downloadItem);
                 });
 
+                ipcMain.on(ELECTRON_EVENTS.OPEN_EXTERNAL_LINK, (event, url) => {
+                    shell.openExternal(url);
+                });
+                
                 // Automatically check for and install the latest version in the background
                 ipcMain.on(ELECTRON_EVENTS.SILENT_UPDATE, () => {
                     if (isSilentUpdating) {
