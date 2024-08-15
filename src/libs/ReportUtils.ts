@@ -2006,7 +2006,6 @@ function getDisplayNameForParticipant(
     if (!personalDetails) {
         return '';
     }
-
     const login = personalDetails.login ?? '';
 
     // Check if the phone number is already cached
@@ -2017,15 +2016,17 @@ function getDisplayNameForParticipant(
         phoneNumberCache[login] = formattedLogin;
     }
 
+
+    // For selfDM, we display the user's displayName followed by '(you)' as a postfix
+    const isSelfDM = accountID === currentUserAccountID;
+    const shouldAddPostfix = shouldAddCurrentUserPostfix && isSelfDM;
+
     // This is to check if account is an invite/optimistically created one
     // and prevent from falling back to 'Hidden', so a correct value is shown
     // when searching for a new user
     if (personalDetails.isOptimisticPersonalDetail === true) {
-        return formattedLogin;
+        return !isEmpty(formattedLogin) ? formattedLogin : (isSelfDM ? PersonalDetailsUtils.getDisplayNameOrDefault(personalDetails, currentUserEmail, shouldFallbackToHidden, shouldAddPostfix) : '');
     }
-
-    // For selfDM, we display the user's displayName followed by '(you)' as a postfix
-    const shouldAddPostfix = shouldAddCurrentUserPostfix && accountID === currentUserAccountID;
 
     const longName = PersonalDetailsUtils.getDisplayNameOrDefault(personalDetails, formattedLogin, shouldFallbackToHidden, shouldAddPostfix);
 
@@ -3636,7 +3637,7 @@ function getInvoicesChatName(report: OnyxEntry<Report>, receiverPolicy: OnyxEntr
 }
 
 const reportNameCache = new Map<string, {lastVisibleActionCreated: string; reportName: string}>();
-
+window.reportNameCache = reportNameCache
 /**
  * Get a cache key for the report name.
  */
@@ -3653,111 +3654,153 @@ function getReportName(
     invoiceReceiverPolicy?: OnyxEntry<Policy>,
 ): string {
     const reportID = report?.reportID;
+    console.log('[wildebug] reportID:', reportID);
+    
     const cacheKey = getCacheKey(report);
-
+    console.log('[wildebug] cacheKey:', cacheKey);
+    
     if (reportID) {
         const reportNameFromCache = reportNameCache.get(cacheKey);
-
+        console.log('[wildebug] reportNameFromCache:', reportNameFromCache);
+    
         if (reportNameFromCache && reportNameFromCache.reportName === report?.reportName) {
+            console.log('[wildebug] Returning cached report name:', reportNameFromCache.reportName);
             return reportNameFromCache.reportName;
         }
     }
-
+    
     let formattedName: string | undefined;
     const parentReportAction = parentReportActionParam ?? ReportActionsUtils.getParentReportAction(report);
+    console.log('[wildebug] parentReportAction:', parentReportAction);
+    
     const parentReportActionMessage = ReportActionsUtils.getReportActionMessage(parentReportAction);
-
+    console.log('[wildebug] parentReportActionMessage:', parentReportActionMessage);
+    
     if (isChatThread(report)) {
+        console.log('[wildebug] Report is a chat thread');
+    
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isTransactionThread(parentReportAction)) {
+            console.log('[wildebug] Parent report action is a transaction thread');
             formattedName = getTransactionReportName(parentReportAction);
             if (isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
                 formattedName += ` (${Localize.translateLocal('common.archived')})`;
             }
+            console.log('[wildebug] Returning formatted transaction report name:', formattedName);
             return formatReportLastMessageText(formattedName);
         }
-
+    
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isOldDotReportAction(parentReportAction)) {
+            console.log('[wildebug] Parent report action is an old dot report action');
             return ReportActionsUtils.getMessageOfOldDotReportAction(parentReportAction);
         }
-
+    
         if (parentReportActionMessage?.isDeletedParentAction) {
+            console.log('[wildebug] Parent report action message is deleted');
             return Localize.translateLocal('parentReportAction.deletedMessage');
         }
-
+    
         const isAttachment = ReportActionsUtils.isReportActionAttachment(!isEmptyObject(parentReportAction) ? parentReportAction : undefined);
+        console.log('[wildebug] isAttachment:', isAttachment);
+    
         const reportActionMessage = getReportActionMessage(parentReportAction, report?.parentReportID, report?.reportID ?? '').replace(/(\n+|\r\n|\n|\r)/gm, ' ');
+        console.log('[wildebug] reportActionMessage:', reportActionMessage);
+    
         if (isAttachment && reportActionMessage) {
+            console.log('[wildebug] Report action is an attachment');
             return `[${Localize.translateLocal('common.attachment')}]`;
         }
+    
         if (
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE ||
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN ||
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_REMOVE
         ) {
+            console.log('[wildebug] Parent report action message is hidden due to moderation decision');
             return Localize.translateLocal('parentReportAction.hiddenMessage');
         }
+    
         if (isAdminRoom(report) || isUserCreatedPolicyRoom(report)) {
+            console.log('[wildebug] Report is an admin room or user-created policy room');
             return getAdminRoomInvitedParticipants(parentReportAction, reportActionMessage);
         }
+    
         if (reportActionMessage && isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
+            console.log('[wildebug] Report is archived');
             return `${reportActionMessage} (${Localize.translateLocal('common.archived')})`;
         }
+    
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isModifiedExpenseAction(parentReportAction)) {
+            console.log('[wildebug] Parent report action is a modified expense action');
             return ModifiedExpenseMessage.getForReportAction(report?.reportID, parentReportAction);
         }
-
+    
         if (isTripRoom(report)) {
+            console.log('[wildebug] Report is a trip room');
             return report?.reportName ?? '';
         }
-
+    
+        console.log('[wildebug] Returning report action message:', reportActionMessage);
         return reportActionMessage;
     }
 
     if (isClosedExpenseReportWithNoExpenses(report)) {
+        console.log('[wildebug] Report is a closed expense report with no expenses');
         return Localize.translateLocal('parentReportAction.deletedReport');
     }
-
+    
     if (isTaskReport(report) && isCanceledTaskReport(report, parentReportAction)) {
+        console.log('[wildebug] Report is a canceled task report');
         return Localize.translateLocal('parentReportAction.deletedTask');
     }
-
+    
     if (isGroupChat(report)) {
+        console.log('[wildebug] Report is a group chat');
         return getGroupChatName(undefined, true, report) ?? '';
     }
-
+    
     if (isChatRoom(report) || isTaskReport(report)) {
+        console.log('[wildebug] Report is a chat room or task report');
         formattedName = report?.reportName;
     }
-
+    
     if (isPolicyExpenseChat(report)) {
+        console.log('[wildebug] Report is a policy expense chat');
         formattedName = getPolicyExpenseChatName(report, policy);
     }
-
+    
     if (isMoneyRequestReport(report)) {
+        console.log('[wildebug] Report is a money request report');
         formattedName = getMoneyRequestReportName(report, policy);
     }
-
+    
     if (isInvoiceReport(report)) {
+        console.log('[wildebug] Report is an invoice report');
         formattedName = getMoneyRequestReportName(report, policy, invoiceReceiverPolicy);
     }
-
+    
     if (isInvoiceRoom(report)) {
+        console.log('[wildebug] Report is an invoice room');
         formattedName = getInvoicesChatName(report, invoiceReceiverPolicy);
     }
-
+    
     if (isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
+        console.log('[wildebug] Report is archived');
         formattedName += ` (${Localize.translateLocal('common.archived')})`;
     }
-
+    
     if (isSelfDM(report)) {
+        console.log('[wildebug] Report is a self DM');
         formattedName = getDisplayNameForParticipant(currentUserAccountID, undefined, undefined, true, personalDetails);
     }
-
+    
+    console.log('[wildebug] Formatted name aosjidioj:', formattedName);
     if (formattedName) {
         if (reportID) {
+            console.log('[wildebug] Caching report name with reportID:', reportID);
             reportNameCache.set(cacheKey, {lastVisibleActionCreated: report?.lastVisibleActionCreated ?? '', reportName: formattedName});
         }
-
+    
+        console.log('[wildebug] Returning formatted report name:', formattedName);
         return formatReportLastMessageText(formattedName);
     }
 
@@ -3774,6 +3817,8 @@ function getReportName(
     formattedName = participantNames;
 
     if (reportID) {
+        console.log('[wildebug] Caching report name with reportID oiajsdij:', reportID);
+
         reportNameCache.set(cacheKey, {lastVisibleActionCreated: report?.lastVisibleActionCreated ?? '', reportName: formattedName});
     }
 
