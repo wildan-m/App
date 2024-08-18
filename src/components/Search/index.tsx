@@ -175,11 +175,10 @@ function Search({queryJSON, policyIDs, isCustomQuery}: SearchProps) {
     }
 
     const searchResults = currentSearchResults?.data ? currentSearchResults : lastSearchResultsRef.current;
-
+    const type = SearchUtils.getSearchType(searchResults?.search);
     const isDataLoaded = searchResults?.data !== undefined;
-    const shouldShowLoadingState = !isOffline && !isDataLoaded;
+    const shouldShowLoadingState = (!isOffline && !isDataLoaded) || (searchResults === undefined || type === undefined);
     const shouldShowLoadingMoreItems = !shouldShowLoadingState && searchResults?.search?.isLoading && searchResults?.search?.offset > 0;
-
     const isSearchResultsEmpty = !searchResults || SearchUtils.isSearchResultsEmpty(searchResults);
     const prevIsSearchResultEmpty = usePrevious(isSearchResultsEmpty);
 
@@ -201,13 +200,6 @@ function Search({queryJSON, policyIDs, isCustomQuery}: SearchProps) {
                 <SearchRowSkeleton shouldAnimate />
             </>
         );
-    }
-
-    const type = SearchUtils.getSearchType(searchResults?.search);
-
-    if (searchResults === undefined || type === undefined) {
-        Log.alert('[Search] Undefined search type');
-        return null;
     }
 
     const ListItem = SearchUtils.getListItem(type, status);
