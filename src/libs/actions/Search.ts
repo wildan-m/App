@@ -1,5 +1,5 @@
 import Onyx from 'react-native-onyx';
-import type {OnyxUpdate} from 'react-native-onyx';
+import type {OnyxUpdate, OnyxEntry} from 'react-native-onyx';
 import type {FormOnyxValues} from '@components/Form/types';
 import type {SearchQueryJSON} from '@components/Search/types';
 import * as API from '@libs/API';
@@ -10,8 +10,9 @@ import fileDownload from '@libs/fileDownload';
 import enhanceParameters from '@libs/Network/enhanceParameters';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchTransaction} from '@src/types/onyx/SearchResults';
+import type {SearchTransaction, SearchReport, SearchPersonalDetails} from '@src/types/onyx/SearchResults';
 import * as Report from './Report';
+import type { AdjustedAmountsByReportID } from '@components/Search/types';
 
 let currentUserEmail: string;
 Onyx.connect({
@@ -21,7 +22,17 @@ Onyx.connect({
     },
 });
 
-function getOnyxLoadingData(hash: number): {optimisticData: OnyxUpdate[]; finallyData: OnyxUpdate[]} {
+
+function getOnyxLoadingData(hash: number, adjustedAmountsByReportID?: AdjustedAmountsByReportID): {optimisticData: OnyxUpdate[]; finallyData: OnyxUpdate[]} {
+    let adjustedTotals: Record<string, Partial<SearchTransaction> & Record<string, Partial<SearchPersonalDetails>>> & Record<string, Partial<SearchReport>> = {};
+    if (adjustedAmountsByReportID) {
+        Object.keys(adjustedAmountsByReportID).forEach(reportID => {
+            adjustedTotals[reportID] = {
+                total: adjustedAmountsByReportID[reportID]
+            } as SearchReport;
+        });
+    }
+    
     const optimisticData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -30,10 +41,11 @@ function getOnyxLoadingData(hash: number): {optimisticData: OnyxUpdate[]; finall
                 search: {
                     isLoading: true,
                 },
+                data: adjustedTotals,
             },
         },
     ];
-
+    
     const finallyData: OnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -46,7 +58,7 @@ function getOnyxLoadingData(hash: number): {optimisticData: OnyxUpdate[]; finall
         },
     ];
 
-    return {optimisticData, finallyData};
+    return { optimisticData, failureData, finallyData };
 }
 
 function search({queryJSON, offset, policyIDs}: {queryJSON: SearchQueryJSON; offset?: number; policyIDs?: string}) {
@@ -90,8 +102,8 @@ function unholdMoneyRequestOnSearch(hash: number, transactionIDList: string[]) {
     API.write(WRITE_COMMANDS.UNHOLD_MONEY_REQUEST_ON_SEARCH, {hash, transactionIDList}, {optimisticData, finallyData});
 }
 
-function deleteMoneyRequestOnSearch(hash: number, transactionIDList: string[]) {
-    const {optimisticData, finallyData} = getOnyxLoadingData(hash);
+function deleteMoneyRequestOnSearch(hash: number, transactionIDList: string[], adjustedAmountsByReportID?: AdjustedAmountsByReportID) {
+    const {optimisticData, finallyData, failureData} = getOnyxLoadingData(hash, adjustedAmountsByReportID);
     API.write(WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH, {hash, transactionIDList}, {optimisticData, finallyData});
 }
 

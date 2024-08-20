@@ -32,8 +32,7 @@ import type SearchResults from '@src/types/onyx/SearchResults';
 import {useSearchContext} from './SearchContext';
 import SearchPageHeader from './SearchPageHeader';
 import SearchStatusBar from './SearchStatusBar';
-import type {SearchColumnType, SearchQueryJSON, SearchStatus, SelectedTransactionInfo, SelectedTransactions, SortOrder} from './types';
-
+import type {SearchColumnType, SearchQueryJSON, SearchStatus, SelectedTransactionInfo, SelectedTransactions, SortOrder, AdjustedAmountsByReportID} from './types';
 type SearchProps = {
     queryJSON: SearchQueryJSON;
     isCustomQuery: boolean;
@@ -131,9 +130,28 @@ function Search({queryJSON, policyIDs, isCustomQuery}: SearchProps) {
             return;
         }
 
+        const amountsByReportID: AdjustedAmountsByReportID = {};
+        const resultsByReportID: { [key: string]: number } = {};
+        
+        selectedTransactionsToDelete?.forEach((transactionID) => {
+            const transaction = currentSearchResults?.data[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+            if (transaction) {
+                const { reportID, amount = 0 } = transaction;
+                const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${reportID}`;
+                amountsByReportID[reportKey] = (amountsByReportID[reportKey] ?? 0) + amount;
+            }
+        });
+        
+        Object.entries(amountsByReportID).forEach(([reportKey, totalAmount]) => {
+            const report = currentSearchResults?.data[reportKey];
+            if (report) {
+                resultsByReportID[reportKey] = (report.total ?? 0) - totalAmount;
+            }
+        });
+        
         clearSelectedTransactions();
         setDeleteExpensesConfirmModalVisible(false);
-        SearchActions.deleteMoneyRequestOnSearch(hash, selectedTransactionsToDelete);
+        SearchActions.deleteMoneyRequestOnSearch(hash, selectedTransactionsToDelete, resultsByReportID);    
     };
 
     const handleOnSelectDeleteOption = (itemsToDelete: string[]) => {

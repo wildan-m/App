@@ -70,6 +70,8 @@ type SearchQueryJSON = {
     hash: number;
 } & SearchQueryAST;
 
+type AdjustedAmountsByReportID = { [reportID: string]: number };
+
 export type {
     SelectedTransactionInfo,
     SelectedTransactions,
@@ -87,4 +89,5 @@ export type {
     ExpenseSearchStatus,
     InvoiceSearchStatus,
     TripSearchStatus,
+    AdjustedAmountsByReportID,
 };

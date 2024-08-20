@@ -218,7 +218,7 @@ type SearchResults = {
     search: SearchResultsInfo;
 
     /** Search results data */
-    data: Record<string, SearchTransaction & Record<string, SearchPersonalDetails>> & Record<string, SearchReport>;
+    data: Record<string, Partial<SearchTransaction> & Record<string, Partial<SearchPersonalDetails>>> & Record<string, Partial<SearchReport>>;
 
     /** Whether search data is being fetched from server */
     isLoading?: boolean;
