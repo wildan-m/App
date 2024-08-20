@@ -58,7 +58,7 @@ function getOnyxLoadingData(hash: number, adjustedAmountsByReportID?: AdjustedAm
         },
     ];
 
-    return { optimisticData, failureData, finallyData };
+    return { optimisticData, finallyData };
 }
 
 function search({queryJSON, offset, policyIDs}: {queryJSON: SearchQueryJSON; offset?: number; policyIDs?: string}) {
@@ -103,7 +103,7 @@ function unholdMoneyRequestOnSearch(hash: number, transactionIDList: string[]) {
 }
 
 function deleteMoneyRequestOnSearch(hash: number, transactionIDList: string[], adjustedAmountsByReportID?: AdjustedAmountsByReportID) {
-    const {optimisticData, finallyData, failureData} = getOnyxLoadingData(hash, adjustedAmountsByReportID);
+    const {optimisticData, finallyData} = getOnyxLoadingData(hash, adjustedAmountsByReportID);
     API.write(WRITE_COMMANDS.DELETE_MONEY_REQUEST_ON_SEARCH, {hash, transactionIDList}, {optimisticData, finallyData});
 }
 
