@@ -131,23 +131,37 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
         User.deleteContactMethod(contactMethod, loginList ?? {});
     }, [contactMethod, loginList, toggleDeleteModal]);
 
+    const initialCodeValidateRequestedRef = useRef(false);
+
     useEffect(() => {
         if (isEmptyObject(loginData)) {
             return;
         }
+    
         User.resetContactMethodValidateCodeSentState(contactMethod);
+    
+        // initialCodeValidateRequestedRef is required to prevent duplicate calls in React strict mode 
+        if (!loginData?.validatedDate && !loginData?.validateCodeSent && !initialCodeValidateRequestedRef.current) {
+            User.requestContactMethodValidateCode(contactMethod);
+            initialCodeValidateRequestedRef.current = true;
+            return;
+        }
         // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     }, []);
 
     const prevValidatedDate = usePrevious(loginData?.validatedDate);
+    const hasMagicCodeBeenSent = !!loginData?.validateCodeSent;
+    
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         if (prevValidatedDate || !loginData?.validatedDate) {
+            console.log('[wildebug] prevValidatedDate is true, returning');
             return;
         }
 
         // Navigate to methods page on successful magic code verification
         // validatedDate property is responsible to decide the status of the magic code verification
+        console.log('[wildebug] Navigating back to contact methods page');
         Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHODS.route);
     }, [prevValidatedDate, loginData?.validatedDate, isDefaultContactMethod]);
 
@@ -168,9 +182,9 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
         );
     }
 
+    console.log('[wildebug] loginData', loginData)
     // Replacing spaces with "hard spaces" to prevent breaking the number
     const formattedContactMethod = Str.isSMSLogin(contactMethod) ? formatPhoneNumber(contactMethod) : contactMethod;
-    const hasMagicCodeBeenSent = !!loginData.validateCodeSent;
     const isFailedAddContactMethod = !!loginData.errorFields?.addedLogin;
     const isFailedRemovedContactMethod = !!loginData.errorFields?.deletedLogin;
 
