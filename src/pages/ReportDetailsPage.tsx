@@ -684,8 +684,8 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
     const navigateBackToAfterDelete = useRef<Route>();
 
     const deleteTransaction = useCallback(() => {
+        Navigation.dismissModal();
         setIsDeleteModalVisible(false);
-        // Navigation.dismissModal();
         isTransactionDeleted.current = true;
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
     return (
@@ -773,28 +773,30 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
                     onConfirm={deleteTransaction}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     onModalHide={() => {
-                        if (caseID === CASES.DEFAULT) {
-                            console.log('[wildebug] caseID is DEFAULT');
-                            navigateBackToAfterDelete.current = Task.deleteTask(report);
-                            console.log('[wildebug] navigateBackToAfterDelete.current:', navigateBackToAfterDelete.current);
-                            return;
+                        if (isTransactionDeleted.current) {
+                            if (caseID === CASES.DEFAULT) {
+                                console.log('[wildebug] caseID is DEFAULT');
+                                navigateBackToAfterDelete.current = Task.deleteTask(report);
+                                console.log('[wildebug] navigateBackToAfterDelete.current:', navigateBackToAfterDelete.current);
+                                return;
+                            }
+
+                            if (!requestParentReportAction) {
+                                console.log('[wildebug] requestParentReportAction is not defined');
+                                return;
+                            }
+
+                            if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
+                                console.log('[wildebug] requestParentReportAction is a TrackExpenseAction');
+                                navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
+                                console.log('[wildebug] navigateBackToAfterDelete.current after deleteTrackExpense:', navigateBackToAfterDelete.current);
+                            } else {
+                                console.log('[wildebug] requestParentReportAction is not a TrackExpenseAction');
+                                navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
+                                console.log('[wildebug] navigateBackToAfterDelete.current after deleteMoneyRequest:', navigateBackToAfterDelete.current);
+                            }
                         }
-                        
-                        if (!requestParentReportAction) {
-                            console.log('[wildebug] requestParentReportAction is not defined');
-                            return;
-                        }
-                        
-                        if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
-                            console.log('[wildebug] requestParentReportAction is a TrackExpenseAction');
-                            navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
-                            console.log('[wildebug] navigateBackToAfterDelete.current after deleteTrackExpense:', navigateBackToAfterDelete.current);
-                        } else {
-                            console.log('[wildebug] requestParentReportAction is not a TrackExpenseAction');
-                            navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
-                            console.log('[wildebug] navigateBackToAfterDelete.current after deleteMoneyRequest:', navigateBackToAfterDelete.current);
-                        }
-                        
+
                         // We use isTransactionDeleted to know if the modal hides because the user deletes the transaction.
                         if (!isTransactionDeleted.current) {
                             console.log('[wildebug] isTransactionDeleted.current is false');

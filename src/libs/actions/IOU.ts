@@ -1718,7 +1718,12 @@ function getDeleteTrackExpenseInformation(
             {
                 onyxMethod: Onyx.METHOD.SET,
                 key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
-                value: null,
+                value: {
+                    reportID: null,
+                    stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                    statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
+                    notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
+                },
             },
             {
                 onyxMethod: Onyx.METHOD.SET,
@@ -1757,6 +1762,17 @@ function getDeleteTrackExpenseInformation(
             },
         },
     ];
+
+    if(shouldDeleteTransactionThread) {
+        successData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
+            value: Object.keys(transactionThread as OnyxTypes.Report).reduce<Record<string, null>>((acc, key) => {
+                        acc[key] = null;
+                        return acc;
+                    }, {}),
+        })
+    }
 
     const failureData: OnyxUpdate[] = [];
 
