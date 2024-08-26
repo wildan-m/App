@@ -685,22 +685,7 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
 
     const deleteTransaction = useCallback(() => {
         setIsDeleteModalVisible(false);
-
-        if (caseID === CASES.DEFAULT) {
-            navigateBackToAfterDelete.current = Task.deleteTask(report);
-            return;
-        }
-
-        if (!requestParentReportAction) {
-            return;
-        }
-
-        if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
-            navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
-        } else {
-            navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
-        }
-
+        Navigation.dismissModal();
         isTransactionDeleted.current = true;
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
     return (
@@ -788,21 +773,49 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
                     onConfirm={deleteTransaction}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     onModalHide={() => {
+                        if (caseID === CASES.DEFAULT) {
+                            console.log('[wildebug] caseID is DEFAULT');
+                            navigateBackToAfterDelete.current = Task.deleteTask(report);
+                            console.log('[wildebug] navigateBackToAfterDelete.current:', navigateBackToAfterDelete.current);
+                            return;
+                        }
+                        
+                        if (!requestParentReportAction) {
+                            console.log('[wildebug] requestParentReportAction is not defined');
+                            return;
+                        }
+                        
+                        if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
+                            console.log('[wildebug] requestParentReportAction is a TrackExpenseAction');
+                            navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
+                            console.log('[wildebug] navigateBackToAfterDelete.current after deleteTrackExpense:', navigateBackToAfterDelete.current);
+                        } else {
+                            console.log('[wildebug] requestParentReportAction is not a TrackExpenseAction');
+                            navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
+                            console.log('[wildebug] navigateBackToAfterDelete.current after deleteMoneyRequest:', navigateBackToAfterDelete.current);
+                        }
+                        
                         // We use isTransactionDeleted to know if the modal hides because the user deletes the transaction.
                         if (!isTransactionDeleted.current) {
+                            console.log('[wildebug] isTransactionDeleted.current is false');
                             if (caseID === CASES.DEFAULT) {
+                                console.log('[wildebug] caseID is DEFAULT inside isTransactionDeleted check');
                                 if (navigateBackToAfterDelete.current) {
+                                    console.log('[wildebug] navigateBackToAfterDelete.current is defined, navigating back');
                                     Navigation.goBack(navigateBackToAfterDelete.current);
                                 } else {
+                                    console.log('[wildebug] navigateBackToAfterDelete.current is not defined, dismissing modal');
                                     Navigation.dismissModal();
                                 }
                             }
                             return;
                         }
-
+                        
                         if (!navigateBackToAfterDelete.current) {
+                            console.log('[wildebug] navigateBackToAfterDelete.current is not defined, dismissing modal');
                             Navigation.dismissModal();
                         } else {
+                            console.log('[wildebug] navigateBackToAfterDelete.current is defined, navigating back after delete transaction');
                             ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
                         }
                     }}

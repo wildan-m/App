@@ -5496,7 +5496,7 @@ function prepareToCleanUpMoneyRequest(transactionID: string, reportAction: OnyxT
     const allReports = ReportConnection.getAllReports();
     const iouReportID = ReportActionsUtils.isMoneyRequestAction(reportAction) ? ReportActionsUtils.getOriginalMessage(reportAction)?.IOUReportID : '-1';
     const iouReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`] ?? null;
-    const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`] as Report;
+    const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`] as OnyxTypes.Report;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const reportPreviewAction = getReportPreviewAction(iouReport?.chatReportID ?? '-1', iouReport?.reportID ?? '-1')!;
     const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
@@ -5907,7 +5907,7 @@ function deleteMoneyRequest(transactionID: string, reportAction: OnyxTypes.Repor
     if(shouldDeleteTransactionThread) {
         successData.push({
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT}${chatReport?.reportID}`,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
             value: Object.keys(chatReport).reduce<Record<string, null>>((acc, key) => {
                         acc[key] = null;
                         return acc;
@@ -5938,11 +5938,6 @@ function deleteMoneyRequest(transactionID: string, reportAction: OnyxTypes.Repor
     });
 
     if (shouldDeleteTransactionThread) {
-        failureData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT}${chatReport?.reportID}`,
-            value: chatReport,
-        })
         failureData.push({
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
