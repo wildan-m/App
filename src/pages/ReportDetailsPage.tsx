@@ -685,7 +685,7 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
 
     const deleteTransaction = useCallback(() => {
         setIsDeleteModalVisible(false);
-        Navigation.dismissModal();
+        // Navigation.dismissModal();
         isTransactionDeleted.current = true;
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
     return (
