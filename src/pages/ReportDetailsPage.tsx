@@ -684,10 +684,22 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
     const navigateBackToAfterDelete = useRef<Route>();
 
     const deleteTransaction = useCallback(() => {
-        Navigation.dismissModal();
-        setIsDeleteModalVisible(false);
-        isTransactionDeleted.current = true;
+        if (caseID === CASES.DEFAULT) {
+            navigateBackToAfterDelete.current = Task.deleteTask(report);
+            return;
+        }
+
+        if (!requestParentReportAction) {
+            return;
+        }
+
+        if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
+            navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
+        } else {
+            navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
+        }
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
+
     return (
         <ScreenWrapper testID={ReportDetailsPage.displayName}>
             <FullPageNotFoundView shouldShow={isEmptyObject(report)}>
@@ -770,31 +782,15 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
                 <ConfirmModal
                     title={caseID === CASES.DEFAULT ? translate('task.deleteTask') : translate('iou.deleteExpense')}
                     isVisible={isDeleteModalVisible}
-                    onConfirm={deleteTransaction}
+                    onConfirm={()=>{
+                        Navigation.dismissModal();
+                        setIsDeleteModalVisible(false);
+                        isTransactionDeleted.current = true;
+                    }}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     onModalHide={() => {
                         if (isTransactionDeleted.current) {
-                            if (caseID === CASES.DEFAULT) {
-                                console.log('[wildebug] caseID is DEFAULT');
-                                navigateBackToAfterDelete.current = Task.deleteTask(report);
-                                console.log('[wildebug] navigateBackToAfterDelete.current:', navigateBackToAfterDelete.current);
-                                return;
-                            }
-
-                            if (!requestParentReportAction) {
-                                console.log('[wildebug] requestParentReportAction is not defined');
-                                return;
-                            }
-
-                            if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
-                                console.log('[wildebug] requestParentReportAction is a TrackExpenseAction');
-                                navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
-                                console.log('[wildebug] navigateBackToAfterDelete.current after deleteTrackExpense:', navigateBackToAfterDelete.current);
-                            } else {
-                                console.log('[wildebug] requestParentReportAction is not a TrackExpenseAction');
-                                navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
-                                console.log('[wildebug] navigateBackToAfterDelete.current after deleteMoneyRequest:', navigateBackToAfterDelete.current);
-                            }
+                            deleteTransaction();
                         }
 
                         // We use isTransactionDeleted to know if the modal hides because the user deletes the transaction.
