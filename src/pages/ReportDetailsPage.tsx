@@ -680,6 +680,7 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
 
     // A flag to indicate whether the user choose to delete the transaction or not
     const isTransactionDeleted = useRef<boolean>(false);
+    const isDeletedButtonPressed = useRef<boolean>(false);
     // Where to go back after deleting the transaction and its report. It's empty if the transaction report isn't deleted.
     const navigateBackToAfterDelete = useRef<Route>();
 
@@ -698,6 +699,8 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
         } else {
             navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
         }
+
+        isTransactionDeleted.current = true;
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
 
     return (
@@ -785,24 +788,20 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
                     onConfirm={()=>{
                         Navigation.dismissModal();
                         setIsDeleteModalVisible(false);
-                        isTransactionDeleted.current = true;
+                        isDeletedButtonPressed.current = true;
                     }}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     onModalHide={() => {
-                        if (isTransactionDeleted.current) {
+                        if (isDeletedButtonPressed.current) {
                             deleteTransaction();
                         }
 
                         // We use isTransactionDeleted to know if the modal hides because the user deletes the transaction.
                         if (!isTransactionDeleted.current) {
-                            console.log('[wildebug] isTransactionDeleted.current is false');
                             if (caseID === CASES.DEFAULT) {
-                                console.log('[wildebug] caseID is DEFAULT inside isTransactionDeleted check');
                                 if (navigateBackToAfterDelete.current) {
-                                    console.log('[wildebug] navigateBackToAfterDelete.current is defined, navigating back');
                                     Navigation.goBack(navigateBackToAfterDelete.current);
                                 } else {
-                                    console.log('[wildebug] navigateBackToAfterDelete.current is not defined, dismissing modal');
                                     Navigation.dismissModal();
                                 }
                             }
@@ -810,10 +809,8 @@ function ReportDetailsPage({policies, report, session, personalDetails}: ReportD
                         }
                         
                         if (!navigateBackToAfterDelete.current) {
-                            console.log('[wildebug] navigateBackToAfterDelete.current is not defined, dismissing modal');
                             Navigation.dismissModal();
                         } else {
-                            console.log('[wildebug] navigateBackToAfterDelete.current is defined, navigating back after delete transaction');
                             ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
                         }
                     }}
