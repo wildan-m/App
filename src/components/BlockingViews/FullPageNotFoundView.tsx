@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useLayoutEffect} from 'react';
 import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import * as Illustrations from '@components/Icon/Illustrations';
@@ -9,6 +9,12 @@ import variables from '@styles/variables';
 import type {TranslationPaths} from '@src/languages/types';
 import BlockingView from './BlockingView';
 import ForceFullScreenView from './ForceFullScreenView';
+
+import { useNavigation } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import {BackHandler} from 'react-native';
+import SCREENS from '@src/SCREENS';
+
 
 type FullPageNotFoundViewProps = {
     /** Child elements */
@@ -57,6 +63,57 @@ function FullPageNotFoundView({
 }: FullPageNotFoundViewProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    const navigation = useNavigation();
+
+    // Handle back swipe on iOS
+    useLayoutEffect(() => {
+        if (!shouldShow) {
+            return;
+        }
+    
+        const state = navigation.getState();
+        if (!state) {
+            return;
+        }
+    
+        // Check if the last route's name is 'not-found' or if there is no parent navigator
+        const lastRoute = state.routes[state.routes.length - 1];
+        if (lastRoute.name === SCREENS.NOT_FOUND || !navigation.getParent()) {
+            return;
+        }
+    
+        // Check if the first route's name is not the initial workspace screen
+        // Currently we only have case for workspace, this check to avoid potential regression
+        if (state.routes[0].name !== SCREENS.WORKSPACE.INITIAL) {
+            return;
+        }
+    
+        // Iterate through all routes and disable gestures for all except the first one
+        state.routes.forEach((route, index) => {
+            navigation.setOptions({
+                gestureEnabled: index === 0,
+            });
+        });
+    }, [navigation]);
+
+    // To block android native back button behavior
+    useFocusEffect(
+        useCallback(() => {
+            if (!onBackButtonPress) {
+                return;
+            }
+    
+            const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+                onBackButtonPress();
+                return true;
+            });
+    
+            return () => {
+                backHandler.remove();
+            };
+        }, [onBackButtonPress]),
+    );
 
     if (shouldShow) {
         return (
