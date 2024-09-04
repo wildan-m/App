@@ -81,6 +81,8 @@ import ReportActionItemMessageEdit from './ReportActionItemMessageEdit';
 import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import ReportAttachmentsContext from './ReportAttachmentsContext';
+import useEventHistory from '@hooks/useEventHistory';
+
 
 type ReportActionItemOnyxProps = {
     /** IOU report for this action, if any */
@@ -175,6 +177,8 @@ function ReportActionItem({
     shouldDisplayContextMenu = true,
     parentReportActionForTransactionThread,
 }: ReportActionItemProps) {
+    const eventHistory = useEventHistory();
+
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const blockedFromConcierge = useBlockedFromConcierge();
@@ -338,6 +342,8 @@ function ReportActionItem({
      */
     const showPopover = useCallback(
         (event: GestureResponderEvent | MouseEvent) => {
+            console.log("[wildebug] ~ file: ReportActionItem.tsx:181 ~ eventHistory:", eventHistory)
+
             // Block menu on the message being Edited or if the report action item has errors
             if (draftMessage !== undefined || !isEmptyObject(action.errors) || !shouldDisplayContextMenu) {
                 return;
@@ -365,7 +371,7 @@ function ReportActionItem({
                 setIsEmojiPickerActive as () => void,
             );
         },
-        [draftMessage, action, report.reportID, toggleContextMenuFromActiveReportAction, originalReportID, shouldDisplayContextMenu, disabledActions, isArchivedRoom, isChronosReport],
+        [draftMessage, action, report.reportID, toggleContextMenuFromActiveReportAction, originalReportID, shouldDisplayContextMenu, disabledActions, isArchivedRoom, isChronosReport, eventHistory],
     );
 
     // Handles manual scrolling to the bottom of the chat when the last message is an actionable whisper and it's resolved.

@@ -31,6 +31,7 @@ import {CurrentReportIDContextProvider} from './components/withCurrentReportID';
 import {EnvironmentProvider} from './components/withEnvironment';
 import {KeyboardStateProvider} from './components/withKeyboardState';
 import {WindowDimensionsProvider} from './components/withWindowDimensions';
+import { EventHistoryProvider } from '@hooks/EventHistoryProvider';
 import CONFIG from './CONFIG';
 import Expensify from './Expensify';
 import useDefaultDragAndDrop from './hooks/useDefaultDragAndDrop';
@@ -94,6 +95,7 @@ function App({url}: AppProps) {
                             VolumeContextProvider,
                             VideoPopoverMenuContextProvider,
                             KeyboardProvider,
+                            EventHistoryProvider,
                         ]}
                     >
                         <CustomStatusBarAndBackground />
