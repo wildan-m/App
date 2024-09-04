@@ -332,8 +332,12 @@ function getOptionData({
         ) {
             result.brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
         }
-    } else if (!isEmptyObject(reportActions)) {
-        for (const action of Object.values(reportActions)) {
+    } else if (!isEmptyObject(reportActions) && !isEmptyObject(transactionViolations)) {
+        const filteredActions = Object.values(reportActions).filter(action => 
+            ReportActionsUtils.isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW)
+        );
+    
+        for (const action of filteredActions) {
             const iouReportID = ReportActionsUtils.getIOUReportIDFromReportActionPreview(action);
             if (ReportUtils.hasViolations(iouReportID, transactionViolations)) {
                 result.brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
@@ -341,7 +345,6 @@ function getOptionData({
             }
         }
     }
-
 
     result.ownerAccountID = report.ownerAccountID;
     result.managerID = report.managerID;
