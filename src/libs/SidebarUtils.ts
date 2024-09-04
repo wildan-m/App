@@ -22,6 +22,8 @@ import * as PolicyUtils from './PolicyUtils';
 import * as ReportActionsUtils from './ReportActionsUtils';
 import * as ReportUtils from './ReportUtils';
 import * as TaskUtils from './TaskUtils';
+import { isEmptyObject } from '@src/types/utils/EmptyObject';
+
 
 type WelcomeMessage = {showReportName: boolean; phrase1?: string; phrase2?: string; phrase3?: string; messageText?: string; messageHtml?: string};
 
@@ -253,6 +255,8 @@ function getOptionData({
     invoiceReceiverPolicy?: OnyxEntry<Policy>;
     transactionViolations?: OnyxCollection<TransactionViolation[]>;
 }): ReportUtils.OptionData | undefined {
+    console.log("[wildebug] ~ file: SidebarUtils.ts:256 ~ report.reportID:", report.reportID)
+    console.log("[wildebug] ~ file: SidebarUtils.ts:256 ~ transactionViolations:", transactionViolations)
     // When a user signs out, Onyx is cleared. Due to the lazy rendering with a virtual list, it's possible for
     // this method to be called after the Onyx data has been cleared out. In that case, it's fine to do
     // a null check here and return early.
@@ -313,7 +317,9 @@ function getOptionData({
     result.shouldShowSubscript = ReportUtils.shouldReportShowSubscript(report);
     result.pendingAction = report.pendingFields?.addWorkspaceRoom ?? report.pendingFields?.createChat;
     result.brickRoadIndicator = hasErrors || hasViolations ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : '';
-    const oneTransactionThreadReportID = ReportActionsUtils.getOneTransactionThreadReportID(report.reportID, ReportActionsUtils.getAllReportActions(report.reportID));
+    const oneTransactionThreadReportID = ReportActionsUtils.getOneTransactionThreadReportID(report.reportID, reportActions);
+    console.log("[wildebug] ~ file: SidebarUtils.ts:317 ~ reportActions:", reportActions)
+
     if (oneTransactionThreadReportID) {
         const oneTransactionThreadReport = ReportUtils.getReport(oneTransactionThreadReportID);
 
@@ -326,7 +332,17 @@ function getOptionData({
         ) {
             result.brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
         }
+    } else if (!isEmptyObject(reportActions)) {
+        for (const action of Object.values(reportActions)) {
+            const iouReportID = ReportActionsUtils.getIOUReportIDFromReportActionPreview(action);
+            if (ReportUtils.hasViolations(iouReportID, transactionViolations)) {
+                result.brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
+                break;
+            }
+        }
     }
+
+
     result.ownerAccountID = report.ownerAccountID;
     result.managerID = report.managerID;
     result.reportID = report.reportID;
