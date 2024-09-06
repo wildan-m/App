@@ -21,34 +21,43 @@ const SOUNDS = {
 
 const SOUND_CACHE_KEY = 'SOUND_CACHE';
 
-async function cacheSound(soundFile: string) {
+async function cacheSound(soundFile: string): Promise<string | null> {
     try {
         const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
         const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
 
-        if (!cachedSounds[soundFile]) {
-            const sound = new Sound(`${config.prefix}${soundFile}.mp3`, Sound.MAIN_BUNDLE, (error) => {
+        if (cachedSounds[soundFile]) {
+            return cachedSounds[soundFile];
+        } else {
+            const soundPath = `${config.prefix}${soundFile}.mp3`;
+            const sound = new Sound(soundPath, Sound.MAIN_BUNDLE, (error) => {
                 if (!error) {
-                    cachedSounds[soundFile] = `${config.prefix}${soundFile}.mp3`;
+                    cachedSounds[soundFile] = soundPath;
                     AsyncStorage.setItem(SOUND_CACHE_KEY, JSON.stringify(cachedSounds));
                 }
             });
+            return soundPath;
         }
     } catch (error) {
         console.error('Error caching sound:', error);
+        return null;
     }
 }
+
 async function loadCachedSounds() {
     try {
         const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
         const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
-        Object.keys(cachedSounds).forEach((soundFile) => {
-            new Sound(cachedSounds[soundFile], Sound.MAIN_BUNDLE, (error) => {
-                if (error) {
-                    console.error('Error loading cached sound:', error);
-                }
-            });
-        });
+
+        for (const soundFile in cachedSounds) {
+            if (cachedSounds.hasOwnProperty(soundFile)) {
+                new Sound(cachedSounds[soundFile], Sound.MAIN_BUNDLE, (error) => {
+                    if (error) {
+                        console.error('Error loading cached sound:', error);
+                    }
+                });
+            }
+        }
     } catch (error) {
         console.error('Error loading cached sounds:', error);
     }
@@ -95,16 +104,17 @@ function withMinimalExecutionTime<F extends (...args: Parameters<F>) => ReturnTy
     };
 }
 
-const playSound = (soundFile: ValueOf<typeof SOUNDS>) => {
-    cacheSound(soundFile);
-    const sound = new Sound(`${config.prefix}${soundFile}.mp3`, Sound.MAIN_BUNDLE, (error) => {
-        if (error || isMuted) {
-            return;
-        }
+const playSound = async (soundFile: ValueOf<typeof SOUNDS>) => {
+    const cachedSoundPath = await cacheSound(soundFile);
+    if (cachedSoundPath) {
+        const sound = new Sound(cachedSoundPath, Sound.MAIN_BUNDLE, (error) => {
+            if (error || isMuted) {
+                return;
+            }
 
-        sound.play();
-    });
+            sound.play();
+        });
+    }
 };
-
 export {SOUNDS};
 export default withMinimalExecutionTime(playSound, 300);
