@@ -1,6 +1,5 @@
 import Onyx from 'react-native-onyx';
 import Sound from 'react-native-sound';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {ValueOf} from 'type-fest';
 import ONYXKEYS from '@src/ONYXKEYS';
 import config from './config';
@@ -19,52 +18,26 @@ const SOUNDS = {
     RECEIVE: 'receive',
 } as const;
 
-const SOUND_CACHE_KEY = 'SOUND_CACHE';
+const soundCache: Record<ValueOf<typeof SOUNDS>, Sound> = {} as Record<ValueOf<typeof SOUNDS>, Sound>;
 
-async function cacheSound(soundFile: string): Promise<string | null> {
-    try {
-        const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
-        const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
-
-        if (cachedSounds[soundFile]) {
-            return cachedSounds[soundFile];
-        } else {
-            const soundPath = `${config.prefix}${soundFile}.mp3`;
-            const sound = new Sound(soundPath, Sound.MAIN_BUNDLE, (error) => {
-                if (!error) {
-                    cachedSounds[soundFile] = soundPath;
-                    AsyncStorage.setItem(SOUND_CACHE_KEY, JSON.stringify(cachedSounds));
-                }
-            });
-            return soundPath;
+/**
+ * Load all sounds into the cache during app initialization.
+ */
+function loadSounds() {
+    Object.values(SOUNDS).forEach((soundFile) => {
+        // Check if the sound is already in the cache
+        if (soundCache[soundFile]) {
+            return;
         }
-    } catch (error) {
-        console.error('Error caching sound:', error);
-        return null;
-    }
-}
 
-async function loadCachedSounds() {
-    try {
-        const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
-        const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
-
-        for (const soundFile in cachedSounds) {
-            if (cachedSounds.hasOwnProperty(soundFile)) {
-                new Sound(cachedSounds[soundFile], Sound.MAIN_BUNDLE, (error) => {
-                    if (error) {
-                        console.error('Error loading cached sound:', error);
-                    }
-                });
+        const sound = new Sound(`${config.prefix}${soundFile}.mp3`, Sound.MAIN_BUNDLE, (error) => {
+            if (error) {
+                console.error(`Failed to load sound: ${soundFile}`, error);
             }
-        }
-    } catch (error) {
-        console.error('Error loading cached sounds:', error);
-    }
+        });
+        soundCache[soundFile] = sound;
+    });
 }
-
-loadCachedSounds();
-
 /**
  * Creates a version of the given function that, when called, queues the execution and ensures that
  * calls are spaced out by at least the specified `minExecutionTime`, even if called more frequently. This allows
@@ -104,17 +77,21 @@ function withMinimalExecutionTime<F extends (...args: Parameters<F>) => ReturnTy
     };
 }
 
-const playSound = async (soundFile: ValueOf<typeof SOUNDS>) => {
-    const cachedSoundPath = await cacheSound(soundFile);
-    if (cachedSoundPath) {
-        const sound = new Sound(cachedSoundPath, Sound.MAIN_BUNDLE, (error) => {
-            if (error || isMuted) {
-                return;
-            }
-
-            sound.play();
-        });
+const playSound = (soundFile: ValueOf<typeof SOUNDS>) => {
+    const sound = soundCache[soundFile];
+    if (!sound || isMuted) {
+        return;
     }
+
+    sound.play((success) => {
+        if (!success) {
+            console.error(`Failed to play sound: ${soundFile}`);
+        }
+    });
 };
+
+// Load sounds during app initialization
+loadSounds();
+
 export {SOUNDS};
 export default withMinimalExecutionTime(playSound, 300);
