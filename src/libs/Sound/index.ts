@@ -1,5 +1,6 @@
 import Onyx from 'react-native-onyx';
 import Sound from 'react-native-sound';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {ValueOf} from 'type-fest';
 import ONYXKEYS from '@src/ONYXKEYS';
 import config from './config';
@@ -17,6 +18,43 @@ const SOUNDS = {
     ATTENTION: 'attention',
     RECEIVE: 'receive',
 } as const;
+
+const SOUND_CACHE_KEY = 'SOUND_CACHE';
+
+async function cacheSound(soundFile: string) {
+    try {
+        const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
+        const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
+
+        if (!cachedSounds[soundFile]) {
+            const sound = new Sound(`${config.prefix}${soundFile}.mp3`, Sound.MAIN_BUNDLE, (error) => {
+                if (!error) {
+                    cachedSounds[soundFile] = `${config.prefix}${soundFile}.mp3`;
+                    AsyncStorage.setItem(SOUND_CACHE_KEY, JSON.stringify(cachedSounds));
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error caching sound:', error);
+    }
+}
+async function loadCachedSounds() {
+    try {
+        const cachedSoundsString = await AsyncStorage.getItem(SOUND_CACHE_KEY);
+        const cachedSounds = cachedSoundsString ? JSON.parse(cachedSoundsString) : {};
+        Object.keys(cachedSounds).forEach((soundFile) => {
+            new Sound(cachedSounds[soundFile], Sound.MAIN_BUNDLE, (error) => {
+                if (error) {
+                    console.error('Error loading cached sound:', error);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error loading cached sounds:', error);
+    }
+}
+
+loadCachedSounds();
 
 /**
  * Creates a version of the given function that, when called, queues the execution and ensures that
@@ -58,6 +96,7 @@ function withMinimalExecutionTime<F extends (...args: Parameters<F>) => ReturnTy
 }
 
 const playSound = (soundFile: ValueOf<typeof SOUNDS>) => {
+    cacheSound(soundFile);
     const sound = new Sound(`${config.prefix}${soundFile}.mp3`, Sound.MAIN_BUNDLE, (error) => {
         if (error || isMuted) {
             return;

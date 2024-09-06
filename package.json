@@ -86,6 +86,7 @@
     "@kie/act-js": "^2.6.2",
     "@kie/mock-github": "2.0.1",
     "@onfido/react-native-sdk": "10.6.0",
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-camera-roll/camera-roll": "7.4.0",
     "@react-native-clipboard/clipboard": "^1.13.2",
     "@react-native-community/geolocation": "3.3.0",
