@@ -1920,9 +1920,6 @@ function getSendInvoiceInformation(
     }
 
     // STEP 5: Build optimistic reportActions.
-    const reportPreviewAction = ReportUtils.buildOptimisticReportPreview(chatReport, optimisticInvoiceReport, trimmedComment, optimisticTransaction);
-    optimisticInvoiceReport.parentReportActionID = reportPreviewAction.reportActionID;
-    chatReport.lastVisibleActionCreated = reportPreviewAction.created;
     const [optimisticCreatedActionForChat, optimisticCreatedActionForIOUReport, iouAction, optimisticTransactionThread, optimisticCreatedActionForTransactionThread] =
         ReportUtils.buildOptimisticMoneyRequestEntities(
             optimisticInvoiceReport,
@@ -1938,6 +1935,17 @@ function getSendInvoiceInformation(
             false,
             false,
         );
+    
+    // Set the created time for optimisticCreatedActionForChat
+    optimisticCreatedActionForChat.created = DateUtils.getDBTime();
+    
+    const reportPreviewAction = ReportUtils.buildOptimisticReportPreview(chatReport, optimisticInvoiceReport, trimmedComment, optimisticTransaction);
+    
+    // Set the created time for reportPreviewAction to be after optimisticCreatedActionForChat
+    reportPreviewAction.created = DateUtils.getDBTime(new Date().getTime() + 1000); // Adding 1 second to ensure it's after (Optional)
+    
+    optimisticInvoiceReport.parentReportActionID = reportPreviewAction.reportActionID;
+    chatReport.lastVisibleActionCreated = reportPreviewAction.created;
 
     // STEP 6: Build Onyx Data
     const [optimisticData, successData, failureData] = buildOnyxDataForInvoice(
