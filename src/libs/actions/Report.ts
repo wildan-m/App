@@ -168,6 +168,7 @@ Onyx.connect({
         // When signed out, val is undefined
         if (!value?.accountID) {
             conciergeChatReportID = undefined;
+            Onyx.set(ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID, undefined);
             return;
         }
         currentUserEmail = value.email;
@@ -2169,7 +2170,7 @@ function navigateToConciergeChat(shouldDismissModal = false, checkIfCurrentPageA
             if(!conciergeChatReportID){
                 return;
             }
-            
+
             navigate(conciergeChatReportID, shouldDismissModal, actionType);
         });
     } else {
