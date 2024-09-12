@@ -1390,6 +1390,7 @@ function handleReportChanged(report: OnyxEntry<Report>) {
     if (report?.reportID) {
         if (ReportUtils.isConciergeChatReport(report)) {
             conciergeChatReportID = report.reportID;
+            Onyx.set(ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID, report.reportID);
         }
     }
 }
@@ -2145,6 +2146,14 @@ function updateWriteCapabilityAndNavigate(report: Report, newValue: WriteCapabil
 /**
  * Navigates to the 1:1 report with Concierge
  */
+function navigate(reportID: string, shouldDismissModal: boolean, actionType?: string) {
+    if (shouldDismissModal) {
+        Navigation.dismissModal(reportID);
+    } else {
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID), actionType);
+    }
+}
+
 function navigateToConciergeChat(shouldDismissModal = false, checkIfCurrentPageActive = () => true, actionType?: string) {
     // If conciergeChatReportID contains a concierge report ID, we navigate to the concierge chat using the stored report ID.
     // Otherwise, we would find the concierge chat and navigate to it.
@@ -2156,12 +2165,15 @@ function navigateToConciergeChat(shouldDismissModal = false, checkIfCurrentPageA
             if (!checkIfCurrentPageActive()) {
                 return;
             }
-            navigateToAndOpenReport([CONST.EMAIL.CONCIERGE], shouldDismissModal, actionType);
+
+            if(!conciergeChatReportID){
+                return;
+            }
+            
+            navigate(conciergeChatReportID, shouldDismissModal, actionType);
         });
-    } else if (shouldDismissModal) {
-        Navigation.dismissModal(conciergeChatReportID);
     } else {
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeChatReportID), actionType);
+        navigate(conciergeChatReportID, shouldDismissModal, actionType);
     }
 }
 

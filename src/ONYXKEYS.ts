@@ -121,6 +121,7 @@ const ONYXKEYS = {
 
     /** This NVP contains information about whether the onboarding flow was completed or not */
     NVP_ONBOARDING: 'nvp_onboarding',
+    NVP_CONCIERGE_CHAT_REPORT_ID: 'nvp_conciergeChatReportID',
 
     /** This NVP contains data associated with HybridApp */
     NVP_TRYNEWDOT: 'nvp_tryNewDot',
@@ -830,6 +831,8 @@ type OnyxValuesMapping = {
 
     // NVP_ONBOARDING is an array for old users.
     [ONYXKEYS.NVP_ONBOARDING]: Onboarding | [];
+    
+    [ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID]: string;
 
     // ONYXKEYS.NVP_TRYNEWDOT is HybridApp onboarding data
     [ONYXKEYS.NVP_TRYNEWDOT]: OnyxTypes.TryNewDot;

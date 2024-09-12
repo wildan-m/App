@@ -11,10 +11,12 @@ import ROUTES from '@src/ROUTES';
 import type Onboarding from '@src/types/onyx/Onboarding';
 import type TryNewDot from '@src/types/onyx/TryNewDot';
 import * as OnboardingFlow from './OnboardingFlow';
+import { isEmpty } from 'lodash';
 
 type OnboardingData = Onboarding | [] | undefined;
 
 let isLoadingReportData = true;
+let conciergeChatReportID: string | undefined;
 let tryNewDotData: TryNewDot | undefined;
 let onboarding: OnboardingData;
 
@@ -111,7 +113,7 @@ function handleHybridAppOnboarding() {
  * Check if report data are loaded
  */
 function checkServerDataReady() {
-    if (isLoadingReportData) {
+    if (isLoadingReportData || isEmpty(conciergeChatReportID)) {
         return;
     }
 
@@ -201,6 +203,15 @@ Onyx.connect({
     initWithStoredValues: false,
     callback: (value) => {
         isLoadingReportData = value ?? false;
+        checkServerDataReady();
+    },
+});
+
+Onyx.connect({
+    key: ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID,
+    initWithStoredValues: false,
+    callback: (value) => {
+        conciergeChatReportID = value ?? '';
         checkServerDataReady();
     },
 });
