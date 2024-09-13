@@ -365,41 +365,53 @@ function isTransactionThread(parentReportAction: OnyxInputOrEntry<ReportAction>)
  *
  */
 function getSortedReportActions(reportActions: ReportAction[] | null, shouldSortInDescendingOrder = false): ReportAction[] {
+    console.log('[wildebug] reportActions:', reportActions);
+    console.log('[wildebug] shouldSortInDescendingOrder:', shouldSortInDescendingOrder);
+
     if (!Array.isArray(reportActions)) {
         throw new Error(`ReportActionsUtils.getSortedReportActions requires an array, received ${typeof reportActions}`);
     }
 
     const invertedMultiplier = shouldSortInDescendingOrder ? -1 : 1;
+    console.log('[wildebug] invertedMultiplier:', invertedMultiplier);
 
     const createdCount = reportActions?.filter(action => action.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED).length || 0;
 
     const sortedActions = reportActions?.filter(Boolean).sort((first, second) => {
+
         // It means we only have reportActions from one report
-        if (createdCount <= 1 && first.created !== second.created) {
-            return (first.created < second.created ? -1 : 1) * invertedMultiplier;
+        if (createdCount <= 1 && (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
+            const result = (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
+            return result;
+        }
+
+        if (first.created !== second.created) {
+            const result = (first.created < second.created ? -1 : 1) * invertedMultiplier;
+            return result;
         }
 
         // Then by action type, ensuring that `CREATED` actions always come first if they have the same timestamp as another action type
-        if ((first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
-            return (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
-        }
-
-        // It means we have reportActions from multiple reports and we sort by created date first.
-        if (createdCount > 1 && first.created !== second.created) {
-            return (first.created < second.created ? -1 : 1) * invertedMultiplier;
+        if (createdCount > 1 && (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
+            const result = (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
+            return result;
         }
 
         // Ensure that `REPORT_PREVIEW` actions always come after if they have the same timestamp as another action type
         if ((first.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW || second.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW) && first.actionName !== second.actionName) {
-            return (first.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW ? 1 : -1) * invertedMultiplier;
+            const result = (first.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW ? 1 : -1) * invertedMultiplier;
+            console.log('[wildebug] Action type REPORT_PREVIEW comparison result:', result);
+            return result;
         }
 
         // Then fallback on reportActionID as the final sorting criteria. It is a random number,
         // but using this will ensure that the order of reportActions with the same created time and action type
         // will be consistent across all users and devices
-        return (first.reportActionID < second.reportActionID ? -1 : 1) * invertedMultiplier;
+        const result = (first.reportActionID < second.reportActionID ? -1 : 1) * invertedMultiplier;
+        console.log('[wildebug] reportActionID comparison result:', result);
+        return result;
     });
 
+    console.log('[wildebug] sortedActions:', sortedActions);
     return sortedActions;
 }
 
