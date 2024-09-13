@@ -364,22 +364,26 @@ function isTransactionThread(parentReportAction: OnyxInputOrEntry<ReportAction>)
  * This gives us a stable order even in the case of multiple reportActions created on the same millisecond
  *
  */
-function getSortedReportActions(reportActions: ReportAction[] | null, shouldSortInDescendingOrder = false): ReportAction[] {
+function getSortedReportActions(reportActions: ReportAction[] | null, shouldSortInDescendingOrder = false, shouldPrioritizeCreatedType = false): ReportAction[] {
     if (!Array.isArray(reportActions)) {
         throw new Error(`ReportActionsUtils.getSortedReportActions requires an array, received ${typeof reportActions}`);
     }
 
     const invertedMultiplier = shouldSortInDescendingOrder ? -1 : 1;
-
     const sortedActions = reportActions?.filter(Boolean).sort((first, second) => {
-        // First sort by timestamp
+
+        if (shouldPrioritizeCreatedType && (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
+            const result = (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
+            return result;
+        }
+
         if (first.created !== second.created) {
             return (first.created < second.created ? -1 : 1) * invertedMultiplier;
         }
 
-        // Then by action type, ensuring that `CREATED` actions always come first if they have the same timestamp as another action type
-        if ((first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
-            return (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
+        if (!shouldPrioritizeCreatedType && (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED || second.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) && first.actionName !== second.actionName) {
+            const result = (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
+            return result;
         }
         // Ensure that `REPORT_PREVIEW` actions always come after if they have the same timestamp as another action type
         if ((first.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW || second.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW) && first.actionName !== second.actionName) {
