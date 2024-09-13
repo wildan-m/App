@@ -210,10 +210,26 @@ function ReportActionsView({
 
     // Get a sorted array of reportActions for both the current report and the transaction thread report associated with this report (if there is one)
     // so that we display transaction-level and report-level report actions in order in the one-transaction view
-    const combinedReportActions = useMemo(
-        () => ReportActionsUtils.getCombinedReportActions(reportActionsToDisplay, transactionThreadReportID ?? null, transactionThreadReportActions),
-        [reportActionsToDisplay, transactionThreadReportActions, transactionThreadReportID],
-    );
+    const combinedReportActions = useMemo(() => {
+        const combinedActions = ReportActionsUtils.getCombinedReportActions(
+            reportActionsToDisplay,
+            transactionThreadReportID ?? null,
+            transactionThreadReportActions
+        );
+    
+        // Find the index of the action of the specified type
+        const actionIndex = combinedActions.findIndex(action =>
+            ReportActionsUtils.isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED)
+        );
+    
+        // If the action is found and it's not already the last item, move it to the last index
+        if (actionIndex !== -1 && actionIndex !== combinedActions.length - 1) {
+            const [action] = combinedActions.splice(actionIndex, 1);
+            combinedActions.push(action);
+        }
+    
+        return combinedActions;
+    }, [reportActionsToDisplay, transactionThreadReportActions, transactionThreadReportID]);
 
     const parentReportActionForTransactionThread = useMemo(
         () =>
