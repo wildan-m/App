@@ -374,7 +374,7 @@ function getSortedReportActions(reportActions: ReportAction[] | null, shouldSort
     const createdCount = reportActions?.filter(action => action.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED).length || 0;
 
     const sortedActions = reportActions?.filter(Boolean).sort((first, second) => {
-        // First sort by timestamp
+        // It means we only have reportActions from one report
         if (createdCount <= 1 && first.created !== second.created) {
             return (first.created < second.created ? -1 : 1) * invertedMultiplier;
         }
@@ -384,7 +384,7 @@ function getSortedReportActions(reportActions: ReportAction[] | null, shouldSort
             return (first.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED ? -1 : 1) * invertedMultiplier;
         }
 
-        // First sort by timestamp
+        // It means we have reportActions from multiple reports and we sort by created date first.
         if (createdCount > 1 && first.created !== second.created) {
             return (first.created < second.created ? -1 : 1) * invertedMultiplier;
         }
