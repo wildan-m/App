@@ -8,6 +8,7 @@ import tryResolveUrlFromApiRoot from '@libs/tryResolveUrlFromApiRoot';
 import CONST from '@src/CONST';
 import type {ReportAction, ReportActions} from '@src/types/onyx';
 import type {Note} from '@src/types/onyx/Report';
+import { OptimisticAddCommentReportAction } from '@libs/ReportUtils';
 
 /**
  * Constructs the initial component state from report actions
@@ -45,6 +46,7 @@ function extractAttachments(
                     duration: Number(attribs[CONST.ATTACHMENT_DURATION_ATTRIBUTE]),
                     isReceipt: false,
                     hasBeenFlagged: false,
+                    optimisticUri: attribs['data-optimistic-uri'],
                 });
                 return;
             }
@@ -81,6 +83,7 @@ function extractAttachments(
                     file: {name: fileName, width, height},
                     isReceipt: false,
                     hasBeenFlagged: attribs['data-flagged'] === 'true',
+                    optimisticUri: attribs['data-optimistic-uri'],
                 });
             }
         },
@@ -98,10 +101,11 @@ function extractAttachments(
         if (!ReportActionsUtils.shouldReportActionBeVisible(action, key) || ReportActionsUtils.isMoneyRequestAction(action)) {
             return;
         }
-
         const decision = ReportActionsUtils.getReportActionMessage(action)?.moderationDecision?.decision;
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
-        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}"/>`);
+        const optimisticUri = (action as OptimisticAddCommentReportAction).optimisticUri;
+        const optimisticUriAttribute = optimisticUri ? `data-optimistic-uri="${optimisticUri}"` : '';
+        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" ${optimisticUriAttribute}/>`);
         htmlParser.write(html);
     });
     htmlParser.end();
