@@ -27,7 +27,7 @@ function AttachmentCarousel({report, reportActions, parentReportActions, source,
     const {shouldShowArrows, setShouldShowArrows, autoHideArrows, cancelAutoHideArrows} = useCarouselArrows();
     const [activeSource, setActiveSource] = useState<AttachmentSource>(source);
 
-    const compareImage = useCallback((attachment: Attachment) => attachment.source === source, [source]);
+    const compareImage = useCallback((attachment: Attachment) => attachment.source === source || (!!attachment.optimisticUri && attachment.optimisticUri === source), [source]);
 
     useEffect(() => {
         const parentReportAction = report.parentReportActionID && parentReportActions ? parentReportActions[report.parentReportActionID] : undefined;
