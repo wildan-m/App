@@ -126,7 +126,7 @@ type OptimisticAddCommentReportAction = Pick<
     | 'childCommenterCount'
     | 'childLastVisibleActionCreated'
     | 'childOldestFourAccountIDs'
-> & {isOptimisticAction: boolean, optimisticUri: string};
+> & {isOptimisticAction: boolean, optimisticSrc: string};
 
 type OptimisticReportAction = {
     commentText: string;
@@ -4175,7 +4175,7 @@ function buildOptimisticAddCommentReportAction(
             pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
             shouldShow: true,
             isOptimisticAction: true,
-            optimisticUri: file?.uri,
+            optimisticSrc: file?.uri,
         },
     };
 }

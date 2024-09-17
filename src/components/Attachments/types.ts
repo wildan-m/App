@@ -29,7 +29,7 @@ type Attachment = {
 
     duration?: number;
 
-    optimisticUri?: string;
+    optimisticSrc?: string;
 };
 
 export type {AttachmentSource, Attachment};

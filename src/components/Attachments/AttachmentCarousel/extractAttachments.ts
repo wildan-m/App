@@ -46,7 +46,7 @@ function extractAttachments(
                     duration: Number(attribs[CONST.ATTACHMENT_DURATION_ATTRIBUTE]),
                     isReceipt: false,
                     hasBeenFlagged: false,
-                    optimisticUri: attribs['data-optimistic-uri'],
+                    optimisticSrc: attribs[CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE],
                 });
                 return;
             }
@@ -72,7 +72,7 @@ function extractAttachments(
                 if (!fileInfo.fileExtension) {
                     fileName = `${fileInfo.fileName || 'image'}.jpg`;
                 }
-
+console.log('[wildebug] attribs[data-optimistic-src]',attribs['data-optimistic-src'])
                 // By iterating actions in chronological order and prepending each attachment
                 // we ensure correct order of attachments even across actions with multiple attachments.
                 attachments.unshift({
@@ -83,7 +83,7 @@ function extractAttachments(
                     file: {name: fileName, width, height},
                     isReceipt: false,
                     hasBeenFlagged: attribs['data-flagged'] === 'true',
-                    optimisticUri: attribs['data-optimistic-uri'],
+                    optimisticSrc: attribs[CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE],
                 });
             }
         },
@@ -103,9 +103,9 @@ function extractAttachments(
         }
         const decision = ReportActionsUtils.getReportActionMessage(action)?.moderationDecision?.decision;
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
-        const optimisticUri = (action as OptimisticAddCommentReportAction).optimisticUri;
-        const optimisticUriAttribute = optimisticUri ? `data-optimistic-uri="${optimisticUri}"` : '';
-        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" ${optimisticUriAttribute}/>`);
+        const optimisticSrc = (action as OptimisticAddCommentReportAction).optimisticSrc;
+        const optimisticSrcAttribute = optimisticSrc ? `${CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE}="${optimisticSrc}"` : '';
+        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" ${optimisticSrcAttribute}/>`);
         htmlParser.write(html);
     });
     htmlParser.end();
