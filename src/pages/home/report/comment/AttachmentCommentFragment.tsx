@@ -14,7 +14,8 @@ type AttachmentCommentFragmentProps = {
 
 function AttachmentCommentFragment({addExtraMargin, html, source, styleAsDeleted}: AttachmentCommentFragmentProps) {
     const styles = useThemeStyles();
-    const isUploading = html.includes(CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE);
+    const isUploading = CONST.ATTACHMENT_LOCAL_URL_PREFIX.some((prefix) => source.startsWith(prefix));
+
     const htmlContent = styleAsDeleted && isUploading ? `<del>${html}</del>` : html;
 
     return (

@@ -574,7 +574,8 @@ const ContextMenuActions: ContextMenuAction[] = [
         shouldShow: (type, reportAction, isArchivedRoom, betas, menuTarget, isChronosReport, reportID, isPinnedChat, isUnreadChat, isOffline): reportAction is ReportAction => {
             const isAttachment = ReportActionsUtils.isReportActionAttachment(reportAction);
             const html = getActionHtml(reportAction);
-            const isUploading = html.includes(CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE);
+            const {sourceURL} = getAttachmentDetails(html);
+            const isUploading = CONST.ATTACHMENT_LOCAL_URL_PREFIX.some((prefix) => !!sourceURL && sourceURL.startsWith(prefix));
             return isAttachment && !isUploading && !!reportAction?.reportActionID && !ReportActionsUtils.isMessageDeleted(reportAction) && !isOffline;
         },
         onPress: (closePopover, {reportAction}) => {
