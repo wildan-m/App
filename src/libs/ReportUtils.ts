@@ -126,7 +126,7 @@ type OptimisticAddCommentReportAction = Pick<
     | 'childCommenterCount'
     | 'childLastVisibleActionCreated'
     | 'childOldestFourAccountIDs'
-> & {isOptimisticAction: boolean, optimisticSrc: string};
+> & {isOptimisticAction: boolean, optimisticSrc: string | undefined};
 
 type OptimisticReportAction = {
     commentText: string;
