@@ -12,6 +12,7 @@ import type {Note} from '@src/types/onyx/Report';
 /**
  * Constructs the initial component state from report actions
  */
+const reportActionOptimisticSrcCache = new Map<string, string>()
 function extractAttachments(
     type: ValueOf<typeof CONST.ATTACHMENT_TYPE>,
     {
@@ -30,6 +31,11 @@ function extractAttachments(
 
     const htmlParser = new HtmlParser({
         onopentag: (name, attribs) => {
+            const optimisticSrc = attribs[CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE];
+            const reportActionID = attribs['data-id'];
+            if (optimisticSrc) {
+                reportActionOptimisticSrcCache.set(reportActionID, optimisticSrc);
+            }
             if (name === 'video') {
                 const source = tryResolveUrlFromApiRoot(attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE]);
                 if (uniqueSources.has(source)) {
@@ -45,6 +51,7 @@ function extractAttachments(
                     duration: Number(attribs[CONST.ATTACHMENT_DURATION_ATTRIBUTE]),
                     isReceipt: false,
                     hasBeenFlagged: false,
+                    optimisticSrc: reportActionOptimisticSrcCache.get(reportActionID),
                 });
                 return;
             }
@@ -74,13 +81,14 @@ function extractAttachments(
                 // By iterating actions in chronological order and prepending each attachment
                 // we ensure correct order of attachments even across actions with multiple attachments.
                 attachments.unshift({
-                    reportActionID: attribs['data-id'],
+                    reportActionID,
                     source,
                     previewSource,
                     isAuthTokenRequired: !!expensifySource,
                     file: {name: fileName, width, height},
                     isReceipt: false,
                     hasBeenFlagged: attribs['data-flagged'] === 'true',
+                    optimisticSrc: reportActionOptimisticSrcCache.get(reportActionID),
                 });
             }
         },
@@ -101,7 +109,9 @@ function extractAttachments(
 
         const decision = ReportActionsUtils.getReportActionMessage(action)?.moderationDecision?.decision;
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
-        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}"/>`);
+         const html = ReportActionsUtils.getReportActionHtml(action)
+            .replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}"/>`)
+            .replace(/\/>(?!.*\/>)/, `data-id="${action.reportActionID}"/>`);       
         htmlParser.write(html);
     });
     htmlParser.end();
