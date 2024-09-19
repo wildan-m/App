@@ -105,8 +105,10 @@ console.log('[wildebug] attribs[data-optimistic-src]',attribs['data-optimistic-s
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
         const optimisticSrc = (action as OptimisticAddCommentReportAction).optimisticSrc;
         const optimisticSrcAttribute = optimisticSrc ? `${CONST.ATTACHMENT_OPTIMISTIC_SOURCE_ATTRIBUTE}="${optimisticSrc}"` : '';
-        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" ${optimisticSrcAttribute}/>`);
-        htmlParser.write(html);
+        const html = ReportActionsUtils.getReportActionHtml(action)
+            .replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" />`)
+            .replace(/\/>(?!.*\/>)/, ` ${optimisticSrcAttribute}/>`);        
+            htmlParser.write(html);
     });
     htmlParser.end();
 

@@ -10,6 +10,7 @@ import type {Decision} from './OriginalMessage';
 import type {NotificationPreference} from './Report';
 import type ReportActionName from './ReportActionName';
 import type {Receipt} from './Transaction';
+import { OptimisticAddCommentReportAction } from '@libs/ReportUtils';
 
 /** Model of report action message */
 type Message = {
@@ -299,7 +300,7 @@ type ReportAction<T extends ReportActionName = ReportActionName> = ReportActionB
 type ReportActionChangeLog = ReportAction<ValueOf<Spread<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG, typeof CONST.REPORT.ACTIONS.TYPE.ROOM_CHANGE_LOG>>>;
 
 /** Record of report actions, indexed by report action ID */
-type ReportActions = Record<string, ReportAction>;
+type ReportActions = Record<string, ReportAction | OptimisticAddCommentReportAction>;
 
 /** Collection of mock report actions, indexed by reportActions_${reportID} */
 type ReportActionsCollectionDataSet = CollectionDataSet<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>;

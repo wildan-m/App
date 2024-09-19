@@ -1631,6 +1631,7 @@ function editReportComment(reportID: string, originalReportAction: OnyxEntry<Rep
                 },
             ],
             lastModified: DateUtils.getDBTime(),
+            optimisticSrc: null,
         },
     };
 
