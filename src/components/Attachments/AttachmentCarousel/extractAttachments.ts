@@ -8,6 +8,7 @@ import tryResolveUrlFromApiRoot from '@libs/tryResolveUrlFromApiRoot';
 import CONST from '@src/CONST';
 import type {ReportAction, ReportActions} from '@src/types/onyx';
 import type {Note} from '@src/types/onyx/Report';
+import { Message } from '@src/types/onyx/ReportAction';
 
 /**
  * Constructs the initial component state from report actions
@@ -30,6 +31,10 @@ function extractAttachments(
 
     const htmlParser = new HtmlParser({
         onopentag: (name, attribs) => {
+            const reportActionID = attribs['data-id'];
+            const sequenceID = attribs['data-sequence-id'];
+            const isEdited = attribs['data-is-edited'] === 'true';
+
             if (name === 'video') {
                 const source = tryResolveUrlFromApiRoot(attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE]);
                 if (uniqueSources.has(source)) {
@@ -39,12 +44,15 @@ function extractAttachments(
                 uniqueSources.add(source);
                 const fileName = attribs[CONST.ATTACHMENT_ORIGINAL_FILENAME_ATTRIBUTE] || FileUtils.getFileName(`${source}`);
                 attachments.unshift({
+                    reportActionID,
                     source: tryResolveUrlFromApiRoot(attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE]),
                     isAuthTokenRequired: !!attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE],
                     file: {name: fileName},
                     duration: Number(attribs[CONST.ATTACHMENT_DURATION_ATTRIBUTE]),
                     isReceipt: false,
                     hasBeenFlagged: false,
+                    sequenceID,
+                    isEdited,
                 });
                 return;
             }
@@ -74,13 +82,15 @@ function extractAttachments(
                 // By iterating actions in chronological order and prepending each attachment
                 // we ensure correct order of attachments even across actions with multiple attachments.
                 attachments.unshift({
-                    reportActionID: attribs['data-id'],
+                    reportActionID,
                     source,
                     previewSource,
                     isAuthTokenRequired: !!expensifySource,
                     file: {name: fileName, width, height},
                     isReceipt: false,
                     hasBeenFlagged: attribs['data-flagged'] === 'true',
+                    sequenceID,
+                    isEdited,
                 });
             }
         },
@@ -101,8 +111,14 @@ function extractAttachments(
 
         const decision = ReportActionsUtils.getReportActionMessage(action)?.moderationDecision?.decision;
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
-        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}"/>`);
-        htmlParser.write(html);
+        const html = ReportActionsUtils.getReportActionHtml(action);
+        const isEdited = (action.message as Message).isEdited;
+        let sequenceId = 0;
+        const updatedHtml = html.replace(/\/>/g, (match) => {
+            sequenceId++;
+            return `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" data-sequence-id="${sequenceId}" data-is-edited="${isEdited}"/>`;
+        });        
+        htmlParser.write(updatedHtml);
     });
     htmlParser.end();
 

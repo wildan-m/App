@@ -28,6 +28,10 @@ type Attachment = {
     isReceipt?: boolean;
 
     duration?: number;
+
+    isEdited?: boolean;
+
+    sequenceID?: string;
 };
 
 export type {AttachmentSource, Attachment};

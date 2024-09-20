@@ -61,6 +61,7 @@ function AttachmentCarousel({report, reportActions, parentReportActions, source,
     const [activeSource, setActiveSource] = useState<AttachmentSource | null>(source);
     const {shouldShowArrows, setShouldShowArrows, autoHideArrows, cancelAutoHideArrows} = useCarouselArrows();
     const {handleTap, handleScaleChange, scale} = useCarouselContextEvents(setShouldShowArrows);
+    const prevTargetAttachmentsRef = useRef<Attachment[]>([]);
 
     useEffect(() => {
         if (!canUseTouchScreen) {
@@ -69,7 +70,11 @@ function AttachmentCarousel({report, reportActions, parentReportActions, source,
         setShouldShowArrows(true);
     }, [canUseTouchScreen, page, setShouldShowArrows]);
 
-    const compareImage = useCallback((attachment: Attachment) => attachment.source === source, [source]);
+    const compareImage = useCallback((attachment: Attachment) => {
+        console.log('[wildebug] prevTargetAttachmentsRef.current:', prevTargetAttachmentsRef.current);
+        console.log('[wildebug] attachment:', attachment);
+        attachment.source === source
+    }, [source]);
 
     useEffect(() => {
         const parentReportAction = report.parentReportActionID && parentReportActions ? parentReportActions[report.parentReportActionID] : undefined;
@@ -107,6 +112,8 @@ function AttachmentCarousel({report, reportActions, parentReportActions, source,
                 onNavigate(targetAttachments[initialPage]);
             }
         }
+
+        prevTargetAttachmentsRef.current = targetAttachments;
     }, [report.privateNotes, reportActions, parentReportActions, compareImage, report.parentReportActionID, attachments, setDownloadButtonVisibility, onNavigate, accountID, type]);
 
     // Scroll position is affected when window width is resized, so we readjust it on width changes
