@@ -29,9 +29,9 @@ type Attachment = {
 
     duration?: number;
 
-    isEdited?: boolean;
+    reportActionIsEdited?: boolean;
 
-    sequenceID?: string;
+    sequenceID?: number;
 };
 
 export type {AttachmentSource, Attachment};

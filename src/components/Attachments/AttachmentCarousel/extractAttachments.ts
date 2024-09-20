@@ -28,12 +28,18 @@ function extractAttachments(
     // We handle duplicate image sources by considering the first instance as original. Selecting any duplicate
     // and navigating back (<) shows the image preceding the first instance, not the selected duplicate's position.
     const uniqueSources = new Set();
-
+    let sequenceID = 0;
+    let firstDataID = '';
+    let reportActionIsEdited : boolean | undefined = undefined;
     const htmlParser = new HtmlParser({
         onopentag: (name, attribs) => {
-            const reportActionID = attribs['data-id'];
-            const sequenceID = attribs['data-sequence-id'];
-            const isEdited = attribs['data-is-edited'] === 'true';
+            if (!firstDataID) {
+                firstDataID = attribs['data-id'];
+            }
+
+            if(reportActionIsEdited === undefined) {
+                reportActionIsEdited = attribs['data-is-edited'] === 'true';
+            }
 
             if (name === 'video') {
                 const source = tryResolveUrlFromApiRoot(attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE]);
@@ -44,15 +50,15 @@ function extractAttachments(
                 uniqueSources.add(source);
                 const fileName = attribs[CONST.ATTACHMENT_ORIGINAL_FILENAME_ATTRIBUTE] || FileUtils.getFileName(`${source}`);
                 attachments.unshift({
-                    reportActionID,
                     source: tryResolveUrlFromApiRoot(attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE]),
                     isAuthTokenRequired: !!attribs[CONST.ATTACHMENT_SOURCE_ATTRIBUTE],
                     file: {name: fileName},
                     duration: Number(attribs[CONST.ATTACHMENT_DURATION_ATTRIBUTE]),
                     isReceipt: false,
                     hasBeenFlagged: false,
-                    sequenceID,
-                    isEdited,
+                    sequenceID: sequenceID++,
+                    reportActionID: firstDataID,
+                    reportActionIsEdited: reportActionIsEdited,
                 });
                 return;
             }
@@ -82,15 +88,15 @@ function extractAttachments(
                 // By iterating actions in chronological order and prepending each attachment
                 // we ensure correct order of attachments even across actions with multiple attachments.
                 attachments.unshift({
-                    reportActionID,
+                    reportActionID: firstDataID,
                     source,
                     previewSource,
                     isAuthTokenRequired: !!expensifySource,
                     file: {name: fileName, width, height},
                     isReceipt: false,
                     hasBeenFlagged: attribs['data-flagged'] === 'true',
-                    sequenceID,
-                    isEdited,
+                    sequenceID: sequenceID++,
+                    reportActionIsEdited: reportActionIsEdited,
                 });
             }
         },
@@ -111,14 +117,13 @@ function extractAttachments(
 
         const decision = ReportActionsUtils.getReportActionMessage(action)?.moderationDecision?.decision;
         const hasBeenFlagged = decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_HIDE || decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN;
-        const html = ReportActionsUtils.getReportActionHtml(action);
-        const isEdited = (action.message as Message).isEdited;
-        let sequenceId = 0;
-        const updatedHtml = html.replace(/\/>/g, (match) => {
-            sequenceId++;
-            return `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" data-sequence-id="${sequenceId}" data-is-edited="${isEdited}"/>`;
-        });        
-        htmlParser.write(updatedHtml);
+        const isEdited = Array.isArray(action.message) && action.message[0] ? (action.message[0] as Message).isEdited : false;
+        const html = ReportActionsUtils.getReportActionHtml(action).replace('/>', `data-flagged="${hasBeenFlagged}" data-id="${action.reportActionID}" data-is-edited="${isEdited}"/>`);
+        //reset sequenceID and firstDataID for each action
+        sequenceID = 0;
+        firstDataID = '';
+        reportActionIsEdited = undefined;
+        htmlParser.write(html);
     });
     htmlParser.end();
 

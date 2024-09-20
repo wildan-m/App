@@ -73,7 +73,8 @@ function AttachmentCarousel({report, reportActions, parentReportActions, source,
     const compareImage = useCallback((attachment: Attachment) => {
         console.log('[wildebug] prevTargetAttachmentsRef.current:', prevTargetAttachmentsRef.current);
         console.log('[wildebug] attachment:', attachment);
-        attachment.source === source
+        const prevOriginalAttachment = prevTargetAttachmentsRef.current.find((prevAttachment) => !attachment.reportActionIsEdited && prevAttachment.reportActionID === attachment.reportActionID && prevAttachment.sequenceID === attachment.sequenceID);
+        return attachment.source === source || prevOriginalAttachment?.source === source; 
     }, [source]);
 
     useEffect(() => {
