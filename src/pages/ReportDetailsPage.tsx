@@ -823,7 +823,7 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
                 <ConfirmModal
                     title={caseID === CASES.DEFAULT ? translate('task.deleteTask') : translate('iou.deleteExpense')}
                     isVisible={isDeleteModalVisible}
-                    onConfirm={()=>{
+                    onConfirm={() => {
                         Navigation.dismissModal();
                         setIsDeleteModalVisible(false);
                         isDeletedButtonPressed.current = true;
@@ -845,7 +845,7 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
                             }
                             return;
                         }
-                        
+
                         if (!navigateBackToAfterDelete.current) {
                             Navigation.dismissModal();
                         } else {

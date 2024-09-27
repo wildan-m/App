@@ -1788,15 +1788,15 @@ function getDeleteTrackExpenseInformation(
         },
     ];
 
-    if(shouldDeleteTransactionThread) {
+    if (shouldDeleteTransactionThread) {
         successData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
-            value: Object.keys(transactionThread as OnyxTypes.Report).reduce<Record<string, null>>((acc, key) => {
-                        acc[key] = null;
-                        return acc;
-                    }, {}),
-        })
+            value: Object.keys(transactionThread!).reduce<Record<string, null>>((acc, key) => {
+                acc[key] = null;
+                return acc;
+            }, {}),
+        });
     }
 
     const failureData: OnyxUpdate[] = [];
@@ -5859,20 +5859,7 @@ function deleteMoneyRequest(transactionID: string, reportAction: OnyxTypes.Repor
         reportPreviewAction,
         urlToNavigateBack,
     } = prepareToCleanUpMoneyRequest(transactionID, reportAction, isSingleTransactionView);
-    
-    console.log('[wildebug] shouldDeleteTransactionThread:', shouldDeleteTransactionThread);
-    console.log('[wildebug] shouldDeleteIOUReport:', shouldDeleteIOUReport);
-    console.log('[wildebug] updatedReportAction:', updatedReportAction);
-    console.log('[wildebug] updatedIOUReport:', updatedIOUReport);
-    console.log('[wildebug] updatedReportPreviewAction:', updatedReportPreviewAction);
-    console.log('[wildebug] transactionThreadID:', transactionThreadID);
-    console.log('[wildebug] transactionThread:', transactionThread);
-    console.log('[wildebug] chatReport:', chatReport);
-    console.log('[wildebug] transaction:', transaction);
-    console.log('[wildebug] transactionViolations:', transactionViolations);
-    console.log('[wildebug] iouReport:', iouReport);
-    console.log('[wildebug] reportPreviewAction:', reportPreviewAction);
-    console.log('[wildebug] urlToNavigateBack:', urlToNavigateBack);
+
     // STEP 2: Build Onyx data
     // The logic mostly resembles the cleanUpMoneyRequest function
     const optimisticData: OnyxUpdate[] = [
@@ -5990,15 +5977,15 @@ function deleteMoneyRequest(transactionID: string, reportAction: OnyxTypes.Repor
         },
     ];
 
-    if(shouldDeleteTransactionThread) {
+    if (shouldDeleteTransactionThread) {
         successData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadID}`,
-            value: Object.keys(transactionThread as OnyxTypes.Report).reduce<Record<string, null>>((acc, key) => {
-                        acc[key] = null;
-                        return acc;
-                    }, {}),
-        })
+            value: Object.keys(transactionThread!).reduce<Record<string, null>>((acc, key) => {
+                acc[key] = null;
+                return acc;
+            }, {}),
+        });
     }
 
     if (shouldDeleteIOUReport) {
@@ -6096,9 +6083,6 @@ function deleteMoneyRequest(transactionID: string, reportAction: OnyxTypes.Repor
         reportActionID: reportAction.reportActionID,
     };
 
-    console.log('[wildebug] optimisticData:', optimisticData);
-    console.log('[wildebug] successData:', successData);
-    console.log('[wildebug] failureData:', failureData);
     // STEP 3: Make the API request
     API.write(WRITE_COMMANDS.DELETE_MONEY_REQUEST, parameters, {optimisticData, successData, failureData});
     CachedPDFPaths.clearByKey(transactionID);
