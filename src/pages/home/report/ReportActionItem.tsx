@@ -157,6 +157,14 @@ function ReportActionItem({
     shouldDisplayContextMenu = true,
     parentReportActionForTransactionThread,
 }: ReportActionItemProps) {
+
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ displayAsGroup:", displayAsGroup)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ action:", action)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ parentReportActionForTransactionThread:", parentReportActionForTransactionThread)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ parentReportAction:", parentReportAction)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ transactionThreadReport:", transactionThreadReport)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:140 ~ report:", report)
+
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const blockedFromConcierge = useBlockedFromConcierge();
@@ -212,7 +220,7 @@ function ReportActionItem({
     const isOriginalMessageAnObject = originalMessage && typeof originalMessage === 'object';
     const hasResolutionInOriginalMessage = isOriginalMessageAnObject && 'resolution' in originalMessage;
     const prevActionResolution = usePrevious(isActionableWhisper && hasResolutionInOriginalMessage ? originalMessage?.resolution : null);
-
+    const prevParentReportAction = usePrevious(parentReportAction);
     // IOUDetails only exists when we are sending money
     const isSendingMoney =
         ReportActionsUtils.isMoneyRequestAction(action) &&
@@ -358,9 +366,33 @@ function ReportActionItem({
         [draftMessage, action, reportID, toggleContextMenuFromActiveReportAction, originalReportID, shouldDisplayContextMenu, disabledActions, isArchivedRoom, isChronosReport],
     );
 
-    // Handles manual scrolling to the bottom of the chat when the last message is an actionable whisper and it's resolved.
+    useEffect(() => {
+        console.log("[wildebug] ~ file: ReportActionItem.tsx:373 ~ useEffect ~ parentReportAction?.childMoneyRequestCount:", parentReportAction?.childMoneyRequestCount)
+        console.log("[wildebug] ~ file: ReportActionItem.tsx:375 ~ useEffect ~ prevParentReportAction?.childMoneyRequestCount:", prevParentReportAction?.childMoneyRequestCount)
+        console.log("[wildebug] ~ file: ReportActionItem.tsx:377 ~ useEffect ~ index:", index)
+        if (!prevParentReportAction){
+            console.log('[wildebug] asdoijfasd')
+            return
+        };
+        if (index !== 0) {
+            console.log('[wildebug] dufihsdfg')
+            
+            return};
+        if (parentReportAction?.childMoneyRequestCount !== 1) {
+            console.log('[wildebug] doisjgisdfgsdfg')
+            
+            return};
+        if ((prevParentReportAction?.childMoneyRequestCount ?? 0) <= 1) {
+            console.log('[wildebug] alsiodjfiasjdf')
+            
+            return};
+    
+        console.log('[wildebug] reportScrollManager.scrollToIndex', index)
+        reportScrollManager.scrollToIndex(index);
+    }, [parentReportAction?.childMoneyRequestCount, prevParentReportAction?.childMoneyRequestCount, index]);    // Handles manual scrolling to the bottom of the chat when the last message is an actionable whisper and it's resolved.
     // This fixes an issue where InvertedFlatList fails to auto scroll down and results in an empty space at the bottom of the chat in IOS.
     useEffect(() => {
+
         if (index !== 0 || !isActionableWhisper) {
             return;
         }
@@ -369,7 +401,14 @@ function ReportActionItem({
             reportScrollManager.scrollToIndex(index);
         }
     }, [index, originalMessage, prevActionResolution, reportScrollManager, isActionableWhisper, hasResolutionInOriginalMessage]);
+const sti = (indexOverride)=>{
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:375 ~ sti ~ index:", index)
+    console.log("[wildebug] ~ file: ReportActionItem.tsx:375 ~ sti ~ indexOverride:", indexOverride)
 
+    reportScrollManager.scrollToIndex(indexOverride ?? index)
+}
+
+window.sti=sti;
     const toggleReaction = useCallback(
         (emoji: Emoji, ignoreSkinToneOnCompare?: boolean) => {
             Report.toggleEmojiReaction(reportID, action, emoji, emojiReactions, undefined, ignoreSkinToneOnCompare);

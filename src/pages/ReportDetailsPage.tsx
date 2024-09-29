@@ -824,31 +824,39 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
                     title={caseID === CASES.DEFAULT ? translate('task.deleteTask') : translate('iou.deleteExpense')}
                     isVisible={isDeleteModalVisible}
                     onConfirm={() => {
-                        Navigation.dismissModal();
+                        // Navigation.dismissModal();
                         setIsDeleteModalVisible(false);
                         isDeletedButtonPressed.current = true;
                     }}
                     onCancel={() => setIsDeleteModalVisible(false)}
                     onModalHide={() => {
+                        console.log('[wildebug] Modal hide triggered');
                         if (isDeletedButtonPressed.current) {
+                            console.log('[wildebug] Delete button was pressed');
                             deleteTransaction();
                         }
-
+                    
                         // We use isTransactionDeleted to know if the modal hides because the user deletes the transaction.
                         if (!isTransactionDeleted.current) {
+                            console.log('[wildebug] Transaction is not deleted');
                             if (caseID === CASES.DEFAULT) {
+                                console.log('[wildebug] Case ID is default');
                                 if (navigateBackToAfterDelete.current) {
+                                    console.log('[wildebug] Navigating back to:', navigateBackToAfterDelete.current);
                                     Navigation.goBack(navigateBackToAfterDelete.current);
                                 } else {
+                                    console.log('[wildebug] Dismissing modal');
                                     Navigation.dismissModal();
                                 }
                             }
                             return;
                         }
-
+                    
                         if (!navigateBackToAfterDelete.current) {
+                            console.log('[wildebug] No navigation back target, dismissing modal');
                             Navigation.dismissModal();
                         } else {
+                            console.log('[wildebug] Navigating back after delete transaction:', navigateBackToAfterDelete.current);
                             ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
                         }
                     }}

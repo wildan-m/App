@@ -68,6 +68,7 @@ const dismissModal = (reportID?: string, ref = navigationRef) => {
     const report = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
     originalDismissModalWithReport({reportID, ...report}, ref);
 };
+window.dismissModal = dismissModal;
 // Re-exporting the closeRHPFlow here to fill in default value for navigationRef. The closeRHPFlow isn't defined in this file to avoid cyclic dependencies.
 const closeRHPFlow = (ref = navigationRef) => originalCloseRHPFlow(ref);
 
