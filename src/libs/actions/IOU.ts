@@ -3418,8 +3418,6 @@ function categorizeTrackedExpense(
         receipt,
         policyExpenseChatReportID: createdWorkspaceParams?.expenseChatReportID,
         policyExpenseCreatedReportActionID: createdWorkspaceParams?.expenseCreatedReportActionID,
-        announceChatReportID: createdWorkspaceParams?.announceChatReportID,
-        announceCreatedReportActionID: createdWorkspaceParams?.announceCreatedReportActionID,
         adminsChatReportID: createdWorkspaceParams?.adminsChatReportID,
         adminsCreatedReportActionID: createdWorkspaceParams?.adminsCreatedReportActionID,
     };
@@ -3495,8 +3493,6 @@ function shareTrackedExpense(
         receipt,
         policyExpenseChatReportID: createdWorkspaceParams?.expenseChatReportID,
         policyExpenseCreatedReportActionID: createdWorkspaceParams?.expenseCreatedReportActionID,
-        announceChatReportID: createdWorkspaceParams?.announceChatReportID,
-        announceCreatedReportActionID: createdWorkspaceParams?.announceCreatedReportActionID,
         adminsChatReportID: createdWorkspaceParams?.adminsChatReportID,
         adminsCreatedReportActionID: createdWorkspaceParams?.adminsCreatedReportActionID,
     };
@@ -6683,23 +6679,10 @@ function getPayMoneyRequestParams(
             successData: policySuccessData,
             params,
         } = Policy.buildPolicyData(currentUserEmail, true, undefined, payerPolicyID);
-        const {
-            announceChatReportID,
-            announceCreatedReportActionID,
-            adminsChatReportID,
-            adminsCreatedReportActionID,
-            expenseChatReportID,
-            expenseCreatedReportActionID,
-            customUnitRateID,
-            customUnitID,
-            ownerEmail,
-            policyName,
-        } = params;
+        const {adminsChatReportID, adminsCreatedReportActionID, expenseChatReportID, expenseCreatedReportActionID, customUnitRateID, customUnitID, ownerEmail, policyName} = params;
 
         policyParams = {
             policyID: payerPolicyID,
-            announceChatReportID,
-            announceCreatedReportActionID,
             adminsChatReportID,
             adminsCreatedReportActionID,
             expenseChatReportID,
@@ -7621,8 +7604,6 @@ function payInvoice(paymentMethodType: PaymentMethodType, chatReport: OnyxTypes.
         params: {
             reportActionID,
             policyID,
-            announceChatReportID,
-            announceCreatedReportActionID,
             adminsChatReportID,
             adminsCreatedReportActionID,
             expenseChatReportID,
@@ -7648,8 +7629,6 @@ function payInvoice(paymentMethodType: PaymentMethodType, chatReport: OnyxTypes.
         params = {
             ...params,
             policyID,
-            announceChatReportID,
-            announceCreatedReportActionID,
             adminsChatReportID,
             adminsCreatedReportActionID,
             expenseChatReportID,
