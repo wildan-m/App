@@ -76,13 +76,6 @@ function WorkspaceInvitePage({route, betas, invitedEmailsToAccountIDsDraft, poli
     });
 
     useEffect(() => {
-        return () => {
-            Member.setWorkspaceInviteMembersDraft(route.params.policyID, {});
-        };
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
-    }, [route.params.policyID]);
-
-    useEffect(() => {
         Policy.clearErrors(route.params.policyID);
         openWorkspaceInvitePage();
         // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps -- policyID changes remount the component

@@ -192,6 +192,7 @@ function WorkspaceMembersPage({personalDetails, route, policy, currentUserPerson
      * Open the modal to invite a user
      */
     const inviteUser = () => {
+        Member.setWorkspaceInviteMembersDraft(route.params.policyID, {});
         Navigation.navigate(ROUTES.WORKSPACE_INVITE.getRoute(route.params.policyID));
     };
 
