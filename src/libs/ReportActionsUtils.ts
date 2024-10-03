@@ -138,6 +138,17 @@ function getReportActionMessage(reportAction: PartialReportAction) {
     return Array.isArray(reportAction?.message) ? reportAction.message.at(0) : reportAction?.message;
 }
 
+function getReportActionPreviousMessage(reportAction: PartialReportAction) {
+    if(!reportAction){
+        return;
+    }
+
+    if ('previousMessage' in reportAction && Array.isArray(reportAction.previousMessage)) {
+        return reportAction.previousMessage.at(0);
+    }
+    return reportAction?.message;
+}
+
 function isDeletedParentAction(reportAction: OnyxInputOrEntry<ReportAction>): boolean {
     return (getReportActionMessage(reportAction)?.isDeletedParentAction ?? false) && (reportAction?.childVisibleActionCount ?? 0) > 0;
 }
@@ -1792,6 +1803,7 @@ export {
     getReportAction,
     getReportActionHtml,
     getReportActionMessage,
+    getReportActionPreviousMessage,
     getReportActionMessageText,
     getReportActionText,
     getReportPreviewAction,

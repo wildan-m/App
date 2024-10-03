@@ -3756,6 +3756,7 @@ function getReportName(
     personalDetails?: Partial<PersonalDetailsList>,
     invoiceReceiverPolicy?: OnyxEntry<Policy>,
     shouldIncludePolicyName = false,
+    shouldUsePrevName = false,
 ): string {
     const reportID = report?.reportID;
     const cacheKey = getCacheKey(report);
@@ -3776,22 +3777,29 @@ function getReportName(
         parentReportAction = isThread(report) ? allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`]?.[report.parentReportActionID] : undefined;
     }
     const parentReportActionMessage = ReportActionsUtils.getReportActionMessage(parentReportAction);
+    console.log("[wildebug] ~ file: ReportUtils.ts:3779 ~ parentReportActionMessage:", parentReportActionMessage)
+    const parentReportActionPreviousMessage = ReportActionsUtils.getReportActionPreviousMessage(parentReportAction);
+    console.log("[wildebug] ~ file: ReportUtils.ts:3781 ~ parentReportActionPreviousMessage:", parentReportActionPreviousMessage)
 
     if (
-        ReportActionsUtils.isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.SUBMITTED) ||
-        ReportActionsUtils.isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.SUBMITTED_AND_CLOSED)
-    ) {
-        return getIOUSubmittedMessage(parentReportAction);
-    }
-    if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.FORWARDED) {
-        return getIOUForwardedMessage(parentReportAction, report);
-    }
-    if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.REJECTED) {
-        return getRejectedReportMessage();
-    }
-    if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.APPROVED) {
-        return getIOUApprovedMessage(parentReportAction);
-    }
+            ReportActionsUtils.isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.SUBMITTED) ||
+            ReportActionsUtils.isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.SUBMITTED_AND_CLOSED)
+        ) {
+            console.log('[wildebug] IOU Submitted or Submitted and Closed:', parentReportAction);
+            return getIOUSubmittedMessage(parentReportAction);
+        }
+        if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.FORWARDED) {
+            console.log('[wildebug] IOU Forwarded:', parentReportAction, report);
+            return getIOUForwardedMessage(parentReportAction, report);
+        }
+        if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.REJECTED) {
+            console.log('[wildebug] IOU Rejected:', parentReportAction);
+            return getRejectedReportMessage();
+        }
+        if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.APPROVED) {
+            console.log('[wildebug] IOU Approved:', parentReportAction);
+            return getIOUApprovedMessage(parentReportAction);
+        }
 
     if (isChatThread(report)) {
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isTransactionThread(parentReportAction)) {
@@ -3799,20 +3807,24 @@ function getReportName(
             if (isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
                 formattedName += ` (${Localize.translateLocal('common.archived')})`;
             }
+            console.log('[wildebug] Transaction Thread:', formattedName);
             return formatReportLastMessageText(formattedName);
         }
-
+    
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isOldDotReportAction(parentReportAction)) {
+            console.log('[wildebug] Old Dot Report Action:', parentReportAction);
             return ReportActionsUtils.getMessageOfOldDotReportAction(parentReportAction);
         }
-
+    
         if (parentReportActionMessage?.isDeletedParentAction) {
-            return Localize.translateLocal('parentReportAction.deletedMessage');
+            console.log('[wildebug] Deleted Parent Action:', parentReportActionMessage);
+            return shouldUsePrevName ? (parentReportActionPreviousMessage as Message).text : Localize.translateLocal('parentReportAction.deletedMessage');
         }
-
+    
         const isAttachment = ReportActionsUtils.isReportActionAttachment(!isEmptyObject(parentReportAction) ? parentReportAction : undefined);
         const reportActionMessage = getReportActionMessage(parentReportAction, report?.parentReportID, report?.reportID ?? '').replace(/(\n+|\r\n|\n|\r)/gm, ' ');
         if (isAttachment && reportActionMessage) {
+            console.log('[wildebug] Attachment:', reportActionMessage);
             return `[${Localize.translateLocal('common.attachment')}]`;
         }
         if (
@@ -3820,78 +3832,98 @@ function getReportName(
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_HIDDEN ||
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_REMOVE
         ) {
+            console.log('[wildebug] Moderation Decision:', parentReportActionMessage.moderationDecision.decision);
             return Localize.translateLocal('parentReportAction.hiddenMessage');
         }
         if (isAdminRoom(report) || isUserCreatedPolicyRoom(report)) {
+            console.log('[wildebug] Admin or User Created Policy Room:', reportActionMessage);
             return getAdminRoomInvitedParticipants(parentReportAction, reportActionMessage);
         }
         if (reportActionMessage && isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
+            console.log('[wildebug] Archived Room:', reportActionMessage);
             return `${reportActionMessage} (${Localize.translateLocal('common.archived')})`;
         }
         if (!isEmptyObject(parentReportAction) && ReportActionsUtils.isModifiedExpenseAction(parentReportAction)) {
             const modifiedMessage = ModifiedExpenseMessage.getForReportAction(report?.reportID, parentReportAction);
+            console.log('[wildebug] Modified Expense Action:', modifiedMessage);
             return formatReportLastMessageText(modifiedMessage);
         }
         if (isTripRoom(report)) {
+            console.log('[wildebug] Trip Room:', report?.reportName);
             return report?.reportName ?? '';
         }
-
+    
         if (ReportActionsUtils.isCardIssuedAction(parentReportAction)) {
+            console.log('[wildebug] Card Issued Action:', parentReportAction);
             return ReportActionsUtils.getCardIssuedMessage(parentReportAction);
         }
+        console.log('[wildebug] Default Case:', reportActionMessage);
         return reportActionMessage;
     }
 
     if (isClosedExpenseReportWithNoExpenses(report)) {
+        console.log('[wildebug] Closed Expense Report with No Expenses:', report);
         return Localize.translateLocal('parentReportAction.deletedReport');
     }
-
+    
     if (isTaskReport(report) && isCanceledTaskReport(report, parentReportAction)) {
+        console.log('[wildebug] Canceled Task Report:', report, parentReportAction);
         return Localize.translateLocal('parentReportAction.deletedTask');
     }
-
+    
     if (isGroupChat(report)) {
+        console.log('[wildebug] Group Chat:', report);
         return getGroupChatName(undefined, true, report) ?? '';
     }
-
+    
     if (isChatRoom(report) || isTaskReport(report)) {
         formattedName = report?.reportName;
+        console.log('[wildebug] Chat Room or Task Report:', formattedName);
     }
-
+    
     if (isPolicyExpenseChat(report)) {
         formattedName = getPolicyExpenseChatName(report, policy);
+        console.log('[wildebug] Policy Expense Chat:', formattedName);
     }
-
+    
     if (isMoneyRequestReport(report)) {
         formattedName = getMoneyRequestReportName(report, policy);
+        console.log('[wildebug] Money Request Report:', formattedName);
     }
-
+    
     if (isInvoiceReport(report)) {
         formattedName = getMoneyRequestReportName(report, policy, invoiceReceiverPolicy);
+        console.log('[wildebug] Invoice Report:', formattedName);
     }
-
+    
     if (isInvoiceRoom(report)) {
         formattedName = getInvoicesChatName(report, invoiceReceiverPolicy);
+        console.log('[wildebug] Invoice Room:', formattedName);
     }
-
+    
     if (shouldIncludePolicyName && (isUserCreatedPolicyRoom(report) || isDefaultRoom(report))) {
         const policyName = getPolicyName(report, true);
         formattedName = policyName ? `${policyName} • ${report?.reportName}` : report?.reportName;
+        console.log('[wildebug] Policy Name Included:', formattedName);
     }
-
+    
     if (isArchivedRoom(report, getReportNameValuePairs(report?.reportID))) {
         formattedName += ` (${Localize.translateLocal('common.archived')})`;
+        console.log('[wildebug] Archived Room:', formattedName);
     }
-
+    
     if (isSelfDM(report)) {
         formattedName = getDisplayNameForParticipant(currentUserAccountID, undefined, undefined, true, personalDetails);
+        console.log('[wildebug] Self DM:', formattedName);
     }
-
+    
     if (formattedName) {
         if (reportID) {
             reportNameCache.set(cacheKey, {lastVisibleActionCreated: report?.lastVisibleActionCreated ?? '', reportName: formattedName});
+            console.log('[wildebug] Report Name Cached:', cacheKey, formattedName);
         }
-
+    
+        console.log('[wildebug] Formatted Name:', formattedName);
         return formatReportLastMessageText(formattedName);
     }
 
@@ -3906,12 +3938,13 @@ function getReportName(
     const isMultipleParticipantReport = participantsWithoutCurrentUser.length > 1;
     const participantNames = participantsWithoutCurrentUser.map((accountID) => getDisplayNameForParticipant(accountID, isMultipleParticipantReport, true, false, personalDetails)).join(', ');
     formattedName = participantNames;
+if (reportID) {
+    console.log('[wildebug] Caching Report Name:', cacheKey, formattedName);
+    reportNameCache.set(cacheKey, {lastVisibleActionCreated: report?.lastVisibleActionCreated ?? '', reportName: formattedName});
+}
 
-    if (reportID) {
-        reportNameCache.set(cacheKey, {lastVisibleActionCreated: report?.lastVisibleActionCreated ?? '', reportName: formattedName});
-    }
-
-    return formattedName;
+console.log('[wildebug] Returning Formatted Name:', formattedName);
+return formattedName;
 }
 
 /**
