@@ -8404,6 +8404,45 @@ function resolveDuplicates(params: TransactionMergeParams) {
     API.write(WRITE_COMMANDS.RESOLVE_DUPLICATES, parameters, {optimisticData, failureData});
 }
 
+function getNavigationUrlAfterTransactionDelete(params: {
+    iouReport: OnyxTypes.Report | null;
+    chatReport: OnyxTypes.Report | null;
+    shouldDeleteTransactionThread: boolean;
+    shouldDeleteIOUReport: boolean;
+    isSingleTransactionView: boolean;
+    isTrackExpense?: boolean;
+}): string | undefined {
+    const {
+        iouReport,
+        chatReport,
+        shouldDeleteTransactionThread,
+        shouldDeleteIOUReport,
+        isSingleTransactionView,
+        isTrackExpense = false,
+    } = params;
+
+    // For track expenses in self DMs, we only care about the chat report
+    if (isTrackExpense && chatReport && ReportUtils.isSelfDM(chatReport)) {
+        if (isSingleTransactionView && shouldDeleteTransactionThread) {
+            return ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID);
+        }
+        return undefined;
+    }
+
+    // For money requests, determine where to navigate based on what's being deleted
+    let reportIDToNavigateBack: string | undefined;
+    
+    if (iouReport && isSingleTransactionView && shouldDeleteTransactionThread && !shouldDeleteIOUReport) {
+        reportIDToNavigateBack = iouReport.reportID;
+    }
+
+    if (iouReport?.chatReportID && shouldDeleteIOUReport) {
+        reportIDToNavigateBack = iouReport.chatReportID;
+    }
+
+    return reportIDToNavigateBack ? ROUTES.REPORT_WITH_ID.getRoute(reportIDToNavigateBack) : undefined;
+}
+
 export {
     adjustRemainingSplitShares,
     getNextApproverAccountID,
@@ -8476,5 +8515,8 @@ export {
     updateMoneyRequestTaxRate,
     mergeDuplicates,
     resolveDuplicates,
+    getNavigationUrlAfterTransactionDelete,
+    getDeleteTrackExpenseInformation,
+    prepareToCleanUpMoneyRequest,
 };
 export type {GPSPoint as GpsPoint, IOURequestType};

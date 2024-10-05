@@ -47,12 +47,20 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type * as OnyxTypes from '@src/types/onyx';
+import * as OnyxTypes from '@src/types/onyx';
 import type DeepValueOf from '@src/types/utils/DeepValueOf';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type IconAsset from '@src/types/utils/IconAsset';
 import type {WithReportOrNotFoundProps} from './home/report/withReportOrNotFound';
 import withReportOrNotFound from './home/report/withReportOrNotFound';
+import * as ReportConnection from '@libs/ReportConnection';
+import { useNavigationState } from '@react-navigation/native';
+
+function useIsNavigating() {
+    const isNavigating = useNavigationState(state => state.isNavigating);
+    return isNavigating;
+}
+
 
 type ReportDetailsPageMenuItem = {
     key: DeepValueOf<typeof CONST.REPORT_DETAILS_MENU_ITEM>;
@@ -715,9 +723,11 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
     const isTransactionDeleted = useRef<boolean>(false);
     // Where to go back after deleting the transaction and its report. It's empty if the transaction report isn't deleted.
     const navigateBackToAfterDelete = useRef<Route>();
+    const isNavigating = useIsNavigating();
 
     const deleteTransaction = useCallback(() => {
         setIsDeleteModalVisible(false);
+        console.log("[wildebug] ~ file: ReportDetailsPage.tsx:727 ~ ReportDetailsPage ~ isNavigating:", isNavigating)
 
         if (caseID === CASES.DEFAULT) {
             navigateBackToAfterDelete.current = Task.deleteTask(report);
@@ -728,14 +738,57 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
             return;
         }
 
+        // Get prepared data without executing the delete
+        let navigationUrl: string | undefined;
+
         if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
-            navigateBackToAfterDelete.current = IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
+            const moneyRequestReportChat = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${moneyRequestReport?.reportID}`] ?? null;
+            
+            const { shouldDeleteTransactionThread } = IOU.getDeleteTrackExpenseInformation(
+                moneyRequestReport?.reportID ?? '',
+                iouTransactionID,
+                requestParentReportAction
+            );
+
+            navigationUrl = IOU.getNavigationUrlAfterTransactionDelete({
+                iouReport: null,
+                chatReport: moneyRequestReportChat as OnyxTypes.Report,
+                shouldDeleteTransactionThread,
+                shouldDeleteIOUReport: false,
+                isSingleTransactionView,
+                isTrackExpense: true
+            });
         } else {
-            navigateBackToAfterDelete.current = IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
+            const {
+                shouldDeleteTransactionThread,
+                shouldDeleteIOUReport,
+                iouReport,
+                chatReport: iouReportChat,
+            } = IOU.prepareToCleanUpMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
+
+            navigationUrl = IOU.getNavigationUrlAfterTransactionDelete({
+                iouReport,
+                chatReport: iouReportChat as OnyxTypes.Report,
+                shouldDeleteTransactionThread,
+                shouldDeleteIOUReport,
+                isSingleTransactionView
+            });
+        }
+
+        // Store the navigation URL for use after the delete operation
+        navigateBackToAfterDelete.current = navigationUrl as Route;
+        ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
+
+        // Execute the delete operation
+        if (ReportActionsUtils.isTrackExpenseAction(requestParentReportAction)) {
+            IOU.deleteTrackExpense(moneyRequestReport?.reportID ?? '', iouTransactionID, requestParentReportAction, isSingleTransactionView);
+        } else {
+            IOU.deleteMoneyRequest(iouTransactionID, requestParentReportAction, isSingleTransactionView);
         }
 
         isTransactionDeleted.current = true;
     }, [caseID, iouTransactionID, moneyRequestReport?.reportID, report, requestParentReportAction, isSingleTransactionView]);
+
     return (
         <ScreenWrapper testID={ReportDetailsPage.displayName}>
             <FullPageNotFoundView shouldShow={isEmptyObject(report)}>
@@ -841,7 +894,7 @@ function ReportDetailsPage({policies, report, route}: ReportDetailsPageProps) {
                         if (!navigateBackToAfterDelete.current) {
                             Navigation.dismissModal();
                         } else {
-                            ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
+                            // ReportUtils.navigateBackAfterDeleteTransaction(navigateBackToAfterDelete.current, true);
                         }
                     }}
                     prompt={caseID === CASES.DEFAULT ? translate('task.deleteConfirmation') : translate('iou.deleteConfirmation', {count: 1})}
