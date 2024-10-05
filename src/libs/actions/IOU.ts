@@ -5675,16 +5675,13 @@ function prepareToCleanUpMoneyRequest(transactionID: string, reportAction: OnyxT
 
     // STEP 5: Calculate the url that the user will be navigated back to
     // This depends on which page they are on and which resources were deleted
-    let reportIDToNavigateBack: string | undefined;
-    if (iouReport && isSingleTransactionView && shouldDeleteTransactionThread && !shouldDeleteIOUReport) {
-        reportIDToNavigateBack = iouReport.reportID;
-    }
-
-    if (iouReport?.chatReportID && shouldDeleteIOUReport) {
-        reportIDToNavigateBack = iouReport.chatReportID;
-    }
-
-    const urlToNavigateBack = reportIDToNavigateBack ? ROUTES.REPORT_WITH_ID.getRoute(reportIDToNavigateBack) : undefined;
+    const urlToNavigateBack = getNavigationUrlAfterTransactionDelete({
+        iouReport,
+        chatReport,
+        shouldDeleteTransactionThread,
+        shouldDeleteIOUReport,
+        isSingleTransactionView
+    });
 
     return {
         shouldDeleteTransactionThread,
@@ -6120,10 +6117,15 @@ function deleteTrackExpense(chatReportID: string, transactionID: string, reportA
     CachedPDFPaths.clearByKey(transactionID);
 
     // STEP 7: Navigate the user depending on which page they are on and which resources were deleted
-    if (isSingleTransactionView && shouldDeleteTransactionThread) {
-        // Pop the deleted report screen before navigating. This prevents navigating to the Concierge chat due to the missing report.
-        return ROUTES.REPORT_WITH_ID.getRoute(chatReport?.reportID ?? '-1');
-    }
+    // Return navigation URL
+    return getNavigationUrlAfterTransactionDelete({
+        iouReport: null,
+        chatReport,
+        shouldDeleteTransactionThread,
+        shouldDeleteIOUReport: false,
+        isSingleTransactionView,
+        isTrackExpense: true
+    });
 }
 
 /**
