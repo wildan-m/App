@@ -6,6 +6,7 @@ import type * as OnyxTypes from './types/onyx';
 import type Onboarding from './types/onyx/Onboarding';
 import type AssertTypesEqual from './types/utils/AssertTypesEqual';
 import type DeepValueOf from './types/utils/DeepValueOf';
+import ActionHighlight from './types/onyx/ActionHighlight';
 
 /**
  * This is a file containing constants for all the top level keys in our store
@@ -114,6 +115,7 @@ const ONYXKEYS = {
 
     /** This NVP contains information about whether the onboarding flow was completed or not */
     NVP_ONBOARDING: 'nvp_onboarding',
+    ACTION_HIGHLIGHT: 'actionHighlight',
 
     /** This NVP contains data associated with HybridApp */
     NVP_TRYNEWDOT: 'nvp_tryNewDot',
@@ -856,6 +858,7 @@ type OnyxValuesMapping = {
 
     // NVP_ONBOARDING is an array for old users.
     [ONYXKEYS.NVP_ONBOARDING]: Onboarding | [];
+    [ONYXKEYS.ACTION_HIGHLIGHT]: ActionHighlight;
 
     // ONYXKEYS.NVP_TRYNEWDOT is HybridApp onboarding data
     [ONYXKEYS.NVP_TRYNEWDOT]: OnyxTypes.TryNewDot;

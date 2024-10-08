@@ -338,6 +338,7 @@ function ReportActionItemMessageEdit(
      * @param emoji
      */
     const addEmojiToTextBox = (emoji: string) => {
+        ReportActionsUtils.dismissHighlight();
         const newSelection = {
             start: selection.start + emoji.length + CONST.SPACE_LENGTH,
             end: selection.start + emoji.length + CONST.SPACE_LENGTH,

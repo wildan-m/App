@@ -1777,6 +1777,11 @@ function getCardIssuedMessage(reportAction: OnyxEntry<ReportAction>, shouldRende
     }
 }
 
+function dismissHighlight()
+{
+    Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, {isHighlighted: false});
+}
+
 export {
     doesReportHaveVisibleActions,
     extractLinksFromMessageHtml,
@@ -1887,6 +1892,7 @@ export {
     getCardIssuedMessage,
     getRemovedConnectionMessage,
     getActionableJoinRequestPendingReportAction,
+    dismissHighlight,
 };
 
 export type {LastVisibleMessage};

@@ -53,6 +53,8 @@ import ComposerWithSuggestions from './ComposerWithSuggestions';
 import type {ComposerRef, ComposerWithSuggestionsProps} from './ComposerWithSuggestions/ComposerWithSuggestions';
 import RNMeasureContainer from './measureContainer';
 import SendButton from './SendButton';
+import * as ReportActionUtils from '@libs/ReportActionsUtils';
+
 
 type SuggestionsRef = {
     resetSuggestions: () => void;
@@ -349,6 +351,7 @@ function ReportActionCompose({
 
         // This will cause onCleared to be triggered where we actually send the message
         clearComposer();
+        ReportActionUtils.dismissHighlight();
     }, [isSendDisabled, isReportReadyForDisplay, composerRefShared]);
 
     // eslint-disable-next-line react-compiler/react-compiler

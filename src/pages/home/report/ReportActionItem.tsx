@@ -3,7 +3,7 @@ import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useSta
 import type {GestureResponderEvent, TextInput} from 'react-native';
 import {InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import {useOnyx} from 'react-native-onyx';
+import Onyx, {useOnyx} from 'react-native-onyx';
 import type {Emoji} from '@assets/emojis/types';
 import {AttachmentContext} from '@components/AttachmentContext';
 import Button from '@components/Button';
@@ -170,6 +170,7 @@ function ReportActionItem({
             return typeof matchingDraftMessage === 'string' ? matchingDraftMessage : matchingDraftMessage?.message;
         },
     });
+    const [actionHighlight] = useOnyx(ONYXKEYS.ACTION_HIGHLIGHT);
     const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${ReportActionsUtils.getIOUReportIDFromReportActionPreview(action) ?? -1}`);
     const [emojiReactions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${action.reportActionID}`);
     const [userWallet] = useOnyx(ONYXKEYS.USER_WALLET);
@@ -206,9 +207,31 @@ function ReportActionItem({
     const originalMessage = ReportActionsUtils.getOriginalMessage(action);
 
     const highlightedBackgroundColorIfNeeded = useMemo(
-        () => (isReportActionLinked ? StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG) : {}),
-        [StyleUtils, isReportActionLinked, theme.messageHighlightBG],
+        () => (actionHighlight?.reportActionID === action.reportActionID && actionHighlight.isHighlighted ? StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG) : {}),
+        [StyleUtils, actionHighlight, theme.messageHighlightBG],
     );
+
+    useEffect(() => {
+        if(!isReportActionLinked) {
+            // console.log("[wildebug] ~ file: ReportActionItem.tsx:216 ~ useEffect ~ !isReportActionLinked:", !isReportActionLinked)
+            // console.log("[wildebug] ~ file: ReportActionItem.tsx:225 ~ useEffect ~ linkedReportActionID:", linkedReportActionID)
+            // if(!linkedReportActionID)
+            // {
+            //     console.log("[wildebug] ~ file: ReportActionItem.tsx:224 ~ useEffect ~ !linkedReportActionID:", !linkedReportActionID)
+            //     Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: '', isHighlighted: false });
+            // }
+            return;
+        }
+
+        let isVisited = false;
+        if(actionHighlight?.reportActionID === action.reportActionID) {
+            console.log("[wildebug] ~ file: ReportActionItem.tsx:223 ~ useEffect ~ actionHighlight?.reportActionID === action.reportActionID:", actionHighlight?.reportActionID === action.reportActionID)
+            isVisited = true;
+        }
+
+        Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, {reportActionID: action.reportActionID, isHighlighted: !isVisited});
+        console.log("[wildebug] ~ file: ReportActionItem.tsx:228 ~ useEffect ~ {reportActionID: action.reportActionID, isHighlighted: !isVisited}:", {reportActionID: action.reportActionID, isHighlighted: !isVisited})
+    }, [isReportActionLinked]);
 
     const isDeletedParentAction = ReportActionsUtils.isDeletedParentAction(action);
     const isOriginalMessageAnObject = originalMessage && typeof originalMessage === 'object';
