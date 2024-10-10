@@ -145,7 +145,7 @@ function ReportActionItem({
     action,
     report,
     transactionThreadReport,
-    linkedReportActionID = '-1',
+    linkedReportActionID,
     displayAsGroup,
     index,
     isMostRecentIOUReportAction,
@@ -202,14 +202,14 @@ function ReportActionItem({
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID || -1}`);
-    const isReportActionLinked = linkedReportActionID && linkedReportActionID !== '-1' && action.reportActionID && linkedReportActionID === action.reportActionID;
+    const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const reportScrollManager = useReportScrollManager();
     const isActionableWhisper =
         ReportActionsUtils.isActionableMentionWhisper(action) || ReportActionsUtils.isActionableTrackExpense(action) || ReportActionsUtils.isActionableReportMentionWhisper(action);
     const originalMessage = ReportActionsUtils.getOriginalMessage(action);
 
     const highlightedBackgroundColorIfNeeded = useMemo(() => {
-        if (actionHighlight?.reportActionID && actionHighlight?.reportActionID !== '-1' && action.reportActionID  && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID) {
+        if (actionHighlight?.reportActionID && action.reportActionID  && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID) {
             return StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG);
         }
         return {};
@@ -238,10 +238,9 @@ const isFocused= useIsFocused();
 
 
         if (linkedReportActionID === '-1') {
-            console.log("[wildebug] ~ Onyx.set: setting actionHighlight to null");
-            Onyx.set(ONYXKEYS.ACTION_HIGHLIGHT, null);
             return;
         }
+
         if ( !action.reportActionID || !isFocused)
         {
             console.log("[wildebug] ~ useEffect early return: linkedReportActionID or action.reportActionID is invalid");
@@ -259,11 +258,11 @@ const isFocused= useIsFocused();
         if (actionHighlight?.reportActionID === action.reportActionID) {
             console.log("[wildebug] ~ file: ReportActionItem.tsx:237 ~ useEffect ~ actionHighlight.isVisited:", actionHighlight.isVisited)
 
-            // if(actionHighlight.isVisited){
-            //     console.log("[wildebug] ~ Onyx.merge: setting isHighlighted to false");
-            //     Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isHighlighted: false });
-            //     return;
-            // }
+            if(actionHighlight.isVisited){
+                console.log("[wildebug] ~ Onyx.merge: setting isHighlighted to false");
+                Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isHighlighted: false });
+                return;
+            }
             console.log("[wildebug] ~ Onyx.merge: setting isVisited to true");
             Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isVisited: true });
             return;

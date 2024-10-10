@@ -1918,6 +1918,7 @@ export {
     getRemovedConnectionMessage,
     getActionableJoinRequestPendingReportAction,
     dismissHighlight,
+    resetHighlight,
 };
 
 export type {LastVisibleMessage};
