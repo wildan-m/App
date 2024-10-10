@@ -1804,7 +1804,7 @@ function dismissHighlight(shouldUseSet = false)
 
 function resetHighlight()
 {
-    Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, null);
+    Onyx.set(ONYXKEYS.ACTION_HIGHLIGHT, null);
 }
 
 export {

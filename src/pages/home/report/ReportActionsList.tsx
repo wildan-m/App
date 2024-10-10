@@ -198,6 +198,29 @@ function ReportActionsList({
         [sortedReportActions, isOffline],
     );
 
+    useEffect(() => {
+        console.log("[wildebug] ~ file: ReportActionsList.tsx:204 ~ useEffect ~ linkedReportActionID:", linkedReportActionID)
+        if(linkedReportActionID === '-1')
+        {
+            console.log("[wildebug] ~ file: ReportActionsList.tsx:208 ~ useEffect ~ resetHighlight")
+            // no report action id defined in param, reset highlight
+            ReportActionsUtils.resetHighlight();
+            return;
+        }
+
+        const dismissActionHighlight = () => {
+            console.log("[wildebug] ~ file: ReportScreen.tsx:532 ~ dismissActionHighlight ~ dismissActionHighlight:")
+            ReportActionsUtils.dismissHighlight(true);
+        };
+
+        window.addEventListener('beforeunload', dismissActionHighlight);
+
+        return () => {
+            window.removeEventListener('beforeunload', dismissActionHighlight);
+        };
+    }, [linkedReportActionID]);
+
+
     /**
      * The timestamp for the unread marker.
      *

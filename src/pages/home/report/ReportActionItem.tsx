@@ -240,45 +240,59 @@ function ReportActionItem({
   
     const isFocused = useIsFocused();
     
-    useEffect(() => {          
+    useEffect(() => {        
+        console.log("[wildebug] useEffect triggered");
+        console.log("[wildebug] linkedReportActionID:", linkedReportActionID);
+        console.log("[wildebug] action.reportActionID:", action.reportActionID);
+        console.log("[wildebug] isFocused:", isFocused);
+        console.log("[wildebug] actionHighlight:", actionHighlight);
+
         if (!linkedReportActionID) {
+            console.log("[wildebug] linkedReportActionID is not defined");
             return;
         }
-
 
         if (linkedReportActionID === '-1') {
+            console.log("[wildebug] linkedReportActionID is '-1'");
             return;
         }
 
-        if ( !action.reportActionID || !isFocused)
-        {
+        if (!action.reportActionID || !isFocused) {
+            console.log("[wildebug] action.reportActionID or isFocused is not valid");
             return;
         }
 
         const isReportActionLinked = linkedReportActionID === action.reportActionID;
+        console.log("[wildebug] isReportActionLinked:", isReportActionLinked);
 
         if (!isReportActionLinked) {
+            console.log("[wildebug] isReportActionLinked is false");
             return;
         }
 
         if (actionHighlight?.reportActionID === action.reportActionID) {
-            if(actionHighlight.isVisited){
+            console.log("[wildebug] actionHighlight matches action.reportActionID");
+            if (actionHighlight.isVisited) {
+                console.log("[wildebug] actionHighlight isVisited is true, setting isHighlighted to false");
                 Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isHighlighted: false });
                 return;
             }
+            console.log("[wildebug] actionHighlight isVisited is false, setting isVisited to true");
             Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isVisited: true });
             return;
         }
 
         // Initialize actionHighlight when no previous one
         if (!actionHighlight) {
+            console.log("[wildebug] actionHighlight is not defined, initializing");
             Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
             return;
         }
 
         // reportActionID different with previous, replace
+        console.log("[wildebug] reportActionID different with previous, replacing");
         Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
-    }, [actionHighlight?.reportActionID, linkedReportActionID, action.reportActionID, isFocused])
+    }, [actionHighlight?.reportActionID, linkedReportActionID, action.reportActionID, isFocused]);
 
    
 
