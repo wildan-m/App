@@ -1119,7 +1119,14 @@ function ReportActionItem({
     return (
         <PressableWithSecondaryInteraction
             ref={popoverAnchorRef}
-            onPress={draftMessage === undefined ? onPress : undefined}
+            onPress={() => {
+                if(actionHighlight?.reportActionID !== action.reportActionID) {
+                    ReportActionsUtils.dismissHighlight();
+                }
+                if (draftMessage === undefined) {
+                    onPress?.();
+                }
+            }}
             style={[action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !isDeletedParentAction ? styles.pointerEventsNone : styles.pointerEventsAuto]}
             onPressIn={() => shouldUseNarrowLayout && DeviceCapabilities.canUseTouchScreen() && ControlSelection.block()}
             onPressOut={() => ControlSelection.unblock()}
