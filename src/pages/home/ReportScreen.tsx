@@ -528,6 +528,20 @@ function ReportScreen({route, currentReportID = '', navigation}: ReportScreenPro
     }, [prevIsFocused, report?.participants, isFocused, isSingleTransactionView, reportID]);
 
     useEffect(() => {
+        const dismissActionHighlight = () => {
+            console.log("[wildebug] ~ file: ReportScreen.tsx:532 ~ dismissActionHighlight ~ dismissActionHighlight:")
+            ReportActionsUtils.dismissHighlight(true);
+        };
+
+        window.addEventListener('beforeunload', dismissActionHighlight);
+
+        return () => {
+            window.removeEventListener('beforeunload', dismissActionHighlight);
+        };
+    }, []);
+
+
+    useEffect(() => {
         // We don't want this effect to run on the first render.
         if (firstRenderRef.current) {
             firstRenderRef.current = false;

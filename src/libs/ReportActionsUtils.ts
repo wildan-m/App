@@ -31,6 +31,7 @@ import type {OptimisticIOUReportAction, PartialReportAction} from './ReportUtils
 import StringUtils from './StringUtils';
 // eslint-disable-next-line import/no-cycle
 import * as TransactionUtils from './TransactionUtils';
+import ActionHighlight from '@src/types/onyx/ActionHighlight';
 
 type LastVisibleMessage = {
     lastMessageTranslationKey?: string;
@@ -89,6 +90,15 @@ Onyx.connect({
     key: ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
     callback: (personalDetails) => {
         privatePersonalDetails = personalDetails;
+    },
+});
+
+
+let currentActionHighlight: ActionHighlight | undefined;
+Onyx.connect({
+    key: ONYXKEYS.ACTION_HIGHLIGHT,
+    callback: (actionHightlight) => {
+        currentActionHighlight = actionHightlight;
     },
 });
 
@@ -1777,9 +1787,24 @@ function getCardIssuedMessage(reportAction: OnyxEntry<ReportAction>, shouldRende
     }
 }
 
-function dismissHighlight()
+function dismissHighlight(shouldUseSet = false)
 {
+    if(shouldUseSet)
+    {
+        if (!currentActionHighlight || !currentActionHighlight.reportActionID || !currentActionHighlight.isHighlighted)
+        {
+            return;
+        }
+        Onyx.set(ONYXKEYS.ACTION_HIGHLIGHT, {reportActionID: currentActionHighlight?.reportActionID, isVisited: currentActionHighlight?.isVisited, isHighlighted: false});
+        return;
+    }
+    // use merge by default to avoid unnecessary render in useEffect
     Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, {isHighlighted: false});
+}
+
+function resetHighlight()
+{
+    Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, null);
 }
 
 export {
