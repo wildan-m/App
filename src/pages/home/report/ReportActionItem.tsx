@@ -209,11 +209,22 @@ function ReportActionItem({
     const originalMessage = ReportActionsUtils.getOriginalMessage(action);
 
     const highlightedBackgroundColorIfNeeded = useMemo(() => {
-        if (actionHighlight?.reportActionID && action.reportActionID  && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID) {
+        console.log("[wildebug] ~ useMemo ~ actionHighlight:", actionHighlight);
+        const isHighlighted = actionHighlight?.reportActionID && action.reportActionID && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID;
+        
+        console.log('[wildebug] actionHighlight:', actionHighlight);
+        console.log('[wildebug] actionHighlight?.reportActionID:', actionHighlight?.reportActionID);
+        console.log('[wildebug] action.reportActionID:', action.reportActionID);
+        console.log('[wildebug] actionHighlight?.isHighlighted:', actionHighlight?.isHighlighted);
+        console.log('[wildebug] actionHighlight.reportActionID === action.reportActionID:', actionHighlight?.reportActionID === action.reportActionID);
+        console.log('[wildebug] isHighlighted:', isHighlighted);       
+         console.log("[wildebug] ~ useMemo ~ isHighlighted:", isHighlighted);
+        if (isHighlighted) {
+            console.log("[wildebug] ~ useMemo ~ theme.messageHighlightBG:", theme.messageHighlightBG);
             return StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG);
         }
         return {};
-    }, [StyleUtils, actionHighlight?.isHighlighted, action.reportActionID, theme.messageHighlightBG]);
+    }, [StyleUtils, actionHighlight?.reportActionID, actionHighlight?.isHighlighted, action.reportActionID, theme.messageHighlightBG]);
 
 
     // const highlightedBackgroundColorIfNeeded = useMemo(() => {
@@ -228,6 +239,7 @@ function ReportActionItem({
     // }, [StyleUtils, actionHighlight?.reportActionID, actionHighlight?.isHighlighted, action.reportActionID, theme.messageHighlightBG]);
   
     const isFocused = useIsFocused();
+    
     useEffect(() => {          
         if (!linkedReportActionID) {
             return;
