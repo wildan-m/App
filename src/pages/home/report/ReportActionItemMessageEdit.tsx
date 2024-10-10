@@ -313,6 +313,7 @@ function ReportActionItemMessageEdit(
      * the new content.
      */
     const publishDraft = useCallback(() => {
+        ReportActionsUtils.dismissHighlight();
         // Do nothing if draft exceed the character limit
         if (ReportUtils.getCommentLength(draft, {reportID}) > CONST.MAX_COMMENT_LENGTH) {
             return;
