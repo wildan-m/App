@@ -235,27 +235,9 @@ function ReportActionItem({
         return {};
     }, [StyleUtils, actionHighlight?.reportActionID, actionHighlight?.isHighlighted, action.reportActionID, theme.messageHighlightBG]);
 
-
-    // const highlightedBackgroundColorIfNeeded = useMemo(() => {
-    //     console.log("[wildebug] ~ useMemo ~ actionHighlight:", actionHighlight);
-    //     const isHighlighted = action.reportActionID && actionHighlight?.reportActionID && actionHighlight?.reportActionID === action.reportActionID && actionHighlight.isHighlighted;
-    //     console.log("[wildebug] ~ useMemo ~ isHighlighted:", isHighlighted);
-    //     if (isHighlighted) {
-    //         console.log("[wildebug] ~ useMemo ~ theme.messageHighlightBG:", theme.messageHighlightBG);
-    //         return StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG);
-    //     }
-    //     return {};
-    // }, [StyleUtils, actionHighlight?.reportActionID, actionHighlight?.isHighlighted, action.reportActionID, theme.messageHighlightBG]);
-  
     const isFocused = useIsFocused();
     
     useEffect(() => {        
-        console.log("[wildebug] useEffect triggered");
-        console.log("[wildebug] linkedReportActionID:", linkedReportActionID);
-        console.log("[wildebug] action.reportActionID:", action.reportActionID);
-        console.log("[wildebug] isFocused:", isFocused);
-        console.log("[wildebug] actionHighlight:", actionHighlight);
-
         if (!linkedReportActionID) {
             console.log("[wildebug] linkedReportActionID is not defined");
             return;
@@ -304,106 +286,6 @@ function ReportActionItem({
     }, [actionHighlight?.reportActionID, linkedReportActionID, action.reportActionID, isFocused]);
 
    
-
-
-    // useEffect(() => {
-    //     return () => {
-    //         console.log('[wildebug] unmount');
-    //         if (actionHighlight?.reportActionID === action.reportActionID) {
-    //             console.log("[wildebug] ~ file: ReportActionItem.tsx:237 ~ useEffect ~ actionHighlight.isVisited:", actionHighlight.isVisited);
-
-    //             if (actionHighlight.isVisited) {
-    //                 console.log("[wildebug] ~ Onyx.merge: setting isHighlighted to false");
-    //                 Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isHighlighted: false });
-    //             }
-    //         }
-    //     };
-    // }, []);
-
-
-    // const prevActionHighlightIDRef = useRef(actionHighlight?.reportActionID);
-
-//    useEffect(()=>{
-//        if (!action.reportActionID || !linkedReportActionID) {
-//            return;
-//        }
-
-//        if (prevActionHighlightIDRef.current === action.reportActionID) {
-//            if (actionHighlight?.isVisited) {
-//                Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isHighlighted: false });
-//                return;
-//            }
-//            Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { isVisited: true });
-//            return;
-//         //    Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
-//        }
-
-//        if(linkedReportActionID === action.reportActionID){
-//            prevActionHighlightIDRef.current = action.reportActionID;
-//            Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
-//        }
- 
-//        console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ isReportActionLinked:", isReportActionLinked);
-//        console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ action.reportActionID:", action.reportActionID);
-//        console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ linkedReportActionID:", linkedReportActionID);
-//        console.log("[wildebug] ~ file: ReportActionItem.tsx:238 ~ useEffect ~ actionHighlight:", actionHighlight);
-//        console.log("[wildebug] ~ file: ReportActionItem.tsx:238 ~ useEffect ~ actionHighlight?.reportActionID === action.reportActionID:", actionHighlight?.reportActionID === action.reportActionID);
-//    }, [actionHighlight?.reportActionID, action.reportActionID, linkedReportActionID])
-
-
-    // useEffect(() => {
-    //     if (!linkedReportActionID || !actionHighlight?.reportActionID || !action.reportActionID) {
-    //         return;
-    //     }
-
-    //     if (actionHighlight?.reportActionID !== action.reportActionID) {
-    //         Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
-    //     }
-
-    // }, [linkedReportActionID, actionHighlight?.reportActionID, action.reportActionID])
-
-   
-    // const isFocused = useIsFocused();
-    
-    // useEffect(() => {
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ isReportActionLinked:", isReportActionLinked);
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ action.reportActionID:", action.reportActionID);
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:219 ~ linkedReportActionID:", linkedReportActionID);
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:238 ~ useEffect ~ actionHighlight:", actionHighlight);
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:238 ~ useEffect ~ actionHighlight?.reportActionID === action.reportActionID:", actionHighlight?.reportActionID === action.reportActionID);
-    
-    //     if (actionHighlight === undefined) {
-    //         console.log("[wildebug] ~ if(actionHighlight === undefined):");
-    //         return;
-    //     }
-    //     if (!action.reportActionID) {
-    //         console.log("[wildebug] ~  if(action.reportActionID)");
-    //         return;
-    //     }
-    //     if (!isFocused) {
-    //         console.log("[wildebug] ~  if(!isFocused)");
-    //         return;
-    //     }
-    //     if (!isReportActionLinked) {
-    //         console.log("[wildebug] ~  if(!isReportActionLinked)");
-    //         return;
-    //     }
-    
-    //     if (actionHighlight?.reportActionID === action.reportActionID) {
-    //         console.log("[wildebug] actionHighlight matches action.reportActionID");
-    //         console.log("[wildebug] ~ file: ReportActionItem.tsx:246 ~ useEffect ~ { reportActionID: action.reportActionID, isHighlighted: !actionHighlight?.isVisited, isVisited: true }:", { reportActionID: action.reportActionID, isHighlighted: !actionHighlight?.isVisited, isVisited: true })
-
-    //         Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: !actionHighlight?.isVisited, isVisited: true });
-
-    //         return;
-    //     }
-    //     console.log("[wildebug] ~ file: ReportActionItem.tsx:249 ~ useEffect ~ { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false }:", { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false })
-    //     Onyx.merge(ONYXKEYS.ACTION_HIGHLIGHT, { reportActionID: action.reportActionID, isHighlighted: true, isVisited: false });
-
-     
-    // }, []);
-// }, [isReportActionLinked, isFocused]);
-
 
     const isDeletedParentAction = ReportActionsUtils.isDeletedParentAction(action);
     const isOriginalMessageAnObject = originalMessage && typeof originalMessage === 'object';
