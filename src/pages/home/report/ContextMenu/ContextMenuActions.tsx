@@ -508,7 +508,7 @@ const ContextMenuActions: ContextMenuAction[] = [
             const originalReportID = ReportUtils.getOriginalReportID(reportID, reportAction);
             Environment.getEnvironmentURL().then((environmentURL) => {
                 const reportActionID = reportAction?.reportActionID;
-                Clipboard.setString(`${environmentURL}/r/${originalReportID}/${reportActionID}`);
+                Clipboard.setString(`${environmentURL}/r/${originalReportID}/${reportActionID}?referrer=copy-link`);
             });
             hideContextMenu(true, ReportActionComposeFocusManager.focus);
         },

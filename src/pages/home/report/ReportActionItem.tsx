@@ -84,8 +84,9 @@ import ReportActionItemMessageEdit from './ReportActionItemMessageEdit';
 import ReportActionItemSingle from './ReportActionItemSingle';
 import ReportActionItemThread from './ReportActionItemThread';
 import ReportAttachmentsContext from './ReportAttachmentsContext';
-import { useIsFocused } from '@react-navigation/native';
-
+import { RouteProp, useIsFocused, useRoute } from '@react-navigation/native';
+import { AuthScreensParamList } from '@libs/Navigation/types';
+import SCREENS from '@src/SCREENS';
 
 type ReportActionItemProps = {
     /** Report for this action */
@@ -206,12 +207,16 @@ function ReportActionItem({
     // The app would crash due to subscribing to the entire report collection if parentReportID is an empty string. So we should have a fallback ID here.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID || -1}`);
-    const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
+    const route = useRoute<RouteProp<AuthScreensParamList, typeof SCREENS.REPORT>>();
+    
+
     const reportScrollManager = useReportScrollManager();
     const isActionableWhisper =
         ReportActionsUtils.isActionableMentionWhisper(action) || ReportActionsUtils.isActionableTrackExpense(action) || ReportActionsUtils.isActionableReportMentionWhisper(action);
     const originalMessage = ReportActionsUtils.getOriginalMessage(action);
 
+    const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
+    const isFromCopyLink = route?.params?.referrer === CONST.REFERRER.COPY_LINK;
     const highlightedBackgroundColorIfNeeded = useMemo(() => {
         console.log("[wildebug] ~ useMemo ~ actionHighlight:", actionHighlight);
         const isHighlighted = actionHighlight?.reportActionID && action.reportActionID && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID;
@@ -223,7 +228,7 @@ function ReportActionItem({
         console.log('[wildebug] actionHighlight.reportActionID === action.reportActionID:', actionHighlight?.reportActionID === action.reportActionID);
         console.log('[wildebug] isHighlighted:', isHighlighted);       
          console.log("[wildebug] ~ useMemo ~ isHighlighted:", isHighlighted);
-        if (isHighlighted) {
+        if ((isHighlighted || (isReportActionLinked && isFromCopyLink))) {
             console.log("[wildebug] ~ useMemo ~ theme.messageHighlightBG:", theme.messageHighlightBG);
             return StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG);
         }

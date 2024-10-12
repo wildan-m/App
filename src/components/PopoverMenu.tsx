@@ -26,6 +26,7 @@ import OfflineWithFeedback from './OfflineWithFeedback';
 import PopoverWithMeasuredContent from './PopoverWithMeasuredContent';
 import ScrollView from './ScrollView';
 import Text from './Text';
+import * as ReportActionUtils from '@libs/ReportActionsUtils';
 
 type PopoverMenuItem = MenuItemProps & {
     /** Text label */
@@ -149,6 +150,7 @@ function PopoverMenu({
         if (!selectedItem) {
             return;
         }
+        ReportActionUtils.dismissHighlight();
         if (selectedItem?.subMenuItems) {
             setCurrentMenuItems([...selectedItem.subMenuItems]);
             setEnteredSubMenuIndexes([...enteredSubMenuIndexes, index]);

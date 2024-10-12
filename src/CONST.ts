@@ -5659,6 +5659,7 @@ const CONST = {
 
     REFERRER: {
         NOTIFICATION: 'notification',
+        COPY_LINK: 'copy-link',
     },
 
     SUBSCRIPTION_SIZE_LIMIT: 20000,
