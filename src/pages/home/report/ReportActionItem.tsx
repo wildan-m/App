@@ -218,18 +218,8 @@ function ReportActionItem({
     const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const isFromCopyLink = route?.params?.referrer === CONST.REFERRER.COPY_LINK;
     const highlightedBackgroundColorIfNeeded = useMemo(() => {
-        console.log("[wildebug] ~ useMemo ~ actionHighlight:", actionHighlight);
         const isHighlighted = actionHighlight?.reportActionID && action.reportActionID && actionHighlight?.isHighlighted && actionHighlight.reportActionID === action.reportActionID;
-        
-        console.log('[wildebug] actionHighlight:', actionHighlight);
-        console.log('[wildebug] actionHighlight?.reportActionID:', actionHighlight?.reportActionID);
-        console.log('[wildebug] action.reportActionID:', action.reportActionID);
-        console.log('[wildebug] actionHighlight?.isHighlighted:', actionHighlight?.isHighlighted);
-        console.log('[wildebug] actionHighlight.reportActionID === action.reportActionID:', actionHighlight?.reportActionID === action.reportActionID);
-        console.log('[wildebug] isHighlighted:', isHighlighted);       
-         console.log("[wildebug] ~ useMemo ~ isHighlighted:", isHighlighted);
         if ((isHighlighted || (isReportActionLinked && isFromCopyLink))) {
-            console.log("[wildebug] ~ useMemo ~ theme.messageHighlightBG:", theme.messageHighlightBG);
             return StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG);
         }
         return {};
