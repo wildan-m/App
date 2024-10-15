@@ -1078,8 +1078,9 @@ function navigateToAndOpenReportWithAccountIDs(participantAccountIDs: number[]) 
  */
 function navigateToAndOpenChildReport(childReportID = '-1', parentReportAction: Partial<ReportAction> = {}, parentReportID = '0') {
     const onyxChildReport = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${childReportID}`];
+    const isNewChildReport = childReportID === '-1' || childReportID === '0'
 
-    if (childReportID !== '-1' && childReportID !== '0' && onyxChildReport?.reportID) {
+    if (!isNewChildReport && onyxChildReport?.reportID) {
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(childReportID));
     } else {
         const participantAccountIDs = [...new Set([currentUserAccountID, Number(parentReportAction.actorAccountID)])];
@@ -1102,10 +1103,10 @@ function navigateToAndOpenChildReport(childReportID = '-1', parentReportAction: 
             '',
             '',
             '',
-            childReportID !== '-1' && childReportID !== '0' ? childReportID : '',
+            !isNewChildReport ? childReportID : '',
         );
 
-        if (childReportID !== '-1' && childReportID !== '0') {
+        if (!isNewChildReport) {
             Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${newChat.reportID}`, newChat)
         } else {
             const participantLogins = PersonalDetailsUtils.getLoginsByAccountIDs(Object.keys(newChat.participants ?? {}).map(Number));
