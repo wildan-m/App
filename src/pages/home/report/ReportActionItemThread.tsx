@@ -10,6 +10,8 @@ import Timing from '@libs/actions/Timing';
 import * as Report from '@userActions/Report';
 import CONST from '@src/CONST';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
+import * as ReportUtils from '@libs/ReportUtils';
+import { ReportAction } from '@src/types/onyx';
 
 type ReportActionItemThreadProps = {
     /** List of participant icons for the thread */
@@ -29,9 +31,13 @@ type ReportActionItemThreadProps = {
 
     /** The function that should be called when the thread is LongPressed or right-clicked */
     onSecondaryInteraction: (event: GestureResponderEvent | MouseEvent) => void;
+
+    reportID: string;
+
+    reportAction: ReportAction;
 };
 
-function ReportActionItemThread({numberOfReplies, icons, mostRecentReply, childReportID, isHovered, onSecondaryInteraction}: ReportActionItemThreadProps) {
+function ReportActionItemThread({numberOfReplies, icons, mostRecentReply, childReportID, isHovered, onSecondaryInteraction, reportID, reportAction}: ReportActionItemThreadProps) {
     const styles = useThemeStyles();
 
     const {translate, datetimeToCalendarTime} = useLocalize();
@@ -45,7 +51,8 @@ function ReportActionItemThread({numberOfReplies, icons, mostRecentReply, childR
         <View style={[styles.chatItemMessage]}>
             <PressableWithSecondaryInteraction
                 onPress={() => {
-                    Report.navigateToAndOpenChildReport(childReportID);
+                    const originalReportID = ReportUtils.getOriginalReportID(reportID, reportAction);
+                    Report.navigateToAndOpenChildReport(childReportID ?? '-1', reportAction, originalReportID);
                     Timing.start(CONST.TIMING.OPEN_REPORT_THREAD);
                 }}
                 role={CONST.ROLE.BUTTON}
