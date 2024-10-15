@@ -1997,14 +1997,14 @@ function getWorkspaceIcon(report: OnyxInputOrEntry<Report>, policy?: OnyxInputOr
     const iconFromCache = workSpaceIconsCache.get(cacheKey);
     // disabling to protect against empty strings
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const policyAvatarURL = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatarURL || report?.policyAvatar;
+    const policyAvatarURL = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.avatarURL;
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const policyExpenseChatAvatarSource = policyAvatarURL || getDefaultWorkspaceAvatar(workspaceName);
 
     const isSameAvatarURL = iconFromCache?.icon?.source === policyExpenseChatAvatarSource;
     const hasWorkSpaceNameChanged = iconFromCache?.name !== workspaceName;
 
-    if (iconFromCache && (isSameAvatarURL || report?.policyAvatar === undefined) && !hasWorkSpaceNameChanged) {
+    if (iconFromCache && isSameAvatarURL && !hasWorkSpaceNameChanged) {
         return iconFromCache.icon;
     }
 
