@@ -1077,10 +1077,14 @@ function navigateToAndOpenReportWithAccountIDs(participantAccountIDs: number[]) 
  * @param parentReportID The reportID of the parent
  */
 function navigateToAndOpenChildReport(childReportID = '-1', parentReportAction: Partial<ReportAction> = {}, parentReportID = '0') {
-    const onyxChildReport = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${childReportID}`];
     const isNewChildReport = childReportID === '-1' || childReportID === '0'
-
-    if (!isNewChildReport && onyxChildReport?.reportID) {
+    if (!isNewChildReport) {
+        const onyxChildReport = ReportConnection.getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${childReportID}`];
+        // onyxChildReport not exists in onyx yet
+        if(!onyxChildReport?.reportID)
+        {
+            Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${childReportID}`, { reportID: childReportID, parentReportID: parentReportID, parentReportActionID: parentReportAction.reportActionID })
+        }
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(childReportID));
     } else {
         const participantAccountIDs = [...new Set([currentUserAccountID, Number(parentReportAction.actorAccountID)])];
@@ -1106,12 +1110,8 @@ function navigateToAndOpenChildReport(childReportID = '-1', parentReportAction: 
             !isNewChildReport ? childReportID : '',
         );
 
-        if (!isNewChildReport) {
-            Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${newChat.reportID}`, newChat)
-        } else {
-            const participantLogins = PersonalDetailsUtils.getLoginsByAccountIDs(Object.keys(newChat.participants ?? {}).map(Number));
-            openReport(newChat.reportID, '', participantLogins, newChat, parentReportAction.reportActionID);
-        }
+        const participantLogins = PersonalDetailsUtils.getLoginsByAccountIDs(Object.keys(newChat.participants ?? {}).map(Number));
+        openReport(newChat.reportID, '', participantLogins, newChat, parentReportAction.reportActionID);
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(newChat.reportID));
     }
 }
