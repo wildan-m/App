@@ -74,26 +74,29 @@ function Lottie({source, webStyle, shouldLoadAfterInteractions, ...props}: Props
             const state = navigationContainerRef.getRootState();
             const targetRouteName = state?.routes?.[state?.index ?? 0]?.name;
             if (!isSideModalNavigator(targetRouteName)) {
+                console.log("[wildebug] ~ file: index.tsx:79 ~ unsubscribeNavigationBlur ~ setHasNavigatedAway(true)")
+                animationRef?.current?.pause();
+
                 setHasNavigatedAway(true);
             }
         });
         return unsubscribeNavigationBlur;
     }, [browser, navigationContainerRef, navigator]);
 
-    // If user is being navigated away, let pause the animation to prevent memory leak.
-    // see issue: https://github.com/Expensify/App/issues/36645
-    useEffect(() => {
-        if (!animationRef.current || !hasNavigatedAway) {
-            return;
-        }
-        animationRef?.current?.pause();
-    }, [hasNavigatedAway]);
+    // // If user is being navigated away, let pause the animation to prevent memory leak.
+    // // see issue: https://github.com/Expensify/App/issues/36645
+    // useEffect(() => {
+    //     if (!animationRef.current || !hasNavigatedAway) {
+    //         return;
+    //     }
+    //     animationRef?.current?.pause();
+    // }, [hasNavigatedAway]);
 
     // If the page navigates to another screen, the image fails to load, app is in background state, animation file isn't ready, or the splash screen isn't hidden yet,
     // we'll just render an empty view as the fallback to prevent
     // 1. heavy rendering, see issues: https://github.com/Expensify/App/issues/34696 and https://github.com/Expensify/App/issues/47273
     // 2. lag on react navigation transitions, see issue: https://github.com/Expensify/App/issues/44812
-    if (isError || appState.isBackground || !animationFile || splashScreenState !== CONST.BOOT_SPLASH_STATE.HIDDEN || (!isInteractionComplete && shouldLoadAfterInteractions)) {
+    if (isError || appState.isBackground || !animationFile || splashScreenState !== CONST.BOOT_SPLASH_STATE.HIDDEN || (!isInteractionComplete && shouldLoadAfterInteractions) || hasNavigatedAway) {
         return <View style={[aspectRatioStyle, props.style]} />;
     }
 
