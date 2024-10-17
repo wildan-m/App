@@ -1,5 +1,6 @@
 import type {ValueOf} from 'type-fest';
 import type CONST from '@src/CONST';
+import type * as OnyxCommon from './OnyxCommon';
 
 /** Card feed data */
 type CardFeedData = {
@@ -23,6 +24,9 @@ type CardFeedData = {
 
     /** Indicates the day when the statement period for this card ends */
     statementPeriodEndDay: string;
+
+    /** Broken connection errors */
+    errors?: OnyxCommon.Errors;
 };
 
 /** Card feeds model */
@@ -32,6 +36,9 @@ type CardFeeds = {
 
     /** User-friendly feed nicknames */
     companyCardNicknames: Record<string, string>;
+
+    /** Whether we are loading the data via the API */
+    isLoading?: boolean;
 };
 
 /** Data required to be sent to add a new card */
@@ -41,6 +48,15 @@ type AddNewCardFeedData = {
 
     /** Card type */
     cardType: ValueOf<typeof CONST.COMPANY_CARDS.CARD_TYPE>;
+
+    /** Selected bank */
+    selectedBank: ValueOf<typeof CONST.COMPANY_CARDS.BANKS>;
+
+    /** Selected feed type */
+    selectedFeedType: ValueOf<typeof CONST.COMPANY_CARDS.FEED_TYPE>;
+
+    /** Selected Amex bank custom feed */
+    selectedAmexCustomFeed: ValueOf<typeof CONST.COMPANY_CARDS.AMEX_CUSTOM_FEED>;
 
     /** Name of the card */
     cardTitle: string;
@@ -62,4 +78,4 @@ type AddNewCompanyCardFeed = {
 };
 
 export default CardFeeds;
-export type {AddNewCardFeedStep, AddNewCompanyCardFeed, AddNewCardFeedData};
+export type {AddNewCardFeedStep, AddNewCompanyCardFeed, AddNewCardFeedData, CardFeedData};
