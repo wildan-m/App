@@ -112,6 +112,7 @@ const ONYXKEYS = {
     /** Boolean flag only true when first set */
     NVP_IS_FIRST_TIME_NEW_EXPENSIFY_USER: 'nvp_isFirstTimeNewExpensifyUser',
 
+    NVP_CONCIERGE_CHAT_REPORT_ID: 'nvp_conciergeChatReportID',
     /** This NVP contains information about whether the onboarding flow was completed or not */
     NVP_ONBOARDING: 'nvp_onboarding',
 
@@ -856,6 +857,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.ACCOUNT]: OnyxTypes.Account;
     [ONYXKEYS.ACCOUNT_MANAGER_REPORT_ID]: string;
     [ONYXKEYS.NVP_IS_FIRST_TIME_NEW_EXPENSIFY_USER]: boolean;
+    [ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID]: string;
 
     // NVP_ONBOARDING is an array for old users.
     [ONYXKEYS.NVP_ONBOARDING]: Onboarding | [];

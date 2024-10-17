@@ -9,6 +9,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type Onboarding from '@src/types/onyx/Onboarding';
 import type TryNewDot from '@src/types/onyx/TryNewDot';
 import * as OnboardingFlow from './OnboardingFlow';
+import * as ReportConnection from '@libs/ReportConnection';
+import lodashIsEmpty from 'lodash/isEmpty';
+
 
 type OnboardingData = Onboarding | [] | undefined;
 
@@ -56,11 +59,21 @@ function isOnboardingFlowCompleted({onCompleted, onNotCompleted, onCanceled}: Ha
     });
 }
 
+let conciergeChatReportID: string | undefined;
+Onyx.connect({
+    key: ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID,
+    initWithStoredValues: false,
+    callback: (value) => {
+        conciergeChatReportID = value ?? undefined;
+        checkServerDataReady();
+    },
+});
+
 /**
  * Check if report data are loaded
  */
 function checkServerDataReady() {
-    if (isLoadingReportData) {
+    if (ReportConnection.getAllReports() === undefined || isLoadingReportData || lodashIsEmpty(conciergeChatReportID)) {
         return;
     }
 

@@ -167,6 +167,7 @@ Onyx.connect({
         // When signed out, val is undefined
         if (!value?.accountID) {
             conciergeChatReportID = undefined;
+            Onyx.set(ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID, null);
             return;
         }
         currentUserEmail = value.email;
@@ -1400,6 +1401,7 @@ function handleReportChanged(report: OnyxEntry<Report>) {
     if (report?.reportID) {
         if (ReportUtils.isConciergeChatReport(report)) {
             conciergeChatReportID = report.reportID;
+            Onyx.set(ONYXKEYS.NVP_CONCIERGE_CHAT_REPORT_ID, report.reportID);
         }
     }
 }
