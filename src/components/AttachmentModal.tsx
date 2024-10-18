@@ -43,6 +43,7 @@ import * as Expensicons from './Icon/Expensicons';
 import * as Illustrations from './Icon/Illustrations';
 import Modal from './Modal';
 import SafeAreaConsumer from './SafeAreaConsumer';
+import PagerView from '@components/PagerView';
 
 /**
  * Modal render prop component that exposes modal launching triggers that can be used
@@ -558,23 +559,29 @@ function AttachmentModal({
                                 shouldLoadAttachment &&
                                 !isLoading && (
                                     <AttachmentCarouselPagerContext.Provider value={context}>
-                                        <AttachmentView
-                                            containerStyles={[styles.mh5]}
-                                            source={sourceForAttachmentView}
-                                            isAuthTokenRequired={isAuthTokenRequiredState}
-                                            file={file}
-                                            onToggleKeyboard={setIsConfirmButtonDisabled}
-                                            onPDFLoadError={() => {
-                                                isPDFLoadError.current = true;
-                                                setIsModalOpen(false);
-                                            }}
-                                            isWorkspaceAvatar={isWorkspaceAvatar}
-                                            maybeIcon={maybeIcon}
-                                            fallbackSource={fallbackSource}
-                                            isUsedInAttachmentModal
-                                            transactionID={transaction?.transactionID}
-                                            isUploaded={!isEmptyObject(report)}
-                                        />
+                                        <PagerView
+                                            useNext={true}
+                                            style={[styles.imageModalImageCenterContainer]}
+                                            scrollEnabled={false}
+                                        >
+                                            <AttachmentView
+                                                containerStyles={[styles.mh5]}
+                                                source={sourceForAttachmentView}
+                                                isAuthTokenRequired={isAuthTokenRequiredState}
+                                                file={file}
+                                                onToggleKeyboard={setIsConfirmButtonDisabled}
+                                                onPDFLoadError={() => {
+                                                    isPDFLoadError.current = true;
+                                                    setIsModalOpen(false);
+                                                }}
+                                                isWorkspaceAvatar={isWorkspaceAvatar}
+                                                maybeIcon={maybeIcon}
+                                                fallbackSource={fallbackSource}
+                                                isUsedInAttachmentModal
+                                                transactionID={transaction?.transactionID}
+                                                isUploaded={!isEmptyObject(report)}
+                                            />
+                                        </PagerView>
                                     </AttachmentCarouselPagerContext.Provider>
                                 )
                             ))}
