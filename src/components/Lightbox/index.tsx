@@ -91,8 +91,8 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
     const hasSiblingCarouselItems = isUsedInCarousel && !isSingleCarouselItem;
     const isActive = page === activePage;
 
-    const [canvasSize, setCanvasSize] = useState<CanvasSize>();
-    const isCanvasLoading = canvasSize === undefined;
+    const [canvasSize, setCanvasSize] = useState<CanvasSize>({width: 0, height: 0});
+    const isCanvasLoading = canvasSize.height === 0 && canvasSize.width === 0;
     const updateCanvasSize = useCallback(
         ({
             nativeEvent: {
@@ -205,7 +205,7 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
             style={[StyleSheet.absoluteFill, style]}
             onLayout={updateCanvasSize}
         >
-            {!isCanvasLoading && (
+            {/* {!isCanvasLoading && ( */}
                 <>
                     {isLightboxVisible && (
                         <View style={[StyleUtils.getFullscreenCenteredContentStyles(), StyleUtils.getOpacityStyle(Number(shouldShowLightbox))]}>
@@ -259,7 +259,7 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
                     )}
                     {isLoading && !isLocalFile && <AttachmentOfflineIndicator />}
                 </>
-            )}
+            {/* )} */}
         </View>
     );
 }
