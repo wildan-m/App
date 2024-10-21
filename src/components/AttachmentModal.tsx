@@ -44,6 +44,7 @@ import * as Illustrations from './Icon/Illustrations';
 import Modal from './Modal';
 import SafeAreaConsumer from './SafeAreaConsumer';
 import PagerView from '@components/PagerView';
+import shouldUseNewPager from '@libs/shouldUseNewPager';
 
 /**
  * Modal render prop component that exposes modal launching triggers that can be used
@@ -560,7 +561,7 @@ function AttachmentModal({
                                 !isLoading && (
                                     <AttachmentCarouselPagerContext.Provider value={context}>
                                         <PagerView
-                                            useNext={true}
+                                            useNext={shouldUseNewPager()}
                                             style={[styles.imageModalImageCenterContainer]}
                                             scrollEnabled={false}
                                         >
