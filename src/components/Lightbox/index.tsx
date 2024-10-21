@@ -205,61 +205,59 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
             style={[StyleSheet.absoluteFill, style]}
             onLayout={updateCanvasSize}
         >
-            {/* {!isCanvasLoading && ( */}
-                <>
-                    {isLightboxVisible && (
-                        <View style={[StyleUtils.getFullscreenCenteredContentStyles(), StyleUtils.getOpacityStyle(Number(shouldShowLightbox))]}>
-                            <MultiGestureCanvas
-                                isActive={isActive}
-                                canvasSize={canvasSize}
-                                contentSize={contentSize}
-                                zoomRange={zoomRange}
-                                pagerRef={pagerRef}
-                                shouldDisableTransformationGestures={isPagerScrolling}
-                                onTap={onTap}
-                                onScaleChanged={scaleChange}
-                                onSwipeDown={onSwipeDown}
-                            >
-                                <Image
-                                    source={{uri}}
-                                    style={[contentSize ?? styles.invisibleImage]}
-                                    isAuthTokenRequired={isAuthTokenRequired}
-                                    onError={onError}
-                                    onLoad={(e) => {
-                                        updateContentSize(e);
-                                        setLightboxImageLoaded(true);
-                                    }}
-                                />
-                            </MultiGestureCanvas>
-                        </View>
-                    )}
-
-                    {/* Keep rendering the image without gestures as fallback if the carousel item is not active and while the lightbox is loading the image */}
-                    {isFallbackVisible && (
-                        <View style={StyleUtils.getFullscreenCenteredContentStyles()}>
+            <>
+                {isLightboxVisible && (
+                    <View style={[StyleUtils.getFullscreenCenteredContentStyles(), StyleUtils.getOpacityStyle(Number(shouldShowLightbox))]}>
+                        <MultiGestureCanvas
+                            isActive={isActive && !isCanvasLoading}
+                            canvasSize={canvasSize}
+                            contentSize={contentSize}
+                            zoomRange={zoomRange}
+                            pagerRef={pagerRef}
+                            shouldDisableTransformationGestures={isPagerScrolling}
+                            onTap={onTap}
+                            onScaleChanged={scaleChange}
+                            onSwipeDown={onSwipeDown}
+                        >
                             <Image
-                                source={{uri}}
-                                resizeMode="contain"
-                                style={[fallbackSize ?? styles.invisibleImage]}
+                                source={{ uri }}
+                                style={[contentSize ?? styles.invisibleImage]}
                                 isAuthTokenRequired={isAuthTokenRequired}
+                                onError={onError}
                                 onLoad={(e) => {
                                     updateContentSize(e);
-                                    setFallbackImageLoaded(true);
+                                    setLightboxImageLoaded(true);
                                 }}
                             />
-                        </View>
-                    )}
+                        </MultiGestureCanvas>
+                    </View>
+                )}
 
-                    {/* Show activity indicator while the lightbox is still loading the image. */}
-                    {isLoading && (!isOffline || isLocalFile) && (
-                        <ActivityIndicator
-                            size="large"
-                            style={StyleSheet.absoluteFill}
+                {/* Keep rendering the image without gestures as fallback if the carousel item is not active and while the lightbox is loading the image */}
+                {isFallbackVisible && (
+                    <View style={StyleUtils.getFullscreenCenteredContentStyles()}>
+                        <Image
+                            source={{ uri }}
+                            resizeMode="contain"
+                            style={[fallbackSize ?? styles.invisibleImage]}
+                            isAuthTokenRequired={isAuthTokenRequired}
+                            onLoad={(e) => {
+                                updateContentSize(e);
+                                setFallbackImageLoaded(true);
+                            }}
                         />
-                    )}
-                    {isLoading && !isLocalFile && <AttachmentOfflineIndicator />}
-                </>
-            {/* )} */}
+                    </View>
+                )}
+
+                {/* Show activity indicator while the lightbox is still loading the image. */}
+                {isLoading && (!isOffline || isLocalFile) && (
+                    <ActivityIndicator
+                        size="large"
+                        style={StyleSheet.absoluteFill}
+                    />
+                )}
+                {isLoading && !isLocalFile && <AttachmentOfflineIndicator />}
+            </>
         </View>
     );
 }
