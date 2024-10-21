@@ -34,6 +34,7 @@ class MainApplication : MultiDexApplication(), ReactApplication {
             add(BootSplashPackage())
             add(ExpensifyAppPackage())
             add(RNTextInputResetPackage())
+            add(MyPackage())
         }
 
         override fun getJSMainModuleName() = ".expo/.virtual-metro-entry"

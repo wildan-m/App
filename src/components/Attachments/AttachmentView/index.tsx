@@ -28,6 +28,7 @@ import AttachmentViewPdf from './AttachmentViewPdf';
 import AttachmentViewVideo from './AttachmentViewVideo';
 import DefaultAttachmentView from './DefaultAttachmentView';
 import HighResolutionInfo from './HighResolutionInfo';
+import MyWrapper from '@components/MyWrapper';
 
 type AttachmentViewProps = Attachment & {
     /** Whether this view is the active screen  */

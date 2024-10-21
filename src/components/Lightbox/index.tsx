@@ -14,6 +14,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import * as FileUtils from '@libs/fileDownload/FileUtils';
 import NUMBER_OF_CONCURRENT_LIGHTBOXES from './numberOfConcurrentLightboxes';
+import MyWrapper from '@components/MyWrapper';
 
 const cachedImageDimensions = new Map<string, ContentSize | undefined>();
 
@@ -201,7 +202,7 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
     const isLocalFile = FileUtils.isLocalFile(uri);
 
     return (
-        <View
+        <MyWrapper
             style={[StyleSheet.absoluteFill, style]}
             onLayout={updateCanvasSize}
         >
@@ -260,7 +261,7 @@ function Lightbox({isAuthTokenRequired = false, uri, onScaleChanged: onScaleChan
                     {isLoading && !isLocalFile && <AttachmentOfflineIndicator />}
                 </>
             )}
-        </View>
+        </MyWrapper>
     );
 }
 
