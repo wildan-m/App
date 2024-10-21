@@ -1078,6 +1078,8 @@ function getMultiGestureCanvasContainerStyle(canvasWidth: number): ViewStyle {
     return {
         width: canvasWidth,
         overflow: 'hidden',
+        backgroundColor: 'red',
+        opacity: 0.5,
     };
 }
 
