@@ -565,23 +565,27 @@ function AttachmentModal({
                                             style={[styles.imageModalImageCenterContainer]}
                                             scrollEnabled={false}
                                         >
-                                            <AttachmentView
-                                                containerStyles={[styles.mh5]}
-                                                source={sourceForAttachmentView}
-                                                isAuthTokenRequired={isAuthTokenRequiredState}
-                                                file={file}
-                                                onToggleKeyboard={setIsConfirmButtonDisabled}
-                                                onPDFLoadError={() => {
-                                                    isPDFLoadError.current = true;
-                                                    setIsModalOpen(false);
-                                                }}
-                                                isWorkspaceAvatar={isWorkspaceAvatar}
-                                                maybeIcon={maybeIcon}
-                                                fallbackSource={fallbackSource}
-                                                isUsedInAttachmentModal
-                                                transactionID={transaction?.transactionID}
-                                                isUploaded={!isEmptyObject(report)}
-                                            />
+                                            <View
+                                                style={[styles.imageModalImageCenterContainer]}
+                                            >
+                                                <AttachmentView
+                                                    containerStyles={[styles.mh5]}
+                                                    source={sourceForAttachmentView}
+                                                    isAuthTokenRequired={isAuthTokenRequiredState}
+                                                    file={file}
+                                                    onToggleKeyboard={setIsConfirmButtonDisabled}
+                                                    onPDFLoadError={() => {
+                                                        isPDFLoadError.current = true;
+                                                        setIsModalOpen(false);
+                                                    }}
+                                                    isWorkspaceAvatar={isWorkspaceAvatar}
+                                                    maybeIcon={maybeIcon}
+                                                    fallbackSource={fallbackSource}
+                                                    isUsedInAttachmentModal
+                                                    transactionID={transaction?.transactionID}
+                                                    isUploaded={!isEmptyObject(report)}
+                                                />
+                                            </View>
                                         </PagerView>
                                     </AttachmentCarouselPagerContext.Provider>
                                 )
