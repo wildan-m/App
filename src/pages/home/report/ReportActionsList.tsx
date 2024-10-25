@@ -657,10 +657,16 @@ function ReportActionsList({
 
 
     const handleInteraction = () => {
-        if (!hasInteracted) {
-            setHasInteracted(true);
-            loadNewerChats(false);
+        if (hasInteracted) {
+            return;
         }
+        setHasInteracted(true);
+
+        if(!linkedReportActionID || linkedReportActionID === '-1')
+        {
+            return;
+        }
+        loadNewerChats(false);
     };
 
 return (
