@@ -409,6 +409,7 @@ function ReportActionsList({
     };
 
     const trackVerticalScrolling = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        handleInteraction();
         scrollingVerticalOffset.current = event.nativeEvent.contentOffset.y;
         handleUnreadFloatingButton();
         onScroll?.(event);
@@ -624,19 +625,45 @@ function ReportActionsList({
             />
         );
     }, [isLoadingNewerReportActions, canShowHeader, hasLoadingNewerReportActionsError, retryLoadNewerChatsError]);
-
+    const [hasInteracted, setHasInteracted] = useState(false);
+    
     const onStartReached = useCallback(() => {
-        InteractionManager.runAfterInteractions(() => requestAnimationFrame(() => loadNewerChats(false)));
+        console.log('[wildebug] onStartReached triggered');
+
+        if(!hasInteracted && linkedReportActionID !== '-1')
+        {
+            return;
+        }
+
+        InteractionManager.runAfterInteractions(() => {
+            console.log('[wildebug] InteractionManager.runAfterInteractions callback');
+            requestAnimationFrame(() => {
+                console.log('[wildebug] requestAnimationFrame callback');
+                loadNewerChats(false);
+            });
+        });
     }, [loadNewerChats]);
 
     const onEndReached = useCallback(() => {
+        console.log('[wildebug] onEndReached triggered');
         loadOlderChats(false);
     }, [loadOlderChats]);
 
     // When performing comment linking, initially 25 items are added to the list. Subsequent fetches add 15 items from the cache or 50 items from the server.
     // This is to ensure that the user is able to see the 'scroll to newer comments' button when they do comment linking and have not reached the end of the list yet.
     const canScrollToNewerComments = !isLoadingInitialReportActions && !hasNewestReportAction && sortedReportActions.length > 25 && !isLastPendingActionIsDelete;
-    return (
+    
+    
+
+
+    const handleInteraction = () => {
+        if (!hasInteracted) {
+            setHasInteracted(true);
+            loadNewerChats(false);
+        }
+    };
+
+return (
         <>
             <FloatingMessageCounter
                 isActive={(isFloatingMessageCounterVisible && !!unreadMarkerReportActionID) || canScrollToNewerComments}
@@ -664,6 +691,8 @@ function ReportActionsList({
                     onContentSizeChange={onContentSizeChangeInner}
                     onScroll={trackVerticalScrolling}
                     onScrollToIndexFailed={onScrollToIndexFailed}
+                    onTouchStart={handleInteraction}
+                    onWheel={handleInteraction}
                     extraData={extraData}
                     key={listID}
                     shouldEnableAutoScrollToTopThreshold={shouldEnableAutoScrollToTopThreshold}
