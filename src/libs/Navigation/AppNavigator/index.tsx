@@ -1,5 +1,7 @@
-import React, {lazy, memo, Suspense} from 'react';
+import React, {lazy, memo, Suspense, useState, useEffect} from 'react';
 import lazyRetry from '@src/utils/lazyRetry';
+import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
+import SplashScreen from '@components/SplashScreen';
 
 const AuthScreens = lazy(() => lazyRetry(() => import('./AuthScreens')));
 const PublicScreens = lazy(() => lazyRetry(() => import('./PublicScreens')));
@@ -10,20 +12,26 @@ type AppNavigatorProps = {
 };
 
 function AppNavigator({authenticated}: AppNavigatorProps) {
-    if (authenticated) {
-        // These are the protected screens and only accessible when an authToken is present
-        return (
-            <Suspense fallback={null}>
-                <AuthScreens />
-            </Suspense>
-        );
-    }
+    const [currentScreen, setCurrentScreen] = useState<JSX.Element | null>(null);
 
-    return (
-        <Suspense fallback={null}>
-            <PublicScreens />
-        </Suspense>
-    );
+    useEffect(() => {
+        if (authenticated) {
+         // These are the protected screens and only accessible when an authToken is present
+            setCurrentScreen(
+                <Suspense fallback={<SplashScreen/>}>
+                    <AuthScreens />
+                </Suspense>
+            );
+        } else {
+            setCurrentScreen(
+                <Suspense fallback={null}>
+                    <PublicScreens />
+                </Suspense>
+            );
+        }
+    }, [authenticated]);
+
+    return currentScreen;
 }
 
 AppNavigator.displayName = 'AppNavigator';
