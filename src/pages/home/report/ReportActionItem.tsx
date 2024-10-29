@@ -269,6 +269,15 @@ function ReportActionItem({
             return;
         }
 
+        if(index === 0)
+        {
+            InteractionManager.runAfterInteractions(() => {
+                requestAnimationFrame(() => {
+                    reportScrollManager.scrollToIndex(index);
+                });
+            })
+        }
+
         focusComposerWithDelay(textInputRef.current)(true);
     }, [prevDraftMessage, draftMessage]);
 
@@ -374,7 +383,7 @@ function ReportActionItem({
             reportScrollManager.scrollToIndex(index);
         }
     }, [index, originalMessage, prevActionResolution, reportScrollManager, isActionableWhisper, hasResolutionInOriginalMessage]);
-
+  
     const toggleReaction = useCallback(
         (emoji: Emoji, ignoreSkinToneOnCompare?: boolean) => {
             Report.toggleEmojiReaction(reportID, action, emoji, emojiReactions, undefined, ignoreSkinToneOnCompare);
