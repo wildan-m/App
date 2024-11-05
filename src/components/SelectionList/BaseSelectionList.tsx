@@ -30,6 +30,7 @@ import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import arraysEqual from '@src/utils/arraysEqual';
 import type {BaseSelectionListProps, ButtonOrCheckBoxRoles, FlattenedSectionsReturn, ListItem, SectionListDataType, SectionWithIndexOffset, SelectionListHandle} from './types';
+import * as Browser from '@libs/Browser';
 
 const getDefaultItemHeight = () => variables.optionRowHeight;
 
@@ -448,6 +449,7 @@ function BaseSelectionList<TItem extends ListItem>(
             }
             return onCheckboxPress ? () => onCheckboxPress(item) : undefined;
         };
+        const longPressedItem = useRef<TItem | null>(null);
 
         return (
             <>
@@ -457,7 +459,10 @@ function BaseSelectionList<TItem extends ListItem>(
                     isDisabled={isDisabled}
                     showTooltip={showTooltip}
                     canSelectMultiple={canSelectMultiple}
-                    onLongPressRow={onLongPressRow}
+                    onLongPressRow={(item: TItem) => {
+                        longPressedItem.current = item;
+                        onLongPressRow?.(item);
+                    }}                    
                     onSelectRow={() => {
                         if (shouldSingleExecuteRowSelect) {
                             singleExecution(() => selectRow(item, index))();
@@ -476,7 +481,12 @@ function BaseSelectionList<TItem extends ListItem>(
                     isAlternateTextMultilineSupported={isAlternateTextMultilineSupported}
                     alternateTextNumberOfLines={alternateTextNumberOfLines}
                     onFocus={() => {
-                        if (shouldIgnoreFocus || isDisabled) {
+                        const isFocusedItemLongPressed = longPressedItem.current?.keyForList === item.keyForList;
+                        
+                        // clear after use
+                        longPressedItem.current = null;
+
+                        if (shouldIgnoreFocus || isDisabled || (isFocusedItemLongPressed && Browser.isMobileChrome())) {
                             return;
                         }
                         setFocusedIndex(normalizedIndex);
