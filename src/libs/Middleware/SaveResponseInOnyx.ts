@@ -13,6 +13,17 @@ const requestsToIgnoreLastUpdateID: string[] = [
     SIDE_EFFECT_REQUEST_COMMANDS.GET_MISSING_ONYX_MESSAGES,
 ];
 
+
+const filterAllowedRequestData = (data: any, allowedKeys: string[]) => {
+    const regex = new RegExp(`^(${allowedKeys.join('|')})$`);
+    return Object.keys(data)
+        .filter(key => regex.test(key))
+        .reduce((obj, key) => {
+            obj[key] = data[key];
+            return obj;
+        }, {});
+};
+
 const SaveResponseInOnyx: Middleware = (requestResponse, request) =>
     requestResponse.then((response = {}) => {
         const onyxUpdates = response?.onyxData ?? [];
@@ -23,14 +34,19 @@ const SaveResponseInOnyx: Middleware = (requestResponse, request) =>
             return Promise.resolve(response);
         }
 
+        
+        const filteredRequestData = filterAllowedRequestData(request.data, [...CONST.ONYX_ALLOWED_REQUEST_DATA]);
+        
         const responseToApply = {
             type: CONST.ONYX_UPDATE_TYPES.HTTPS,
             lastUpdateID: Number(response?.lastUpdateID ?? 0),
             previousUpdateID: Number(response?.previousUpdateID ?? 0),
-            request,
+            request: {
+                ...request,
+                data: filteredRequestData,
+            },
             response: response ?? {},
         };
-
         if (requestsToIgnoreLastUpdateID.includes(request.command) || !OnyxUpdates.doesClientNeedToBeUpdated(Number(response?.previousUpdateID ?? 0))) {
             return OnyxUpdates.apply(responseToApply);
         }

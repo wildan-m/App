@@ -4558,6 +4558,7 @@ const CONST = {
         PUSHER: 'pusher',
         AIRSHIP: 'airship',
     },
+    ONYX_ALLOWED_REQUEST_DATA: ['apiRequestType', 'returnValueList', 'nvpNames', 'shouldRetry', 'apiRequestType', 'skipReauthentication', 'shouldProcessImmediately', 'canCancel'],
     EVENTS: {
         SCROLLING: 'scrolling',
     },
