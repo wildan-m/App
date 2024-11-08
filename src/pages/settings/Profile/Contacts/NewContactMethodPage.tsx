@@ -29,6 +29,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/NewContactMethodForm';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
+import { truncate } from 'node:original-fs';
 
 type NewContactMethodPageProps = StackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.PROFILE.NEW_CONTACT_METHOD>;
 
@@ -110,7 +111,7 @@ function NewContactMethodPage({route}: NewContactMethodPageProps) {
     }, [navigateBackTo]);
 
     return (
-        <AccessOrNotFoundWrapper shouldBeBlocked={isActingAsDelegate}>
+        <AccessOrNotFoundWrapper shouldBeBlocked={isActingAsDelegate} shouldDisableLoadingIndicator={true}>
             <ScreenWrapper
                 onEntryTransitionEnd={() => loginInputRef.current?.focus()}
                 includeSafeAreaPaddingBottom={false}

@@ -83,6 +83,8 @@ type AccessOrNotFoundWrapperProps = {
 
     /** The list of all policies */
     allPolicies?: OnyxCollection<OnyxTypes.Policy>;
+
+    shouldDisableLoadingIndicator?: boolean;
 } & Pick<FullPageNotFoundViewProps, 'subtitleKey' | 'onLinkPress'>;
 
 type PageNotFoundFallbackProps = Pick<AccessOrNotFoundWrapperProps, 'policyID' | 'fullPageNotFoundViewProps'> & {
@@ -120,6 +122,7 @@ function AccessOrNotFoundWrapper({
     iouType,
     allPolicies,
     featureName,
+    shouldDisableLoadingIndicator,
     ...props
 }: AccessOrNotFoundWrapperProps) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
@@ -141,7 +144,7 @@ function AccessOrNotFoundWrapper({
         // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     }, [isPolicyIDInRoute, policyID]);
 
-    const shouldShowFullScreenLoadingIndicator = !isMoneyRequest && isLoadingReportData !== false && (!Object.entries(policy ?? {}).length || !policy?.id);
+    const shouldShowFullScreenLoadingIndicator = !isMoneyRequest && isLoadingReportData !== false && (!Object.entries(policy ?? {}).length || !policy?.id) && !shouldDisableLoadingIndicator;
 
     const isFeatureEnabled = featureName ? PolicyUtils.isPolicyFeatureEnabled(policy, featureName) : true;
 
