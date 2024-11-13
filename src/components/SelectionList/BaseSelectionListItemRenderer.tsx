@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
 import type useSingleExecution from '@hooks/useSingleExecution';
 import * as SearchUIUtils from '@libs/SearchUIUtils';
 import type {BaseListItemProps, BaseSelectionListProps, ListItem} from './types';
+import * as Browser from '@libs/Browser';
 
 type BaseSelectionListItemRendererProps<TItem extends ListItem> = Omit<BaseListItemProps<TItem>, 'onSelectRow'> &
     Pick<BaseSelectionListProps<TItem>, 'ListItem' | 'shouldHighlightSelectedItem' | 'shouldIgnoreFocus' | 'shouldSingleExecuteRowSelect'> & {
@@ -45,6 +46,7 @@ function BaseSelectionListItemRenderer<TItem extends ListItem>({
         }
         return onCheckboxPress ? () => onCheckboxPress(item) : undefined;
     };
+    const longPressedItem = useRef<TItem | null>(null);
 
     return (
         <>
@@ -54,7 +56,10 @@ function BaseSelectionListItemRenderer<TItem extends ListItem>({
                 isDisabled={isDisabled}
                 showTooltip={showTooltip}
                 canSelectMultiple={canSelectMultiple}
-                onLongPressRow={onLongPressRow}
+                onLongPressRow={(item: TItem) => {
+                    longPressedItem.current = item;
+                    onLongPressRow?.(item);
+                }}                    
                 onSelectRow={() => {
                     if (shouldSingleExecuteRowSelect) {
                         singleExecution(() => selectRow(item, index))();
@@ -73,8 +78,12 @@ function BaseSelectionListItemRenderer<TItem extends ListItem>({
                 isAlternateTextMultilineSupported={isAlternateTextMultilineSupported}
                 alternateTextNumberOfLines={alternateTextNumberOfLines}
                 onFocus={() => {
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                    if (shouldIgnoreFocus || isDisabled) {
+                    const isFocusedItemLongPressed = longPressedItem.current?.keyForList && longPressedItem.current?.keyForList === item.keyForList;
+                    
+                    // clear after use
+                    longPressedItem.current = null;
+
+                    if (shouldIgnoreFocus || isDisabled || (isFocusedItemLongPressed && Browser.isMobileChrome())) {
                         return;
                     }
                     setFocusedIndex(normalizedIndex);
