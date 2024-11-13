@@ -32,7 +32,6 @@ import arraysEqual from '@src/utils/arraysEqual';
 import BaseSelectionListItemRenderer from './BaseSelectionListItemRenderer';
 import FocusAwareCellRendererComponent from './FocusAwareCellRendererComponent';
 import type {BaseSelectionListProps, ButtonOrCheckBoxRoles, FlattenedSectionsReturn, ListItem, SectionListDataType, SectionWithIndexOffset, SelectionListHandle} from './types';
-import * as Browser from '@libs/Browser';
 
 const getDefaultItemHeight = () => variables.optionRowHeight;
 
