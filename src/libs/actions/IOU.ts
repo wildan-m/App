@@ -74,7 +74,7 @@ import * as Category from './Policy/Category';
 import * as Policy from './Policy/Policy';
 import * as Tag from './Policy/Tag';
 import * as Report from './Report';
-import {getRecentWaypoints, sanitizeRecentWaypoints} from './Transaction';
+import {getRecentWaypoints, sanitizeRecentWaypoints, clearError} from './Transaction';
 import * as TransactionEdit from './TransactionEdit';
 
 type IOURequestType = ValueOf<typeof CONST.IOU.REQUEST_TYPE>;
@@ -182,6 +182,24 @@ Onyx.connect({
             allTransactions = {};
             return;
         }
+
+        // Clear error if the server restores waypoints to previous correct values
+        // This waypoint restoration can be caused by re-opening the report or its parent report
+        Object.values(value).forEach((transaction) => {
+            if (!transaction) return;
+        
+            const isDistanceRequest = TransactionUtils.isDistanceRequest(transaction);
+            const hasRouteError = !!transaction?.errorFields?.route;
+        
+            if (!hasRouteError || !isDistanceRequest) return;
+        
+            const waypoints = Object.values(transaction.comment?.waypoints || {});
+            const allWaypointsServerValidated = waypoints.every(waypoint => waypoint.lat !== 0 && waypoint.lng !== 0 && waypoint.name);
+        
+            if (allWaypointsServerValidated) {
+                clearError(transaction.transactionID);
+            }
+        });
 
         allTransactions = value;
     },
