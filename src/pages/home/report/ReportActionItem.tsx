@@ -271,6 +271,12 @@ function ReportActionItem({
             return;
         }
 
+        InteractionManager.runAfterInteractions(() => {
+            requestAnimationFrame(() => {
+                reportScrollManager.scrollToIndex(index);
+            });
+        })
+
         focusComposerWithDelay(textInputRef.current)(true);
     }, [prevDraftMessage, draftMessage]);
 
