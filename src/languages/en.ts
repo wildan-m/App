@@ -532,7 +532,7 @@ const translations = {
     composer: {
         noExtensionFoundForMimeType: 'No extension found for mime type',
         problemGettingImageYouPasted: 'There was a problem getting the image you pasted',
-        commentExceededMaxLength: ({formattedMaxLength}: FormattedMaxLengthParams) => `The maximum comment length is ${formattedMaxLength} characters.`,
+        commentExceededMaxLength: ({ formattedLength, formattedMaxLength }: FormattedMaxLengthParams) => `Maximum character limit reached (${formattedLength}/${formattedMaxLength})`,
     },
     baseUpdateAppModal: {
         updateApp: 'Update app',

@@ -108,7 +108,7 @@ function ReportActionItemMessageEdit(
     });
     const [selection, setSelection] = useState<TextSelection>({start: draft.length, end: draft.length, positionX: 0, positionY: 0});
     const [isFocused, setIsFocused] = useState<boolean>(false);
-    const {hasExceededMaxCommentLength, validateCommentMaxLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxCommentLength, validateCommentMaxLength, isEqualToMaxCommentLength, commentLength} = useHandleExceedMaxCommentLength();
     const [modal, setModal] = useState<OnyxTypes.Modal>({
         willAlertModalBecomeVisible: false,
         isVisible: false,
@@ -479,7 +479,7 @@ function ReportActionItemMessageEdit(
                         styles.flexRow,
                         styles.flex1,
                         styles.chatItemComposeBox,
-                        hasExceededMaxCommentLength && styles.borderColorDanger,
+                        (isEqualToMaxCommentLength || hasExceededMaxCommentLength) && styles.borderColorDanger,
                     ]}
                 >
                     <View style={[styles.justifyContentEnd, styles.mb1]}>
@@ -609,7 +609,7 @@ function ReportActionItemMessageEdit(
                     </View>
                 </View>
             </View>
-            {hasExceededMaxCommentLength && <ExceededCommentLength />}
+            {(isEqualToMaxCommentLength || hasExceededMaxCommentLength) && <ExceededCommentLength commentLength={commentLength}/>}
         </>
     );
 }

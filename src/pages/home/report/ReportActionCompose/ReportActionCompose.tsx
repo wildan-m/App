@@ -171,7 +171,7 @@ function ReportActionCompose({
      * Updates the composer when the comment length is exceeded
      * Shows red borders and prevents the comment from being sent
      */
-    const {hasExceededMaxCommentLength, validateCommentMaxLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxCommentLength, validateCommentMaxLength, isEqualToMaxCommentLength, commentLength} = useHandleExceedMaxCommentLength();
 
     const suggestionsRef = useRef<SuggestionsRef>(null);
     const composerRef = useRef<ComposerRef>();
@@ -436,7 +436,7 @@ function ReportActionCompose({
                                 styles.flexRow,
                                 styles.chatItemComposeBox,
                                 isComposerFullSize && styles.chatItemFullComposeBox,
-                                hasExceededMaxCommentLength && styles.borderColorDanger,
+                                (isEqualToMaxCommentLength || hasExceededMaxCommentLength) && styles.borderColorDanger,
                             ]}
                         >
                             <AttachmentModal
@@ -554,7 +554,7 @@ function ReportActionCompose({
                     >
                         {!shouldUseNarrowLayout && <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />}
                         <ReportTypingIndicator reportID={reportID} />
-                        {hasExceededMaxCommentLength && <ExceededCommentLength />}
+                        {(isEqualToMaxCommentLength || hasExceededMaxCommentLength) && <ExceededCommentLength commentLength={commentLength}/>}
                     </View>
                 </OfflineWithFeedback>
                 {!isSmallScreenWidth && (

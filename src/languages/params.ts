@@ -225,7 +225,7 @@ type UpdatedTheRequestParams = {valueName: string; newValueToDisplay: string; ol
 
 type UpdatedTheDistanceMerchantParams = {translatedChangedField: string; newMerchant: string; oldMerchant: string; newAmountToDisplay: string; oldAmountToDisplay: string};
 
-type FormattedMaxLengthParams = {formattedMaxLength: string};
+type FormattedMaxLengthParams = {formattedLength: string, formattedMaxLength: string};
 
 type WalletProgramParams = {walletProgram: string};
 

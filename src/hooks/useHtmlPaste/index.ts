@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useCallback, useEffect} from 'react';
 import Parser from '@libs/Parser';
 import type UseHtmlPaste from './types';
+import CONST from '@src/CONST';
 
 const insertByCommand = (text: string) => {
     // eslint-disable-next-line deprecation/deprecation
@@ -65,11 +66,15 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, removeLi
      */
     const handlePastedHTML = useCallback(
         (html: string) => {
-            paste(Parser.htmlToMarkdown(html));
+            // Trim the HTML content if it exceeds the max length
+            const trimmedHtml = html.length > CONST.MAX_COMMENT_LENGTH 
+                ? html.substring(0, CONST.MAX_COMMENT_LENGTH) 
+                : html;
+    
+            paste(Parser.htmlToMarkdown(trimmedHtml));
         },
         [paste],
     );
-
     /**
      * Paste the plaintext content into Composer.
      *
@@ -78,8 +83,13 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, removeLi
     const handlePastePlainText = useCallback(
         (event: ClipboardEvent) => {
             const plainText = event.clipboardData?.getData('text/plain');
-            if (plainText) {
-                paste(plainText);
+            // Trim the text content if it exceeds the max length
+            const trimmedText = plainText && plainText.length > CONST.MAX_COMMENT_LENGTH
+                ? plainText.substring(0, CONST.MAX_COMMENT_LENGTH)
+                : plainText;
+
+            if (trimmedText) {
+                paste(trimmedText);
             }
         },
         [paste],

@@ -4,7 +4,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import Text from './Text';
 
-function ExceededCommentLength() {
+type ExceededCommentLengthProps = {
+    commentLength: number;
+};
+
+function ExceededCommentLength({commentLength}: ExceededCommentLengthProps) {
     const styles = useThemeStyles();
     const {numberFormat, translate} = useLocalize();
 
@@ -13,7 +17,7 @@ function ExceededCommentLength() {
             style={[styles.textMicro, styles.textDanger, styles.chatItemComposeSecondaryRow, styles.mlAuto, styles.pl2]}
             numberOfLines={1}
         >
-            {translate('composer.commentExceededMaxLength', {formattedMaxLength: numberFormat(CONST.MAX_COMMENT_LENGTH)})}
+            {translate('composer.commentExceededMaxLength', { formattedLength: numberFormat(commentLength), formattedMaxLength: numberFormat(CONST.MAX_COMMENT_LENGTH) })}
         </Text>
     );
 }
