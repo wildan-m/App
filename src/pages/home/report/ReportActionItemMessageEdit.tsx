@@ -108,7 +108,8 @@ function ReportActionItemMessageEdit(
     });
     const [selection, setSelection] = useState<TextSelection>({start: draft.length, end: draft.length, positionX: 0, positionY: 0});
     const [isFocused, setIsFocused] = useState<boolean>(false);
-    const {hasExceededMaxCommentLength, validateCommentMaxLength, isEqualToMaxCommentLength, commentLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxCommentLength, validateCommentMaxLength} = useHandleExceedMaxCommentLength();
+    const debouncedValidateCommentMaxLength = useMemo(() => lodashDebounce(validateCommentMaxLength, CONST.TIMING.COMMENT_LENGTH_DEBOUNCE_TIME), [validateCommentMaxLength]);
     const [modal, setModal] = useState<OnyxTypes.Modal>({
         willAlertModalBecomeVisible: false,
         isVisible: false,
@@ -453,8 +454,8 @@ function ReportActionItemMessageEdit(
     );
 
     useEffect(() => {
-        validateCommentMaxLength(draft, {reportID});
-    }, [draft, reportID, validateCommentMaxLength]);
+        debouncedValidateCommentMaxLength(draft, {reportID});
+    }, [draft, reportID, debouncedValidateCommentMaxLength]);
 
     useEffect(() => {
         // required for keeping last state of isFocused variable
@@ -479,7 +480,7 @@ function ReportActionItemMessageEdit(
                         styles.flexRow,
                         styles.flex1,
                         styles.chatItemComposeBox,
-                        (isEqualToMaxCommentLength || hasExceededMaxCommentLength) && styles.borderColorDanger,
+                        hasExceededMaxCommentLength && styles.borderColorDanger,
                     ]}
                 >
                     <View style={[styles.justifyContentEnd, styles.mb1]}>
@@ -609,7 +610,7 @@ function ReportActionItemMessageEdit(
                     </View>
                 </View>
             </View>
-            {(isEqualToMaxCommentLength || hasExceededMaxCommentLength) && <ExceededCommentLength commentLength={commentLength}/>}
+            {hasExceededMaxCommentLength && <ExceededCommentLength />}
         </>
     );
 }
