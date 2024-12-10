@@ -5,11 +5,12 @@ import CONST from '@src/CONST';
 import Text from './Text';
 
 type ExceededCommentLengthProps = {
+    commentLength: number;
     maxCommentLength?: number;
     isTaskTitle?: boolean;
 };
 
-function ExceededCommentLength({maxCommentLength = CONST.MAX_COMMENT_LENGTH, isTaskTitle}: ExceededCommentLengthProps) {
+function ExceededCommentLength({commentLength, maxCommentLength = CONST.MAX_COMMENT_LENGTH, isTaskTitle}: ExceededCommentLengthProps) {
     const styles = useThemeStyles();
     const {numberFormat, translate} = useLocalize();
 
@@ -20,7 +21,7 @@ function ExceededCommentLength({maxCommentLength = CONST.MAX_COMMENT_LENGTH, isT
             style={[styles.textMicro, styles.textDanger, styles.chatItemComposeSecondaryRow, styles.mlAuto, styles.pl2]}
             numberOfLines={1}
         >
-            {translate(translationKey, {formattedMaxLength: numberFormat(maxCommentLength)})}
+            {translate(translationKey, {formattedLength: numberFormat(commentLength), formattedMaxLength: numberFormat(maxCommentLength)})}
         </Text>
     );
 }

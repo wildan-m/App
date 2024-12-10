@@ -173,8 +173,8 @@ function ReportActionCompose({
      * Updates the composer when the comment length is exceeded
      * Shows red borders and prevents the comment from being sent
      */
-    const {hasExceededMaxCommentLength, validateCommentMaxLength, setHasExceededMaxCommentLength} = useHandleExceedMaxCommentLength();
-    const {hasExceededMaxTaskTitleLength, validateTaskTitleMaxLength, setHasExceededMaxTitleLength} = useHandleExceedMaxTaskTitleLength();
+    const {hasExceededMaxCommentLength, validateCommentMaxLength, setHasExceededMaxCommentLength, commentLength, isEqualToMaxCommentLength} = useHandleExceedMaxCommentLength();
+    const {hasExceededMaxTaskTitleLength, validateTaskTitleMaxLength, setHasExceededMaxTitleLength, taskTitleLength, isEqualToMaxTaskTitleLength} = useHandleExceedMaxTaskTitleLength();
     const [exceededMaxLength, setExceededMaxLength] = useState<number | null>(null);
 
     const suggestionsRef = useRef<SuggestionsRef>(null);
@@ -587,6 +587,7 @@ function ReportActionCompose({
                         <ReportTypingIndicator reportID={reportID} />
                         {!!exceededMaxLength && (
                             <ExceededCommentLength
+                                commentLength={hasExceededMaxTaskTitleLength ? taskTitleLength : commentLength}
                                 maxCommentLength={exceededMaxLength}
                                 isTaskTitle={hasExceededMaxTaskTitleLength}
                             />
