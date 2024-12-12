@@ -64,13 +64,8 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, removeLi
      * @param {String} html - pasted HTML
      */
     const handlePastedHTML = useCallback(
-        (html: string) => {
-            // Trim the HTML content if it exceeds the max length
-            const trimmedHtml = html.length > CONST.MAX_COMMENT_LENGTH 
-                ? html.substring(0, CONST.MAX_COMMENT_LENGTH) 
-                : html;
-    
-            paste(Parser.htmlToMarkdown(trimmedHtml));
+        (html: string) => {    
+            paste(Parser.htmlToMarkdown(html));
         },
         [paste],
     );
@@ -82,13 +77,8 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, removeLi
     const handlePastePlainText = useCallback(
         (event: ClipboardEvent) => {
             const plainText = event.clipboardData?.getData('text/plain');
-            // Trim the text content if it exceeds the max length
-            const trimmedText = plainText && plainText.length > CONST.MAX_COMMENT_LENGTH
-                ? plainText.substring(0, CONST.MAX_COMMENT_LENGTH)
-                : plainText;
-
-            if (trimmedText) {
-                paste(trimmedText);
+            if (plainText) {
+                paste(plainText);
             }
         },
         [paste],

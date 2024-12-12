@@ -36,6 +36,7 @@ function Composer(
         selection,
         value,
         isGroupPolicyReport = false,
+        onPasteText = () => { },
         ...props
     }: ComposerProps,
     ref: ForwardedRef<TextInput>,
@@ -110,6 +111,7 @@ function Composer(
         (e: NativeSyntheticEvent<TextInputPasteEventData>) => {
             const clipboardContent = e.nativeEvent.items.at(0);
             if (clipboardContent?.type === 'text/plain') {
+                onPasteText?.();
                 return;
             }
             const mimeType = clipboardContent?.type ?? '';

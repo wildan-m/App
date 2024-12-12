@@ -418,7 +418,7 @@ function ReportActionCompose({
             } else {
                 setHasExceededMaxTitleLength(false);
                 validateCommentMaxLength(value, {reportID});
-            }
+        }
         },
         [setHasExceededMaxCommentLength, setHasExceededMaxTitleLength, validateTaskTitleMaxLength, validateCommentMaxLength, reportID],
     );
@@ -535,6 +535,8 @@ function ReportActionCompose({
                                             onBlur={onBlur}
                                             measureParentContainer={measureContainer}
                                             onValueChange={onValueChange}
+                                            maxCommentLength={200}
+                                            // maxCommentLength={isEqualToMaxTaskTitleLength || exceededMaxLength}
                                         />
                                         <ReportDropUI
                                             onDrop={(event: DragEvent) => {

@@ -147,6 +147,9 @@ type ComposerWithSuggestionsProps = Partial<ChildrenProps> & {
 
     /** policy ID of the report */
     policyID: string;
+
+    /** The max length of the comment */
+    maxCommentLength?: number | null;
 };
 
 type SwitchToCurrentReportProps = {
@@ -229,6 +232,7 @@ function ComposerWithSuggestions(
         raiseIsScrollLikelyLayoutTriggered,
         onCleared = () => {},
         onLayout: onLayoutProps,
+        maxCommentLength,
 
         // Refs
         suggestionsRef,
@@ -257,7 +261,10 @@ function ComposerWithSuggestions(
         }
         return draftComment;
     });
+    console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:259 ~ const[value,setValue]=useState ~ value:", value)
+
     const commentRef = useRef(value);
+    console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:259 ~ const[value,setValue]=useState ~ value:", value)
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [modal] = useOnyx(ONYXKEYS.MODAL);
@@ -381,16 +388,35 @@ function ComposerWithSuggestions(
         [selection.start, selection.end],
     );
 
+    const isPastedRef = useRef(false);
+    const [deferredValue, setDeferredValue] = useState('');
+    useEffect(() => {
+        if (deferredValue) {
+            setValue(deferredValue);
+            setDeferredValue('');
+        }
+    }, [deferredValue]);
+
+
     /**
      * Update the value of the comment in Onyx
      */
     const updateComment = useCallback(
         (commentValue: string, shouldDebounceSaveComment?: boolean) => {
+            let trimmedCommentValue = commentValue;
+            console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:399 ~ isPasted:", isPastedRef.current);
+        
+            if (isPastedRef.current && maxCommentLength && maxCommentLength > 0) {
+                trimmedCommentValue = trimmedCommentValue.slice(0, maxCommentLength);
+            }
+    
             raiseIsScrollLikelyLayoutTriggered();
-            const {startIndex, endIndex, diff} = findNewlyAddedChars(lastTextRef.current, commentValue);
+            const {startIndex, endIndex, diff} = findNewlyAddedChars(lastTextRef.current, trimmedCommentValue);
+            console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:405 ~ startIndex, endIndex, diff:", startIndex, endIndex, diff);
             const isEmojiInserted = diff.length && endIndex > startIndex && diff.trim() === diff && EmojiUtils.containsOnlyEmojis(diff);
-            const commentWithSpaceInserted = isEmojiInserted ? ComposerUtils.insertWhiteSpaceAtIndex(commentValue, endIndex) : commentValue;
+            const commentWithSpaceInserted = isEmojiInserted ? ComposerUtils.insertWhiteSpaceAtIndex(trimmedCommentValue, endIndex) : trimmedCommentValue;
             const {text: newComment, emojis, cursorPosition} = EmojiUtils.replaceAndExtractEmojis(commentWithSpaceInserted, preferredSkinTone, preferredLocale);
+            console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:409 ~ newComment, emojis, cursorPosition:", newComment, emojis, cursorPosition);
             if (emojis.length) {
                 const newEmojis = EmojiUtils.getAddedEmojis(emojis, emojisPresentBefore.current);
                 if (newEmojis.length) {
@@ -410,9 +436,19 @@ function ComposerWithSuggestions(
             }
             emojisPresentBefore.current = emojis;
 
-            setValue(newCommentConverted);
-            if (commentValue !== newComment) {
+            if (isPastedRef.current && newCommentConverted === value) {
+                setValue(newCommentConverted + '\u200B');
+                setDeferredValue(newCommentConverted);
+            } else {
+                setValue(newCommentConverted);
+            }
+    
+            isPastedRef.current = false;
+
+            console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:430 ~ lastTextRef.current:", lastTextRef.current)
+            if (trimmedCommentValue !== newComment) {
                 const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), cursorPosition ?? 0);
+                console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:426 ~ position:", position);
 
                 if (commentWithSpaceInserted !== newComment && isIOSNative) {
                     syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
@@ -429,15 +465,17 @@ function ComposerWithSuggestions(
             commentRef.current = newCommentConverted;
             if (shouldDebounceSaveComment) {
                 isCommentPendingSaved.current = true;
+                debouncedSaveReportComment(reportID, '');
                 debouncedSaveReportComment(reportID, newCommentConverted);
             } else {
+                Report.saveReportDraftComment(reportID, '');
                 Report.saveReportDraftComment(reportID, newCommentConverted);
             }
             if (newCommentConverted) {
                 debouncedBroadcastUserIsTyping(reportID);
             }
         },
-        [findNewlyAddedChars, preferredLocale, preferredSkinTone, reportID, setIsCommentEmpty, suggestionsRef, raiseIsScrollLikelyLayoutTriggered, debouncedSaveReportComment, selection.end],
+        [findNewlyAddedChars, preferredLocale, preferredSkinTone, reportID, setIsCommentEmpty, suggestionsRef, raiseIsScrollLikelyLayoutTriggered, debouncedSaveReportComment, selection.end, maxCommentLength, isPastedRef],
     );
 
     /**
@@ -484,6 +522,8 @@ function ComposerWithSuggestions(
 
     const onChangeText = useCallback(
         (commentValue: string) => {
+    console.log("[wildebug] ~ file: ComposerWithSuggestions.tsx:521 ~ onChangeText:", commentValue)
+
             updateComment(commentValue, true);
 
             if (isIOSNative && syncSelectionWithOnChangeTextRef.current) {
@@ -762,6 +802,9 @@ function ComposerWithSuggestions(
                     onPasteFile={(file) => {
                         textInputRef.current?.blur();
                         displayFileInModal(file);
+                    }}
+                    onPasteText={() => {
+                        isPastedRef.current = true;
                     }}
                     onClear={onClear}
                     isDisabled={isBlockedFromConcierge || disabled}

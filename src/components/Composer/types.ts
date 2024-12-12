@@ -37,6 +37,9 @@ type ComposerProps = Omit<TextInputProps, 'onClear'> & {
     /** Callback method to handle pasting a file */
     onPasteFile?: (file: FileObject) => void;
 
+    /** Callback method to handle pasting a text */
+    onPasteText?: () => void;
+
     /** General styles to apply to the text input */
     // eslint-disable-next-line react/forbid-prop-types
     style?: StyleProp<TextStyle>;

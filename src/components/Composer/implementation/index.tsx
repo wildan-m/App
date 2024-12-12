@@ -49,6 +49,7 @@ function Composer(
         isComposerFullSize = false,
         shouldContainScroll = true,
         isGroupPolicyReport = false,
+        onPasteText = () => { },
         ...props
     }: ComposerProps,
     ref: ForwardedRef<TextInput | HTMLInputElement>,
@@ -198,6 +199,8 @@ function Composer(
                     }
                 }
             }
+
+            onPasteText?.();
             return false;
         },
         [onPasteFile, checkComposerVisibility],
