@@ -39,6 +39,7 @@ import type {WithFullTransactionOrNotFoundProps} from './withFullTransactionOrNo
 import withFullTransactionOrNotFound from './withFullTransactionOrNotFound';
 import type {WithWritableReportOrNotFoundProps} from './withWritableReportOrNotFound';
 import withWritableReportOrNotFound from './withWritableReportOrNotFound';
+import promptLocationPermission from '@libs/actions/promptLocationPermission';
 
 type IOURequestStepConfirmationProps = WithWritableReportOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.STEP_CONFIRMATION> &
     WithFullTransactionOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.STEP_CONFIRMATION>;
@@ -473,7 +474,24 @@ function IOURequestStepConfirmation({
                                 });
                             },
                             (errorData) => {
-                                Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
+
+                                if (errorData?.code === GeolocationPositionError.TIMEOUT) {
+                                    promptLocationPermission().then((message) => {
+                                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
+                                        
+                                    })
+                                }
+                                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:476 ~ errorData:", errorData)
+                                Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, {
+                                    code: errorData?.code,
+                                    message: errorData?.message,
+                                    error: {
+                                        PERMISSION_DENIED: errorData?.code === GeolocationPositionError.PERMISSION_DENIED,
+                                        POSITION_UNAVAILABLE: errorData?.code === GeolocationPositionError.POSITION_UNAVAILABLE, 
+                                        TIMEOUT: errorData?.code === GeolocationPositionError.TIMEOUT
+                                    }
+                                });
+    
                                 // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                                 trackExpense(selectedParticipants, trimmedComment, receiptFile);
                             },
@@ -504,7 +522,23 @@ function IOURequestStepConfirmation({
                             });
                         },
                         (errorData) => {
-                            Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, errorData);
+                            if (errorData?.code === GeolocationPositionError.TIMEOUT) {
+                                promptLocationPermission().then((message) => {
+                                    console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
+                                    
+                                })
+                            }
+
+                            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
+                            Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, {
+                                code: errorData?.code,
+                                message: errorData?.message,
+                                error: {
+                                    PERMISSION_DENIED: errorData?.code === GeolocationPositionError.PERMISSION_DENIED,
+                                    POSITION_UNAVAILABLE: errorData?.code === GeolocationPositionError.POSITION_UNAVAILABLE, 
+                                    TIMEOUT: errorData?.code === GeolocationPositionError.TIMEOUT
+                                }
+                            });
                             // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                             requestMoney(selectedParticipants, trimmedComment, receiptFile);
                         },

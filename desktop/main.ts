@@ -15,6 +15,7 @@ import type {Locale} from '@src/types/onyx';
 import type {CreateDownloadQueueModule, DownloadItem} from './createDownloadQueue';
 import serve from './electron-serve';
 import ELECTRON_EVENTS from './ELECTRON_EVENTS';
+import { exec } from 'child_process';
 
 const createDownloadQueue = require<CreateDownloadQueueModule>('./createDownloadQueue').default;
 
@@ -310,6 +311,24 @@ const mainWindow = (): Promise<void> => {
                 });
 
                 ipcMain.handle(ELECTRON_EVENTS.REQUEST_DEVICE_ID, () => machineId());
+
+                ipcMain.handle(ELECTRON_EVENTS.PROMPT_LOCATION_PERMISSION, () => 
+                    dialog.showMessageBox({
+                        type: 'warning',
+                        title: 'Location Access Error',
+                        message: 'Unable to access your location',
+                        detail: 'This could be due to disabled location services.',
+                        buttons: ['Continue Without Location', 'Open Location Settings'],
+                        defaultId: 1,
+                        cancelId: 0
+                    }).then((result) => {
+                        if (result.response === 1) {
+                            exec('open x-apple.systempreferences:com.apple.preference.security?Privacy_Location');
+                            return 'SETTINGS_OPENED';
+                        }
+                        return 'CONTINUE_WITHOUT_LOCATION';
+                    })
+                );
 
                 /*
                  * The default origin of our Electron app is app://- instead of https://new.expensify.com or https://staging.new.expensify.com
