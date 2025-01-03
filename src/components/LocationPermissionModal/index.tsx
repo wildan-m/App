@@ -25,6 +25,7 @@ function LocationPermissionModal({startPermissionFlow, resetPermissionFlow, onDe
         }
 
         getLocationPermission().then((status) => {
+            console.log("[wildebug] ~ file: index.tsx:28 ~ getLocationPermission ~ status:", status)
             if (status === RESULTS.GRANTED || status === RESULTS.LIMITED) {
                 return onGrant();
             }

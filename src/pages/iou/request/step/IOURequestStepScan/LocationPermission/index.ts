@@ -23,6 +23,7 @@ function getLocationPermission(): Promise<PermissionStatus> {
     return new Promise((resolve) => {
         if (navigator.geolocation) {
             navigator.permissions.query({name: 'geolocation'}).then((result) => {
+            console.log('[wildebug] Permission state:', result.state);
                 if (result.state === 'prompt') {
                     resolve(RESULTS.DENIED);
                     return;
@@ -30,6 +31,7 @@ function getLocationPermission(): Promise<PermissionStatus> {
                 resolve(result.state === 'granted' ? RESULTS.GRANTED : RESULTS.BLOCKED);
             });
         } else {
+            console.log('[wildebug] Geolocation is unavailable');
             resolve(RESULTS.UNAVAILABLE);
         }
     });

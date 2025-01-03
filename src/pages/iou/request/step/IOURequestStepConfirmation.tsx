@@ -355,11 +355,14 @@ function IOURequestStepConfirmation({
 
     const createTransaction = useCallback(
         (selectedParticipants: Participant[], locationPermissionGranted = false) => {
+            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:358 ~ locationPermissionGranted:", locationPermissionGranted)
+            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:358 ~ selectedParticipants:", selectedParticipants)
             setIsConfirmed(true);
             let splitParticipants = selectedParticipants;
 
             // Filter out participants with an amount equal to O
             if (iouType === CONST.IOU.TYPE.SPLIT && transaction?.splitShares) {
+                console.log("[wildebug] ~ asoidfjaoisdjf")
                 const participantsWithAmount = Object.keys(transaction.splitShares ?? {})
                     .filter((accountID: string): boolean => (transaction?.splitShares?.[Number(accountID)]?.amount ?? 0) > 0)
                     .map((accountID) => Number(accountID));
@@ -373,6 +376,8 @@ function IOURequestStepConfirmation({
 
             // Don't let the form be submitted multiple times while the navigator is waiting to take the user to a different page
             if (formHasBeenSubmitted.current) {
+                console.log("[wildebug] ~ asdfasdfasdf")
+
                 return;
             }
 
@@ -380,6 +385,8 @@ function IOURequestStepConfirmation({
             playSound(SOUNDS.DONE);
 
             if (iouType !== CONST.IOU.TYPE.TRACK && isDistanceRequest && !isMovingTransactionFromTrackExpense) {
+                console.log("[wildebug] ~ asdoijfawe")
+
                 createDistanceRequest(iouType === CONST.IOU.TYPE.SPLIT ? splitParticipants : selectedParticipants, trimmedComment);
                 return;
             }
@@ -510,35 +517,57 @@ function IOURequestStepConfirmation({
                 trackExpense(selectedParticipants, trimmedComment, receiptFile);
                 return;
             }
+            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:522 ~ !!transaction:", !!transaction)
+            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:522 ~ receiptFile:", receiptFile)
 
             if (receiptFile && !!transaction) {
+                console.log("[wildebug] ~ asdoijfoiwefwef")
+                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:526 ~ locationPermissionGranted:", locationPermissionGranted)
+                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:526 ~ !isCategorizingTrackExpense:", !isCategorizingTrackExpense)
+                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:526 ~ !isSharingTrackExpense:", !isSharingTrackExpense)
+                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:526 ~ transaction.amount:", transaction.amount)
+
                 // If the transaction amount is zero, then the money is being requested through the "Scan" flow and the GPS coordinates need to be included.
                 if (transaction.amount === 0 && !isSharingTrackExpense && !isCategorizingTrackExpense && locationPermissionGranted) {
+                    console.log("[wildebug] ~ aosdijfwef")
+
                     getCurrentPosition(
                         (successData) => {
+                            console.log("[wildebug] ~ sdfwef")
+
                             requestMoney(selectedParticipants, trimmedComment, receiptFile, {
                                 lat: successData.coords.latitude,
                                 long: successData.coords.longitude,
                             });
                         },
                         (errorData) => {
-                            if (errorData?.code === GeolocationPositionError.TIMEOUT) {
-                                promptLocationPermission().then((message) => {
-                                    console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
-                                    
-                                })
-                            }
+                            console.log("[wildebug] ~ zdcwee")
 
-                            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
                             Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, {
                                 code: errorData?.code,
                                 message: errorData?.message,
                                 error: {
                                     PERMISSION_DENIED: errorData?.code === GeolocationPositionError.PERMISSION_DENIED,
-                                    POSITION_UNAVAILABLE: errorData?.code === GeolocationPositionError.POSITION_UNAVAILABLE, 
+                                    POSITION_UNAVAILABLE: errorData?.code === GeolocationPositionError.POSITION_UNAVAILABLE,
                                     TIMEOUT: errorData?.code === GeolocationPositionError.TIMEOUT
                                 }
                             });
+
+                            if (errorData?.code === GeolocationPositionError.TIMEOUT) {
+                                promptLocationPermission().then((message) => {
+                                    console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
+                                    console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
+
+                                    if (message === 'SETTINGS_OPENED') {
+                                        setIsConfirmed(false);
+                                        formHasBeenSubmitted.current = false;
+                                        // IOU.updateLastLocationPermissionPrompt();
+                                        return;
+                                    }
+
+                                })
+                                return;
+                            }
                             // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                             requestMoney(selectedParticipants, trimmedComment, receiptFile);
                         },
@@ -550,10 +579,14 @@ function IOURequestStepConfirmation({
                     return;
                 }
 
+                console.log("[wildebug] ~ asdoifwefwe")
+
                 // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                 requestMoney(selectedParticipants, trimmedComment, receiptFile);
                 return;
             }
+
+            console.log("[wildebug] ~ aiojdosifjwe")
 
             requestMoney(selectedParticipants, trimmedComment);
         },
@@ -618,15 +651,18 @@ function IOURequestStepConfirmation({
     const isLoading = !!transaction?.originalCurrency;
 
     const onConfirm = (listOfParticipants: Participant[]) => {
+        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:626 ~ onConfirm ~ listOfParticipants:", listOfParticipants)
         setSelectedParticipantList(listOfParticipants);
 
         if (gpsRequired) {
+            console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:633 ~ onConfirm ~ if (gpsRequired) {:")
             const shouldStartLocationPermissionFlow =
                 !lastLocationPermissionPrompt ||
                 (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
                     DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS);
 
             if (shouldStartLocationPermissionFlow) {
+                console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:640 ~ onConfirm ~ if (shouldStartLocationPermissionFlow) {:")
                 setStartLocationPermissionFlow(true);
                 return;
             }
@@ -638,6 +674,7 @@ function IOURequestStepConfirmation({
     if (isLoadingTransaction) {
         return <FullScreenLoadingIndicator />;
     }
+    console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:680 ~ startLocationPermissionFlow:", startLocationPermissionFlow)
 
     return (
         <ScreenWrapper
@@ -665,10 +702,20 @@ function IOURequestStepConfirmation({
                     <LocationPermissionModal
                         startPermissionFlow={startLocationPermissionFlow}
                         resetPermissionFlow={() => setStartLocationPermissionFlow(false)}
-                        onGrant={() => createTransaction(selectedParticipantList, true)}
+                        onGrant={() => {
+                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:682 ~ onGrant:")
+                            
+                            createTransaction(selectedParticipantList, true)
+                            setStartLocationPermissionFlow(false);
+                        }
+                            
+                        }
+
                         onDeny={() => {
                             IOU.updateLastLocationPermissionPrompt();
                             createTransaction(selectedParticipantList, false);
+                            setStartLocationPermissionFlow(false);
+
                         }}
                     />
                 )}

@@ -324,6 +324,19 @@ const mainWindow = (): Promise<void> => {
                     }).then((result) => {
                         if (result.response === 1) {
                             exec('open x-apple.systempreferences:com.apple.preference.security?Privacy_Location');
+
+                            dialog.showMessageBox({
+                                type: 'info',
+                                buttons: ['Relaunch Now', 'Later'],
+                                defaultId: 0,
+                                message: 'System Preferences Opened',
+                                detail: 'Please enable location access in the System Preferences, then relaunch the app for changes to take effect.\n\nTo enable: Check the box next to the app name in the Location Services list.'
+                            }).then((result) => {
+                                if (result.response === 0) {
+                                    app.relaunch();
+                                    app.exit(0);
+                                }
+                            });
                             return 'SETTINGS_OPENED';
                         }
                         return 'CONTINUE_WITHOUT_LOCATION';
