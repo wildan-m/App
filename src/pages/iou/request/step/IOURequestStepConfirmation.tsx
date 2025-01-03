@@ -107,6 +107,7 @@ function IOURequestStepConfirmation({
 
     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && receiptFile;
     const [isConfirmed, setIsConfirmed] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     const headerTitle = useMemo(() => {
         if (isCategorizingTrackExpense) {
@@ -501,6 +502,7 @@ function IOURequestStepConfirmation({
     
                                 // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                                 trackExpense(selectedParticipants, trimmedComment, receiptFile);
+
                             },
                             {
                                 maximumAge: CONST.GPS.MAX_AGE,
@@ -554,6 +556,7 @@ function IOURequestStepConfirmation({
                             });
 
                             if (errorData?.code === GeolocationPositionError.TIMEOUT) {
+                            setIsConfirming(false);
                                 promptLocationPermission().then((message) => {
                                     console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
                                     console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
@@ -561,7 +564,6 @@ function IOURequestStepConfirmation({
                                     if (message === 'SETTINGS_OPENED') {
                                         setIsConfirmed(false);
                                         formHasBeenSubmitted.current = false;
-                                        // IOU.updateLastLocationPermissionPrompt();
                                         return;
                                     }
 
@@ -580,14 +582,12 @@ function IOURequestStepConfirmation({
                 }
 
                 console.log("[wildebug] ~ asdoifwefwe")
-
                 // Otherwise, the money is being requested through the "Manual" flow with an attached image and the GPS coordinates are not needed.
                 requestMoney(selectedParticipants, trimmedComment, receiptFile);
                 return;
             }
 
             console.log("[wildebug] ~ aiojdosifjwe")
-
             requestMoney(selectedParticipants, trimmedComment);
         },
         [
@@ -651,6 +651,7 @@ function IOURequestStepConfirmation({
     const isLoading = !!transaction?.originalCurrency;
 
     const onConfirm = (listOfParticipants: Participant[]) => {
+        setIsConfirming(true);
         console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:626 ~ onConfirm ~ listOfParticipants:", listOfParticipants)
         setSelectedParticipantList(listOfParticipants);
 
@@ -746,6 +747,7 @@ function IOURequestStepConfirmation({
                     payeePersonalDetails={payeePersonalDetails}
                     shouldPlaySound={false}
                     isConfirmed={isConfirmed}
+                    isConfirming={isConfirming}
                 />
             </View>
         </ScreenWrapper>
