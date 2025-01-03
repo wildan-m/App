@@ -556,7 +556,7 @@ function IOURequestStepConfirmation({
                             });
 
                             if (errorData?.code === GeolocationPositionError.TIMEOUT) {
-                            setIsConfirming(false);
+                                setIsConfirming(false);
                                 promptLocationPermission().then((message) => {
                                     console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
                                     console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
@@ -566,7 +566,8 @@ function IOURequestStepConfirmation({
                                         formHasBeenSubmitted.current = false;
                                         return;
                                     }
-
+                                    // When there is an error, the money can still be requested, it just won't include the GPS coordinates
+                                    requestMoney(selectedParticipants, trimmedComment, receiptFile);
                                 })
                                 return;
                             }
