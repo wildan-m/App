@@ -483,12 +483,6 @@ function IOURequestStepConfirmation({
                             },
                             (errorData) => {
 
-                                if (errorData?.code === GeolocationPositionError.TIMEOUT) {
-                                    promptLocationPermission().then((message) => {
-                                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
-                                        
-                                    })
-                                }
                                 console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:476 ~ errorData:", errorData)
                                 Log.info('[IOURequestStepConfirmation] getCurrentPosition failed', false, {
                                     code: errorData?.code,
@@ -500,6 +494,25 @@ function IOURequestStepConfirmation({
                                     }
                                 });
     
+
+                                if (errorData?.code === GeolocationPositionError.TIMEOUT) {
+                                    setIsConfirming(false);
+                                    promptLocationPermission().then((message) => {
+                                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:480 ~ promptLocationPermission ~ message:", message)
+                                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:507 ~ errorData:", errorData)
+    
+                                        if (message === 'SETTINGS_OPENED') {
+                                            setIsConfirmed(false);
+                                            formHasBeenSubmitted.current = false;
+                                            return;
+                                        }
+                                        // When there is an error, the money can still be requested, it just won't include the GPS coordinates
+                                        trackExpense(selectedParticipants, trimmedComment, receiptFile);
+                                    })
+                                    return;
+                                }
+
+
                                 // When there is an error, the money can still be requested, it just won't include the GPS coordinates
                                 trackExpense(selectedParticipants, trimmedComment, receiptFile);
 
