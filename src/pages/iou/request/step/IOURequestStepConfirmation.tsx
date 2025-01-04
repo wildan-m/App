@@ -724,25 +724,16 @@ function IOURequestStepConfirmation({
                 {isLoading && <FullScreenLoadingIndicator />}
                 {!!gpsRequired && (
                     <LocationPermissionModal
-                        startPermissionFlow={startLocationPermissionFlow}
-                        resetPermissionFlow={() => setStartLocationPermissionFlow(false)}
-                        onGrant={() => {
-                        console.log("[wildebug] ~ file: IOURequestStepConfirmation.tsx:682 ~ onGrant:")
-                            
-                            createTransaction(selectedParticipantList, true)
-                            setStartLocationPermissionFlow(false);
-                        }
-                            
-                        }
-
-                        onDeny={() => {
-                            IOU.updateLastLocationPermissionPrompt();
-                            createTransaction(selectedParticipantList, false);
-                            setStartLocationPermissionFlow(false);
-
-                        }}
-                    />
-                )}
+                    startPermissionFlow={startLocationPermissionFlow}
+                    resetPermissionFlow={() => setStartLocationPermissionFlow(false)}
+                    onGrant={() => createTransaction(selectedParticipantList, true)}
+                    onDeny={() => {
+                        IOU.updateLastLocationPermissionPrompt();
+                        createTransaction(selectedParticipantList, false);
+                    }}
+                />
+            )}
+            
                 <MoneyRequestConfirmationList
                     transaction={transaction}
                     selectedParticipants={participants}
