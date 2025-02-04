@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSearchContext} from '@components/Search/SearchContext';
 import BaseListItem from '@components/SelectionList/BaseListItem';
 import type {ListItem, TransactionListItemProps, TransactionListItemType} from '@components/SelectionList/types';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
+import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -53,6 +54,28 @@ function TransactionListItem<TItem extends ListItem>({
         backgroundColor: theme.highlightBG,
     });
 
+    // Manages transaction action loading states and changes:
+    // 1. Sets loading state when transaction action is in progress
+    // 2. Resets loading state when both changes are detected and loading is active
+    // 3. Tracks changes by comparing current action with previous action
+    const [isTransactionActionLoading, setIsTransactionActionLoading] = useState(false);
+    const [isTransactionActionChanges, setIsTransactionActionChanges] = useState(false);
+    const prevTransactionAction = usePrevious(transactionItem.action);
+
+    useEffect(() => {
+        if (transactionItem.isActionLoading) {
+            setIsTransactionActionLoading(true);
+        }
+
+        if (isTransactionActionChanges && isTransactionActionLoading) {
+            setIsTransactionActionLoading(false);
+        }
+
+        if (transactionItem.action !== prevTransactionAction) {
+            setIsTransactionActionChanges(true);
+        }
+    }, [transactionItem.isActionLoading, transactionItem.action, prevTransactionAction, isTransactionActionChanges, isTransactionActionLoading]);
+
     return (
         <BaseListItem
             item={item}
@@ -83,7 +106,7 @@ function TransactionListItem<TItem extends ListItem>({
                 canSelectMultiple={!!canSelectMultiple}
                 isButtonSelected={item.isSelected}
                 shouldShowTransactionCheckbox={false}
-                isLoading={isLoading ?? transactionItem.isActionLoading}
+                isLoading={isLoading ?? isTransactionActionLoading}
             />
         </BaseListItem>
     );
