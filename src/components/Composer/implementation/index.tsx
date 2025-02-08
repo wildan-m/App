@@ -355,6 +355,7 @@ function Composer(
             StyleUtils.getComposerMaxHeightStyle(maxLines, isComposerFullSize),
             isComposerFullSize ? {height: '100%', maxHeight: 'none'} : undefined,
             textContainsOnlyEmojis && hasMultipleLines ? styles.onlyEmojisTextLineHeight : {},
+            textContainsOnlyEmojis ? styles.onlyEmojisTextFontSize : {},
         ],
 
         [style, styles.rtlTextRenderForSafari, styles.onlyEmojisTextLineHeight, scrollStyleMemo, hasMultipleLines, StyleUtils, maxLines, isComposerFullSize, textContainsOnlyEmojis],
@@ -370,6 +371,7 @@ function Composer(
             selection={selection}
             style={[inputStyleMemo, shouldTransparentCursor ? {caretColor: 'transparent'} : undefined]}
             markdownStyle={markdownStyle}
+            shouldAlignEmojiVertically={!textContainsOnlyEmojis}
             value={value}
             defaultValue={defaultValue}
             autoFocus={autoFocus}

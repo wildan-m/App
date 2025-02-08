@@ -1758,6 +1758,10 @@ const styles = (theme: ThemeColors) =>
             lineHeight: variables.fontSizeOnlyEmojisHeight,
         },
 
+        onlyEmojisTextFontSize: {
+            fontSize: variables.fontSizeOnlyEmojis,
+        },
+
         onlyEmojisTextLineHeight: {
             lineHeight: variables.fontSizeOnlyEmojisHeight,
         },
