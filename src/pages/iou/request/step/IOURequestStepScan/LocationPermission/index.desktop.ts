@@ -22,9 +22,18 @@ function requestLocationPermission(): Promise<PermissionStatus> {
 function getLocationPermission(): Promise<PermissionStatus> {
     return new Promise((resolve) => {
         if (navigator.geolocation) {
+            const startTime = Date.now();
             navigator.geolocation.getCurrentPosition(
-                () => resolve(RESULTS.GRANTED),
+                () => {
+                    const endTime = Date.now();
+                    const timeElapsed = endTime - startTime;
+                    console.log("[wildebug] ~ success~ timeElapsed:", timeElapsed)
+                    resolve(RESULTS.GRANTED)},
                 (error) => {
+                    console.log("[wildebug] ~ index.desktop.ts:33 ~ returnnewPromise ~ error:", error)
+                    const endTime = Date.now();
+                    const timeElapsed = endTime - startTime;
+                    console.log("[wildebug] ~ index.tsx:34 ~ getLocationPermission ~ timeElapsed:", timeElapsed)
                     // If user denies permission, error.code will be 1 (PERMISSION_DENIED)
                     if (error.code === 1) {
                         resolve(RESULTS.BLOCKED);
@@ -37,7 +46,7 @@ function getLocationPermission(): Promise<PermissionStatus> {
                     }
                 },
                 {
-                    timeout: CONST.GPS.TIMEOUT,
+                    timeout:5000,
                     enableHighAccuracy: true,
                 }
             );

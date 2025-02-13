@@ -10,6 +10,8 @@ import {getLocationPermission, requestLocationPermission} from '@pages/iou/reque
 import CONST from '@src/CONST';
 import type {LocationPermissionModalProps} from './types';
 import ELECTRON_EVENTS from '@desktop/ELECTRON_EVENTS';
+import { clearUserLocation, setUserLocation } from '@libs/actions/UserLocation';
+import getCurrentPosition from '@libs/getCurrentPosition';
 
 function LocationPermissionModal({startPermissionFlow, resetPermissionFlow, onDeny, onGrant, onInitialGetLocationCompleted}: LocationPermissionModalProps) {
     const [hasError, setHasError] = useState(false);
@@ -29,6 +31,19 @@ function LocationPermissionModal({startPermissionFlow, resetPermissionFlow, onDe
         getLocationPermission().then((status) => {
             onInitialGetLocationCompleted?.(status);
             if (status === RESULTS.GRANTED || status === RESULTS.LIMITED) {
+                clearUserLocation();
+                const startTime = Date.now();
+                getCurrentPosition((params) => {
+                    const endTime = Date.now();
+                    const timeElapsed = endTime - startTime;
+                    console.log("[wildebug] ~ index.tsx:34 ~ getLocationPermission ~ timeElapsed:", timeElapsed)
+
+                    
+                    const currentCoords = { longitude: params.coords.longitude, latitude: params.coords.latitude };
+                    setUserLocation(currentCoords);
+                }, (errorData) => {
+                    console.log("[wildebug] ~ index.desktop.tsx:45 ~ getCurrentPosition ~ errorData:", errorData)
+                 });
                 return onGrant();
             }
 

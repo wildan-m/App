@@ -9,6 +9,8 @@ import getPlatform from '@libs/getPlatform';
 import {getLocationPermission, requestLocationPermission} from '@pages/iou/request/step/IOURequestStepScan/LocationPermission';
 import CONST from '@src/CONST';
 import type {LocationPermissionModalProps} from './types';
+import getCurrentPosition from '@libs/getCurrentPosition';
+import { clearUserLocation, setUserLocation } from '@libs/actions/UserLocation';
 
 function LocationPermissionModal({startPermissionFlow, resetPermissionFlow, onDeny, onGrant, onInitialGetLocationCompleted}: LocationPermissionModalProps) {
     const [hasError, setHasError] = useState(false);
@@ -25,8 +27,13 @@ function LocationPermissionModal({startPermissionFlow, resetPermissionFlow, onDe
         }
 
         getLocationPermission().then((status) => {
-            onInitialGetLocationCompleted?.();
+            onInitialGetLocationCompleted?.(status);
             if (status === RESULTS.GRANTED || status === RESULTS.LIMITED) {
+                clearUserLocation();
+                getCurrentPosition((params) => {                    
+                    const currentCoords = { longitude: params.coords.longitude, latitude: params.coords.latitude };
+                    setUserLocation(currentCoords);
+                }, () => { });
                 return onGrant();
             }
 

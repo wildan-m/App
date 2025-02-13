@@ -43,7 +43,7 @@ import ReceiptDropUI from '@pages/iou/ReceiptDropUI';
 import StepScreenDragAndDropWrapper from '@pages/iou/request/step/StepScreenDragAndDropWrapper';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import withWritableReportOrNotFound from '@pages/iou/request/step/withWritableReportOrNotFound';
-import {setUserLocation} from '@libs/actions/UserLocation';
+import {setUserLocation, clearUserLocation} from '@libs/actions/UserLocation';
 
 import {
     replaceReceipt,
@@ -204,24 +204,51 @@ function IOURequestStepScan({
         // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
     }, [isTabActive]);
 
-
+    const [isInitialLocationFetched, setIsInitialLocationFetched] = useState(false);
+    const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION);
     useEffect(() => {
         const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT;
         if (gpsRequired) {
+            // if (!isInitialLocationFetched) {
+            //     // clearUserLocation();
+            //     // getCurrentPosition(
+            //     //     (successData) => {
+            //     //         console.log("[wildebug] ~ index.tsx:214 ~ useEffect ~ successData:", successData)
+            //     //         setUserLocation({ longitude: successData.coords.latitude, latitude: successData.coords.longitude });
+            //     //         setIsInitialLocationFetched(true)
+            //     //     },
+            //     //     (errorData) => {
+            //     //         console.log("[wildebug] ~ index.tsx:218 ~ useEffect ~ errorData:", errorData)
+            //     //         setIsInitialLocationFetched(true)
+            //     //     },
+            //     //     {
+            //     //         maximumAge: CONST.GPS.MAX_AGE,
+            //     //         timeout: 5000,
+            //     //     },
+            //     // );
+            // }
 
-            getCurrentPosition(
-                (successData) => {
-                    console.log("[wildebug] ~ index.tsx:214 ~ useEffect ~ successData:", successData)
-                    setUserLocation({longitude: successData.coords.latitude, latitude: successData.coords.longitude});
-                },
-                () => {},
-                {
-                    maximumAge: CONST.GPS.MAX_AGE,
-                    timeout: CONST.GPS.TIMEOUT,
-                },
-            );
+
+            if (startLocationPermissionFlow) {
+                return;
+            }
+
+            const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+            if (!beginLocationPermissionFlow) {
+                return;
+            }
+            console.log("[wildebug] ~ index.tsx:243 ~ useEffect ~ setStartLocationPermissionFlow(true);:")
+
+
+            setStartLocationPermissionFlow(true);
         }
-    }, [transaction?.amount, iouType, setUserLocation]);
+
+    }, [transaction?.amount, iouType, 
+        startLocationPermissionFlow,
+    
+        // setUserLocation, userLocation, clearUserLocation, isInitialLocationFetched
+    
+    ]);
 
 
     const hideRecieptModal = () => {
