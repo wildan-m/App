@@ -129,7 +129,6 @@ function IOURequestStepConfirmation({
 
     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && receiptFile;
     const [isConfirmed, setIsConfirmed] = useState(false);
-    const [isConfirming, setIsConfirming] = useState(false);
 
     const headerTitle = useMemo(() => {
         if (isCategorizingTrackExpense) {
@@ -704,23 +703,21 @@ function IOURequestStepConfirmation({
     const isLoading = !!transaction?.originalCurrency;
 
     const onConfirm = (listOfParticipants: Participant[]) => {
-        setIsConfirming(true);
         setSelectedParticipantList(listOfParticipants);
 
-        if (gpsRequired) {
-            const shouldStartLocationPermissionFlow =
-                !lastLocationPermissionPrompt ||
-                (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
-                    DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS);
+        // if (gpsRequired ) {
+        //     const shouldStartLocationPermissionFlow =
+        //         !lastLocationPermissionPrompt ||
+        //         (DateUtils.isValidDateString(lastLocationPermissionPrompt ?? '') &&
+        //             DateUtils.getDifferenceInDaysFromNow(new Date(lastLocationPermissionPrompt ?? '')) > CONST.IOU.LOCATION_PERMISSION_PROMPT_THRESHOLD_DAYS);
 
-            if (shouldStartLocationPermissionFlow) {
-                setStartLocationPermissionFlow(true);
-                return;
-            }
-        }
+        //     if (shouldStartLocationPermissionFlow) {
+        //         setStartLocationPermissionFlow(true);
+        //         return;
+        //     }
+        // }
 
         createTransaction(listOfParticipants);
-        setIsConfirming(false);
     };
 
     if (isLoadingTransaction) {
@@ -794,7 +791,6 @@ function IOURequestStepConfirmation({
                     payeePersonalDetails={payeePersonalDetails}
                     shouldPlaySound={iouType === CONST.IOU.TYPE.PAY}
                     isConfirmed={isConfirmed}
-                    isConfirming={isConfirming}
                 />
             </View>
         </ScreenWrapper>

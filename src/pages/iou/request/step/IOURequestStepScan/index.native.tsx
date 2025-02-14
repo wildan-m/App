@@ -1,6 +1,6 @@
 import {useFocusEffect} from '@react-navigation/core';
 import {Str} from 'expensify-common';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {ActivityIndicator, Alert, AppState, InteractionManager, View} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -61,6 +61,7 @@ import type {Receipt} from '@src/types/onyx/Transaction';
 import CameraPermission from './CameraPermission';
 import NavigationAwareCamera from './NavigationAwareCamera/Camera';
 import type IOURequestStepScanProps from './types';
+import { clearUserLocation, setUserLocation } from '@libs/actions/UserLocation';
 
 function IOURequestStepScan({
     report,
@@ -89,6 +90,7 @@ function IOURequestStepScan({
     const [skipConfirmation] = useOnyx(`${ONYXKEYS.COLLECTION.SKIP_CONFIRMATION}${transactionID}`);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
+    const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION)
     const platform = getPlatform(true);
     const [mutedPlatforms = {}] = useOnyx(ONYXKEYS.NVP_MUTED_PLATFORMS);
     const isPlatformMuted = mutedPlatforms[platform];
@@ -165,6 +167,25 @@ function IOURequestStepScan({
 
             runOnJS(focusCamera)(point);
         });
+
+    useEffect(() => {
+        const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT;
+        if (gpsRequired) {
+            clearUserLocation();
+            getCurrentPosition(
+                (successData) => {
+                    console.log("[wildebug] native ~ index.tsx:214 ~ useEffect ~ successData:", successData)
+                    setUserLocation({ longitude: successData.coords.longitude, latitude: successData.coords.latitude });
+                },
+                () => { },
+                {
+                    maximumAge: CONST.GPS.MAX_AGE,
+                    timeout: CONST.GPS.TIMEOUT,
+                },
+            );
+        }
+    }, [transaction?.amount, iouType, setUserLocation]);
+    
 
     useFocusEffect(
         useCallback(() => {
@@ -488,19 +509,19 @@ function IOURequestStepScan({
                 updateScanAndNavigate(file, file?.uri ?? '');
                 return;
             }
-            if (shouldSkipConfirmation) {
-                setFileResize(file);
-                setFileSource(file?.uri ?? '');
-                const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
+            // if (shouldSkipConfirmation) {
+            setFileResize(file);
+            setFileSource(file?.uri ?? '');
+            const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
 
-                if (gpsRequired) {
-                    const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
-                    if (beginLocationPermissionFlow) {
-                        setStartLocationPermissionFlow(true);
-                        return;
-                    }
+            if (gpsRequired && !userLocation) {
+                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+                if (beginLocationPermissionFlow) {
+                    setStartLocationPermissionFlow(true);
+                    return;
                 }
-            }
+                }
+            // }
             navigateToConfirmationStep(file, file?.uri ?? '', false);
         });
     };

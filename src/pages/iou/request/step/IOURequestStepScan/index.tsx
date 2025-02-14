@@ -212,7 +212,7 @@ function IOURequestStepScan({
             getCurrentPosition(
                 (successData) => {
                     console.log("[wildebug] ~ index.tsx:214 ~ useEffect ~ successData:", successData)
-                    setUserLocation({longitude: successData.coords.latitude, latitude: successData.coords.longitude});
+                    setUserLocation({longitude: successData.coords.longitude, latitude: successData.coords.latitude});
                 },
                 () => {},
                 {
@@ -506,6 +506,7 @@ function IOURequestStepScan({
         [transactionID, navigateBack],
     );
 
+    const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION);
     /**
      * Sets the Receipt objects and navigates the user to the next page
      */
@@ -527,7 +528,7 @@ function IOURequestStepScan({
                 setIsLoadingReceipt(true);
             }
             resizeImageIfNeeded(originalFile).then((file) => {
-                setIsLoadingReceipt(false);
+                // setIsLoadingReceipt(false);
                 // Store the receipt on the transaction object in Onyx
                 const source = URL.createObjectURL(file as Blob);
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -541,7 +542,9 @@ function IOURequestStepScan({
                     setFileResize(file);
                     setFileSource(source);
                     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
-                    if (gpsRequired) {
+                    if (gpsRequired && !userLocation) {
+                        setIsLoadingReceipt(true);
+
                         const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
 
                         if (beginLocationPermissionFlow) {
@@ -550,6 +553,9 @@ function IOURequestStepScan({
                         }
                     }
                 // }
+
+                setIsLoadingReceipt(false);
+
                 navigateToConfirmationStep(file, source, false);
             });
         });
@@ -588,16 +594,14 @@ function IOURequestStepScan({
             updateScanAndNavigate(file, source);
             return;
         }
-        if (shouldSkipConfirmation) {
-            setFileResize(file);
-            setFileSource(source);
-            const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
-            if (gpsRequired) {
-                const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
-                if (beginLocationPermissionFlow) {
-                    setStartLocationPermissionFlow(true);
-                    return;
-                }
+        setFileResize(file);
+        setFileSource(source);
+        const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
+        if (gpsRequired && !userLocation) {
+            const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+            if (beginLocationPermissionFlow) {
+                setStartLocationPermissionFlow(true);
+                return;
             }
         }
         navigateToConfirmationStep(file, source, false);
@@ -869,6 +873,9 @@ function IOURequestStepScan({
                                         return;
                                     }
                                     navigateToConfirmationStep(fileResize, fileSource, false);
+                                }}
+                                onInitialGetLocationCompleted={()=>{
+                                    setIsLoadingReceipt(false);
                                 }}
                             />
                         )}
