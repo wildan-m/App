@@ -538,21 +538,22 @@ function IOURequestStepScan({
                     updateScanAndNavigate(file, source);
                     return;
                 }
-                // if (shouldSkipConfirmation) {
+                if (shouldSkipConfirmation) {
                     setFileResize(file);
                     setFileSource(source);
-                    const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
-                    if (gpsRequired && !userLocation) {
-                        setIsLoadingReceipt(true);
+                }
 
-                        const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+                const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
+                if (gpsRequired && !userLocation) {
+                    setIsLoadingReceipt(true);
 
-                        if (beginLocationPermissionFlow) {
-                            setStartLocationPermissionFlow(true);
-                            return;
-                        }
+                    const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+
+                    if (beginLocationPermissionFlow) {
+                        setStartLocationPermissionFlow(true);
+                        return;
                     }
-                // }
+                }
 
                 setIsLoadingReceipt(false);
 

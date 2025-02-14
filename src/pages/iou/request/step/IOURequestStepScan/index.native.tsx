@@ -509,9 +509,11 @@ function IOURequestStepScan({
                 updateScanAndNavigate(file, file?.uri ?? '');
                 return;
             }
-            // if (shouldSkipConfirmation) {
-            setFileResize(file);
-            setFileSource(file?.uri ?? '');
+            if (shouldSkipConfirmation) {
+                setFileResize(file);
+                setFileSource(file?.uri ?? '');
+            }
+
             const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && file;
 
             if (gpsRequired && !userLocation) {
@@ -520,8 +522,8 @@ function IOURequestStepScan({
                     setStartLocationPermissionFlow(true);
                     return;
                 }
-                }
-            // }
+            }
+            
             navigateToConfirmationStep(file, file?.uri ?? '', false);
         });
     };
