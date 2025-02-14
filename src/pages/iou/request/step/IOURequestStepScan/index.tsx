@@ -216,7 +216,7 @@ function IOURequestStepScan({
                 },
                 () => {},
                 {
-                    maximumAge: CONST.GPS.MAX_AGE,
+                    maximumAge: 0, // No cache, always get fresh location info
                     timeout: CONST.GPS.TIMEOUT,
                 },
             );
