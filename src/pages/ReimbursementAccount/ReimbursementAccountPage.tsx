@@ -289,7 +289,7 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
             if (
                 (prevReimbursementAccount &&
                 prevReimbursementAccount.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
-                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction) || !prevReimbursementAccount && reimbursementAccount || !initialReimbursementAccount.current
+                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction) || !initialReimbursementAccount.current
             ) {
                 initialReimbursementAccount.current = prevReimbursementAccount;
                 setShouldShowContinueSetupButton(hasInProgressVBBA());
