@@ -119,6 +119,8 @@ function getFieldsForStep(step: TBankAccountStep): InputID[] {
 function ReimbursementAccountPage({route, policy, isLoadingPolicy}: ReimbursementAccountPageProps) {
     const session = useSession();
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
+    const initialReimbursementAccount = useRef(reimbursementAccount);
+    const [isCheckingShowContinueSetupButton, setIsCheckingShowContinueSetupButton] = useState(true);
     const [plaidLinkToken = ''] = useOnyx(ONYXKEYS.PLAID_LINK_TOKEN);
     const [plaidCurrentEvent = ''] = useOnyx(ONYXKEYS.PLAID_CURRENT_EVENT);
     const [onfidoToken = ''] = useOnyx(ONYXKEYS.ONFIDO_TOKEN);
@@ -285,13 +287,15 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
             }
 
             if (
-                prevReimbursementAccount &&
+                (prevReimbursementAccount &&
                 prevReimbursementAccount.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
-                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction
+                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction) || !prevReimbursementAccount && reimbursementAccount || !initialReimbursementAccount.current && reimbursementAccount
             ) {
+                initialReimbursementAccount.current = prevReimbursementAccount;
                 setShouldShowContinueSetupButton(hasInProgressVBBA());
             }
 
+            setIsCheckingShowContinueSetupButton(false);
             if (shouldShowContinueSetupButton) {
                 return;
             }
@@ -409,7 +413,7 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
     // On Android, when we open the app from the background, Onfido activity gets destroyed, so we need to reopen it.
     // eslint-disable-next-line react-compiler/react-compiler
     if (
-        (!hasACHDataBeenLoaded || isLoading) &&
+        (!hasACHDataBeenLoaded || isLoading || isCheckingShowContinueSetupButton) &&
         shouldShowOfflineLoader &&
         (shouldReopenOnfido || !requestorStepRef?.current) &&
         !(currentStep === CONST.BANK_ACCOUNT.STEP.BANK_ACCOUNT && isValidateCodeActionModalVisible)
