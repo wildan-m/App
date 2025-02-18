@@ -119,8 +119,7 @@ function getFieldsForStep(step: TBankAccountStep): InputID[] {
 function ReimbursementAccountPage({route, policy, isLoadingPolicy}: ReimbursementAccountPageProps) {
     const session = useSession();
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
-    const initialReimbursementAccount = useRef(reimbursementAccount);
-    const [isCheckingShowContinueSetupButton, setIsCheckingShowContinueSetupButton] = useState(true);
+    const [isCheckingShowContinueSetupButton, setIsCheckingShowContinueSetupButton] = useState(!reimbursementAccount);
     const [plaidLinkToken = ''] = useOnyx(ONYXKEYS.PLAID_LINK_TOKEN);
     const [plaidCurrentEvent = ''] = useOnyx(ONYXKEYS.PLAID_CURRENT_EVENT);
     const [onfidoToken = ''] = useOnyx(ONYXKEYS.ONFIDO_TOKEN);
@@ -289,9 +288,8 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
             if (
                 (prevReimbursementAccount &&
                 prevReimbursementAccount.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE &&
-                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction) || !initialReimbursementAccount.current
+                reimbursementAccount?.pendingAction !== prevReimbursementAccount.pendingAction) || isCheckingShowContinueSetupButton
             ) {
-                initialReimbursementAccount.current = prevReimbursementAccount;
                 setShouldShowContinueSetupButton(hasInProgressVBBA());
             }
 
