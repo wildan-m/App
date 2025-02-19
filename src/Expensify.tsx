@@ -42,6 +42,11 @@ import type {Route} from './ROUTES';
 import ROUTES from './ROUTES';
 import SplashScreenStateContext from './SplashScreenStateContext';
 import type {ScreenShareRequest} from './types/onyx';
+import { clearUserLocation, setUserLocation } from '@libs/actions/UserLocation';
+import getCurrentPosition from '@libs/getCurrentPosition';
+import { shouldStartLocationPermissionFlow } from '@libs/IOUUtils';
+import LocationPermissionModal from '@components/LocationPermissionModal';
+import { updateLastLocationPermissionPrompt } from '@libs/actions/IOU';
 
 Onyx.registerLogger(({level, message}) => {
     if (level === 'alert') {
@@ -237,6 +242,17 @@ function Expensify() {
         setCrashlyticsUserId(session?.accountID ?? -1);
     }, [isAuthenticated, session?.accountID]);
 
+    const [startLocationPermissionFlow, setStartLocationPermissionFlow] = useState(false);
+
+    useEffect(() => {
+        const beginLocationPermissionFlow = shouldStartLocationPermissionFlow();
+        if (beginLocationPermissionFlow) {
+            setStartLocationPermissionFlow(true);
+            return;
+        }
+    }, [setStartLocationPermissionFlow]);
+
+
     // Display a blank page until the onyx migration completes
     if (!isOnyxMigrated) {
         return null;
@@ -295,6 +311,27 @@ function Expensify() {
                 />
             )}
             {shouldHideSplash && <SplashScreenHider onHide={onSplashHide} />}
+            <LocationPermissionModal
+                startPermissionFlow={startLocationPermissionFlow}
+                resetPermissionFlow={() => setStartLocationPermissionFlow(false)}
+                onGrant={() => {
+                    clearUserLocation();
+                    getCurrentPosition(
+                        (successData) => {
+                            setUserLocation({ longitude: successData.coords.longitude, latitude: successData.coords.latitude });
+                        },
+                        () => {},
+                        {
+                            maximumAge: 0, // No cache, always get fresh location info
+                            timeout: CONST.GPS.TIMEOUT,
+                        },
+                    );
+                 }}
+                onDeny={() => {
+                    updateLastLocationPermissionPrompt();
+                }}
+            />
+
         </DeeplinkWrapper>
     );
 }

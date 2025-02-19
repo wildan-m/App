@@ -208,7 +208,7 @@ function IOURequestStepScan({
     useEffect(() => {
         const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT;
         if (gpsRequired) {
-            clearUserLocation();
+            // clearUserLocation();
             getCurrentPosition(
                 (successData) => {
                     console.log("[wildebug] ~ index.tsx:214 ~ useEffect ~ successData:", successData)
