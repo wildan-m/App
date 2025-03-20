@@ -339,7 +339,7 @@ function Composer(
             scrollStyleMemo,
             StyleUtils.getComposerMaxHeightStyle(maxLines, isComposerFullSize),
             isComposerFullSize ? {height: '100%', maxHeight: 'none'} : undefined,
-            textContainsOnlyEmojis ? styles.onlyEmojisTextLineHeight : {},
+            textContainsOnlyEmojis ? styles.onlyEmojisText : {},
         ],
 
         [style, styles.rtlTextRenderForSafari, styles.onlyEmojisTextLineHeight, scrollStyleMemo, StyleUtils, maxLines, isComposerFullSize, textContainsOnlyEmojis],
@@ -355,7 +355,7 @@ function Composer(
             selection={selection}
             style={[inputStyleMemo]}
             markdownStyle={markdownStyle}
-            // shouldAlignEmojiVertically={!textContainsOnlyEmojis}
+            shouldAlignEmojiVertically={!textContainsOnlyEmojis}
             value={value}
             defaultValue={defaultValue}
             autoFocus={autoFocus}
