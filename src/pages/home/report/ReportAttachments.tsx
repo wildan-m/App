@@ -10,6 +10,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import * as Expensicons from '@components/Icon/Expensicons';
 
 type ReportAttachmentsProps = PlatformStackScreenProps<AuthScreensParamList, typeof SCREENS.ATTACHMENTS>;
 
@@ -65,6 +66,7 @@ function ReportAttachments({route}: ReportAttachmentsProps) {
             isAuthTokenRequired={!!isAuthTokenRequired}
             attachmentLink={attachmentLink ?? ''}
             originalFileName={fileName ?? ''}
+            fallbackSource={Expensicons.AttachmentNotFound}
         />
     );
 }
