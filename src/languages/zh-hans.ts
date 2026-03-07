@@ -1513,6 +1513,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: '拒绝你不打算批准或报销的报销单。',
             reasonPageTitle: '拒绝报销',
             reasonPageDescription: '请说明你为何不会批准这笔报销。',
+            reasonPageDescriptionMultiple: '请说明你为何不会批准这些报销。',
             rejectReason: '拒绝原因',
             markAsResolved: '标记为已解决',
             rejectedStatus: '该报销已被拒绝。请先修复问题并标记为已解决，然后才能提交。',

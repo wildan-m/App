@@ -1538,6 +1538,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: '承認や支払いを行う予定のない経費を却下します。',
             reasonPageTitle: '経費を却下',
             reasonPageDescription: 'この経費を承認しない理由を説明してください。',
+            reasonPageDescriptionMultiple: 'これらの経費を承認しない理由を説明してください。',
             rejectReason: '却下理由',
             markAsResolved: '解決済みにする',
             rejectedStatus: 'この経費は却下されました。問題を修正して解決済みにすると、再提出できるようになります。',

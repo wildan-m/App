@@ -93,6 +93,7 @@ function SearchRejectReasonPage({route}: SearchRejectReasonPageProps) {
         <RejectReasonFormView
             onSubmit={onSubmit}
             validate={validate}
+            isMultipleTransactions={Object.keys(selectedTransactionsForReject).length > 1}
         />
     );
 }

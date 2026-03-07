@@ -1555,6 +1555,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Rejetez une dépense que vous n’avez pas l’intention d’approuver ou de payer.',
             reasonPageTitle: 'Rejeter la dépense',
             reasonPageDescription: "Expliquez pourquoi vous n'approuverez pas cette dépense.",
+            reasonPageDescriptionMultiple: "Expliquez pourquoi vous n'approuverez pas ces dépenses.",
             rejectReason: 'Motif de rejet',
             markAsResolved: 'Marquer comme résolu',
             rejectedStatus: 'Cette dépense a été rejetée. Nous attendons que vous corrigiez les problèmes et la marquiez comme résolue pour permettre la soumission.',
