@@ -1130,7 +1130,7 @@ function handleNavigateAfterExpenseCreate({
     isInvoice?: boolean;
     shouldHandleNavigation?: boolean;
 }) {
-    const isUserOnInbox = isReportTopmostSplitNavigator();
+    const isUserOnInbox = !isSearchTopmostFullScreenRoute();
 
     // If the expense is not created from global create or is currently on the inbox tab,
     // we just need to dismiss the money request flow screens
