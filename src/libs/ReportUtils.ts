@@ -4317,8 +4317,12 @@ function getReasonAndReportActionThatRequiresAttention(
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policy = getPolicy(optionOrReport.policyID);
+    // Only trust hasOutstandingChildRequest if there is at least one REPORT_PREVIEW action loaded locally.
+    // The backend may set this flag for old policy expense chats with stale child reports whose actions
+    // are not in local Onyx, causing a GBR with no actionable item for the user.
+    const hasAnyReportPreviewAction = Object.values(reportActions ?? {}).some((action) => action.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW && !isDeletedAction(action));
     if (
-        (optionOrReport.hasOutstandingChildRequest === true || iouReportActionToApproveOrPay?.reportActionID) &&
+        ((optionOrReport.hasOutstandingChildRequest === true && hasAnyReportPreviewAction) || iouReportActionToApproveOrPay?.reportActionID) &&
         (policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO || !hasOnlyPendingTransactions)
     ) {
         return {
