@@ -24,9 +24,12 @@ type RejectReasonFormViewProps = {
 
     /** Link to previous page */
     backTo?: Route;
+
+    /** Whether multiple transactions are being rejected */
+    isMultipleTransactions?: boolean;
 };
 
-function RejectReasonFormView({backTo, validate, onSubmit}: RejectReasonFormViewProps) {
+function RejectReasonFormView({backTo, validate, onSubmit, isMultipleTransactions}: RejectReasonFormViewProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
@@ -52,7 +55,7 @@ function RejectReasonFormView({backTo, validate, onSubmit}: RejectReasonFormView
                 isSubmitActionDangerous
             >
                 <View style={styles.mb6}>
-                    <Text>{translate('iou.reject.reasonPageDescription')}</Text>
+                    <Text>{translate(isMultipleTransactions ? 'iou.reject.reasonPageDescriptionMultiple' : 'iou.reject.reasonPageDescription')}</Text>
                 </View>
                 <View>
                     <InputWrapper

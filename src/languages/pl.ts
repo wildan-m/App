@@ -1545,6 +1545,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Odrzuć wydatek, którego nie zamierzasz zatwierdzić ani opłacić.',
             reasonPageTitle: 'Odrzuć wydatek',
             reasonPageDescription: 'Wyjaśnij, dlaczego nie zatwierdzisz tego wydatku.',
+            reasonPageDescriptionMultiple: 'Wyjaśnij, dlaczego nie zatwierdzisz tych wydatków.',
             rejectReason: 'Powód odrzucenia',
             markAsResolved: 'Oznacz jako rozwiązane',
             rejectedStatus: 'Ten wydatek został odrzucony. Czekamy, aż naprawisz problemy i oznaczysz go jako rozwiązany, aby umożliwić przesłanie.',

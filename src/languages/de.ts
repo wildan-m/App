@@ -1551,6 +1551,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Lehne eine Ausgabe ab, die du nicht genehmigen oder bezahlen möchtest.',
             reasonPageTitle: 'Ausgabe ablehnen',
             reasonPageDescription: 'Erkläre, warum du diese Ausgabe nicht genehmigen wirst.',
+            reasonPageDescriptionMultiple: 'Erkläre, warum du diese Ausgaben nicht genehmigen wirst.',
             rejectReason: 'Ablehnungsgrund',
             markAsResolved: 'Als gelöst markieren',
             rejectedStatus: 'Diese Ausgabe wurde abgelehnt. Wir warten darauf, dass du die Probleme behebst und als gelöst markierst, um das Einreichen zu ermöglichen.',

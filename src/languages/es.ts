@@ -1416,6 +1416,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Rechaza un gasto que no tengos intención de aprobar o pagar.',
             reasonPageTitle: 'Rechazar gasto',
             reasonPageDescription: 'Explica por qué no aprobarás este gasto.',
+            reasonPageDescriptionMultiple: 'Explica por qué no aprobarás estos gastos.',
             rejectReason: 'Motivo del rechazo',
             markAsResolved: 'Marcar como resuelto',
             rejectedStatus: 'Este gasto fue rechazado. Estamos esperando que soluciones los problemas y lo marques como resuelto para poder enviarlo.',

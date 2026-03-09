@@ -1543,6 +1543,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Rejeite uma despesa que você não pretende aprovar ou pagar.',
             reasonPageTitle: 'Rejeitar despesa',
             reasonPageDescription: 'Explique por que você não aprovará esta despesa.',
+            reasonPageDescriptionMultiple: 'Explique por que você não aprovará estas despesas.',
             rejectReason: 'Motivo da rejeição',
             markAsResolved: 'Marcar como resolvido',
             rejectedStatus: 'Esta despesa foi rejeitada. Estamos aguardando você corrigir os problemas e marcá-la como resolvida para permitir o envio.',

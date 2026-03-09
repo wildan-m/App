@@ -1548,6 +1548,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Rifiuta una spesa che non intendi approvare o pagare.',
             reasonPageTitle: 'Rifiuta spesa',
             reasonPageDescription: 'Spiega perché non approverai questa spesa.',
+            reasonPageDescriptionMultiple: 'Spiega perché non approverai queste spese.',
             rejectReason: 'Motivo del rifiuto',
             markAsResolved: 'Segna come risolto',
             rejectedStatus: 'Questa spesa è stata rifiutata. In attesa che tu risolva i problemi e la contrassegni come risolta per consentirne l’invio.',

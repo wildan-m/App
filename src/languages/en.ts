@@ -1576,6 +1576,7 @@ const translations = {
             rejectExpenseTitle: "Reject an expense that you don't intend to approve or pay.",
             reasonPageTitle: 'Reject expense',
             reasonPageDescription: 'Explain why you will not approve this expense.',
+            reasonPageDescriptionMultiple: 'Explain why you will not approve these expenses.',
             rejectReason: 'Rejection reason',
             markAsResolved: 'Mark as resolved',
             rejectedStatus: 'This expense was rejected. Waiting on you to fix the issues and mark as resolved to enable submission.',

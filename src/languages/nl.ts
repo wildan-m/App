@@ -1546,6 +1546,7 @@ const translations: TranslationDeepObject<typeof en> = {
             rejectExpenseTitle: 'Wijs een uitgave af die je niet van plan bent goed te keuren of te betalen.',
             reasonPageTitle: 'Uitgave afwijzen',
             reasonPageDescription: 'Leg uit waarom je deze uitgave niet zult goedkeuren.',
+            reasonPageDescriptionMultiple: 'Leg uit waarom je deze uitgaven niet zult goedkeuren.',
             rejectReason: 'Reden van afwijzing',
             markAsResolved: 'Markeren als opgelost',
             rejectedStatus: 'Deze uitgave is afgewezen. We wachten tot jij de problemen oplost en als opgelost markeert, zodat je deze opnieuw kunt indienen.',
