@@ -12680,7 +12680,7 @@ function isTestTransactionReport(report: OnyxEntry<Report>): boolean {
 }
 
 function isWaitingForSubmissionFromCurrentUser(chatReport: OnyxEntry<Report>, policy: OnyxEntry<Policy>) {
-    return chatReport?.isOwnPolicyExpenseChat && !policy?.harvesting?.enabled;
+    return chatReport?.isOwnPolicyExpenseChat && !policy?.harvesting?.enabled && (policy?.areWorkflowsEnabled ?? true);
 }
 
 function getChatListItemReportName(action: ReportAction & {reportName?: string}, report: Report | undefined): string {
