@@ -1,3 +1,4 @@
+import lodashEscape from 'lodash/escape';
 import isEmpty from 'lodash/isEmpty';
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
@@ -74,8 +75,8 @@ function buildMessageFragmentForValue(
     changeFragments: string[],
     shouldConvertToLowercase = true,
 ) {
-    const newValueToDisplay = valueInQuotes ? `"${newValue}"` : newValue;
-    const oldValueToDisplay = valueInQuotes ? `"${oldValue}"` : oldValue;
+    const newValueToDisplay = valueInQuotes ? `"${lodashEscape(newValue)}"` : newValue;
+    const oldValueToDisplay = valueInQuotes ? `"${lodashEscape(oldValue)}"` : oldValue;
 
     const isCategoryField = valueName.includes(translate('common.category').toLowerCase());
 
