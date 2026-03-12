@@ -1,4 +1,5 @@
 import {findFocusedRoute} from '@react-navigation/native';
+import {hasCompletedGuidedSetupFlowSelector} from '@selectors/Onboarding';
 import {InteractionManager} from 'react-native';
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
@@ -366,7 +367,7 @@ function openReportFromDeepLink(url: string, reports: OnyxCollection<Report>, is
                             }
                         };
 
-                        if (isAnonymousUser()) {
+                        if (isAnonymousUser() || hasCompletedGuidedSetupFlowSelector(val)) {
                             handleDeeplinkNavigation();
                         }
                     });
