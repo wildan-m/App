@@ -23,6 +23,25 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
+/**
+ * Normalizes a role string from a spreadsheet to the corresponding internal
+ * policy role constant. Handles display-name variations (e.g. "Admin", "Member",
+ * "Auditor") and case-insensitive matching.
+ */
+function normalizeSpreadsheetRole(rawRole: string): string {
+    const normalized = rawRole.trim().toLowerCase();
+    if (normalized === 'admin') {
+        return CONST.POLICY.ROLE.ADMIN;
+    }
+    if (normalized === 'auditor' || normalized === 'audit') {
+        return CONST.POLICY.ROLE.AUDITOR;
+    }
+    if (normalized === 'member' || normalized === 'user') {
+        return CONST.POLICY.ROLE.USER;
+    }
+    return rawRole;
+}
+
 type ImportedMembersPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.MEMBERS_IMPORTED>;
 
 function ImportedMembersPage({route}: ImportedMembersPageProps) {
@@ -86,7 +105,9 @@ function ImportedMembersPage({route}: ImportedMembersPageProps) {
             membersRolesColumn !== -1 &&
             spreadsheet?.data
                 ?.at(membersRolesColumn)
-                ?.some((role, index) => (containsHeader ? spreadsheet?.data?.at(membersRolesColumn)?.at(index + 1) : (role ?? '')) === CONST.POLICY.ROLE.AUDITOR);
+                ?.some(
+                    (role, index) => normalizeSpreadsheetRole(containsHeader ? (spreadsheet?.data?.at(membersRolesColumn)?.at(index + 1) ?? '') : (role ?? '')) === CONST.POLICY.ROLE.AUDITOR,
+                );
 
         if (hasAuditorRole && !isControlPolicy(policy)) {
             Navigation.navigate(ROUTES.WORKSPACE_UPGRADE.getRoute(route.params.policyID, CONST.UPGRADE_FEATURE_INTRO_MAPPING.auditor.alias, Navigation.getActiveRoute()));
@@ -104,7 +125,7 @@ function ImportedMembersPage({route}: ImportedMembersPageProps) {
             const isPolicyMember = isPolicyMemberWithoutPendingDelete(email, policy);
             let role = isPolicyMember ? (policy?.employeeList?.[email]?.role ?? '') : '';
             if (membersRolesColumn !== -1 && membersRoles?.[containsHeader ? index + 1 : index]) {
-                role = membersRoles?.[containsHeader ? index + 1 : index];
+                role = normalizeSpreadsheetRole(membersRoles?.[containsHeader ? index + 1 : index]);
             }
             if (membersRolesColumn !== -1 && !role) {
                 isRoleMissing = true;
