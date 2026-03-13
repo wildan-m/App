@@ -800,7 +800,9 @@ function getOptionData({
     result.statusNum = report.statusNum;
     // When the only message of a report is deleted lastVisibleActionCreated is not reset leading to wrongly
     // setting it Unread so we add additional condition here to avoid empty chat LHN from being bold.
-    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived) && !!report.lastActorAccountID;
+    // Pass lastAction?.created as override so isUnread uses the client-computed last visible action time,
+    // which correctly excludes system-only actions like MOVEDTRANSACTION.
+    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived, lastAction?.created) && !!report.lastActorAccountID;
     result.isUnreadWithMention = isUnreadWithMention(report);
     result.isPinned = report.isPinned;
     result.iouReportID = report.iouReportID;

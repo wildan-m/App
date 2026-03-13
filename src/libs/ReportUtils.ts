@@ -8958,7 +8958,7 @@ function generateIsEmptyReport(report: OnyxEntry<Report>, isReportArchived: bool
 }
 
 // We need oneTransactionThreadReport to get the correct last visible action created
-function isUnread(report: OnyxEntry<Report>, oneTransactionThreadReport: OnyxEntry<Report>, isReportArchived: boolean | undefined): boolean {
+function isUnread(report: OnyxEntry<Report>, oneTransactionThreadReport: OnyxEntry<Report>, isReportArchived: boolean | undefined, lastVisibleActionCreatedOverride?: string): boolean {
     if (!report) {
         return false;
     }
@@ -8971,7 +8971,10 @@ function isUnread(report: OnyxEntry<Report>, oneTransactionThreadReport: OnyxEnt
         return true;
     }
     // lastVisibleActionCreated and lastReadTime are both datetime strings and can be compared directly
-    const lastVisibleActionCreated = getReportLastVisibleActionCreated(report, oneTransactionThreadReport);
+    // When lastVisibleActionCreatedOverride is provided (e.g. from the client-computed last visible action),
+    // use it instead of the stored value. This allows excluding system-only actions like MOVEDTRANSACTION
+    // that the server counts but shouldn't mark the report as unread.
+    const lastVisibleActionCreated = lastVisibleActionCreatedOverride ?? getReportLastVisibleActionCreated(report, oneTransactionThreadReport);
     const lastReadTime = report.lastReadTime ?? '';
     const lastMentionedTime = report.lastMentionedTime ?? '';
 
