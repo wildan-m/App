@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import type {ForwardedRef} from 'react';
 import React, {useCallback, useMemo, useState} from 'react';
 import type {GestureResponderEvent, LayoutChangeEvent, StyleProp, TextStyle, ViewStyle} from 'react-native';
@@ -201,18 +201,25 @@ function KeyboardShortcutComponent({
     isPressOnEnterActive = false,
 }: KeyboardShortcutComponentProps) {
     const isFocused = useIsFocused();
+    const navigation = useNavigation();
     const activeElementRole = useActiveElementRole();
 
     const shouldDisableEnterShortcut = useMemo(() => accessibilityRoles.includes(activeElementRole ?? '') && activeElementRole !== CONST.ROLE.PRESENTATION, [activeElementRole]);
 
     const keyboardShortcutCallback = useCallback(
         (event?: GestureResponderEvent | KeyboardEvent) => {
+            // When a screen is frozen by react-freeze (e.g. split navigator keeps previous screens mounted),
+            // useIsFocused() doesn't update because the React subtree is suspended. Use the imperative
+            // navigation.isFocused() check which reads the real navigation state at call time.
+            if (!isPressOnEnterActive && !navigation.isFocused()) {
+                return;
+            }
             if (!validateSubmitShortcut(isDisabled, isLoading, event)) {
                 return;
             }
             onPress();
         },
-        [isDisabled, isLoading, onPress],
+        [isDisabled, isLoading, onPress, isPressOnEnterActive, navigation],
     );
 
     const config = useMemo(
