@@ -543,24 +543,11 @@ function resetToHome() {
 }
 
 /**
- * The goBack function doesn't support recursive pop e.g. pop route from root and then from nested navigator.
- * There is only one case where recursive pop is needed which is going back to home.
- * This function will cover this case.
- * We will implement recursive pop if more use cases will appear.
+ * Navigate to the Home page.
+ * Used as the default "Go back to home page" action in not-found views.
  */
 function goBackToHome() {
-    const isNarrowLayout = getIsNarrowLayout();
-
-    // This set the right split navigator.
-    goBack(ROUTES.INBOX);
-
-    // We want to keep the report screen in the split navigator on wide layout.
-    if (!isNarrowLayout) {
-        return;
-    }
-
-    // This set the right route in this split navigator.
-    goBack(ROUTES.INBOX);
+    navigate(ROUTES.HOME);
 }
 
 /**
