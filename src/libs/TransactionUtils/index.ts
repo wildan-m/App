@@ -2485,9 +2485,10 @@ function compareDuplicateTransactionFields(
                     const tax = getTaxByID(policy, (taxID as string) ?? '');
                     return tax?.name && !tax.isDisabled && tax.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
                 });
+                const hasEmptyTaxCode = differentValues.some((taxID) => !taxID);
 
-                if (!areAllFieldsEqualForKey && validTaxes.length > 1) {
-                    change[fieldName] = validTaxes;
+                if (!areAllFieldsEqualForKey && (validTaxes.length > 1 || (validTaxes.length >= 1 && hasEmptyTaxCode))) {
+                    change[fieldName] = [...validTaxes, ...(hasEmptyTaxCode ? [''] : [])];
                 } else if (areAllFieldsEqualForKey) {
                     keep[fieldName] = firstTransaction?.[keys[0]] ?? firstTransaction?.[keys[1]];
                 }
