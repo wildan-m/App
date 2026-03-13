@@ -3484,17 +3484,22 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
     // I want to clean this up at some point, but it's possible this will live in the code for a while so I've created https://github.com/Expensify/App/issues/25417
     // to remind me to do this.
     if (isDistanceRequest && existingTransaction) {
+        // Exclude receipt from the draft to prevent stale receipt state (e.g. {state: 'OPEN'}) from leaking
+        // into the optimistic transaction via fastMerge. The optimistic transaction already has the correct
+        // receipt from buildOptimisticTransaction.
+        const {receipt: omittedReceipt, ...existingTransactionWithoutReceipt} = existingTransaction;
+
         // For split expenses, exclude merchant from merge to preserve merchant from splitExpense
         if (isSplitExpense) {
             // Preserve merchant from transactionParams (splitExpense.merchant) before merge
             const preservedMerchant = merchant || optimisticTransaction.merchant;
-            const {merchant: omittedMerchant, ...existingTransactionWithoutMerchant} = existingTransaction;
-            optimisticTransaction = fastMerge(existingTransactionWithoutMerchant, optimisticTransaction, false) as OnyxTypes.Transaction;
+            const {merchant: omittedMerchant, ...existingTxWithoutMerchant} = existingTransactionWithoutReceipt;
+            optimisticTransaction = fastMerge(existingTxWithoutMerchant, optimisticTransaction, false) as OnyxTypes.Transaction;
 
             // Explicitly set merchant from splitExpense to ensure it's not overwritten
             optimisticTransaction.merchant = preservedMerchant;
         } else {
-            optimisticTransaction = fastMerge(existingTransaction, optimisticTransaction, false);
+            optimisticTransaction = fastMerge(existingTransactionWithoutReceipt, optimisticTransaction, false);
         }
     }
 
@@ -3947,7 +3952,11 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
     // I want to clean this up at some point, but it's possible this will live in the code for a while so I've created https://github.com/Expensify/App/issues/25417
     // to remind me to do this.
     if (isDistanceRequest) {
-        optimisticTransaction = fastMerge(existingTransactionData, optimisticTransaction, false);
+        // Exclude receipt from the draft to prevent stale receipt state (e.g. {state: 'OPEN'}) from leaking
+        // into the optimistic transaction via fastMerge. The optimistic transaction already has the correct
+        // receipt from buildOptimisticTransaction.
+        const {receipt: omittedReceipt, ...existingDataWithoutReceipt} = existingTransactionData ?? {};
+        optimisticTransaction = fastMerge(existingDataWithoutReceipt, optimisticTransaction, false);
     }
 
     // STEP 4: Build optimistic reportActions. We need:
