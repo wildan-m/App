@@ -4235,13 +4235,22 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
                 lastReadTime: transactionThreadReport?.lastReadTime,
             },
         });
-        successData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReport?.reportID}`,
-            value: {
-                [updatedReportAction.reportActionID]: {pendingAction: null},
+        successData.push(
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReport?.reportID}`,
+                value: {
+                    [updatedReportAction.reportActionID]: {pendingAction: null},
+                },
             },
-        });
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReport?.reportID}`,
+                value: {
+                    lastReadTime: updatedReportAction.created,
+                },
+            },
+        );
 
         // Don't push error to failureData when updating distance requests
         // The error will be handled by API response for distance requests
@@ -4334,7 +4343,11 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     successData.push({
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`,
-        value: {pendingAction: null, ...(isTotalIndeterminate && {pendingFields: {total: null}})},
+        value: {
+            pendingAction: null,
+            ...(isTotalIndeterminate && {pendingFields: {total: null}}),
+            ...(updatedReportAction && isOneTransactionThread(transactionThreadReport ?? undefined, iouReport ?? undefined, undefined) && {lastReadTime: updatedReportAction.created}),
+        },
     });
 
     // Optimistically modify the transaction and the transaction thread
