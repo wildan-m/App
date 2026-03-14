@@ -262,13 +262,13 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             return;
         }
 
-        if (sumOfSplitExpenses > transactionDetailsAmount && !isDistance) {
-            const greaterThanDifference = sumOfSplitExpenses - transactionDetailsAmount;
+        if (Math.abs(sumOfSplitExpenses) > Math.abs(transactionDetailsAmount) && !isDistance) {
+            const greaterThanDifference = Math.abs(sumOfSplitExpenses) - Math.abs(transactionDetailsAmount);
             setErrorMessage(translate('iou.totalAmountGreaterThanOriginal', convertToDisplayString(greaterThanDifference, transactionDetails?.currency)));
             return;
         }
-        if (sumOfSplitExpenses < transactionDetailsAmount && (isPerDiem || isCard) && !isDistance) {
-            const lessThanDifference = transactionDetailsAmount - sumOfSplitExpenses;
+        if (Math.abs(sumOfSplitExpenses) < Math.abs(transactionDetailsAmount) && (isPerDiem || isCard) && !isDistance) {
+            const lessThanDifference = Math.abs(transactionDetailsAmount) - Math.abs(sumOfSplitExpenses);
             setErrorMessage(translate('iou.totalAmountLessThanOriginal', convertToDisplayString(lessThanDifference, transactionDetails?.currency)));
             return;
         }
