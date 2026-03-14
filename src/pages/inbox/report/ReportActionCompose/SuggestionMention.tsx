@@ -438,6 +438,13 @@ function SuggestionMention({
                 prefixType,
             };
 
+            // After inserting a mention, suppress suggestions until the user moves the cursor.
+            // This prevents the suggestion menu from flickering back for all mention types
+            // (@here, @user, and #room). The ref is cleared when the selection changes.
+            if (suggestionInsertionIndexRef.current) {
+                return;
+            }
+
             if (isMentionCode(suggestionWord) && prefixType === '@') {
                 const suggestions = getUserMentionOptions(weightedPersonalDetails, normalizedPrefix);
                 nextState.suggestedMentions = suggestions;
