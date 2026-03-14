@@ -4562,6 +4562,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
                 value: {
                     data: {
                         [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`]: violationsOnyxData.value,
+                        ...(updatedTransaction && {[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]: updatedTransaction}),
                     },
                 },
             });
@@ -4572,6 +4573,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
                 value: {
                     data: {
                         [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`]: currentTransactionViolations,
+                        ...(transaction && {[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]: transaction}),
                     },
                 },
             });
