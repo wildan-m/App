@@ -93,7 +93,7 @@ function IOURequestStepSubrate({
     const totalSubrateCount = allPossibleSubrates.length;
     const filledSubrateCount = allSubrates.length;
     const [subrateValue, setSubrateValue] = useState(currentSubrate?.id);
-    const [quantityValue, setQuantityValue] = useState(() => (currentSubrate?.quantity ? String(currentSubrate.quantity) : undefined));
+    const [quantityValue, setQuantityValue] = useState(() => (currentSubrate?.quantity ? String(currentSubrate.quantity) : ''));
 
     const onChangeQuantity = useCallback((newValue: string) => {
         // replace all characters that are not spaces or digits
@@ -104,7 +104,7 @@ function IOURequestStepSubrate({
 
     useEffect(() => {
         setSubrateValue(currentSubrate?.id);
-        setQuantityValue(currentSubrate?.quantity ? String(currentSubrate.quantity) : undefined);
+        setQuantityValue(currentSubrate?.quantity ? String(currentSubrate.quantity) : '');
     }, [currentSubrate?.id, currentSubrate?.quantity]);
 
     // Hide the menu when there is only one subrate
