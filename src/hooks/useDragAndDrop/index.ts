@@ -24,6 +24,7 @@ const useDragAndDrop: UseDragAndDrop = ({
 }) => {
     const isFocused = useIsFocused();
     const [isDraggingOver, setIsDraggingOver] = useState(false);
+    const isDraggingOverRef = useRef(false);
     const {close: closePopover} = usePopoverActions();
 
     const dragCounter = useRef(0);
@@ -44,6 +45,7 @@ const useDragAndDrop: UseDragAndDrop = ({
             return;
         }
         dragCounter.current = 0;
+        isDraggingOverRef.current = false;
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
             debounceTimeoutRef.current = null;
@@ -88,20 +90,20 @@ const useDragAndDrop: UseDragAndDrop = ({
                 event.stopPropagation();
             }
 
-            // Clear any existing debounce timeout
-            if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current);
-                debounceTimeoutRef.current = null;
-            }
-
             switch (event.type) {
                 case DRAG_OVER_EVENT:
                     handleDragEvent(event);
                     break;
                 case DRAG_ENTER_EVENT:
+                    // Only clear debounce on dragenter — a real re-entry cancels a pending leave
+                    if (debounceTimeoutRef.current) {
+                        clearTimeout(debounceTimeoutRef.current);
+                        debounceTimeoutRef.current = null;
+                    }
                     handleDragEvent(event);
                     dragCounter.current += 1;
-                    if (dragCounter.current === 1 && !isDraggingOver) {
+                    if (dragCounter.current === 1 && !isDraggingOverRef.current) {
+                        isDraggingOverRef.current = true;
                         setIsDraggingOver(true);
                     }
                     break;
@@ -111,12 +113,18 @@ const useDragAndDrop: UseDragAndDrop = ({
                         dragCounter.current = 0;
                         // Add small debounce to prevent rapid flickering
                         debounceTimeoutRef.current = setTimeout(() => {
+                            isDraggingOverRef.current = false;
                             setIsDraggingOver(false);
                         }, 50);
                     }
                     break;
                 case DROP_EVENT:
+                    if (debounceTimeoutRef.current) {
+                        clearTimeout(debounceTimeoutRef.current);
+                        debounceTimeoutRef.current = null;
+                    }
                     dragCounter.current = 0;
+                    isDraggingOverRef.current = false;
                     setIsDraggingOver(false);
                     onDrop(event);
                     break;
@@ -124,7 +132,7 @@ const useDragAndDrop: UseDragAndDrop = ({
                     break;
             }
         },
-        [isFocused, isDisabled, shouldAcceptDrop, shouldStopPropagation, handleDragEvent, isDraggingOver, onDrop],
+        [isFocused, isDisabled, shouldAcceptDrop, shouldStopPropagation, handleDragEvent, onDrop],
     );
 
     useEffect(() => {
