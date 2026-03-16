@@ -821,12 +821,24 @@ const ViolationsUtils = {
         const errorMessages = extractErrorMessages(transaction?.errors ?? {}, transactionThreadActions?.filter((e) => !!e.errors) ?? [], translate);
         const filteredViolations = filterReceiptViolations(transactionViolations);
 
+        // Deduplicate violations by name so the same message (e.g. "Potential duplicate") is not shown multiple times.
+        // A transaction can have multiple violations of the same type (e.g. duplicatedTransaction for each duplicate match),
+        // but the user only needs to see the message once.
+        const seenViolationNames = new Set<string>();
+        const deduplicatedViolations = filteredViolations.filter((violation) => {
+            if (seenViolationNames.has(violation.name)) {
+                return false;
+            }
+            seenViolationNames.add(violation.name);
+            return true;
+        });
+
         return [
             ...errorMessages,
             ...(missingFieldError ? [`${missingFieldError}.`] : []),
             // Some violations end with a period already so lets make sure the connected messages have only single period between them
             // and end with a single dot.
-            ...filteredViolations.map((violation) => {
+            ...deduplicatedViolations.map((violation) => {
                 const cardID = violation?.data?.cardID;
                 const card = cardID ? cardList?.[cardID] : undefined;
                 const message = ViolationsUtils.getViolationTranslation(violation, translate, true, tags, companyCardPageURL, connectionLink, card, isMarkAsCash);
