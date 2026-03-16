@@ -1,6 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import Badge from '@components/Badge';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -21,6 +20,7 @@ import {getMemberAccountIDsForWorkspace, goBackFromInvalidPolicy, isExpensifyTea
 import tokenizedSearch from '@libs/tokenizedSearch';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
+import MemberRightIcon from '@pages/workspace/MemberRightIcon';
 import withPolicyAndFullscreenLoading from '@pages/workspace/withPolicyAndFullscreenLoading';
 import type {WithPolicyAndFullscreenLoadingProps} from '@pages/workspace/withPolicyAndFullscreenLoading';
 import {setWorkspacePayer} from '@userActions/Policy/Policy';
@@ -76,7 +76,13 @@ function WorkspaceWorkflowsPayerPage({route, policy, personalDetails, isLoadingR
                 continue;
             }
 
-            const roleBadge = <Badge text={isOwner ? translate('common.owner') : translate('common.admin')} />;
+            const roleBadge = (
+                <MemberRightIcon
+                    role={policyEmployee.role}
+                    owner={policy?.owner}
+                    login={details?.login}
+                />
+            );
 
             const isAuthorizedPayer = policy?.achAccount?.reimburser === details?.login;
 
@@ -114,7 +120,6 @@ function WorkspaceWorkflowsPayerPage({route, policy, personalDetails, isLoadingR
         policy?.pendingFields?.reimburser,
         personalDetails,
         isDeletedPolicyEmployee,
-        translate,
         formatPhoneNumber,
         icons.FallbackAvatar,
     ]);
