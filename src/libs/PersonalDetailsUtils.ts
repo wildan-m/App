@@ -28,12 +28,24 @@ Onyx.connect({
     callback: (val) => {
         personalDetails = Object.values(val ?? {});
         allPersonalDetails = val;
-        emailToPersonalDetailsCache = personalDetails.reduce((acc: Record<string, PersonalDetails>, detail) => {
+        const previousCache = emailToPersonalDetailsCache;
+        const newCache: Record<string, PersonalDetails> = {};
+        for (const detail of personalDetails) {
             if (detail?.login) {
-                acc[detail.login.toLowerCase()] = detail;
+                newCache[detail.login.toLowerCase()] = detail;
             }
-            return acc;
-        }, {});
+        }
+        // Preserve old email mappings when a personal detail's login field changed
+        // (e.g. a server search response temporarily overwrites the login with a
+        // secondary contact method). Without this, getMemberAccountIDsForWorkspace
+        // loses the ability to resolve the original email and drops the member.
+        for (const [email, oldDetail] of Object.entries(previousCache)) {
+            const preservedDetail = oldDetail?.accountID ? val?.[oldDetail.accountID] : undefined;
+            if (!newCache[email] && preservedDetail) {
+                newCache[email] = preservedDetail;
+            }
+        }
+        emailToPersonalDetailsCache = newCache;
     },
 });
 
