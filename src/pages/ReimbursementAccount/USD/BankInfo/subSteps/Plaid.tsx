@@ -34,13 +34,17 @@ function Plaid({onNext, setUSDBankAccountStep}: PlaidProps) {
     const handleNextPress = useCallback(() => {
         const selectedPlaidBankAccount = (plaidData?.bankAccounts ?? []).find((account) => account.plaidAccountID === reimbursementAccountDraft?.[BANK_INFO_STEP_KEYS.PLAID_ACCOUNT_ID]);
 
+        if (!selectedPlaidBankAccount) {
+            return;
+        }
+
         const bankAccountData = {
-            [BANK_INFO_STEP_KEYS.ROUTING_NUMBER]: selectedPlaidBankAccount?.[BANK_INFO_STEP_KEYS.ROUTING_NUMBER],
-            [BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER]: selectedPlaidBankAccount?.[BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER],
-            [BANK_INFO_STEP_KEYS.PLAID_MASK]: selectedPlaidBankAccount?.mask,
-            [BANK_INFO_STEP_KEYS.IS_SAVINGS]: selectedPlaidBankAccount?.[BANK_INFO_STEP_KEYS.IS_SAVINGS],
+            [BANK_INFO_STEP_KEYS.ROUTING_NUMBER]: selectedPlaidBankAccount[BANK_INFO_STEP_KEYS.ROUTING_NUMBER] ?? '',
+            [BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER]: selectedPlaidBankAccount[BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER] ?? '',
+            [BANK_INFO_STEP_KEYS.PLAID_MASK]: selectedPlaidBankAccount.mask ?? '',
+            [BANK_INFO_STEP_KEYS.IS_SAVINGS]: selectedPlaidBankAccount[BANK_INFO_STEP_KEYS.IS_SAVINGS] ?? false,
             [BANK_INFO_STEP_KEYS.BANK_NAME]: plaidData?.[BANK_INFO_STEP_KEYS.BANK_NAME] ?? '',
-            [BANK_INFO_STEP_KEYS.PLAID_ACCOUNT_ID]: selectedPlaidBankAccount?.[BANK_INFO_STEP_KEYS.PLAID_ACCOUNT_ID],
+            [BANK_INFO_STEP_KEYS.PLAID_ACCOUNT_ID]: selectedPlaidBankAccount[BANK_INFO_STEP_KEYS.PLAID_ACCOUNT_ID] ?? '',
             [BANK_INFO_STEP_KEYS.PLAID_ACCESS_TOKEN]: plaidData?.[BANK_INFO_STEP_KEYS.PLAID_ACCESS_TOKEN] ?? '',
         };
 
@@ -84,7 +88,14 @@ function Plaid({onNext, setUSDBankAccountStep}: PlaidProps) {
                 InputComponent={AddPlaidBankAccount}
                 text={translate('bankAccount.plaidBodyCopy')}
                 onSelect={(plaidAccountID: string) => {
-                    updateReimbursementAccountDraft({plaidAccountID});
+                    const selectedAccount = (plaidData?.bankAccounts ?? []).find((account) => account.plaidAccountID === plaidAccountID);
+                    updateReimbursementAccountDraft({
+                        plaidAccountID,
+                        [BANK_INFO_STEP_KEYS.ROUTING_NUMBER]: selectedAccount?.[BANK_INFO_STEP_KEYS.ROUTING_NUMBER] ?? '',
+                        [BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER]: selectedAccount?.[BANK_INFO_STEP_KEYS.ACCOUNT_NUMBER] ?? '',
+                        [BANK_INFO_STEP_KEYS.PLAID_MASK]: selectedAccount?.mask ?? '',
+                        [BANK_INFO_STEP_KEYS.IS_SAVINGS]: selectedAccount?.[BANK_INFO_STEP_KEYS.IS_SAVINGS] ?? false,
+                    });
                 }}
                 plaidData={plaidData}
                 onExitPlaid={handlePlaidExit}
