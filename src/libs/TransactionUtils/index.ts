@@ -1652,6 +1652,32 @@ function mergeProhibitedViolations(transactionViolations: TransactionViolations)
 }
 
 /**
+ * Merge multiple duplicatedTransaction violations into one violation with combined duplicate IDs.
+ * When a transaction is a duplicate of multiple others (e.g. two split children), the server
+ * creates separate violations for each match. This merges them so the UI shows one message.
+ */
+function mergeDuplicateViolations(transactionViolations: TransactionViolations): TransactionViolations {
+    const duplicateViolations = transactionViolations.filter((violation: TransactionViolation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
+
+    if (duplicateViolations.length <= 1) {
+        return transactionViolations;
+    }
+
+    const allDuplicateIDs = duplicateViolations.flatMap((violation: TransactionViolation) => violation.data?.duplicates ?? []);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- length > 1 is checked above
+    const firstViolation = duplicateViolations.at(0)!;
+    const mergedDuplicateViolation: TransactionViolation = {
+        ...firstViolation,
+        data: {
+            ...firstViolation.data,
+            duplicates: [...new Set(allDuplicateIDs)],
+        },
+    };
+
+    return [...transactionViolations.filter((violation: TransactionViolation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION), mergedDuplicateViolation];
+}
+
+/**
  * Check if the user should see the violation
  */
 function shouldShowViolation(
@@ -2966,6 +2992,7 @@ export {
     isCorporateCardTransaction,
     isExpenseUnreported,
     mergeProhibitedViolations,
+    mergeDuplicateViolations,
     getOriginalAttendees,
     getReportOwnerAsAttendee,
     isFromCreditCardImport,

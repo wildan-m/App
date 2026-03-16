@@ -24,7 +24,7 @@ import {handleActionButtonPress as handleActionButtonPressUtil} from '@libs/acti
 import {syncMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isInvoiceReport} from '@libs/ReportUtils';
-import {isViolationDismissed, mergeProhibitedViolations, shouldShowViolation} from '@libs/TransactionUtils';
+import {isViolationDismissed, mergeDuplicateViolations, mergeProhibitedViolations, shouldShowViolation} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -145,7 +145,7 @@ function TransactionListItem<TItem extends ListItem>({
         isInvoice,
     );
 
-    const transactionViolations = mergeProhibitedViolations(attendeeOnyxViolations);
+    const transactionViolations = mergeDuplicateViolations(mergeProhibitedViolations(attendeeOnyxViolations));
 
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
