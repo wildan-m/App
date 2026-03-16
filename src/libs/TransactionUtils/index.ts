@@ -1664,14 +1664,12 @@ function mergeDuplicateViolations(transactionViolations: TransactionViolations):
     }
 
     const allDuplicateIDs = duplicateViolations.flatMap((violation: TransactionViolation) => violation.data?.duplicates ?? []);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- length > 1 is checked above
-    const firstViolation = duplicateViolations.at(0)!;
     const mergedDuplicateViolation: TransactionViolation = {
-        ...firstViolation,
+        name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
         data: {
-            ...firstViolation.data,
             duplicates: [...new Set(allDuplicateIDs)],
         },
+        type: CONST.VIOLATION_TYPES.VIOLATION,
     };
 
     return [...transactionViolations.filter((violation: TransactionViolation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION), mergedDuplicateViolation];
