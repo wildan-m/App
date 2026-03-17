@@ -29,11 +29,10 @@ function stripDecimalsFromAmount(amount: string): string {
  * Adds a leading zero to the amount if user entered just the decimal separator
  *
  * @param amount - Changed amount from user input
- * @param shouldAllowNegative - Should allow negative numbers
  */
-function addLeadingZero(amount: string, shouldAllowNegative = false): string {
-    if (shouldAllowNegative && amount.startsWith('-.')) {
-        return `-0${amount}`;
+function addLeadingZero(amount: string): string {
+    if (amount.startsWith('-.')) {
+        return `-0${amount.slice(1)}`;
     }
     return amount.startsWith('.') ? `0${amount}` : amount;
 }

@@ -274,7 +274,7 @@ function NumberWithSymbolForm({
             ? replaceCommasWithPeriod(newNumberWithoutSpaces)
             : handleNegativeAmountFlipping(replaceCommasWithPeriod(newNumberWithoutSpaces), allowFlippingAmount, toggleNegative);
 
-        const withLeadingZero = addLeadingZero(replacedCommasNumber, allowNegativeInput);
+        const withLeadingZero = addLeadingZero(replacedCommasNumber);
 
         if (!validateAmount(withLeadingZero, decimals, maxLength, allowNegativeInput)) {
             setSelection((prevSelection) => ({...prevSelection}));
@@ -324,14 +324,14 @@ function NumberWithSymbolForm({
                 if (currentNumber.length > 0) {
                     const selectionStart = selection.start === selection.end ? selection.start - 1 : selection.start;
                     const newNumber = `${currentNumber.substring(0, selectionStart)}${currentNumber.substring(selection.end)}`;
-                    setNewNumber(addLeadingZero(newNumber, allowNegativeInput));
+                    setNewNumber(addLeadingZero(newNumber));
                 }
                 return;
             }
-            const newNumber = addLeadingZero(`${currentNumber.substring(0, selection.start)}${key}${currentNumber.substring(selection.end)}`, allowNegativeInput);
+            const newNumber = addLeadingZero(`${currentNumber.substring(0, selection.start)}${key}${currentNumber.substring(selection.end)}`);
             setNewNumber(newNumber);
         },
-        [currentNumber, selection.start, selection.end, shouldUpdateSelection, setNewNumber, allowNegativeInput],
+        [currentNumber, selection.start, selection.end, shouldUpdateSelection, setNewNumber],
     );
 
     /**

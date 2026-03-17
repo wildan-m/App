@@ -48,7 +48,7 @@ function PercentageForm({value: amount, errorText, onInputChange, label, allowEx
             // Remove spaces from the newAmount value because Safari on iOS adds spaces when pasting a copied value
             // More info: https://github.com/Expensify/App/issues/16974
             const newAmountWithoutSpaces = stripSpacesFromAmount(newAmount);
-            const withLeadingZero = addLeadingZero(newAmountWithoutSpaces, allowNegative);
+            const withLeadingZero = addLeadingZero(newAmountWithoutSpaces);
             if (!validatePercentage(withLeadingZero, allowExceedingHundred, allowDecimal, allowNegative)) {
                 return;
             }
