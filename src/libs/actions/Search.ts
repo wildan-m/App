@@ -497,6 +497,9 @@ function search({
         shouldCalculateTotals,
         // Backend expects 'maximumResults' instead of 'limit'
         ...(limit !== undefined && {maximumResults: limit}),
+        // Send user's timezone so the backend can correctly interpret date filter boundaries
+        // for data types that store UTC timestamps (e.g. reports, chats)
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
     const jsonQuery = JSON.stringify(query);
 
