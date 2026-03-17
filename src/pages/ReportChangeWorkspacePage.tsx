@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo} from 'react';
+import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
+import ActivityIndicator from '@components/ActivityIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {useSession} from '@components/OnyxListItemProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -14,6 +15,7 @@ import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceList from '@hooks/useWorkspaceList';
 import {changeReportPolicy, changeReportPolicyAndInviteSubmitter, moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter} from '@libs/actions/Report';
@@ -49,6 +51,7 @@ const changePolicyTrainingModalDismissedSelector = (nvpDismissedProductTraining:
 function ReportChangeWorkspacePage({report, route}: ReportChangeWorkspacePageProps) {
     const reportID = report?.reportID;
     const {isOffline} = useNetwork();
+    const theme = useTheme();
     const styles = useThemeStyles();
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const {translate, formatPhoneNumber, localeCompare} = useLocalize();
@@ -191,10 +194,9 @@ function ReportChangeWorkspacePage({report, route}: ReportChangeWorkspacePagePro
                         }}
                     />
                     {shouldShowLoadingIndicator ? (
-                        <FullScreenLoadingIndicator
-                            style={[styles.flex1, styles.pRelative]}
-                            reasonAttributes={{context: 'ReportChangeWorkspacePage', isLoadingApp: !!isLoadingApp}}
-                        />
+                        <View style={[styles.flex1, styles.pRelative, styles.alignItemsCenter, styles.justifyContentCenter, {backgroundColor: theme.componentBG, opacity: 0.8}]}>
+                            <ActivityIndicator size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE} />
+                        </View>
                     ) : (
                         <SelectionList<WorkspaceListItemType>
                             ListItem={UserListItem}
