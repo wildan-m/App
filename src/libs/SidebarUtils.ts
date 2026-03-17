@@ -926,7 +926,7 @@ function getOptionData({
                 result.alternateText += `${preposition} ${roomName}`;
             }
         } else if (isActionOfType(lastAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_NAME)) {
-            result.alternateText = getWorkspaceNameUpdatedMessage(translate, lastAction);
+            result.alternateText = Str.htmlDecode(getWorkspaceNameUpdatedMessage(translate, lastAction));
         } else if (isActionOfType(lastAction, CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT) && getOriginalMessage(lastAction)?.resolution) {
             result.alternateText = getActionableCardFraudAlertResolutionMessage(translate, lastAction);
         } else if (isActionOfType(lastAction, CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_DESCRIPTION)) {
