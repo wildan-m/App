@@ -824,6 +824,7 @@ type OptimisticIOUReport = Pick<
     | 'parentReportID'
     | 'created'
     | 'lastVisibleActionCreated'
+    | 'lastReadTime'
     | 'fieldList'
     | 'parentReportActionID'
 >;
@@ -6653,6 +6654,7 @@ function buildOptimisticIOUReport(
         parentReportID: chatReportID,
         created,
         lastVisibleActionCreated: created,
+        lastReadTime: created,
         fieldList: policy?.fieldList,
         parentReportActionID,
     };

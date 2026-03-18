@@ -181,6 +181,7 @@ function getSendMoneyParams({
             ...optimisticIOUReport,
             lastMessageText: getReportActionText(optimisticIOUReportAction),
             lastMessageHtml: getReportActionHtml(optimisticIOUReportAction),
+            lastReadTime: optimisticIOUReportAction.created,
             pendingFields: {
                 createChat: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
             },
@@ -287,6 +288,7 @@ function getSendMoneyParams({
             key: `${ONYXKEYS.COLLECTION.REPORT}${optimisticIOUReport.reportID}`,
             value: {
                 participants: redundantParticipants,
+                lastReadTime: optimisticIOUReportAction.created,
                 pendingFields: {
                     createChat: null,
                 },

@@ -9458,6 +9458,7 @@ function getPayMoneyRequestParams({
                 lastMessageText: getReportActionText(optimisticIOUReportAction),
                 lastMessageHtml: getReportActionHtml(optimisticIOUReportAction),
                 lastVisibleActionCreated: optimisticIOUReportAction.created,
+                lastReadTime: optimisticIOUReportAction.created,
                 hasOutstandingChildRequest: false,
                 statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
                 stateNum: CONST.REPORT.STATE_NUM.APPROVED,
@@ -9504,6 +9505,7 @@ function getPayMoneyRequestParams({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`,
             value: {
+                lastReadTime: optimisticIOUReportAction.created,
                 pendingFields: {
                     preview: null,
                     reimbursed: null,
