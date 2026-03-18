@@ -1035,14 +1035,24 @@ function getCurrency(transaction: OnyxInputOrEntry<Transaction>): string {
  * Transactions that match the destination currency can keep their convertedAmount since no conversion is needed.
  */
 function shouldClearConvertedAmount(transaction: OnyxInputOrEntry<Transaction>, sourceCurrency: string | undefined, destinationCurrency: string | undefined): boolean {
-    if (!sourceCurrency || !destinationCurrency || sourceCurrency === destinationCurrency) {
+    if (!destinationCurrency) {
         return false;
     }
 
     const transactionCurrency = getCurrency(transaction);
-    const transactionMatchesDestination = transactionCurrency === destinationCurrency;
 
-    return !transactionMatchesDestination;
+    // When source currency is unknown (e.g. unreported expenses from Self DM), any existing
+    // convertedAmount was calculated for a different context and should be cleared if the
+    // transaction currency differs from the destination.
+    if (!sourceCurrency) {
+        return transactionCurrency !== destinationCurrency;
+    }
+
+    if (sourceCurrency === destinationCurrency) {
+        return false;
+    }
+
+    return transactionCurrency !== destinationCurrency;
 }
 
 /**

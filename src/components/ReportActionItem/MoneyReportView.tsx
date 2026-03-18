@@ -263,7 +263,7 @@ function MoneyReportView({
                                         >
                                             <View style={[styles.flex1, styles.justifyContentCenter]}>
                                                 <Text
-                                                    style={[styles.textLabelSupporting, hasPendingAction && styles.opacitySemiTransparent]}
+                                                    style={[styles.textLabelSupporting, (hasPendingAction || !isTotalUpdated) && styles.opacitySemiTransparent]}
                                                     numberOfLines={1}
                                                 >
                                                     {translate(label as TranslationPaths)}
@@ -272,7 +272,7 @@ function MoneyReportView({
                                             <View style={[styles.flexRow, styles.justifyContentCenter]}>
                                                 <Text
                                                     numberOfLines={1}
-                                                    style={[subAmountTextStyles, hasPendingAction && styles.opacitySemiTransparent]}
+                                                    style={[subAmountTextStyles, (hasPendingAction || !isTotalUpdated) && styles.opacitySemiTransparent]}
                                                 >
                                                     {value}
                                                 </Text>

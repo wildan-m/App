@@ -1037,6 +1037,7 @@ function changeTransactionsReport({
                 modifiedMerchant,
                 ...(shouldClearAmount && {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}),
                 ...(shouldClearAmount && {convertedAmount: null}),
+                ...(shouldClearAmount && {convertedTaxAmount: null}),
                 ...(oldIOUAction ? {linkedTrackedExpenseReportAction: newIOUAction} : {}),
             },
         });
@@ -1061,6 +1062,7 @@ function changeTransactionsReport({
                 modifiedMerchant: transaction.modifiedMerchant,
                 ...(shouldClearAmount && {pendingAction: transaction.pendingAction ?? null}),
                 ...(shouldClearAmount && {convertedAmount: transaction.convertedAmount}),
+                ...(shouldClearAmount && {convertedTaxAmount: transaction.convertedTaxAmount}),
             },
         });
 
