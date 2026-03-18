@@ -1274,7 +1274,7 @@ function isReportActionVisibleAsLastAction(
             isActionableMentionWhisper(reportAction)) &&
         isReportActionVisible(reportAction, actionReportID, canUserPerformWriteAction, visibleReportActions) &&
         reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED &&
-        !isMovedTransactionAction(reportAction) &&
+        !(isMovedTransactionAction(reportAction) && reportAction.actorAccountID === CONST.ACCOUNT_ID.CONCIERGE) &&
         reportAction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE
     );
 }
