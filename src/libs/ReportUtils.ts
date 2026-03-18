@@ -402,6 +402,7 @@ type OptimisticExpenseReport = Pick<
     | 'parentReportID'
     | 'created'
     | 'lastVisibleActionCreated'
+    | 'lastReadTime'
     | 'parentReportActionID'
     | 'participants'
     | 'fieldList'
@@ -6871,6 +6872,7 @@ function buildOptimisticExpenseReport({
         parentReportID: chatReportID,
         created,
         lastVisibleActionCreated: created,
+        lastReadTime: created,
         parentReportActionID,
     };
 
