@@ -5237,9 +5237,16 @@ function resolveActionableMentionWhisper(
         },
     ];
 
+    const originalMessage = ReportActionsUtils.getOriginalMessage(reportAction);
     const parameters: ResolveActionableMentionWhisperParams = {
         reportActionID: reportAction.reportActionID,
         resolution,
+        ...(resolution === CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE && reportID
+            ? {
+                  reportID,
+                  inviteeEmails: originalMessage && 'inviteeEmails' in originalMessage ? originalMessage.inviteeEmails : undefined,
+              }
+            : {}),
     };
 
     API.write(WRITE_COMMANDS.RESOLVE_ACTIONABLE_MENTION_WHISPER, parameters, {optimisticData, failureData});
