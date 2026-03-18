@@ -1,6 +1,7 @@
 import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
+import AttachmentPicker from '@components/AttachmentPicker';
 import Button from '@components/Button';
 import ConfirmModal from '@components/ConfirmModal';
 import ReceiptCropView from '@components/ReceiptCropView';
@@ -24,7 +25,6 @@ import {openReport} from '@libs/actions/Report';
 import cropOrRotateImage from '@libs/cropOrRotateImage';
 import fetchImage from '@libs/fetchImage';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
-import getPlatform from '@libs/getPlatform';
 import Navigation from '@libs/Navigation/Navigation';
 import {getThumbnailAndImageURIs} from '@libs/ReceiptUtils';
 import {getReportAction, isTrackExpenseAction} from '@libs/ReportActionsUtils';
@@ -52,7 +52,7 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import useDownloadAttachment from './hooks/useDownloadAttachment';
 
 function TransactionReceiptModalContent({navigation, route}: AttachmentModalScreenProps<typeof SCREENS.TRANSACTION_RECEIPT>) {
-    const {reportID, transactionID, action, iouType: iouTypeParam, readonly: readonlyParam, mergeTransactionID, imageType, isEditingConfirmation, backToReport} = route.params;
+    const {reportID, transactionID, action, iouType: iouTypeParam, readonly: readonlyParam, mergeTransactionID, imageType} = route.params;
 
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
@@ -68,8 +68,6 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const policy = usePolicy(report?.policyID);
-    const platform = getPlatform();
-    const isNative = platform === CONST.PLATFORM.ANDROID || platform === CONST.PLATFORM.IOS;
 
     // If we have a merge transaction, we need to use the receipt from the merge transaction
     const [mergeTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${getNonEmptyStringOnyxID(mergeTransactionID)}`);
@@ -541,24 +539,44 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         style={styles.transactionReceiptButton}
                     />
                 )}
-                {(shouldShowReplaceReceiptButton || isOdometerImage) && (
+                {!!isOdometerImage && (
+                    <AttachmentPicker type={CONST.ATTACHMENT_PICKER_TYPE.IMAGE}>
+                        {({openPicker}) => (
+                            <Button
+                                icon={expensifyIcons.Camera}
+                                onPress={() => {
+                                    openPicker({
+                                        onPicked: (files) => {
+                                            const file = files.at(0);
+                                            if (!file || !transaction?.transactionID || !imageType) {
+                                                return;
+                                            }
+                                            setMoneyRequestOdometerImage(transaction.transactionID, imageType, file as File, isDraftTransaction);
+                                            navigation.goBack();
+                                        },
+                                    });
+                                }}
+                                text={translate('common.replace')}
+                                style={styles.transactionReceiptButton}
+                            />
+                        )}
+                    </AttachmentPicker>
+                )}
+                {!!shouldShowReplaceReceiptButton && !isOdometerImage && (
                     <Button
                         icon={expensifyIcons.Camera}
                         onPress={() => {
-                            const getDestinationRoute = () => {
-                                return isOdometerImage
-                                    ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType, isEditingConfirmation, backToReport)
-                                    : ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
-                                          action ?? CONST.IOU.ACTION.EDIT,
-                                          iouType,
-                                          draftTransactionID ?? transaction?.transactionID,
-                                          report?.reportID,
-                                          Navigation.getActiveRoute(),
-                                      );
-                            };
-
                             Navigation.dismissModal({
-                                afterTransition: () => Navigation.navigate(getDestinationRoute()),
+                                afterTransition: () =>
+                                    Navigation.navigate(
+                                        ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
+                                            action ?? CONST.IOU.ACTION.EDIT,
+                                            iouType,
+                                            draftTransactionID ?? transaction?.transactionID,
+                                            report?.reportID,
+                                            Navigation.getActiveRoute(),
+                                        ),
+                                    ),
                             });
                         }}
                         text={translate('common.replace')}
@@ -593,15 +611,12 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         cropRect,
         action,
         iouType,
-        transactionID,
-        reportID,
         imageType,
-        isEditingConfirmation,
-        backToReport,
         draftTransactionID,
         transaction?.transactionID,
         report?.reportID,
-        isNative,
+        isDraftTransaction,
+        navigation,
     ]);
 
     const customAttachmentContent = useMemo(() => {
