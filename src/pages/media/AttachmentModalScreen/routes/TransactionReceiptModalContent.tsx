@@ -132,10 +132,10 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
 
     const receiptFilename = transaction?.receipt?.filename;
     const isImage = !!receiptFilename && Str.isImage(receiptFilename);
-    const isStitchedOdometerReceipt = isOdometerDistanceRequest(transaction) && !imageType;
+    const isStitchedOdometerReceipt = (isOdometerDistanceRequest(transaction) || !!receiptFilename?.startsWith('stitched_odometer')) && !imageType;
 
     const shouldShowReplaceReceiptButton = ((canEditReceipt && !readonly) || isDraftTransaction) && !transaction?.receipt?.isTestDriveReceipt && !isStitchedOdometerReceipt;
-    const shouldShowDeleteReceiptButton = canDeleteReceipt && !readonly && !isDraftTransaction && !transaction?.receipt?.isTestDriveReceipt;
+    const shouldShowDeleteReceiptButton = canDeleteReceipt && !readonly && !isDraftTransaction && !transaction?.receipt?.isTestDriveReceipt && !isStitchedOdometerReceipt;
 
     const isEReceipt = transaction && !hasReceiptSource(transaction) && hasEReceipt(transaction);
     const isTrackExpenseActionValue = isTrackExpenseAction(parentReportAction);
