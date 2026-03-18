@@ -3117,7 +3117,9 @@ function canDeleteMoneyRequestReport(report: OnyxEntry<Report>, reportTransactio
     const isUnreported = isSelfDM(report) || transaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
     const canCardTransactionBeDeleted = canDeleteCardTransactionByLiabilityType(transaction);
     if (isUnreported) {
-        return isOwner && canCardTransactionBeDeleted;
+        // For self-DM, use report ownership as fallback since report actions may not be available in search results
+        const isSelfDMOwner = isSelfDM(report) && report?.ownerAccountID === currentUserAccountID;
+        return (isOwner || isSelfDMOwner) && canCardTransactionBeDeleted;
     }
 
     if (isInvoiceReport(report)) {
