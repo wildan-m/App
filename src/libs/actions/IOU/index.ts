@@ -1973,6 +1973,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
             value: {
                 ...iou.report,
                 lastVisibleActionCreated: iou.action.created,
+                lastReadTime: iou.action.created,
                 pendingFields: {
                     ...(shouldCreateNewMoneyRequestReport ? {createChat: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD} : {preview: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}),
                 },
@@ -2270,6 +2271,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
             key: `${ONYXKEYS.COLLECTION.REPORT}${iou.report.reportID}`,
             value: {
                 participants: redundantParticipants,
+                lastReadTime: iou.action.created,
                 pendingFields: null,
                 errorFields: null,
             },
