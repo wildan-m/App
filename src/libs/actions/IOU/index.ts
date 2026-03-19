@@ -9899,9 +9899,10 @@ function approveMoneyRequest(params: ApproveMoneyRequestFunctionParams) {
     const shouldAddOptimisticApproveAction = !isDEWPolicy || isOffline();
 
     const nextApproverAccountID = getNextApproverAccountID(expenseReport);
-    const predictedNextStatus = !nextApproverAccountID ? CONST.REPORT.STATUS_NUM.APPROVED : CONST.REPORT.STATUS_NUM.SUBMITTED;
-    const predictedNextState = !nextApproverAccountID ? CONST.REPORT.STATE_NUM.APPROVED : CONST.REPORT.STATE_NUM.SUBMITTED;
-    const managerID = !nextApproverAccountID ? expenseReport.managerID : nextApproverAccountID;
+    const isPartialApproval = hasHeldExpenses && !full;
+    const predictedNextStatus = !nextApproverAccountID && !isPartialApproval ? CONST.REPORT.STATUS_NUM.APPROVED : CONST.REPORT.STATUS_NUM.SUBMITTED;
+    const predictedNextState = !nextApproverAccountID && !isPartialApproval ? CONST.REPORT.STATE_NUM.APPROVED : CONST.REPORT.STATE_NUM.SUBMITTED;
+    const managerID = !nextApproverAccountID && !isPartialApproval ? expenseReport.managerID : (nextApproverAccountID ?? expenseReport.managerID);
 
     // buildOptimisticNextStep is used in parallel
     const optimisticNextStepDeprecated = isDEWPolicy
