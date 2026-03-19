@@ -57,6 +57,15 @@ function WorkspaceEditTaxPage({
         Navigation.setParams({taxID: currentTaxID});
     }, [taxID, currentTaxID]);
 
+    useEffect(() => {
+        if (currentTaxRate || !policy?.taxRates?.taxes) {
+            return;
+        }
+        // Tax rate no longer exists under this key — it may have been renamed/recoded
+        // externally (e.g. tax code changed in OD). Navigate back to the taxes list.
+        Navigation.goBack(ROUTES.WORKSPACE_TAXES.getRoute(policyID));
+    }, [currentTaxRate, policy?.taxRates?.taxes, policyID]);
+
     const deleteTaxRate = () => {
         if (!policyID) {
             return;
