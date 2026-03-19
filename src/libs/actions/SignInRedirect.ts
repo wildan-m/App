@@ -80,6 +80,14 @@ function clearStorageAndRedirect(errorMessage?: string): Promise<void> {
     }
 
     return Onyx.clear(keysToPreserve).then(() => {
+        // Ensure the splash screen is unblocked after clearing storage.
+        // When an unauthenticated user opens a deep link with a reportID, the app calls
+        // OpenReport to check if it's a public room. If reauthentication fails and triggers
+        // this redirect, Onyx.clear() resets IS_CHECKING_PUBLIC_ROOM — which keeps the splash
+        // screen visible indefinitely. Setting it to false here guarantees the sign-in page
+        // is always reachable after a redirect.
+        Onyx.set(ONYXKEYS.IS_CHECKING_PUBLIC_ROOM, false);
+
         if (CONFIG.IS_HYBRID_APP) {
             resetSignInFlow();
             HybridAppModule.signOutFromOldDot();
