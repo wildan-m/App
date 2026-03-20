@@ -398,6 +398,7 @@ const ROUTES = {
         getRoute: (login: string, role: string) => `settings/security/delegate/${encodeURIComponent(login)}/role/${role}/confirm/magic-code` as const,
     },
     SETTINGS_ABOUT: 'settings/about',
+    SETTINGS_HELP: 'settings/help',
     SETTINGS_APP_DOWNLOAD_LINKS: 'settings/about/app-download-links',
     SETTINGS_WALLET: 'settings/wallet',
     SETTINGS_WALLET_DOMAIN_CARD: {

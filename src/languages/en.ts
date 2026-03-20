@@ -2021,6 +2021,10 @@ const translations = {
         versionLetter: 'v',
         readTheTermsAndPrivacy: `Read the <a href="${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}">Terms of Service</a> and <a href="${CONST.OLD_DOT_PUBLIC_URLS.PRIVACY_URL}">Privacy</a>.`,
         help: 'Help',
+        helpPage: {
+            description: 'Find answers to your questions and get help with your account.',
+            visitHelpWebsite: 'Visit help website',
+        },
         whatIsNew: "What's new",
         accountSettings: 'Account settings',
         account: 'Account',

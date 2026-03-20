@@ -105,6 +105,7 @@ const SCREENS = {
         SHARE_CODE: 'Settings_Share_Code',
         SECURITY: 'Settings_Security',
         ABOUT: 'Settings_About',
+        HELP: 'Settings_Help',
         SAVE_THE_WORLD: 'Settings_TeachersUnite',
         APP_DOWNLOAD_LINKS: 'Settings_App_Download_Links',
         ADD_DEBIT_CARD: 'Settings_Add_Debit_Card',
