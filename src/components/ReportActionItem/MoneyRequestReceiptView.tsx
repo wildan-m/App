@@ -278,10 +278,12 @@ function MoneyRequestReceiptView({
 
     const errorsWithoutReportCreation = useMemo(
         () => ({
-            ...(transaction?.errorFields?.route ?? transaction?.errorFields?.waypoints ?? transaction?.errors),
+            ...(isDistanceRequest
+                ? (transaction?.errorFields?.waypoints ?? transaction?.errors)
+                : (transaction?.errorFields?.route ?? transaction?.errorFields?.waypoints ?? transaction?.errors)),
             ...parentReportAction?.errors,
         }),
-        [transaction?.errorFields?.route, transaction?.errorFields?.waypoints, transaction?.errors, parentReportAction?.errors],
+        [isDistanceRequest, transaction?.errorFields?.route, transaction?.errorFields?.waypoints, transaction?.errors, parentReportAction?.errors],
     );
     const reportCreationError = useMemo(() => (getCreationReportErrors(report) ? getMicroSecondOnyxErrorWithTranslationKey('report.genericCreateReportFailureMessage') : {}), [report]);
     const errors = useMemo(() => ({...errorsWithoutReportCreation, ...reportCreationError}), [errorsWithoutReportCreation, reportCreationError]);
