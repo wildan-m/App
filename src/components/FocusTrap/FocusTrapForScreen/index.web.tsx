@@ -213,7 +213,7 @@ function FocusTrapForScreen({children, focusTrapSettings}: FocusTrapProps) {
             <View
                 // Keep the route marker inside the web-only FocusTrap path so
                 // shared containers do not need a dedicated forwarding prop.
-                style={{flex: 1}}
+                style={{flex: 1, width: '100%'}}
                 dataSet={routeBoundaryDataSet}
             >
                 {children}
