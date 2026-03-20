@@ -4229,12 +4229,15 @@ function createWorkspaceFromIOUPayment(
         });
     }
 
-    // To optimistically remove the GBR from the DM we need to update the hasOutstandingChildRequest param to false
+    // To optimistically remove the GBR from the DM we need to update the hasOutstandingChildRequest param to false.
+    // We also clear iouReportID so that new expenses in the DM create a fresh IOU report
+    // instead of reusing the one that was just moved to the workspace.
     optimisticData.push({
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.REPORT}${oldChatReportID}`,
         value: {
             hasOutstandingChildRequest: false,
+            iouReportID: null,
         },
     });
     failureData.push({
@@ -4242,6 +4245,7 @@ function createWorkspaceFromIOUPayment(
         key: `${ONYXKEYS.COLLECTION.REPORT}${oldChatReportID}`,
         value: {
             hasOutstandingChildRequest: true,
+            iouReportID: iouReportID ?? null,
         },
     });
 
