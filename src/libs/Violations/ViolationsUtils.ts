@@ -360,7 +360,7 @@ const ViolationsUtils = {
 
         // Calculate client-side category violations
         const policyRequiresCategories = !!policy.requiresCategory;
-        if (policyRequiresCategories) {
+        if (policyRequiresCategories || updatedTransaction.category) {
             const hasCategoryOutOfPolicyViolation = transactionViolations.some((violation) => violation.name === 'categoryOutOfPolicy');
             const hasMissingCategoryViolation = transactionViolations.some((violation) => violation.name === 'missingCategory');
             const categoryKey = updatedTransaction.category;
