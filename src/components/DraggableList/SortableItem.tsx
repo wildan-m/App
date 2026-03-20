@@ -55,12 +55,25 @@ function SortableItem({id, children, disabled = false, isFocused = false}: Sorta
         }
     };
 
+    // Screen readers (e.g. JAWS) synthesize click events instead of keydown when
+    // activating a role="button" element with Enter. Forward those wrapper-level
+    // clicks to the inner pressable so activation works the same as keyboard Enter.
+    const handleClick = (e: React.MouseEvent) => {
+        if (isDragging || e.target !== e.currentTarget) {
+            return;
+        }
+        const innerPressable = node.current?.querySelector<HTMLElement>(PRESSABLE_SELECTOR);
+        innerPressable?.click();
+    };
+
     return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- role="button" is provided dynamically via {...attributes} from dnd-kit
         <div
             ref={setNodeRef}
             style={style}
             // Use capture phase to intercept Enter before inner MenuItem handles it
             onKeyDownCapture={handleKeyDown}
+            onClick={handleClick}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...attributes}
             // eslint-disable-next-line react/jsx-props-no-spreading
