@@ -26,7 +26,7 @@ import TextInput from './components/TextInput';
 import useSearchFocusSync from './hooks/useSearchFocusSync';
 import useSelectedItemFocusSync from './hooks/useSelectedItemFocusSync';
 import ListItemRenderer from './ListItem/ListItemRenderer';
-import type {ButtonOrCheckBoxRoles, DataDetailsType, ListItem, SelectionListProps} from './types';
+import type {DataDetailsType, ListItem, SelectionListProps} from './types';
 import {getListboxRole} from './utils/getListboxRole';
 
 const ANIMATED_HIGHLIGHT_DURATION =
@@ -263,8 +263,12 @@ function BaseSelectionList<TItem extends ListItem>({
         selectRow(focusedOption);
     };
 
-    // Disable `Enter` shortcut if the active element is a button or checkbox
-    const disableEnterShortcut = activeElementRole && [CONST.ROLE.BUTTON, CONST.ROLE.CHECKBOX].includes(activeElementRole as ButtonOrCheckBoxRoles);
+    // Disable `Enter` shortcut if the active element is a button, to avoid Enter from both
+    // selecting the focused list item and clicking the focused button at the same time.
+    // Note: checkbox is intentionally excluded — list items with role="checkbox" already block
+    // native Enter via shouldPreventEnterKeySubmit, so the keyboard shortcut is the only way
+    // Enter can select them (fixes keyboard navigation in multi-select filter dropdowns).
+    const disableEnterShortcut = activeElementRole === CONST.ROLE.BUTTON;
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, selectFocusedOption, {
         captureOnInputs: true,

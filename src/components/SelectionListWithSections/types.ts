@@ -1201,8 +1201,6 @@ type UnreportedExpenseListItemType = Transaction & {
     errors?: Errors;
 };
 
-type ButtonOrCheckBoxRoles = 'button' | 'checkbox';
-
 type ExtendedSectionListData<TItem extends ListItem, TSection extends SectionWithIndexOffset<TItem>> = SectionListData<TItem, TSection> & {
     CustomSectionHeader?: ({section}: {section: TSection}) => ReactElement;
 };
@@ -1216,7 +1214,6 @@ type SearchListItem = TransactionListItemType | TransactionGroupListItemType | R
 export type {
     BaseListItemProps,
     SelectionListProps,
-    ButtonOrCheckBoxRoles,
     ExtendedTargetedEvent,
     FlattenedSectionsReturn,
     InviteMemberListItemProps,

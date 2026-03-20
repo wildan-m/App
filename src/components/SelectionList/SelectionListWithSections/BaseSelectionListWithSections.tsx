@@ -12,7 +12,6 @@ import useFlattenedSections, {isItemSelected, shouldTreatItemAsDisabled} from '@
 import useSearchFocusSync from '@components/SelectionList/hooks/useSearchFocusSync';
 import useSelectedItemFocusSync from '@components/SelectionList/hooks/useSelectedItemFocusSync';
 import ListItemRenderer from '@components/SelectionList/ListItem/ListItemRenderer';
-import type {ButtonOrCheckBoxRoles} from '@components/SelectionList/types';
 import {getListboxRole} from '@components/SelectionList/utils/getListboxRole';
 import Text from '@components/Text';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
@@ -225,8 +224,12 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         [focusTextInput, scrollToIndex, clearInputAfterSelect, updateAndScrollToFocusedIndex, updateExternalTextInputFocus, getFocusedItem],
     );
 
-    // Disable `Enter` shortcut if the active element is a button or checkbox
-    const disableEnterShortcut = activeElementRole && [CONST.ROLE.BUTTON, CONST.ROLE.CHECKBOX].includes(activeElementRole as ButtonOrCheckBoxRoles);
+    // Disable `Enter` shortcut if the active element is a button, to avoid Enter from both
+    // selecting the focused list item and clicking the focused button at the same time.
+    // Note: checkbox is intentionally excluded — list items with role="checkbox" already block
+    // native Enter via shouldPreventEnterKeySubmit, so the keyboard shortcut is the only way
+    // Enter can select them (fixes keyboard navigation in multi-select filter dropdowns).
+    const disableEnterShortcut = activeElementRole === CONST.ROLE.BUTTON;
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, selectFocusedItem, {
         captureOnInputs: true,

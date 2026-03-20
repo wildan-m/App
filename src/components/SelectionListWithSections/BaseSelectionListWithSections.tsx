@@ -35,7 +35,7 @@ import getEmptyArray from '@src/types/utils/getEmptyArray';
 import arraysEqual from '@src/utils/arraysEqual';
 import BaseSelectionListItemRenderer from './BaseSelectionListItemRenderer';
 import FocusAwareCellRendererComponent from './FocusAwareCellRendererComponent';
-import type {ButtonOrCheckBoxRoles, FlattenedSectionsReturn, ListItem, SectionListDataType, SectionWithIndexOffset, SelectionListProps} from './types';
+import type {FlattenedSectionsReturn, ListItem, SectionListDataType, SectionWithIndexOffset, SelectionListProps} from './types';
 
 const getDefaultItemHeight = () => variables.optionRowHeight;
 
@@ -332,8 +332,12 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         );
     }, [sections, currentPage]);
 
-    // Disable `Enter` shortcut if the active element is a button or checkbox
-    const disableEnterShortcut = activeElementRole && [CONST.ROLE.BUTTON, CONST.ROLE.CHECKBOX].includes(activeElementRole as ButtonOrCheckBoxRoles);
+    // Disable `Enter` shortcut if the active element is a button, to avoid Enter from both
+    // selecting the focused list item and clicking the focused button at the same time.
+    // Note: checkbox is intentionally excluded — list items with role="checkbox" already block
+    // native Enter via shouldPreventEnterKeySubmit, so the keyboard shortcut is the only way
+    // Enter can select them (fixes keyboard navigation in multi-select filter dropdowns).
+    const disableEnterShortcut = activeElementRole === CONST.ROLE.BUTTON;
 
     /**
      * Scrolls to the desired item index in the section list

@@ -283,8 +283,6 @@ type ConfirmButtonOptions<TItem extends ListItem> = {
     isDisabled?: boolean;
 };
 
-type ButtonOrCheckBoxRoles = 'button' | 'checkbox';
-
 type SelectionListHandle<TItem extends ListItem> = {
     /** Scrolls to and highlights the specified items */
     scrollAndHighlightItem: (items: string[]) => void;
@@ -330,7 +328,6 @@ export type {
     TextInputOptions,
     ConfirmButtonOptions,
     ListItem,
-    ButtonOrCheckBoxRoles,
     SelectionListStyle,
     SelectionListWithSectionsHandle,
     SelectionListWithSectionsProps,
