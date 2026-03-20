@@ -2029,6 +2029,10 @@ const translations = {
         account: 'Account',
         general: 'General',
     },
+    helpPage: {
+        concierge: 'Concierge',
+        helpSite: 'Expensify Help Site',
+    },
     closeAccountPage: {
         // @context close as a verb, not an adjective
         closeAccount: 'Close account',

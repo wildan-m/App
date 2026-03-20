@@ -1955,6 +1955,10 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Conta',
         general: 'Geral',
     },
+    helpPage: {
+        concierge: 'Concierge',
+        helpSite: 'Site de ajuda do Expensify',
+    },
     closeAccountPage: {
         closeAccount: 'Encerrar conta',
         reasonForLeavingPrompt: 'Não gostaríamos de ver você ir embora! Você poderia nos dizer o motivo, para que possamos melhorar?',

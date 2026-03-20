@@ -1959,6 +1959,10 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Account',
         general: 'Algemeen',
     },
+    helpPage: {
+        concierge: 'Concierge',
+        helpSite: 'Expensify Help-site',
+    },
     closeAccountPage: {
         closeAccount: 'Account sluiten',
         reasonForLeavingPrompt: 'We zouden het jammer vinden als je vertrekt! Wil je ons alsjeblieft vertellen waarom, zodat we ons kunnen verbeteren?',

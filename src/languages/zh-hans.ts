@@ -1912,6 +1912,10 @@ const translations: TranslationDeepObject<typeof en> = {
         account: '账户',
         general: '常规',
     },
+    helpPage: {
+        concierge: 'Concierge',
+        helpSite: 'Expensify帮助站点',
+    },
     closeAccountPage: {
         closeAccount: '关闭账户',
         reasonForLeavingPrompt: '我们真心不想失去你！可以告诉我们离开的原因吗？这样我们才能不断改进。',

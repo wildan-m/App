@@ -1942,6 +1942,10 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'アカウント',
         general: '一般',
     },
+    helpPage: {
+        concierge: 'コンシェルジュ',
+        helpSite: 'Expensifyヘルプサイト',
+    },
     closeAccountPage: {
         closeAccount: 'アカウントを閉じる',
         reasonForLeavingPrompt: '退会されるのは残念です。今後の改善のため、よろしければ理由をお聞かせください。',
