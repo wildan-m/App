@@ -451,8 +451,10 @@ function Search({
 
     const prevIsSearchResultEmpty = usePrevious(isSearchResultsEmpty);
 
+    const searchResultsData = searchResults?.data;
+
     const [baseFilteredData, filteredDataLength, allDataLength] = useMemo(() => {
-        if (shouldDeferHeavySearchWork || searchResults === undefined || !isDataLoaded) {
+        if (shouldDeferHeavySearchWork || searchResultsData === undefined || !isDataLoaded) {
             return [[], 0, 0];
         }
 
@@ -465,7 +467,7 @@ function Search({
 
         const [filteredData1, allLength] = getSections({
             type,
-            data: searchResults.data,
+            data: searchResultsData,
             policies,
             currentAccountID: accountID,
             currentUserEmail: email ?? '',
@@ -495,7 +497,7 @@ function Search({
         validGroupBy,
         isDataLoaded,
         shouldDeferHeavySearchWork,
-        searchResults,
+        searchResultsData,
         type,
         archivedReportsIdSet,
         translate,
