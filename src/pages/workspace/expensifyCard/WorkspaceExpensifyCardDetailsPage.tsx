@@ -181,6 +181,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                     {canManageCardFreeze && isCardFrozen(card) ? (
                         <FrozenCardHeader
                             cardID={cardID}
+                            card={card}
                             onUnfreezePress={handleUnfreezePress}
                             cardPreview={
                                 <View style={[styles.pRelative, styles.alignSelfCenter, StyleUtils.getWidthStyle(variables.cardPreviewWidth)]}>

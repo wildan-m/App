@@ -11,6 +11,7 @@ import DateUtils from '@libs/DateUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type Card from '@src/types/onyx/Card';
 import Button from './Button';
 import Icon from './Icon';
 import Text from './Text';
@@ -19,9 +20,11 @@ type FrozenCardHeaderProps = {
     cardID: string;
     cardPreview: React.ReactNode;
     onUnfreezePress: () => void;
+    /** Card data from workspace cards list. When provided, used instead of reading from CARD_LIST. */
+    card?: Card;
 };
 
-function FrozenCardHeader({cardID, cardPreview, onUnfreezePress}: FrozenCardHeaderProps) {
+function FrozenCardHeader({cardID, cardPreview, onUnfreezePress, card: cardProp}: FrozenCardHeaderProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -29,7 +32,8 @@ function FrozenCardHeader({cardID, cardPreview, onUnfreezePress}: FrozenCardHead
     const icons = useMemoizedLazyExpensifyIcons(['FreezeCard'] as const);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [session] = useOnyx(ONYXKEYS.SESSION);
-    const [card] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(cardID)});
+    const [cardFromCardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(cardID)});
+    const card = cardProp ?? cardFromCardList;
 
     const frozenByAccountID = card?.nameValuePairs?.frozen?.byAccountID;
     const frozenDate = card?.nameValuePairs?.frozen?.date;
