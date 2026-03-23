@@ -2414,8 +2414,9 @@ const translations = {
         pinChangedHeader: 'PIN changed',
         pinChangedDescription: "You're all set to use your PIN now.",
         changePin: 'Change PIN',
-        changePinAtATM: 'Change your PIN at any ATM',
-        changePinAtATMDescription: 'This is required in your region. <concierge-link>Reach out to Concierge</concierge-link> if you have any questions.',
+        visitAnATM: 'Visit an ATM',
+        visitAnATMDescription:
+            'Use your card at any ATM to complete your PIN change. This is required in your region. <concierge-link>Reach out to Concierge</concierge-link> if you have any questions.',
         freezeCard: 'Freeze card',
         unfreeze: 'Unfreeze',
         unfreezeCard: 'Unfreeze card',
