@@ -51,6 +51,7 @@ import {getCategoryApproverRule} from './CategoryUtils';
 import {convertToBackendAmount} from './CurrencyUtils';
 import Navigation from './Navigation/Navigation';
 import {getIsOffline} from './NetworkState';
+import {generateHexadecimalValue} from './NumberUtils';
 import {formatMemberForList} from './OptionsListUtils';
 import type {MemberForList} from './OptionsListUtils';
 import {getAccountIDsByLogins, getLoginByAccountID, getLoginsByAccountIDs, getPersonalDetailByEmail} from './PersonalDetailsUtils';
@@ -309,6 +310,22 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
     return false;
 }
 
+function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string): CustomUnit {
+    const newRates: Record<string, Rate> = {};
+    for (const rate of Object.values(unit.rates)) {
+        const newRateID = generateHexadecimalValue(13);
+        newRates[newRateID] = {
+            ...rate,
+            customUnitRateID: newRateID,
+        };
+    }
+    return {
+        ...unit,
+        customUnitID: newCustomUnitID,
+        rates: newRates,
+    };
+}
+
 function getCustomUnitsForDuplication(
     policy: Policy,
     isDistanceRatesOptionSelected: boolean,
@@ -333,7 +350,10 @@ function getCustomUnitsForDuplication(
             return undefined;
         }
 
-        return {[distanceCustomUnitID]: distanceCustomUnit, [perDiemCustomUnitID]: perDiemUnit};
+        return {
+            [distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID),
+            [perDiemCustomUnitID]: cloneCustomUnitWithNewIDs(perDiemUnit, perDiemCustomUnitID),
+        };
     }
 
     if (isDistanceRatesOptionSelected && distanceCustomUnitID) {
@@ -341,14 +361,14 @@ function getCustomUnitsForDuplication(
         if (!distanceCustomUnit) {
             return undefined;
         }
-        return {[distanceCustomUnitID]: distanceCustomUnit};
+        return {[distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID)};
     }
 
     const perDiemUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL);
     if (!perDiemUnit || !perDiemCustomUnitID) {
         return undefined;
     }
-    return {[perDiemCustomUnitID]: perDiemUnit};
+    return {[perDiemCustomUnitID]: cloneCustomUnitWithNewIDs(perDiemUnit, perDiemCustomUnitID)};
 }
 
 /**
