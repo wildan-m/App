@@ -607,11 +607,15 @@ function IOURequestStepConfirmation({
     const requestMoney = useCallback(
         (selectedParticipants: Participant[], gpsPoint?: GpsPoint) => {
             if (!transactions.length) {
+                setIsConfirmed(false);
+                formHasBeenSubmitted.current = false;
                 return;
             }
 
             const participant = selectedParticipants.at(0);
             if (!participant) {
+                setIsConfirmed(false);
+                formHasBeenSubmitted.current = false;
                 return;
             }
 

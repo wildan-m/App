@@ -13,7 +13,10 @@ import useTransactionDraftValues from './useTransactionDraftValues';
 const useOptimisticDraftTransactions = (transaction: OnyxEntry<Transaction>) => {
     const optimisticTransactions = useTransactionDraftValues();
 
-    const allTransactions = optimisticTransactions && optimisticTransactions.length > 1 ? optimisticTransactions : [transaction];
+    // Filter out null/undefined entries before checking length, since removed drafts
+    // (via Onyx.set(key, null)) persist as null in the collection and inflate the count.
+    const validOptimisticTransactions = optimisticTransactions?.filter((value): value is Transaction => !!value);
+    const allTransactions = validOptimisticTransactions && validOptimisticTransactions.length > 1 ? validOptimisticTransactions : [transaction];
     const transactions = allTransactions.filter((value): value is Transaction => !!value);
 
     const optimisticDraftTransactions = [transactions, optimisticTransactions];
