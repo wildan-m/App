@@ -322,7 +322,10 @@ function buildOptimisticNextStepForPreventSelfApprovalsEnabled() {
     return optimisticNextStep;
 }
 
-function buildOptimisticFixIssueNextStep() {
+function buildOptimisticFixIssueNextStep(ownerAccountID: number, currentUserAccountID: number, currentUserEmail: string) {
+    const ownerDisplayName =
+        getDisplayNameForParticipant({accountID: ownerAccountID, formatPhoneNumber: formatPhoneNumberPhoneUtils}) ?? getPersonalDetailsForAccountID(ownerAccountID).login ?? '';
+
     const optimisticNextStep: ReportNextStepDeprecated = {
         type: 'neutral',
         icon: CONST.NEXT_STEP.ICONS.HOURGLASS,
@@ -331,8 +334,9 @@ function buildOptimisticFixIssueNextStep() {
                 text: 'Waiting for ',
             },
             {
-                text: `you`,
+                text: ownerDisplayName,
                 type: 'strong',
+                clickToCopyText: ownerAccountID === currentUserAccountID ? currentUserEmail : '',
             },
             {
                 text: ' to ',
@@ -378,7 +382,7 @@ function getReportNextStep(
             (transaction) => !!transaction && hasSubmissionBlockingViolations(transaction, transactionViolations, currentUserEmail, currentUserAccountID, moneyRequestReport, policy),
         )
     ) {
-        return buildOptimisticFixIssueNextStep();
+        return buildOptimisticFixIssueNextStep(moneyRequestReport?.ownerAccountID ?? -1, currentUserAccountID, currentUserEmail);
     }
 
     const isSubmitterSameAsNextApprover =
