@@ -74,18 +74,20 @@ function TaxPicker({selectedTaxRate = '', policyID, transactionID, onSubmit, act
     const effectiveSelectedTaxRate = selectedTaxRate || (effectiveTaxCode ? (transformedTaxRates(policy, currentTransaction)[effectiveTaxCode]?.modifiedName ?? '') : '');
     const hasTaxBeenDeleted = !!taxCode && taxValue !== undefined && !taxRates?.taxes?.[taxCode];
     const hasTaxValueChanged = !!taxCode && taxValue !== undefined && taxRates?.taxes?.[taxCode]?.value !== taxValue;
+    const policyHasMatchingTaxValue = hasTaxBeenDeleted && Object.values(taxRates?.taxes ?? {}).some((tax) => !tax.isDisabled && tax.value === taxValue);
 
-    const deletedTaxOption = !hasTaxBeenDeleted
-        ? null
-        : {
-              code: undefined,
-              text: taxValue ?? '',
-              keyForList: taxCode ?? '',
-              searchText: taxValue ?? '',
-              tooltipText: taxValue ?? '',
-              isDisabled: true,
-              isSelected: true,
-          };
+    const deletedTaxOption =
+        !hasTaxBeenDeleted || policyHasMatchingTaxValue
+            ? null
+            : {
+                  code: undefined,
+                  text: taxValue ?? '',
+                  keyForList: taxCode ?? '',
+                  searchText: taxValue ?? '',
+                  tooltipText: taxValue ?? '',
+                  isDisabled: true,
+                  isSelected: true,
+              };
 
     const selectedOptions = effectiveSelectedTaxRate
         ? [
