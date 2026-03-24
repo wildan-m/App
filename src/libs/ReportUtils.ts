@@ -4352,11 +4352,10 @@ function getReasonAndReportActionThatRequiresAttention(
     const transactions = getReportTransactions(iouReportID);
     const hasOnlyPendingTransactions = transactions.length > 0 && transactions.every((t) => isExpensifyCardTransaction(t) && isPending(t));
 
-    // Has a child report that is awaiting action (e.g. approve, pay, add bank account) from current user
-    if (
-        (optionOrReport.hasOutstandingChildRequest === true || iouReportActionToApproveOrPay?.reportActionID) &&
-        (policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO || !hasOnlyPendingTransactions)
-    ) {
+    // Has a child report that is awaiting action (e.g. approve, pay, add bank account) from current user.
+    // Only rely on the locally-verified actionable child report (iouReportActionToApproveOrPay) rather than
+    // the backend-cached hasOutstandingChildRequest flag, which can be stale and cause phantom GBR indicators.
+    if (iouReportActionToApproveOrPay?.reportActionID && (policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO || !hasOnlyPendingTransactions)) {
         return {
             reason: CONST.REQUIRES_ATTENTION_REASONS.HAS_CHILD_REPORT_AWAITING_ACTION,
             reportAction: iouReportActionToApproveOrPay,
