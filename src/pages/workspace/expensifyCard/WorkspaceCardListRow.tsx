@@ -177,7 +177,7 @@ function WorkspaceCardListRow({limit, cardholder, lastFourPAN, name, frozenByDis
                         fill={theme.icon}
                         small
                     />
-                    <Text style={[styles.textLabelSupporting, styles.colorMuted, styles.ml2]}>{frozenByText}</Text>
+                    <Text style={[styles.textLabelSupporting, styles.colorMuted, styles.ml2, styles.flexShrink1]}>{frozenByText}</Text>
                 </View>
             )}
         </View>
