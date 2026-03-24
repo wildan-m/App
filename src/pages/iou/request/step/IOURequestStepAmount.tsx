@@ -27,7 +27,18 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
 import {getPolicyExpenseChat, getReportOrDraftReport, getTransactionDetails, isMoneyRequestReport, isPolicyExpenseChat, isSelfDM, shouldEnableNegative} from '@libs/ReportUtils';
 import shouldUseDefaultExpensePolicy from '@libs/shouldUseDefaultExpensePolicy';
-import {calculateTaxAmount, getAmount, getCurrency, getDefaultTaxCode, getRequestType, getTaxValue, isDistanceRequest, isExpenseUnreported} from '@libs/TransactionUtils';
+import {
+    calculateTaxAmount,
+    getAmount,
+    getCurrency,
+    getDefaultTaxCode,
+    getRequestType,
+    getTaxValue,
+    hasReceipt,
+    hasValidModifiedAmount,
+    isDistanceRequest,
+    isExpenseUnreported,
+} from '@libs/TransactionUtils';
 import MoneyRequestAmountForm from '@pages/iou/MoneyRequestAmountForm';
 import {
     getMoneyRequestParticipantsFromReport,
@@ -385,8 +396,15 @@ function IOURequestStepAmount({
         }
 
         // If the value hasn't changed, don't request to save changes on the server and just close the modal
+        // Exception: when a receipt scan failed and the user hasn't yet confirmed the amount (modifiedAmount not set),
+        // always process the save so that modifiedAmount gets set and the "missing amount" error clears.
         const transactionCurrency = getCurrency(currentTransaction);
-        if (newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) && selectedCurrency === transactionCurrency) {
+        const hasSmartScanFailed = hasReceipt(currentTransaction) && currentTransaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
+        if (
+            newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) &&
+            selectedCurrency === transactionCurrency &&
+            !(hasSmartScanFailed && !hasValidModifiedAmount(currentTransaction))
+        ) {
             navigateBack();
             return;
         }
