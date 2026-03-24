@@ -715,6 +715,7 @@ function duplicateExpenseTransaction({
         isSelfTourViewed,
         betas,
         personalDetails,
+        duplicateOfTransactionID: transaction.transactionID,
     };
 
     // If no workspace is provided the expense should be unreported
@@ -902,6 +903,7 @@ function duplicateReport({
             betas,
             personalDetails,
             shouldDeferAutoSubmit: !isLastExpense,
+            duplicateOfTransactionID: transaction.transactionID,
         };
 
         const result = createExpenseByType({

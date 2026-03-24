@@ -538,6 +538,7 @@ type RequestMoneyInformation = {
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     shouldDeferAutoSubmit?: boolean;
+    duplicateOfTransactionID?: string;
 };
 
 type MoneyRequestInformationParams = {
@@ -569,6 +570,7 @@ type MoneyRequestInformationParams = {
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     policyRecentlyUsedCurrencies: string[];
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    duplicateOfTransactionID?: string;
 };
 
 type MoneyRequestOptimisticParams = {
@@ -615,6 +617,7 @@ type BuildOnyxDataForMoneyRequestParams = {
     hasViolations: boolean;
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    duplicateOfTransactionID?: string;
 };
 
 type DistanceRequestTransactionParams = BaseTransactionParams & {
@@ -651,6 +654,7 @@ type CreateDistanceRequestInformation = {
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     optimisticReportPreviewActionID?: string;
     shouldDeferAutoSubmit?: boolean;
+    duplicateOfTransactionID?: string;
 };
 
 type CreateSplitsTransactionParams = Omit<BaseTransactionParams, 'customUnitRateID'> & {
@@ -1890,6 +1894,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
         hasViolations,
         quickAction,
         personalDetails,
+        duplicateOfTransactionID,
     } = moneyRequestParams;
     const {policy, policyCategories, policyTagList} = policyParams;
     const {
@@ -2481,9 +2486,17 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
     if (!policy || !isPaidGroupPolicy(policy) || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
         return onyxData;
     }
+    const initialViolations: OnyxTypes.TransactionViolation[] = [];
+    if (duplicateOfTransactionID) {
+        initialViolations.push({
+            type: CONST.VIOLATION_TYPES.VIOLATION,
+            name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
+            data: {duplicates: [duplicateOfTransactionID]},
+        });
+    }
     const violationsOnyxData = ViolationsUtils.getViolationsOnyxData(
         transaction,
-        [],
+        initialViolations,
         policy,
         policyTagList ?? {},
         policyCategories ?? {},
@@ -3228,6 +3241,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         policyRecentlyUsedCurrencies,
         personalDetails,
         betas,
+        duplicateOfTransactionID,
     } = moneyRequestInformation;
     const {payeeAccountID = userAccountID, payeeEmail = currentUserEmail, participant} = participantParams;
     const {policy, policyCategories, policyTagList, policyRecentlyUsedCategories, policyRecentlyUsedTags} = policyParams;
@@ -3595,6 +3609,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         hasViolations,
         quickAction,
         personalDetails,
+        duplicateOfTransactionID,
     });
 
     return {
@@ -6307,6 +6322,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         betas,
         personalDetails,
         shouldDeferAutoSubmit,
+        duplicateOfTransactionID,
     } = requestMoneyInformation;
     const {payeeAccountID} = participantParams;
     const parsedComment = getParsedComment(transactionParams.comment ?? '');
@@ -6402,6 +6418,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         policyRecentlyUsedCurrencies,
         betas,
         personalDetails,
+        duplicateOfTransactionID,
     });
     const activeReportID = isMoneyRequestReport ? report?.reportID : chatReport.reportID;
 
@@ -7541,6 +7558,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         betas,
         optimisticReportPreviewActionID,
         shouldDeferAutoSubmit,
+        duplicateOfTransactionID,
     } = distanceRequestInformation;
     const {policy, policyCategories, policyTagList, policyRecentlyUsedCategories, policyRecentlyUsedTags} = policyParams;
     const parsedComment = getParsedComment(transactionParams.comment);
@@ -7711,6 +7729,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             personalDetails,
             betas,
             optimisticReportPreviewActionID,
+            duplicateOfTransactionID,
         });
 
         onyxData = moneyRequestOnyxData;
