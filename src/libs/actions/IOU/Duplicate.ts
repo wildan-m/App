@@ -6,10 +6,12 @@ import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import * as API from '@libs/API';
 import type {MergeDuplicatesParams, ResolveDuplicatesParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
+import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
+import {isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {getIOUActionForReportID, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     buildOptimisticCreatedReportAction,
@@ -21,7 +23,11 @@ import {
 } from '@libs/ReportUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {
+    calculateTaxAmount,
+    getCurrency,
+    getDefaultTaxCode,
     getRequestType,
+    getTaxValue,
     getTransactionType,
     hasCustomUnitOutOfPolicyViolation,
     isDistanceRequest,
@@ -31,6 +37,7 @@ import {
     isPartialTransaction,
     isPerDiemRequest,
     isScanning,
+    isTimeRequest,
 } from '@libs/TransactionUtils';
 import {createNewReport} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -514,7 +521,7 @@ function resolveDuplicates(params: MergeDuplicatesParams) {
  * Builds the transactionParams object and computes waypoints used when duplicating a transaction.
  * Shared between duplicateExpenseTransaction and duplicateReport.
  */
-function buildDuplicateTransactionParams(transaction: OnyxTypes.Transaction, transactionDetails: ReturnType<typeof getTransactionDetails>) {
+function buildDuplicateTransactionParams(transaction: OnyxTypes.Transaction, transactionDetails: ReturnType<typeof getTransactionDetails>, targetPolicy?: OnyxEntry<OnyxTypes.Policy>) {
     const {linkedTrackedExpenseReportAction, ...transactionWithoutLinkedAction} = transaction;
     const waypoints = !isExpenseSplit(transaction) ? (transactionDetails?.waypoints as WaypointCollection | undefined) : undefined;
 
@@ -547,6 +554,26 @@ function buildDuplicateTransactionParams(transaction: OnyxTypes.Transaction, tra
         rate: transaction.comment?.units?.rate,
         unit: transaction.comment?.units?.unit,
     };
+
+    // When the target policy has tax tracking enabled but the original transaction's taxCode
+    // is not valid for the policy (e.g. expense was created before taxes were enabled),
+    // use the workspace's default tax code to prevent a TAX_OUT_OF_POLICY violation.
+    if (targetPolicy) {
+        const isPolicyTaxEnabled = isTaxTrackingEnabled(true, targetPolicy, isDistanceRequest(transaction), isPerDiemRequest(transaction), isTimeRequest(transaction));
+        if (isPolicyTaxEnabled) {
+            const isTaxInPolicy = Object.keys(targetPolicy.taxRates?.taxes ?? {}).some((key) => key === transactionParams.taxCode);
+            if (!isTaxInPolicy) {
+                const defaultTaxCode = getDefaultTaxCode(targetPolicy, transaction);
+                if (defaultTaxCode) {
+                    transactionParams.taxCode = defaultTaxCode;
+                    const taxPercentage = getTaxValue(targetPolicy, transaction, defaultTaxCode);
+                    const amount = Math.abs(transactionParams.amount);
+                    const currency = getCurrency(transaction) || targetPolicy.outputCurrency || CONST.CURRENCY.USD;
+                    transactionParams.taxAmount = convertToBackendAmount(calculateTaxAmount(taxPercentage, amount, getCurrencyDecimals(currency)));
+                }
+            }
+        }
+    }
 
     if (isDistanceRequest(transaction) && (isExpenseSplit(transaction) || isOdometerDistanceRequest(transaction))) {
         transactionParams.distance = transaction.comment?.customUnit?.quantity ?? undefined;
@@ -686,7 +713,7 @@ function duplicateExpenseTransaction({
 
     const participants = getMoneyRequestParticipantsFromReport(targetReport, userAccountID);
     const transactionDetails = getTransactionDetails(transaction);
-    const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails);
+    const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails, targetPolicy);
 
     const params: RequestMoneyInformation = {
         report: targetReport,
@@ -872,7 +899,7 @@ function duplicateReport({
         }
 
         const isLastExpense = i === eligibleTransactions.length - 1;
-        const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails);
+        const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails, targetPolicy);
 
         const params: RequestMoneyInformation = {
             report: parentChatReport,
