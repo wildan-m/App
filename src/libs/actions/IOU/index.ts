@@ -11,6 +11,7 @@ import type {ValueOf} from 'type-fest';
 import ReceiptGeneric from '@assets/images/receipt-generic.png';
 import type {PaymentMethod} from '@components/KYCWall/types';
 import type {SearchQueryJSON} from '@components/Search/types';
+import {suppressTransactionHighlight} from '@hooks/useNewTransactions';
 import * as API from '@libs/API';
 import type {
     AddReportApproverParams,
@@ -1179,6 +1180,13 @@ function handleNavigateAfterExpenseCreate({
     isInvoice?: boolean;
     shouldHandleNavigation?: boolean;
 }) {
+    // Suppress the report-view highlight animation for transactions created without navigation
+    // (e.g. duplicated expenses). Without this, useNewTransactions detects the optimistic
+    // transaction as "new" and triggers an unwanted highlight in the MoneyRequestReportView.
+    if (!shouldHandleNavigation && transactionID) {
+        suppressTransactionHighlight(transactionID);
+    }
+
     const isUserOnInbox = isReportTopmostSplitNavigator();
 
     // If the expense is not created from global create or is currently on the inbox tab,
