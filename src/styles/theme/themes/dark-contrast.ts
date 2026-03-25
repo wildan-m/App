@@ -10,6 +10,7 @@ const darkContrastTheme = {
     buttonSuccessText: colors.productLight900,
     bordersBold: colors.productDark700,
     buttonIcon: colors.productDark900,
+    iconSuccessFill: colors.green200,
     mentionText: colors.blue600,
     textLight: colors.productLight900,
     iconColorfulBackground: colors.yellow800,

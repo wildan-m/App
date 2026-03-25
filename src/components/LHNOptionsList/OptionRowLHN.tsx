@@ -418,7 +418,7 @@ function OptionRowLHN({
                                                     <Icon
                                                         testID="GBR Icon"
                                                         src={expensifyIcons.DotIndicator}
-                                                        fill={theme.success}
+                                                        fill={theme.iconSuccessFill}
                                                     />
                                                 </View>
                                             ))}
