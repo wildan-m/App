@@ -273,6 +273,11 @@ npm run web
 ### Browser Testing
 Use the `/playwright-app-testing` skill to test and debug the App in a browser. Use this skill after making frontend changes to verify your work, or when the user requests testing.
 
+### Sentry MCP
+The Sentry MCP server is configured in `.mcp.json` and surfaces Sentry tools directly in Claude Code: search issues by query, retrieve stack traces and event details, inspect distributed traces, and run AI-powered root cause analysis via Seer.
+
+**First-time setup:** On first use, Claude Code opens a browser window to complete Sentry's OAuth flow. Authorize access and select the tool groups you want enabled. No personal access tokens or environment variables are needed — authentication is handled automatically via OAuth and persists across sessions.
+
 ## Architecture Decisions
 
 ### React Native New Architecture

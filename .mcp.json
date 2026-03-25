@@ -3,6 +3,9 @@
         "playwright": {
             "command": "npx",
             "args": ["@playwright/mcp@latest", "--isolated", "--output-dir", ".playwright-output"]
+        },
+        "sentry": {
+            "url": "https://mcp.sentry.dev/mcp"
         }
     }
 }
