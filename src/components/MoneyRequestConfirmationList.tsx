@@ -627,21 +627,19 @@ function MoneyRequestConfirmationList({
             }
         } else if (isTypeTrackExpense) {
             text = translate('iou.createExpense');
-            if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
+            if (iouAmount !== 0) {
                 text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
             }
         } else if (isTypeSplit && iouAmount === 0) {
             text = translate('iou.splitExpense');
         } else if ((receiptPath && isTypeRequest) || isDistanceRequestWithPendingRoute || isPerDiemRequest) {
             text = translate('iou.createExpense');
-            if (iouAmount !== 0 && !isNewManualExpenseFlowEnabled) {
+            if (iouAmount !== 0) {
                 text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
             }
         } else if (isTypeSplit) {
             text = translate('iou.splitAmount', formattedAmount);
         } else if (iouAmount === 0) {
-            text = translate('iou.createExpense');
-        } else if (isNewManualExpenseFlowEnabled) {
             text = translate('iou.createExpense');
         } else {
             text = translate('iou.createExpenseWithAmount', {amount: formattedAmount});
@@ -666,7 +664,6 @@ function MoneyRequestConfirmationList({
         policy,
         translate,
         formattedAmount,
-        isNewManualExpenseFlowEnabled,
     ]);
 
     const onSplitShareChange = useCallback(
