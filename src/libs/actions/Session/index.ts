@@ -1012,6 +1012,7 @@ function cleanupSession() {
     HttpUtils.cancelPendingRequests();
     PersistedRequests.clear();
     NetworkConnection.clearReconnectionCallbacks();
+    SequentialQueue.resetQueue();
     SessionUtils.resetDidUserLogInDuringSession();
     resetNavigationState();
     clearCache().then(() => {
