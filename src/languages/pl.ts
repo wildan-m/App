@@ -6594,6 +6594,14 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
                 title: 'Polityka wydatków',
                 cardSubtitle: 'To tutaj znajduje się polityka wydatków Twojego zespołu, aby wszyscy mieli jasność co do tego, co jest objęte.',
             },
+            companyRulesPdf: {
+                title: 'Company rules',
+                uploadDescription: 'Drag and drop a PDF of your company rules',
+                uploadFallback: 'or click to choose a file',
+                replace: 'Replace',
+                remove: 'Remove',
+                notPdf: 'Only PDF files are allowed',
+            },
         },
         planTypePage: {
             planTypes: {

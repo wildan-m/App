@@ -16,6 +16,7 @@ import type {
     CreateWorkspaceParams,
     DeleteWorkspaceAvatarParams,
     DeleteWorkspaceParams,
+    DeleteWorkspaceRulesDocumentParams,
     DisablePolicyApprovalsParams,
     DisablePolicyBillableModeParams,
     DowngradeToTeamParams,
@@ -70,6 +71,7 @@ import type {
     UpdateWorkspaceClientIDParams,
     UpdateWorkspaceDescriptionParams,
     UpdateWorkspaceGeneralSettingsParams,
+    UpdateWorkspaceRulesDocumentParams,
     UpgradeToCorporateParams,
 } from '@libs/API/parameters';
 import type SetPolicyCashExpenseModeParams from '@libs/API/parameters/SetPolicyCashExpenseModeParams';
@@ -1807,6 +1809,116 @@ function clearAvatarErrors(policyID: string) {
         },
         pendingFields: {
             avatarURL: null,
+        },
+    });
+}
+
+/**
+ * Upload a company rules PDF document for the workspace
+ */
+function updateWorkspaceRulesDocument(policyID: string, currentURL: string | undefined, file: File) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                companyRulesPdfURL: file.uri,
+                errorFields: {
+                    companyRulesPdfURL: null,
+                },
+                pendingFields: {
+                    companyRulesPdfURL: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+            },
+        },
+    ];
+    const finallyData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                pendingFields: {
+                    companyRulesPdfURL: null,
+                },
+            },
+        },
+    ];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                companyRulesPdfURL: currentURL,
+                errorFields: {
+                    companyRulesPdfURL: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                },
+            },
+        },
+    ];
+
+    const params: UpdateWorkspaceRulesDocumentParams = {policyID, file};
+
+    API.write(WRITE_COMMANDS.UPDATE_WORKSPACE_RULES_DOCUMENT, params, {optimisticData, finallyData, failureData});
+}
+
+/**
+ * Delete the company rules PDF document for the workspace
+ */
+function deleteWorkspaceRulesDocument(policyID: string, currentURL: string | undefined) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                companyRulesPdfURL: '',
+                pendingFields: {
+                    companyRulesPdfURL: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+                errorFields: {
+                    companyRulesPdfURL: null,
+                },
+            },
+        },
+    ];
+    const finallyData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                pendingFields: {
+                    companyRulesPdfURL: null,
+                },
+            },
+        },
+    ];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                companyRulesPdfURL: currentURL,
+                errorFields: {
+                    companyRulesPdfURL: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                },
+            },
+        },
+    ];
+
+    const params: DeleteWorkspaceRulesDocumentParams = {policyID};
+
+    API.write(WRITE_COMMANDS.DELETE_WORKSPACE_RULES_DOCUMENT, params, {optimisticData, finallyData, failureData});
+}
+
+/**
+ * Clear error and pending fields for the workspace rules document
+ */
+function clearCompanyRulesPdfErrors(policyID: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
+        errorFields: {
+            companyRulesPdfURL: null,
+        },
+        pendingFields: {
+            companyRulesPdfURL: null,
         },
     });
 }
@@ -7086,6 +7198,9 @@ export {
     deleteWorkspaceAvatar,
     updateWorkspaceAvatar,
     clearAvatarErrors,
+    updateWorkspaceRulesDocument,
+    deleteWorkspaceRulesDocument,
+    clearCompanyRulesPdfErrors,
     generatePolicyID,
     createWorkspace,
     openPolicyTaxesPage,

@@ -1,7 +1,8 @@
 import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import {Linking, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
+import AttachmentPicker from '@components/AttachmentPicker';
 import Avatar from '@components/Avatar';
 import AvatarWithImagePicker from '@components/AvatarWithImagePicker';
 import Button from '@components/Button';
@@ -10,6 +11,7 @@ import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
 import ConfirmModal from '@components/ConfirmModal';
 import MentionReportContext from '@components/HTMLEngineProvider/HTMLRenderers/MentionReportRenderer/MentionReportContext';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
+import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -36,17 +38,21 @@ import {clearInviteDraft, clearWorkspaceOwnerChangeFlow, requestWorkspaceOwnerCh
 import {
     calculateBillNewDot,
     clearAvatarErrors,
+    clearCompanyRulesPdfErrors,
     clearDeleteWorkspaceError,
     clearPolicyErrorField,
     deleteWorkspace,
     deleteWorkspaceAvatar,
+    deleteWorkspaceRulesDocument,
     leaveWorkspace,
     openPolicyProfilePage,
     setIsComingFromGlobalReimbursementsFlow,
     updateWorkspaceAvatar,
+    updateWorkspaceRulesDocument,
 } from '@libs/actions/Policy/Policy';
 import {filterInactiveCards, getCardSettings} from '@libs/CardUtils';
 import {getLatestErrorField, getLatestErrorMessage} from '@libs/ErrorUtils';
+import {splitExtensionFromFileName} from '@libs/fileDownload/FileUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
@@ -72,6 +78,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import {ownerPoliciesSelector} from '@src/selectors/Policy';
 import {reimbursementAccountErrorSelector} from '@src/selectors/ReimbursementAccount';
+import type {FileObject} from '@src/types/utils/Attachment';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {WithPolicyProps} from './withPolicy';
 import withPolicy from './withPolicy';
@@ -86,7 +93,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencySymbol} = useCurrencyListActions();
     const illustrationIcons = useMemoizedLazyIllustrations(['Building']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Exit', 'FallbackWorkspaceAvatar', 'ImageCropSquareMask', 'QrCode', 'Transfer', 'Trashcan', 'UserPlus']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Document', 'Exit', 'FallbackWorkspaceAvatar', 'ImageCropSquareMask', 'QrCode', 'Transfer', 'Trashcan', 'Upload', 'UserPlus']);
 
     const backTo = route.params.backTo;
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
@@ -166,6 +173,28 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         }
         Navigation.navigate(ROUTES.WORKSPACE_OVERVIEW_PLAN.getRoute(policyID));
     };
+    const handleUploadRulesDocument = useCallback(
+        (files: FileObject[]) => {
+            if (!policyID) {
+                return;
+            }
+            const file = files.at(0);
+            const {fileExtension} = splitExtensionFromFileName(file?.name ?? '');
+            if (fileExtension.toLowerCase() !== 'pdf') {
+                return;
+            }
+            updateWorkspaceRulesDocument(policyID, policy?.companyRulesPdfURL, file as File);
+        },
+        [policyID, policy?.companyRulesPdfURL],
+    );
+
+    const handleRemoveRulesDocument = useCallback(() => {
+        if (!policyID) {
+            return;
+        }
+        deleteWorkspaceRulesDocument(policyID, policy?.companyRulesPdfURL);
+    }, [policyID, policy?.companyRulesPdfURL]);
+
     const policyName = policy?.name ?? '';
     const policyDescription = policy?.description ?? translate('workspace.common.defaultDescription');
     const policyCurrency = policy?.outputCurrency ?? '';
@@ -754,6 +783,72 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                             </OfflineWithFeedback>
                         </Section>
                     ) : null}
+                    {(!readOnly || !!policy?.companyRulesPdfURL) && (
+                        <Section
+                            isCentralPane
+                            title={translate('workspace.rules.companyRulesPdf.title')}
+                            titleStyles={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle, styles.mb0]}
+                            containerStyles={shouldUseNarrowLayout ? styles.p5 : styles.p8}
+                        >
+                            <OfflineWithFeedback
+                                pendingAction={policy?.pendingFields?.companyRulesPdfURL}
+                                errors={policy?.errorFields?.companyRulesPdfURL}
+                                onClose={() => {
+                                    if (!policyID) {
+                                        return;
+                                    }
+                                    clearCompanyRulesPdfErrors(policyID);
+                                }}
+                            >
+                                {policy?.companyRulesPdfURL ? (
+                                    <>
+                                        <MenuItemWithTopDescription
+                                            title={policy.companyRulesPdfURL.split('/').pop() ?? ''}
+                                            description={translate('workspace.rules.companyRulesPdf.title')}
+                                            icon={expensifyIcons.Document}
+                                            shouldShowRightIcon={readOnly}
+                                            interactive={readOnly}
+                                            wrapperStyle={styles.sectionMenuItemTopDescription}
+                                            onPress={readOnly ? () => Linking.openURL(policy.companyRulesPdfURL ?? '') : undefined}
+                                        />
+                                        {!readOnly && (
+                                            <>
+                                                <AttachmentPicker acceptedFileTypes={['pdf']}>
+                                                    {({openPicker}) => (
+                                                        <MenuItem
+                                                            title={translate('workspace.rules.companyRulesPdf.replace')}
+                                                            icon={expensifyIcons.Upload}
+                                                            onPress={() => {
+                                                                openPicker({onPicked: handleUploadRulesDocument});
+                                                            }}
+                                                        />
+                                                    )}
+                                                </AttachmentPicker>
+                                                <MenuItem
+                                                    title={translate('workspace.rules.companyRulesPdf.remove')}
+                                                    icon={expensifyIcons.Trashcan}
+                                                    onPress={handleRemoveRulesDocument}
+                                                />
+                                            </>
+                                        )}
+                                    </>
+                                ) : (
+                                    <AttachmentPicker acceptedFileTypes={['pdf']}>
+                                        {({openPicker}) => (
+                                            <MenuItem
+                                                title={translate('workspace.rules.companyRulesPdf.uploadDescription')}
+                                                description={translate('workspace.rules.companyRulesPdf.uploadFallback')}
+                                                icon={expensifyIcons.Upload}
+                                                onPress={() => {
+                                                    openPicker({onPicked: handleUploadRulesDocument});
+                                                }}
+                                            />
+                                        )}
+                                    </AttachmentPicker>
+                                )}
+                            </OfflineWithFeedback>
+                        </Section>
+                    )}
                 </View>
             )}
         </WorkspacePageWithSections>

@@ -6620,6 +6620,14 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 title: 'Politica di spesa',
                 cardSubtitle: 'Qui trovi il regolamento spese del tuo team, così tutti sono allineati su cosa è coperto.',
             },
+            companyRulesPdf: {
+                title: 'Company rules',
+                uploadDescription: 'Drag and drop a PDF of your company rules',
+                uploadFallback: 'or click to choose a file',
+                replace: 'Replace',
+                remove: 'Remove',
+                notPdf: 'Only PDF files are allowed',
+            },
         },
         planTypePage: {
             planTypes: {

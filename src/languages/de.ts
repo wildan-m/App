@@ -6633,6 +6633,14 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 title: 'Spesenrichtlinie',
                 cardSubtitle: 'Hier ist die Spesenrichtlinie deines Teams hinterlegt, damit alle denselben Stand haben, was abgedeckt ist.',
             },
+            companyRulesPdf: {
+                title: 'Company rules',
+                uploadDescription: 'Drag and drop a PDF of your company rules',
+                uploadFallback: 'or click to choose a file',
+                replace: 'Replace',
+                remove: 'Remove',
+                notPdf: 'Only PDF files are allowed',
+            },
         },
         planTypePage: {
             planTypes: {

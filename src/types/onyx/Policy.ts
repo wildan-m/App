@@ -1982,6 +1982,9 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** A set of custom rules defined with natural language */
         customRules?: string;
 
+        /** URL of the uploaded company rules PDF document */
+        companyRulesPdfURL?: string;
+
         /** ReportID of the admins room for this workspace - This should be a string, we are keeping the number for backward compatibility */
         chatReportIDAdmins?: string | number;
 

@@ -6609,6 +6609,14 @@ const translations = {
                 title: 'Expense policy',
                 cardSubtitle: "Here's where your team's expense policy lives, so everyone's on the same page about what's covered.",
             },
+            companyRulesPdf: {
+                title: 'Company rules',
+                uploadDescription: 'Drag and drop a PDF of your company rules',
+                uploadFallback: 'or click to choose a file',
+                replace: 'Replace',
+                remove: 'Remove',
+                notPdf: 'Only PDF files are allowed',
+            },
         },
         planTypePage: {
             planTypes: {

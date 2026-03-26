@@ -272,6 +272,8 @@ const WRITE_COMMANDS = {
     SET_POLICY_PROHIBITED_EXPENSES: 'SetPolicyProhibitedExpenses',
     SET_POLICY_EXPENSE_MAX_AGE: ' SetPolicyExpenseMaxAge',
     UPDATE_CUSTOM_RULES: 'UpdateCustomRules',
+    UPDATE_WORKSPACE_RULES_DOCUMENT: 'UpdateWorkspaceRulesDocument',
+    DELETE_WORKSPACE_RULES_DOCUMENT: 'DeleteWorkspaceRulesDocument',
     SET_POLICY_BILLABLE_MODE: 'SetPolicyBillableMode',
     SET_POLICY_REIMBURSABLE_MODE: 'SetPolicyReimbursableMode',
     DISABLE_POLICY_BILLABLE_MODE: 'DisablePolicyBillableExpenses',
@@ -881,6 +883,8 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.SET_POLICY_EXPENSE_MAX_AMOUNT]: Parameters.SetPolicyExpenseMaxAmount;
     [WRITE_COMMANDS.SET_POLICY_EXPENSE_MAX_AGE]: Parameters.SetPolicyExpenseMaxAge;
     [WRITE_COMMANDS.UPDATE_CUSTOM_RULES]: Parameters.UpdateCustomRules;
+    [WRITE_COMMANDS.UPDATE_WORKSPACE_RULES_DOCUMENT]: Parameters.UpdateWorkspaceRulesDocumentParams;
+    [WRITE_COMMANDS.DELETE_WORKSPACE_RULES_DOCUMENT]: Parameters.DeleteWorkspaceRulesDocumentParams;
     [WRITE_COMMANDS.SET_POLICY_BILLABLE_MODE]: Parameters.SetPolicyBillableModeParams;
     [WRITE_COMMANDS.SET_POLICY_REIMBURSABLE_MODE]: Parameters.SetPolicyCashExpenseModeParams;
     [WRITE_COMMANDS.DISABLE_POLICY_BILLABLE_MODE]: Parameters.DisablePolicyBillableModeParams;

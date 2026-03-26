@@ -6599,6 +6599,14 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 title: 'Declaratiebeleid',
                 cardSubtitle: 'Hier staat het declaratiebeleid van je team, zodat iedereen hetzelfde beeld heeft van wat er wordt vergoed.',
             },
+            companyRulesPdf: {
+                title: 'Company rules',
+                uploadDescription: 'Drag and drop a PDF of your company rules',
+                uploadFallback: 'or click to choose a file',
+                replace: 'Replace',
+                remove: 'Remove',
+                notPdf: 'Only PDF files are allowed',
+            },
         },
         planTypePage: {
             planTypes: {
