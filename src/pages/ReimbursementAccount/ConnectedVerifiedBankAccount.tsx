@@ -55,7 +55,7 @@ function ConnectedVerifiedBankAccount({
     const bankAccountOwnerName = reimbursementAccount?.achData?.addressName;
     const errors = reimbursementAccount?.errors ?? {};
     const pendingAction = reimbursementAccount?.pendingAction;
-    const shouldShowResetModal = reimbursementAccount?.shouldShowResetModal ?? false;
+
     const {asset: ThumbsUpStars} = useMemoizedLazyAsset(() => loadIllustration('ThumbsUpStars' as IllustrationName));
     const icons = useMemoizedLazyExpensifyIcons(['Close'] as const);
 
@@ -104,14 +104,12 @@ function ConnectedVerifiedBankAccount({
                     </OfflineWithFeedback>
                 </Section>
             </ScrollView>
-            {shouldShowResetModal && (
-                <WorkspaceResetBankAccountModal
-                    reimbursementAccount={reimbursementAccount}
-                    isNonUSDWorkspace={isNonUSDWorkspace}
-                    setShouldShowConnectedVerifiedBankAccount={setShouldShowConnectedVerifiedBankAccount}
-                    setUSDBankAccountStep={setUSDBankAccountStep}
-                />
-            )}
+            <WorkspaceResetBankAccountModal
+                reimbursementAccount={reimbursementAccount}
+                isNonUSDWorkspace={isNonUSDWorkspace}
+                setShouldShowConnectedVerifiedBankAccount={setShouldShowConnectedVerifiedBankAccount}
+                setUSDBankAccountStep={setUSDBankAccountStep}
+            />
         </ScreenWrapper>
     );
 }

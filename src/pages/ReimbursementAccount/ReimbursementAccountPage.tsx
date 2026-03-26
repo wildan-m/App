@@ -446,7 +446,8 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
         (!!policyIDParam || !!bankAccountIDParam) &&
         (!hasACHDataBeenLoaded || isLoading || isLoadingWorkspaceReimbursement) &&
         shouldShowOfflineLoader &&
-        (shouldReopenOnfido || !requestorStepRef?.current)
+        (shouldReopenOnfido || !requestorStepRef?.current) &&
+        reimbursementAccount?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE
     ) {
         return <ReimbursementAccountLoadingIndicator onBackButtonPress={goBack} />;
     }

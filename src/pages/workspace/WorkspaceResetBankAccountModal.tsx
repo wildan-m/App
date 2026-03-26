@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useRef} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import ConfirmModal from '@components/ConfirmModal';
@@ -68,36 +68,38 @@ function WorkspaceResetBankAccountModal({
         [lastPaymentMethodSelector],
     );
 
+    const shouldResetOnHide = useRef(false);
+
     const handleConfirm = () => {
+        shouldResetOnHide.current = true;
         if (isNonUSDWorkspace) {
             resetNonUSDBankAccount(policyID, policy?.achAccount, achData?.bankAccountID, lastPaymentMethod);
-
-            if (setShouldShowConnectedVerifiedBankAccount) {
-                setShouldShowConnectedVerifiedBankAccount(false);
-            }
-
-            if (setShouldShowContinueSetupButton) {
-                setShouldShowContinueSetupButton(false);
-            }
-
             Navigation.navigate(
                 ROUTES.BANK_ACCOUNT_NON_USD_SETUP.getRoute({policyID: policyID ?? CONST.POLICY.ID_FAKE, page: CONST.NON_USD_BANK_ACCOUNT.PAGE_NAME.CURRENCY_AND_COUNTRY, backTo}),
             );
         } else {
             resetUSDBankAccount(bankAccountID, session, policyID, policy?.achAccount, lastPaymentMethod);
-
-            if (setShouldShowContinueSetupButton) {
-                setShouldShowContinueSetupButton(false);
-            }
-
-            if (setShouldShowConnectedVerifiedBankAccount) {
-                setShouldShowConnectedVerifiedBankAccount(false);
-            }
-
-            if (setUSDBankAccountStep) {
-                setUSDBankAccountStep(null);
-            }
         }
+    };
+
+    const handleModalHide = () => {
+        if (!shouldResetOnHide.current) {
+            return;
+        }
+        shouldResetOnHide.current = false;
+
+        if (setShouldShowContinueSetupButton) {
+            setShouldShowContinueSetupButton(false);
+        }
+
+        if (setShouldShowConnectedVerifiedBankAccount) {
+            setShouldShowConnectedVerifiedBankAccount(false);
+        }
+
+        if (!isNonUSDWorkspace && setUSDBankAccountStep) {
+            setUSDBankAccountStep(null);
+        }
+
         if (navigateAfterReset) {
             navigateAfterReset();
         }
@@ -120,8 +122,9 @@ function WorkspaceResetBankAccountModal({
             danger
             onCancel={cancelResetBankAccount}
             onConfirm={handleConfirm}
+            onModalHide={handleModalHide}
             shouldShowCancelButton
-            isVisible
+            isVisible={reimbursementAccount?.shouldShowResetModal ?? false}
         />
     );
 }

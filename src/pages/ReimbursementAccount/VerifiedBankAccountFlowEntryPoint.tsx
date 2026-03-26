@@ -310,16 +310,14 @@ function VerifiedBankAccountFlowEntryPoint({
                 </View>
             </ScrollView>
 
-            {!!reimbursementAccount?.shouldShowResetModal && (
-                <WorkspaceResetBankAccountModal
-                    reimbursementAccount={reimbursementAccount}
-                    isNonUSDWorkspace={isNonUSDWorkspace}
-                    setUSDBankAccountStep={setUSDBankAccountStep}
-                    setShouldShowContinueSetupButton={setShouldShowContinueSetupButton}
-                    navigateAfterReset={navigateAfterReset}
-                    backTo={backTo}
-                />
-            )}
+            <WorkspaceResetBankAccountModal
+                reimbursementAccount={reimbursementAccount}
+                isNonUSDWorkspace={isNonUSDWorkspace}
+                setUSDBankAccountStep={setUSDBankAccountStep}
+                setShouldShowContinueSetupButton={setShouldShowContinueSetupButton}
+                navigateAfterReset={navigateAfterReset}
+                backTo={backTo}
+            />
         </ScreenWrapper>
     );
 }
