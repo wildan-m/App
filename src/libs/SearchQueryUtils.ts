@@ -45,10 +45,23 @@ import type {SearchFullscreenNavigatorParamList} from './Navigation/types';
 import {getDisplayNameOrDefault, getPersonalDetailByEmail} from './PersonalDetailsUtils';
 import {getCleanedTagName} from './PolicyUtils';
 import {getReportName} from './ReportNameUtils';
-import {parse as parseSearchQuery} from './SearchParser/searchParser';
+import {parse as searchParser} from './SearchParser/searchParser';
 import StringUtils from './StringUtils';
 import {hashText} from './UserUtils';
 import {isValidDate} from './ValidationUtils';
+
+/**
+ * Normalize smart punctuation (e.g. iOS smart quotes) to ASCII equivalents before parsing.
+ * iOS keyboards replace ' (U+0027) with ' (U+2019), causing search queries like "merchant: macy's"
+ * to not match stored values that use ASCII apostrophes.
+ */
+function normalizeSearchInput(query: string): string {
+    return query.replaceAll(/[\u2018\u2019]/g, "'");
+}
+
+function parseSearchQuery(query: string): ReturnType<typeof searchParser> {
+    return searchParser(normalizeSearchInput(query));
+}
 
 type FilterKeys = keyof typeof CONST.SEARCH.SYNTAX_FILTER_KEYS;
 
