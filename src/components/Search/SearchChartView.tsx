@@ -49,7 +49,14 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading}: SearchChar
     const ChartComponent = CHART_VIEW_TO_COMPONENT[view];
 
     const handleItemPress = (filterQuery: string) => {
-        const currentQueryString = buildSearchQueryString(queryJSON);
+        const filterKey = filterQuery.match(/^(\w+)/)?.[1];
+        const filteredQueryJSON = filterKey
+            ? {
+                  ...queryJSON,
+                  flatFilters: queryJSON.flatFilters.filter((f) => f.key !== filterKey),
+              }
+            : queryJSON;
+        const currentQueryString = buildSearchQueryString(filteredQueryJSON);
         const newQueryJSON = buildSearchQueryJSON(`${currentQueryString} ${filterQuery}`);
 
         if (!newQueryJSON) {
