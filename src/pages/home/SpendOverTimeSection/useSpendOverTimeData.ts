@@ -1,4 +1,5 @@
 import {useEffect, useEffectEvent} from 'react';
+import type {OnyxCollection} from 'react-native-onyx';
 import type {GroupedItem} from '@components/Search/types';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
@@ -8,6 +9,15 @@ import {search} from '@libs/actions/Search';
 import {getSections, getSortedSections, getSuggestedSearches, isSearchDataLoaded} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {Transaction} from '@src/types/onyx';
+
+const transactionAmountSelector = (transactions: OnyxCollection<Transaction>) => {
+    let sum = 0;
+    for (const t of Object.values(transactions ?? {})) {
+        sum += t?.amount ?? 0;
+    }
+    return sum;
+};
 
 function useSpendOverTimeData() {
     const config = getSuggestedSearches()[CONST.SEARCH.SEARCH_KEYS.SPEND_OVER_TIME];
@@ -20,6 +30,12 @@ function useSpendOverTimeData() {
     const isSearchLoading = !!searchResults?.search?.isLoading;
 
     const {isOffline} = useNetwork();
+
+    // Track a lightweight signal that changes when any transaction amount is modified.
+    // This triggers a re-fetch of chart data when expenses are created, deleted, or edited.
+    const [transactionAmountSignal] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {
+        selector: transactionAmountSelector,
+    });
 
     const fetchData = () => {
         if (!queryJSON || isSearchLoading || isOffline) {
@@ -39,7 +55,7 @@ function useSpendOverTimeData() {
 
     useEffect(() => {
         onConfigChanged();
-    }, [config.hash, isOffline]);
+    }, [config.hash, isOffline, transactionAmountSignal]);
 
     const sortedData =
         searchResults?.data && queryJSON && groupBy && login
