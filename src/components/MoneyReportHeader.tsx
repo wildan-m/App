@@ -2069,7 +2069,7 @@ function MoneyReportHeader({reportID: reportIDProp, shouldDisplayBackButton = fa
                 if (result.action !== ModalActions.CONFIRM) {
                     return;
                 }
-                const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
+                const backToRoute = route.params?.backTo;
                 const deleteNavigateBackUrl = backToRoute ?? Navigation.getActiveRoute();
                 setDeleteTransactionNavigateBackUrl(deleteNavigateBackUrl);
 
@@ -2240,22 +2240,13 @@ function MoneyReportHeader({reportID: reportIDProp, shouldDisplayBackButton = fa
                 return;
             }
             if (transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length) {
-                const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
+                const backToRoute = route.params?.backTo;
                 handleDeleteTransactionsWithNavigation(backToRoute);
             } else {
                 handleDeleteTransactions();
             }
         });
-    }, [
-        showConfirmModal,
-        translate,
-        selectedTransactionIDs.length,
-        transactions,
-        handleDeleteTransactions,
-        handleDeleteTransactionsWithNavigation,
-        route.params?.backTo,
-        chatReport?.reportID,
-    ]);
+    }, [showConfirmModal, translate, selectedTransactionIDs.length, transactions, handleDeleteTransactions, handleDeleteTransactionsWithNavigation, route.params?.backTo]);
 
     const showExportAgainModal = useCallback(() => {
         if (!connectedIntegration) {

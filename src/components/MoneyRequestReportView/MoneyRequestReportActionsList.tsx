@@ -275,14 +275,14 @@ function MoneyRequestReportActionsList({
                 }
                 const shouldNavigateBack = transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length;
                 if (shouldNavigateBack) {
-                    const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
+                    const backToRoute = route.params?.backTo;
                     handleDeleteTransactionsWithNavigation(backToRoute);
                     return;
                 }
                 handleDeleteTransactions();
             });
         },
-        [showConfirmModal, translate, selectedTransactionIDs.length, transactions, route.params?.backTo, chatReport?.reportID],
+        [showConfirmModal, translate, selectedTransactionIDs.length, transactions, route.params?.backTo],
     );
 
     const {options: originalSelectedTransactionsOptions} = useSelectedTransactionsActions({
