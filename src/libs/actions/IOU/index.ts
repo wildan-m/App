@@ -4458,7 +4458,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             pendingFields: clearedPendingFields,
             isLoading: false,
             errorFields: null,
-            routes: null,
+            ...(hasPendingWaypoints ? {routes: null} : {}),
         },
     });
 
@@ -4813,7 +4813,7 @@ function getUpdateTrackExpenseParams(
             pendingFields: clearedPendingFields,
             isLoading: false,
             errorFields: null,
-            routes: null,
+            ...(hasPendingWaypoints ? {routes: null} : {}),
         },
     });
 
