@@ -174,7 +174,10 @@ function PlaidConnectionStep({feed, onExit}: {feed?: CompanyCardFeedWithDomainID
     };
 
     const handlePlaidLinkExit = () => {
-        onExit?.();
+        if (onExit) {
+            onExit();
+            return;
+        }
         handleBackButtonPress();
     };
 

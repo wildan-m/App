@@ -8,7 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {navigateToConciergeChat} from '@libs/actions/Report';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
-import {clearAddNewPersonalCardFlow} from '@userActions/PersonalCards';
+import {clearAddNewPersonalCardFlow, setAddNewPersonalCardStepAndData} from '@userActions/PersonalCards';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
@@ -78,9 +78,13 @@ function AddPersonalNewCardPage() {
                 confirmText={translate('workspace.companyCards.addNewCard.exitModal.confirmText')}
                 cancelText={translate('workspace.companyCards.addNewCard.exitModal.cancelText')}
                 prompt={translate('workspace.companyCards.addNewCard.exitModal.prompt')}
-                onCancel={() => setIsModalVisible(false)}
+                onCancel={() => {
+                    setIsModalVisible(false);
+                    setAddNewPersonalCardStepAndData({step: CONST.PERSONAL_CARDS.STEP.SELECT_COUNTRY});
+                }}
                 onConfirm={() => {
                     setIsModalVisible(false);
+                    setAddNewPersonalCardStepAndData({step: CONST.PERSONAL_CARDS.STEP.SELECT_COUNTRY});
                     navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, false, betas);
                 }}
             />
