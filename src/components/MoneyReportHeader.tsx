@@ -577,11 +577,6 @@ function MoneyReportHeader({reportID: reportIDProp, shouldDisplayBackButton = fa
 
     const beginExportWithTemplate = useCallback(
         (templateName: string, templateType: string, transactionIDList: string[], policyID?: string) => {
-            if (isOffline) {
-                setOfflineModalVisible(true);
-                return;
-            }
-
             if (!moneyRequestReport) {
                 return;
             }
@@ -601,7 +596,7 @@ function MoneyReportHeader({reportID: reportIDProp, shouldDisplayBackButton = fa
                 policyID,
             });
         },
-        [isOffline, moneyRequestReport, showExportProgressModal, clearSelectedTransactions],
+        [moneyRequestReport, showExportProgressModal, clearSelectedTransactions],
     );
 
     const isOnSearch = route.name.toLowerCase().startsWith('search');

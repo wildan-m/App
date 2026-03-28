@@ -239,11 +239,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 setIsDownloadErrorModalVisible(true);
                 return;
             }
-            if (isOffline) {
-                setIsOfflineModalVisible(true);
-                return;
-            }
-
             if (areAllMatchingItemsSelected) {
                 queueExportSearchWithTemplate({
                     templateName,
@@ -277,7 +272,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         },
         [
             selectedReports,
-            isOffline,
             areAllMatchingItemsSelected,
             showConfirmModal,
             translate,
@@ -303,11 +297,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     }, [policies]);
 
     const handleBasicExport = useCallback(async () => {
-        if (isOffline) {
-            setIsOfflineModalVisible(true);
-            return;
-        }
-
         if (status === null || status === undefined) {
             return;
         }
@@ -334,6 +323,11 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             });
             selectAllMatchingItems(false);
             clearSelectedTransactions();
+            return;
+        }
+
+        if (isOffline) {
+            setIsOfflineModalVisible(true);
             return;
         }
 
