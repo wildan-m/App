@@ -132,6 +132,7 @@ import {
     canBeAutoReimbursed,
     canSubmitAndIsAwaitingForCurrentUser,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
+    computeOptimisticReportName,
     findSelfDMReportID,
     generateReportID,
     getAllHeldTransactions as getAllHeldTransactionsReportUtils,
@@ -181,7 +182,6 @@ import {
     isSettled,
     isTestTransactionReport,
     isTrackExpenseReport,
-    populateOptimisticReportFormula,
     prepareOnboardingOnyxData,
     shouldCreateNewMoneyRequestReport as shouldCreateNewMoneyRequestReportReportUtils,
     shouldEnableNegative,
@@ -3185,14 +3185,10 @@ function getDeleteTrackExpenseInformation(
  * to ensure the report title reflects the updated values like {report:reimbursable}.
  */
 function recalculateOptimisticReportName(iouReport: OnyxTypes.Report, policy: OnyxEntry<OnyxTypes.Policy>): string | undefined {
-    if (!policy?.fieldList?.[CONST.POLICY.FIELDS.FIELD_LIST_TITLE]) {
+    if (!policy?.fieldList?.[CONST.POLICY.FIELDS.FIELD_LIST_TITLE]?.defaultValue) {
         return undefined;
     }
-    const titleFormula = policy.fieldList[CONST.POLICY.FIELDS.FIELD_LIST_TITLE]?.defaultValue ?? '';
-    if (!titleFormula) {
-        return undefined;
-    }
-    return populateOptimisticReportFormula(titleFormula, iouReport as Parameters<typeof populateOptimisticReportFormula>[1], policy);
+    return computeOptimisticReportName(iouReport, policy, iouReport.policyID, {}) ?? undefined;
 }
 
 function maybeUpdateReportNameForFormulaTitle(iouReport: OnyxTypes.Report, policy: OnyxEntry<OnyxTypes.Policy>): OnyxTypes.Report {

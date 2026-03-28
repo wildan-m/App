@@ -384,9 +384,9 @@ function computeReportPart(part: FormulaPart, context: FormulaContext): string {
         case 'workspacename':
             return policy?.name ?? '';
         case 'created':
-            // Backend will always return at least one report action (of type created) and its date is equal to report's creation date
-            // We can make it slightly more efficient in the future by ensuring report.created is always present in backend's responses
-            return formatDate(getOldestReportActionDate(report.reportID), format);
+            // Use report action date when available, fall back to report.created for optimistic reports
+            // where report actions haven't been pushed to Onyx yet
+            return formatDate(getOldestReportActionDate(report.reportID) ?? report.created, format);
         case 'submit': {
             return computeSubmitPart(additionalPath, context);
         }
