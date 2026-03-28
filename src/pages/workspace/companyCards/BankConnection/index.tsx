@@ -95,6 +95,13 @@ function BankConnection({policyID: policyIDFromProps, feed, route, title}: BankC
         });
     }, [isBlockedToAddNewFeeds, policyID, feed]);
 
+    useEffect(() => {
+        return () => {
+            customWindow?.close();
+            customWindow = null;
+        };
+    }, []);
+
     const handleBackButtonPress = () => {
         customWindow?.close();
 

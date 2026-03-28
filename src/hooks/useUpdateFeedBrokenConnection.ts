@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {getCompanyCardFeed, getCompanyFeeds, getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
+import {getCardFeedWithDomainID, getCompanyCardFeed, getCompanyFeeds, getDomainOrWorkspaceAccountID} from '@libs/CardUtils';
 import {updateWorkspaceCompanyCard} from '@userActions/CompanyCards';
 import CONST from '@src/CONST';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
@@ -13,12 +13,14 @@ export default function useUpdateFeedBrokenConnection({policyID, feed}: {policyI
     const companyFeeds = getCompanyFeeds(cardFeeds);
     const workspaceAccountID = policy?.workspaceAccountID ?? CONST.DEFAULT_NUMBER_ID;
     const domainOrWorkspaceAccountID = feed ? getDomainOrWorkspaceAccountID(workspaceAccountID, companyFeeds[feed]) : CONST.DEFAULT_NUMBER_ID;
-    const {
-        all: {isFeedConnectionBroken},
-        cardsWithBrokenFeedConnection,
-    } = useCardFeedErrors();
+    const cardFeedErrorsData = useCardFeedErrors();
+    const {cardsWithBrokenFeedConnection} = cardFeedErrorsData;
+    const isFeedConnectionBroken = feed ? (cardFeedErrorsData.cardFeedErrors[feed]?.isFeedConnectionBroken ?? false) : cardFeedErrorsData.all.isFeedConnectionBroken;
 
-    const [brokenCardId, firstCardWithBrokenFeedConnection] = Object.entries(cardsWithBrokenFeedConnection).at(0) ?? [];
+    const feedBrokenCards = feed
+        ? Object.entries(cardsWithBrokenFeedConnection).filter(([, card]) => getCardFeedWithDomainID(card.bank, Number(card.fundID)) === feed)
+        : Object.entries(cardsWithBrokenFeedConnection);
+    const [brokenCardId, firstCardWithBrokenFeedConnection] = feedBrokenCards.at(0) ?? [];
 
     const updateBrokenConnection = useCallback(() => {
         if (!brokenCardId || !feed) {
