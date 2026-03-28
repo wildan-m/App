@@ -11715,9 +11715,8 @@ function prepareOnboardingOnyxData({
     // When posting to admins room and the user is in the suggestedFollowups beta, we skip tasks in favor of backend-generated followups.
     const shouldUseFollowupsInsteadOfTasks = shouldPostTasksInAdminsRoom && Permissions.isBetaEnabled(CONST.BETAS.SUGGESTED_FOLLOWUPS, betas ?? allBetas, betaConfiguration);
     const adminsChatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${adminsChatReportID}`];
-    const targetChatReport = shouldPostTasksInAdminsRoom
-        ? (adminsChatReport ?? {reportID: adminsChatReportID, policyID: onboardingPolicyID})
-        : getChatByParticipants([CONST.ACCOUNT_ID.CONCIERGE, deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID], allReports, false);
+    const conciergeChatReport = getChatByParticipants([CONST.ACCOUNT_ID.CONCIERGE, deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID], allReports, false);
+    const targetChatReport = shouldPostTasksInAdminsRoom && adminsChatReportID ? (adminsChatReport ?? {reportID: adminsChatReportID, policyID: onboardingPolicyID}) : conciergeChatReport;
     const {reportID: targetChatReportID = '', policyID: targetChatPolicyID = ''} = targetChatReport ?? {};
 
     if (!targetChatReportID) {
