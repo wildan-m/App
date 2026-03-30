@@ -1706,6 +1706,10 @@ function shouldShowViolation(
         return isAttendeeTrackingEnabled;
     }
 
+    if (violationName === CONST.VIOLATIONS.SMARTSCAN_FAILED) {
+        return isSubmitter;
+    }
+
     if (violationName === CONST.VIOLATIONS.MISSING_CATEGORY && isCategoryBeingAnalyzed(transaction)) {
         return false;
     }
