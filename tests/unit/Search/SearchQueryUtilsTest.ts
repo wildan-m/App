@@ -307,12 +307,13 @@ describe('SearchQueryUtils', () => {
         });
 
         describe('limit option', () => {
-            test('includes limit in query string when provided', () => {
+            test('includes limit in query string when provided in form values', () => {
                 const filterValues: Partial<SearchAdvancedFiltersForm> = {
                     type: 'expense',
+                    limit: '10',
                 };
 
-                const result = buildQueryStringFromFilterFormValues(filterValues, {limit: 10});
+                const result = buildQueryStringFromFilterFormValues(filterValues);
 
                 expect(result).toEqual('type:expense limit:10');
             });
@@ -321,9 +322,10 @@ describe('SearchQueryUtils', () => {
                 const filterValues: Partial<SearchAdvancedFiltersForm> = {
                     type: 'expense',
                     merchant: 'Amazon',
+                    limit: '25',
                 };
 
-                const result = buildQueryStringFromFilterFormValues(filterValues, {sortBy: 'amount', sortOrder: 'asc', limit: 25});
+                const result = buildQueryStringFromFilterFormValues(filterValues, {sortBy: 'amount', sortOrder: 'asc'});
 
                 expect(result).toEqual('sortBy:amount sortOrder:asc type:expense merchant:Amazon limit:25');
             });
@@ -344,7 +346,7 @@ describe('SearchQueryUtils', () => {
                     limit: '',
                 };
 
-                const result = buildQueryStringFromFilterFormValues(filterValues, {limit: 10});
+                const result = buildQueryStringFromFilterFormValues(filterValues);
 
                 expect(result).not.toContain('limit:');
             });
@@ -412,15 +414,14 @@ describe('SearchQueryUtils', () => {
                 expect(keywordFilter?.filters.at(0)?.value).toBe('hello');
             });
 
-            test('form limit takes priority over options limit', () => {
+            test('omits limit when form value is null (user reset filters)', () => {
                 const filterValues: Partial<SearchAdvancedFiltersForm> = {
                     type: 'expense',
-                    limit: '30',
+                    limit: null as unknown as string,
                 };
 
-                const result = buildQueryStringFromFilterFormValues(filterValues, {limit: 10});
-                expect(result).toContain('limit:30');
-                expect(result).not.toContain('limit:10');
+                const result = buildQueryStringFromFilterFormValues(filterValues);
+                expect(result).not.toContain('limit:');
             });
         });
 

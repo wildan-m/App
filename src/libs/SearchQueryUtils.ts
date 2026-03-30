@@ -604,7 +604,6 @@ function getSanitizedRawFilters(queryJSON: SearchQueryJSON): RawQueryFilter[] | 
 type BuildQueryStringOptions = {
     sortBy?: string;
     sortOrder?: string;
-    limit?: number;
 };
 
 /**
@@ -791,7 +790,7 @@ function buildQueryStringFromFilterFormValues(filterValues: Partial<SearchAdvanc
         filtersString.push(amountFilter);
     }
 
-    const limitValue = limit ?? options?.limit;
+    const limitValue = limit;
     if (limitValue) {
         const num = Number(limitValue);
         if (Number.isInteger(num) && num > 0) {
@@ -1690,7 +1689,7 @@ function shouldResetSortForViewChange({newView, oldView, groupBy}: {newView: str
 function buildFilterQueryWithSortDefaults(
     filterValues: Partial<SearchAdvancedFiltersForm>,
     previousState: {view?: string; groupBy?: string},
-    currentQueryOptions: {sortBy?: string; sortOrder?: string; limit?: number},
+    currentQueryOptions: {sortBy?: string; sortOrder?: string},
 ): string | undefined {
     const resetSort = shouldResetSort({
         newGroupBy: filterValues.groupBy,
@@ -1708,7 +1707,6 @@ function buildFilterQueryWithSortDefaults(
     const queryString = buildQueryStringFromFilterFormValues(filterValues, {
         sortBy: resetSort || resetSortForViewChange ? undefined : currentQueryOptions.sortBy,
         sortOrder: resetSort || resetSortForViewChange ? undefined : currentQueryOptions.sortOrder,
-        limit: currentQueryOptions.limit,
     });
 
     if (!resetSort && !resetSortForViewChange) {
