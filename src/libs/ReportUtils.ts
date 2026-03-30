@@ -6760,8 +6760,15 @@ function computeOptimisticReportName(report: Report, policy: OnyxEntry<Policy>, 
     }
 
     const titleReportField = getTitleReportField(getReportFieldsByPolicyID(policyID) ?? {});
+
+    // For formula-type title fields, don't resolve with optimistic totals — the server
+    // is the source of truth for formula computation. Zero out amount fields so that
+    // tokens like {report:total} resolve to $0.00 instead of the unconfirmed amount.
+    const reportForFormula =
+        titleReportField?.type === CONST.REPORT_FIELD_TYPES.FORMULA ? {...report, total: 0, nonReimbursableTotal: 0, unheldTotal: 0, unheldNonReimbursableTotal: 0} : report;
+
     const formulaContext: FormulaContext = {
-        report,
+        report: reportForFormula,
         policy,
         allTransactions: reportTransactions,
     };
