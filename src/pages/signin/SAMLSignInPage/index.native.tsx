@@ -11,7 +11,7 @@ import getPlatform from '@libs/getPlatform';
 import Log from '@libs/Log';
 import {handleSAMLLoginError, postSAMLLogin} from '@libs/LoginUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {clearSignInData, setAccountError, signInWithShortLivedAuthToken} from '@userActions/Session';
+import {clearSignInData, setAccountError, setIsAuthenticatingWithShortLivedToken, signInWithShortLivedAuthToken} from '@userActions/Session';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -60,6 +60,7 @@ function SAMLSignInPage() {
                 return;
             }
 
+            setIsAuthenticatingWithShortLivedToken(false);
             clearSignInData();
             setAccountError(translate('common.error.login'));
             Navigation.isNavigationReady().then(() => {
@@ -77,15 +78,22 @@ function SAMLSignInPage() {
             return;
         }
         hasOpenedAuthSession.current = true;
+
+        // Set the flag before opening the in-app browser to prevent reconnection-triggered
+        // reauthentication from racing with the SAML callback when the app resumes.
+        setIsAuthenticatingWithShortLivedToken(true);
+
         openAuthSessionAsync(SAMLUrl, CONST.SAML_REDIRECT_URL)
             .then((response: WebBrowserAuthSessionResult) => {
                 if (response.type !== 'success') {
+                    setIsAuthenticatingWithShortLivedToken(false);
                     Navigation.goBack();
                     return;
                 }
                 handleNavigationStateChange(response.url);
             })
             .catch((error) => {
+                setIsAuthenticatingWithShortLivedToken(false);
                 Log.hmmm('SAML sign in failed', {error});
                 Navigation.goBack();
             });
