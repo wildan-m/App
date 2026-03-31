@@ -660,7 +660,12 @@ function isCreatedMissing(transaction: OnyxEntry<Transaction>) {
 
 function areRequiredFieldsEmpty(transaction: OnyxEntry<Transaction>, transactionReport: OnyxEntry<Report>): boolean {
     const isFromExpenseReport = transactionReport?.type === CONST.REPORT.TYPE.EXPENSE;
-    return (isFromExpenseReport && isMerchantMissing(transaction)) || isCreatedMissing(transaction) || isAmountMissing(transaction) || (!isFromExpenseReport && getAmount(transaction) === 0);
+    return (
+        (isFromExpenseReport && isMerchantMissing(transaction)) ||
+        isCreatedMissing(transaction) ||
+        isAmountMissing(transaction) ||
+        (!isFromExpenseReport && getAmount(transaction) === 0 && !hasValidModifiedAmount(transaction))
+    );
 }
 
 function getClearedPendingFields(transactionChanges: TransactionChanges) {
