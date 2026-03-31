@@ -395,17 +395,17 @@ function IOURequestStepAmount({
             return;
         }
 
-        // If the value hasn't changed, don't request to save changes on the server and just close the modal
+        // If the value hasn't changed, don't request to save changes on the server and just close the modal.
+        // Exception: when a receipt scan failed and the user hasn't yet confirmed the amount (modifiedAmount not set),
+        // always process the save so that modifiedAmount gets set and receipt.state changes from SCANFAILED to OPEN,
+        // which durably clears the "missing amount" error even across server reconnections.
         const transactionCurrency = getCurrency(currentTransaction);
-        if (newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) && selectedCurrency === transactionCurrency) {
-            // When a receipt scan failed and the user hasn't yet confirmed the amount, mark the amount
-            // as user-confirmed by setting modifiedAmount. This clears the "missing amount" error.
-            // We intentionally use local Onyx merge instead of the API to avoid creating an unnecessary
-            // "changed the amount to $0.00 (previously $0.00)" report action when the value hasn't changed.
-            const hasSmartScanFailed = hasReceipt(currentTransaction) && currentTransaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
-            if (hasSmartScanFailed && !hasValidModifiedAmount(currentTransaction)) {
-                setTransactionReport(transactionID, {modifiedAmount: newAmount}, false);
-            }
+        const hasSmartScanFailed = hasReceipt(currentTransaction) && currentTransaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
+        if (
+            newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) &&
+            selectedCurrency === transactionCurrency &&
+            !(hasSmartScanFailed && !hasValidModifiedAmount(currentTransaction))
+        ) {
             navigateBack();
             return;
         }
