@@ -395,16 +395,16 @@ function IOURequestStepAmount({
             return;
         }
 
-        // If the value hasn't changed, don't request to save changes on the server and just close the modal
+        // If the value hasn't changed, don't request to save changes on the server and just close the modal.
+        // Exception: when a receipt scan failed and the user hasn't yet confirmed the amount (modifiedAmount not set),
+        // always process the save so that modifiedAmount gets set server-side and the "missing amount" error clears.
         const transactionCurrency = getCurrency(currentTransaction);
-        if (newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) && selectedCurrency === transactionCurrency) {
-            // When a receipt scan failed and the user hasn't yet confirmed the amount, mark the amount
-            // as user-confirmed by setting modifiedAmount. This clears the "missing amount" error
-            // without making an unnecessary API call (the actual amount hasn't changed).
-            const hasSmartScanFailed = hasReceipt(currentTransaction) && currentTransaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
-            if (hasSmartScanFailed && !hasValidModifiedAmount(currentTransaction)) {
-                setTransactionReport(transactionID, {modifiedAmount: newAmount}, false);
-            }
+        const hasSmartScanFailed = hasReceipt(currentTransaction) && currentTransaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
+        if (
+            newAmount === getAmount(currentTransaction, false, false, allowNegative, disableOppositeConversion) &&
+            selectedCurrency === transactionCurrency &&
+            !(hasSmartScanFailed && !hasValidModifiedAmount(currentTransaction))
+        ) {
             navigateBack();
             return;
         }
