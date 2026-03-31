@@ -87,6 +87,9 @@ target 'NewExpensify' do
   # Flags change depending on the env values.
   flags = get_default_flags()
 
+  # ENV Variable enables Hermes V1
+  ENV['RCT_HERMES_V1_ENABLED'] = '1'
+
   # ENV Variable enables/disables TurboModules
   ENV['RCT_NEW_ARCH_ENABLED'] = '1';
 
