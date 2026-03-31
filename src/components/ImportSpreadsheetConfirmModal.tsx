@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -23,6 +23,7 @@ function ImportSpreadsheetConfirmModal({isVisible, closeImportPageAndModal, onMo
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const [spreadsheet] = useOnyx(ONYXKEYS.IMPORTED_SPREADSHEET);
+    const isShowingModalRef = useRef(false);
 
     const titleText = spreadsheet?.importFinalModal?.titleKey ? translate(spreadsheet.importFinalModal.titleKey) : '';
     const promptText = spreadsheet?.importFinalModal?.promptKey
@@ -31,8 +32,13 @@ function ImportSpreadsheetConfirmModal({isVisible, closeImportPageAndModal, onMo
 
     useEffect(() => {
         if (!isVisible || !titleText || !promptText || !spreadsheet?.importFinalModal) {
+            isShowingModalRef.current = false;
             return;
         }
+        if (isShowingModalRef.current) {
+            return;
+        }
+        isShowingModalRef.current = true;
         showConfirmModal({
             title: titleText,
             prompt: promptText,
