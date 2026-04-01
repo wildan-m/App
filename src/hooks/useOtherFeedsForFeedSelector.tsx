@@ -50,6 +50,9 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
                 if (feed?.linkedPolicyIDs?.includes(policyID)) {
                     continue;
                 }
+                if (!feed?.linkedPolicyIDs && feedPolicyID === policyID) {
+                    continue;
+                }
                 const feedName = feed.feed;
                 const plaidUrl = getPlaidInstitutionIconUrl(feedName);
                 const domain = allDomains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${feed.fundID}`];
