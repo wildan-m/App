@@ -698,6 +698,30 @@ function mergeTransactionRequest({
                     [targetIOUAction.reportActionID]: targetIOUAction,
                 },
             });
+
+            // Re-parent the target transaction's thread report to the new IOU action so that
+            // post-merge navigation (especially from search RHP) resolves a valid data chain.
+            const targetTransactionThreadID = targetIOUAction.childReportID;
+            if (targetTransactionThreadID) {
+                newIOUAction.childReportID = targetTransactionThreadID;
+                optimisticData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT}${targetTransactionThreadID}`,
+                    value: {
+                        parentReportID: mergeTransaction.reportID,
+                        parentReportActionID: newIOUAction.reportActionID,
+                    },
+                });
+
+                failureData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT}${targetTransactionThreadID}`,
+                    value: {
+                        parentReportID: targetTransaction.reportID,
+                        parentReportActionID: targetIOUAction.reportActionID,
+                    },
+                });
+            }
         }
 
         params.createdIOUReportActionID = newIOUAction.reportActionID;
