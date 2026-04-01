@@ -1,4 +1,5 @@
 import {useNavigationState} from '@react-navigation/native';
+import {defaultExpensifyCardSelector} from '@selectors/Card';
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 // We need direct access to useOnyx from react-native-onyx to avoid circular dependencies in SearchContext
 // eslint-disable-next-line no-restricted-imports
@@ -111,9 +112,10 @@ function SearchContextProvider({children}: SearchContextProps) {
     const todoSearchResultsData = useTodos();
     const [snapshotSearchResults] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${currentSearchHash}`);
 
+    const [defaultExpensifyCard] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST, {selector: defaultExpensifyCardSelector});
     const {defaultCardFeed} = useCardFeedsForDisplay();
     const {accountID} = useCurrentUserPersonalDetails();
-    const defaultCardFeedID = defaultCardFeed?.id;
+    const defaultCardFeedID = (defaultCardFeed ?? defaultExpensifyCard)?.id;
     const suggestedSearches = useMemo(() => getSuggestedSearches(accountID, defaultCardFeedID), [accountID, defaultCardFeedID]);
 
     const currentSearchKey = useMemo(() => {
