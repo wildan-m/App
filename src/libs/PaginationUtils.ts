@@ -222,13 +222,34 @@ function getContinuousChain<TResource>(sortedItems: TResource[], pages: Pages, g
 
         const linkedPage = pagesWithIndexes.find((pageIndex) => index >= pageIndex.firstIndex && index <= pageIndex.lastIndex);
 
-        // If we are linked to an action in a gap return it by itself
+        // If we are linked to an action in a gap, fall back to the first page so that
+        // newly delivered actions (e.g. via Pusher) and the linked action are both visible.
         if (!linkedPage && resourceItem) {
+            const firstPage = pagesWithIndexes.at(0);
+            if (firstPage) {
+                // Include everything from the start of the first page to the linked item
+                const endIndex = Math.max(firstPage.lastIndex, index);
+                return {
+                    data: sortedItems.slice(firstPage.firstIndex, endIndex + 1),
+                    hasNextPage: endIndex < sortedItems.length - 1,
+                    hasPreviousPage: firstPage.firstID !== CONST.PAGINATION_START_ID,
+                    resourceItem,
+                };
+            }
             return {data: [resourceItem.item], hasNextPage: false, hasPreviousPage: false, resourceItem};
         }
 
         if (linkedPage) {
-            page = linkedPage;
+            // When no page has the start boundary marker (PAGINATION_START_ID was stripped by a
+            // cursor-based fetch), items at the beginning of sortedItems (e.g. Pusher-delivered
+            // actions) fall outside all pages. Extend the result to include them so that newly
+            // delivered actions are visible when deep-linking to a specific action.
+            const hasStartBoundary = pagesWithIndexes.some((p) => p.firstID === CONST.PAGINATION_START_ID);
+            if (!hasStartBoundary && linkedPage.firstIndex > 0) {
+                page = {...linkedPage, firstIndex: 0, firstID: CONST.PAGINATION_START_ID};
+            } else {
+                page = linkedPage;
+            }
         }
     } else {
         // If we did not find an item with the resource id, we want to link to the first page
