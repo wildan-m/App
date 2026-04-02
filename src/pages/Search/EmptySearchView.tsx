@@ -190,6 +190,7 @@ function EmptySearchViewContent({
         policyID: defaultChatEnabledPolicyID,
         policyName: defaultChatEnabledPolicy?.name ?? '',
         onConfirm: handleCreateWorkspaceReport,
+        shouldHandleNavigationBack: false,
     });
 
     const handleCreateReportClick = () => {
