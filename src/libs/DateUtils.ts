@@ -810,7 +810,9 @@ function getFormattedTransportDateAndHour(date: Date): {date: string; hour: stri
  * 1. When the date refers to the current year: Wednesday, Mar 17 8:00 AM
  * 2. When the date refers not to the current year: Wednesday, Mar 17, 2023 8:00 AM
  */
-function getFormattedCancellationDate(date: Date): string {
+function getFormattedCancellationDate(dateTimeISO: string): string {
+    // Strip timezone offset so the booking-local date/time components are preserved as-is.
+    const date = new Date(dateTimeISO.replace(/([+-]\d{2}(:\d{2})?|Z)$/, ''));
     if (isThisYear(date)) {
         return format(date, 'EEEE, MMM d h:mm a');
     }
