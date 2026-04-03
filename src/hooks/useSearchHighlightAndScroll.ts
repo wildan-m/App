@@ -178,7 +178,36 @@ function useSearchHighlightAndScroll({
         initializedRef.current = true;
     }, [searchResultsData, isChat]);
 
-    // Detect new items (transactions or report actions)
+    // Handle manual highlights (from transactionIDsToHighlight) independently of search result diffs.
+    // This runs whenever transactionIDsToHighlight or searchResultsData changes, without requiring
+    // previousSearchResults to differ — ensuring highlights fire even when a new Search screen mounts
+    // with the same cached snapshot (where usePrevious initializes to the current value).
+    useEffect(() => {
+        if (isChat || isEmptyObject(transactionIDsToHighlight) || !searchResultsData) {
+            return;
+        }
+
+        const currentTransactionIDs = extractTransactionIDsFromSearchResults(searchResultsData);
+        const currentIDsSet = new Set(currentTransactionIDs);
+
+        const matchingIDs = Object.keys(transactionIDsToHighlight).filter(
+            (id) => transactionIDsToHighlight[id] && currentIDsSet.has(id) && !highlightedIDs.current.has(`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`),
+        );
+
+        if (matchingIDs.length === 0) {
+            return;
+        }
+
+        const newKeys = new Set<string>();
+        for (const id of matchingIDs) {
+            const newTransactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${id}`;
+            highlightedIDs.current.add(newTransactionKey);
+            newKeys.add(newTransactionKey);
+        }
+        setNewSearchResultKeys(newKeys);
+    }, [transactionIDsToHighlight, searchResultsData, isChat]);
+
+    // Detect new items (transactions or report actions) via search result diffs
     useEffect(() => {
         if (!previousSearchResults || !searchResults?.data) {
             return;
@@ -204,13 +233,9 @@ function useSearchHighlightAndScroll({
         } else {
             const previousTransactionIDs = extractTransactionIDsFromSearchResults(previousSearchResults);
             const currentTransactionIDs = extractTransactionIDsFromSearchResults(searchResults.data);
-            const manualHighlightTransactionIDs = new Set(Object.keys(transactionIDsToHighlight ?? {}).filter((id) => !!transactionIDsToHighlight?.[id]));
 
             // Find new transaction IDs that are not in the previousTransactionIDs and not already highlighted
             const newTransactionIDs = currentTransactionIDs.filter((id) => {
-                if (manualHighlightTransactionIDs.has(id)) {
-                    return true;
-                }
                 if (!triggeredByHookRef.current || !hasNewItemsRef.current) {
                     return false;
                 }
@@ -229,7 +254,7 @@ function useSearchHighlightAndScroll({
             }
             setNewSearchResultKeys(newKeys);
         }
-    }, [searchResults?.data, previousSearchResults, isChat, transactionIDsToHighlight]);
+    }, [searchResults?.data, previousSearchResults, isChat]);
 
     // Reset transactionIDsToHighlight after they have been highlighted
     useEffect(() => {
