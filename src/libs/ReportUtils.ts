@@ -13174,7 +13174,7 @@ function buildOptimisticReportLevelRejectCommentAction(
             {
                 type: CONST.REPORT.MESSAGE.TYPE.COMMENT,
                 text: comment,
-                html: comment,
+                html: getParsedComment(comment),
             },
         ],
         person: [

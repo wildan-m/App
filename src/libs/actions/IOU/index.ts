@@ -13961,7 +13961,7 @@ function rejectExpenseReport(
     const parameters: RejectExpenseReportParams = {
         reportID,
         targetAccountID,
-        comment,
+        comment: getParsedComment(comment),
         rejectedActionReportActionID: optimisticRejectAction.reportActionID,
         rejectedCommentReportActionID: optimisticCommentAction.reportActionID,
     };
