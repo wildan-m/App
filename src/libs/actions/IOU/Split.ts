@@ -2068,6 +2068,7 @@ function updateSplitTransactions({
         const originalTransactionThreadReportID = splits.at(0)?.transactionThreadReportID;
         const iouActionReportActionID = splits.at(0)?.splitReportActionID;
         if (splitThreadComments.length > 0 && originalTransactionThreadReportID && splitTransactionThreadReportID && iouActionReportActionID && expenseReportID) {
+            const originalIouAction = getAllReportActions(expenseReportID)?.[iouActionReportActionID];
             const optimisticMovedComments: Record<string, OnyxTypes.ReportAction> = {};
             const optimisticRemovedComments: Record<string, null> = {};
             const successMovedComments: OnyxCollection<NullishDeep<OnyxTypes.ReportAction>> = {};
@@ -2143,10 +2144,10 @@ function updateSplitTransactions({
                     key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReportID}`,
                     value: {
                         [iouActionReportActionID]: {
-                            childVisibleActionCount: 0,
-                            childCommenterCount: 0,
-                            childLastVisibleActionCreated: '',
-                            childOldestFourAccountIDs: '',
+                            childVisibleActionCount: originalIouAction?.childVisibleActionCount ?? 0,
+                            childCommenterCount: originalIouAction?.childCommenterCount ?? 0,
+                            childLastVisibleActionCreated: originalIouAction?.childLastVisibleActionCreated ?? '',
+                            childOldestFourAccountIDs: originalIouAction?.childOldestFourAccountIDs ?? '',
                         },
                     },
                 },
