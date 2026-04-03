@@ -21,6 +21,7 @@ import usePermissions from '@hooks/usePermissions';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {createNewReport} from '@libs/actions/Report';
+import isHomeTopmostFullScreenRoute from '@libs/Navigation/helpers/isHomeTopmostFullScreenRoute';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import setNavigationActionToMicrotaskQueue from '@libs/Navigation/helpers/setNavigationActionToMicrotaskQueue';
 import Navigation from '@libs/Navigation/Navigation';
@@ -99,10 +100,15 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
         }
 
         Navigation.setNavigationActionToMicrotaskQueue(() => {
-            Navigation.navigate(
-                isSearchTopmostFullScreenRoute() ? ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: optimisticReportID}) : ROUTES.REPORT_WITH_ID.getRoute(optimisticReportID),
-                {forceReplace: isRHPOnReportInSearch || shouldUseNarrowLayout},
-            );
+            let reportRoute;
+            if (isSearchTopmostFullScreenRoute()) {
+                reportRoute = ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: optimisticReportID});
+            } else if (isHomeTopmostFullScreenRoute()) {
+                reportRoute = ROUTES.EXPENSE_REPORT_RHP.getRoute({reportID: optimisticReportID, backTo: Navigation.getActiveRoute()});
+            } else {
+                reportRoute = ROUTES.REPORT_WITH_ID.getRoute(optimisticReportID);
+            }
+            Navigation.navigate(reportRoute, {forceReplace: isRHPOnReportInSearch || shouldUseNarrowLayout});
         });
     };
 
