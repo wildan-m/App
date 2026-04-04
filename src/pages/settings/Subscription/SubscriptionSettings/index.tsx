@@ -242,8 +242,8 @@ function SubscriptionSettings() {
                         <Text style={styles.mv1}>{translate('subscription.yourPlan.pricePerMemberPerMonth', collectPriceDisplay)}</Text>
                         <View style={[styles.mt5, styles.mb5]}>
                             <OptionItem
-                                title="subscription.details.payPerUse"
-                                icon={illustrations.SubscriptionPPU}
+                                title={isAnnual ? 'subscription.details.annual' : 'subscription.details.payPerUse'}
+                                icon={isAnnual ? illustrations.SubscriptionAnnual : illustrations.SubscriptionPPU}
                                 style={styles.flex0}
                                 isSelected
                                 isDisabled
@@ -279,39 +279,37 @@ function SubscriptionSettings() {
                                     onOptionSelected={onOptionSelected}
                                     style={styles.mt5}
                                 />
-                                {subscriptionSizeSection}
                             </OfflineWithFeedback>
                         )}
-                        {isAnnual ? (
-                            <>
-                                <OfflineWithFeedback pendingAction={privateSubscription?.pendingFields?.autoRenew}>
-                                    <View style={styles.mt5}>
-                                        <ToggleSettingOptionRow
-                                            title={translate('subscription.subscriptionSettings.autoRenew')}
-                                            switchAccessibilityLabel={translate('subscription.subscriptionSettings.autoRenew')}
-                                            onToggle={handleAutoRenewToggle}
-                                            isActive={privateSubscription?.autoRenew}
-                                        />
-                                        {!!autoRenewalDate && (
-                                            <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('subscription.subscriptionSettings.renewsOn', autoRenewalDate)}</Text>
-                                        )}
-                                    </View>
-                                </OfflineWithFeedback>
-                                <OfflineWithFeedback pendingAction={privateSubscription?.pendingFields?.addNewUsersAutomatically}>
-                                    <View style={styles.mt3}>
-                                        <ToggleSettingOptionRow
-                                            customTitle={customTitle}
-                                            switchAccessibilityLabel={translate('subscription.subscriptionSettings.autoRenew')}
-                                            onToggle={handleAutoIncreaseToggle}
-                                            isActive={privateSubscription?.addNewUsersAutomatically ?? false}
-                                        />
-                                        <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('subscription.subscriptionSettings.automaticallyIncrease')}</Text>
-                                    </View>
-                                </OfflineWithFeedback>
-                            </>
-                        ) : null}
                     </>
                 )}
+                {subscriptionSizeSection}
+                {isAnnual ? (
+                    <>
+                        <OfflineWithFeedback pendingAction={privateSubscription?.pendingFields?.autoRenew}>
+                            <View style={styles.mt5}>
+                                <ToggleSettingOptionRow
+                                    title={translate('subscription.subscriptionSettings.autoRenew')}
+                                    switchAccessibilityLabel={translate('subscription.subscriptionSettings.autoRenew')}
+                                    onToggle={handleAutoRenewToggle}
+                                    isActive={privateSubscription?.autoRenew}
+                                />
+                                {!!autoRenewalDate && <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('subscription.subscriptionSettings.renewsOn', autoRenewalDate)}</Text>}
+                            </View>
+                        </OfflineWithFeedback>
+                        <OfflineWithFeedback pendingAction={privateSubscription?.pendingFields?.addNewUsersAutomatically}>
+                            <View style={styles.mt3}>
+                                <ToggleSettingOptionRow
+                                    customTitle={customTitle}
+                                    switchAccessibilityLabel={translate('subscription.subscriptionSettings.autoRenew')}
+                                    onToggle={handleAutoIncreaseToggle}
+                                    isActive={privateSubscription?.addNewUsersAutomatically ?? false}
+                                />
+                                <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('subscription.subscriptionSettings.automaticallyIncrease')}</Text>
+                            </View>
+                        </OfflineWithFeedback>
+                    </>
+                ) : null}
                 {shouldShowExpensifyCodeSection && (
                     <MenuItemWithTopDescription
                         description={translate('subscription.expensifyCode.title')}
