@@ -1743,7 +1743,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
             value: {
                 ...chat.report,
                 lastReadTime: DateUtils.getDBTime(),
-                ...(shouldCreateNewMoneyRequestReport ? {lastVisibleActionCreated: chat.reportPreviewAction.created} : {}),
+                lastVisibleActionCreated: shouldCreateNewMoneyRequestReport ? chat.reportPreviewAction.created : iou.action.created,
                 // do not update iouReportID if auto submit beta is enabled and it is a scan request
                 ...(isASAPSubmitBetaEnabled && isScanRequest ? {} : {iouReportID: iou.report.reportID}),
                 ...outstandingChildRequest,

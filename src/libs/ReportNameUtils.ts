@@ -370,7 +370,7 @@ function getMoneyRequestReportName({report, policy, invoiceReceiverPolicy}: {rep
         }
     }
 
-    if (report?.reportName && isExpenseReport(report)) {
+    if (report?.reportName && isExpenseReport(report) && !report?.pendingFields?.preview) {
         return report.reportName;
     }
 
@@ -893,7 +893,7 @@ function computeReportName({
         return parentReportActionBasedName;
     }
 
-    if (report?.reportName && report.type === CONST.REPORT.TYPE.EXPENSE) {
+    if (report?.reportName && report.type === CONST.REPORT.TYPE.EXPENSE && !report?.pendingFields?.preview) {
         return report?.reportName;
     }
 
