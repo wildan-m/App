@@ -1148,8 +1148,7 @@ function shouldReportActionBeVisible(
     if (actionName === CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION) {
         const unreportedTransactionOriginalMessage = getOriginalMessage(reportAction as OnyxEntry<ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION>>) ?? {};
         const {fromReportID} = unreportedTransactionOriginalMessage as OriginalMessageUnreportedTransaction;
-        const fromReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`];
-        return !!fromReport;
+        return !!fromReportID && fromReportID !== CONST.REPORT.UNREPORTED_REPORT_ID;
     }
 
     if (isMovedTransactionAction(reportAction)) {

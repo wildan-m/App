@@ -1,7 +1,6 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import {isActionableWhisperRequiringWritePermission, isConciergeCategoryOptions, isMovedTransactionAction, shouldReportActionBeVisible} from '@libs/ReportActionsUtils';
 import createOnyxDerivedValueConfig from '@userActions/OnyxDerived/createOnyxDerivedValueConfig';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction, ReportActions} from '@src/types/onyx';
 import type {VisibleReportActionsDerivedValue} from '@src/types/onyx/DerivedValues';
@@ -18,10 +17,7 @@ function getOrCreateReportVisibilityRecord(result: VisibleReportActionsDerivedVa
 }
 
 function doesActionDependOnReportExistence(action: ReportAction): boolean {
-    const isUnreportedTransaction = action.actionName === CONST.REPORT.ACTIONS.TYPE.UNREPORTED_TRANSACTION;
-    const isMovedTransaction = isMovedTransactionAction(action as OnyxEntry<ReportAction>);
-
-    return isUnreportedTransaction || isMovedTransaction;
+    return isMovedTransactionAction(action as OnyxEntry<ReportAction>);
 }
 
 /**
