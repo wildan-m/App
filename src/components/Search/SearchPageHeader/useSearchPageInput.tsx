@@ -125,7 +125,7 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
         Navigation.navigate(
             ROUTES.SEARCH_ROOT.getRoute({
                 query: updatedQuery,
-                rawQuery: queryWithSubstitutions,
+                rawQuery: shouldSkipAmountConversion ? undefined : queryWithSubstitutions,
             }),
         );
         onSubmit();
