@@ -24,6 +24,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getBankName} from '@libs/CardUtils';
 import {isCategoryMissing} from '@libs/CategoryUtils';
 import getBase62ReportID from '@libs/getBase62ReportID';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
@@ -53,6 +54,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type {PersonalDetails, Policy, Report, ReportAction, TransactionViolation} from '@src/types/onyx';
+import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
 import type {SearchTransactionAction} from '@src/types/onyx/SearchResults';
 import CategoryCell from './DataCells/CategoryCell';
 import ChatBubbleCell from './DataCells/ChatBubbleCell';
@@ -267,7 +269,17 @@ function TransactionItemRow({
         if (cardID && customCardNames?.[cardID]) {
             return customCardNames[cardID];
         }
-        return transactionItem.cardName;
+        const rawCardName = transactionItem.cardName;
+        if (rawCardName) {
+            const resolvedBankName = getBankName(rawCardName as CardFeedWithNumber);
+            if (resolvedBankName) {
+                return resolvedBankName;
+            }
+            if (rawCardName.includes(':')) {
+                return translate('cardTransactions.companyCard');
+            }
+        }
+        return rawCardName;
     }, [transactionItem.cardID, transactionItem.cardName, transactionItem.isCardFeedDeleted, customCardNames, translate]);
 
     const transactionAttendees = useMemo(() => getAttendees(transactionItem, currentUserPersonalDetails), [transactionItem, currentUserPersonalDetails]);
