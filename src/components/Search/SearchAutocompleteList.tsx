@@ -404,7 +404,7 @@ function SearchAutocompleteList({
             } as AutocompleteListItem;
         });
 
-        if (areOptionsInitialized) {
+        if (areOptionsInitialized || nextStyledRecentReports.length > 0) {
             pushSection({
                 title: autocompleteQueryValue.trim() === '' ? translate('search.recentChats') : undefined,
                 data: nextStyledRecentReports,
