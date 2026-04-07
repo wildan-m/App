@@ -283,7 +283,7 @@ function shouldDisplayReportInLHN(
         requiresAttention ||
         (report.isOwnPolicyExpenseChat && !isReportArchived);
 
-    if (isHidden && !shouldOverrideHidden) {
+    if (isHidden && !shouldOverrideHidden && !isReportArchived) {
         return {shouldDisplay: false};
     }
 
