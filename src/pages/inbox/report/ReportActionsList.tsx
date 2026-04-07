@@ -258,8 +258,10 @@ function ReportActionsList({
      * - reads a new message as it is received
      */
     const [unreadMarkerTime, setUnreadMarkerTime] = useState(reportLastReadTime);
+    const wasInitializedWithEmptyLastReadTime = useRef(!reportLastReadTime);
     useEffect(() => {
         setUnreadMarkerTime(reportLastReadTime);
+        wasInitializedWithEmptyLastReadTime.current = !reportLastReadTime;
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [report.reportID]);
@@ -342,6 +344,21 @@ function ReportActionsList({
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lastAction?.created]);
+
+    // Fix initialization race after sign-in: when the component mounts before report data is fully loaded,
+    // reportLastReadTime is empty and unreadMarkerTime is initialized to ''. This causes all actions to appear
+    // unread, flashing the marker at the beginning of the chat. When reportLastReadTime later arrives, correct
+    // unreadMarkerTime before the browser paints. Uses a ref guard instead of checking unreadMarkerTime === ''
+    // because the useLayoutEffect above may have already pushed unreadMarkerTime forward.
+    useLayoutEffect(() => {
+        if (!wasInitializedWithEmptyLastReadTime.current || !reportLastReadTime) {
+            return;
+        }
+
+        setUnreadMarkerTime(reportLastReadTime);
+        wasInitializedWithEmptyLastReadTime.current = false;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportLastReadTime]);
 
     const lastVisibleActionCreated = getReportLastVisibleActionCreated(report, transactionThreadReport);
     const hasNewestReportAction = lastAction?.created === lastVisibleActionCreated || isReportPreviewAction(lastAction);
