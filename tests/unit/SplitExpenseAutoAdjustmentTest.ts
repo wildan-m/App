@@ -127,6 +127,14 @@ describe('Split Expense Auto-Adjustment', () => {
             expect(split1?.amount).toBe(300);
             expect(split1?.isManuallyEdited).toBe(true);
 
+            // Verify split 2 (unedited) and the new split share the remaining 700 evenly
+            const split2 = splitExpenses.find((s) => s.transactionID === 'split2');
+            expect(split2?.amount).toBe(350);
+            expect(split2?.isManuallyEdited).toBe(false);
+            const newSplit = splitExpenses.find((s) => s.transactionID !== 'split1' && s.transactionID !== 'split2');
+            expect(newSplit?.amount).toBe(350);
+            expect(newSplit?.isManuallyEdited).toBe(false);
+
             // Verify total matches
             const totalAmount = splitExpenses.reduce((sum, split) => sum + split.amount, 0);
             expect(totalAmount).toBe(TOTAL_AMOUNT);
