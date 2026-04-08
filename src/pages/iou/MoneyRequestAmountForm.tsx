@@ -126,10 +126,12 @@ function MoneyRequestAmountForm({
 
     const initializeAmount = useCallback(
         (newAmount: number) => {
-            const frontendAmount = newAmount ? onFormatAmount(newAmount, currency) : '';
+            // When editing, always render the existing amount (including 0) so the user can confirm or change it.
+            // The empty-string fallback is for new-expense flows where 0 means "no input yet".
+            const frontendAmount = newAmount || isEditing ? onFormatAmount(newAmount, currency) : '';
             moneyRequestAmountInputRef.current?.updateNumber(frontendAmount);
         },
-        [currency, onFormatAmount],
+        [currency, onFormatAmount, isEditing],
     );
 
     const toggleNegative = useCallback(() => {
