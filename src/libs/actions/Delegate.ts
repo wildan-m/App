@@ -282,24 +282,25 @@ function disconnect({stashedCredentials, stashedSession}: DisconnectParams) {
             const authToken = response.authToken;
             return SequentialQueue.waitForIdle()
                 .then(() => {
-                    return Promise.all([
-                        Onyx.set(ONYXKEYS.SESSION, {
-                            ...stashedSession,
-                            accountID: response.requesterID,
-                            email: requesterEmail,
-                            authToken,
-                            encryptedAuthToken: response.encryptedAuthToken,
-                        }),
-                        Onyx.merge(ONYXKEYS.ACCOUNT, {
-                            primaryLogin: requesterEmail,
-                        }),
-                    ]);
+                    return Onyx.set(ONYXKEYS.SESSION, {
+                        ...stashedSession,
+                        accountID: response.requesterID,
+                        email: requesterEmail,
+                        authToken,
+                        encryptedAuthToken: response.encryptedAuthToken,
+                    });
                 })
                 .then(() => {
                     NetworkStore.setAuthToken(response?.authToken ?? null);
                     return Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS);
                 })
                 .then(() => {
+                    // Re-populate primaryLogin after Onyx.clear wipes ONYXKEYS.ACCOUNT, so that
+                    // screens reading account.primaryLogin (e.g. magic code pages) show the correct
+                    // email immediately without waiting for the async openApp() response below.
+                    Onyx.merge(ONYXKEYS.ACCOUNT, {
+                        primaryLogin: requesterEmail,
+                    });
                     Onyx.set(ONYXKEYS.CREDENTIALS, {
                         ...stashedCredentials,
                         accountID: response.requesterID,
