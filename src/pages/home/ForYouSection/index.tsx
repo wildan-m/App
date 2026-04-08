@@ -43,7 +43,7 @@ function ForYouSection() {
         (action: string, queryParams: Record<string, unknown>, reportID?: string) => () => {
             if (reportID) {
                 if (shouldUseNarrowLayout) {
-                    Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID, undefined, undefined, ROUTES.HOME));
+                    Navigation.navigate(ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID, backTo: ROUTES.HOME}));
                 } else {
                     Navigation.navigate(ROUTES.EXPENSE_REPORT_RHP.getRoute({reportID, backTo: ROUTES.HOME}));
                 }
