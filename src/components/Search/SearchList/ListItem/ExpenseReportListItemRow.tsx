@@ -252,22 +252,31 @@ function ExpenseReportListItemRow({
                     accessibilityLabel={groupAccessibilityLabel}
                     role={CONST.ROLE.BUTTON}
                 >
-                    <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.gap2, styles.mb2]}>
-                        {showUserInfo && (
-                            <UserInfoCellsWithArrow
-                                shouldShowToRecipient={shouldShowToRecipient}
-                                participantFrom={item?.from}
-                                participantFromDisplayName={participantFromDisplayName}
-                                participantToDisplayName={participantToDisplayName}
-                                participantTo={item?.to}
-                                avatarSize={CONST.AVATAR_SIZE.SMALL_SUBSCRIPT}
-                                style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}
-                                infoCellsTextStyle={{lineHeight: 14}}
-                                infoCellsAvatarStyle={styles.pr1}
-                                fromRecipientStyle={!shouldShowToRecipient ? styles.mw100 : {}}
-                                shouldUseArrowIcon={false}
-                            />
+                    <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.gap2, styles.mb2]}>
+                        {showUserInfo ? (
+                            <View style={[styles.flexShrink1, styles.flexGrow1, styles.mnw0]}>
+                                <UserInfoCellsWithArrow
+                                    shouldShowToRecipient={shouldShowToRecipient}
+                                    participantFrom={item?.from}
+                                    participantFromDisplayName={participantFromDisplayName}
+                                    participantToDisplayName={participantToDisplayName}
+                                    participantTo={item?.to}
+                                    avatarSize={CONST.AVATAR_SIZE.SMALL_SUBSCRIPT}
+                                    style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}
+                                    infoCellsTextStyle={{lineHeight: 14}}
+                                    infoCellsAvatarStyle={styles.pr1}
+                                    fromRecipientStyle={!shouldShowToRecipient ? styles.mw100 : {}}
+                                    shouldUseArrowIcon={false}
+                                />
+                            </View>
+                        ) : (
+                            <View />
                         )}
+                        <StatusCell
+                            stateNum={item.stateNum}
+                            statusNum={item.statusNum}
+                            isPending={item.shouldShowStatusAsPending}
+                        />
                     </View>
                     <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.justifyContentStart]}>
                         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mnh40, styles.flex1, styles.gap3]}>

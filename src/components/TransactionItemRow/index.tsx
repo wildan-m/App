@@ -682,12 +682,36 @@ function TransactionItemRow({
     }, [columns]);
 
     if (shouldUseNarrowLayout) {
+        const submitter = transactionItem.from;
+        const hasSubmitter = !!submitter?.accountID && !!submitter.displayName;
+        const shouldShowStatusBadge = !isIOUReport(report) && (transactionItem.report?.stateNum !== undefined || transactionItem.report?.statusNum !== undefined);
+        const shouldShowHeaderStrip = hasSubmitter || shouldShowStatusBadge;
+
         return (
             <>
                 <View
                     style={[styles.expenseWidgetRadius, bgActiveStyles, styles.justifyContentEvenly, style, styles.overflowHidden]}
                     testID="transaction-item-row"
                 >
+                    {shouldShowHeaderStrip && (
+                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.gap2, styles.mb2]}>
+                            {hasSubmitter ? (
+                                <UserInfoCell
+                                    accountID={submitter?.accountID}
+                                    avatar={submitter?.avatar}
+                                    displayName={transactionItem.formattedFrom ?? submitter?.displayName ?? ''}
+                                />
+                            ) : (
+                                <View />
+                            )}
+                            {shouldShowStatusBadge && (
+                                <StatusCell
+                                    stateNum={transactionItem.report?.stateNum}
+                                    statusNum={transactionItem.report?.statusNum}
+                                />
+                            )}
+                        </View>
+                    )}
                     <View style={[styles.flexRow]}>
                         {shouldShowCheckbox && (
                             <Checkbox
@@ -771,16 +795,6 @@ function TransactionItemRow({
                     </View>
                     <View style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsStart]}>
                         <View style={[styles.flexColumn, styles.flex1]}>
-                            {!isIOUReport(report) && (
-                                <View style={[styles.flexRow, styles.alignItemsStart, styles.gap2, styles.mt2, styles.minHeight4]}>
-                                    <View style={[styles.flexShrink1]}>
-                                        <StatusCell
-                                            stateNum={transactionItem.report?.stateNum}
-                                            statusNum={transactionItem.report?.statusNum}
-                                        />
-                                    </View>
-                                </View>
-                            )}
                             {shouldShowErrors && (
                                 <TransactionItemRowRBR
                                     transaction={transactionItem}
