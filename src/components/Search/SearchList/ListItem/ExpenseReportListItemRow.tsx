@@ -73,7 +73,7 @@ function ExpenseReportListItemRow({
     const theme = useTheme();
     const {translate} = useLocalize();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const {isLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const {isLargeScreenWidth} = useResponsiveLayout();
     const policy = usePolicy(item.policyID);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
@@ -237,7 +237,6 @@ function ExpenseReportListItemRow({
         const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';
         const participantToDisplayName = item.formattedTo ?? item?.to?.displayName ?? '';
         const shouldShowToRecipient = hasFromSender && hasToRecipient && !!item?.to?.accountID && !!isCorrectSearchUserName(participantToDisplayName);
-        const isInMobileSelectionMode = shouldUseNarrowLayout && !!canSelectMultiple;
 
         // Compute accessible group label (user name, subtitle, report title, status, amount)
         const parentNavigationSubtitleData = getParentNavigationSubtitle(item, policy, conciergeReportID);
@@ -252,7 +251,6 @@ function ExpenseReportListItemRow({
                     accessible
                     accessibilityLabel={groupAccessibilityLabel}
                     role={CONST.ROLE.BUTTON}
-                    style={{marginRight: variables.w72}}
                 >
                     <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.gap2, styles.mb2]}>
                         {showUserInfo && (
@@ -271,7 +269,7 @@ function ExpenseReportListItemRow({
                             />
                         )}
                     </View>
-                    <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.justifyContentStart, {marginRight: -variables.w72}]}>
+                    <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, styles.justifyContentStart]}>
                         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mnh40, styles.flex1, styles.gap3]}>
                             {!!canSelectMultiple && (
                                 <Checkbox
@@ -303,20 +301,6 @@ function ExpenseReportListItemRow({
                             />
                         </View>
                     </View>
-                </View>
-                <View style={[styles.pAbsolute, styles.t0, styles.r0, {width: variables.w72}, styles.alignItemsEnd]}>
-                    <ActionCell
-                        action={item.action}
-                        goToItem={onButtonPress}
-                        isSelected={item.isSelected}
-                        isLoading={isActionLoading}
-                        policyID={item.policyID}
-                        reportID={item.reportID}
-                        hash={item.hash}
-                        amount={item.total}
-                        extraSmall
-                        shouldDisablePointerEvents={isInMobileSelectionMode || isPendingDelete}
-                    />
                 </View>
             </View>
         );
