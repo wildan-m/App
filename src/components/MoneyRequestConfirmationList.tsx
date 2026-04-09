@@ -26,6 +26,7 @@ import Log from '@libs/Log';
 import {validateAmount} from '@libs/MoneyRequestUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getIOUConfirmationOptionsFromPayeePersonalDetail, hasEnabledOptions} from '@libs/OptionsListUtils';
+import Parser from '@libs/Parser';
 import {getTagLists, isAttendeeTrackingEnabled, isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {isSelectedManagerMcTest} from '@libs/ReportUtils';
 import type {OptionData} from '@libs/ReportUtils';
@@ -291,7 +292,11 @@ function MoneyRequestConfirmationList({
     const isGPSDistanceRequest = isGPSDistanceRequestUtil(transaction);
 
     const iouAmount = hasValidModifiedAmount(transaction) ? Number(transaction?.modifiedAmount) : (transaction?.amount ?? 0);
-    const iouComment = getDescription(transaction);
+    // `getDescription` returns the raw `transaction.comment.comment`, which is stored as HTML for saved
+    // transactions (e.g. viewing a completed split on `SplitBillDetailsPage`). Normalize to markdown here
+    // so every downstream consumer (`shouldParseTitle` menu item and `type="markdown"` input) receives
+    // a consistent format regardless of whether the transaction is a draft (plain text) or a saved one (HTML).
+    const iouComment = Parser.htmlToMarkdown(getDescription(transaction));
     const iouCurrencyCode = getCurrency(transaction);
     const iouMerchant = getMerchant(transaction);
     const iouCreated = getCreated(transaction);
