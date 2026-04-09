@@ -93,12 +93,22 @@ export default createOnyxDerivedValueConfig({
 
             const feed = combinedCompanyCardFeeds?.[feedNameWithDomainID];
 
-            // If the feed no longer exists in the combined company card feeds (e.g. the feed was
-            // deleted and only orphaned cards linger in CARD_LIST or WORKSPACE_CARDS_LIST), skip
-            // the card. An orphaned card without a feed should not flip isFeedConnectionBroken or
-            // raise the workspace RBR. Expensify cards are exempt because they never have an entry
-            // in combinedCompanyCardFeeds by design (they are not stored in companyCards settings).
-            if (!isExpensifyCard && !feed) {
+            // If this workspace's SHARED_NVP_PRIVATE_DOMAIN_MEMBER.settings.companyCards has been
+            // loaded but the card's specific feed is missing from it, the feed has been explicitly
+            // removed (e.g. after a successful deleteWorkspaceCompanyCardFeed). Any card that still
+            // lingers in CARD_LIST or WORKSPACE_CARDS_LIST for that feed is orphaned and must not
+            // contribute to isFeedConnectionBroken or shouldShowRbrForWorkspaceAccountID — those
+            // stale contributions are what keep the Company Cards RBR and the Home "fix broken
+            // bank connection" to-do alive after the feed is gone.
+            //
+            // Expensify cards are exempt because they never have an entry in combinedCompanyCardFeeds
+            // by design (they are not stored under settings.companyCards).
+            //
+            // If the workspace's SHARED_NVP entry has not been loaded at all (workspaceCompanyCards
+            // is undefined), fall through to the existing behavior so cards seen before their feed
+            // metadata arrives are still processed.
+            const workspaceCompanyCards = cardFeeds?.[`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${workspaceAccountID}`]?.settings?.companyCards;
+            if (!isExpensifyCard && !feed && workspaceCompanyCards && !(bankName in workspaceCompanyCards)) {
                 return;
             }
 

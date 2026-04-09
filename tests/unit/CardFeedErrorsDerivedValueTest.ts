@@ -551,5 +551,129 @@ describe('CardFeedErrors Derived Value', () => {
                 expect(result.all.shouldShowRBR).toBe(false);
             });
         });
+
+        describe('orphaned cards after feed deletion (regression for #87529)', () => {
+            it('should NOT flag a broken card whose feed was removed from SHARED_NVP (card lingers in globalCardList)', () => {
+                const deletedFeed = CARD_FEEDS[CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE];
+                const remainingFeed = CARD_FEEDS[CONST.COMPANY_CARD.FEED_BANK_NAME.MASTER_CARD];
+
+                // Orphaned card: bank/fundID point at the just-deleted feed, but the feed no
+                // longer exists in SHARED_NVP_PRIVATE_DOMAIN_MEMBER.settings.companyCards.
+                const orphanedCard = createCard({
+                    cardID: CARD_IDS.card1,
+                    bank: deletedFeed.feedName,
+                    fundID: String(deletedFeed.workspaceAccountID),
+                    lastScrapeResult: 403, // would normally flag as broken
+                });
+
+                const globalCardList: CardList = {[CARD_IDS.card1]: orphanedCard};
+
+                // SHARED_NVP entry for the workspace is loaded and contains only the OTHER feed,
+                // not the deleted one — simulating post-successful-delete state.
+                const cardFeeds: OnyxCollection<CardFeeds> = {
+                    [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${deletedFeed.workspaceAccountID}`]: {
+                        settings: {
+                            companyCards: {
+                                [remainingFeed.feedName]: {pending: false},
+                            },
+                        },
+                    },
+                };
+
+                const result = cardFeedErrorsConfig.compute([globalCardList, {}, cardFeeds], DERIVED_VALUE_CONTEXT);
+
+                // The orphaned card must not raise the RBR or the broken-connection state — there
+                // is no feed for it to be "broken" against.
+                expect(result.all.isFeedConnectionBroken).toBe(false);
+                expect(result.all.shouldShowRBR).toBe(false);
+                expect(result.cardsWithBrokenFeedConnection).not.toHaveProperty(String(CARD_IDS.card1));
+                expect(result.shouldShowRbrForWorkspaceAccountID[deletedFeed.workspaceAccountID]).toBeFalsy();
+            });
+
+            it('should NOT flag a broken card whose feed was removed from SHARED_NVP (card lingers in allWorkspaceCards)', () => {
+                const deletedFeed = CARD_FEEDS[CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE];
+
+                const orphanedCard = createCard({
+                    cardID: CARD_IDS.card2,
+                    bank: deletedFeed.feedName,
+                    fundID: String(deletedFeed.workspaceAccountID),
+                    lastScrapeResult: 401,
+                });
+
+                // WORKSPACE_CARDS_LIST still has a stale entry for the deleted feed (successData's
+                // per-card MERGE didn't enumerate this cardID).
+                const allWorkspaceCards: OnyxCollection<WorkspaceCardsList> = {
+                    [`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${deletedFeed.workspaceAccountID}_${deletedFeed.feedName}`]: createWorkspaceCardsList({
+                        card2: orphanedCard,
+                    }),
+                };
+
+                // SHARED_NVP for the workspace is loaded but empty — the deleted feed is gone.
+                const cardFeeds: OnyxCollection<CardFeeds> = {
+                    [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${deletedFeed.workspaceAccountID}`]: {
+                        settings: {
+                            companyCards: {},
+                        },
+                    },
+                };
+
+                const result = cardFeedErrorsConfig.compute([{}, allWorkspaceCards, cardFeeds], DERIVED_VALUE_CONTEXT);
+
+                expect(result.all.isFeedConnectionBroken).toBe(false);
+                expect(result.all.shouldShowRBR).toBe(false);
+                expect(result.cardsWithBrokenFeedConnection).not.toHaveProperty(String(CARD_IDS.card2));
+                expect(result.shouldShowRbrForWorkspaceAccountID[deletedFeed.workspaceAccountID]).toBeFalsy();
+            });
+
+            it('should STILL flag a broken card when the feed is genuinely present (guards against over-suppression)', () => {
+                const presentFeed = CARD_FEEDS[CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE];
+
+                const card = createCard({
+                    cardID: CARD_IDS.card1,
+                    bank: presentFeed.feedName,
+                    fundID: String(presentFeed.workspaceAccountID),
+                    lastScrapeResult: 403,
+                });
+
+                const globalCardList: CardList = {[CARD_IDS.card1]: card};
+
+                // Feed IS present in SHARED_NVP — existing behavior must still apply.
+                const cardFeeds: OnyxCollection<CardFeeds> = {
+                    [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${presentFeed.workspaceAccountID}`]: {
+                        settings: {
+                            companyCards: {
+                                [presentFeed.feedName]: {pending: false},
+                            },
+                        },
+                    },
+                };
+
+                const result = cardFeedErrorsConfig.compute([globalCardList, {}, cardFeeds], DERIVED_VALUE_CONTEXT);
+
+                expect(result.all.isFeedConnectionBroken).toBe(true);
+                expect(result.cardsWithBrokenFeedConnection).toHaveProperty(String(CARD_IDS.card1));
+            });
+
+            it('should STILL flag a broken card when SHARED_NVP has not loaded yet (preserves load-race behavior)', () => {
+                const feed = CARD_FEEDS[CONST.COMPANY_CARD.FEED_BANK_NAME.CHASE];
+
+                const card = createCard({
+                    cardID: CARD_IDS.card1,
+                    bank: feed.feedName,
+                    fundID: String(feed.workspaceAccountID),
+                    lastScrapeResult: 403,
+                });
+
+                const globalCardList: CardList = {[CARD_IDS.card1]: card};
+
+                // cardFeeds is empty — the workspace's SHARED_NVP is not loaded. The fix must NOT
+                // trigger here; it only activates when SHARED_NVP is loaded and the feed is
+                // explicitly absent from companyCards.
+                const result = cardFeedErrorsConfig.compute([globalCardList, {}, {}], DERIVED_VALUE_CONTEXT);
+
+                expect(result.all.isFeedConnectionBroken).toBe(true);
+                expect(result.cardsWithBrokenFeedConnection).toHaveProperty(String(CARD_IDS.card1));
+            });
+        });
     });
 });
