@@ -92,6 +92,16 @@ export default createOnyxDerivedValueConfig({
             const previousFeedErrors = cardFeedErrors[feedNameWithDomainID] ?? DEFAULT_CARD_FEED_ERROR_STATE;
 
             const feed = combinedCompanyCardFeeds?.[feedNameWithDomainID];
+
+            // If the feed no longer exists in the combined company card feeds (e.g. the feed was
+            // deleted and only orphaned cards linger in CARD_LIST or WORKSPACE_CARDS_LIST), skip
+            // the card. An orphaned card without a feed should not flip isFeedConnectionBroken or
+            // raise the workspace RBR. Expensify cards are exempt because they never have an entry
+            // in combinedCompanyCardFeeds by design (they are not stored in companyCards settings).
+            if (!isExpensifyCard && !feed) {
+                return;
+            }
+
             const feedErrors = {
                 ...previousFeedErrors.feedErrors,
                 ...feed?.errors,
