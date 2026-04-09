@@ -81,9 +81,15 @@ function importState(transformedState: OnyxState): Promise<void> {
         }
     }
 
+    // Import the regular (non-collection) keys first so that SESSION — and therefore the module-level
+    // `deprecatedCurrentUserAccountID` used by `ReportUtils` — reflects the imported account before
+    // any collection subscribers fire. Then import collections with `REPORT` loaded last, so the LHN
+    // re-render triggered by `REPORT` sees a fully-populated snapshot of its dependencies (see
+    // `importOnyxCollectionState`).
     return clearOnyxStateBeforeImport()
+        .then(() => importOnyxRegularState(regularState))
         .then(() => importOnyxCollectionState(collectionsMap))
-        .then(() => importOnyxRegularState(regularState));
+        .then(() => undefined);
 }
 
 export {cleanAndTransformState, importState, transformNumericKeysToArray};
