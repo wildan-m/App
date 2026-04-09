@@ -23,8 +23,8 @@ import type {
 import type AskForCorpaySignerInformationParams from '@libs/API/parameters/AskForCorpaySignerInformationParams';
 import type {SaveCorpayOnboardingCompanyDetails} from '@libs/API/parameters/SaveCorpayOnboardingCompanyDetailsParams';
 import type SaveCorpayOnboardingDirectorInformationParams from '@libs/API/parameters/SaveCorpayOnboardingDirectorInformationParams';
-import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
-import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
+import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
+import {getMicroSecondOnyxErrorWithMessage, getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import * as NetworkStore from '@libs/Network/NetworkStore';
@@ -1434,42 +1434,35 @@ function shareBankAccount(bankAccountID: number, emailList: string[]) {
         emailList,
     };
 
-    const onyxData: OnyxData<typeof ONYXKEYS.SHARE_BANK_ACCOUNT> = {
-        optimisticData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
-                    isLoading: true,
-                    errors: null,
-                },
-            },
-        ],
-        successData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
+    Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {isLoading: true, errors: null});
+
+    // Use a side-effect request so we can surface the server's specific error message
+    // (e.g. "recipient needs to validate their Expensify account") instead of always
+    // overwriting it with a generic string. This matches the expected behavior in
+    // https://github.com/Expensify/App/issues/87502.
+    // eslint-disable-next-line rulesdir/no-api-side-effects-method
+    API.makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.SHARE_BANK_ACCOUNT, parameters)
+        .then((response) => {
+            if (response?.jsonCode === CONST.JSON_CODE.SUCCESS) {
+                Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
                     isLoading: false,
                     errors: null,
                     admins: null,
                     shouldShowSuccess: true,
-                },
-            },
-        ],
-        failureData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
-                    isLoading: false,
-                    errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
-                },
-            },
-        ],
-    };
-
-    API.write(WRITE_COMMANDS.SHARE_BANK_ACCOUNT, parameters, onyxData);
+                });
+                return;
+            }
+            Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
+                isLoading: false,
+                errors: response?.message ? getMicroSecondOnyxErrorWithMessage(response.message) : getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
+            });
+        })
+        .catch(() => {
+            Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
+                isLoading: false,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
+            });
+        });
 }
 
 function shareBankAccountAndSetPayer(bankAccountID: number, shareeAccountID: number, policyID: string) {
@@ -1479,42 +1472,34 @@ function shareBankAccountAndSetPayer(bankAccountID: number, shareeAccountID: num
         policyID,
     };
 
-    const onyxData: OnyxData<typeof ONYXKEYS.SHARE_BANK_ACCOUNT> = {
-        optimisticData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
-                    isLoading: true,
-                    errors: null,
-                },
-            },
-        ],
-        successData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
+    Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {isLoading: true, errors: null});
+
+    // Use a side-effect request so we can surface the server's specific error message
+    // (e.g. "recipient needs to validate their Expensify account") instead of always
+    // overwriting it with a generic string. See https://github.com/Expensify/App/issues/87502.
+    // eslint-disable-next-line rulesdir/no-api-side-effects-method
+    API.makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.SHARE_BANK_ACCOUNT_AND_UPDATE_POLICY_REIMBURSER, parameters)
+        .then((response) => {
+            if (response?.jsonCode === CONST.JSON_CODE.SUCCESS) {
+                Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
                     isLoading: false,
                     errors: null,
                     admins: null,
                     shouldShowSuccess: true,
-                },
-            },
-        ],
-        failureData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.SHARE_BANK_ACCOUNT,
-                value: {
-                    isLoading: false,
-                    errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
-                },
-            },
-        ],
-    };
-
-    API.write(WRITE_COMMANDS.SHARE_BANK_ACCOUNT_AND_UPDATE_POLICY_REIMBURSER, parameters, onyxData);
+                });
+                return;
+            }
+            Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
+                isLoading: false,
+                errors: response?.message ? getMicroSecondOnyxErrorWithMessage(response.message) : getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
+            });
+        })
+        .catch(() => {
+            Onyx.merge(ONYXKEYS.SHARE_BANK_ACCOUNT, {
+                isLoading: false,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.shareBankAccountFailure'),
+            });
+        });
 }
 
 /**
