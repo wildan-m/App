@@ -1,10 +1,11 @@
 import Onyx from 'react-native-onyx';
-import {shareBankAccountAndSetPayer} from '@libs/actions/BankAccounts';
+import {shareBankAccount, shareBankAccountAndSetPayer} from '@libs/actions/BankAccounts';
 import {setWorkspacePayer} from '@libs/actions/Policy/Policy';
 import {makeRequestWithSideEffects, write} from '@libs/API';
 import {SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type * as OnyxTypes from '@src/types/onyx';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 jest.mock('@libs/API', () => ({
@@ -42,6 +43,51 @@ describe('actions/ShareBankAccountAndWorkspacePayer', () => {
                 shareeAccountID,
                 policyID,
             });
+        });
+    });
+
+    describe('shareBankAccount error surfacing', () => {
+        it('should surface the server-provided error message verbatim when the request fails', async () => {
+            const serverMessage = 'The recipient needs to validate their Expensify account before you can share this bank account.';
+            (makeRequestWithSideEffects as jest.Mock).mockResolvedValueOnce({jsonCode: 402, message: serverMessage});
+
+            shareBankAccount(123, ['unvalidated@example.com']);
+            await waitForBatchedUpdates();
+
+            const shareState: OnyxTypes.ShareBankAccount | undefined = await new Promise((resolve) => {
+                const connection = Onyx.connect({
+                    key: ONYXKEYS.SHARE_BANK_ACCOUNT,
+                    callback: (value) => {
+                        Onyx.disconnect(connection);
+                        resolve(value ?? undefined);
+                    },
+                });
+            });
+
+            expect(shareState?.isLoading).toBe(false);
+            const errorMessages = Object.values(shareState?.errors ?? {});
+            expect(errorMessages).toContain(serverMessage);
+        });
+
+        it('should fall back to the generic translation key when the server returns no message', async () => {
+            (makeRequestWithSideEffects as jest.Mock).mockResolvedValueOnce({jsonCode: 500});
+
+            shareBankAccount(123, ['someone@example.com']);
+            await waitForBatchedUpdates();
+
+            const shareState: OnyxTypes.ShareBankAccount | undefined = await new Promise((resolve) => {
+                const connection = Onyx.connect({
+                    key: ONYXKEYS.SHARE_BANK_ACCOUNT,
+                    callback: (value) => {
+                        Onyx.disconnect(connection);
+                        resolve(value ?? undefined);
+                    },
+                });
+            });
+
+            expect(shareState?.isLoading).toBe(false);
+            expect(shareState?.errors).not.toBeNull();
+            expect(Object.keys(shareState?.errors ?? {}).length).toBeGreaterThan(0);
         });
     });
 
