@@ -30,7 +30,18 @@ function SpendOverTimeSectionContent() {
         return null;
     }
 
-    if (!shouldShowErrorIndicator && sortedData?.length === 0) {
+    // Don't render the widget (not even a loading indicator) while the search is still loading.
+    // Once the data arrives we decide whether to show it based on the number of data points,
+    // so showing a loader here would cause a flicker whenever the user ends up with fewer than
+    // two points to chart.
+    if (shouldShowLoadingIndicator) {
+        return null;
+    }
+
+    // A single data point is not a meaningful trend for "Spend over time", so hide the widget
+    // until the user has at least two grouped data points. Offline and error states should still
+    // render their BlockingView feedback below.
+    if (!shouldShowErrorIndicator && !shouldShowOfflineIndicator && (sortedData?.length ?? 0) < 2) {
         return null;
     }
 
