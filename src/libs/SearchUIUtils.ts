@@ -934,6 +934,7 @@ function getSuggestedSearches(accountID: number = CONST.DEFAULT_NUMBER_ID, defau
                 {
                     sortBy: CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL,
                     sortOrder: CONST.SEARCH.SORT_ORDER.DESC,
+                    limit: CONST.SEARCH.TOP_SEARCH_LIMIT,
                 },
             ),
             get searchQueryJSON() {
