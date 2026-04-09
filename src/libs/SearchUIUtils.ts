@@ -1591,22 +1591,6 @@ function shouldShowYear(
 
 /**
  * @private
- * Extracts all transaction violations from the search data.
- */
-function getViolations(data: OnyxTypes.SearchResults['data']): OnyxCollection<OnyxTypes.TransactionViolation[]> {
-    const violations: OnyxCollection<OnyxTypes.TransactionViolation[]> = {};
-
-    for (const key in data) {
-        if (isViolationEntry(key)) {
-            violations[key] = data[key];
-        }
-    }
-
-    return violations;
-}
-
-/**
- * @private
  * Generates a display name for IOU reports considering the personal details of the payer and the transaction details.
  */
 function getIOUReportName(translate: LocalizedTranslate, data: OnyxTypes.SearchResults['data'], reportItem: TransactionReportGroupListItemType) {
@@ -1688,6 +1672,217 @@ function createReportActionsLookupMaps(data: OnyxTypes.SearchResults['data']): {
     };
 }
 
+type SearchResultsPreprocessed = {
+    shouldShowMerchant: boolean;
+    shouldShowAmountInWideColumn: boolean;
+    shouldShowTaxAmountInWideColumn: boolean;
+    yearFlags: ShouldShowYearResult;
+    allViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
+    lastExportedActionByReportID: Map<string, OnyxTypes.ReportAction>;
+    moneyRequestReportActionsByTransactionID: Map<string, OnyxTypes.ReportAction>;
+    holdReportActionsByTransactionID: Map<string, OnyxTypes.ReportAction>;
+    reportKeys: ReportKey[];
+    transactionKeys: TransactionKey[];
+    transactionsByReportID: Map<string, OnyxTypes.Transaction[]>;
+};
+
+/**
+ * @private
+ * Performs a single pass over `Object.keys(data)` and produces every derived structure that
+ * {@link getTransactionsSections} and {@link getReportSections} need before their main loop runs.
+ *
+ * This consolidates what was previously done by `getShouldShowMerchant`, `buildLastExportedActionByReportIDMap`,
+ * `shouldShowYear`, `getWideAmountIndicators`, `getViolations`, `createReportActionsLookupMaps` and the
+ * inline `Object.keys(data).reduce(...)` classifier in `getReportSections` into one traversal. The
+ * individual helpers are kept as thin wrappers so external callers stay unaffected.
+ *
+ * @param data - The search results data object.
+ * @param skipReportCreatedDate - Matches the `shouldShowYear` flag of the same name: when true, the
+ *   report-entry branch does not count report `created` dates toward `shouldShowYearCreated`. Used
+ *   by `getTransactionsSections` (which only shows a year column for transactions).
+ */
+function preprocessSearchResultsData(data: OnyxTypes.SearchResults['data'], skipReportCreatedDate: boolean): SearchResultsPreprocessed {
+    const currentYear = new Date().getFullYear();
+
+    const allViolations: OnyxCollection<OnyxTypes.TransactionViolation[]> = {};
+    const result: SearchResultsPreprocessed = {
+        shouldShowMerchant: false,
+        shouldShowAmountInWideColumn: false,
+        shouldShowTaxAmountInWideColumn: false,
+        yearFlags: {
+            shouldShowYearCreated: false,
+            shouldShowYearSubmitted: false,
+            shouldShowYearApproved: false,
+            shouldShowYearPosted: false,
+            shouldShowYearExported: false,
+            shouldShowYearWithdrawn: false,
+        },
+        allViolations,
+        lastExportedActionByReportID: new Map<string, OnyxTypes.ReportAction>(),
+        moneyRequestReportActionsByTransactionID: new Map<string, OnyxTypes.ReportAction>(),
+        holdReportActionsByTransactionID: new Map<string, OnyxTypes.ReportAction>(),
+        reportKeys: [] as ReportKey[],
+        transactionKeys: [] as TransactionKey[],
+        transactionsByReportID: new Map<string, OnyxTypes.Transaction[]>(),
+    };
+
+    // Hold actions are keyed by reportActionID and must be matched to transactions in a second phase
+    // because the main loop does not guarantee that reportAction keys are visited before transaction keys.
+    const allHoldReportActions = new Map<string, OnyxTypes.ReportAction>();
+
+    for (const key of Object.keys(data)) {
+        if (isTransactionEntry(key)) {
+            result.transactionKeys.push(key);
+            const item = data[key];
+
+            if (!result.shouldShowMerchant) {
+                const merchant = item.modifiedMerchant ? item.modifiedMerchant : (item.merchant ?? '');
+                if (!isInvalidMerchantValue(merchant) || isScanning(item)) {
+                    result.shouldShowMerchant = true;
+                }
+            }
+
+            if (!result.shouldShowAmountInWideColumn && isTransactionAmountTooLong(item)) {
+                result.shouldShowAmountInWideColumn = true;
+            }
+            if (!result.shouldShowTaxAmountInWideColumn && isTransactionTaxAmountTooLong(item)) {
+                result.shouldShowTaxAmountInWideColumn = true;
+            }
+
+            if (item.reportID) {
+                const existing = result.transactionsByReportID.get(item.reportID);
+                if (existing) {
+                    existing.push(item);
+                } else {
+                    result.transactionsByReportID.set(item.reportID, [item]);
+                }
+            }
+
+            const transactionCreated = getTransactionCreatedDate(item);
+            if (!result.yearFlags.shouldShowYearCreated && transactionCreated && DateUtils.doesDateBelongToAPastYear(transactionCreated)) {
+                result.yearFlags.shouldShowYearCreated = true;
+            }
+            const relatedReport = data[`${ONYXKEYS.COLLECTION.REPORT}${item.reportID}`];
+            if (!result.yearFlags.shouldShowYearSubmitted && relatedReport?.submitted && DateUtils.doesDateBelongToAPastYear(relatedReport.submitted)) {
+                result.yearFlags.shouldShowYearSubmitted = true;
+            }
+            if (!result.yearFlags.shouldShowYearApproved && relatedReport?.approved && DateUtils.doesDateBelongToAPastYear(relatedReport.approved)) {
+                result.yearFlags.shouldShowYearApproved = true;
+            }
+
+            // Posted date is in YYYYMMDD format, so the year is extracted manually.
+            if (!result.yearFlags.shouldShowYearPosted && item?.posted) {
+                const postedYear = parseInt(item.posted.slice(0, 4), 10);
+                if (postedYear !== currentYear) {
+                    result.yearFlags.shouldShowYearPosted = true;
+                }
+            }
+        } else if (isReportEntry(key)) {
+            result.reportKeys.push(key);
+            const item = data[key];
+
+            if (!skipReportCreatedDate && !result.yearFlags.shouldShowYearCreated && item.created && DateUtils.doesDateBelongToAPastYear(item.created)) {
+                result.yearFlags.shouldShowYearCreated = true;
+            }
+            if (!result.yearFlags.shouldShowYearSubmitted && item.submitted && DateUtils.doesDateBelongToAPastYear(item.submitted)) {
+                result.yearFlags.shouldShowYearSubmitted = true;
+            }
+            if (!result.yearFlags.shouldShowYearApproved && item.approved && DateUtils.doesDateBelongToAPastYear(item.approved)) {
+                result.yearFlags.shouldShowYearApproved = true;
+            }
+        } else if (isReportActionEntry(key)) {
+            const reportID = key.replace(ONYXKEYS.COLLECTION.REPORT_ACTIONS, '');
+            const actions = data[key];
+
+            let exportedAction: OnyxTypes.ReportAction | undefined;
+            let latestExportedTime = -Infinity;
+
+            for (const action of Object.values(actions)) {
+                if (action.actionName === CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_CSV || action.actionName === CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION) {
+                    const currentTime = new Date(action.created).getTime();
+                    if (currentTime > latestExportedTime) {
+                        latestExportedTime = currentTime;
+                        exportedAction = action;
+                    }
+                }
+
+                if (isMoneyRequestAction(action)) {
+                    const originalMessage = getOriginalMessage<typeof CONST.REPORT.ACTIONS.TYPE.IOU>(action);
+                    const transactionID = originalMessage?.IOUTransactionID;
+                    if (transactionID) {
+                        result.moneyRequestReportActionsByTransactionID.set(transactionID, action);
+                    }
+                } else if (isHoldAction(action)) {
+                    allHoldReportActions.set(action.reportActionID, action);
+                }
+
+                if (!result.yearFlags.shouldShowYearCreated && action.created && DateUtils.doesDateBelongToAPastYear(action.created)) {
+                    result.yearFlags.shouldShowYearCreated = true;
+                }
+            }
+
+            if (exportedAction) {
+                result.lastExportedActionByReportID.set(reportID, exportedAction);
+            }
+        } else if (isViolationEntry(key)) {
+            allViolations[key] = data[key];
+        } else if (!result.yearFlags.shouldShowYearWithdrawn && isGroupEntry(key)) {
+            const group = data[key];
+            if ('debitPosted' in group && group.debitPosted && DateUtils.doesDateBelongToAPastYear(group.debitPosted)) {
+                result.yearFlags.shouldShowYearWithdrawn = true;
+            }
+        }
+    }
+
+    // Second phase: resolve hold actions against the transaction keys collected in the first pass.
+    // This keeps the original behaviour of matching `transaction.comment.hold` to the hold report
+    // action while no longer relying on iteration order between reportAction and transaction keys.
+    if (allHoldReportActions.size > 0) {
+        for (const key of result.transactionKeys) {
+            if (result.holdReportActionsByTransactionID.size >= allHoldReportActions.size) {
+                break;
+            }
+            const transaction = data[key];
+            const holdReportActionID = transaction?.comment?.hold;
+            if (holdReportActionID) {
+                const holdAction = allHoldReportActions.get(holdReportActionID);
+                if (holdAction) {
+                    result.holdReportActionsByTransactionID.set(transaction.transactionID, holdAction);
+                }
+            }
+        }
+    }
+
+    // Third phase: compute `shouldShowYearExported` from the now-complete lastExportedActionByReportID map.
+    // The original `shouldShowYear` checks this flag both on report entries and on transaction entries
+    // (via their related report), so we replicate the superset by scanning the collected keys.
+    if (!result.yearFlags.shouldShowYearExported) {
+        for (const reportKey of result.reportKeys) {
+            const reportItem = data[reportKey];
+            const exportedAction = result.lastExportedActionByReportID.get(reportItem.reportID);
+            if (exportedAction?.created && DateUtils.doesDateBelongToAPastYear(exportedAction.created)) {
+                result.yearFlags.shouldShowYearExported = true;
+                break;
+            }
+        }
+    }
+    if (!result.yearFlags.shouldShowYearExported) {
+        for (const transactionKey of result.transactionKeys) {
+            const transactionItem = data[transactionKey];
+            if (!transactionItem.reportID) {
+                continue;
+            }
+            const exportedAction = result.lastExportedActionByReportID.get(transactionItem.reportID);
+            if (exportedAction?.created && DateUtils.doesDateBelongToAPastYear(exportedAction.created)) {
+                result.yearFlags.shouldShowYearExported = true;
+                break;
+            }
+        }
+    }
+
+    return result;
+}
+
 /**
  * Calculates the "to" field value for a given transaction item based on the associated report and search data.
  */
@@ -1746,24 +1941,25 @@ function getTransactionsSections({
     queryJSON,
     cardFeeds,
 }: GetTransactionSectionsParams): [TransactionListItemType[], number] {
-    const shouldShowMerchant = getShouldShowMerchant(data);
-    const lastExportedActionByReportID = buildLastExportedActionByReportIDMap(data);
-    const {shouldShowYearCreated, shouldShowYearSubmitted, shouldShowYearApproved, shouldShowYearPosted, shouldShowYearExported} = shouldShowYear(
-        data,
-        false,
+    // Single pass over `Object.keys(data)` that produces every derived structure below
+    // (merchant visibility, year flags, wide-amount flags, violations, export/hold/money-request
+    // lookup maps, transaction keys) — replaces six separate helpers that used to walk `data`
+    // independently before the main loop.
+    const preprocessed = preprocessSearchResultsData(data, true);
+    const {
+        shouldShowMerchant,
+        shouldShowAmountInWideColumn,
+        shouldShowTaxAmountInWideColumn,
+        allViolations,
         lastExportedActionByReportID,
-        true,
-    );
-    const {shouldShowAmountInWideColumn, shouldShowTaxAmountInWideColumn} = getWideAmountIndicators(data);
+        moneyRequestReportActionsByTransactionID,
+        holdReportActionsByTransactionID,
+        transactionKeys,
+    } = preprocessed;
+    const {shouldShowYearCreated, shouldShowYearSubmitted, shouldShowYearApproved, shouldShowYearPosted, shouldShowYearExported} = preprocessed.yearFlags;
 
-    // Pre-filter transaction keys to avoid repeated checks
-    const transactionKeys = Object.keys(data).filter(isTransactionEntry);
-    // Get violations - optimize by using a Map for faster lookups
-    const allViolations = getViolations(data);
-
-    // Use Map for faster lookups of personal details and reportActions
+    // Use Map for faster lookups of personal details
     const personalDetailsMap = new Map(Object.entries(data.personalDetailsList ?? {}));
-    const {moneyRequestReportActionsByTransactionID, holdReportActionsByTransactionID} = createReportActionsLookupMaps(data);
 
     const transactionsSections: TransactionListItemType[] = [];
 
@@ -2323,66 +2519,62 @@ function getReportSections({
     queryJSON,
     onyxPersonalDetailsList,
 }: GetReportSectionsParams): [TransactionGroupListItemType[], number] {
-    const shouldShowMerchant = getShouldShowMerchant(data);
-    const lastExportedActionByReportID = buildLastExportedActionByReportIDMap(data);
+    // Single pass over `Object.keys(data)` that produces every derived structure this function
+    // needs before the main loop: merchant/year/wide-amount flags, violations, lookup maps,
+    // and classified report/transaction keys with `transactionsByReportID`.
+    const preprocessed = preprocessSearchResultsData(data, false);
+    const {
+        shouldShowMerchant,
+        shouldShowAmountInWideColumn,
+        shouldShowTaxAmountInWideColumn,
+        allViolations,
+        lastExportedActionByReportID,
+        moneyRequestReportActionsByTransactionID,
+        holdReportActionsByTransactionID,
+        reportKeys,
+        transactionKeys,
+        transactionsByReportID,
+    } = preprocessed;
 
+    // Transaction-level year flags use the aggregated flags from the single pass; the per-report
+    // year flags are kept as separate locals below so the report-entry branch of the main loop
+    // can cheaply reconsider them from the reportKeys slice.
     const {
         shouldShowYearCreated: shouldShowYearCreatedTransaction,
         shouldShowYearSubmitted: shouldShowYearSubmittedTransaction,
         shouldShowYearApproved: shouldShowYearApprovedTransaction,
         shouldShowYearPosted: shouldShowYearPostedTransaction,
         shouldShowYearExported: shouldShowYearExportedTransaction,
-    } = shouldShowYear(data, false, lastExportedActionByReportID);
-    const {shouldShowAmountInWideColumn, shouldShowTaxAmountInWideColumn} = getWideAmountIndicators(data);
-    const {moneyRequestReportActionsByTransactionID, holdReportActionsByTransactionID} = createReportActionsLookupMaps(data);
-
-    // Get violations - optimize by using a Map for faster lookups
-    const allViolations = getViolations(data);
+    } = preprocessed.yearFlags;
 
     const currentQueryJSON = queryJSON ?? getCurrentSearchQueryJSON();
     const reportIDToTransactions: Record<string, TransactionReportGroupListItemType> = {};
 
-    // Build transactionsByReportID map and compute report-level year flags in a single pass for performance reasons.
-    const transactionsByReportID = new Map<string, OnyxTypes.Transaction[]>();
+    // Report-level year flags, derived from the classified report keys only (matches the
+    // behaviour of the previous inline `reduce(...)` classifier that set these four).
     let shouldShowYearCreatedReport = false;
     let shouldShowYearSubmittedReport = false;
     let shouldShowYearApprovedReport = false;
     let shouldShowYearExportedReport = false;
-
-    const {reportKeys, transactionKeys} = Object.keys(data).reduce(
-        (acc, key) => {
-            if (isReportEntry(key)) {
-                acc.reportKeys.push(key);
-                const item = data[key];
-                if (!shouldShowYearCreatedReport && item.created && DateUtils.doesDateBelongToAPastYear(item.created)) {
-                    shouldShowYearCreatedReport = true;
-                }
-                if (!shouldShowYearSubmittedReport && item.submitted && DateUtils.doesDateBelongToAPastYear(item.submitted)) {
-                    shouldShowYearSubmittedReport = true;
-                }
-                if (!shouldShowYearApprovedReport && item.approved && DateUtils.doesDateBelongToAPastYear(item.approved)) {
-                    shouldShowYearApprovedReport = true;
-                }
-                const exportedAction = lastExportedActionByReportID.get(item.reportID);
-                if (!shouldShowYearExportedReport && exportedAction?.created && DateUtils.doesDateBelongToAPastYear(exportedAction.created)) {
-                    shouldShowYearExportedReport = true;
-                }
-            } else if (isTransactionEntry(key)) {
-                acc.transactionKeys.push(key);
-                const transaction = data[key];
-                if (transaction.reportID) {
-                    const existing = transactionsByReportID.get(transaction.reportID);
-                    if (existing) {
-                        existing.push(transaction);
-                    } else {
-                        transactionsByReportID.set(transaction.reportID, [transaction]);
-                    }
-                }
-            }
-            return acc;
-        },
-        {reportKeys: [] as string[], transactionKeys: [] as string[]},
-    );
+    for (const reportKey of reportKeys) {
+        const reportItem = data[reportKey];
+        if (!shouldShowYearCreatedReport && reportItem.created && DateUtils.doesDateBelongToAPastYear(reportItem.created)) {
+            shouldShowYearCreatedReport = true;
+        }
+        if (!shouldShowYearSubmittedReport && reportItem.submitted && DateUtils.doesDateBelongToAPastYear(reportItem.submitted)) {
+            shouldShowYearSubmittedReport = true;
+        }
+        if (!shouldShowYearApprovedReport && reportItem.approved && DateUtils.doesDateBelongToAPastYear(reportItem.approved)) {
+            shouldShowYearApprovedReport = true;
+        }
+        const exportedAction = lastExportedActionByReportID.get(reportItem.reportID);
+        if (!shouldShowYearExportedReport && exportedAction?.created && DateUtils.doesDateBelongToAPastYear(exportedAction.created)) {
+            shouldShowYearExportedReport = true;
+        }
+        if (shouldShowYearCreatedReport && shouldShowYearSubmittedReport && shouldShowYearApprovedReport && shouldShowYearExportedReport) {
+            break;
+        }
+    }
 
     const orderedKeys: string[] = [...reportKeys, ...transactionKeys];
     const mergedPersonalDetails = {...(onyxPersonalDetailsList ?? {}), ...(data.personalDetailsList ?? {})};
