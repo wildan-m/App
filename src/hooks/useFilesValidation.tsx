@@ -102,8 +102,8 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
         });
     };
 
-    const setErrorAndOpenModal = (error: ValueOf<typeof CONST.FILE_VALIDATION_ERRORS>) => {
-        setFileError({error, isValidatingMultipleFiles});
+    const setErrorAndOpenModal = (error: ValueOf<typeof CONST.FILE_VALIDATION_ERRORS>, isMultipleFiles = isValidatingMultipleFiles) => {
+        setFileError({error, isValidatingMultipleFiles: isMultipleFiles});
         setIsErrorModalVisible(true);
     };
 
@@ -245,9 +245,15 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
                 } else {
                     const errorMessage = result.reason instanceof Error ? result.reason.message : undefined;
                     if (errorMessage === CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE) {
-                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE, isValidatingMultipleFiles});
+                        collectedErrors.current.push({
+                            error: CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE,
+                            isValidatingMultipleFiles: validationState.isValidatingMultipleFiles,
+                        });
                     } else {
-                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.FILE_CORRUPTED, isValidatingMultipleFiles});
+                        collectedErrors.current.push({
+                            error: CONST.FILE_VALIDATION_ERRORS.FILE_CORRUPTED,
+                            isValidatingMultipleFiles: validationState.isValidatingMultipleFiles,
+                        });
                     }
                 }
             }
@@ -301,7 +307,7 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
             if (items) {
                 dataTransferItemList.current = items.slice(0, CONST.API_ATTACHMENT_VALIDATIONS.MAX_FILE_LIMIT);
             }
-            setErrorAndOpenModal(CONST.FILE_VALIDATION_ERRORS.MAX_FILE_LIMIT_EXCEEDED);
+            setErrorAndOpenModal(CONST.FILE_VALIDATION_ERRORS.MAX_FILE_LIMIT_EXCEEDED, validationState.isValidatingMultipleFiles);
         } else {
             validateAndResizeFiles(files, items ?? [], validationState);
         }
