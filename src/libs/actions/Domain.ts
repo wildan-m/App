@@ -109,8 +109,30 @@ function resetDomainValidationError(accountID: number) {
  * Fetches the latest domain data from the server,
  * when accessing the domain initial page
  */
-function openDomainInitialPage(domainName: string) {
-    API.read(READ_COMMANDS.OPEN_DOMAIN_INITIAL_PAGE, {domainName});
+function openDomainInitialPage(domainName: string, domainAccountID: number) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {isLoadingDomainInitialPage: true},
+        },
+    ];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {isLoadingDomainInitialPage: null},
+        },
+    ];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {isLoadingDomainInitialPage: null},
+        },
+    ];
+
+    API.read(READ_COMMANDS.OPEN_DOMAIN_INITIAL_PAGE, {domainName}, {optimisticData, successData, failureData});
 }
 
 /**

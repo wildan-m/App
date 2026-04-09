@@ -1,4 +1,11 @@
-import {defaultSecurityGroupIDSelector, domainNameSelector, memberAccountIDsSelector, memberPendingActionSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
+import {
+    defaultSecurityGroupIDSelector,
+    domainNameSelector,
+    isLoadingDomainInitialPageSelector,
+    memberAccountIDsSelector,
+    memberPendingActionSelector,
+    selectSecurityGroupForAccount,
+} from '@selectors/Domain';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
@@ -70,6 +77,10 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const [memberIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: memberAccountIDsSelector,
     });
+    const [isLoadingDomainInitialPage] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        selector: isLoadingDomainInitialPageSelector,
+    });
+    const shouldShowFullscreenLoading = !!isLoadingDomainInitialPage && (memberIDs?.length ?? 0) === 0;
 
     const {groupPreFilter, groupOptions, selectedGroup, handleGroupChange, dropdownLabel, groups} = useDomainGroupFilter(domainAccountID);
 
@@ -286,6 +297,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             <BaseDomainMembersPage
                 domainAccountID={domainAccountID}
                 accountIDs={memberIDs ?? []}
+                isLoading={shouldShowFullscreenLoading}
                 preFilter={groupPreFilter}
                 headerTitle={translate('domain.members.title')}
                 getCustomListHeader={getCustomListHeader}

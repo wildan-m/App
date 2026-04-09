@@ -1,6 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
+import FullscreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SearchBar from '@components/SearchBar';
@@ -96,6 +97,9 @@ type BaseDomainMembersPageProps = {
 
     /** Subtitle to show in the empty state when the list has no items */
     emptyStateSubtitle?: string;
+
+    /** Whether the initial data is still being fetched. When true, a fullscreen loading indicator is shown in place of the list. */
+    isLoading?: boolean;
 };
 
 function BaseDomainMembersPage({
@@ -120,6 +124,7 @@ function BaseDomainMembersPage({
     preFilter,
     emptyStateTitle,
     emptyStateSubtitle,
+    isLoading = false,
 }: BaseDomainMembersPageProps) {
     const {formatPhoneNumber, localeCompare, translate} = useLocalize();
     const styles = useThemeStyles();
@@ -274,33 +279,42 @@ function BaseDomainMembersPage({
                     {!shouldUseNarrowLayout && !!headerContent && <View style={[styles.flexRow, styles.gap2]}>{headerContent}</View>}
                 </HeaderWithBackButton>
                 {shouldUseNarrowLayout && !!headerContent && <View style={[styles.ph5, styles.flexRow, styles.gap2]}>{headerContent}</View>}
-                <SelectionListWithModal
-                    data={filteredData}
-                    shouldShowRightCaret
-                    style={{
-                        containerStyle: styles.flex1,
-                        listHeaderWrapperStyle: styles.baseListHeaderWrapperStyle,
-                        listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3,
-                        listItemErrorRowStyles: [styles.ph4, styles.pb2],
-                        contentContainerStyle: shouldShowEmptyPreFilterState ? [styles.flex1, styles.mh100] : undefined,
-                        listFooterContentStyle: shouldShowEmptyPreFilterState ? styles.flex1 : undefined,
-                    }}
-                    ListItem={TableListItem}
-                    onSelectRow={onSelectRow}
-                    onDismissError={onDismissError}
-                    shouldShowListEmptyContent={false}
-                    showScrollIndicator={false}
-                    customListHeader={getFilteredListHeader()}
-                    shouldHeaderBeInsideList
-                    customListHeaderContent={listHeaderContent}
-                    canSelectMultiple={canSelectMultiple}
-                    onSelectAll={toggleAllUsers}
-                    onCheckboxPress={toggleUser}
-                    selectedItems={selectedMembers}
-                    turnOnSelectionModeOnLongPress={turnOnSelectionModeOnLongPress}
-                    onTurnOnSelectionMode={(item) => item && toggleUser?.(item)}
-                    listFooterContent={listFooterContent}
-                />
+                {isLoading ? (
+                    <FullscreenLoadingIndicator
+                        reasonAttributes={{
+                            context: 'BaseDomainMembersPage',
+                            isLoading,
+                        }}
+                    />
+                ) : (
+                    <SelectionListWithModal
+                        data={filteredData}
+                        shouldShowRightCaret
+                        style={{
+                            containerStyle: styles.flex1,
+                            listHeaderWrapperStyle: styles.baseListHeaderWrapperStyle,
+                            listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3,
+                            listItemErrorRowStyles: [styles.ph4, styles.pb2],
+                            contentContainerStyle: shouldShowEmptyPreFilterState ? [styles.flex1, styles.mh100] : undefined,
+                            listFooterContentStyle: shouldShowEmptyPreFilterState ? styles.flex1 : undefined,
+                        }}
+                        ListItem={TableListItem}
+                        onSelectRow={onSelectRow}
+                        onDismissError={onDismissError}
+                        shouldShowListEmptyContent={false}
+                        showScrollIndicator={false}
+                        customListHeader={getFilteredListHeader()}
+                        shouldHeaderBeInsideList
+                        customListHeaderContent={listHeaderContent}
+                        canSelectMultiple={canSelectMultiple}
+                        onSelectAll={toggleAllUsers}
+                        onCheckboxPress={toggleUser}
+                        selectedItems={selectedMembers}
+                        turnOnSelectionModeOnLongPress={turnOnSelectionModeOnLongPress}
+                        onTurnOnSelectionMode={(item) => item && toggleUser?.(item)}
+                        listFooterContent={listFooterContent}
+                    />
+                )}
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
     );

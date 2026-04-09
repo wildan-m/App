@@ -159,6 +159,8 @@ const adminPendingActionSelector = (pendingAction: OnyxEntry<DomainPendingAction
 
 const defaultSecurityGroupIDSelector = (domain: OnyxEntry<Domain>) => domain?.domain_defaultSecurityGroupID;
 
+const isLoadingDomainInitialPageSelector = (domain: OnyxEntry<Domain>) => domain?.isLoadingDomainInitialPage;
+
 function groupsSelector(domain: OnyxEntry<Domain>): DomainSecurityGroupWithID[] {
     if (!domain) {
         return getEmptyArray<DomainSecurityGroupWithID>();
@@ -185,6 +187,7 @@ export {
     adminPendingActionSelector,
     technicalContactSettingsSelector,
     defaultSecurityGroupIDSelector,
+    isLoadingDomainInitialPageSelector,
     selectSecurityGroupForAccount,
     memberPendingActionSelector,
     isSecurityGroupEntry,

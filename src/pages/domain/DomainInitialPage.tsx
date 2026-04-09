@@ -92,8 +92,8 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
         if (!domainName) {
             return;
         }
-        openDomainInitialPage(domainName);
-    }, [domainName]);
+        openDomainInitialPage(domainName, domainAccountID);
+    }, [domainName, domainAccountID]);
 
     useEffect(() => {
         fetchDomainData();

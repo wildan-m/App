@@ -45,6 +45,9 @@ type Domain = OnyxCommon.OnyxValueWithOfflineFeedback<{
     /** Whether setting SAML required setting has failed and why */
     samlRequiredError?: OnyxCommon.Errors;
 
+    /** Whether the initial domain payload (security groups, members, admins) is currently being fetched */
+    isLoadingDomainInitialPage?: boolean;
+
     /** ID of the default security group for the domain */
     // eslint-disable-next-line @typescript-eslint/naming-convention
     domain_defaultSecurityGroupID: string;
