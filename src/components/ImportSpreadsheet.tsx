@@ -192,9 +192,7 @@ function ImportSpreadsheet({backTo, goTo, isImportingMultiLevelTags}: ImportSpre
                 {...panResponder.panHandlers}
             >
                 <Text style={[styles.textFileUpload, styles.mb1]}>{isImportingMultiLevelTags ? translate('spreadsheet.import') : translate('spreadsheet.upload')}</Text>
-                <View style={[styles.flexRow]}>
-                    <RenderHTML html={getTextForImportModal()} />
-                </View>
+                <RenderHTML html={getTextForImportModal()} />
             </View>
             <FilePicker acceptableFileTypes={acceptableFileTypes}>
                 {({openPicker}) => (
