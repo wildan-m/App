@@ -374,7 +374,7 @@ function BaseTextInput({
                             )}
                             <InputComponent
                                 ref={(element: BaseTextInputRef | null): void => {
-                                    const baseTextInputRef = isInLandscapeMode ? getLandscapeTextInputRefProxy(element) : element;
+                                    const baseTextInputRef = isInLandscapeMode && !disableKeyboard ? getLandscapeTextInputRefProxy(element) : element;
 
                                     if (typeof ref === 'function') {
                                         ref(baseTextInputRef);
@@ -388,7 +388,7 @@ function BaseTextInput({
                                 }}
                                 // eslint-disable-next-line
                                 {...inputProps}
-                                autoFocus={isInLandscapeMode ? false : inputProps.autoFocus}
+                                autoFocus={isInLandscapeMode && !disableKeyboard ? false : inputProps.autoFocus}
                                 accessibilityLabel={inputProps.accessibilityLabel ?? accessibilityLabel}
                                 accessibilityValue={accessibilityValue}
                                 accessibilityHint={errorText || inputProps.accessibilityHint}
