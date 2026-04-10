@@ -7,7 +7,7 @@ import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Attendee} from '@src/types/onyx/IOU';
 import * as TransactionUtils from '../../src/libs/TransactionUtils';
-import type {Card, Policy, Report, Transaction} from '../../src/types/onyx';
+import type {Card, Policy, Report, Transaction, TransactionViolation} from '../../src/types/onyx';
 import createRandomPolicy, {createCategoryTaxExpenseRules} from '../utils/collections/policies';
 import {createRandomReport} from '../utils/collections/reports';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
@@ -1112,6 +1112,81 @@ describe('TransactionUtils', () => {
             };
 
             expect(TransactionUtils.shouldShowViolation(iouReport, policy, CONST.VIOLATIONS.OVER_AUTO_APPROVAL_LIMIT, 'test@example.com')).toBe(false);
+        });
+
+        it('should return true for brokenCardConnection RTER violation even when user is not submitter and instant submit is disabled', () => {
+            const iouReport: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+                stateNum: CONST.REPORT.STATE_NUM.OPEN,
+                ownerAccountID: 2,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            const brokenConnectionViolation: TransactionViolation = {
+                name: CONST.VIOLATIONS.RTER,
+                type: CONST.VIOLATION_TYPES.VIOLATION,
+                data: {
+                    rterType: CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION,
+                },
+            };
+
+            expect(TransactionUtils.shouldShowViolation(iouReport, policy, CONST.VIOLATIONS.RTER, 'admin@example.com', true, undefined, brokenConnectionViolation)).toBe(true);
+        });
+
+        it('should return false for regular RTER violation when user is not submitter and instant submit is disabled', () => {
+            const iouReport: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+                stateNum: CONST.REPORT.STATE_NUM.OPEN,
+                ownerAccountID: 2,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            const regularRterViolation: TransactionViolation = {
+                name: CONST.VIOLATIONS.RTER,
+                type: CONST.VIOLATION_TYPES.VIOLATION,
+                data: {},
+            };
+
+            expect(TransactionUtils.shouldShowViolation(iouReport, policy, CONST.VIOLATIONS.RTER, 'admin@example.com', true, undefined, regularRterViolation)).toBe(false);
+        });
+
+        it('should return false for brokenCardConnection violation on settled report when shouldShowRterForSettledReport is false', () => {
+            const iouReport: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                ownerAccountID: 2,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+            };
+
+            const brokenConnectionViolation: TransactionViolation = {
+                name: CONST.VIOLATIONS.RTER,
+                type: CONST.VIOLATION_TYPES.VIOLATION,
+                data: {
+                    rterType: CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION,
+                },
+            };
+
+            expect(TransactionUtils.shouldShowViolation(iouReport, policy, CONST.VIOLATIONS.RTER, 'admin@example.com', false, undefined, brokenConnectionViolation)).toBe(false);
         });
     });
 
