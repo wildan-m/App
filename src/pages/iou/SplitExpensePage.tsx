@@ -71,7 +71,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
 
     const {reportID, transactionID, splitExpenseTransactionID, backTo} = route.params;
 
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
 
     const [errorMessage, setErrorMessage] = React.useState<string>('');
@@ -393,27 +393,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         };
     });
 
-    const listFooterContent = (
-        <View style={[styles.w100, styles.flexColumn, styles.mt1, shouldUseNarrowLayout && styles.mb3]}>
-            <MenuItem
-                onPress={onAddSplitExpense}
-                title={translate('iou.addSplit')}
-                icon={icons.Plus}
-                style={[styles.ph4]}
-                sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.ADD_SPLIT_BUTTON}
-            />
-            {isInitialSplit && (
-                <MenuItem
-                    onPress={onMakeSplitsEven}
-                    title={translate('iou.makeSplitsEven')}
-                    icon={icons.ArrowsLeftRight}
-                    style={[styles.ph4]}
-                    sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.MAKE_SPLITS_EVEN_BUTTON}
-                />
-            )}
-        </View>
-    );
-
     let warningMessage = '';
 
     if (invalidSplit && sumOfSplitExpenses !== transactionDetailsAmount) {
@@ -428,7 +407,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         warningMessage = translate('iou.totalAmountGreaterThanOriginal', convertToDisplayString(Math.abs(difference), transactionDetails?.currency));
     }
 
-    const footerContent = (
+    const saveFooter = (
         <View style={[styles.ph5, styles.pb5]}>
             {(!!errorMessage || !!warningMessage) && (
                 <FormHelpMessage
@@ -450,6 +429,33 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             />
         </View>
     );
+
+    // In landscape mode, include the save footer inside the list so it scrolls with items
+    // instead of being fixed at the bottom, which would consume too much vertical space
+    // when the keyboard is open.
+    const listFooterContent = (
+        <View style={[styles.w100, styles.flexColumn, styles.mt1, shouldUseNarrowLayout && styles.mb3]}>
+            <MenuItem
+                onPress={onAddSplitExpense}
+                title={translate('iou.addSplit')}
+                icon={icons.Plus}
+                style={[styles.ph4]}
+                sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.ADD_SPLIT_BUTTON}
+            />
+            {isInitialSplit && (
+                <MenuItem
+                    onPress={onMakeSplitsEven}
+                    title={translate('iou.makeSplitsEven')}
+                    icon={icons.ArrowsLeftRight}
+                    style={[styles.ph4]}
+                    sentryLabel={CONST.SENTRY_LABEL.SPLIT_EXPENSE.MAKE_SPLITS_EVEN_BUTTON}
+                />
+            )}
+            {isInLandscapeMode && saveFooter}
+        </View>
+    );
+
+    const footerContent = isInLandscapeMode ? null : saveFooter;
 
     const splitStartDate = draftTransaction?.comment?.splitsStartDate;
     const splitEndDate = draftTransaction?.comment?.splitsEndDate;

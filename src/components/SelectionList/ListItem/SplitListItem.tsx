@@ -6,6 +6,7 @@ import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
+import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
@@ -38,6 +39,7 @@ function SplitListItem<TItem extends ListItem>({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {didScreenTransitionEnd} = useScreenWrapperTransitionStatus();
+    const isInLandscapeMode = useIsInLandscapeMode();
 
     const splitItem = item as unknown as SplitListItemType;
 
@@ -75,9 +77,10 @@ function SplitListItem<TItem extends ListItem>({
         onInputFocus?.(item);
     }, [onInputFocus, item]);
 
-    // Auto-focus input when item is selected and screen transition ends
+    // Auto-focus input when item is selected and screen transition ends.
+    // Skip in landscape mode to prevent the keyboard from obstructing the page on phones.
     useEffect(() => {
-        if (!didScreenTransitionEnd || !splitItem.isSelected || !splitItem.isEditable || !inputRef.current) {
+        if (!didScreenTransitionEnd || !splitItem.isSelected || !splitItem.isEditable || !inputRef.current || isInLandscapeMode) {
             return;
         }
 
@@ -88,7 +91,7 @@ function SplitListItem<TItem extends ListItem>({
         InteractionManager.runAfterInteractions(() => {
             inputRef.current?.focus();
         });
-    }, [didScreenTransitionEnd, splitItem.isSelected, splitItem.isEditable]);
+    }, [didScreenTransitionEnd, splitItem.isSelected, splitItem.isEditable, isInLandscapeMode]);
 
     const inputCallbackRef = (ref: BaseTextInputRef | null) => {
         inputRef.current = ref;
