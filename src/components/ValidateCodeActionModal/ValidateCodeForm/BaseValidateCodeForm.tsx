@@ -1,7 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import type {ForwardedRef} from 'react';
 import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
-import {AccessibilityInfo, View} from 'react-native';
+import {AccessibilityInfo, InteractionManager, View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
 import Button from '@components/Button';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
@@ -21,6 +21,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isMobileSafari} from '@libs/Browser';
 import {getLatestErrorField, getLatestErrorMessage} from '@libs/ErrorUtils';
+import isWindowReadyToFocus from '@libs/isWindowReadyToFocus';
 import {isValidValidateCode} from '@libs/ValidationUtils';
 import {clearValidateCodeActionError} from '@userActions/User';
 import CONST from '@src/CONST';
@@ -170,16 +171,25 @@ function BaseValidateCodeForm({
                 clearTimeout(focusTimeoutRef.current);
             }
 
-            // Keyboard won't show if we focus the input with a delay, so we need to focus immediately.
-            if (!isMobileSafari()) {
-                focusTimeoutRef.current = setTimeout(() => {
-                    inputValidateCodeRef.current?.focusLastSelected();
-                }, CONST.ANIMATED_TRANSITION);
-            } else {
+            // On mobile Safari, focus must be synchronous to trigger the keyboard.
+            if (isMobileSafari()) {
                 inputValidateCodeRef.current?.focusLastSelected();
+                return;
             }
 
+            // Wait for in-flight interactions (animations) to finish, then ensure the app
+            // window has focus before focusing the input.  On Android this is essential —
+            // the soft keyboard only appears when the window is focused (see Android docs
+            // for showSoftInput).  `isWindowReadyToFocus` is a no-op on other platforms.
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            const focusTaskHandle = InteractionManager.runAfterInteractions(() => {
+                isWindowReadyToFocus().then(() => {
+                    inputValidateCodeRef.current?.focusLastSelected();
+                });
+            });
+
             return () => {
+                focusTaskHandle.cancel();
                 if (!focusTimeoutRef.current) {
                     return;
                 }
