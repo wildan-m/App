@@ -268,6 +268,17 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
         const bankIcon = getBankIcon({bankName: bankName as BankName, isCard: false, styles});
 
+        // When a fully-set-up VBA exists, also check for a partially-set-up bank account connected to this workspace
+        const partiallySetupBankAccountForWorkspace = isBankAccountFullySetup
+            ? Object.values(bankAccountList ?? {}).find(
+                  (bankAccount) => bankAccount?.accountData?.additionalData?.policyID === policy?.id && isBankAccountPartiallySetup(bankAccount?.accountData?.state),
+              )
+            : undefined;
+        const partiallySetupBankName = (partiallySetupBankAccountForWorkspace?.accountData?.additionalData?.bankName ?? '') as BankName;
+        const partiallySetupAddressName = partiallySetupBankAccountForWorkspace?.accountData?.addressName ?? '';
+        const partiallySetupBankTitle = partiallySetupAddressName.includes(CONST.MASKED_PAN_PREFIX) ? partiallySetupBankName : partiallySetupAddressName;
+        const partiallySetupBankIcon = partiallySetupBankAccountForWorkspace ? getBankIcon({bankName: partiallySetupBankName, isCard: false, styles}) : bankIcon;
+
         const hasReimburserError = !!policy?.errorFields?.reimburser;
         const hasApprovalError = !!policy?.errorFields?.approvalMode;
         const hasDelayedSubmissionError = !!(policy?.errorFields?.autoReporting ?? policy?.errorFields?.autoReportingFrequency);
@@ -482,6 +493,32 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                     wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt3, styles.mbn3]}
                                     brickRoadIndicator={hasReimburserError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                                 />
+                                {!!isBankAccountFullySetup && !!partiallySetupBankAccountForWorkspace && (
+                                    <MenuItem
+                                        title={partiallySetupBankTitle}
+                                        description={getPaymentMethodDescription(CONST.PAYMENT_METHODS.BUSINESS_BANK_ACCOUNT, partiallySetupBankAccountForWorkspace.accountData, translate)}
+                                        onPress={() => {
+                                            navigateToBankAccountRoute({
+                                                policyID: route.params.policyID,
+                                                bankAccountID: partiallySetupBankAccountForWorkspace.methodID,
+                                                backTo: ROUTES.WORKSPACE_WORKFLOWS.getRoute(route.params.policyID),
+                                            });
+                                        }}
+                                        displayInDefaultIconColor
+                                        icon={partiallySetupBankIcon.icon}
+                                        iconHeight={partiallySetupBankIcon.iconHeight ?? partiallySetupBankIcon.iconSize}
+                                        iconWidth={partiallySetupBankIcon.iconWidth ?? partiallySetupBankIcon.iconSize}
+                                        iconStyles={partiallySetupBankIcon.iconStyles}
+                                        disabled={isOffline || !isPolicyAdmin}
+                                        badgeText={translate('common.actionRequired')}
+                                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.BANK_ACCOUNT}
+                                        badgeIcon={expensifyIcons.DotIndicator}
+                                        isBadgeSuccess
+                                        shouldShowRightIcon
+                                        shouldGreyOutWhenDisabled={!policy?.pendingFields?.reimbursementChoice}
+                                        wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt3, styles.mbn3]}
+                                    />
+                                )}
                             </>
                         ) : (
                             <MenuItem
