@@ -82,6 +82,7 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
         isPerDiemRequest(transaction),
         isTimeRequestUtil(transaction),
         selectedReport?.policyID ?? transactionPolicyID,
+        ownerAccountID,
     );
 
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);

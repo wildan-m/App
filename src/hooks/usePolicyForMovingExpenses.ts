@@ -31,7 +31,7 @@ function isPolicyValidForMovingExpenses(policy: OnyxEntry<Policy>, login: string
     );
 }
 
-function usePolicyForMovingExpenses(isPerDiemRequest?: boolean, isTimeRequest?: boolean, expensePolicyID?: string) {
+function usePolicyForMovingExpenses(isPerDiemRequest?: boolean, isTimeRequest?: boolean, expensePolicyID?: string, ownerAccountID?: number) {
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`, {
@@ -57,10 +57,11 @@ function usePolicyForMovingExpenses(isPerDiemRequest?: boolean, isTimeRequest?: 
         }
     }
 
-    // If an expense policy ID is provided and valid, prefer it over the active policy
-    // This ensures that when viewing/editing an expense from workspace B, we show workspace B
-    // even if the user's default workspace is A
-    if (expensePolicyID) {
+    // If an expense policy ID is provided and valid, prefer it for non-owner users (e.g. admins
+    // managing someone else's expense). For the expense owner, skip this so the hook falls through
+    // to the user's default/active workspace.
+    const isExpenseOwner = ownerAccountID !== undefined && ownerAccountID === session?.accountID;
+    if (expensePolicyID && !isExpenseOwner) {
         const expensePolicy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${expensePolicyID}`];
         if (expensePolicy && isPolicyValidForMovingExpenses(expensePolicy, login, isPerDiemRequest, isTimeRequest)) {
             return {policyForMovingExpensesID: expensePolicyID, policyForMovingExpenses: expensePolicy, shouldSelectPolicy: false};
