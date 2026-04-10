@@ -246,7 +246,7 @@ function NumberWithSymbolForm({
 
             // When allowNegativeInput is true, keep negative sign as-is (for split amounts)
             // When allowFlippingAmount is true, strip the negative sign and call toggleNegative
-            const finalNumber = allowNegativeInput ? rawFinalNumber : handleNegativeAmountFlipping(rawFinalNumber, allowFlippingAmount, toggleNegative);
+            const finalNumber = addLeadingZero(allowNegativeInput ? rawFinalNumber : handleNegativeAmountFlipping(rawFinalNumber, allowFlippingAmount, toggleNegative), allowNegativeInput);
 
             // Use a shallow copy of selection to trigger setSelection
             // More info: https://github.com/Expensify/App/issues/16385

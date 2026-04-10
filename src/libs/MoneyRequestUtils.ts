@@ -33,7 +33,7 @@ function stripDecimalsFromAmount(amount: string): string {
  */
 function addLeadingZero(amount: string, shouldAllowNegative = false): string {
     if (shouldAllowNegative && amount.startsWith('-.')) {
-        return `-0${amount}`;
+        return `-0${amount.slice(1)}`;
     }
     return amount.startsWith('.') ? `0${amount}` : amount;
 }
