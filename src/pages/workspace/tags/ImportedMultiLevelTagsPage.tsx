@@ -4,6 +4,7 @@ import ImportSpreadsheetColumns from '@components/ImportSpreadsheetColumns';
 import ImportSpreadsheetConfirmModal from '@components/ImportSpreadsheetConfirmModal';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useCloseImportPage from '@hooks/useCloseImportPage';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {importMultiLevelTags} from '@libs/actions/Policy/Tag';
@@ -11,6 +12,7 @@ import {generateColumnNames} from '@libs/importSpreadsheetUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import {getCountOfEnabledTagsOfList, getTagLists} from '@libs/PolicyUtils';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -25,13 +27,25 @@ function ImportedMultiLevelTagsPage({route}: ImportedMultiLevelTagsPageProps) {
     const [spreadsheet, spreadsheetMetadata] = useOnyx(ONYXKEYS.IMPORTED_SPREADSHEET);
     const [isImportingTags, setIsImportingTags] = useState(false);
     const policyID = route.params.policyID;
+    const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
+    const {showConfirmModal} = useConfirmModal();
     const columnNames = generateColumnNames(spreadsheet?.data?.length ?? 0);
 
     const {setIsClosing} = useCloseImportPage();
     const importTags = useCallback(() => {
+        const policyTagLists = getTagLists(policyTags);
+        if (policyTagLists.some((tagList) => tagList.required && getCountOfEnabledTagsOfList(tagList.tags) > 0)) {
+            showConfirmModal({
+                title: translate('workspace.tags.cannotDeleteOrDisableAllTags.title'),
+                prompt: translate('workspace.tags.cannotDeleteOrDisableAllTags.description'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+            return;
+        }
         setIsImportingTags(true);
         importMultiLevelTags(policyID, spreadsheet);
-    }, [spreadsheet, policyID]);
+    }, [spreadsheet, policyID, policyTags, showConfirmModal, translate]);
 
     if (!spreadsheet && isLoadingOnyxValue(spreadsheetMetadata)) {
         return;
