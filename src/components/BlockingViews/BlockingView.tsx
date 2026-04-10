@@ -8,6 +8,7 @@ import type {MergeExclusive} from 'type-fest';
 import Icon from '@components/Icon';
 import Lottie from '@components/Lottie';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
+import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -129,53 +130,55 @@ function BlockingView({
 
     return (
         <View
-            style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph10, containerStyle]}
+            style={[styles.flex1, containerStyle]}
             accessibilityLabel={accessibilityLabel}
             testID={testID}
         >
-            {!!animation && (
-                <Lottie
-                    source={animation}
-                    loop
-                    autoPlay
-                    style={animationStyles}
-                    webStyle={animationWebStyle}
-                />
-            )}
-            {!!icon && (
-                <Icon
-                    src={icon}
-                    fill={iconColor}
-                    width={iconWidth}
-                    height={iconHeight}
-                    contentFit={contentFitImage}
-                />
-            )}
-            <View>
-                <Text style={[styles.notFoundTextHeader, titleStyles]}>{title}</Text>
-
-                {CustomSubtitle}
-                {!CustomSubtitle && (
-                    <SubtitleWrapper style={subtitleWrapperStyle}>
-                        {!!subtitleKeyBelowLink && !!linkTranslationKey ? (
-                            <SubtitleWithBelowLink
-                                subtitle={subtitle}
-                                subtitleStyle={subtitleStyle}
-                                subtitleKeyBelowLink={subtitleKeyBelowLink}
-                                onLinkPress={onLinkPress}
-                                linkTranslationKey={linkTranslationKey}
-                            />
-                        ) : (
-                            <BlockingViewSubtitle
-                                subtitle={subtitle}
-                                subtitleStyle={subtitleStyle}
-                                onLinkPress={onLinkPress}
-                                linkTranslationKey={linkTranslationKey}
-                            />
-                        )}
-                    </SubtitleWrapper>
+            <ScrollView contentContainerStyle={[styles.flexGrow1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph10]}>
+                {!!animation && (
+                    <Lottie
+                        source={animation}
+                        loop
+                        autoPlay
+                        style={animationStyles}
+                        webStyle={animationWebStyle}
+                    />
                 )}
-            </View>
+                {!!icon && (
+                    <Icon
+                        src={icon}
+                        fill={iconColor}
+                        width={iconWidth}
+                        height={iconHeight}
+                        contentFit={contentFitImage}
+                    />
+                )}
+                <View>
+                    <Text style={[styles.notFoundTextHeader, titleStyles]}>{title}</Text>
+
+                    {CustomSubtitle}
+                    {!CustomSubtitle && (
+                        <SubtitleWrapper style={subtitleWrapperStyle}>
+                            {!!subtitleKeyBelowLink && !!linkTranslationKey ? (
+                                <SubtitleWithBelowLink
+                                    subtitle={subtitle}
+                                    subtitleStyle={subtitleStyle}
+                                    subtitleKeyBelowLink={subtitleKeyBelowLink}
+                                    onLinkPress={onLinkPress}
+                                    linkTranslationKey={linkTranslationKey}
+                                />
+                            ) : (
+                                <BlockingViewSubtitle
+                                    subtitle={subtitle}
+                                    subtitleStyle={subtitleStyle}
+                                    onLinkPress={onLinkPress}
+                                    linkTranslationKey={linkTranslationKey}
+                                />
+                            )}
+                        </SubtitleWrapper>
+                    )}
+                </View>
+            </ScrollView>
         </View>
     );
 }
