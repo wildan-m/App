@@ -96,12 +96,16 @@ function DistanceRequestController({
             return;
         }
 
-        // If there is a distance rate in the policy that matches the rate and unit of the currently selected mileage rate, select it automatically
-        const matchingRate = Object.values(policyRates).find((policyRate) => policyRate.rate === mileageRate.rate && policyRate.unit === mileageRate.unit);
-        if (matchingRate?.customUnitRateID) {
-            setCustomUnitRateID(transactionID, matchingRate.customUnitRateID, transaction, policy);
-            clearFormErrors([errorKey]);
-            return;
+        // If there is a distance rate in the policy that matches the rate and unit of the currently selected mileage rate, select it automatically.
+        // Skip this when moving from track expense (self DM), because getRate() falls back to the workspace's default rate when the
+        // personal policy rate ID isn't found, making value+unit matching trivially succeed and hiding the validation error.
+        if (!isMovingTransactionFromTrackExpense) {
+            const matchingRate = Object.values(policyRates).find((policyRate) => policyRate.rate === mileageRate.rate && policyRate.unit === mileageRate.unit);
+            if (matchingRate?.customUnitRateID) {
+                setCustomUnitRateID(transactionID, matchingRate.customUnitRateID, transaction, policy);
+                clearFormErrors([errorKey]);
+                return;
+            }
         }
 
         // If none of the above conditions are met, display the rate error
