@@ -262,7 +262,7 @@ function getEligibleBankAccountShareRecipients(policies: OnyxCollection<Policy> 
                 continue;
             }
             const personalDetails = getPersonalDetailByEmail(email);
-            if (!personalDetails) {
+            if (!personalDetails || !personalDetails.validated) {
                 continue;
             }
             adminMap.set(
@@ -299,6 +299,10 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
         for (const admin of admins) {
             const email = admin?.email;
             if (!email || email === currentUserLogin || alreadySharedSharees.has(email)) {
+                continue;
+            }
+            const personalDetails = getPersonalDetailByEmail(email);
+            if (!personalDetails?.validated) {
                 continue;
             }
 
