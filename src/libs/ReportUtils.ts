@@ -10017,12 +10017,14 @@ function getMoneyRequestOptions(
 
     const otherParticipants = reportParticipants.filter((accountID) => deprecatedCurrentUserAccountID !== accountID);
     // We don't allow IOU actions if an Expensify account is a participant of the report, unless the policy that the report is on is owned by an Expensify account
+    // Policy expense chats are exempt because expense creation is governed by the workspace policy, not participant identity
+    // (e.g. Concierge joining a workspace chat should not disable expense options)
     const doParticipantsIncludeExpensifyAccounts = lodashIntersection(reportParticipants, CONST.EXPENSIFY_ACCOUNT_IDS).length > 0;
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policyOwnerAccountID = getPolicy(report?.policyID)?.ownerAccountID;
     const isPolicyOwnedByExpensifyAccounts = policyOwnerAccountID ? CONST.EXPENSIFY_ACCOUNT_IDS.includes(policyOwnerAccountID) : false;
-    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts) {
+    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts && !isPolicyExpenseChat(report)) {
         // Allow create expense option for Manager McTest report
         if (
             canRequestMoney(report, policy, otherParticipants) &&
