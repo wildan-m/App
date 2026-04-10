@@ -112,8 +112,15 @@ function IOURequestStepScan({
         {photoResolution: {width: CONST.RECEIPT_CAMERA.PHOTO_WIDTH, height: CONST.RECEIPT_CAMERA.PHOTO_HEIGHT}},
         {videoResolution: {width: windowHeight, height: windowWidth}},
     ]);
-    // Format dimensions are in landscape orientation, so height/width gives portrait aspect ratio
-    const cameraAspectRatio = format ? format.photoHeight / format.photoWidth : undefined;
+    // Format dimensions are in landscape (sensor-native) orientation.
+    // In portrait mode, height/width gives the correct portrait aspect ratio (e.g. 0.75).
+    // In landscape mode, we invert to width/height so the viewfinder matches the landscape screen (e.g. 1.33).
+    const cameraAspectRatio = useMemo(() => {
+        if (!format) {
+            return undefined;
+        }
+        return isInLandscapeMode ? format.photoWidth / format.photoHeight : format.photoHeight / format.photoWidth;
+    }, [format, isInLandscapeMode]);
     const fps = useMemo(() => (format ? Math.min(Math.max(30, format.minFps), format.maxFps) : 30), [format]);
 
     const navigateBack = () => {
