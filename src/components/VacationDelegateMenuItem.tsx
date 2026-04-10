@@ -67,7 +67,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
         </>
     ) : (
         <MenuItem
-            description={translate('common.vacationDelegate')}
+            title={translate('common.vacationDelegate')}
             shouldShowRightIcon
             onPress={onPress}
         />
