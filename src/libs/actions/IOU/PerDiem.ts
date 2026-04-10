@@ -26,6 +26,7 @@ import {
     buildOptimisticExpenseReport,
     buildOptimisticIOUReport,
     buildOptimisticMoneyRequestEntities,
+    buildOptimisticMovedTransactionAction,
     buildOptimisticReportPreview,
     buildOptimisticSelfDMReport,
     generateReportID,
@@ -64,6 +65,7 @@ import {
     mergePolicyRecentlyUsedCurrencies,
 } from '.';
 import type {BaseTransactionParams, MoneyRequestInformation, RequestMoneyParticipantParams} from './index';
+import {getDeleteTrackExpenseInformation} from './TrackExpense';
 import type BasePolicyParams from './types/BasePolicyParams';
 
 function removeSubrate(transaction: OnyxEntry<OnyxTypes.Transaction>, currentIndex: string) {
@@ -236,6 +238,9 @@ type PerDiemExpenseInformation = {
     shouldPlaySound?: boolean;
     optimisticReportPreviewActionID?: string;
     shouldDeferAutoSubmit?: boolean;
+    actionableWhisperReportActionID?: string;
+    linkedTrackedExpenseReportAction?: OnyxTypes.ReportAction;
+    linkedTrackedExpenseReportID?: string;
 };
 
 type PerDiemExpenseInformationParams = {
@@ -894,6 +899,9 @@ function submitPerDiemExpense(submitPerDiemExpenseInformation: PerDiemExpenseInf
         shouldPlaySound: shouldPlaySoundParam = true,
         optimisticReportPreviewActionID,
         shouldDeferAutoSubmit,
+        actionableWhisperReportActionID,
+        linkedTrackedExpenseReportAction,
+        linkedTrackedExpenseReportID,
     } = submitPerDiemExpenseInformation;
     const {payeeAccountID} = participantParams;
     const {currency, comment = '', category, tag, created, customUnit, attendees, isFromGlobalCreate} = transactionParams;
@@ -948,6 +956,43 @@ function submitPerDiemExpense(submitPerDiemExpenseInformation: PerDiemExpenseInf
 
     const activeReportID = isMoneyRequestReport && Navigation.getTopmostReportId() === report?.reportID ? report?.reportID : chatReport.reportID;
 
+    // If we're moving a tracked per diem expense from self DM, add deletion data for the original expense
+    if (linkedTrackedExpenseReportAction && linkedTrackedExpenseReportID) {
+        const {
+            optimisticData: deleteOptimisticData,
+            successData: deleteSuccessData,
+            failureData: deleteFailureData,
+        } = getDeleteTrackExpenseInformation(
+            getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${linkedTrackedExpenseReportID}`],
+            transaction.transactionID,
+            linkedTrackedExpenseReportAction,
+            false,
+            false,
+            true,
+            actionableWhisperReportActionID,
+            CONST.IOU.ACTION.SUBMIT,
+            true,
+        );
+        onyxData.optimisticData?.push(...deleteOptimisticData);
+        onyxData.successData?.push(...deleteSuccessData);
+        onyxData.failureData?.push(...deleteFailureData);
+
+        const existingTransactionThreadReportID = linkedTrackedExpenseReportAction.childReportID;
+        if (existingTransactionThreadReportID) {
+            const modifiedExpenseReportAction = buildOptimisticMovedTransactionAction(existingTransactionThreadReportID, linkedTrackedExpenseReportID);
+            onyxData.optimisticData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${existingTransactionThreadReportID}`,
+                value: {[modifiedExpenseReportAction.reportActionID]: modifiedExpenseReportAction},
+            });
+            onyxData.successData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${existingTransactionThreadReportID}`,
+                value: {[modifiedExpenseReportAction.reportActionID]: {pendingAction: null}},
+            });
+        }
+    }
+
     const customUnitRate = getPerDiemRateCustomUnitRate(policyParams.policy, customUnit.customUnitRateID);
 
     const customUnitRateParam = {
@@ -982,6 +1027,9 @@ function submitPerDiemExpense(submitPerDiemExpenseInformation: PerDiemExpenseInf
         attendees: attendees ? JSON.stringify(attendees) : undefined,
         customUnitPolicyID,
         shouldDeferAutoSubmit,
+        actionableWhisperReportActionID,
+        linkedTrackedExpenseReportActionID: linkedTrackedExpenseReportAction?.reportActionID,
+        linkedTrackedExpenseReportID,
     };
 
     if (shouldPlaySoundParam) {

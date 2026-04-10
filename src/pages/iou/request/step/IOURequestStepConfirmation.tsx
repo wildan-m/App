@@ -672,6 +672,9 @@ function IOURequestStepConfirmation({
                     quickAction,
                     betas,
                     personalDetails,
+                    actionableWhisperReportActionID: transaction.actionableWhisperReportActionID,
+                    linkedTrackedExpenseReportAction: transaction.linkedTrackedExpenseReportAction,
+                    linkedTrackedExpenseReportID: transaction.linkedTrackedExpenseReportID,
                 });
             }
         },
