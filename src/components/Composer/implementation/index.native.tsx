@@ -114,7 +114,8 @@ function Composer({
         [onPasteFile],
     );
 
-    const maxHeightStyle = useMemo(() => StyleUtils.getComposerMaxHeightStyle(maxLines, isComposerFullSize), [StyleUtils, isComposerFullSize, maxLines]);
+    const effectiveMaxLines = isInLandscapeMode && maxLines != null ? Math.min(maxLines, CONST.COMPOSER.MAX_LINES_LANDSCAPE) : maxLines;
+    const maxHeightStyle = useMemo(() => StyleUtils.getComposerMaxHeightStyle(effectiveMaxLines, isComposerFullSize), [StyleUtils, isComposerFullSize, effectiveMaxLines]);
     const composerStyle = useMemo(() => StyleSheet.flatten([style, textContainsOnlyEmojis ? styles.onlyEmojisTextLineHeight : {}]), [style, textContainsOnlyEmojis, styles]);
 
     return (
