@@ -6824,6 +6824,7 @@ const translations = {
                 reviewSelectedCards: 'Review selected cards',
                 summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} more`,
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Apply at least one spend rule to one card',
+                allCardsAlreadyHaveRules: 'All cards already have a spend rule',
                 confirmErrorCardRequired: 'Card is a required field',
                 confirmErrorApplyAtLeastOneSpendRule: 'Apply at least one spend rule',
                 categories: 'Categories',

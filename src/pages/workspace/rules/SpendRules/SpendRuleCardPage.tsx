@@ -106,6 +106,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
 
     const isCardSettingsLoading = !isOffline && (!expensifyCardSettings || expensifyCardSettings.isLoading) && !expensifyCardSettings?.hasOnceLoaded;
     const eligibleCards = expensifyCardSettings ? getEligibleCards(cardsList, expensifyCardSettings, ruleID === ROUTES.NEW ? undefined : ruleID) : [];
+    const allCardsHaveRules = eligibleCards.length === 0 && Object.keys(cardsList ?? {}).some((key) => key !== 'cardList');
 
     const filterCard = (card: Card, searchInput: string) => filterCardsByPersonalDetails(card, searchInput, personalDetails);
     const sortCards = (cards: Card[]) => sortCardsByCardholderName(cards, personalDetails, localeCompare);
@@ -238,7 +239,14 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                                 icon={illustrations.Telescope}
                                 iconWidth={variables.emptyListIconWidth}
                                 iconHeight={variables.emptyListIconHeight}
-                                title={inputValue.trim() ? translate('common.noResultsFound') : translate('workspace.companyCards.noActiveCards')}
+                                title={
+                                    // eslint-disable-next-line no-nested-ternary
+                                    inputValue.trim()
+                                        ? translate('common.noResultsFound')
+                                        : allCardsHaveRules
+                                          ? translate('workspace.rules.spendRules.allCardsAlreadyHaveRules')
+                                          : translate('workspace.companyCards.noActiveCards')
+                                }
                             />
                         }
                         footerContent={

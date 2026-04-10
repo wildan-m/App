@@ -248,7 +248,7 @@ function SpendRulePageBase({policyID, ruleID, titleKey, testID}: SpendRulePageBa
                         description={translate('workspace.rules.spendRules.maxAmount')}
                         onPress={() => {
                             clearError();
-                            if (!selectedCurrency) {
+                            if (hasSelectedCards && !selectedCurrency) {
                                 openCurrencyMismatchModal();
                                 return;
                             }

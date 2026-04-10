@@ -6865,6 +6865,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 reviewSelectedCards: 'Examiner les cartes sélectionnées',
                 summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} de plus`,
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Appliquez au moins une règle de dépense à une carte',
+                allCardsAlreadyHaveRules: 'Toutes les cartes ont déjà une règle de dépenses',
                 confirmErrorCardRequired: 'La carte est un champ obligatoire',
                 confirmErrorApplyAtLeastOneSpendRule: 'Appliquez au moins une règle de dépense',
                 categories: 'Catégories',
