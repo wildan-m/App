@@ -5056,6 +5056,10 @@ function getPayMoneyRequestParams({
         optimisticNextStep = buildOptimisticNextStep({report: iouReport, predictedNextStatus: CONST.REPORT.STATUS_NUM.REIMBURSED});
     }
 
+    // Recalculate report name for formula-based titles (e.g., {report:status}) since statusNum is changing
+    const updatedIouReportForTitle = iouReport ? maybeUpdateReportNameForFormulaTitle({...iouReport, statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED}, reportPolicy) : undefined;
+    const optimisticReportName = updatedIouReportForTitle?.reportName && updatedIouReportForTitle.reportName !== iouReport?.reportName ? updatedIouReportForTitle.reportName : undefined;
+
     const optimisticChatReport = {
         ...chatReport,
         lastReadTime: DateUtils.getDBTime(),
@@ -5097,6 +5101,7 @@ function getPayMoneyRequestParams({
                 hasOutstandingChildRequest: false,
                 statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
                 stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                ...(optimisticReportName ? {reportName: optimisticReportName} : {}),
                 pendingFields: {
                     preview: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                     reimbursed: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
