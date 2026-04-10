@@ -114,7 +114,7 @@ function getTagViolationsForSingleLevelTags(
 /**
  * Calculates missing tag violations for policies with dependent tags
  */
-function getTagViolationsForDependentTags(policyTagList: PolicyTagLists, transactionViolations: TransactionViolation[], tagName: string) {
+function getTagViolationsForDependentTags(policyTagList: PolicyTagLists, transactionViolations: TransactionViolation[], tagName: string, policyRequiresTag: boolean) {
     const tagViolations = [...transactionViolations];
 
     if (!tagName) {
@@ -125,7 +125,7 @@ function getTagViolationsForDependentTags(policyTagList: PolicyTagLists, transac
                 data: {tagName: tagList.name},
             });
         }
-    } else {
+    } else if (policyRequiresTag) {
         const tags = TransactionUtils.getTagArrayFromName(tagName);
         if (Object.keys(policyTagList).length !== tags.length || tags.includes('')) {
             tagViolations.push({
@@ -214,6 +214,7 @@ function getTagViolationsForMultiLevelTags(
     transactionViolations: TransactionViolation[],
     policyTagList: PolicyTagLists,
     hasDependentTags: boolean,
+    policyRequiresTag: boolean,
 ): TransactionViolation[] {
     const tagViolations = [
         CONST.VIOLATIONS.SOME_TAG_LEVELS_REQUIRED,
@@ -224,7 +225,7 @@ function getTagViolationsForMultiLevelTags(
     const filteredTransactionViolations = transactionViolations.filter((violation) => !tagViolations.includes(violation.name));
 
     if (hasDependentTags) {
-        return getTagViolationsForDependentTags(policyTagList, filteredTransactionViolations, updatedTransaction.tag ?? '');
+        return getTagViolationsForDependentTags(policyTagList, filteredTransactionViolations, updatedTransaction.tag ?? '', policyRequiresTag);
     }
 
     return getTagViolationForIndependentTags(policyTagList, filteredTransactionViolations, updatedTransaction);
@@ -415,7 +416,7 @@ const ViolationsUtils = {
             newTransactionViolations =
                 Object.keys(policyTagList).length === 1
                     ? getTagViolationsForSingleLevelTags(updatedTransaction, newTransactionViolations, policyRequiresTags, policyTagList)
-                    : getTagViolationsForMultiLevelTags(updatedTransaction, newTransactionViolations, policyTagList, hasDependentTags);
+                    : getTagViolationsForMultiLevelTags(updatedTransaction, newTransactionViolations, policyTagList, hasDependentTags, !!policy.requiresTag);
         }
 
         const customUnitRateID = updatedTransaction?.comment?.customUnit?.customUnitRateID;
