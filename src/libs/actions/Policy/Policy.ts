@@ -2585,6 +2585,7 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
                 avatarURL: file?.uri,
                 originalFileName: file?.name,
                 ...optimisticMccGroupData.optimisticData,
+                eReceipts: outputCurrency === CONST.CURRENCY.USD,
                 requiresCategory: true,
                 fieldList: {
                     [CONST.POLICY.FIELDS.FIELD_LIST_TITLE]: {
@@ -3802,6 +3803,12 @@ function openWorkspace(policyID: string, clientMemberAccountIDs: number[]) {
     if (!policyID || !clientMemberAccountIDs) {
         Log.warn('openWorkspace invalid params', {policyID, clientMemberAccountIDs});
         return;
+    }
+
+    // Auto-enable eReceipts for Team (Collect) plan USD workspaces to match Classic Expensify default behavior
+    const policy = deprecatedAllPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
+    if (policy && !policy.eReceipts && policy.type === CONST.POLICY.TYPE.TEAM && policy.outputCurrency === CONST.CURRENCY.USD) {
+        setWorkspaceEReceiptsEnabled(policyID, true, policy.eReceipts);
     }
 
     const params: OpenWorkspaceParams = {
