@@ -48,6 +48,7 @@ function IncorporationCode({onNext, isEditing}: SubPageProps) {
             style={[styles.mh0, styles.flexGrow1]}
             submitButtonStyles={[styles.ph5, styles.mb0]}
             shouldHideFixErrorsAlert
+            shouldUseScrollView={false}
         >
             <Text style={[styles.textHeadlineLineHeightXXL, styles.ph5, styles.mb6]}>{translate('companyStep.industryClassification')}</Text>
             <InputWrapper
