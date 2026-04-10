@@ -281,7 +281,7 @@ function isExportAction(report: Report, currentUserLogin: string, policy?: Polic
         return false;
     }
 
-    const hasExportError = hasExportErrorUtil(reportActions);
+    const hasExportError = hasExportErrorUtil(reportActions, report);
     if (syncEnabled && !hasExportError) {
         return false;
     }
