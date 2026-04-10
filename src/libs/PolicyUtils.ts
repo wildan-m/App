@@ -339,20 +339,20 @@ function getCustomUnitsForDuplication(
             return undefined;
         }
 
-        return {[distanceCustomUnitID]: distanceCustomUnit, [perDiemCustomUnitID]: perDiemUnit};
+        return {[distanceCustomUnitID]: {...distanceCustomUnit, customUnitID: distanceCustomUnitID}, [perDiemCustomUnitID]: {...perDiemUnit, customUnitID: perDiemCustomUnitID}};
     }
 
     if (isDistanceRatesOptionSelected && distanceCustomUnitID) {
         if (!distanceCustomUnit) {
             return undefined;
         }
-        return {[distanceCustomUnitID]: distanceCustomUnit};
+        return {[distanceCustomUnitID]: {...distanceCustomUnit, customUnitID: distanceCustomUnitID}};
     }
 
     if (!perDiemUnit || !perDiemCustomUnitID) {
         return undefined;
     }
-    return {[perDiemCustomUnitID]: perDiemUnit};
+    return {[perDiemCustomUnitID]: {...perDiemUnit, customUnitID: perDiemCustomUnitID}};
 }
 
 /**
