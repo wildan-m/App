@@ -287,7 +287,7 @@ type ConfirmButtonOptions<TItem extends ListItem> = {
     isDisabled?: boolean;
 };
 
-type InteractiveElementRoles = 'button' | 'checkbox' | 'switch';
+type InteractiveElementRoles = 'button' | 'switch';
 
 type SelectionListHandle<TItem extends ListItem> = {
     /** Scrolls to and highlights the specified items */
