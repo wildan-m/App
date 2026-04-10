@@ -2987,6 +2987,9 @@ type AttachmentModalScreensParamList = {
         policyID: string;
         letter?: UpperCaseCharacters;
     };
+    [SCREENS.WORKSPACE_DOCUMENT]: AttachmentModalContainerModalProps & {
+        policyID: string;
+    };
     [SCREENS.REPORT_AVATAR]: AttachmentModalContainerModalProps & {
         reportID: string;
         policyID?: string;
