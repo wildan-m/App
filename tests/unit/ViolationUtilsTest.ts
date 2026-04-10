@@ -1123,22 +1123,30 @@ describe('getViolationsOnyxData', () => {
                 policy.tax = {trackingEnabled: false};
             });
 
-            it('should add taxOutOfPolicy violation when transaction has taxCode', () => {
+            it('should not add taxOutOfPolicy violation when transaction has taxCode', () => {
                 transaction.taxCode = 'SOME_TAX';
                 const result = ViolationsUtils.getViolationsOnyxData(transaction, transactionViolations, policy, policyTags, policyCategories, false, false);
-                expect(result.value).toContainEqual(taxOutOfPolicyViolation);
+                expect(result.value).not.toContainEqual(taxOutOfPolicyViolation);
             });
 
-            it('should add taxOutOfPolicy violation when transaction has taxAmount', () => {
+            it('should not add taxOutOfPolicy violation when transaction has taxAmount', () => {
                 transaction.taxAmount = 500;
                 const result = ViolationsUtils.getViolationsOnyxData(transaction, transactionViolations, policy, policyTags, policyCategories, false, false);
-                expect(result.value).toContainEqual(taxOutOfPolicyViolation);
+                expect(result.value).not.toContainEqual(taxOutOfPolicyViolation);
             });
 
-            it('should add taxOutOfPolicy violation when transaction has taxValue', () => {
+            it('should not add taxOutOfPolicy violation when transaction has taxValue', () => {
                 transaction.taxValue = '10%';
                 const result = ViolationsUtils.getViolationsOnyxData(transaction, transactionViolations, policy, policyTags, policyCategories, false, false);
-                expect(result.value).toContainEqual(taxOutOfPolicyViolation);
+                expect(result.value).not.toContainEqual(taxOutOfPolicyViolation);
+            });
+
+            it('should remove existing taxOutOfPolicy violation even when transaction has tax data', () => {
+                transaction.taxCode = 'SOME_TAX';
+                transaction.taxAmount = 500;
+                transactionViolations = [taxOutOfPolicyViolation];
+                const result = ViolationsUtils.getViolationsOnyxData(transaction, transactionViolations, policy, policyTags, policyCategories, false, false);
+                expect(result.value).not.toContainEqual(taxOutOfPolicyViolation);
             });
 
             it('should not add taxOutOfPolicy violation when transaction has no tax data', () => {

@@ -662,8 +662,7 @@ const ViolationsUtils = {
             newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.MISSING_ATTENDEES});
         }
 
-        const hasTransactionTaxData = !!updatedTransaction.taxCode || !!updatedTransaction.taxValue || !!updatedTransaction.taxAmount;
-        const shouldAddTaxOutOfPolicy = isPolicyTrackTaxEnabled ? !isTaxInPolicy : hasTransactionTaxData;
+        const shouldAddTaxOutOfPolicy = isPolicyTrackTaxEnabled && !isTaxInPolicy;
 
         if (!hasTaxOutOfPolicyViolation && shouldAddTaxOutOfPolicy) {
             newTransactionViolations.push({name: CONST.VIOLATIONS.TAX_OUT_OF_POLICY, type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true});
