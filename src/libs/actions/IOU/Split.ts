@@ -87,7 +87,7 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type {Unit} from '@src/types/onyx/Policy';
 import type RecentlyUsedTags from '@src/types/onyx/RecentlyUsedTags';
 import type {OnyxData} from '@src/types/onyx/Request';
-import type {SplitShares, TransactionChanges, TransactionCustomUnit} from '@src/types/onyx/Transaction';
+import type {Comment, SplitShares, TransactionChanges, TransactionCustomUnit} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
     buildMinimalTransactionForFormula,
@@ -2171,7 +2171,11 @@ function updateSplitTransactions({
         const splitApiParams = {} as Record<string, string | number | boolean>;
         for (const [i, split] of splits.entries()) {
             for (const [key, value] of Object.entries(split)) {
-                splitApiParams[`splits[${i}][${key}]`] = value !== null && typeof value === 'object' ? JSON.stringify(value) : value;
+                if (key === 'comment' && value !== null && typeof value === 'object') {
+                    splitApiParams[`splits[${i}][${key}]`] = (value as Comment).comment ?? '';
+                } else {
+                    splitApiParams[`splits[${i}][${key}]`] = value !== null && typeof value === 'object' ? JSON.stringify(value) : value;
+                }
             }
         }
 
