@@ -104,6 +104,10 @@ function isBusinessBankAccountLocked(account: PaymentMethodItem) {
     return account.accountData && 'state' in account.accountData && account.accountData.state === CONST.BANK_ACCOUNT.STATE.LOCKED && account.accountData.allowDebit;
 }
 
+function isBusinessBankAccountVerified(account: PaymentMethodItem) {
+    return !!(account.accountData && 'state' in account.accountData && account.accountData.state === CONST.BANK_ACCOUNT.STATE.OPEN && account.accountData.allowDebit);
+}
+
 function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems, listItemStyle}: PaymentMethodListItemProps) {
     const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'FreezeCard', 'QuestionMark']);
     const theme = useTheme();
@@ -114,6 +118,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
     const threeDotsMenuRef = useRef<{hidePopoverMenu: () => void; isPopupMenuVisible: boolean; onThreeDotsPress: () => void}>(null);
     const isInSetupState = isAccountInSetupState(item);
     const isInLockedState = isBusinessBankAccountLocked(item);
+    const isVerified = isBusinessBankAccountVerified(item);
     const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems;
 
     // Check if this is a Chase personal bank account connected via Plaid
@@ -147,8 +152,11 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
         if (isInSetupState) {
             return translate('common.actionRequired');
         }
+        if (isVerified) {
+            return translate('common.verified');
+        }
         return shouldShowDefaultBadge ? translate('paymentMethodList.defaultPaymentMethod') : undefined;
-    }, [isInSetupState, isInLockedState, shouldShowDefaultBadge, translate]);
+    }, [isInSetupState, isInLockedState, isVerified, shouldShowDefaultBadge, translate]);
 
     const badgeIcon = useMemo(() => {
         if (isInSetupState || isInLockedState) {
@@ -206,7 +214,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                 iconFill={item.iconFill}
                 badgeText={badgeText}
                 badgeIcon={badgeIcon}
-                isBadgeSuccess={isInSetupState}
+                isBadgeSuccess={isInSetupState || isVerified}
                 isBadgeError={isInLockedState}
                 wrapperStyle={[styles.paymentMethod, listItemStyle]}
                 iconRight={isInSetupState ? undefined : item.iconRight}
