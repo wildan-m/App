@@ -3752,7 +3752,7 @@ function getRenamedCardFeedMessage(translate: LocalizedTranslate, reportAction: 
     const originalMessage = getOriginalMessage(reportAction);
     const oldName = originalMessage?.oldName;
     const newName = originalMessage?.newName;
-    return oldName && newName ? translate('workspaceActions.renamedCardFeed', newName, oldName) : getReportActionText(reportAction);
+    return oldName && newName ? translate('workspaceActions.renamedCardFeed', Str.htmlDecode(newName), Str.htmlDecode(oldName)) : getReportActionText(reportAction);
 }
 
 function getAssignedCompanyCardMessage(translate: LocalizedTranslate, reportAction: OnyxEntry<ReportAction>): string {
@@ -3818,7 +3818,7 @@ function getUpdatedCardFeedStatementPeriodMessage(translate: LocalizedTranslate,
 
 function getRenamedAction(translate: LocalizedTranslate, reportAction: OnyxEntry<ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.RENAMED>>, isExpenseReport: boolean, actorName?: string) {
     const originalMessage = getOriginalMessage(reportAction);
-    return translate('newRoomPage.renamedRoomAction', originalMessage?.oldName ?? '', originalMessage?.newName ?? '', isExpenseReport, actorName);
+    return translate('newRoomPage.renamedRoomAction', Str.htmlDecode(originalMessage?.oldName ?? ''), Str.htmlDecode(originalMessage?.newName ?? ''), isExpenseReport, actorName);
 }
 
 function getAddedApprovalRuleMessage(translate: LocalizedTranslate, reportAction: OnyxEntry<ReportAction>) {
