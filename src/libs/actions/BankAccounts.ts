@@ -423,7 +423,10 @@ function deletePaymentBankAccount(
         pendingAction: null,
     };
 
-    const onyxData: OnyxData<typeof ONYXKEYS.BANK_ACCOUNT_LIST | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD | typeof ONYXKEYS.USER_WALLET> = {
+    // Find the policyID linked to the bank account being deleted, so we can clear the workspace's achAccount
+    const linkedPolicyID = bankAccountList?.[bankAccountID]?.accountData?.additionalData?.policyID;
+
+    const onyxData: OnyxData<typeof ONYXKEYS.BANK_ACCOUNT_LIST | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD | typeof ONYXKEYS.USER_WALLET | typeof ONYXKEYS.COLLECTION.POLICY> = {
         optimisticData: [
             {
                 onyxMethod: Onyx.METHOD.MERGE,
@@ -452,6 +455,18 @@ function deletePaymentBankAccount(
             },
         ],
     };
+
+    // If the deleted bank account is linked to a workspace, clear the policy's achAccount
+    // so the bank account no longer appears in Workspace > Payments after deletion from Wallet
+    if (linkedPolicyID) {
+        onyxData.successData?.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${linkedPolicyID}`,
+            value: {
+                achAccount: null,
+            },
+        });
+    }
 
     if (newBankAccountID) {
         const newDefaultPaymentMethodOnyxData = getMakeDefaultPaymentOnyxData(newBankAccountID);
