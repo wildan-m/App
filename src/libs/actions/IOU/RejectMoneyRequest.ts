@@ -856,7 +856,7 @@ function prepareRejectMoneyRequestData(
     const parameters: RejectMoneyRequestParams = {
         transactionID,
         reportID,
-        comment: parsedComment,
+        comment,
         rejectedToReportID,
         reportPreviewReportActionID: reportPreviewAction?.reportActionID,
         rejectedActionReportActionID: optimisticRejectReportAction.reportActionID,
