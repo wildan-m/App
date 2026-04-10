@@ -31,7 +31,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {clearIssueNewCardFormData, setIssueNewCardStepAndData} from '@libs/actions/Card';
 import {clearDeletePaymentMethodError} from '@libs/actions/PaymentMethods';
-import {filterCardsByPersonalDetails, getCardsByCardholderName, getCardSettings, sortCardsByCardholderName} from '@libs/CardUtils';
+import {filterCardsByPersonalDetails, getCardsByCardholderName, getCardSettings, isCardFrozen, sortCardsByCardholderName} from '@libs/CardUtils';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import {getDescriptionForPolicyDomainCard, getMemberAccountIDsForWorkspace} from '@libs/PolicyUtils';
@@ -157,9 +157,9 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
 
     const renderItem = useCallback(
         ({item, index}: ListRenderItemInfo<Card>) => {
-            const frozenByDisplayName = item.nameValuePairs?.frozen?.byAccountID
-                ? getDisplayNameOrDefault(personalDetails?.[item.nameValuePairs.frozen.byAccountID], '', false) || undefined
-                : undefined;
+            const isFrozen = isCardFrozen(item);
+            const frozenByDisplayName =
+                isFrozen && item.nameValuePairs?.frozen?.byAccountID ? getDisplayNameOrDefault(personalDetails?.[item.nameValuePairs.frozen.byAccountID], '', false) || undefined : undefined;
 
             return (
                 <OfflineWithFeedback
@@ -184,8 +184,8 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                                 limit={item.nameValuePairs?.unapprovedExpenseLimit ?? 0}
                                 name={item.nameValuePairs?.cardTitle ?? ''}
                                 frozenByDisplayName={frozenByDisplayName}
-                                frozenByAccountID={item.nameValuePairs?.frozen?.byAccountID}
-                                frozenDate={item.nameValuePairs?.frozen?.date}
+                                frozenByAccountID={isFrozen ? item.nameValuePairs?.frozen?.byAccountID : undefined}
+                                frozenDate={isFrozen ? item.nameValuePairs?.frozen?.date : undefined}
                                 currency={settlementCurrency}
                                 isVirtual={!!item.nameValuePairs?.isVirtual}
                                 isHovered={hovered}
