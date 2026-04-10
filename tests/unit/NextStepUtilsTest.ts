@@ -898,13 +898,14 @@ describe('libs/NextStepUtils', () => {
                     },
                 ];
 
+                const noReimbursementPolicy = {...policy, reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO};
                 return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
                     reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO,
                 }).then(() => {
                     // eslint-disable-next-line @typescript-eslint/no-deprecated
                     const result = buildNextStepNew({
                         report,
-                        policy,
+                        policy: noReimbursementPolicy,
                         currentUserAccountIDParam: currentUserAccountID,
                         currentUserEmailParam: currentUserEmail,
                         hasViolations: false,
@@ -920,13 +921,26 @@ describe('libs/NextStepUtils', () => {
             });
 
             test('non-payer', () => {
-                optimisticNextStep.icon = CONST.NEXT_STEP.ICONS.CHECKMARK;
+                optimisticNextStep.icon = CONST.NEXT_STEP.ICONS.HOURGLASS;
                 optimisticNextStep.message = [
                     {
-                        text: 'No further action required!',
+                        text: 'Waiting for ',
+                    },
+                    {
+                        text: 'an admin',
+                    },
+                    {
+                        text: ' to ',
+                    },
+                    {
+                        text: 'pay',
+                    },
+                    {
+                        text: ' %expenses.',
                     },
                 ];
 
+                const manualReimbursementPolicy = {...policy, reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL, role: 'user' as const};
                 return Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
                     reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL,
                     role: 'user',
@@ -934,7 +948,7 @@ describe('libs/NextStepUtils', () => {
                     // eslint-disable-next-line @typescript-eslint/no-deprecated
                     const result = buildNextStepNew({
                         report,
-                        policy,
+                        policy: manualReimbursementPolicy,
                         currentUserAccountIDParam: currentUserAccountID,
                         currentUserEmailParam: currentUserEmail,
                         hasViolations: false,

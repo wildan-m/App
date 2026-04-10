@@ -244,12 +244,11 @@ function buildOptimisticNextStep(params: BuildNextStepNewParams): ReportNextStep
 
         // Generates an optimistic nextStep once a report has been approved
         case CONST.REPORT.STATUS_NUM.APPROVED:
-            if (isInvoiceReport(report) || !isPayer(currentUserAccountIDParam, currentUserEmailParam, report, undefined)) {
+            if (isInvoiceReport(report) || policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO) {
                 nextStep = nextStepNoActionRequired;
                 break;
             }
 
-            // Self review
             nextStep = {
                 messageKey: hasValidAccount ? CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_PAY : CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_POLICY_BANK_ACCOUNT,
                 icon: CONST.NEXT_STEP.ICONS.HOURGLASS,
@@ -772,7 +771,7 @@ function buildNextStepNew(params: BuildNextStepNewParams): ReportNextStepDepreca
 
         // Generates an optimistic nextStep once a report has been approved
         case CONST.REPORT.STATUS_NUM.APPROVED: {
-            if (isInvoiceReport(report) || !isPayer(currentUserAccountIDParam, currentUserEmailParam, report, undefined) || reimbursableSpend === 0) {
+            if (isInvoiceReport(report) || reimbursableSpend === 0 || policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO) {
                 optimisticNextStep = noActionRequired;
 
                 break;
