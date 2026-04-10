@@ -50,6 +50,7 @@ import {
     navigateToDetailsPage,
     rejectMoneyRequestReason,
 } from '@libs/ReportUtils';
+import shouldPopoverUseScrollView from '@libs/shouldPopoverUseScrollView';
 import {
     getOriginalTransactionWithSplitInfo,
     hasCustomUnitOutOfPolicyViolation as hasCustomUnitOutOfPolicyViolationTransactionUtils,
@@ -514,6 +515,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
                 options={applicableSecondaryActions}
                 isSplitButton={false}
                 wrapperStyle={!isNarrow && !hasPrimaryAction ? [styles.flexGrow4] : undefined}
+                shouldPopoverUseScrollView={shouldPopoverUseScrollView(applicableSecondaryActions)}
             />
             {!!rejectModalAction && (
                 <HoldOrRejectEducationalModal
