@@ -30,7 +30,7 @@ function PaymentCurrencyPage() {
 
     return (
         <ScreenWrapper
-            includeSafeAreaPaddingBottom={false}
+            enableEdgeToEdgeBottomSafeAreaPadding
             testID="PaymentCurrencyPage"
         >
             {({didScreenTransitionEnd}) => (
@@ -54,6 +54,7 @@ function PaymentCurrencyPage() {
                         }}
                         initiallySelectedCurrencyCode={paymentCurrency}
                         didScreenTransitionEnd={didScreenTransitionEnd}
+                        addBottomSafeAreaPadding
                     />
                 </>
             )}
