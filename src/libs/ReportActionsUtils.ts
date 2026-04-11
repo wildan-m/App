@@ -1457,6 +1457,18 @@ function getLastVisibleMessage(
         };
     }
 
+    // Task creation actions (ADD_COMMENT with taskReportID) have empty message text
+    // because the display text is computed dynamically via getTaskCreatedMessage.
+    // Use childReportName (the task title) so the parent chat is not treated as empty.
+    if (isCreatedTaskReportAction(lastVisibleAction)) {
+        const taskTitle = lastVisibleAction.childReportName;
+        if (taskTitle) {
+            return {
+                lastMessageText: formatLastMessageText(taskTitle),
+            };
+        }
+    }
+
     let messageText = getReportActionMessageText(lastVisibleAction) ?? '';
     if (messageText) {
         messageText = formatLastMessageText(messageText);
