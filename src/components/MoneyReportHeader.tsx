@@ -1688,8 +1688,8 @@ function MoneyReportHeaderContent({reportID: reportIDProp, shouldDisplayBackButt
                 if (result.action !== ModalActions.CONFIRM) {
                     return;
                 }
-                const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
-                const deleteNavigateBackUrl = backToRoute ?? Navigation.getActiveRoute();
+                const backToRoute = route.params?.backTo;
+                const deleteNavigateBackUrl = backToRoute ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined) ?? Navigation.getActiveRoute();
                 setDeleteTransactionNavigateBackUrl(deleteNavigateBackUrl);
 
                 Navigation.setNavigationActionToMicrotaskQueue(() => {
@@ -1843,22 +1843,12 @@ function MoneyReportHeaderContent({reportID: reportIDProp, shouldDisplayBackButt
                 return;
             }
             if (transactions.filter((trans) => trans.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length === selectedTransactionIDs.length) {
-                const backToRoute = route.params?.backTo ?? (chatReport?.reportID ? ROUTES.REPORT_WITH_ID.getRoute(chatReport.reportID) : undefined);
-                handleDeleteTransactionsWithNavigation(backToRoute);
+                handleDeleteTransactionsWithNavigation(route.params?.backTo);
             } else {
                 handleDeleteTransactions();
             }
         });
-    }, [
-        showConfirmModal,
-        translate,
-        selectedTransactionIDs.length,
-        transactions,
-        handleDeleteTransactions,
-        handleDeleteTransactionsWithNavigation,
-        route.params?.backTo,
-        chatReport?.reportID,
-    ]);
+    }, [showConfirmModal, translate, selectedTransactionIDs.length, transactions, handleDeleteTransactions, handleDeleteTransactionsWithNavigation, route.params?.backTo]);
 
     const allExpensesSelected = selectedTransactionIDs.length > 0 && selectedTransactionIDs.length === nonPendingDeleteTransactions.length;
 
