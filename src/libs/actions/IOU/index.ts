@@ -5763,7 +5763,7 @@ function approveMoneyRequest(params: ApproveMoneyRequestFunctionParams) {
         });
     }
 
-    // Clear hold reason of all transactions if we approve all requests
+    // Clear hold reason and hold violations of all transactions if we approve all requests
     if (full && hasHeldExpenses) {
         const heldTransactions = getAllHeldTransactionsReportUtils(expenseReport.reportID);
         for (const heldTransaction of heldTransactions) {
@@ -5784,6 +5784,19 @@ function approveMoneyRequest(params: ApproveMoneyRequestFunctionParams) {
                         hold: heldTransaction.comment?.hold,
                     },
                 },
+            });
+
+            const transactionViolations = allTransactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${heldTransaction.transactionID}`] ?? [];
+            const newTransactionViolations = transactionViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.HOLD);
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${heldTransaction.transactionID}`,
+                value: newTransactionViolations,
+            });
+            failureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${heldTransaction.transactionID}`,
+                value: transactionViolations,
             });
         }
     }
