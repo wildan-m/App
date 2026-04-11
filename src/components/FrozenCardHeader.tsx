@@ -89,7 +89,7 @@ function FrozenCardHeader({cardPreview, onUnfreezePress, onAskToUnfreezePress, c
                     fill={theme.icon}
                     small
                 />
-                <Text style={[styles.textLabel, styles.colorMuted, styles.ml2]}>{statusText}</Text>
+                <Text style={[styles.textLabel, styles.colorMuted, styles.ml2, styles.flex1]}>{statusText}</Text>
             </View>
             <Button
                 medium
