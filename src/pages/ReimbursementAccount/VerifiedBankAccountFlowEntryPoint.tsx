@@ -310,7 +310,7 @@ function VerifiedBankAccountFlowEntryPoint({
                 </View>
             </ScrollView>
 
-            {!!reimbursementAccount?.shouldShowResetModal && (
+            {!!reimbursementAccount?.shouldShowResetModal && !!shouldShowContinueSetupButton && (
                 <WorkspaceResetBankAccountModal
                     reimbursementAccount={reimbursementAccount}
                     isNonUSDWorkspace={isNonUSDWorkspace}
