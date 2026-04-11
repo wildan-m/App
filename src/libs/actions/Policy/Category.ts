@@ -446,6 +446,32 @@ function setWorkspaceCategoryEnabled({
         ],
     };
 
+    // Preserve defaultCategory on custom units when their referenced category is disabled/re-enabled.
+    // The backend clears defaultCategory when a category is disabled but does not restore it on re-enable.
+    const customUnits = policyData.policy?.customUnits ?? {};
+    for (const [unitID, unit] of Object.entries(customUnits)) {
+        for (const [categoryName, categoryUpdate] of Object.entries(categoriesToUpdate)) {
+            if (!categoryUpdate.enabled && unit.defaultCategory === categoryName) {
+                Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
+                    customUnits: {
+                        [unitID]: {
+                            previousDefaultCategory: categoryName,
+                        },
+                    },
+                });
+            } else if (categoryUpdate.enabled && unit.previousDefaultCategory === categoryName && !unit.defaultCategory) {
+                setPolicyCustomUnitDefaultCategory(policyID ?? '', unitID, '', categoryName);
+                Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
+                    customUnits: {
+                        [unitID]: {
+                            previousDefaultCategory: null,
+                        },
+                    },
+                });
+            }
+        }
+    }
+
     pushTransactionViolationsOnyxData(onyxData, policyData, {}, policyCategoriesOptimisticData);
     appendSetupCategoriesOnboardingData(
         onyxData,

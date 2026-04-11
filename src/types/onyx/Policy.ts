@@ -93,6 +93,9 @@ type CustomUnit = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The default category in which this custom unit is used */
         defaultCategory?: string;
 
+        /** Stores the previous default category when it is cleared due to the category being disabled, so it can be restored when re-enabled */
+        previousDefaultCategory?: string | null;
+
         /** Whether this custom unit is enabled */
         enabled?: boolean;
 
