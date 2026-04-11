@@ -927,14 +927,14 @@ describe('TransactionUtils', () => {
                 expect(result).toBe(false);
             });
 
-            it('should return false when submitter views their own open report (not condition 2)', () => {
+            it('should return true when submitter views their own open report and admin dismissed violation', () => {
                 // Given an OPEN report owned by current user
                 const iouReport: Report = {
                     ...openReport,
                     ownerAccountID: CURRENT_USER_ID,
                 };
 
-                // And a transaction where someone else dismissed a violation
+                // And a transaction where someone else (admin/approver) dismissed a violation
                 const transaction = generateTransaction({
                     reportID: iouReport.reportID,
                     comment: {
@@ -950,8 +950,8 @@ describe('TransactionUtils', () => {
                 // When current user (the submitter) checks if violation is dismissed
                 const result = TransactionUtils.isViolationDismissed(transaction, violation, CURRENT_USER_EMAIL, CURRENT_USER_ID, iouReport, undefined);
 
-                // Then it should return false (condition 2 doesn't apply to submitters)
-                expect(result).toBe(false);
+                // Then it should return true because admin/approver has resolved the duplicates
+                expect(result).toBe(true);
             });
         });
 

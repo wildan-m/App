@@ -1926,6 +1926,11 @@ function isViolationDismissed(
         }
     }
 
+    // If the submitter is looking at their own open report, check if anyone else (admin/approver) has dismissed it
+    if (isSubmitter && isOpenExpenseReport(iouReport) && dismissedByEmails.length > 0) {
+        return true;
+    }
+
     return false;
 }
 
