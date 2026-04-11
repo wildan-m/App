@@ -2,6 +2,7 @@ import {getUnixTime} from 'date-fns';
 import lodashClone from 'lodash/clone';
 import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import * as API from '@libs/API';
 import type {
     ChangeTransactionsReportParams,
@@ -17,7 +18,7 @@ import DateUtils from '@libs/DateUtils';
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import {rand64} from '@libs/NumberUtils';
-import {hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {hasDependentTags, isInstantSubmitEnabled, isPaidGroupPolicy, isSubmitAndClose} from '@libs/PolicyUtils';
 import {
     getAllReportActions,
     getIOUActionForReportID,
@@ -1445,6 +1446,38 @@ function changeTransactionsReport({
         return;
     }
 
+    // 7b. If the destination is a newly created empty report, recalculate its status now that it has transactions.
+    // buildOptimisticEmptyReport sets isEmptyOptimisticReport=true which can leave the report in OPEN status
+    // even when the policy has instant submit enabled, causing moved expenses to appear as "draft".
+    let destinationReportStatusNum: ValueOf<typeof CONST.REPORT.STATUS_NUM> | undefined;
+    let destinationReportStateNum: ValueOf<typeof CONST.REPORT.STATE_NUM> | undefined;
+    if (newReport?.pendingFields?.createReport && reportID !== CONST.REPORT.UNREPORTED_REPORT_ID && !isASAPSubmitBetaEnabled) {
+        const isInstantSubmit = isInstantSubmitEnabled(policy);
+        const isSubmitClose = isSubmitAndClose(policy);
+        const arePaymentsDisabled = policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO;
+
+        if (isInstantSubmit && arePaymentsDisabled && isSubmitClose) {
+            destinationReportStateNum = CONST.REPORT.STATE_NUM.APPROVED;
+            destinationReportStatusNum = CONST.REPORT.STATUS_NUM.CLOSED;
+        } else if (isInstantSubmit) {
+            destinationReportStateNum = CONST.REPORT.STATE_NUM.SUBMITTED;
+            destinationReportStatusNum = CONST.REPORT.STATUS_NUM.SUBMITTED;
+        }
+
+        if (destinationReportStateNum !== undefined && destinationReportStatusNum !== undefined) {
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {stateNum: destinationReportStateNum, statusNum: destinationReportStatusNum},
+            });
+            failureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {stateNum: newReport.stateNum, statusNum: newReport.statusNum},
+            });
+        }
+    }
+
     // 8. Update the report totals
     for (const [reportIDToUpdate, total] of Object.entries(updatedReportTotals)) {
         optimisticData.push({
@@ -1560,10 +1593,9 @@ function changeTransactionsReport({
             reportID: affectedReport.reportID ?? affectedReportID,
         };
 
-        const predictedNextStatus = updatedReport.statusNum ?? CONST.REPORT.STATUS_NUM.OPEN;
-
         const hasViolations = hasViolationsReportUtils(updatedReport.reportID, allTransactionViolation, accountID, email ?? '');
         const isDestinationReport = affectedReportID === destinationReportID;
+        const predictedNextStatus = (isDestinationReport && destinationReportStatusNum !== undefined ? destinationReportStatusNum : updatedReport.statusNum) ?? CONST.REPORT.STATUS_NUM.OPEN;
         const shouldFixViolationsForReport = isDestinationReport ? shouldFixViolations : false;
         const shouldUseUnreportedNextStepKey = reportID === CONST.REPORT.UNREPORTED_REPORT_ID && isDestinationReport;
         const nextStepOnyxReportID = shouldUseUnreportedNextStepKey ? reportID : affectedReportID;
