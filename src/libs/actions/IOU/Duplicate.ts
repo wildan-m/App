@@ -23,6 +23,7 @@ import {
 } from '@libs/ReportUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {
+    getDefaultTaxCode,
     getRequestType,
     getTransactionType,
     hasCustomUnitOutOfPolicyViolation,
@@ -518,15 +519,23 @@ function resolveDuplicates(params: MergeDuplicatesParams) {
  * Builds the transactionParams object and computes waypoints used when duplicating a transaction.
  * Shared between duplicateExpenseTransaction and duplicateReport.
  */
-function buildDuplicateTransactionParams(transaction: OnyxTypes.Transaction, transactionDetails: ReturnType<typeof getTransactionDetails>) {
+function buildDuplicateTransactionParams(transaction: OnyxTypes.Transaction, transactionDetails: ReturnType<typeof getTransactionDetails>, policy?: OnyxEntry<OnyxTypes.Policy>) {
     const {linkedTrackedExpenseReportAction, ...transactionWithoutLinkedAction} = transaction;
     const waypoints = !isExpenseSplit(transaction) ? (transactionDetails?.waypoints as WaypointCollection | undefined) : undefined;
+
+    // If the source transaction has no tax code but the target policy has taxes enabled,
+    // use the policy's default tax code to avoid a brief TAX_OUT_OF_POLICY violation.
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- taxCode can be empty string
+    const sourceTaxCode = transactionDetails?.taxCode || transaction.taxCode;
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- taxCode can be empty string
+    const taxCode = sourceTaxCode || (getDefaultTaxCode(policy, transaction) ?? '');
 
     const transactionParams = {
         ...transactionWithoutLinkedAction,
         ...transactionDetails,
         amount: transactionDetails?.amount ?? 0,
         taxAmount: transactionDetails?.taxAmount ?? 0,
+        taxCode,
         convertedAmount: undefined,
         originalAmount: undefined,
         actionableWhisperReportActionID: undefined,
@@ -694,7 +703,7 @@ function duplicateExpenseTransaction({
 
     const participants = getMoneyRequestParticipantsFromReport(targetReport, userAccountID);
     const transactionDetails = getTransactionDetails(transaction);
-    const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails);
+    const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails, targetPolicy);
 
     const params: RequestMoneyInformation = {
         report: targetReport,
@@ -882,7 +891,7 @@ function duplicateReport({
         }
 
         const isLastExpense = i === eligibleTransactions.length - 1;
-        const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails);
+        const {transactionParams, waypoints} = buildDuplicateTransactionParams(transaction, transactionDetails, targetPolicy);
 
         const params: RequestMoneyInformation = {
             report: parentChatReport,
