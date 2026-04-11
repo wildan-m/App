@@ -37,6 +37,15 @@ function EnablePaymentsPage() {
 
         if (isEmptyObject(userWallet)) {
             openEnablePaymentsPage();
+            return;
+        }
+
+        // If the wallet activation step is complete (terms accepted, wallet pending/activated),
+        // redirect back to the wallet settings page. The refactored flow navigates to SETTINGS_WALLET
+        // after accepting terms, but if the user navigates back to this screen, there's nothing to show
+        // for the ACTIVATE step — it would render a blank screen.
+        if (userWallet?.currentStep === CONST.WALLET.STEP.ACTIVATE) {
+            Navigation.goBack(ROUTES.SETTINGS_WALLET);
         }
     }, [isOffline, userWallet]);
 
