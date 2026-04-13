@@ -849,16 +849,23 @@ function removeScreenByKey(key: string) {
 function removeReportScreen(reportIDSet: Set<string>) {
     isNavigationReady().then(() => {
         navigationRef.current?.dispatch((state) => {
+            const focusedRouteKey = state?.routes.at(state.index)?.key;
             const routes = state?.routes.filter((route) => {
                 if (route.name === SCREENS.REPORT && route.params && 'reportID' in route.params) {
                     return !reportIDSet.has(route.params?.reportID as string);
                 }
                 return true;
             });
+            // Recompute the focused index by locating the previously focused route in the
+            // filtered array. This keeps focus on the same screen regardless of how many
+            // routes were removed and prevents an out-of-bounds index when more than one
+            // route is filtered out.
+            const focusedRouteIndex = focusedRouteKey ? routes.findIndex((route) => route.key === focusedRouteKey) : -1;
+            const nextIndex = focusedRouteIndex >= 0 ? focusedRouteIndex : Math.max(0, routes.length - 1);
             return CommonActions.reset({
                 ...state,
                 routes,
-                index: routes.length < state.routes.length ? state.index - 1 : state.index,
+                index: nextIndex,
             });
         });
     });
