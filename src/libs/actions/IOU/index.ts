@@ -90,6 +90,7 @@ import {
     buildOptimisticRetractedReportAction,
     buildOptimisticSubmittedReportAction,
     buildOptimisticUnapprovedReportAction,
+    canAddTransaction,
     canBeAutoReimbursed,
     canEditFieldOfMoneyRequest,
     canSubmitAndIsAwaitingForCurrentUser,
@@ -2397,7 +2398,11 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         }),
     });
 
-    const shouldCreateNewMoneyRequestReport = isSplitExpense ? false : shouldCreateNewMoneyRequestReportReportUtils(iouReport, chatReport, isScanRequest, betas, action);
+    // When the caller supplies an explicit moneyRequestReportID and the resolved report can still accept transactions,
+    // honor the user's intent instead of letting the ASAP "force a new report per scan" clause override the target report.
+    const hasExplicitWritableTargetReport = !!moneyRequestReportID && !!iouReport && canAddTransaction(iouReport);
+    const shouldCreateNewMoneyRequestReport =
+        isSplitExpense || hasExplicitWritableTargetReport ? false : shouldCreateNewMoneyRequestReportReportUtils(iouReport, chatReport, isScanRequest, betas, action);
 
     // Generate IDs upfront so we can pass them to buildOptimisticExpenseReport for formula computation
     const optimisticTransactionID = existingTransactionID ?? NumberUtils.rand64();
