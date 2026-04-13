@@ -7,6 +7,7 @@ import FocusTrapForModal from '@components/FocusTrap/FocusTrapForModal';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import withViewportOffsetTop from '@components/withViewportOffsetTop';
+import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -58,7 +59,9 @@ function EmojiPicker({viewportOffsetTop, ref}: EmojiPickerProps) {
     const emojiSearchInput = useRef<BaseTextInputRef | null>(null);
     const composerToRefocusOnClose = useRef<ComposerType | undefined>(undefined);
     const {windowHeight} = useWindowDimensions();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
+    const prevIsSmallScreenWidth = usePrevious(isSmallScreenWidth);
 
     /**
      * Get the popover anchor ref
@@ -205,6 +208,18 @@ function EmojiPicker({viewportOffsetTop, ref}: EmojiPickerProps) {
     const resetEmojiPopoverAnchor = () => (emojiPopoverAnchorRef.current = null);
 
     useImperativeHandle(ref, () => ({showEmojiPicker, isActive, clearActive, hideEmojiPicker, isEmojiPickerVisible, resetEmojiPopoverAnchor}));
+
+    // When the layout crosses the narrow/wide breakpoint, PopoverWithMeasuredContent
+    // switches between a bottom-docked modal and an anchor-positioned popover. The
+    // stored anchor position from before the transition becomes stale, so the picker
+    // would render at the wrong location and the composer could not regain focus.
+    // Close the picker on the transition so the user reopens it cleanly.
+    useEffect(() => {
+        if (prevIsSmallScreenWidth === isSmallScreenWidth || !isEmojiPickerVisible) {
+            return;
+        }
+        hideEmojiPicker();
+    }, [isSmallScreenWidth, prevIsSmallScreenWidth, isEmojiPickerVisible, hideEmojiPicker]);
 
     useEffect(() => {
         const emojiPopoverDimensionListener = Dimensions.addEventListener('change', () => {
