@@ -11,7 +11,17 @@ import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {isDeletedParentAction} from '@libs/ReportActionsUtils';
-import {isAdminRoom, isAnnounceRoom, isGroupChat, isMoneyRequest, isMoneyRequestReport, isMoneyRequestReportPendingDeletion, isPolicyExpenseChat} from '@libs/ReportUtils';
+import {
+    getReportOrDraftReport,
+    isAdminRoom,
+    isAnnounceRoom,
+    isGroupChat,
+    isMoneyRequest,
+    isMoneyRequestReport,
+    isMoneyRequestReportPendingDeletion,
+    isPolicyExpenseChat,
+    isReportParticipant,
+} from '@libs/ReportUtils';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import {setShouldShowComposeInput} from '@userActions/Composer';
 import {navigateToConciergeChat} from '@userActions/Report';
@@ -112,10 +122,15 @@ function ReportNavigateAwayHandler() {
             if (isMoneyRequestReportPendingDeletion(prevParentReportID)) {
                 return;
             }
-            Navigation.isNavigationReady().then(() => {
-                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(prevParentReportID));
-            });
-            return;
+            // Avoid pushing the current user into a parent they can't open, which would
+            // land them on a "Not here" screen and trap them in a back-button loop.
+            const prevParentReport = getReportOrDraftReport(prevParentReportID);
+            if (isReportParticipant(currentUserAccountID, prevParentReport)) {
+                Navigation.isNavigationReady().then(() => {
+                    Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(prevParentReportID));
+                });
+                return;
+            }
         }
 
         Navigation.isNavigationReady().then(() => {
