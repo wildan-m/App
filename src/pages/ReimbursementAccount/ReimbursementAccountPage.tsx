@@ -28,7 +28,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReimbursementAccountNavigatorParamList} from '@libs/Navigation/types';
 import {goBackFromInvalidPolicy, isPendingDeletePolicy, isPolicyAdmin} from '@libs/PolicyUtils';
-import {getRouteForCurrentStep, hasInProgressUSDVBBA, hasInProgressVBBA} from '@libs/ReimbursementAccountUtils';
+import {getRouteForCurrentStep, hasInProgressUSDVBBA, hasInProgressVBBA, REIMBURSEMENT_ACCOUNT_ROUTE_NAMES} from '@libs/ReimbursementAccountUtils';
 import shouldReopenOnfido from '@libs/shouldReopenOnfido';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {isFullScreenName} from '@navigation/helpers/isNavigatorName';
@@ -47,7 +47,7 @@ import {
 import {setDraftValues} from '@userActions/FormActions';
 import {getPaymentMethods} from '@userActions/PaymentMethods';
 import {isCurrencySupportedForGlobalReimbursement} from '@userActions/Policy/Policy';
-import {clearReimbursementAccount, clearReimbursementAccountDraft} from '@userActions/ReimbursementAccount';
+import {clearReimbursementAccount, clearReimbursementAccountDraft, resetBankAccountTerminalFields} from '@userActions/ReimbursementAccount';
 import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -94,6 +94,7 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
     const subStepParam = route.params?.subStep;
     const backTo = route.params.backTo;
     const isComingFromExpensifyCard = (backTo as string)?.includes(CONST.EXPENSIFY_CARD.ROUTE as string);
+    const isNewBankAccountFlow = route.params?.stepToOpen === REIMBURSEMENT_ACCOUNT_ROUTE_NAMES.NEW;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
@@ -232,6 +233,11 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
     }
 
     useEffect(() => {
+        // `stepToOpen=new` means "start a fresh connection" — discard any terminal fields left from a previously-completed bank account so the sync effect below does not route to the success page.
+        if (isNewBankAccountFlow) {
+            resetBankAccountTerminalFields();
+        }
+
         if ((isPreviousPolicy && !!reimbursementAccount) || isLoadingOnyxValue(reimbursementAccountMetadata)) {
             return;
         }
@@ -269,9 +275,12 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy, navigation}: 
             setUSDBankAccountStep(achData.currentStep);
         }
 
-        setShouldShowConnectedVerifiedBankAccount(isNonUSDSetup ? achData?.state === CONST.BANK_ACCOUNT.STATE.OPEN : achData?.currentStep === CONST.BANK_ACCOUNT.STEP.ENABLE);
+        // Suppress the success-page flip during the async tick before the Onyx reset in the bootstrap effect above lands.
+        setShouldShowConnectedVerifiedBankAccount(
+            !isNewBankAccountFlow && (isNonUSDSetup ? achData?.state === CONST.BANK_ACCOUNT.STATE.OPEN : achData?.currentStep === CONST.BANK_ACCOUNT.STEP.ENABLE),
+        );
         setShouldShowContinueSetupButton(shouldShowContinueSetupButtonValue);
-    }, [policyIDParam, achData?.currentStep, shouldShowContinueSetupButtonValue, isNonUSDSetup, isPreviousPolicy, achData?.state, policyCurrency, USDBankAccountStep]);
+    }, [policyIDParam, achData?.currentStep, shouldShowContinueSetupButtonValue, isNonUSDSetup, isPreviousPolicy, achData?.state, policyCurrency, USDBankAccountStep, isNewBankAccountFlow]);
 
     useEffect(() => {
         if (!prevPolicyCurrency || policyCurrency === prevPolicyCurrency) {

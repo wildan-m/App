@@ -46,6 +46,14 @@ function clearReimbursementAccount() {
 }
 
 /**
+ * Clear `currentStep` and `state` from the local Onyx copy so a fresh bank-account connection
+ * attempt does not inherit terminal values from a previously-completed account.
+ */
+function resetBankAccountTerminalFields() {
+    Onyx.merge(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {achData: {currentStep: null, state: null}});
+}
+
+/**
  * Triggers a modal to open allowing the user to reset their bank account
  */
 function requestResetBankAccount() {
@@ -69,6 +77,7 @@ function setReimbursementAccountOptionPressed(optionPressed: ValueOf<typeof CONS
 export {
     resetUSDBankAccount,
     resetNonUSDBankAccount,
+    resetBankAccountTerminalFields,
     setBankAccountSubStep,
     hideBankAccountErrors,
     updateReimbursementAccountDraft,
