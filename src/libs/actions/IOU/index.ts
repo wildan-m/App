@@ -2386,7 +2386,17 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
     } else if (moneyRequestReportID) {
         iouReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${moneyRequestReportID}`] ?? null;
     } else if (!allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReport.iouReportID}`]?.errorFields?.createChat) {
-        iouReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReport.iouReportID}`] ?? null;
+        const resolvedIOUReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReport.iouReportID}`] ?? null;
+        // When reaching this branch from an external entry point (e.g. QAB / Create Expense shortcut), `chatReport.iouReportID` can still
+        // point at a report that has already been submitted and is awaiting approval. `canAddOrDeleteTransactions` intentionally allows
+        // adding transactions to a first-level-awaiting report so that in-report editing (which flows through the `moneyRequestReportID`
+        // branch above) keeps working, but reusing such a report here would wrongly stitch the new expense into the already-submitted one.
+        // Treat a submitted expense report as if there were no outstanding report so a fresh optimistic expense report is built below.
+        if (resolvedIOUReport && isProcessingReport(resolvedIOUReport) && isExpenseReport(resolvedIOUReport)) {
+            iouReport = null;
+        } else {
+            iouReport = resolvedIOUReport;
+        }
     }
 
     const isScanRequest = isScanRequestTransactionUtils({
