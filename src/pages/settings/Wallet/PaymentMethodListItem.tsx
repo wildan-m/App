@@ -114,7 +114,9 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
     const threeDotsMenuRef = useRef<{hidePopoverMenu: () => void; isPopupMenuVisible: boolean; onThreeDotsPress: () => void}>(null);
     const isInSetupState = isAccountInSetupState(item);
     const isInLockedState = isBusinessBankAccountLocked(item);
-    const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems;
+    // Locked bank accounts must never open the popover — tapping the three-dot icon navigates to
+    // Concierge instead, and ThreeDotsMenu's async openMenu on iOS would otherwise render over it.
+    const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems && !isInLockedState;
 
     // Check if this is a Chase personal bank account connected via Plaid
     const isChaseAccountConnectedViaPlaid =
