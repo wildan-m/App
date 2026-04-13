@@ -4686,6 +4686,14 @@ function getReportFromHoldRequestsOnyxData({
 
     const isApprovalEnabled = policy ? policy.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL : false;
 
+    // After the held transactions are reassigned to the new hold report, the original iouReport
+    // only contains the previously-unheld transactions. Its total/nonReimbursableTotal must be
+    // updated optimistically so that offline consumers (e.g. the Pay button label computed from
+    // report.total via getMoneyRequestSpendBreakdown) reflect the new remaining amount instead
+    // of the stale pre-move total. unheldTotal is intentionally left unchanged because it already
+    // equals the new total once all remaining transactions on this report are unheld.
+    const shouldUpdateOriginalReportTotals = holdTransactions.length > 0 && iouReport?.unheldTotal !== undefined;
+
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -4744,6 +4752,17 @@ function getReportFromHoldRequestsOnyxData({
             value: updateHeldTransactions,
         },
     ];
+
+    if (shouldUpdateOriginalReportTotals) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`,
+            value: {
+                total: iouReport?.unheldTotal ?? 0,
+                nonReimbursableTotal: iouReport?.unheldNonReimbursableTotal ?? 0,
+            },
+        });
+    }
 
     const bringReportActionsBack: Record<string, OnyxTypes.ReportAction> = {};
     for (const reportAction of holdReportActions) {
@@ -4814,6 +4833,17 @@ function getReportFromHoldRequestsOnyxData({
             value: bringHeldTransactionsBack,
         },
     ];
+
+    if (shouldUpdateOriginalReportTotals) {
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport?.reportID}`,
+            value: {
+                total: iouReport?.total,
+                nonReimbursableTotal: iouReport?.nonReimbursableTotal,
+            },
+        });
+    }
 
     // Copy submission/approval actions to the new report
     const [copiedActionsOptimistic, copiedActionsSuccess, copiedActionsFailure, optimisticReportActionCopyIDs] = getDuplicateActionsForPartialReport(
