@@ -5035,10 +5035,12 @@ function getIOUReportActionWithBadge(
             return false;
         }
         const iouReport = getReportOrDraftReport(action.childReportID);
-        // Show to the actual payer, or to policy admins via the pay-elsewhere path for negative expenses
+        // Show to the actual payer, or to policy admins via the pay-elsewhere path for negative expenses.
+        // Skip the pay-elsewhere branch for reports with only non-reimbursable transactions: paying them is
+        // optional and the LHN should stay in sync with the Pay to-do queue, which already filters them out.
         if (
             canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
-            canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
+            (canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy) && !hasOnlyNonReimbursableTransactions(iouReport?.reportID))
         ) {
             actionBadge = CONST.REPORT.ACTION_BADGE.PAY;
             return true;
