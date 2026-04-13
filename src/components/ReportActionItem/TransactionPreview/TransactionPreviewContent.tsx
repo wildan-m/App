@@ -129,7 +129,7 @@ function TransactionPreviewContent({
     const connectionLink = getBrokenConnectionUrlToFixPersonalCard(personalCardsWithBrokenConnection, environmentURL);
     const cardID = firstViolation?.data?.cardID;
     const card = cardID ? cardList?.[cardID] : undefined;
-    const isMarkAsCash = parentReport && currentUserLogin ? isMarkAsCashActionForTransaction(currentUserLogin, parentReport, violations, policy) : false;
+    const isMarkAsCash = parentReport && currentUserLogin ? isMarkAsCashActionForTransaction(currentUserLogin, parentReport, transaction, violations, policy) : false;
 
     const violationMessage = firstViolation
         ? ViolationsUtils.getViolationTranslation({

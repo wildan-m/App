@@ -1294,6 +1294,38 @@ describe('getTransactionThreadPrimaryAction', () => {
         );
     });
 
+    it('should not return MARK AS CASH while the scan receipt is still being scanned', async () => {
+        const report = {
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            stateNum: CONST.REPORT.STATE_NUM.OPEN,
+            statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+        } as unknown as Report;
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = {};
+        const TRANSACTION_ID = 'TRANSACTION_ID';
+
+        const transaction = {
+            transactionID: TRANSACTION_ID,
+            merchant: '',
+            receipt: {
+                state: CONST.IOU.RECEIPT_STATE.SCANNING,
+                source: 'https://example.com/receipt.jpg',
+            },
+        } as unknown as Transaction;
+
+        const violation = {
+            name: CONST.VIOLATIONS.RTER,
+            data: {
+                pendingPattern: true,
+                rterType: CONST.RTER_VIOLATION_TYPES.SEVEN_DAY_HOLD,
+            },
+        } as unknown as TransactionViolation;
+
+        expect(getTransactionThreadPrimaryAction(CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, {} as Report, report, transaction, [violation], policy as Policy, false)).toBe('');
+    });
+
     it('Should return empty string when we are waiting for user to add a bank account', async () => {
         const report = {
             reportID: REPORT_ID,
