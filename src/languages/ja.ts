@@ -6766,6 +6766,8 @@ ${reportName}
                 cardPageTitle: 'カード',
                 cardsSectionTitle: 'カード',
                 chooseCards: 'カードを選択',
+                noCardsIssuedTitle: 'Expensifyカードはまだ発行されていません',
+                noCardsIssuedSubtitle: '支出ルールを作成する前に、ワークスペースでExpensifyカードを発行してください。',
                 saveRule: 'ルールを保存',
                 allow: '許可',
                 spendRuleSectionTitle: '支出ルール',

@@ -6878,6 +6878,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 cardPageTitle: 'Carte',
                 cardsSectionTitle: 'Cartes',
                 chooseCards: 'Choisir des cartes',
+                noCardsIssuedTitle: 'Aucune carte Expensify émise pour le moment',
+                noCardsIssuedSubtitle: 'Émettez des cartes Expensify dans votre espace de travail avant de créer des règles de dépenses.',
                 saveRule: 'Enregistrer la règle',
                 allow: 'Autoriser',
                 spendRuleSectionTitle: 'Règle de dépense',

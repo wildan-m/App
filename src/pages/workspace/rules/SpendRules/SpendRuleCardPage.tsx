@@ -70,8 +70,12 @@ function getCardIDsWithSpendRules(cardRules: Record<string, ExpensifyCardRule> |
 
 function getEligibleCards(cardsList: OnyxEntry<WorkspaceCardsList>, expensifyCardSettings: ExpensifyCardSettings, currentRuleID?: string) {
     const {cardList, ...cards} = cardsList ?? {};
+    const allCards = Object.values(cards);
     const cardIDsWithSpendRules = getCardIDsWithSpendRules(expensifyCardSettings?.cardRules, currentRuleID);
-    return Object.values(cards).filter((card: Card) => !cardIDsWithSpendRules.has(card.cardID));
+    return {
+        eligibleCards: allCards.filter((card: Card) => !cardIDsWithSpendRules.has(card.cardID)),
+        hasAnyCards: allCards.length > 0,
+    };
 }
 
 function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
@@ -105,7 +109,9 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
     });
 
     const isCardSettingsLoading = !isOffline && (!expensifyCardSettings || expensifyCardSettings.isLoading) && !expensifyCardSettings?.hasOnceLoaded;
-    const eligibleCards = expensifyCardSettings ? getEligibleCards(cardsList, expensifyCardSettings, ruleID === ROUTES.NEW ? undefined : ruleID) : [];
+    const {eligibleCards, hasAnyCards} = expensifyCardSettings
+        ? getEligibleCards(cardsList, expensifyCardSettings, ruleID === ROUTES.NEW ? undefined : ruleID)
+        : {eligibleCards: [], hasAnyCards: false};
 
     const filterCard = (card: Card, searchInput: string) => filterCardsByPersonalDetails(card, searchInput, personalDetails);
     const sortCards = (cards: Card[]) => sortCardsByCardholderName(cards, personalDetails, localeCompare);
@@ -186,6 +192,26 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
 
     const headerMessage = getHeaderMessage(listData.length > 0, false, inputValue, countryCode, false);
 
+    const isSearching = !!inputValue.trim();
+    const getEmptyTitle = () => {
+        if (isSearching) {
+            return translate('common.noResultsFound');
+        }
+        if (hasAnyCards) {
+            return translate('workspace.companyCards.noAvailableCards');
+        }
+        return translate('workspace.rules.spendRules.noCardsIssuedTitle');
+    };
+    const getEmptySubtitle = () => {
+        if (isSearching) {
+            return undefined;
+        }
+        if (hasAnyCards) {
+            return translate('workspace.companyCards.noAvailableCardsSubtitle');
+        }
+        return translate('workspace.rules.spendRules.noCardsIssuedSubtitle');
+    };
+
     return (
         <AccessOrNotFoundWrapper
             policyID={policyID}
@@ -238,9 +264,9 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                                 icon={illustrations.HandCard}
                                 iconWidth={variables.iconSection}
                                 iconHeight={variables.iconSection}
-                                title={inputValue.trim() ? translate('common.noResultsFound') : translate('workspace.companyCards.noAvailableCards')}
+                                title={getEmptyTitle()}
                                 titleStyles={styles.mb2}
-                                subtitle={translate('workspace.companyCards.noAvailableCardsSubtitle')}
+                                subtitle={getEmptySubtitle()}
                                 subtitleStyle={styles.textSupporting}
                             />
                         }

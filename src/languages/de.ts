@@ -6856,6 +6856,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                 cardPageTitle: 'Karte',
                 cardsSectionTitle: 'Karten',
                 chooseCards: 'Karten auswählen',
+                noCardsIssuedTitle: 'Noch keine Expensify-Karten ausgestellt',
+                noCardsIssuedSubtitle: 'Stellen Sie Expensify-Karten in Ihrem Arbeitsbereich aus, bevor Sie Ausgaberegeln erstellen.',
                 saveRule: 'Regel speichern',
                 allow: 'Erlauben',
                 spendRuleSectionTitle: 'Ausgabenregel',

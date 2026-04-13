@@ -6835,6 +6835,8 @@ const translations = {
                 cardPageTitle: 'Card',
                 cardsSectionTitle: 'Cards',
                 chooseCards: 'Choose cards',
+                noCardsIssuedTitle: 'No Expensify cards issued yet',
+                noCardsIssuedSubtitle: 'Issue Expensify cards to your workspace before creating spend rules.',
                 saveRule: 'Save rule',
                 deleteRule: 'Delete rule',
                 deleteRuleConfirmation: 'Are you sure you want to delete this rule?',

@@ -6641,6 +6641,8 @@ ${reportName}
                 cardPageTitle: '卡',
                 cardsSectionTitle: '卡片',
                 chooseCards: '选择卡片',
+                noCardsIssuedTitle: '尚未发行任何Expensify卡',
+                noCardsIssuedSubtitle: '在创建消费规则之前，请先在工作区中发行Expensify卡。',
                 saveRule: '保存规则',
                 allow: '允许',
                 spendRuleSectionTitle: '支出规则',
