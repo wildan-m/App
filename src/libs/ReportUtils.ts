@@ -4428,10 +4428,12 @@ function getMoneyRequestSpendBreakdown(report: OnyxInputOrEntry<Report>, searchR
 function getBillableAndTaxTotal(report: OnyxEntry<Report>, transactions: Array<OnyxEntry<Transaction>>) {
     let billableTotal = 0;
     let taxTotal = 0;
+    let hasPendingConversion = false;
     if (!isExpenseReport(report)) {
         return {
             billableTotal: 0,
             taxTotal: 0,
+            hasPendingConversion: false,
         };
     }
     for (const transaction of transactions) {
@@ -4442,21 +4444,26 @@ function getBillableAndTaxTotal(report: OnyxEntry<Report>, transactions: Array<O
         if (billable) {
             if (currency === report?.currency) {
                 billableTotal += amount;
+            } else if (transaction?.convertedAmount) {
+                billableTotal -= transaction.convertedAmount;
             } else {
-                billableTotal -= transaction?.convertedAmount ?? 0;
+                hasPendingConversion = true;
             }
         }
         if (taxAmount) {
             if (currency === report?.currency) {
                 taxTotal += taxAmount;
+            } else if (transaction?.convertedTaxAmount) {
+                taxTotal -= transaction.convertedTaxAmount;
             } else {
-                taxTotal -= transaction?.convertedTaxAmount ?? 0;
+                hasPendingConversion = true;
             }
         }
     }
     return {
         billableTotal,
         taxTotal,
+        hasPendingConversion,
     };
 }
 

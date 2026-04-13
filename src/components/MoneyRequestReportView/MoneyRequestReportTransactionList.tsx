@@ -151,13 +151,13 @@ function MoneyRequestReportTransactionList({
 
     const isTaxEnabled = isPolicyTaxEnabled(policy);
     const {totalDisplaySpend, nonReimbursableSpend, reimbursableSpend} = getMoneyRequestSpendBreakdown(report);
-    const {billableTotal, taxTotal} = getBillableAndTaxTotal(report, transactions);
+    const {billableTotal, taxTotal, hasPendingConversion} = getBillableAndTaxTotal(report, transactions);
     const formattedOutOfPocketAmount = convertToDisplayString(reimbursableSpend, report?.currency);
     const formattedCompanySpendAmount = convertToDisplayString(nonReimbursableSpend, report?.currency);
     const formattedBillableAmount = convertToDisplayString(billableTotal, report?.currency);
     const formattedTaxAmount = convertToDisplayString(taxTotal, report?.currency);
     const shouldShowExpenseReportBreakDown = shouldShowExpenseBreakdown(transactions);
-    const shouldShowBreakdown = shouldShowExpenseReportBreakDown || !!billableTotal || (!!taxTotal && isTaxEnabled);
+    const shouldShowBreakdown = shouldShowExpenseReportBreakDown || !!billableTotal || (!!taxTotal && isTaxEnabled) || hasPendingConversion;
     const transactionsWithoutPendingDelete = useMemo(() => transactions.filter((t) => !isTransactionPendingDelete(t)), [transactions]);
     const currentUserDetails = useCurrentUserPersonalDetails();
     const isReportArchived = useReportIsArchived(report?.reportID);
@@ -720,13 +720,18 @@ function MoneyRequestReportTransactionList({
                     {shouldShowBreakdown && (
                         <View style={[styles.dFlex, styles.alignItemsEnd, styles.gap2, styles.mb2, styles.flex1]}>
                             {[
-                                {text: 'cardTransactions.outOfPocket', value: formattedOutOfPocketAmount, shouldShow: !!nonReimbursableSpend},
-                                {text: 'cardTransactions.companySpend', value: formattedCompanySpendAmount, shouldShow: !!nonReimbursableSpend},
-                                {text: 'common.billable', value: formattedBillableAmount, shouldShow: !!billableTotal},
-                                {text: 'common.tax', value: formattedTaxAmount, shouldShow: !!taxTotal && isTaxEnabled},
+                                {text: 'cardTransactions.outOfPocket', value: formattedOutOfPocketAmount, shouldShow: !!nonReimbursableSpend, isPending: false},
+                                {text: 'cardTransactions.companySpend', value: formattedCompanySpendAmount, shouldShow: !!nonReimbursableSpend, isPending: false},
+                                {text: 'common.billable', value: formattedBillableAmount, shouldShow: !!billableTotal || hasPendingConversion, isPending: hasPendingConversion},
+                                {
+                                    text: 'common.tax',
+                                    value: formattedTaxAmount,
+                                    shouldShow: (!!taxTotal || hasPendingConversion) && isTaxEnabled,
+                                    isPending: hasPendingConversion,
+                                },
                             ]
                                 .filter(({shouldShow}) => shouldShow)
-                                .map(({text, value}) => (
+                                .map(({text, value, isPending}) => (
                                     <View
                                         key={text}
                                         style={[
@@ -751,7 +756,8 @@ function MoneyRequestReportTransactionList({
                                                 styles.textNormal,
                                                 shouldUseNarrowLayout ? styles.mnw64p : styles.mnw100p,
                                                 styles.textAlignRight,
-                                                hasPendingAction && styles.opacitySemiTransparent,
+                                                (hasPendingAction || isPending) && styles.opacitySemiTransparent,
+                                                isPending && styles.offlineFeedbackPending,
                                             ]}
                                         >
                                             {value}

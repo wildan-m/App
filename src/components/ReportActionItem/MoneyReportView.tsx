@@ -90,7 +90,7 @@ function MoneyReportView({
 
     const {totalDisplaySpend, nonReimbursableSpend, reimbursableSpend} = getMoneyRequestSpendBreakdown(report);
     const transactions = useReportTransactions(report?.reportID);
-    const {billableTotal, taxTotal} = getBillableAndTaxTotal(report, transactions);
+    const {billableTotal, taxTotal, hasPendingConversion} = getBillableAndTaxTotal(report, transactions);
 
     const isTaxEnabled = isPolicyTaxEnabled(policy);
     const shouldShowBreakdown = nonReimbursableSpend || !!billableTotal || (!!taxTotal && isTaxEnabled);
@@ -246,13 +246,18 @@ function MoneyReportView({
                         {!!shouldShowBreakdown && (
                             <>
                                 {[
-                                    {label: 'cardTransactions.outOfPocket', value: formattedOutOfPocketAmount, show: !!nonReimbursableSpend},
-                                    {label: 'cardTransactions.companySpend', value: formattedCompanySpendAmount, show: !!nonReimbursableSpend},
-                                    {label: 'common.billable', value: formattedBillableAmount, show: !!billableTotal},
-                                    {label: 'common.tax', value: formattedTaxAmount, show: !!taxTotal && isTaxEnabled},
+                                    {label: 'cardTransactions.outOfPocket', value: formattedOutOfPocketAmount, show: !!nonReimbursableSpend, isPending: false},
+                                    {label: 'cardTransactions.companySpend', value: formattedCompanySpendAmount, show: !!nonReimbursableSpend, isPending: false},
+                                    {label: 'common.billable', value: formattedBillableAmount, show: !!billableTotal || hasPendingConversion, isPending: hasPendingConversion},
+                                    {
+                                        label: 'common.tax',
+                                        value: formattedTaxAmount,
+                                        show: (!!taxTotal || hasPendingConversion) && isTaxEnabled,
+                                        isPending: hasPendingConversion,
+                                    },
                                 ]
                                     .filter(({show}) => show)
-                                    .map(({label, value}) => (
+                                    .map(({label, value, isPending}) => (
                                         <View
                                             key={label}
                                             style={[styles.flexRow, styles.pointerEventsNone, styles.containerWithSpaceBetween, styles.ph5, styles.pv1]}
@@ -268,7 +273,11 @@ function MoneyReportView({
                                             <View style={[styles.flexRow, styles.justifyContentCenter]}>
                                                 <Text
                                                     numberOfLines={1}
-                                                    style={[subAmountTextStyles, hasPendingAction && styles.opacitySemiTransparent]}
+                                                    style={[
+                                                        subAmountTextStyles,
+                                                        (hasPendingAction || isPending) && styles.opacitySemiTransparent,
+                                                        isPending && styles.offlineFeedbackPending,
+                                                    ]}
                                                 >
                                                     {value}
                                                 </Text>

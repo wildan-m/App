@@ -872,6 +872,7 @@ function changeTransactionsReport({
     const updatedReportTransactionCounts: Record<string, number> = {};
     const updatedReportNonReimbursableTotals: Record<string, number> = {};
     const updatedReportUnheldNonReimbursableTotals: Record<string, number> = {};
+    const reportsWithIndeterminateTotal = new Set<string>();
 
     // Store current violations for each transaction to restore on failure
     const currentTransactionViolations: Record<string, TransactionViolation[]> = {};
@@ -1209,6 +1210,10 @@ function changeTransactionsReport({
 
                 const currentUnheldNonReimbursableTotal = updatedReportUnheldNonReimbursableTotals[targetReportID] ?? targetReport?.unheldNonReimbursableTotal ?? 0;
                 updatedReportUnheldNonReimbursableTotals[targetReportID] = currentUnheldNonReimbursableTotal + (transactionReimbursable && !isOnHold(transaction) ? 0 : convertedAmount);
+            } else {
+                // Cross-currency move with no usable convertedAmount: cannot compute the optimistic total without an exchange rate.
+                // Mark the target report's total as indeterminate so the UI shows a pending state until the server returns the converted values.
+                reportsWithIndeterminateTotal.add(targetReportID);
             }
         }
 
@@ -1499,6 +1504,26 @@ function changeTransactionsReport({
             value: {
                 unheldNonReimbursableTotal: allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportIDToUpdate}`]?.unheldNonReimbursableTotal,
             },
+        });
+    }
+
+    for (const reportIDToUpdate of reportsWithIndeterminateTotal) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${reportIDToUpdate}`,
+            value: {pendingFields: {total: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}},
+        });
+
+        successData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${reportIDToUpdate}`,
+            value: {pendingFields: {total: null}},
+        });
+
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${reportIDToUpdate}`,
+            value: {pendingFields: {total: null}},
         });
     }
 
