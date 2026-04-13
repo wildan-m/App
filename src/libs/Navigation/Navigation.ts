@@ -776,7 +776,7 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
 function dismissModal({ref = navigationRef, afterTransition, waitForTransition}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedTextIfComposerBlurred();
     const runImmediately = !waitForTransition;
-    isNavigationReady().then(() => {
+    const run = () => {
         TransitionTracker.runAfterTransitions({
             callback: () => {
                 ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
@@ -787,7 +787,13 @@ function dismissModal({ref = navigationRef, afterTransition, waitForTransition}:
             },
             runImmediately,
         });
-    });
+    };
+
+    if (ref.isReady()) {
+        run();
+    } else {
+        isNavigationReady().then(run);
+    }
 }
 
 /**
@@ -801,7 +807,7 @@ const dismissModalWithReport = (
     ref = navigationRef,
     options?: {onBeforeNavigate?: (willOpenReport: boolean) => void},
 ) => {
-    isNavigationReady().then(() => {
+    const run = () => {
         const topmostSuperWideRHPReportID = getTopmostSuperWideRHPReportID();
         let areReportsIDsDefined = !!topmostSuperWideRHPReportID && !!reportID;
 
@@ -831,7 +837,13 @@ const dismissModalWithReport = (
                 navigate(reportRoute);
             },
         });
-    });
+    };
+
+    if (ref.isReady()) {
+        run();
+    } else {
+        isNavigationReady().then(run);
+    }
 };
 
 function popRootToTop() {
