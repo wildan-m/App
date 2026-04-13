@@ -2720,6 +2720,8 @@ const translations = {
     reportFraudConfirmationPage: {
         title: 'Card fraud reported',
         description: 'We’ve permanently deactivated your existing card. When you go back to view your card details, you’ll have a new virtual card available.',
+        descriptionCardFrozen:
+            'We’ve permanently deactivated your existing card, but we couldn’t issue a replacement because the card is frozen. Unfreeze the card (or ask a Domain Admin to set a Smart Limit of more than $0) and then report fraud again.',
         buttonText: 'Got it, thanks!',
     },
     activateCardPage: {

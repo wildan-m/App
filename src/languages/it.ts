@@ -2661,6 +2661,8 @@ ${amount} per ${merchant} - ${date}`,
     reportFraudConfirmationPage: {
         title: 'Frode della carta segnalata',
         description: 'Abbiamo disattivato definitivamente la tua carta esistente. Quando tornerai a visualizzare i dettagli della carta, avrai a disposizione una nuova carta virtuale.',
+        descriptionCardFrozen:
+            'Abbiamo disattivato definitivamente la tua carta esistente, ma non abbiamo potuto emetterne una nuova perché la carta è congelata. Scongela la carta (oppure chiedi a un Amministratore di dominio di impostare uno Smart Limit superiore a 0 $) e poi segnala di nuovo la frode.',
         buttonText: 'Ricevuto, grazie!',
     },
     activateCardPage: {

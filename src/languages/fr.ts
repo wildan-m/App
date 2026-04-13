@@ -2672,6 +2672,8 @@ ${amount} pour ${merchant} - ${date}`,
     reportFraudConfirmationPage: {
         title: 'Fraude à la carte signalée',
         description: 'Nous avons définitivement désactivé votre carte actuelle. Lorsque vous retournerez consulter les détails de votre carte, une nouvelle carte virtuelle sera disponible.',
+        descriptionCardFrozen:
+            'Nous avons définitivement désactivé votre carte actuelle, mais nous n’avons pas pu en émettre une nouvelle car la carte est gelée. Dégelez la carte (ou demandez à un administrateur de domaine de définir une Smart Limit supérieure à 0 $), puis signalez à nouveau la fraude.',
         buttonText: 'Compris, merci !',
     },
     activateCardPage: {

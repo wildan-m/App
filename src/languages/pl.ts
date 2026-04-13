@@ -2652,6 +2652,8 @@ ${amount} dla ${merchant} - ${date}`,
     reportFraudConfirmationPage: {
         title: 'Zgłoszono oszustwo kartowe',
         description: 'Trwale dezaktywowaliśmy Twoją dotychczasową kartę. Gdy wrócisz do szczegółów karty, będzie tam dostępna nowa wirtualna karta.',
+        descriptionCardFrozen:
+            'Trwale dezaktywowaliśmy Twoją dotychczasową kartę, ale nie mogliśmy wystawić nowej, ponieważ karta jest zamrożona. Odmroź kartę (lub poproś Administratora domeny o ustawienie Smart Limit większego niż 0 $) i zgłoś oszustwo ponownie.',
         buttonText: 'Jasne, dzięki!',
     },
     activateCardPage: {

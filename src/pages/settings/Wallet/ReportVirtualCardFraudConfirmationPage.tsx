@@ -7,7 +7,9 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNonPersonalCardList from '@hooks/useNonPersonalCardList';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {isCardFrozen} from '@libs/CardUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -24,6 +26,9 @@ function ReportVirtualCardFraudConfirmationPage({
     const themeStyles = useThemeStyles();
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlassSpyMouthClosed']);
+    const cardList = useNonPersonalCardList();
+    const card = cardList?.[cardID];
+    const descriptionKey = isCardFrozen(card) ? 'reportFraudConfirmationPage.descriptionCardFrozen' : 'reportFraudConfirmationPage.description';
 
     const close = useCallback(() => {
         Navigation.navigate(ROUTES.SETTINGS_WALLET_DOMAIN_CARD.getRoute(cardID));
@@ -53,9 +58,7 @@ function ReportVirtualCardFraudConfirmationPage({
                     />
 
                     <Text style={[themeStyles.textHeadlineH1, themeStyles.alignSelfCenter, themeStyles.mt5]}>{translate('reportFraudConfirmationPage.title')}</Text>
-                    <Text style={[themeStyles.textSupporting, themeStyles.alignSelfCenter, themeStyles.mt2, themeStyles.textAlignCenter]}>
-                        {translate('reportFraudConfirmationPage.description')}
-                    </Text>
+                    <Text style={[themeStyles.textSupporting, themeStyles.alignSelfCenter, themeStyles.mt2, themeStyles.textAlignCenter]}>{translate(descriptionKey)}</Text>
                 </View>
 
                 <Button

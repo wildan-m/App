@@ -2577,6 +2577,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
     reportFraudConfirmationPage: {
         title: '已报告卡片欺诈',
         description: '我们已永久停用你的现有卡片。当你返回查看卡片详情时，你将会看到一张新的虚拟卡片可用。',
+        descriptionCardFrozen: '我们已永久停用你的现有卡片，但由于该卡片已冻结，我们无法为你签发新卡。请解冻该卡片（或请域管理员将 Smart Limit 设置为大于 $0），然后再次报告欺诈。',
         buttonText: '明白了，谢谢！',
     },
     activateCardPage: {

@@ -2659,6 +2659,8 @@ ${amount} voor ${merchant} - ${date}`,
     reportFraudConfirmationPage: {
         title: 'Kaartfraude gemeld',
         description: 'We hebben je bestaande kaart permanent gedeactiveerd. Wanneer je teruggaat om je kaartgegevens te bekijken, heb je een nieuwe virtuele kaart beschikbaar.',
+        descriptionCardFrozen:
+            'We hebben je bestaande kaart permanent gedeactiveerd, maar we konden geen nieuwe kaart uitgeven omdat de kaart bevroren is. Ontdooi de kaart (of vraag een domeinbeheerder om een Smart Limit van meer dan $0 in te stellen) en meld de fraude opnieuw.',
         buttonText: 'Begrepen, dank je!',
     },
     activateCardPage: {

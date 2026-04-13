@@ -2666,6 +2666,8 @@ ${amount} für ${merchant} – ${date}`,
     reportFraudConfirmationPage: {
         title: 'Kartenbetrug gemeldet',
         description: 'Wir haben Ihre bestehende Karte dauerhaft deaktiviert. Wenn Sie Ihre Kartendetails erneut aufrufen, steht Ihnen eine neue virtuelle Karte zur Verfügung.',
+        descriptionCardFrozen:
+            'Wir haben Ihre bestehende Karte dauerhaft deaktiviert, konnten aber keine Ersatzkarte ausstellen, da die Karte eingefroren ist. Tauen Sie die Karte auf (oder bitten Sie einen Domain-Administrator, ein Smart Limit von mehr als 0 $ festzulegen) und melden Sie den Betrug erneut.',
         buttonText: 'Verstanden, danke!',
     },
     activateCardPage: {

@@ -2537,6 +2537,8 @@ ${amount} para ${merchant} - ${date}`,
     reportFraudConfirmationPage: {
         title: 'Fraude con tarjeta reportado',
         description: 'Hemos desactivado permanentemente tu tarjeta existente. Cuando vuelvas a ver los detalles de tu tarjeta, tendrás una nueva tarjeta virtual disponible.',
+        descriptionCardFrozen:
+            'Hemos desactivado permanentemente tu tarjeta existente, pero no pudimos emitir una nueva porque la tarjeta está congelada. Descongela la tarjeta (o pide a un Administrador de dominio que establezca un Límite inteligente mayor que $0) y vuelve a reportar el fraude.',
         buttonText: 'Entendido, ¡gracias!',
     },
     activateCardPage: {
