@@ -611,6 +611,7 @@ function MoneyRequestReportTransactionList({
                         accessibilityLabel={translate('accessibilityHints.selectAllTransactions')}
                         isIndeterminate={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length !== transactionsWithoutPendingDelete.length}
                         isChecked={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length === transactionsWithoutPendingDelete.length}
+                        containerStyle={styles.m0}
                     />
                     {isMediumScreenWidth && !shouldScrollHorizontally && <Text style={[styles.textStrong, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>}
                 </View>
