@@ -999,7 +999,9 @@ function getSecondaryReportActions({
 
     options.push(CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF);
 
-    options.push(CONST.REPORT.SECONDARY_ACTIONS.PRINT);
+    if (!isOpenReportUtils(report)) {
+        options.push(CONST.REPORT.SECONDARY_ACTIONS.PRINT);
+    }
 
     if (isChangeWorkspaceAction(report, policies, currentUserLogin, reportActions)) {
         options.push(CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE);
