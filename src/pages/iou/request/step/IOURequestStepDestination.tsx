@@ -120,7 +120,8 @@ function IOURequestStepDestination({
         let targetReport: OnyxEntry<Report> = explicitPolicyID && transaction?.isFromGlobalCreate ? policyExpenseReport : report;
         let targetIouType = iouType;
         let transactionReportID;
-        if (selectedDestination !== destination.keyForList) {
+        const hasQueuedTransactionUpdates = selectedDestination !== destination.keyForList;
+        if (hasQueuedTransactionUpdates) {
             if (openedFromStartPage) {
                 ({targetReport, targetIouType, transactionReportID} = getInitialPerDiemTargetReport(
                     targetReport,
@@ -140,10 +141,21 @@ function IOURequestStepDestination({
             clearSubrates(transactionID);
         }
 
-        if (backTo) {
-            navigateBack();
+        const navigateToNextStep = () => {
+            if (backTo) {
+                navigateBack();
+            } else {
+                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_TIME.getRoute(action, targetIouType, transactionID, targetReport?.reportID ?? reportID));
+            }
+        };
+
+        // When we queued draft transaction updates above, the next screen must mount AFTER those Onyx.merge
+        // writes have been delivered to subscribers, otherwise the Time step briefly reads a stale draft and
+        // renders its NotFound gate for one frame (visible as a "Not here" flash).
+        if (hasQueuedTransactionUpdates) {
+            InteractionManager.runAfterInteractions(navigateToNextStep);
         } else {
-            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_TIME.getRoute(action, targetIouType, transactionID, targetReport?.reportID ?? reportID));
+            navigateToNextStep();
         }
     };
 
