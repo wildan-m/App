@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import CommonConfirmationStep from '@components/SubStepForms/ConfirmationStep';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -22,6 +22,16 @@ function ConfirmationStep({onNext, onMove, isEditing}: SubStepProps) {
     const error = getLatestErrorMessage(walletAdditionalDetails ?? {});
     const values = useMemo(() => getSubstepValues(PERSONAL_INFO_STEP_KEYS, walletAdditionalDetailsDraft, walletAdditionalDetails), [walletAdditionalDetails, walletAdditionalDetailsDraft]);
     const shouldAskForFullSSN = walletAdditionalDetails?.errorCode === CONST.WALLET.ERROR.SSN;
+
+    const handleConfirm = useCallback(() => {
+        // When the backend has asked for the full 9-digit SSN, block re-submission of the stale last-4
+        // draft value and route the user back to the SSN substep so they can provide the required input.
+        if (shouldAskForFullSSN && (values[PERSONAL_INFO_STEP_KEYS.SSN_LAST_4] ?? '').length !== CONST.BANK_ACCOUNT.MAX_LENGTH.FULL_SSN) {
+            onMove(PERSONAL_INFO_STEP_INDEXES.SSN);
+            return;
+        }
+        onNext();
+    }, [shouldAskForFullSSN, values, onMove, onNext]);
 
     const summaryItems = [
         {
@@ -69,7 +79,7 @@ function ConfirmationStep({onNext, onMove, isEditing}: SubStepProps) {
     return (
         <CommonConfirmationStep
             isEditing={isEditing}
-            onNext={onNext}
+            onNext={handleConfirm}
             onMove={onMove}
             pageTitle={translate('personalInfoStep.letsDoubleCheck')}
             summaryItems={summaryItems}
