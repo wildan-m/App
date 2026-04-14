@@ -433,6 +433,20 @@ function updateReportsToDisplayInLHN({
         }
     }
 
+    // Drop stale entries that no longer exist in `reports`. React batches Onyx.clear + setCollection
+    // during an import into a single render, so useOnyx `sourceValue` only surfaces the last update's
+    // keys in `updatedReportsKeys`. Any keys from the cleared account that weren't revisited by the
+    // loop above would otherwise persist in `displayedReports`. Both `displayedReports` and `reports`
+    // are keyed by the full `report_<id>` collection key, so the presence check is unambiguous.
+    if (reports) {
+        const currentDisplayed = displayedReportsCopy ?? displayedReports;
+        for (const displayedKey of Object.keys(currentDisplayed)) {
+            if (!(displayedKey in reports) || !reports[displayedKey]) {
+                delete getMutableCopy()[displayedKey];
+            }
+        }
+    }
+
     return displayedReportsCopy ?? displayedReports;
 }
 /**

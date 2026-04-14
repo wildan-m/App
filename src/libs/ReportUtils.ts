@@ -1108,7 +1108,7 @@ Onyx.connect({
 });
 
 let deprecatedAllReports: OnyxCollection<Report>;
-let deprecatedReportsByPolicyID: ReportByPolicyMap;
+let deprecatedReportsByPolicyID: ReportByPolicyMap = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT,
     waitForCollectionCallback: true,
@@ -1116,6 +1116,7 @@ Onyx.connect({
         deprecatedAllReports = value;
 
         if (!value) {
+            deprecatedReportsByPolicyID = {};
             return;
         }
 
@@ -1157,6 +1158,8 @@ Onyx.connect({
     waitForCollectionCallback: true,
     callback: (value) => {
         if (!value) {
+            deprecatedAllTransactions = {};
+            deprecatedReportsTransactions = {};
             return;
         }
         deprecatedAllTransactions = Object.fromEntries(Object.entries(value).filter(([, transaction]) => transaction));
@@ -1182,20 +1185,19 @@ Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
     waitForCollectionCallback: true,
     callback: (actions) => {
-        if (!actions) {
-            return;
-        }
-        allReportActions = actions;
+        allReportActions = actions ?? undefined;
     },
 });
 
 let allReportMetadata: OnyxCollection<ReportMetadata>;
-const allReportMetadataKeyValue: Record<string, ReportMetadata> = {};
+let allReportMetadataKeyValue: Record<string, ReportMetadata> = {};
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_METADATA,
     waitForCollectionCallback: true,
     callback: (value) => {
         if (!value) {
+            allReportMetadata = undefined;
+            allReportMetadataKeyValue = {};
             return;
         }
         allReportMetadata = value;
@@ -1216,10 +1218,7 @@ Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS,
     waitForCollectionCallback: true,
     callback: (value) => {
-        if (!value) {
-            return;
-        }
-        allReportNameValuePair = value;
+        allReportNameValuePair = value ?? undefined;
     },
 });
 

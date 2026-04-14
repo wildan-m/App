@@ -3489,10 +3489,11 @@ describe('SidebarUtils', () => {
 
         describe('updateReportsToDisplayInLHN', () => {
             it('should return the same reference when no entries actually change', () => {
-                const reports: OnyxCollection<Report> = {
-                    [`${ONYXKEYS.COLLECTION.REPORT}1`]: createRandomReport(1, undefined),
-                };
                 const displayedReports = createSidebarReportsCollection([{reportName: 'Report 1', isPinned: false, hasErrorsOtherThanFailedReceipt: false}]);
+                // Mirror `displayedReports` so the stale-entry cleanup pass finds every displayed key
+                // still present in `reports`. The production hook always passes the same key format for
+                // both, so this reflects real usage.
+                const reports: OnyxCollection<Report> = {...displayedReports};
 
                 const result = SidebarUtils.updateReportsToDisplayInLHN({
                     displayedReports,
@@ -3509,6 +3510,34 @@ describe('SidebarUtils', () => {
                 });
 
                 expect(result).toBe(displayedReports);
+            });
+
+            it('should remove stale displayed entries whose keys no longer exist in reports (covers Onyx.clear + setCollection batching during import)', () => {
+                // Simulate the Onyx import race condition: `displayedReports` still contains entries
+                // from the previously-signed-in account (Account B), and the `updatedReportsKeys` only
+                // surfaces the keys from the last Onyx update (Account A's setCollection). Account B's
+                // stale keys should be dropped even though the incremental loop never visits them.
+                const accountBDisplayed = createSidebarReportsCollection([{reportName: 'Account B Report', isPinned: false, hasErrorsOtherThanFailedReceipt: false}]);
+                const accountAImported: OnyxCollection<Report> = {
+                    [`${ONYXKEYS.COLLECTION.REPORT}ACCOUNT_A_NEW_ID`]: createRandomReport(999, undefined),
+                };
+
+                const result = SidebarUtils.updateReportsToDisplayInLHN({
+                    displayedReports: accountBDisplayed,
+                    reports: accountAImported,
+                    // sourceValue after React batches clear + setCollection only surfaces Account A's keys
+                    updatedReportsKeys: [`${ONYXKEYS.COLLECTION.REPORT}ACCOUNT_A_NEW_ID`],
+                    currentReportId: undefined,
+                    isInFocusMode: false,
+                    betas: [],
+                    transactions: {},
+                    transactionViolations: {},
+                    reportNameValuePairs: {},
+                    reportAttributes: undefined,
+                    draftComments: {},
+                });
+
+                expect(Object.keys(result).filter((k) => k in accountBDisplayed)).toHaveLength(0);
             });
 
             it('should return a new reference when a report is removed', () => {
