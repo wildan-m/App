@@ -5973,6 +5973,11 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             invitedBySecondaryLogin: (secondaryLogin: string) => `Hinzugefügt durch sekundären Login ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Gesamtzahl der Workspace-Mitglieder: ${count}`,
             importMembers: 'Mitglieder importieren',
+            allMembers: 'Alle Mitglieder',
+            noMembersMatchFilter: {
+                title: 'Keine Mitglieder entsprechen diesem Filter',
+                subtitle: 'Lade ein Mitglied ein oder ändere den Filter oben.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Wenn du ${approver} aus diesem Workspace entfernst, ersetzen wir diese Person im Freigabe-Workflow durch ${workspaceOwner}, den/die Workspace-Inhaber:in.`,
             removeMemberPromptPendingApproval: (memberName: string) =>

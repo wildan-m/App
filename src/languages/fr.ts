@@ -5992,6 +5992,11 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             invitedBySecondaryLogin: (secondaryLogin: string) => `Ajouté par la connexion secondaire ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Nombre total de membres de l'espace de travail : ${count}`,
             importMembers: 'Importer des membres',
+            allMembers: 'Tous les membres',
+            noMembersMatchFilter: {
+                title: 'Aucun membre ne correspond à ce filtre',
+                subtitle: 'Invitez un membre ou modifiez le filtre ci-dessus.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Si vous supprimez ${approver} de cet espace de travail, nous le remplacerons dans le workflow d’approbation par ${workspaceOwner}, le responsable de l’espace de travail.`,
             removeMemberPromptPendingApproval: (memberName: string) =>

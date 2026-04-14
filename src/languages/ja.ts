@@ -5895,6 +5895,11 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             invitedBySecondaryLogin: (secondaryLogin: string) => `セカンダリログイン${secondaryLogin}によって追加されました。`,
             workspaceMembersCount: (count: number) => `ワークスペースメンバー合計：${count}`,
             importMembers: 'メンバーをインポート',
+            allMembers: 'すべてのメンバー',
+            noMembersMatchFilter: {
+                title: 'このフィルターに一致するメンバーはいません',
+                subtitle: 'メンバーを招待するか、上のフィルターを変更してください。',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `このワークスペースから${approver}を削除すると、承認ワークフロー内ではワークスペースのオーナーである${workspaceOwner}に置き換えられます。`,
             removeMemberPromptPendingApproval: (memberName: string) =>

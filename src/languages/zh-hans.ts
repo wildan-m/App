@@ -5790,6 +5790,11 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             invitedBySecondaryLogin: (secondaryLogin: string) => `由次要登录账号 ${secondaryLogin} 添加。`,
             workspaceMembersCount: (count: number) => `工作区成员总数：${count}`,
             importMembers: '导入成员',
+            allMembers: '所有成员',
+            noMembersMatchFilter: {
+                title: '没有成员符合此筛选条件',
+                subtitle: '邀请成员或更改上方的筛选条件。',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) => `如果你将 ${approver} 从此工作区中移除，我们会在审批流程中用工作区所有者 ${workspaceOwner} 替换 TA。`,
             removeMemberPromptPendingApproval: (memberName: string) => `${memberName} 还有待审批的报销报告。请先让 TA 审批，或在将其从工作区中移除之前接管 TA 的报告。`,
             removeMemberPromptReimburser: ({memberName}: {memberName: string}) => `您无法将${memberName}从此工作区中移除。请在“工作流”>“进行或跟踪付款”中设置新的报销人，然后重试。`,

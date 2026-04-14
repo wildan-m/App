@@ -5935,6 +5935,11 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             invitedBySecondaryLogin: (secondaryLogin: string) => `Dodane przez dodatkowy login ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Łączna liczba członków przestrzeni roboczej: ${count}`,
             importMembers: 'Zaimportuj członków',
+            allMembers: 'Wszyscy członkowie',
+            noMembersMatchFilter: {
+                title: 'Żaden członek nie pasuje do tego filtra',
+                subtitle: 'Zaproś członka lub zmień filtr powyżej.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Jeśli usuniesz ${approver} z tego obszaru roboczego, zastąpimy tę osobę w procesie zatwierdzania przez ${workspaceOwner}, właściciela obszaru roboczego.`,
             removeMemberPromptPendingApproval: (memberName: string) =>

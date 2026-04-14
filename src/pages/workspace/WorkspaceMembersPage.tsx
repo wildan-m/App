@@ -6,9 +6,13 @@ import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import type {DropdownOption, WorkspaceMemberBulkActionType} from '@components/ButtonWithDropdownMenu/types';
 import DecisionModal from '@components/DecisionModal';
+import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
 import MessagesRow from '@components/MessagesRow';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
+import DropdownButton from '@components/Search/FilterDropdowns/DropdownButton';
+import SingleSelectPopup from '@components/Search/FilterDropdowns/SingleSelectPopup';
 import SearchBar from '@components/SearchBar';
 import TableListItem from '@components/SelectionList/ListItem/TableListItem';
 import type {ListItem, SelectionListHandle} from '@components/SelectionList/types';
@@ -31,6 +35,7 @@ import useSearchResults from '@hooks/useSearchResults';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
+import useWorkspaceRoleFilter from '@hooks/useWorkspaceRoleFilter';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {
     clearAddMemberError,
@@ -148,7 +153,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const selectionListRef = useRef<SelectionListHandle<MemberOption>>(null);
     const isFocused = useIsFocused();
     const policyID = route.params.policyID;
-    const illustrations = useMemoizedLazyIllustrations(['ReceiptWrangler']);
+    const illustrations = useMemoizedLazyIllustrations(['ReceiptWrangler', 'EmptyShelves']);
 
     const ownerDetails = personalDetails?.[policy?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID] ?? ({} as PersonalDetails);
     const {approvalWorkflows} = useMemo(
@@ -509,12 +514,14 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         icons.FallbackAvatar,
     ]);
 
+    const {rolePreFilter, roleOptions, selectedRole, handleRoleChange, dropdownLabel, hasActiveRoleFilter} = useWorkspaceRoleFilter(policy);
+
     const filterMember = useCallback((memberOption: MemberOption, searchQuery: string) => {
         const results = tokenizedSearch([memberOption], searchQuery, (option) => [option.text ?? '', option.alternateText ?? '']);
         return results.length > 0;
     }, []);
     const sortMembers = useCallback((memberOptions: MemberOption[]) => sortAlphabetically(memberOptions, 'text', localeCompare), [localeCompare]);
-    const [inputValue, setInputValue, filteredData] = useSearchResults(data, filterMember, sortMembers);
+    const [inputValue, setInputValue, filteredData] = useSearchResults(data, filterMember, sortMembers, rolePreFilter);
 
     useEffect(() => {
         if (!isFocused) {
@@ -783,6 +790,36 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
 
     const selectionModeHeader = isMobileSelectionModeEnabled && shouldUseNarrowLayout;
 
+    const rolePopoverComponent = useCallback(
+        ({closeOverlay}: PopoverComponentProps) => (
+            <SingleSelectPopup
+                label={translate('common.role')}
+                items={roleOptions}
+                value={selectedRole ?? roleOptions.at(0) ?? null}
+                closeOverlay={closeOverlay}
+                onChange={handleRoleChange}
+                defaultValue={roleOptions.at(0)?.value}
+                selectionListStyle={{listItemWrapperStyle: {minHeight: 40}}}
+            />
+        ),
+        [handleRoleChange, roleOptions, selectedRole, translate],
+    );
+
+    const roleFilterDropdown = data.length > 0 && (
+        <View style={[styles.ph5, styles.pb3]}>
+            <DropdownButton
+                label={dropdownLabel}
+                value={null}
+                PopoverComponent={rolePopoverComponent}
+                innerStyles={[styles.gap2, shouldUseNarrowLayout && styles.mw100]}
+                wrapperStyle={shouldUseNarrowLayout ? styles.w100 : styles.alignSelfStart}
+                labelStyle={styles.fontSizeLabel}
+                caretWrapperStyle={styles.gap2}
+                medium
+            />
+        </View>
+    );
+
     const headerContent = (
         <>
             {shouldUseNarrowLayout && data.length > 0 && <View style={[styles.pr5]}>{getHeaderContent()}</View>}
@@ -796,12 +833,22 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     {getHeaderContent()}
                 </>
             )}
+            {roleFilterDropdown}
             {data.length > CONST.SEARCH_ITEM_LIMIT && (
                 <SearchBar
                     inputValue={inputValue}
                     onChangeText={setInputValue}
                     label={translate('workspace.people.findMember')}
-                    shouldShowEmptyState={!filteredData.length}
+                    shouldShowEmptyState={!filteredData.length && !hasActiveRoleFilter}
+                />
+            )}
+            {hasActiveRoleFilter && filteredData.length === 0 && data.length > 0 && (
+                <GenericEmptyStateComponent
+                    headerMedia={illustrations.EmptyShelves}
+                    headerContentStyles={styles.emptyShelvesIllustration}
+                    title={translate('workspace.people.noMembersMatchFilter.title')}
+                    subtitle={translate('workspace.people.noMembersMatchFilter.subtitle')}
+                    headerStyles={styles.emptyStateCardIllustrationContainer}
                 />
             )}
         </>

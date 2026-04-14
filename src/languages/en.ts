@@ -5981,6 +5981,11 @@ const translations = {
             invitedBySecondaryLogin: (secondaryLogin: string) => `Added by secondary login ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Total workspace members: ${count}`,
             importMembers: 'Import members',
+            allMembers: 'All members',
+            noMembersMatchFilter: {
+                title: 'No members match this filter',
+                subtitle: 'Invite a member or change the filter above.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `If you remove ${approver} from this workspace, we'll replace them in the approval workflow with ${workspaceOwner}, the workspace owner.`,
             removeMemberPromptPendingApproval: (memberName: string) =>

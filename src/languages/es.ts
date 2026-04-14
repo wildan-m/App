@@ -5827,6 +5827,11 @@ ${amount} para ${merchant} - ${date}`,
             invitedBySecondaryLogin: (secondaryLogin) => `Agregado por nombre de usuario secundario ${secondaryLogin}.`,
             workspaceMembersCount: (count) => `Total de miembros del espacio de trabajo: ${count}`,
             importMembers: 'Importar miembros',
+            allMembers: 'Todos los miembros',
+            noMembersMatchFilter: {
+                title: 'Ningún miembro coincide con este filtro',
+                subtitle: 'Invita a un miembro o cambia el filtro de arriba.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Si eliminas a ${approver} de este espacio de trabajo, lo reemplazaremos en el flujo de aprobación por ${workspaceOwner}, el propietario del espacio de trabajo.`,
             removeMemberPromptReimburser: ({memberName}: {memberName: string}) =>

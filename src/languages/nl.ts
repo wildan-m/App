@@ -5943,6 +5943,11 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             invitedBySecondaryLogin: (secondaryLogin: string) => `Toegevoegd door secundair login ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Totaal aantal werkruimteleden: ${count}`,
             importMembers: 'Leden importeren',
+            allMembers: 'Alle leden',
+            noMembersMatchFilter: {
+                title: 'Geen leden komen overeen met dit filter',
+                subtitle: 'Nodig een lid uit of wijzig het filter hierboven.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Als je ${approver} uit deze workspace verwijdert, vervangen we diegene in de goedkeuringsworkflow door ${workspaceOwner}, de eigenaar van de workspace.`,
             removeMemberPromptPendingApproval: (memberName: string) =>

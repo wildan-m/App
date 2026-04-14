@@ -5942,6 +5942,11 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             invitedBySecondaryLogin: (secondaryLogin: string) => `Adicionado pelo login secundário ${secondaryLogin}.`,
             workspaceMembersCount: (count: number) => `Total de membros no workspace: ${count}`,
             importMembers: 'Importar membros',
+            allMembers: 'Todos os membros',
+            noMembersMatchFilter: {
+                title: 'Nenhum membro corresponde a este filtro',
+                subtitle: 'Convide um membro ou altere o filtro acima.',
+            },
             removeMemberPromptApprover: (approver: string, workspaceOwner: string) =>
                 `Se você remover ${approver} deste workspace, nós o substituiremos no fluxo de aprovação por ${workspaceOwner}, o proprietário do workspace.`,
             removeMemberPromptPendingApproval: (memberName: string) =>
