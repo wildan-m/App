@@ -1190,6 +1190,107 @@ describe('TransactionUtils', () => {
         });
     });
 
+    describe('shouldShowBrokenConnectionViolation', () => {
+        const brokenConnectionViolation: TransactionViolation = {
+            name: CONST.VIOLATIONS.RTER,
+            type: CONST.VIOLATION_TYPES.VIOLATION,
+            data: {
+                rterType: CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION,
+            },
+        };
+
+        it('should return true for admin non-submitter on processing report with scheduled submit policy', () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                ownerAccountID: 99999999,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            expect(TransactionUtils.shouldShowBrokenConnectionViolation(report, policy, [brokenConnectionViolation])).toBe(true);
+        });
+
+        it('should return true for admin non-submitter on processing report with weekly submit policy', () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                ownerAccountID: 99999999,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: true,
+                autoReportingFrequency: CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY,
+            };
+
+            expect(TransactionUtils.shouldShowBrokenConnectionViolation(report, policy, [brokenConnectionViolation])).toBe(true);
+        });
+
+        it('should return false for admin non-submitter on approved report regardless of policy', () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+                ownerAccountID: 99999999,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            expect(TransactionUtils.shouldShowBrokenConnectionViolation(report, policy, [brokenConnectionViolation])).toBe(false);
+        });
+
+        it('should return true for admin non-submitter on open expense report', () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.OPEN,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+                ownerAccountID: 99999999,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            expect(TransactionUtils.shouldShowBrokenConnectionViolation(report, policy, [brokenConnectionViolation])).toBe(true);
+        });
+
+        it('should return false when no broken connection violations are present', () => {
+            const report: Report = {
+                ...createRandomReport(0, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                ownerAccountID: 99999999,
+            };
+
+            const policy: Policy = {
+                ...createRandomPolicy(0, CONST.POLICY.TYPE.TEAM),
+                role: CONST.POLICY.ROLE.ADMIN,
+                autoReporting: false,
+            };
+
+            expect(TransactionUtils.shouldShowBrokenConnectionViolation(report, policy, [])).toBe(false);
+        });
+    });
+
     describe('getReportOwnerAsAttendee', () => {
         it('should return undefined when transaction has no reportID', () => {
             const transaction = generateTransaction({
