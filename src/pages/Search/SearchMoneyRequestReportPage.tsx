@@ -99,7 +99,10 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
         }
 
         // Report is gone now but we had a money request report before → it was removed.
-        const isRemovalExpectedForReportType = !report && isMoneyRequestReport(prevReport);
+        // Only treat this as a removal when the previously tracked report matches the current route:
+        // during Next/Prev navigation the route switches to a new reportID and `report` is briefly
+        // undefined while Onyx resolves the new key, which must not be mistaken for a deletion.
+        const isRemovalExpectedForReportType = !report && isMoneyRequestReport(prevReport) && prevReport?.reportID === reportIDFromRoute;
 
         if (isRemovalExpectedForReportType) {
             if (!isFocused) {
@@ -107,7 +110,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
             }
             Navigation.dismissModal();
         }
-    }, [report, isFocused, prevReport]);
+    }, [report, isFocused, prevReport, reportIDFromRoute]);
 
     useEffect(() => {
         // Update last visit time when the expense super wide RHP report is focused
