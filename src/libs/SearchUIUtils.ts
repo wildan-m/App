@@ -2621,7 +2621,21 @@ function getReportSections({
     const reportIDToTransactions: Record<string, TransactionReportGroupListItemType> = {};
 
     const orderedKeys: string[] = [...reportKeys, ...transactionKeys];
-    const mergedPersonalDetails = {...(onyxPersonalDetailsList ?? {}), ...(data.personalDetailsList ?? {})};
+    // Per-entry merge: snapshot avatar can be an empty string; prefer a non-empty live avatar in that case.
+    const mergedPersonalDetails: OnyxTypes.PersonalDetailsList = {...(onyxPersonalDetailsList ?? {})};
+    for (const [accountIDKey, snapshotDetails] of Object.entries(data.personalDetailsList ?? {})) {
+        if (!snapshotDetails) {
+            continue;
+        }
+        const liveDetails = mergedPersonalDetails[accountIDKey];
+        mergedPersonalDetails[accountIDKey] = {
+            ...(liveDetails ?? {}),
+            ...snapshotDetails,
+            // Intentional `||` (not `??`): an empty-string avatar from the snapshot must fall back to the live value, not be kept.
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            avatar: snapshotDetails.avatar || liveDetails?.avatar,
+        };
+    }
 
     for (const key of orderedKeys) {
         if (isReportEntry(key) && (data[key].type === CONST.REPORT.TYPE.IOU || data[key].type === CONST.REPORT.TYPE.EXPENSE || data[key].type === CONST.REPORT.TYPE.INVOICE)) {
