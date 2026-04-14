@@ -1,6 +1,7 @@
 import {format} from 'date-fns';
 import Onyx from 'react-native-onyx';
 import type {Connection, OnyxEntry} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import {formatCurrentUserToAttendee} from '@libs/IOUUtils';
 import revokeOdometerImageUri from '@libs/OdometerImageUtils';
 import CONST from '@src/CONST';
@@ -168,6 +169,10 @@ type BuildOptimisticTransactionParams = {
     reportID: string;
 };
 
+function setDraftTransactionIouRequestType(transactionID: string, iouRequestType: ValueOf<typeof CONST.IOU.REQUEST_TYPE>) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`, {iouRequestType});
+}
+
 function buildOptimisticTransactionAndCreateDraft({initialTransaction, currentUserPersonalDetails, reportID}: BuildOptimisticTransactionParams): Transaction {
     const newTransactionID = generateTransactionID();
     const {currency, iouRequestType, isFromGlobalCreate, isFromFloatingActionButton} = initialTransaction ?? {};
@@ -246,4 +251,5 @@ export {
     removeDraftSplitTransaction,
     replaceDefaultDraftTransaction,
     buildOptimisticTransactionAndCreateDraft,
+    setDraftTransactionIouRequestType,
 };

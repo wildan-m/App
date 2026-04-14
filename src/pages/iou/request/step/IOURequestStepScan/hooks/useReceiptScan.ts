@@ -1,6 +1,6 @@
 import shouldStartLocationPermissionFlowSelector from '@selectors/LocationPermission';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import TestReceipt from '@assets/images/fake-receipt.png';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useFilesValidation from '@hooks/useFilesValidation';
@@ -21,7 +21,7 @@ import {getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import {getDefaultTaxCode, getTaxValue, hasReceipt, shouldReuseInitialTransaction} from '@libs/TransactionUtils';
 import type {ReceiptFile, UseReceiptScanParams} from '@pages/iou/request/step/IOURequestStepScan/types';
 import {setMoneyRequestReceipt} from '@userActions/IOU/Receipt';
-import {buildOptimisticTransactionAndCreateDraft, removeDraftTransactionsByIDs} from '@userActions/TransactionEdit';
+import {buildOptimisticTransactionAndCreateDraft, removeDraftTransactionsByIDs, setDraftTransactionIouRequestType} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
@@ -72,6 +72,19 @@ function useReceiptScan({
     const draftTransactionIDs = Object.keys(allTransactionDrafts ?? {});
     const [isMultiScanEnabled, setIsMultiScanEnabled] = useState(false);
     const isStartingScan = routeName === SCREENS.MONEY_REQUEST.CREATE;
+
+    // The previous flow's draft cleanup is deferred (see createDistanceRequest in IOU/index.ts),
+    // so the draft this step inherits may still carry the prior iouRequestType. Reset it to SCAN
+    // before the user captures anything — buildOptimisticTransactionAndCreateDraft copies the
+    // field onto every subsequent draft it builds.
+    const initialDraftTransactionID = initialTransaction?.transactionID;
+    const initialDraftIouRequestType = initialTransaction?.iouRequestType;
+    useEffect(() => {
+        if (!isStartingScan || !initialDraftTransactionID || initialDraftIouRequestType === CONST.IOU.REQUEST_TYPE.SCAN) {
+            return;
+        }
+        setDraftTransactionIouRequestType(initialDraftTransactionID, CONST.IOU.REQUEST_TYPE.SCAN);
+    }, [isStartingScan, initialDraftTransactionID, initialDraftIouRequestType]);
 
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isReplacingReceipt = (isEditing && hasReceipt(initialTransaction)) || (!!initialTransaction?.receipt && !!backTo);
