@@ -498,7 +498,42 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
     };
 
-    const applicableSecondaryActions = secondaryActions.map((action) => secondaryActionsImplementation[action]).filter((action): action is NonNullable<typeof action> => !!action);
+    const transactionActionSections: Array<Array<ValueOf<typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS>>> = [
+        [
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD,
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REMOVE_HOLD,
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SPLIT,
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MERGE,
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DUPLICATE,
+            CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT,
+        ],
+        [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MOVE_EXPENSE],
+        [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.VIEW_DETAILS, CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DELETE],
+    ];
+    const applicableSecondaryActions: Array<DropdownOption<ValueOf<typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS>>> = [];
+    let hasEmittedSection = false;
+    for (const section of transactionActionSections) {
+        const sectionActions: Array<DropdownOption<ValueOf<typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS>>> = [];
+        for (const actionKey of section) {
+            if (!secondaryActions.includes(actionKey)) {
+                continue;
+            }
+            const implementation = secondaryActionsImplementation[actionKey];
+            if (!implementation) {
+                continue;
+            }
+            sectionActions.push(implementation);
+        }
+        if (sectionActions.length === 0) {
+            continue;
+        }
+        let isFirstInSection = true;
+        for (const action of sectionActions) {
+            applicableSecondaryActions.push(isFirstInSection && hasEmittedSection ? {...action, shouldShowDivider: true} : action);
+            isFirstInSection = false;
+        }
+        hasEmittedSection = true;
+    }
 
     if (!applicableSecondaryActions.length) {
         return null;

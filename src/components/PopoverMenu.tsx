@@ -83,6 +83,9 @@ type PopoverMenuItem = MenuItemProps & {
 
     /** Additional data for the menu item */
     additionalData?: Record<string, unknown>;
+
+    /** Whether to render a horizontal divider line above this item to visually separate it from the previous item */
+    shouldShowDivider?: boolean;
 };
 
 type ModalAnimationProps = Pick<ReanimatedModalProps, 'animationInDelay' | 'animationIn' | 'animationInTiming' | 'animationOut' | 'animationOutTiming'>;
@@ -401,49 +404,49 @@ function BasePopoverMenu({
             testID: menuItemTestID,
             shouldShowLoadingSpinnerIcon,
             badgeText,
+            shouldShowDivider,
             ...menuItemProps
         } = item;
         const icon = typeof item.icon === 'string' ? expensifyIcons[item.icon as keyof typeof expensifyIcons] : item.icon;
         // eslint-disable-next-line react/no-array-index-key
         const reactKey = shouldIgnoreKeyForRendering ? `${item.text}_${menuIndex}` : (key ?? `${item.text}_${menuIndex}`);
         return (
-            <OfflineWithFeedback
-                key={reactKey}
-                pendingAction={item.pendingAction}
-            >
-                <FocusableMenuItem
-                    key={reactKey}
-                    pressableTestID={menuItemTestID ?? `PopoverMenuItem-${item.text}`}
-                    title={text}
-                    onPress={(event) => selectItem(menuIndex, event)}
-                    focused={focusedIndex === menuIndex}
-                    shouldShowSelectedItemCheck={shouldShowSelectedItemCheck}
-                    shouldCheckActionAllowedOnPress={false}
-                    iconRight={item.rightIcon}
-                    shouldShowRightIcon={!!item.rightIcon}
-                    brickRoadIndicator={item.brickRoadIndicator}
-                    onFocus={() => {
-                        if (!shouldUpdateFocusedIndex) {
-                            return;
-                        }
-                        setFocusedIndex(menuIndex);
-                    }}
-                    badgeText={badgeText}
-                    badgeStyle={StyleSheet.flatten(badgeStyle)}
-                    wrapperStyle={[
-                        StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, focusedIndex === menuIndex, item.disabled ?? false, theme.activeComponentBG, theme.hoverComponentBG),
-                        shouldUseScrollView && !shouldUseModalPaddingStyle && StyleUtils.getOptionMargin(menuIndex, currentMenuItems.length - 1),
-                    ]}
-                    shouldRemoveHoverBackground={item.isSelected}
-                    titleStyle={StyleSheet.flatten([styles.flex1, item.titleStyle])}
-                    icon={icon}
-                    role={CONST.ROLE.BUTTON}
-                    // Spread other props dynamically
-                    {...menuItemProps}
-                    hasSubMenuItems={!!subMenuItems?.length}
-                    shouldShowLoadingSpinnerIcon={shouldShowLoadingSpinnerIcon}
-                />
-            </OfflineWithFeedback>
+            <React.Fragment key={reactKey}>
+                {!!shouldShowDivider && menuIndex > 0 && <View style={[styles.dividerLine, styles.mv2]} />}
+                <OfflineWithFeedback pendingAction={item.pendingAction}>
+                    <FocusableMenuItem
+                        pressableTestID={menuItemTestID ?? `PopoverMenuItem-${item.text}`}
+                        title={text}
+                        onPress={(event) => selectItem(menuIndex, event)}
+                        focused={focusedIndex === menuIndex}
+                        shouldShowSelectedItemCheck={shouldShowSelectedItemCheck}
+                        shouldCheckActionAllowedOnPress={false}
+                        iconRight={item.rightIcon}
+                        shouldShowRightIcon={!!item.rightIcon}
+                        brickRoadIndicator={item.brickRoadIndicator}
+                        onFocus={() => {
+                            if (!shouldUpdateFocusedIndex) {
+                                return;
+                            }
+                            setFocusedIndex(menuIndex);
+                        }}
+                        badgeText={badgeText}
+                        badgeStyle={StyleSheet.flatten(badgeStyle)}
+                        wrapperStyle={[
+                            StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, focusedIndex === menuIndex, item.disabled ?? false, theme.activeComponentBG, theme.hoverComponentBG),
+                            shouldUseScrollView && !shouldUseModalPaddingStyle && StyleUtils.getOptionMargin(menuIndex, currentMenuItems.length - 1),
+                        ]}
+                        shouldRemoveHoverBackground={item.isSelected}
+                        titleStyle={StyleSheet.flatten([styles.flex1, item.titleStyle])}
+                        icon={icon}
+                        role={CONST.ROLE.BUTTON}
+                        // Spread other props dynamically
+                        {...menuItemProps}
+                        hasSubMenuItems={!!subMenuItems?.length}
+                        shouldShowLoadingSpinnerIcon={shouldShowLoadingSpinnerIcon}
+                    />
+                </OfflineWithFeedback>
+            </React.Fragment>
         );
     });
 

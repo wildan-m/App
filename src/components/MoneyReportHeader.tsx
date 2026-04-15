@@ -1788,9 +1788,53 @@ function MoneyReportHeaderContent({reportID: reportIDProp, shouldDisplayBackButt
             }),
         },
     };
-    const applicableSecondaryActions = secondaryActions
-        .map((action) => secondaryActionsImplementation[action])
-        .filter((action) => action?.shouldShow !== false && action?.value !== primaryAction);
+    const secondaryActionSections: Array<Array<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>>> = [
+        [CONST.REPORT.SECONDARY_ACTIONS.ADD_EXPENSE],
+        [
+            CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT,
+            CONST.REPORT.SECONDARY_ACTIONS.RETRACT,
+            CONST.REPORT.SECONDARY_ACTIONS.REOPEN,
+            CONST.REPORT.SECONDARY_ACTIONS.SUBMIT,
+            CONST.REPORT.SECONDARY_ACTIONS.APPROVE,
+            CONST.REPORT.SECONDARY_ACTIONS.UNAPPROVE,
+            CONST.REPORT.SECONDARY_ACTIONS.CANCEL_PAYMENT,
+            CONST.REPORT.SECONDARY_ACTIONS.REJECT,
+        ],
+        [
+            CONST.REPORT.SECONDARY_ACTIONS.HOLD,
+            CONST.REPORT.SECONDARY_ACTIONS.REMOVE_HOLD,
+            CONST.REPORT.SECONDARY_ACTIONS.SPLIT,
+            CONST.REPORT.SECONDARY_ACTIONS.MERGE,
+            CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_EXPENSE,
+        ],
+        [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE, CONST.REPORT.SECONDARY_ACTIONS.MOVE_EXPENSE],
+        [CONST.REPORT.SECONDARY_ACTIONS.PRINT, CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF, CONST.REPORT.SECONDARY_ACTIONS.EXPORT],
+        [CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS, CONST.REPORT.SECONDARY_ACTIONS.DELETE],
+    ];
+    const applicableSecondaryActions: Array<DropdownOption<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>>> = [];
+    let hasEmittedSection = false;
+    for (const section of secondaryActionSections) {
+        const sectionActions: Array<DropdownOption<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>>> = [];
+        for (const actionKey of section) {
+            if (!secondaryActions.includes(actionKey)) {
+                continue;
+            }
+            const implementation = secondaryActionsImplementation[actionKey];
+            if (!implementation || implementation.shouldShow === false || implementation.value === primaryAction) {
+                continue;
+            }
+            sectionActions.push(implementation);
+        }
+        if (sectionActions.length === 0) {
+            continue;
+        }
+        let isFirstInSection = true;
+        for (const action of sectionActions) {
+            applicableSecondaryActions.push(isFirstInSection && hasEmittedSection ? {...action, shouldShowDivider: true} : action);
+            isFirstInSection = false;
+        }
+        hasEmittedSection = true;
+    }
     useEffect(() => {
         if (!transactionThreadReportID) {
             return;
