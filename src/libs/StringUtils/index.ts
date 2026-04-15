@@ -124,7 +124,9 @@ function normalizeCRLF(value?: string): string | undefined {
  * Replace all line breaks with white spaces
  */
 function lineBreaksToSpaces(text = '', useNonBreakingSpace = false) {
-    return text.replaceAll(CONST.REGEX.LINE_BREAK, useNonBreakingSpace ? '\u00A0' : ' ');
+    // Match runs of one or more line breaks so that consecutive breaks collapse into a single space
+    // instead of leaving behind runs of spaces that the caller never intended.
+    return text.replaceAll(/(?:\r\n|\r|\n|\u2028)+/g, useNonBreakingSpace ? '\u00A0' : ' ');
 }
 
 /**

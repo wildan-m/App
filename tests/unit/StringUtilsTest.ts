@@ -103,6 +103,33 @@ second
         });
     });
 
+    describe('lineBreaksToSpaces', () => {
+        it('replaces a single line break with a single space', () => {
+            expect(StringUtils.lineBreaksToSpaces('Line 1\nLine 2')).toBe('Line 1 Line 2');
+        });
+
+        it('collapses a run of consecutive line breaks into a single space', () => {
+            expect(StringUtils.lineBreaksToSpaces('Line 1\n\n\n\n\n\n\nLine 2\n\n\n\n\n\n\nLine 3')).toBe('Line 1 Line 2 Line 3');
+        });
+
+        it('collapses a mix of \\r\\n, \\r, \\n and \\u2028 within one run', () => {
+            expect(StringUtils.lineBreaksToSpaces('a\r\n\r\n\r\u2028\nb')).toBe('a b');
+        });
+
+        it('preserves pre-existing runs of regular spaces in the input', () => {
+            expect(StringUtils.lineBreaksToSpaces('foo  bar')).toBe('foo  bar');
+            expect(StringUtils.lineBreaksToSpaces('foo  bar\n\nbaz')).toBe('foo  bar baz');
+        });
+
+        it('uses a non-breaking space when requested and still collapses runs', () => {
+            expect(StringUtils.lineBreaksToSpaces('Line 1\n\n\nLine 2', true)).toBe('Line 1\u00A0Line 2');
+        });
+
+        it('returns an empty string unchanged', () => {
+            expect(StringUtils.lineBreaksToSpaces('')).toBe('');
+        });
+    });
+
     describe('startsWithVowel', () => {
         it('returns true for strings starting with lowercase vowels', () => {
             expect(StringUtils.startsWithVowel('apple')).toBe(true);
