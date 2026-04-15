@@ -26,13 +26,13 @@ function getActiveKey(similarSearchHash: number, hasPaidGroupPolicy: boolean): s
 
 function StaticTabSelector({queryJSON}: {queryJSON: SearchQueryJSON}) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Receipt', 'Document', 'ChatBubbles', 'Send'] as const);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Receipt', 'ReceiptMultiple', 'ChatBubbles', 'Send'] as const);
     const [policyInfo] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: staticPolicyInfoSelector});
     const hasPaidGroupPolicy = policyInfo?.hasPaidGroupPolicy ?? false;
 
     const tabs: TabSelectorBaseItem[] = useMemo(() => {
         const result: TabSelectorBaseItem[] = [
-            {key: reportsSearch.key, icon: expensifyIcons.Document, title: translate(reportsSearch.translationPath)},
+            {key: reportsSearch.key, icon: expensifyIcons.ReceiptMultiple, title: translate(reportsSearch.translationPath)},
             {key: expensesSearch.key, icon: expensifyIcons.Receipt, title: translate(expensesSearch.translationPath)},
             {key: chatsSearch.key, icon: expensifyIcons.ChatBubbles, title: translate(chatsSearch.translationPath)},
         ];

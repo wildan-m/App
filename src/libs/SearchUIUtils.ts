@@ -482,6 +482,7 @@ type SearchTypeMenuItem = {
     icon: Extract<
         ExpensifyIconName,
         | 'Receipt'
+        | 'ReceiptMultiple'
         | 'ChatBubbles'
         | 'MoneyBag'
         | 'CreditCard'
@@ -648,9 +649,9 @@ function getSuggestedSearches(accountID: number = CONST.DEFAULT_NUMBER_ID, defau
         },
         [CONST.SEARCH.SEARCH_KEYS.REPORTS]: {
             key: CONST.SEARCH.SEARCH_KEYS.REPORTS,
-            translationPath: 'common.reports',
+            translationPath: 'common.spend',
             type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
-            icon: 'Document',
+            icon: 'ReceiptMultiple',
             searchQuery: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT}),
             get searchQueryJSON() {
                 return buildSearchQueryJSON(this.searchQuery);
