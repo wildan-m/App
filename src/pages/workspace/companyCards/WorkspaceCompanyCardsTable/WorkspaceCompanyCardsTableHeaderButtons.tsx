@@ -67,11 +67,13 @@ function WorkspaceCompanyCardsTableHeaderButtons({policyID, feedName, isLoading,
     const [countryByIp] = useOnyx(ONYXKEYS.COUNTRY);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
-    const {cardFeedErrors} = useCardFeedErrors();
+    const {cardFeedErrors, shouldShowRbrForFeedNameWithDomainID} = useCardFeedErrors();
     const feedErrors = cardFeedErrors[feedName];
     const hasFeedErrors = feedErrors?.hasFeedErrors;
     const isFeedConnectionBroken = feedErrors?.isFeedConnectionBroken;
-    const shouldShowRBR = feedErrors?.shouldShowRBR;
+    // The feed selector button should only flag errors on OTHER feeds in this workspace — errors for the currently
+    // viewed feed are already surfaced by the inline banner below, so duplicating them here would just be noise.
+    const shouldShowRBR = Object.keys(companyFeeds ?? {}).some((otherFeedName) => otherFeedName !== feedName && !!shouldShowRbrForFeedNameWithDomainID[otherFeedName]);
 
     const openBankConnection = () => {
         if (!feedName) {
