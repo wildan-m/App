@@ -1628,6 +1628,9 @@ function Search({
                     onSelectRow={onSelectRow}
                     onCheckboxPress={toggleTransaction}
                     onAllCheckboxPress={toggleAllTransactions}
+                    onSelectAllMatchingPress={() => selectAllMatchingItems(true)}
+                    shouldShowSelectAllMatching={!!searchResults?.search?.hasMoreResults}
+                    areAllMatchingItemsSelected={areAllMatchingItemsSelected}
                     canSelectMultiple={canSelectMultiple}
                     selectedTransactions={selectedTransactions}
                     shouldPreventLongPressRow={isChat || isTask}

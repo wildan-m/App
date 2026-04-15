@@ -7641,6 +7641,8 @@ ${reportName}
         exportedTo: 'エクスポート先',
         exportAll: {
             selectAllMatchingItems: '一致する項目をすべて選択',
+            selectAllOnPage: 'このページのすべてを選択',
+            openSelectAllMenu: '「すべて選択」メニューを開く',
             allMatchingItemsSelected: '一致する項目をすべて選択済み',
         },
         errors: {

@@ -7513,6 +7513,8 @@ ${reportName}
         exportedTo: '已导出到',
         exportAll: {
             selectAllMatchingItems: '选择所有匹配的项目',
+            selectAllOnPage: '选择此页上的所有项',
+            openSelectAllMenu: '打开"全选"菜单',
             allMatchingItemsSelected: '已选择所有匹配的项目',
         },
         errors: {

@@ -9,9 +9,12 @@ import {View} from 'react-native';
 import type {NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView, StyleProp, ViewStyle} from 'react-native';
 import Animated, {Easing, FadeOutUp, LinearTransition} from 'react-native-reanimated';
 import Checkbox from '@components/Checkbox';
+import Icon from '@components/Icon';
 import MenuItem from '@components/MenuItem';
 import Modal from '@components/Modal';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
+import type {PopoverMenuItem} from '@components/PopoverMenu';
+import PopoverMenu from '@components/PopoverMenu';
 import {PressableWithFeedback} from '@components/Pressable';
 import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import ScrollView from '@components/ScrollView';
@@ -23,6 +26,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import usePopoverPosition from '@hooks/usePopoverPosition';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
@@ -134,6 +138,15 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
     /** Whether all transactions have been loaded from snapshots in group-by views */
     hasLoadedAllTransactions?: boolean;
 
+    /** Whether the backend reports additional rows beyond what's loaded — enables the "Select all matching" menu option */
+    shouldShowSelectAllMatching?: boolean;
+
+    /** Whether the user has already chosen "Select all matching items" — used to reflect the checked state on that menu item */
+    areAllMatchingItemsSelected?: boolean;
+
+    /** Callback to fire when the user picks "Select all matching items" from the Select All dropdown */
+    onSelectAllMatchingPress?: () => void;
+
     /** Reference to the outer element */
     ref?: ForwardedRef<SearchListHandle>;
 };
@@ -218,10 +231,18 @@ function SearchList({
     nonPersonalAndWorkspaceCards,
     selectedTransactions,
     hasLoadedAllTransactions,
+    shouldShowSelectAllMatching = false,
+    areAllMatchingItemsSelected = false,
+    onSelectAllMatchingPress,
     ref,
 }: SearchListProps) {
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare', 'DownArrow']);
+    const {translate} = useLocalize();
+    const selectAllMenuAnchorRef = useRef<View>(null);
+    const [isSelectAllMenuActive, setIsSelectAllMenuActive] = useState(false);
+    const [selectAllMenuPosition, setSelectAllMenuPosition] = useState<{horizontal: number; vertical: number}>({horizontal: 0, vertical: 0});
+    const {calculatePopoverPosition} = usePopoverPosition();
 
     const {hash, groupBy, type} = queryJSON;
     const flattenedItems = useMemo(() => {
@@ -279,7 +300,6 @@ function SearchList({
         return selectableTransactions.length;
     }, [data, type, flattenedItems, emptyReports]);
 
-    const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const listRef = useRef<FlashListRef<SearchListItem>>(null);
     const {isKeyboardShown} = useKeyboardState();
@@ -505,6 +525,40 @@ function SearchList({
     const selectAllButtonVisible = canSelectMultiple && !SearchTableHeader;
     const isSelectAllChecked = selectedItemsLength > 0 && selectedItemsLength === totalItems && hasLoadedAllTransactions;
 
+    const hideSelectAllMenu = useCallback(() => setIsSelectAllMenuActive(false), []);
+    const showSelectAllMenu = useCallback(() => {
+        if (!selectAllMenuAnchorRef.current) {
+            return;
+        }
+        calculatePopoverPosition(selectAllMenuAnchorRef, {
+            horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
+            vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
+        }).then((position) => {
+            setSelectAllMenuPosition(position);
+            setIsSelectAllMenuActive(true);
+        });
+    }, [calculatePopoverPosition]);
+
+    const selectAllMenuItems = useMemo<PopoverMenuItem[]>(
+        () => [
+            {
+                text: translate('search.exportAll.selectAllOnPage'),
+                onSelected: () => {
+                    onAllCheckboxPress();
+                },
+            },
+            {
+                text: translate('search.exportAll.selectAllMatchingItems'),
+                shouldShowSelectedItemCheck: true,
+                isSelected: areAllMatchingItemsSelected,
+                onSelected: () => {
+                    onSelectAllMatchingPress?.();
+                },
+            },
+        ],
+        [translate, onAllCheckboxPress, areAllMatchingItemsSelected, onSelectAllMatchingPress],
+    );
+
     const content = (
         <View style={[styles.flex1, !isKeyboardShown && safeAreaPaddingBottomStyle, containerStyle]}>
             {tableHeaderVisible && (
@@ -515,17 +569,38 @@ function SearchList({
                     ]}
                 >
                     {canSelectMultiple && (
-                        <Checkbox
-                            accessibilityLabel={translate('accessibilityHints.selectAllItems')}
-                            isChecked={isSelectAllChecked}
-                            isIndeterminate={selectedItemsLength > 0 && (selectedItemsLength !== totalItems || !hasLoadedAllTransactions)}
-                            onPress={() => {
-                                onAllCheckboxPress();
-                            }}
-                            disabled={totalItems === 0}
-                            containerStyle={styles.m0}
-                            sentryLabel={CONST.SENTRY_LABEL.SEARCH.SELECT_ALL_CHECKBOX}
-                        />
+                        <View
+                            ref={selectAllMenuAnchorRef}
+                            style={[styles.flexRow, styles.alignItemsCenter]}
+                        >
+                            <Checkbox
+                                accessibilityLabel={translate('accessibilityHints.selectAllItems')}
+                                isChecked={isSelectAllChecked}
+                                isIndeterminate={selectedItemsLength > 0 && (selectedItemsLength !== totalItems || !hasLoadedAllTransactions)}
+                                onPress={() => {
+                                    onAllCheckboxPress();
+                                }}
+                                disabled={totalItems === 0}
+                                containerStyle={styles.m0}
+                                sentryLabel={CONST.SENTRY_LABEL.SEARCH.SELECT_ALL_CHECKBOX}
+                            />
+                            {shouldShowSelectAllMatching && (
+                                <PressableWithFeedback
+                                    accessibilityLabel={translate('search.exportAll.openSelectAllMenu')}
+                                    role="button"
+                                    onPress={showSelectAllMenu}
+                                    style={[styles.ml1, styles.p1, styles.alignItemsCenter, styles.justifyContentCenter]}
+                                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.SELECT_ALL_DROPDOWN_TRIGGER}
+                                >
+                                    <Icon
+                                        src={expensifyIcons.DownArrow}
+                                        width={variables.iconSizeExtraSmall}
+                                        height={variables.iconSizeExtraSmall}
+                                        fill={styles.textMicroSupporting.color}
+                                    />
+                                </PressableWithFeedback>
+                            )}
+                        </View>
                     )}
 
                     {SearchTableHeader}
@@ -542,6 +617,20 @@ function SearchList({
                         >
                             <Text style={[styles.textMicroSupporting, styles.ph3]}>{translate('workspace.people.selectAll')}</Text>
                         </PressableWithFeedback>
+                    )}
+                    {shouldShowSelectAllMatching && canSelectMultiple && (
+                        <PopoverMenu
+                            isVisible={isSelectAllMenuActive}
+                            onClose={hideSelectAllMenu}
+                            onItemSelected={hideSelectAllMenu}
+                            anchorRef={selectAllMenuAnchorRef}
+                            anchorPosition={selectAllMenuPosition}
+                            anchorAlignment={{
+                                horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
+                                vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
+                            }}
+                            menuItems={selectAllMenuItems}
+                        />
                     )}
                 </View>
             )}

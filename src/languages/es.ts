@@ -7584,6 +7584,8 @@ ${amount} para ${merchant} - ${date}`,
         exportedTo: 'Exported to',
         exportAll: {
             selectAllMatchingItems: 'Seleccionar todos los elementos coincidentes',
+            selectAllOnPage: 'Seleccionar todo en esta página',
+            openSelectAllMenu: 'Abrir el menú Seleccionar todo',
             allMatchingItemsSelected: 'Todos los elementos coincidentes seleccionados',
         },
         errors: {

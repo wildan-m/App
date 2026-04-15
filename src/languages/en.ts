@@ -7734,6 +7734,8 @@ const translations = {
         exportedTo: 'Exported to',
         exportAll: {
             selectAllMatchingItems: 'Select all matching items',
+            selectAllOnPage: 'Select all on this page',
+            openSelectAllMenu: 'Open Select all menu',
             allMatchingItemsSelected: 'All matching items selected',
         },
         errors: {
