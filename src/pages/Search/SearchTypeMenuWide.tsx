@@ -44,6 +44,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
         'Basket',
         'CalendarSolid',
         'Receipt',
+        'ReceiptMultiple',
         'ChatBubbles',
         'MoneyBag',
         'CreditCard',

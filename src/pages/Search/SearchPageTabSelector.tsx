@@ -98,6 +98,7 @@ function SearchPageTabSelector({queryJSON, onTabPress}: SearchPageTabSelectorPro
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
+        'ReceiptMultiple',
         'ChatBubbles',
         'MoneyBag',
         'CreditCard',
