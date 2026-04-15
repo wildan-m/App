@@ -7896,6 +7896,8 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         exportedTo: 'Exportado para',
         exportAll: {
             selectAllMatchingItems: 'Selecionar todos os itens correspondentes',
+            selectAllOnPage: 'Selecionar tudo nesta página',
+            openSelectAllMenu: 'Abrir o menu Selecionar tudo',
             allMatchingItemsSelected: 'Todos os itens correspondentes selecionados',
         },
         chartTitles: {

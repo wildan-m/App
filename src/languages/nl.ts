@@ -7906,6 +7906,8 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         exportedTo: 'Geëxporteerd naar',
         exportAll: {
             selectAllMatchingItems: 'Selecteer alle overeenkomende items',
+            selectAllOnPage: 'Alles op deze pagina selecteren',
+            openSelectAllMenu: 'Menu Alles selecteren openen',
             allMatchingItemsSelected: 'Alle overeenkomende items geselecteerd',
         },
         errors: {
