@@ -115,6 +115,7 @@ type BuildOnyxDataForInvoiceParams = {
     companyName?: string;
     companyWebsite?: string;
     participant?: Participant;
+    isFromGlobalCreate?: boolean;
 };
 
 /** Builds the Onyx data for an invoice */
@@ -132,7 +133,7 @@ function buildOnyxDataForInvoice(
     | typeof ONYXKEYS.COLLECTION.POLICY
     | typeof ONYXKEYS.COLLECTION.SNAPSHOT
 > {
-    const {chat, iou, transactionParams, policyParams, optimisticData: optimisticDataParams, companyName, companyWebsite, participant} = invoiceParams;
+    const {chat, iou, transactionParams, policyParams, optimisticData: optimisticDataParams, companyName, companyWebsite, participant, isFromGlobalCreate} = invoiceParams;
     const transaction = transactionParams.transaction;
 
     const clearedPendingFields = Object.fromEntries(Object.keys(transactionParams.transaction.pendingFields ?? {}).map((key) => [key, null]));
@@ -539,6 +540,7 @@ function buildOnyxDataForInvoice(
         iouAction: iou.action,
         policy: policyParams.policy,
         isInvoice: true,
+        isFromGlobalCreate,
         transactionThreadReportID: transactionParams.threadReport.reportID,
     });
 
@@ -589,6 +591,7 @@ function getSendInvoiceInformation({
     policyRecentlyUsedCategories,
     policyRecentlyUsedTags,
     senderPolicyTags,
+    isFromGlobalCreate,
 }: SendInvoiceOptions): SendInvoiceInformation {
     const {amount = 0, currency = '', created = '', merchant = '', category = '', tag = '', taxCode = '', taxAmount = 0, taxValue, billable, comment, participants} = transaction ?? {};
     const trimmedComment = (comment?.comment ?? '').trim();
@@ -701,6 +704,7 @@ function getSendInvoiceInformation({
         participant: receiver,
         companyName,
         companyWebsite,
+        isFromGlobalCreate,
     });
 
     return {
@@ -769,6 +773,7 @@ function sendInvoice({
         policyRecentlyUsedCategories,
         policyRecentlyUsedTags,
         senderPolicyTags: senderPolicyTags ?? {},
+        isFromGlobalCreate,
     });
 
     const parameters: SendInvoiceParams = {

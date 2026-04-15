@@ -72,7 +72,7 @@ import {
     shouldCreateNewMoneyRequestReport as shouldCreateNewMoneyRequestReportReportUtils,
     updateReportPreview,
 } from '@libs/ReportUtils';
-import {buildCannedSearchQuery, buildSearchQueryJSON, buildSearchQueryString, getCurrentSearchQueryJSON} from '@libs/SearchQueryUtils';
+import {buildCannedSearchQuery, buildOptimisticSnapshotData, buildSearchQueryJSON, buildSearchQueryString, getCurrentSearchQueryJSON} from '@libs/SearchQueryUtils';
 import {getSuggestedSearches} from '@libs/SearchUIUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {getSpan, startSpan} from '@libs/telemetry/activeSpans';
@@ -317,6 +317,7 @@ type BuildOnyxDataForMoneyRequestParams = {
     hasViolations: boolean;
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    isFromGlobalCreate?: boolean;
 };
 
 type DistanceRequestTransactionParams = BaseTransactionParams & {
@@ -426,6 +427,7 @@ type GetSearchOnyxUpdateParams = {
     policy?: OnyxEntry<OnyxTypes.Policy>;
     isFromOneTransactionReport?: boolean;
     isInvoice?: boolean;
+    isFromGlobalCreate?: boolean;
     transactionThreadReportID: string | undefined;
 };
 
@@ -1456,6 +1458,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
         hasViolations,
         quickAction,
         personalDetails,
+        isFromGlobalCreate,
     } = moneyRequestParams;
     const {policy, policyCategories, policyTagList} = policyParams;
     const {
@@ -2031,6 +2034,7 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
         policy,
         transactionThreadReportID: transactionThreadReport?.reportID,
         isFromOneTransactionReport: isOneTransactionReport(iou.report),
+        isFromGlobalCreate,
     });
 
     if (searchUpdate) {
@@ -2220,6 +2224,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         waypoints,
         odometerStart,
         odometerEnd,
+        isFromGlobalCreate,
     } = transactionParams;
 
     const payerEmail = addSMSDomainIfPhoneNumber(participant.login ?? '');
@@ -2557,6 +2562,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         hasViolations,
         quickAction,
         personalDetails,
+        isFromGlobalCreate,
     });
 
     return {
@@ -3734,15 +3740,56 @@ function getSearchOnyxUpdate({
     transactionThreadReportID,
     isFromOneTransactionReport,
     isInvoice,
+    isFromGlobalCreate,
 }: GetSearchOnyxUpdateParams): OnyxData<typeof ONYXKEYS.COLLECTION.SNAPSHOT> | undefined {
     const toAccountID = participant?.accountID;
     const fromAccountID = deprecatedCurrentUserPersonalDetails?.accountID;
     const currentSearchQueryJSON = getCurrentSearchQueryJSON();
 
-    if (currentSearchQueryJSON && toAccountID != null && fromAccountID != null) {
+    if (toAccountID == null || fromAccountID == null) {
+        return;
+    }
+
+    const snapshotData = {
+        [ONYXKEYS.PERSONAL_DETAILS_LIST]: {
+            [toAccountID]: {
+                accountID: toAccountID,
+                displayName: participant?.displayName,
+                login: participant?.login,
+            },
+            [fromAccountID]: {
+                accountID: fromAccountID,
+                avatar: deprecatedCurrentUserPersonalDetails?.avatar,
+                displayName: deprecatedCurrentUserPersonalDetails?.displayName,
+                login: deprecatedCurrentUserPersonalDetails?.login,
+            },
+        },
+        [`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`]: {
+            accountID: fromAccountID,
+            managerID: toAccountID,
+            ...(transactionThreadReportID && {transactionThreadReportID}),
+            ...(isFromOneTransactionReport && {isFromOneTransactionReport}),
+            ...transaction,
+        },
+        ...(policy && {[`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`]: policy}),
+        ...(iouReport && {[`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`]: iouReport}),
+        ...(iouReport && iouAction && {[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`]: {[iouAction.reportActionID]: iouAction}}),
+    };
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+
+    // Post-creation navigation from the global FAB always lands on the canned EXPENSE/INVOICE search, so write the optimistic snapshot to that destination hash regardless of which tab the user was on.
+    if (isFromGlobalCreate) {
+        const cannedUpdate = buildOptimisticSnapshotData(isInvoice ? CONST.SEARCH.DATA_TYPES.INVOICE : CONST.SEARCH.DATA_TYPES.EXPENSE, snapshotData);
+        if (cannedUpdate) {
+            optimisticData.push(cannedUpdate);
+        }
+    }
+
+    if (currentSearchQueryJSON) {
         if (shouldOptimisticallyUpdateSearch(currentSearchQueryJSON, iouReport, isInvoice, transaction)) {
             const isOptimisticToAccountData = isOptimisticPersonalDetail(toAccountID);
-            const successData = [];
             if (isOptimisticToAccountData) {
                 // The optimistic personal detail is removed on the API's success data but we can't change the managerID of the transaction in the snapshot.
                 // So we need to add the optimistic personal detail back to the snapshot in success data to prevent the flickering.
@@ -3764,42 +3811,15 @@ function getSearchOnyxUpdate({
                     },
                 });
             }
-            const snapshotData = {
-                [ONYXKEYS.PERSONAL_DETAILS_LIST]: {
-                    [toAccountID]: {
-                        accountID: toAccountID,
-                        displayName: participant?.displayName,
-                        login: participant?.login,
-                    },
-                    [fromAccountID]: {
-                        accountID: fromAccountID,
-                        avatar: deprecatedCurrentUserPersonalDetails?.avatar,
-                        displayName: deprecatedCurrentUserPersonalDetails?.displayName,
-                        login: deprecatedCurrentUserPersonalDetails?.login,
-                    },
-                },
-                [`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`]: {
-                    accountID: fromAccountID,
-                    managerID: toAccountID,
-                    ...(transactionThreadReportID && {transactionThreadReportID}),
-                    ...(isFromOneTransactionReport && {isFromOneTransactionReport}),
-                    ...transaction,
-                },
-                ...(policy && {[`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`]: policy}),
-                ...(iouReport && {[`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`]: iouReport}),
-                ...(iouReport && iouAction && {[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`]: {[iouAction.reportActionID]: iouAction}}),
-            };
 
-            const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
-                {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${currentSearchQueryJSON.hash}` as const,
-                    value: {
-                        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-                        data: snapshotData,
-                    },
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${currentSearchQueryJSON.hash}` as const,
+                value: {
+                    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
+                    data: snapshotData,
                 },
-            ];
+            });
 
             if (currentSearchQueryJSON.groupBy === CONST.SEARCH.GROUP_BY.FROM) {
                 const newFlatFilters = currentSearchQueryJSON.flatFilters.filter((filter) => filter.key !== CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM);
@@ -3835,13 +3855,17 @@ function getSearchOnyxUpdate({
                     });
                 }
             }
-
-            return {
-                optimisticData,
-                successData,
-            };
         }
     }
+
+    if (optimisticData.length === 0 && successData.length === 0) {
+        return;
+    }
+
+    return {
+        optimisticData,
+        successData,
+    };
 }
 
 export {
