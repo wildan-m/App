@@ -384,6 +384,11 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const currentUserLogin = currentUserPersonalDetails.login;
     const invitedPrimaryToSecondaryLogins = useMemo(() => invertObject(policy?.primaryLoginsInvited ?? {}), [policy?.primaryLoginsInvited]);
     const isControlPolicyWithWideLayout = !shouldUseNarrowLayout && isControlPolicy(policy);
+    const hasAnyCustomFieldValues = useMemo(
+        () => Object.values(policy?.employeeList ?? {}).some((employee) => !!employee.employeeUserID || !!employee.employeePayrollID),
+        [policy?.employeeList],
+    );
+    const shouldShowCustomFieldColumns = isControlPolicyWithWideLayout && hasAnyCustomFieldValues;
     const data: MemberOption[] = useMemo(() => {
         const result: MemberOption[] = [];
 
@@ -436,7 +441,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 text: memberName,
                 alternateText: memberEmail,
                 accessibilityLabel,
-                rightElement: isControlPolicyWithWideLayout ? (
+                rightElement: shouldShowCustomFieldColumns ? (
                     <>
                         <View style={[styles.flex1, styles.pr3]}>
                             <Text
@@ -500,7 +505,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         translate,
         styles.alignSelfStart,
         styles.alignSelfEnd,
-        isControlPolicyWithWideLayout,
+        shouldShowCustomFieldColumns,
         StyleUtils,
         formatPhoneNumber,
         invitedPrimaryToSecondaryLogins,
@@ -576,7 +581,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         }
 
         // Show 4 columns only on wide screens for control policies
-        if (isControlPolicyWithWideLayout) {
+        if (shouldShowCustomFieldColumns) {
             const header = (
                 <View style={[styles.flex1, styles.flexRow, styles.justifyContentBetween, canSelectMultiple && styles.pl3]}>
                     <View style={[styles.flex1, StyleUtils.getPaddingRight(variables.w52 + variables.w12)]}>
