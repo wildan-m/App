@@ -1484,10 +1484,17 @@ function didReceiptScanSucceed(transaction: OnyxEntry<Transaction>): boolean {
 }
 
 /**
- * Check if the transaction has a non-smart-scanning receipt and is missing required fields
+ * Check if the transaction has a non-smart-scanning receipt and is missing required fields.
+ * When the user has manually edited the amount, they've opted out of waiting for scan results,
+ * so we should show validation errors even if the receipt state is still SCANNING on the server.
  */
 function hasMissingSmartscanFields(transaction: OnyxInputOrEntry<Transaction>, transactionReport: OnyxEntry<Report>): boolean {
-    return !!(transaction && !isDistanceRequest(transaction) && !isReceiptBeingScanned(transaction) && areRequiredFieldsEmpty(transaction, transactionReport));
+    return !!(
+        transaction &&
+        !isDistanceRequest(transaction) &&
+        (!isReceiptBeingScanned(transaction) || hasValidModifiedAmount(transaction)) &&
+        areRequiredFieldsEmpty(transaction, transactionReport)
+    );
 }
 
 /**
