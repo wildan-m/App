@@ -28,6 +28,10 @@ function useTimeSensitiveCards() {
             continue;
         }
 
+        if (card.nameValuePairs?.unapprovedExpenseLimit === 0) {
+            continue;
+        }
+
         if (isCardPendingIssue(card)) {
             cardsNeedingShippingAddress.push(card);
         }

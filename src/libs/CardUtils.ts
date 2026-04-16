@@ -1560,7 +1560,8 @@ function getDisplayableExpensifyCards(cardList: CardList | undefined): Card[] {
 
     const activeCards = filterAllInactiveCards(cardList);
     const activeExpensifyCards = Object.values(activeCards).filter(
-        (card) => isExpensifyCard(card) && !isExpiredCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH && !isTravelCard(card),
+        (card) =>
+            isExpensifyCard(card) && !isExpiredCard(card) && card.cardName !== CONST.COMPANY_CARDS.CARD_NAME.CASH && !isTravelCard(card) && card.nameValuePairs?.unapprovedExpenseLimit !== 0,
     );
 
     const sortedCards = lodashSortBy(activeExpensifyCards, getAssignedCardSortKey);
