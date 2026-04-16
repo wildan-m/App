@@ -26,9 +26,9 @@ describe('getSpendOverTimeState', () => {
         expect(getSpendOverTimeState(true, undefined, queryJSON, undefined)).toBe(SPEND_OVER_TIME_STATE.OFFLINE);
     });
 
-    it('returns READY when offline but cached data exists', () => {
+    it('returns OFFLINE when offline regardless of cached data', () => {
         const results = makeSearchResults();
-        expect(getSpendOverTimeState(true, results, queryJSON, makeData(3))).toBe(SPEND_OVER_TIME_STATE.READY);
+        expect(getSpendOverTimeState(true, results, queryJSON, makeData(3))).toBe(SPEND_OVER_TIME_STATE.OFFLINE);
     });
 
     it('returns ERROR when online and searchResults has errors', () => {

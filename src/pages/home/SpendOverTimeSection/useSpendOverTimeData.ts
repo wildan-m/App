@@ -28,15 +28,13 @@ function getSpendOverTimeState(
     queryJSON: SearchQueryJSON | undefined,
     sortedData: GroupedItem[] | undefined,
 ): SpendOverTimeState {
-    const isDataLoaded = isSearchDataLoaded(searchResults, queryJSON);
-
-    if (isOffline && !isDataLoaded) {
+    if (isOffline) {
         return SPEND_OVER_TIME_STATE.OFFLINE;
     }
-    if (!isOffline && Object.keys(searchResults?.errors ?? {}).length > 0) {
+    if (Object.keys(searchResults?.errors ?? {}).length > 0) {
         return SPEND_OVER_TIME_STATE.ERROR;
     }
-    if (!isDataLoaded) {
+    if (!isSearchDataLoaded(searchResults, queryJSON)) {
         return SPEND_OVER_TIME_STATE.LOADING;
     }
     if ((sortedData?.length ?? 0) < 2) {
