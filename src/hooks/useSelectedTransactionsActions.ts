@@ -97,6 +97,7 @@ function useSelectedTransactionsActions({
         'Trashcan',
         'ArrowRight',
         'Table',
+        'TablePencil',
         'DocumentMerge',
         'Export',
         'ArrowCollapse',
@@ -392,7 +393,7 @@ function useSelectedTransactionsActions({
             for (const template of exportTemplates) {
                 exportOptions.push({
                     text: template.name,
-                    icon: expensifyIcons.Table,
+                    icon: template.type === CONST.EXPORT_TEMPLATE_TYPES.IN_APP ? expensifyIcons.TablePencil : expensifyIcons.Table,
                     description: template.description,
                     onSelected: () => beginExportWithTemplate(template.templateName, template.type, selectedTransactionIDs, template.policyID),
                 });

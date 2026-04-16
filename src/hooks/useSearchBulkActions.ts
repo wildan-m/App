@@ -257,6 +257,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Export',
         'Table',
+        'TablePencil',
         'DocumentMerge',
         'Send',
         'Trashcan',
@@ -1021,7 +1022,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             for (const template of exportTemplates) {
                 exportOptions.push({
                     text: template.name,
-                    icon: expensifyIcons.Table,
+                    icon: template.type === CONST.EXPORT_TEMPLATE_TYPES.IN_APP ? expensifyIcons.TablePencil : expensifyIcons.Table,
                     description: template.description,
                     onSelected: () => {
                         beginExportWithTemplate(template.templateName, template.type, template.policyID);
