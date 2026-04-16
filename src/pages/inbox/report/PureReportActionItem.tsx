@@ -778,7 +778,7 @@ function PureReportActionItem({
 
     const attachmentContextValue = useMemo(() => {
         if (isOnSearch) {
-            return {type: CONST.ATTACHMENT_TYPE.SEARCH, currentSearchHash};
+            return {type: CONST.ATTACHMENT_TYPE.SEARCH, currentSearchHash, reportID};
         }
         return {reportID, type: CONST.ATTACHMENT_TYPE.REPORT};
     }, [reportID, isOnSearch, currentSearchHash]);
