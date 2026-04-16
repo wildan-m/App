@@ -51,7 +51,6 @@ import {getCategoryApproverRule} from './CategoryUtils';
 import {convertToBackendAmount} from './CurrencyUtils';
 import Navigation from './Navigation/Navigation';
 import {getIsOffline} from './NetworkState';
-import {generateHexadecimalValue} from './NumberUtils';
 import {formatMemberForList} from './OptionsListUtils';
 import type {MemberForList} from './OptionsListUtils';
 import {getAccountIDsByLogins, getLoginByAccountID, getLoginsByAccountIDs, getPersonalDetailByEmail} from './PersonalDetailsUtils';
@@ -310,19 +309,22 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
     return false;
 }
 
-function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string): CustomUnit {
-    const newRates: Record<string, Rate> = {};
-    for (const rate of Object.values(unit.rates)) {
-        const newRateID = generateHexadecimalValue(13);
-        newRates[newRateID] = {
-            ...rate,
-            customUnitRateID: newRateID,
+function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, newDefaultRateID?: string): CustomUnit {
+    if (newDefaultRateID) {
+        // For distance units: use the provided rate ID for the default rate,
+        // matching the customUnitRateID sent to the DUPLICATE_POLICY API
+        const defaultRate = Object.values(unit.rates).find((rate) => rate.enabled) ?? Object.values(unit.rates).at(0);
+        return {
+            ...unit,
+            customUnitID: newCustomUnitID,
+            rates: defaultRate ? {[newDefaultRateID]: {...defaultRate, customUnitRateID: newDefaultRateID}} : {},
         };
     }
+
+    // For other units (per diem): only update the customUnitID
     return {
         ...unit,
         customUnitID: newCustomUnitID,
-        rates: newRates,
     };
 }
 
@@ -333,10 +335,11 @@ function getCustomUnitsForDuplication(
     customUnitIDs: {
         distanceCustomUnitID: string;
         perDiemCustomUnitID: string;
+        customUnitRateID: string;
     },
 ): Record<string, CustomUnit> | undefined {
     const customUnits = policy?.customUnits;
-    const {distanceCustomUnitID, perDiemCustomUnitID} = customUnitIDs ?? {};
+    const {distanceCustomUnitID, perDiemCustomUnitID, customUnitRateID} = customUnitIDs ?? {};
 
     if ((!isDistanceRatesOptionSelected && !isPerDiemOptionSelected) || !customUnits || Object.keys(customUnits).length === 0) {
         return undefined;
@@ -351,7 +354,7 @@ function getCustomUnitsForDuplication(
         }
 
         return {
-            [distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID),
+            [distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID, customUnitRateID),
             [perDiemCustomUnitID]: cloneCustomUnitWithNewIDs(perDiemUnit, perDiemCustomUnitID),
         };
     }
@@ -361,7 +364,7 @@ function getCustomUnitsForDuplication(
         if (!distanceCustomUnit) {
             return undefined;
         }
-        return {[distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID)};
+        return {[distanceCustomUnitID]: cloneCustomUnitWithNewIDs(distanceCustomUnit, distanceCustomUnitID, customUnitRateID)};
     }
 
     const perDiemUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL);
