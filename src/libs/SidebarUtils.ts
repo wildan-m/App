@@ -268,7 +268,13 @@ function shouldDisplayReportInLHN(
 
     // Handle reports with errors
     if (hasErrorsOtherThanFailedReceipt && !isReportInAccessible) {
-        return {shouldDisplay: true, hasErrorsOtherThanFailedReceipt: true};
+        // Skip the force-show for an expense report whose parent is a workspace (policyExpenseChat).
+        // The parent chat will already surface the same "Fix" action badge via the error-propagation
+        // loop in reportAttributes.ts, so force-showing the child here creates a duplicate LHN entry
+        // that also gets hoisted into the pinned/GBR bucket.
+        if (!(isExpenseReport(report) && isPolicyExpenseChat(chatReport))) {
+            return {shouldDisplay: true, hasErrorsOtherThanFailedReceipt: true};
+        }
     }
 
     // Check if report should override hidden status
