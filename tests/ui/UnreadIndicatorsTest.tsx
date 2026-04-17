@@ -10,11 +10,12 @@ import type {OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
 import {setSidebarLoaded} from '@libs/actions/App';
-import {trackExpense} from '@libs/actions/IOU';
+import {trackExpense} from '@libs/actions/IOU/TrackExpense';
 import {addComment, deleteReportComment, markCommentAsUnread, readNewestAction} from '@libs/actions/Report';
 import {subscribeToUserEvents} from '@libs/actions/User';
 import {lastItem} from '@libs/CollectionUtils';
 import DateUtils from '@libs/DateUtils';
+import {setHasRadio} from '@libs/NetworkState';
 import LocalNotification from '@libs/Notification/LocalNotification';
 import {rand64} from '@libs/NumberUtils';
 import {getReportActionText} from '@libs/ReportActionsUtils';
@@ -214,7 +215,7 @@ async function signInAndGetAppWithUnreadChat(): Promise<void> {
     };
 
     await Promise.all([
-        Onyx.merge(ONYXKEYS.RAM_ONLY_IS_LOADING_APP, false),
+        Onyx.merge(ONYXKEYS.IS_LOADING_APP, false),
         Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, personalDetails),
         Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report),
         Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, reportActions),
@@ -692,7 +693,7 @@ describe('Unread Indicators', () => {
     it('Do not display the new line indicator when tracking an expense on self DM while offline', async () => {
         // Given a self DM report and an offline network
         await signInAndGetAppWithUnreadChat();
-        await Onyx.merge(ONYXKEYS.NETWORK, {isOffline: true});
+        setHasRadio(false);
         // Remove unnecessary report
         await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, null);
 
