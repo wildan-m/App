@@ -2045,7 +2045,8 @@ function getTransactionsSections({
 
     for (const key of transactionKeys) {
         const transactionItem = data[key];
-        const report = data[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`];
+        // Fall back to Onyx so limited-result snapshots that omit the report still render Status and stay clickable.
+        const report = data[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? getReportOrDraftReport(transactionItem.reportID);
 
         let shouldShow = true;
 
