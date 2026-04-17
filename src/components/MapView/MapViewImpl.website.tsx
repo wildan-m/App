@@ -60,6 +60,7 @@ function MapViewImpl({
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Crosshair']);
 
     const [mapRef, setMapRef] = useState<MapRef | null>(null);
+    const [isMapLoaded, setIsMapLoaded] = useState(false);
     const initialLocation = useMemo(() => ({longitude: initialState.location[0], latitude: initialState.location[1]}), [initialState]);
     const currentPosition = userLocation ?? initialLocation;
     const prevUserPosition = usePrevious(currentPosition);
@@ -258,6 +259,7 @@ function MapViewImpl({
         >
             <Map
                 onDrag={() => setUserInteractedWithMap(true)}
+                onLoad={() => setIsMapLoaded(true)}
                 ref={setRef}
                 mapLib={mapboxgl}
                 mapboxAccessToken={accessToken}
@@ -266,7 +268,7 @@ function MapViewImpl({
                 mapStyle={styleURL}
                 interactive={interactive}
             >
-                {interactive && (
+                {isMapLoaded && interactive && (
                     <Marker
                         key="Current-position"
                         longitude={currentPosition?.longitude ?? 0}
@@ -275,7 +277,7 @@ function MapViewImpl({
                         <View style={styles.currentPositionDot} />
                     </Marker>
                 )}
-                {!!distanceSymbolCoordinate && !!distanceInMeters && !!distanceUnit && (
+                {isMapLoaded && !!distanceSymbolCoordinate && !!distanceInMeters && !!distanceUnit && (
                     <Marker
                         key="distance-label"
                         longitude={distanceSymbolCoordinate.at(0) ?? 0}
@@ -293,22 +295,23 @@ function MapViewImpl({
                         </PressableWithoutFeedback>
                     </Marker>
                 )}
-                {waypoints?.map(({coordinate, markerComponent, id}) => {
-                    const MarkerComponent = markerComponent;
-                    if (utils.areSameCoordinate([coordinate[0], coordinate[1]], [currentPosition?.longitude ?? 0, currentPosition?.latitude ?? 0]) && interactive) {
-                        return null;
-                    }
-                    return (
-                        <Marker
-                            key={id}
-                            longitude={coordinate[0]}
-                            latitude={coordinate[1]}
-                        >
-                            <MarkerComponent />
-                        </Marker>
-                    );
-                })}
-                {!!directionCoordinates && <Direction coordinates={directionCoordinates} />}
+                {isMapLoaded &&
+                    waypoints?.map(({coordinate, markerComponent, id}) => {
+                        const MarkerComponent = markerComponent;
+                        if (utils.areSameCoordinate([coordinate[0], coordinate[1]], [currentPosition?.longitude ?? 0, currentPosition?.latitude ?? 0]) && interactive) {
+                            return null;
+                        }
+                        return (
+                            <Marker
+                                key={id}
+                                longitude={coordinate[0]}
+                                latitude={coordinate[1]}
+                            >
+                                <MarkerComponent />
+                            </Marker>
+                        );
+                    })}
+                {isMapLoaded && !!directionCoordinates && <Direction coordinates={directionCoordinates} />}
             </Map>
             {interactive && (
                 <View style={[styles.pAbsolute, styles.p5, styles.t0, styles.r0, {zIndex: 1}]}>
