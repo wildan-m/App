@@ -1,6 +1,6 @@
 import {PortalHost} from '@gorhom/portal';
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import type {ViewStyle} from 'react-native';
 import {InteractionManager, View} from 'react-native';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -14,6 +14,8 @@ import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
 import {flushDeferredWrite, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
+import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
 import SCREENS from '@src/SCREENS';
@@ -22,6 +24,7 @@ import {AgentZeroStatusProvider} from './AgentZeroStatusContext';
 import DeleteTransactionNavigateBackHandler from './DeleteTransactionNavigateBackHandler';
 import LinkedActionNotFoundGuard from './LinkedActionNotFoundGuard';
 import ReactionListWrapper from './ReactionListWrapper';
+import ReportActionComposePlaceholder from './report/ReportActionCompose/ReportActionComposePlaceholder';
 import ReportFooter from './report/ReportFooter';
 import ReportActionsList from './ReportActionsList';
 import ReportDragAndDropProvider from './ReportDragAndDropProvider';
@@ -48,6 +51,32 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     const viewportOffsetTop = useViewportOffsetTop();
     const isTopMostReportId = currentReportIDValue === reportIDFromRoute;
     const screenWrapperStyle: ViewStyle[] = [styles.appContent, styles.flex1, {marginTop: viewportOffsetTop}];
+
+    // During dismiss_modal_and_open_report, defer heavy non-content components
+    // (composer, invisible handlers) so the first render is lighter.
+    // Real content (header + messages) still renders immediately.
+    const [shouldDeferNonEssentials, setShouldDeferNonEssentials] = useState(
+        () => getPendingSubmitFollowUpAction()?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT,
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            if (!shouldDeferNonEssentials) {
+                return;
+            }
+            let rafId: number;
+            const handle = TransitionTracker.runAfterTransitions({
+                callback: () => {
+                    rafId = requestAnimationFrame(() => setShouldDeferNonEssentials(false));
+                },
+                waitForUpcomingTransition: true,
+            });
+            return () => {
+                handle.cancel();
+                cancelAnimationFrame(rafId);
+            };
+        }, [shouldDeferNonEssentials]),
+    );
 
     useSubmitToDestinationVisible(
         [CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY],
@@ -86,25 +115,25 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                         shouldEnableKeyboardAvoidingView={isTopMostReportId || isInNarrowPaneModal}
                         testID={`report-screen-${reportIDFromRoute}`}
                     >
-                        <DeleteTransactionNavigateBackHandler />
-                        <ReportRouteParamHandler />
-                        <ReportFetchHandler />
-                        <ReportNavigateAwayHandler />
+                        {!shouldDeferNonEssentials && <DeleteTransactionNavigateBackHandler />}
+                        {!shouldDeferNonEssentials && <ReportRouteParamHandler />}
+                        {!shouldDeferNonEssentials && <ReportFetchHandler />}
+                        {!shouldDeferNonEssentials && <ReportNavigateAwayHandler />}
                         <ReportNotFoundGuard>
                             <LinkedActionNotFoundGuard>
                                 <ReportDragAndDropProvider>
-                                    <ReportLifecycleHandler reportID={reportIDFromRoute} />
+                                    {!shouldDeferNonEssentials && <ReportLifecycleHandler reportID={reportIDFromRoute} />}
                                     <ReportHeader />
-                                    <AccountManagerBanner reportID={reportIDFromRoute} />
+                                    {!shouldDeferNonEssentials && <AccountManagerBanner reportID={reportIDFromRoute} />}
                                     <View style={[styles.flex1, styles.flexRow]}>
-                                        <WideRHPReceiptPanel />
+                                        {!shouldDeferNonEssentials && <WideRHPReceiptPanel />}
                                         <AgentZeroStatusProvider reportID={reportIDFromRoute}>
                                             <View
                                                 style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
                                                 testID="report-actions-view-wrapper"
                                             >
                                                 <ReportActionsList />
-                                                <ReportFooter />
+                                                {shouldDeferNonEssentials ? <ReportActionComposePlaceholder /> : <ReportFooter />}
                                             </View>
                                         </AgentZeroStatusProvider>
                                     </View>

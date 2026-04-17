@@ -1,5 +1,5 @@
 import type {NavigationState} from '@react-navigation/native';
-import React, {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import React, {createContext, startTransition, useCallback, useContext, useMemo, useState} from 'react';
 import Navigation from '@libs/Navigation/Navigation';
 
 type CurrentReportIDStateContextType = {
@@ -58,7 +58,9 @@ function CurrentReportIDContextProvider(props: CurrentReportIDContextProviderPro
             }
 
             props.onSetCurrentReportID?.(reportID);
-            setCurrentReportID(reportID);
+            startTransition(() => {
+                setCurrentReportID(reportID);
+            });
         },
         // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want to re-render when onSetCurrentReportID changes
         [setCurrentReportID, currentReportID],

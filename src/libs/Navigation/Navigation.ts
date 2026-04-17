@@ -987,7 +987,7 @@ function dismissToSuperWideRHP(options: {afterTransition?: () => void} = {}) {
  *             useLinking detects the stale Home+RHP entry and replaces it with a Search
  *             push, yielding correct browser history [Home, Search].
  */
-function revealRouteBeforeDismissingModal(route: Route) {
+function revealRouteBeforeDismissingModal(route: Route, options?: {afterTransition?: () => void}) {
     if (getIsNarrowLayout()) {
         Log.warn('[Navigation] revealRouteBeforeDismissingModal should only be used on wide layouts.');
         return;
@@ -1003,9 +1003,13 @@ function revealRouteBeforeDismissingModal(route: Route) {
             type: CONST.NAVIGATION.ACTION_TYPE.REPLACE_FULLSCREEN_UNDER_RHP,
             payload: {route},
         });
-        requestAnimationFrame(() => {
-            dismissModal();
-        });
+        // Use setTimeout(0) instead of a nested rAF to start the dismiss as soon
+        // as React commits the route insertion. A separate macrotask ensures React 18
+        // doesn't batch both dispatches into a single render (which would lose the
+        // dismiss animation), while avoiding the ~16ms idle gap of a second rAF.
+        setTimeout(() => {
+            dismissModal({afterTransition: options?.afterTransition});
+        }, 0);
     });
 }
 
