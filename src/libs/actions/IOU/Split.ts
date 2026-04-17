@@ -2219,10 +2219,16 @@ function updateSplitTransactions({
 }
 
 function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransactionsParams) {
-    // Detect if this will be a reverse split that deletes the expense report.
-    // When splits are reduced to 1, updateSplitTransactions performs a reverse split which
-    // optimistically deletes the expense report if it's the last transaction. We need to
-    // set the navigate-back URL before the deletion to prevent the "Not Found" page.
+    // Detect operations that will leave the expense report empty after the update.
+    // Two flows can empty the expense report:
+    //   1. A reverse split (splits reduced to 1 with the remaining split still editable) optimistically
+    //      deletes the expense report when it holds the last transaction.
+    //   2. A regular update where the only child in the expense report is being removed and none of the
+    //      remaining splits live on the expense report. This happens when a sibling split was previously
+    //      moved to another report that then became non-editable (e.g. submitted), leaving the child on
+    //      the current expense report as its sole transaction.
+    // In both cases the navigate-back URL must be set before the optimistic deletion to prevent the
+    // "Not Found" page.
     const splitExpenses = params.transactionData?.splitExpenses ?? [];
     const originalTransactionID = params.transactionData?.originalTransactionID ?? CONST.IOU.OPTIMISTIC_TRANSACTION_ID;
     const allChildTransactions = getChildTransactions(params.allTransactionsList, params.allReportsList, originalTransactionID, true);
@@ -2231,11 +2237,13 @@ function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransac
     const isReverseSplitOperation =
         splitExpenses.length === 1 && originalChildTransactions.length > 0 && hasEditableSplitExpensesLeft && allChildTransactions.length === originalChildTransactions.length;
     const expenseReportID = params.expenseReport?.reportID;
-    const isLastTransactionInReport =
-        isReverseSplitOperation && Object.values(params.allTransactionsList ?? {}).filter((itemTransaction) => itemTransaction?.reportID === expenseReportID).length === 1;
+    const currentTransactionsInExpenseReport = expenseReportID
+        ? Object.values(params.allTransactionsList ?? {}).filter((itemTransaction) => itemTransaction?.reportID === expenseReportID).length
+        : 0;
+    const willEmptyExpenseReport = currentTransactionsInExpenseReport === 1 && (isReverseSplitOperation || !splitExpenses.some((expense) => expense.reportID === expenseReportID));
     const fallbackReportID = params.expenseReport?.chatReportID ?? params.expenseReport?.parentReportID;
 
-    if (isLastTransactionInReport && fallbackReportID) {
+    if (willEmptyExpenseReport && fallbackReportID) {
         setDeleteTransactionNavigateBackUrl(ROUTES.REPORT_WITH_ID.getRoute(fallbackReportID));
     }
 
@@ -2270,10 +2278,10 @@ function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransac
         return;
     }
 
-    // When the reverse split deletes the expense report, use the backward navigation pattern
+    // When the operation empties the expense report, use the backward navigation pattern
     // (dismissToSuperWideRHP + goBack) instead of dismissModalWithReport. This naturally pops
     // stale screens from the stack instead of leaving them behind.
-    if (isLastTransactionInReport && fallbackReportID) {
+    if (willEmptyExpenseReport && fallbackReportID) {
         const backRoute = ROUTES.REPORT_WITH_ID.getRoute(fallbackReportID);
         navigateBackOnDeleteTransaction(backRoute);
 
