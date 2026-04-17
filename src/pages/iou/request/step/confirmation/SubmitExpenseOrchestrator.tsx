@@ -1,15 +1,16 @@
 import React, {useState} from 'react';
-import {InteractionManager} from 'react-native';
 import LocationPermissionModal from '@components/LocationPermissionModal';
 import DateUtils from '@libs/DateUtils';
 import {flushDeferredWrite, reserveDeferredWriteChannel} from '@libs/deferredLayoutWrite';
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
+import getTopmostReportParams from '@libs/Navigation/helpers/getTopmostReportParams';
 import isReportOpenInRHP from '@libs/Navigation/helpers/isReportOpenInRHP';
 import isReportOpenInSuperWideRHP from '@libs/Navigation/helpers/isReportOpenInSuperWideRHP';
 import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopmostSplitNavigator';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import navigateAfterInteraction from '@libs/Navigation/navigateAfterInteraction';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {getReportOrDraftReport} from '@libs/ReportUtils';
 import {getCurrentSearchQueryJSON} from '@libs/SearchQueryUtils';
 import getSubmitExpenseScenario from '@libs/telemetry/getSubmitExpenseScenario';
@@ -172,23 +173,23 @@ function SubmitExpenseOrchestrator({
         return true;
     };
 
-    // Fast-path handlers use requestAnimationFrame for createTransaction so optimistic Onyx
-    // data is applied on the very next frame (before the dismiss animation ends). Flushes and
-    // cleanup use InteractionManager.runAfterInteractions to wait until animations complete,
-    // avoiding layout thrash from concurrent Onyx writes and navigation transitions.
+    // Fast-path handlers defer createTransaction until after the dismiss animation completes
+    // via dismissModal's afterTransition callback (backed by TransitionTracker). This prevents
+    // heavy optimistic Onyx writes from blocking the JS thread during the RHP slide-out animation.
     const handleSearchPreInsert = (listOfParticipants: Participant[]) => {
         setFastPath(CONST.TELEMETRY.FAST_PATH_HANDLER.SEARCH_PRE_INSERT, CONST.TELEMETRY.SUBMIT_OPTIMIZATION.PRE_INSERT, CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DISMISS_FIRST);
         setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.NAVIGATE_TO_SEARCH);
         Navigation.clearFullscreenPreInsertedFlag();
         reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        Navigation.dismissModal();
-        requestAnimationFrame(() => {
-            // shouldHandleNavigation defaults to true (unlike other fast paths that pass false).
-            // Search pre-insert relies on createTransaction's internal navigation to handle the
-            // post-creation flow (navigateAfterExpenseCreate), because the Search screen was
-            // pre-inserted before the modal opened - the navigation stack is already correct.
-            createTransaction(listOfParticipants);
-            setIsConfirming(false);
+        Navigation.dismissModal({
+            afterTransition: () => {
+                // shouldHandleNavigation defaults to true (unlike other fast paths that pass false).
+                // Search pre-insert relies on createTransaction's internal navigation to handle the
+                // post-creation flow (navigateAfterExpenseCreate), because the Search screen was
+                // pre-inserted before the modal opened - the navigation stack is already correct.
+                createTransaction(listOfParticipants);
+                setIsConfirming(false);
+            },
         });
     };
 
@@ -197,10 +198,11 @@ function SubmitExpenseOrchestrator({
         Navigation.clearFullscreenPreInsertedFlag();
         setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, destinationReportID);
         reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
-        Navigation.dismissModal();
-        requestAnimationFrame(() => {
-            createTransaction(listOfParticipants, false, false);
-            setIsConfirming(false);
+        Navigation.dismissModal({
+            afterTransition: () => {
+                createTransaction(listOfParticipants, false, false);
+                setIsConfirming(false);
+            },
         });
     };
 
@@ -210,13 +212,19 @@ function SubmitExpenseOrchestrator({
 
         reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
 
+        const runAfterDismiss = () => {
+            createTransaction(listOfParticipants, false, false);
+            setIsConfirming(false);
+        };
+
         if (isDismissOnly) {
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY);
-            Navigation.dismissModal();
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                endSubmitFollowUpActionSpan(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY);
-                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+            Navigation.dismissModal({
+                afterTransition: () => {
+                    endSubmitFollowUpActionSpan(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY);
+                    flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+                    runAfterDismiss();
+                },
             });
         } else if (getIsNarrowLayout()) {
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, destinationReportID);
@@ -228,19 +236,31 @@ function SubmitExpenseOrchestrator({
                     );
                 },
             });
-        } else {
-            setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, destinationReportID);
-            Navigation.revealRouteBeforeDismissingModal(ROUTES.REPORT_WITH_ID.getRoute(destinationReportID));
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+            TransitionTracker.runAfterTransitions({
+                callback: runAfterDismiss,
+                waitForUpcomingTransition: true,
             });
+        } else {
+            const currentReportID = getTopmostReportParams(navigationRef.getRootState())?.reportID;
+            if (currentReportID === destinationReportID) {
+                setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, destinationReportID);
+                Navigation.dismissModal({
+                    afterTransition: () => {
+                        endSubmitFollowUpActionSpan(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY);
+                        flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+                        runAfterDismiss();
+                    },
+                });
+            } else {
+                setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, destinationReportID);
+                Navigation.revealRouteBeforeDismissingModal(ROUTES.REPORT_WITH_ID.getRoute(destinationReportID), {
+                    afterTransition: () => {
+                        flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+                        runAfterDismiss();
+                    },
+                });
+            }
         }
-
-        requestAnimationFrame(() => {
-            createTransaction(listOfParticipants, false, false);
-            setIsConfirming(false);
-        });
     };
 
     const handleSearchDismiss = (listOfParticipants: Participant[]) => {
@@ -249,10 +269,11 @@ function SubmitExpenseOrchestrator({
         const isSameType = getCurrentSearchQueryJSON()?.type === searchType;
         setPendingSubmitFollowUpAction(isSameType ? CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY : CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.NAVIGATE_TO_SEARCH);
         reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        Navigation.dismissModal();
-        requestAnimationFrame(() => {
-            createTransaction(listOfParticipants, false, false);
-            setIsConfirming(false);
+        Navigation.dismissModal({
+            afterTransition: () => {
+                createTransaction(listOfParticipants, false, false);
+                setIsConfirming(false);
+            },
         });
     };
 
@@ -261,10 +282,16 @@ function SubmitExpenseOrchestrator({
         const rootState = navigationRef.getRootState();
         const isSuperWideRHP = isReportOpenInSuperWideRHP(rootState);
 
+        const runAfterDismiss = () => {
+            createTransaction(listOfParticipants, false, false);
+            setIsConfirming(false);
+        };
+
         if (isSuperWideRHP) {
-            reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, destinationReportID);
-            Navigation.dismissToPreviousRHP();
+            Navigation.dismissToPreviousRHP({
+                afterTransition: runAfterDismiss,
+            });
         } else if (destinationReportID) {
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, destinationReportID);
             const isNarrowLayout = getIsNarrowLayout();
@@ -276,12 +303,11 @@ function SubmitExpenseOrchestrator({
             Navigation.setNavigationActionToMicrotaskQueue(() => {
                 Navigation.navigate(ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: destinationReportID}), {forceReplace: !isNarrowLayout});
             });
+            TransitionTracker.runAfterTransitions({
+                callback: runAfterDismiss,
+                waitForUpcomingTransition: true,
+            });
         }
-
-        requestAnimationFrame(() => {
-            createTransaction(listOfParticipants, false, false);
-            setIsConfirming(false);
-        });
     };
 
     const handleDefaultSubmit = (listOfParticipants: Participant[]) => {
@@ -299,6 +325,10 @@ function SubmitExpenseOrchestrator({
     // frequently from Onyx subscriptions anyway, and wrapping this properly would require
     // memoizing every handler + all their captured props for no measurable gain.
     const onConfirm = (listOfParticipants: Participant[]) => {
+        if (isConfirming) {
+            return;
+        }
+
         setIsConfirming(true);
         setSelectedParticipantList(listOfParticipants);
 
@@ -340,7 +370,9 @@ function SubmitExpenseOrchestrator({
             {!!gpsRequired && (
                 <LocationPermissionModal
                     startPermissionFlow={startLocationPermissionFlow}
-                    resetPermissionFlow={() => setStartLocationPermissionFlow(false)}
+                    resetPermissionFlow={() => {
+                        setStartLocationPermissionFlow(false);
+                    }}
                     onGrant={() => {
                         startSubmitSpans();
                         setFastPath(CONST.TELEMETRY.FAST_PATH_HANDLER.DEFAULT);
