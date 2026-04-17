@@ -59,7 +59,9 @@ function BaseVideoPlayer({
     const {isFullScreenRef} = useFullScreenState();
 
     const isOffline = useNetwork().isOffline;
-    const [isVideoOffline, setIsVideoOffline] = useState(false);
+    // OFFLINE_THRESHOLD below is for intermittent blips during playback; a fresh mount with isOffline already
+    // true is confirmed offline and should not wait for the threshold.
+    const [isVideoOffline, setIsVideoOffline] = useState(() => isOffline);
     const session = useSession();
     const encryptedAuthToken = session?.encryptedAuthToken ?? '';
     const [duration, setDuration] = useState(videoDuration);
@@ -89,7 +91,7 @@ function BaseVideoPlayer({
     /* eslint-enable no-param-reassign */
 
     const isPlaying = videoPlayerRef.current.playing;
-    const {currentTime, bufferedPosition} = useEvent(videoPlayerRef.current, 'timeUpdate', {currentTime: 0, bufferedPosition: 0} as TimeUpdateEventPayload);
+    const {currentTime} = useEvent(videoPlayerRef.current, 'timeUpdate', {currentTime: 0, bufferedPosition: 0} as TimeUpdateEventPayload);
     const {status} = useEvent(videoPlayerRef.current, 'statusChange', {status: shouldUseSharedVideoElement ? playerStatus.current : 'loading'} as StatusChangeEventPayload);
 
     const isLoading = useMemo(() => {
@@ -156,8 +158,10 @@ function BaseVideoPlayer({
         return isLoading && (!isPlaying || currentTime <= 0) && !isVideoOffline && !hasError;
     }, [currentTime, hasError, isLoading, isVideoOffline, isPlaying]);
     const shouldShowOfflineIndicator = useMemo(() => {
-        return isVideoOffline && currentTime + bufferedPosition <= 0;
-    }, [bufferedPosition, currentTime, isVideoOffline]);
+        // Gate on !isPlaying so ongoing playback is not interrupted by intermittent blips,
+        // but a cached video that auto-plays from browser HTTP cache offline still surfaces the indicator.
+        return isVideoOffline && !isPlaying && !isUploading;
+    }, [isPlaying, isUploading, isVideoOffline]);
     const {updateVolume} = useVolumeActions();
     const {lastNonZeroVolume} = useVolumeState();
     useHandleNativeVideoControls({
@@ -303,7 +307,9 @@ function BaseVideoPlayer({
         setHasErrorIconVisible(false);
         if (isFirstLoad) {
             setIsFirstLoad(false);
-            if (videoPlayerRef.current === currentVideoPlayerRef.current && !isUploading) {
+            // Skip auto-play while offline: the browser HTTP cache can satisfy the request silently,
+            // which would bypass the offline indicator.
+            if (videoPlayerRef.current === currentVideoPlayerRef.current && !isUploading && !isOffline) {
                 playVideo();
             }
         }
