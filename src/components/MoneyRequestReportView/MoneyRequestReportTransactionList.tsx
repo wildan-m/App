@@ -17,6 +17,7 @@ import {useSearchActionsContext, useSearchStateContext} from '@components/Search
 import type {SearchCustomColumnIds, SortOrder} from '@components/Search/types';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
+import SearchRowSkeleton from '@components/Skeletons/SearchRowSkeleton';
 import Text from '@components/Text';
 import {useWideRHPActions} from '@components/WideRHPContextProvider';
 import useCopySelectionHelper from '@hooks/useCopySelectionHelper';
@@ -57,8 +58,10 @@ import {
 } from '@libs/ReportUtils';
 import type {SortableColumnName} from '@libs/ReportUtils';
 import {compareValues, getColumnsToShow, getTableMinWidth, isTransactionAmountTooLong, isTransactionTaxAmountTooLong} from '@libs/SearchUIUtils';
+import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import {getTransactionPendingAction, isTransactionPendingDelete, shouldShowExpenseBreakdown} from '@libs/TransactionUtils';
 import shouldShowTransactionYear from '@libs/TransactionUtils/shouldShowTransactionYear';
+import isReportOpenInSuperWideRHP from '@navigation/helpers/isReportOpenInSuperWideRHP';
 import Navigation from '@navigation/Navigation';
 import type {ReportsSplitNavigatorParamList} from '@navigation/types';
 import variables from '@styles/variables';
@@ -226,6 +229,35 @@ function MoneyRequestReportTransactionList({
     );
 
     const reportID = report?.reportID;
+
+    const [showPendingExpensePlaceholder, setShowPendingExpensePlaceholder] = useState(false);
+    const transactionCountWhenSkeletonShown = useRef<number | null>(null);
+    const pendingExpenseReasonAttributes = useMemo(() => ({context: 'MoneyRequestReportTransactionList.PendingExpensePlaceholder'}) as const, []);
+
+    const hasOptimisticNewTransaction = useMemo(() => transactions.some((t) => getTransactionPendingAction(t) === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD), [transactions]);
+
+    useFocusEffect(
+        useCallback(() => {
+            if (!showPendingExpensePlaceholder) {
+                const pending = getPendingSubmitFollowUpAction();
+                const hasPendingSubmit =
+                    pending?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY &&
+                    pending?.reportID === reportID &&
+                    isReportOpenInSuperWideRHP(navigationRef.getRootState());
+
+                if (hasPendingSubmit && !hasOptimisticNewTransaction) {
+                    transactionCountWhenSkeletonShown.current = transactions.length;
+                    setShowPendingExpensePlaceholder(true);
+                }
+                return;
+            }
+
+            if (hasOptimisticNewTransaction || (transactionCountWhenSkeletonShown.current !== null && transactions.length > transactionCountWhenSkeletonShown.current)) {
+                transactionCountWhenSkeletonShown.current = null;
+                setShowPendingExpensePlaceholder(false);
+            }
+        }, [showPendingExpensePlaceholder, reportID, transactions.length, hasOptimisticNewTransaction]),
+    );
 
     useEffect(() => {
         clearSelectedTransactions(true);
@@ -590,6 +622,16 @@ function MoneyRequestReportTransactionList({
                           nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards ?? {}}
                       />
                   ))}
+            {showPendingExpensePlaceholder && (
+                <SearchRowSkeleton
+                    shouldAnimate
+                    fixedNumItems={1}
+                    isLoadMore
+                    containerStyle={styles.mhn5}
+                    shouldUseNarrowLayout={false}
+                    reasonAttributes={pendingExpenseReasonAttributes}
+                />
+            )}
         </View>
     );
 
