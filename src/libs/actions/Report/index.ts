@@ -2466,6 +2466,10 @@ function broadcastUserIsLeavingRoom(reportID: string, currentUserAccountID: numb
     const leavingStatus: UserIsLeavingRoomEvent = {
         [currentUserAccountID]: true,
     };
+    // Pusher client-* events don't echo back to the sender, so the Pusher subscriber
+    // in subscribeToReportLeavingEvents never fires on this device. Mirror the same
+    // Onyx write locally so guards on the current user's device see the flag too.
+    Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_USER_IS_LEAVING_ROOM}${reportID}`, true);
     Pusher.sendEvent(privateReportChannelName, Pusher.TYPE.USER_IS_LEAVING_ROOM, leavingStatus);
 }
 
