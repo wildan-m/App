@@ -108,18 +108,22 @@ export default function useReportUnreadMessageScrollTracking({
         const unreadActionIndex = ref.current.unreadMarkerReportActionIndex;
         const hasUnreadMarkerReportAction = unreadActionIndex !== -1;
         const unreadActionVisible = isInverted ? unreadActionIndex >= minIndex : unreadActionIndex <= maxIndex;
+        // maintainVisibleContentPosition can anchor a newly-prepended action into the viewable range
+        // even when the user is still scrolled away from the bottom, so the index check alone is not
+        // enough to say the user has actually seen the action.
+        const isUserAtBottom = currentVerticalScrollingOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
 
         // display floating button if the unread report action is out of view
         if (!unreadActionVisible && hasUnreadMarkerReportAction) {
             setIsFloatingMessageCounterVisible(true);
         }
-        // hide floating button if the unread report action becomes visible
-        if (unreadActionVisible && hasUnreadMarkerReportAction) {
+        // hide floating button if the unread report action becomes visible and the user is actually near the bottom
+        if (unreadActionVisible && hasUnreadMarkerReportAction && isUserAtBottom) {
             setIsFloatingMessageCounterVisible(false);
         }
 
         // if we're scrolled closer than the offset and read action has been skipped then mark message as read
-        if (unreadActionVisible && readActionSkippedRef.current) {
+        if (unreadActionVisible && readActionSkippedRef.current && isUserAtBottom) {
             // eslint-disable-next-line no-param-reassign
             readActionSkippedRef.current = false;
             readNewestAction(ref.current.reportID, ref.current.hasOnceLoadedReportActions);
