@@ -167,6 +167,17 @@ function updateMultipleMoneyRequests({
         }
         if (changes.amount !== undefined && canEditField(CONST.EDIT_REQUEST_FIELD.AMOUNT)) {
             transactionChanges.amount = changes.amount;
+            // When only the amount is being bulk-edited but the transaction already has a tax rate,
+            // recompute taxAmount here using the existing taxCode. Without this, taxAmount stays stale
+            // offline (where no server round-trip corrects it). Skipped when the transaction has no
+            // taxCode to avoid injecting a 0 taxAmount into a non-tax expense, and when changes.taxCode
+            // is set because the block at L183 handles amount+taxCode together and must take precedence.
+            if (transaction.taxCode && !changes.taxCode && supportsExpenseFields && canEditField(CONST.EDIT_REQUEST_FIELD.TAX_RATE)) {
+                const taxValue = getTaxValue(transactionPolicy, transaction, transaction.taxCode);
+                const decimals = getCurrencyDecimals(getCurrency(transaction));
+                const taxAmount = calculateTaxAmount(taxValue, Math.abs(changes.amount), decimals);
+                transactionChanges.taxAmount = convertToBackendAmount(taxAmount);
+            }
         }
         if (changes.currency && canEditField(CONST.EDIT_REQUEST_FIELD.CURRENCY)) {
             transactionChanges.currency = changes.currency;
