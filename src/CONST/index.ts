@@ -2645,6 +2645,8 @@ const CONST = {
         IMPORT_ITEMS: 'importItems',
         AUTO_SYNC_ENABLED: 'enabled',
         ACCOUNTING_METHOD: 'accountingMethod',
+        TRAVEL_INVOICING_VENDOR: 'travelInvoicingVendorID',
+        TRAVEL_INVOICING_PAYABLE_ACCOUNT: 'travelInvoicingPayableAccountID',
     },
 
     QUICKBOOKS_CONFIG: {

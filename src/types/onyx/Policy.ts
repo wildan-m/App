@@ -1457,6 +1457,12 @@ type QBDConnectionConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Whether new categories are enabled in chart of accounts */
         enableNewCategories: boolean;
 
+        /** Default vendor ID for travel invoicing */
+        travelInvoicingVendorID?: string;
+
+        /** Account ID that receives the exported travel payable */
+        travelInvoicingPayableAccountID?: string;
+
         /** Collections of form field errors */
         errorFields?: OnyxCommon.ErrorFields;
     },

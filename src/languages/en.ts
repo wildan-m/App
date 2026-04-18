@@ -4541,6 +4541,9 @@ const translations = {
                     [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Out-of-pocket expenses will export when paid',
                 },
             },
+            travelInvoicing: 'Export Expensify Travel Payable To',
+            travelInvoicingVendor: 'Travel vendor',
+            travelInvoicingPayableAccount: 'Travel payable account',
         },
         qbo: {
             connectedTo: 'Connected to',
