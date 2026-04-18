@@ -368,6 +368,16 @@ function ReportActionsList({
 
     useEffect(() => () => clearTimeout(scrollEndTimerRef.current), []);
 
+    // Snapshot the scroll offset in the render phase BEFORE FlashList's maintainVisibleContentPosition
+    // gets a chance to shift it on a new action prepend. useMemo runs during render, so at the moment it
+    // re-executes (when lastActionID changes), scrollOffsetRef.current still holds the user's scroll
+    // position prior to the mVCP adjustment that happens later in the child commit phase.
+    const preChangeScrollOffset = useMemo(
+        () => scrollOffsetRef.current,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [lastAction?.reportActionID],
+    );
+
     useScrollToEndOnNewMessageReceived({
         sizeChangeType: 'changed',
         scrollOffsetRef,
@@ -377,6 +387,7 @@ function ReportActionsList({
         setIsFloatingMessageCounterVisible,
         scrollToEnd: reportScrollManager.scrollToBottom,
         resetKey: linkedReportActionID,
+        preChangeScrollOffset,
     });
 
     useEffect(() => {

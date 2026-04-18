@@ -28,6 +28,15 @@ type UseScrollToEndOnPaginationMergeParams = {
      * The value does not need to be used inside the effect.
      */
     resetKey?: unknown;
+    /**
+     * Scroll offset snapshot captured in the render phase BEFORE the new action was appended.
+     * When FlashList's maintainVisibleContentPosition anchors a newly-prepended action, it shifts
+     * `scrollOffsetRef.current` up by the new item's height, which can push a user who was actually
+     * at the bottom above `AUTOSCROLL_TO_TOP_THRESHOLD` and suppress the scroll-to-end. Passing the
+     * pre-change snapshot here lets this hook make the near-bottom decision against the real
+     * pre-prepend offset instead.
+     */
+    preChangeScrollOffset?: number;
 };
 
 function useScrollToEndOnNewMessageReceived({
@@ -40,6 +49,7 @@ function useScrollToEndOnNewMessageReceived({
     scrollToEnd,
     sizeChangeType = 'changed',
     resetKey,
+    preChangeScrollOffset,
 }: UseScrollToEndOnPaginationMergeParams) {
     const previousLastIndex = useRef(lastActionID);
     const reportActionSize = useRef(visibleActionsLength);
@@ -47,9 +57,10 @@ function useScrollToEndOnNewMessageReceived({
 
     useEffect(() => {
         const didListSizeChange = sizeChangeType === 'grewFromReportActions' ? reportActionSize.current > (reportActionsLength ?? 0) : reportActionSize.current !== visibleActionsLength;
+        const offsetBeforePrepend = preChangeScrollOffset ?? scrollOffsetRef.current;
 
         if (
-            scrollOffsetRef.current < AUTOSCROLL_TO_TOP_THRESHOLD &&
+            offsetBeforePrepend < AUTOSCROLL_TO_TOP_THRESHOLD &&
             previousLastIndex.current !== lastActionID &&
             didListSizeChange &&
             hasNewestReportAction &&
@@ -77,6 +88,7 @@ function useScrollToEndOnNewMessageReceived({
         resetKey,
         setIsFloatingMessageCounterVisible,
         scrollToEnd,
+        preChangeScrollOffset,
     ]);
 }
 
