@@ -107,23 +107,21 @@ export default function useReportUnreadMessageScrollTracking({
         const minIndex = Math.min(...viewableIndexes);
         const unreadActionIndex = ref.current.unreadMarkerReportActionIndex;
         const hasUnreadMarkerReportAction = unreadActionIndex !== -1;
-        const unreadActionVisible = isInverted ? unreadActionIndex >= minIndex : unreadActionIndex <= maxIndex;
-        // maintainVisibleContentPosition can anchor a newly-prepended action into the viewable range
-        // even when the user is still scrolled away from the bottom, so the index check alone is not
-        // enough to say the user has actually seen the action.
-        const isUserAtBottom = currentVerticalScrollingOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
+        const unreadActionInViewableIndexRange = isInverted ? unreadActionIndex >= minIndex : unreadActionIndex <= maxIndex;
+        // maintainVisibleContentPosition on the inverted list can anchor a newly-prepended action into the
+        // viewable index range even while the user is still scrolled away from the bottom, so the index
+        // check alone cannot tell us whether the user has actually seen the action. Cross-check the live
+        // scroll offset against the same threshold used to decide "near enough to the bottom to count as read".
+        const isUserNearBottom = currentVerticalScrollingOffsetRef.current < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD;
+        const unreadActionSeenByUser = unreadActionInViewableIndexRange && isUserNearBottom;
 
-        // display floating button if the unread report action is out of view
-        if (!unreadActionVisible && hasUnreadMarkerReportAction) {
-            setIsFloatingMessageCounterVisible(true);
-        }
-        // hide floating button if the unread report action becomes visible and the user is actually near the bottom
-        if (unreadActionVisible && hasUnreadMarkerReportAction && isUserAtBottom) {
-            setIsFloatingMessageCounterVisible(false);
+        if (hasUnreadMarkerReportAction) {
+            setIsFloatingMessageCounterVisible(!unreadActionSeenByUser);
         }
 
-        // if we're scrolled closer than the offset and read action has been skipped then mark message as read
-        if (unreadActionVisible && readActionSkippedRef.current && isUserAtBottom) {
+        // Only mark the newest action as read when the user is actually near the bottom; otherwise we would
+        // silently dismiss unread state for a message the user never focused on.
+        if (unreadActionSeenByUser && readActionSkippedRef.current) {
             // eslint-disable-next-line no-param-reassign
             readActionSkippedRef.current = false;
             readNewestAction(ref.current.reportID, ref.current.hasOnceLoadedReportActions);
