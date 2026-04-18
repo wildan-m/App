@@ -4697,6 +4697,9 @@ ${amount} para ${merchant} - ${date}`,
             defaultVendor: 'Fornecedor padrão',
             defaultVendorDescription: (isReimbursable: boolean) =>
                 `Defina um fornecedor padrão que será aplicado às despesas reembolsáveis ${isReimbursable ? '' : 'não-'} que não tiverem um fornecedor correspondente no Sage Intacct.`,
+            travelInvoicing: 'Exportar contas a pagar de viagens do Expensify para',
+            travelInvoicingVendor: 'Fornecedor de viagens',
+            travelInvoicingPayableAccount: 'Conta a pagar de viagens',
             exportDescription: 'Configure como os dados do Expensify são exportados para o Sage Intacct.',
             exportPreferredExporterNote:
                 'O exportador preferencial pode ser qualquer administrador do espaço de trabalho, mas também deve ser um Administrador de Domínio se você definir diferentes contas de exportação para cartões corporativos individuais em Configurações de Domínio.',

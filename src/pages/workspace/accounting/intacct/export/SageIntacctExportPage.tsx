@@ -4,9 +4,14 @@ import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
+import {getCardSettings} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {areSettingsInErrorFields, getCurrentSageIntacctEntityName, settingsPendingAction} from '@libs/PolicyUtils';
+import {getIsTravelInvoicingEnabled, getTravelInvoicingCardSettingsKey} from '@libs/TravelInvoicingUtils';
 import goBackFromExportConnection from '@navigation/helpers/goBackFromExportConnection';
 import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -19,11 +24,20 @@ import type SCREENS from '@src/SCREENS';
 function SageIntacctExportPage({policy}: WithPolicyProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {isBetaEnabled} = usePermissions();
     const policyID = policy?.id;
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_EXPORT>>();
     const backTo = route?.params?.backTo;
-    const {export: exportConfig, pendingFields, errorFields} = policy?.connections?.intacct?.config ?? {};
+    const intacctConfig = policy?.connections?.intacct?.config;
+    const {export: exportConfig, pendingFields, errorFields} = intacctConfig ?? {};
+    const {bankAccounts} = policy?.connections?.intacct?.data ?? {};
+    const travelPayableAccount = bankAccounts?.find((account) => account.id === intacctConfig?.travelInvoicingPayableAccountID);
     const shouldGoBackToSpecificRoute = exportConfig?.reimbursable === CONST.SAGE_INTACCT_REIMBURSABLE_EXPENSE_TYPE.EXPENSE_REPORT;
+
+    const workspaceAccountID = useWorkspaceAccountID(policyID);
+    const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID));
+    const travelSettings = getCardSettings(cardSettings, CONST.TRAVEL.PROGRAM_TRAVEL_US);
+    const isTravelInvoicingEnabled = isBetaEnabled(CONST.BETAS.TRAVEL_INVOICING) && getIsTravelInvoicingEnabled(travelSettings);
 
     const goBack = () => {
         return goBackFromExportConnection(shouldGoBackToSpecificRoute, backTo);
@@ -60,6 +74,16 @@ function SageIntacctExportPage({policy}: WithPolicyProps) {
                     : CONST.SAGE_INTACCT_CONFIG.NON_REIMBURSABLE_CREDIT_CARD_VENDOR,
             ],
         },
+        ...(isTravelInvoicingEnabled
+            ? [
+                  {
+                      description: translate('workspace.sageIntacct.travelInvoicing'),
+                      action: !policyID ? undefined : () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID)),
+                      title: travelPayableAccount?.name,
+                      subscribedSettings: [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
+                  },
+              ]
+            : []),
     ];
 
     return (

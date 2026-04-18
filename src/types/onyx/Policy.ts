@@ -1337,6 +1337,12 @@ type SageIntacctConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Sage Intacct entity */
         entity?: string;
 
+        /** Default vendor ID for travel invoicing */
+        travelInvoicingVendorID?: string;
+
+        /** Account ID that receives the exported travel payable */
+        travelInvoicingPayableAccountID?: string;
+
         /** Collection of Sage Intacct config errors */
         errors?: OnyxCommon.Errors;
 

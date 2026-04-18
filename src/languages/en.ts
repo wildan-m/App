@@ -4793,6 +4793,9 @@ const translations = {
             defaultVendor: 'Default vendor',
             defaultVendorDescription: (isReimbursable: boolean) =>
                 `Set a default vendor that will apply to ${isReimbursable ? '' : 'non-'}reimbursable expenses that don't have a matching vendor in Sage Intacct.`,
+            travelInvoicing: 'Export Expensify Travel Payable To',
+            travelInvoicingVendor: 'Travel vendor',
+            travelInvoicingPayableAccount: 'Travel payable account',
             exportDescription: 'Configure how Expensify data exports to Sage Intacct.',
             exportPreferredExporterNote:
                 'The preferred exporter can be any workspace admin, but must also be a Domain Admin if you set different export accounts for individual company cards in Domain Settings.',

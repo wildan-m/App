@@ -785,6 +785,12 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
         require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/export/DynamicSageIntacctDefaultVendorPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_SAGE_INTACCT_NON_REIMBURSABLE_CREDIT_CARD_ACCOUNT]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/export/DynamicSageIntacctNonReimbursableCreditCardAccountPage').default,
+    [SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION]: () =>
+        require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/export/SageIntacctTravelInvoicingConfigurationPage').default,
+    [SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_TRAVEL_INVOICING_VENDOR_SELECT]: () =>
+        require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/export/SageIntacctTravelInvoicingVendorSelectPage').default,
+    [SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT]: () =>
+        require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/export/SageIntacctTravelInvoicingPayableAccountSelectPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_ADVANCED]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/advanced/SageIntacctAdvancedPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_SAGE_INTACCT_AUTO_SYNC]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/advanced/SageIntacctAutoSyncPage').default,

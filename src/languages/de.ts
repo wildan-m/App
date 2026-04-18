@@ -4725,6 +4725,9 @@ ${amount} für ${merchant} – ${date}`,
             defaultVendor: 'Standardanbieter',
             defaultVendorDescription: (isReimbursable: boolean) =>
                 `Legen Sie einen Standardlieferanten fest, der auf ${isReimbursable ? '' : 'nicht-'}erstattungsfähige Ausgaben angewendet wird, für die in Sage Intacct kein übereinstimmender Lieferant vorhanden ist.`,
+            travelInvoicing: 'Expensify Travel-Verbindlichkeiten exportieren an',
+            travelInvoicingVendor: 'Reiseanbieter',
+            travelInvoicingPayableAccount: 'Verbindlichkeitenkonto Reisen',
             exportDescription: 'Konfigurieren Sie, wie Expensify Daten nach Sage Intacct exportiert.',
             exportPreferredExporterNote:
                 'Der bevorzugte Exporteur kann jede Workspace-Adminperson sein, muss jedoch auch Domain-Admin sein, wenn du in den Domaineinstellungen unterschiedliche Exportkonten für einzelne Firmenkarten festlegst.',

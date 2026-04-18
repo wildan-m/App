@@ -2748,6 +2748,8 @@ const CONST = {
         ENTITY: 'entity',
         DIMENSION_PREFIX: 'dimension_',
         ACCOUNTING_METHOD: 'accountingMethod',
+        TRAVEL_INVOICING_VENDOR: 'travelInvoicingVendorID',
+        TRAVEL_INVOICING_PAYABLE_ACCOUNT: 'travelInvoicingPayableAccountID',
     },
 
     SAGE_INTACCT: {

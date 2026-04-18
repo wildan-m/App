@@ -3843,6 +3843,18 @@ const ROUTES = {
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: (policyID: string, backTo?: string) => getUrlWithBackToParam(`workspaces/${policyID}/accounting/sage-intacct/export/nonreimbursable` as const, backTo),
     },
+    POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION: {
+        route: 'workspaces/:policyID/accounting/sage-intacct/export/travel-invoicing',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/sage-intacct/export/travel-invoicing` as const,
+    },
+    POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_VENDOR_SELECT: {
+        route: 'workspaces/:policyID/accounting/sage-intacct/export/travel-invoicing/vendor',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/sage-intacct/export/travel-invoicing/vendor` as const,
+    },
+    POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT: {
+        route: 'workspaces/:policyID/accounting/sage-intacct/export/travel-invoicing/payable-account',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/sage-intacct/export/travel-invoicing/payable-account` as const,
+    },
     POLICY_ACCOUNTING_SAGE_INTACCT_REIMBURSABLE_DESTINATION: {
         route: 'workspaces/:policyID/accounting/sage-intacct/export/reimbursable/destination',
 

@@ -4702,6 +4702,9 @@ ${amount} voor ${merchant} - ${date}`,
             defaultVendor: 'Standaardleverancier',
             defaultVendorDescription: (isReimbursable: boolean) =>
                 `Stel een standaardleverancier in die wordt toegepast op ${isReimbursable ? '' : 'niet-'}declarabele uitgaven zonder overeenkomende leverancier in Sage Intacct.`,
+            travelInvoicing: 'Expensify Travel-te betalen exporteren naar',
+            travelInvoicingVendor: 'Reisleverancier',
+            travelInvoicingPayableAccount: 'Reiskosten crediteurenrekening',
             exportDescription: 'Configureer hoe Expensify-gegevens worden geëxporteerd naar Sage Intacct.',
             exportPreferredExporterNote:
                 'De voorkeurs-exporteur kan elke werkruimtebeheerder zijn, maar moet ook een domeinbeheerder zijn als je in Domeininstellingen verschillende exportrekeningen instelt voor individuele bedrijfskaarten.',
