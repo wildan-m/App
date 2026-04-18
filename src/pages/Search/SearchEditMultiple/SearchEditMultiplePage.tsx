@@ -101,7 +101,14 @@ function SearchEditMultiplePage() {
     const policyTags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`];
     const policyTagLists = getTagLists(policyTags);
 
-    const isTaxTrackingEnabled = !hasPerDiemOrTimeTransaction && selectedTransactionContexts.every(({transactionPolicy}) => !!transactionPolicy?.tax?.trackingEnabled);
+    const isTaxTrackingEnabled =
+        !hasPerDiemOrTimeTransaction &&
+        selectedTransactionContexts.every(({transaction, transactionPolicy}) => {
+            // Unreported expenses have no transactionPolicy yet — fall back to the page-level policy,
+            // which is the shared policy when all selections belong to one, otherwise the active workspace.
+            const effectivePolicy = !transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID ? policy : transactionPolicy;
+            return !!effectivePolicy?.tax?.trackingEnabled;
+        });
     const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
         if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
             return true;
