@@ -269,6 +269,7 @@ function getBadgeFromIOUReport(
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
     invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
 ): ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined {
+    // Show to the actual payer, or to policy admins via the pay-elsewhere path for negative expenses
     if (
         canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
         canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
@@ -300,11 +301,11 @@ function getIOUReportActionWithBadge(
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
     invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
 ): {reportAction: OnyxEntry<ReportAction>; actionBadge?: ValueOf<typeof CONST.REPORT.ACTION_BADGE>} {
-    // When the report is an expense report itself (not a workspace chat), check it directly
-    // since expense reports don't contain REPORT_PREVIEW actions
-    if (isExpenseReport(chatReport)) {
-        const parentChat = getReportOrDraftReport(chatReport?.chatReportID);
-        return {reportAction: undefined, actionBadge: getBadgeFromIOUReport(chatReport, parentChat, policy, reportMetadata, invoiceReceiverPolicy)};
+    // When the report is an expense report itself (not a workspace chat) and the user doesn't
+    // have access to the workspace chat, check it directly since expense reports don't contain
+    // REPORT_PREVIEW actions
+    if (isExpenseReport(chatReport) && chatReport?.hasParentAccess === false) {
+        return {reportAction: undefined, actionBadge: getBadgeFromIOUReport(chatReport, undefined, policy, reportMetadata, invoiceReceiverPolicy)};
     }
 
     const chatReportActions = getAllReportActionsFromIOU()?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`] ?? {};
@@ -1758,6 +1759,7 @@ export {
     canSubmitReport,
     canUnapproveIOU,
     determineIouReportID,
+    getBadgeFromIOUReport,
     getIOUReportActionWithBadge,
     getReportOriginalCreationTimestamp,
     reopenReport,

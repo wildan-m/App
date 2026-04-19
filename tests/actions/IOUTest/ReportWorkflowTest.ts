@@ -11,6 +11,7 @@ import {
     canCancelPayment,
     canIOUBePaid,
     canUnapproveIOU,
+    getBadgeFromIOUReport,
     getIOUReportActionWithBadge,
     getReportOriginalCreationTimestamp,
     retractReport,
@@ -2936,6 +2937,141 @@ describe('actions/IOU/ReportWorkflow', () => {
             const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined);
             expect(result.reportAction).toBeUndefined();
             expect(result.actionBadge).toBeUndefined();
+        });
+    });
+
+    describe('getBadgeFromIOUReport', () => {
+        it('should return APPROVE badge for submitted expense report when user is manager', async () => {
+            const iouReportID = '1100';
+            const chatReportID = '1101';
+            const policyID = '1102';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+            };
+
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+            };
+
+            const fakeIouReport: Report = {
+                ...createRandomReport(Number(iouReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: iouReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                managerID: RORY_ACCOUNT_ID,
+            };
+
+            const fakeTransaction: Transaction = {
+                ...createRandomTransaction(0),
+                reportID: iouReportID,
+                amount: 100,
+                status: CONST.TRANSACTION.STATUS.POSTED,
+                bank: '',
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`, fakeIouReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction.transactionID}`, fakeTransaction);
+            await waitForBatchedUpdates();
+
+            const result = getBadgeFromIOUReport(fakeIouReport, fakeChatReport, fakePolicy, {}, undefined);
+            expect(result).toBe(CONST.REPORT.ACTION_BADGE.APPROVE);
+        });
+
+        it('should return PAY badge for approved expense report when user is payer', async () => {
+            const iouReportID = '1200';
+            const chatReportID = '1201';
+            const policyID = '1202';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+                role: CONST.POLICY.ROLE.ADMIN,
+                reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL,
+            };
+
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+            };
+
+            const fakeIouReport: Report = {
+                ...createRandomReport(Number(iouReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: iouReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+                managerID: RORY_ACCOUNT_ID,
+                total: -10000,
+                nonReimbursableTotal: 0,
+                isWaitingOnBankAccount: false,
+            };
+
+            const fakeTransaction: Transaction = {
+                ...createRandomTransaction(0),
+                reportID: iouReportID,
+                amount: 100,
+                status: CONST.TRANSACTION.STATUS.POSTED,
+                bank: '',
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`, fakeIouReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction.transactionID}`, fakeTransaction);
+            await waitForBatchedUpdates();
+
+            const result = getBadgeFromIOUReport(fakeIouReport, fakeChatReport, fakePolicy, {}, undefined);
+            expect(result).toBe(CONST.REPORT.ACTION_BADGE.PAY);
+        });
+
+        it('should return undefined badge for settled report', async () => {
+            const iouReportID = '1300';
+            const chatReportID = '1301';
+            const policyID = '1302';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+            };
+
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+            };
+
+            const fakeIouReport: Report = {
+                ...createRandomReport(Number(iouReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: iouReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+                managerID: RORY_ACCOUNT_ID,
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`, fakeIouReport);
+            await waitForBatchedUpdates();
+
+            const result = getBadgeFromIOUReport(fakeIouReport, fakeChatReport, fakePolicy, {}, undefined);
+            expect(result).toBeUndefined();
         });
     });
 });
