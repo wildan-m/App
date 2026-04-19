@@ -4313,9 +4313,7 @@ function getReasonAndReportActionThatRequiresAttention(
 
     if (actionTypeForAssigneeToComplete) {
         const isAssigneeExpenseAction = actionTypeForAssigneeToComplete === CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE.EXPENSE;
-        const expenseBadge = isAssigneeExpenseAction
-            ? getIOUReportActionWithBadge(optionOrReport, policy, optionReportMetadata, invoiceReceiverPolicy).actionBadge
-            : undefined;
+        const expenseBadge = isAssigneeExpenseAction ? getIOUReportActionWithBadge(optionOrReport, policy, optionReportMetadata, invoiceReceiverPolicy).actionBadge : undefined;
         return {
             reason: CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION,
             reportAction: Object.values(reportActions).find((action) => action.childType === CONST.REPORT.TYPE.TASK),
