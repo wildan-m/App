@@ -268,6 +268,36 @@ function getIOUReportActionWithBadge(
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
     invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
 ): {reportAction: OnyxEntry<ReportAction>; actionBadge?: ValueOf<typeof CONST.REPORT.ACTION_BADGE>} {
+    // When the report is an expense report itself (not a workspace chat), check it directly
+    // since expense reports don't contain REPORT_PREVIEW actions
+    if (isExpenseReport(chatReport)) {
+        const parentChat = getReportOrDraftReport(chatReport?.chatReportID);
+        let expenseBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
+        if (
+            canIOUBePaid(chatReport, parentChat, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
+            canIOUBePaid(chatReport, parentChat, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
+        ) {
+            expenseBadge = CONST.REPORT.ACTION_BADGE.PAY;
+        } else if (canApproveIOU(chatReport, policy, reportMetadata)) {
+            expenseBadge = CONST.REPORT.ACTION_BADGE.APPROVE;
+        } else {
+            const isWaitingSubmitFromCurrentUser = canSubmitAndIsAwaitingForCurrentUser(
+                chatReport,
+                parentChat,
+                policy,
+                getReportTransactions(chatReport?.reportID),
+                getAllTransactionViolations(),
+                getCurrentUserEmail(),
+                getUserAccountID(),
+                getAllReportActions(chatReport?.reportID),
+            );
+            if (isWaitingSubmitFromCurrentUser) {
+                expenseBadge = CONST.REPORT.ACTION_BADGE.SUBMIT;
+            }
+        }
+        return {reportAction: undefined, actionBadge: expenseBadge};
+    }
+
     const chatReportActions = getAllReportActionsFromIOU()?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`] ?? {};
 
     let actionBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
