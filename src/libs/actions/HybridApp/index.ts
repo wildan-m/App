@@ -121,14 +121,6 @@ function setUseNewDotSignInPage(useNewDotSignInPage: boolean) {
     return Onyx.merge(ONYXKEYS.HYBRID_APP, {useNewDotSignInPage});
 }
 
-function setClosingReactNativeApp(closingReactNativeApp: boolean) {
-    // This value is only relevant for HybridApp, so we can skip it in other environments.
-    if (!CONFIG.IS_HYBRID_APP) {
-        return;
-    }
-    Onyx.merge(ONYXKEYS.HYBRID_APP, {closingReactNativeApp});
-}
-
 /*
  * Starts HybridApp sign-in flow from the beginning.
  */

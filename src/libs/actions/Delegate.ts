@@ -110,9 +110,6 @@ type IsConnectedAsDelegateParams = WithDelegatedAccess;
 // Connect as delegate
 type ConnectParams = WithEmail & WithDelegatedAccess & WithOldDotFlag & WithCredentials & WithSession & WithActivePolicyID;
 
-// Clear pending action for role update
-type ClearDelegateRolePendingActionParams = WithEmail & WithDelegatedAccess;
-
 /**
  * Connects the user as a delegate to another account.
  * Returns a Promise that resolves to true on success, false on failure, or undefined if not applicable.
@@ -330,10 +327,6 @@ function clearDelegatorErrors({delegatedAccess}: ClearDelegatorErrorsParams) {
         return;
     }
     Onyx.merge(ONYXKEYS.ACCOUNT, {delegatedAccess: {delegators: delegatedAccess.delegators.map((delegator) => ({...delegator, errorFields: undefined}))}});
-}
-
-function requestValidationCode() {
-    API.write(WRITE_COMMANDS.RESEND_VALIDATE_CODE, null);
 }
 
 function addDelegate({email, role, validateCode, delegatedAccess}: AddDelegateParams) {
@@ -667,34 +660,6 @@ function updateDelegateRole({email, role, validateCode, delegatedAccess}: Update
     const parameters: APIUpdateDelegateRoleParams = {delegateEmail: email, validateCode, role};
 
     API.write(WRITE_COMMANDS.UPDATE_DELEGATE_ROLE, parameters, {optimisticData, successData, failureData});
-}
-
-function clearDelegateRolePendingAction({email, delegatedAccess}: ClearDelegateRolePendingActionParams) {
-    if (!delegatedAccess?.delegates) {
-        return;
-    }
-
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT>> = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.ACCOUNT,
-            value: {
-                delegatedAccess: {
-                    delegates: delegatedAccess.delegates.map((delegate) =>
-                        delegate.email === email
-                            ? {
-                                  ...delegate,
-                                  pendingAction: null,
-                                  pendingFields: undefined,
-                              }
-                            : delegate,
-                    ),
-                },
-            },
-        },
-    ];
-
-    Onyx.update(optimisticData);
 }
 
 function restoreDelegateSession<TKey extends OnyxKey>(authenticateResponse: Response<TKey>) {

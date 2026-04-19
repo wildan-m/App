@@ -8,7 +8,6 @@ import resetNonUSDBankAccount from './resetNonUSDBankAccount';
 import resetUSDBankAccount from './resetUSDBankAccount';
 
 export {goToWithdrawalAccountSetupStep, navigateToBankAccountRoute} from './navigation';
-export {resetReimbursementAccount} from './errors';
 
 /**
  * Set the current sub step in first step of adding withdrawal bank account:
@@ -62,6 +61,17 @@ function setReimbursementAccountOptionPressed(optionPressed: ValueOf<typeof CONS
     Onyx.set(ONYXKEYS.REIMBURSEMENT_ACCOUNT_OPTION_PRESSED, optionPressed);
 }
 
+/**
+ * Clear validation messages from reimbursement account
+ */
+function resetReimbursementAccount() {
+    Onyx.merge(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {
+        errors: null,
+        pendingAction: null,
+        errorFields: null,
+    });
+}
+
 export {
     resetUSDBankAccount,
     resetNonUSDBankAccount,
@@ -74,4 +84,5 @@ export {
     clearReimbursementAccountDraft,
     setReimbursementAccountOptionPressed,
     updateReimbursementAccount,
+    resetReimbursementAccount,
 };

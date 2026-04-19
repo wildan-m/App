@@ -79,4 +79,5 @@ function navigateToQuickAction(params: NavigateToQuickActionParams) {
         default:
     }
 }
+// eslint-disable-next-line import/prefer-default-export
 export {navigateToQuickAction};

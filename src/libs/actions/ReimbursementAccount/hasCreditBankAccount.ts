@@ -13,4 +13,4 @@ function hasCreditBankAccount(bankAccountList: OnyxEntry<OnyxTypes.BankAccountLi
     });
 }
 
-export {hasCreditBankAccount};
+export default hasCreditBankAccount;

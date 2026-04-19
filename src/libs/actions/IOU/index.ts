@@ -53,7 +53,6 @@ import {
     getParsedComment,
     getReportNotificationPreference,
     getReportOrDraftReport,
-    hasOutstandingChildRequest,
     hasViolations as hasViolationsReportUtils,
     isDeprecatedGroupDM,
     isExpenseReport,

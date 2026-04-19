@@ -91,7 +91,7 @@ import {createDraftTransaction, setMoneyRequestParticipants, setMoneyRequestPart
 import type {IOURequestType} from './actions/IOU';
 import {unholdRequest} from './actions/IOU/Hold';
 import {createDraftWorkspace} from './actions/Policy/Policy';
-import {hasCreditBankAccount} from './actions/ReimbursementAccount/store';
+import hasCreditBankAccount from './actions/ReimbursementAccount/hasCreditBankAccount';
 import {openUnreportedExpense} from './actions/Report';
 import type {GuidedSetupData, TaskForParameters} from './actions/Report';
 import {isAnonymousUser as isAnonymousUserSession} from './actions/Session';
