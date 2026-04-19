@@ -2524,8 +2524,16 @@ describe('actions/Duplicate', () => {
         });
 
         const getDefaultBulkParams = (reportIDs: string[], overrides: Partial<BulkDuplicateReportsParams> = {}): BulkDuplicateReportsParams => ({
-            reportIDs,
+            selectedReports: reportIDs.map((id) => ({
+                reportID: id,
+                policyID: undefined,
+                action: CONST.SEARCH.ACTION_TYPES.DONE,
+                allActions: [CONST.SEARCH.ACTION_TYPES.DONE],
+                total: 0,
+                chatReportID: undefined,
+            })),
             allReports: {},
+            searchData: undefined,
             allPolicies: {
                 [`${ONYXKEYS.COLLECTION.POLICY}${SOURCE_POLICY_ID}`]: sourcePolicy,
                 [`${ONYXKEYS.COLLECTION.POLICY}${DEFAULT_POLICY_ID}`]: defaultPolicy,
@@ -2769,7 +2777,7 @@ describe('actions/Duplicate', () => {
             expect(requestMoneyCall?.[1]?.chatReportID).toBe(ACTIVE_PEC_REPORT_ID);
         });
 
-        it('should skip reportIDs that do not exist in allReports', async () => {
+        it('should skip reports with no transactions available', async () => {
             const report1: Report = {
                 reportID: 'rpt1',
                 policyID: SOURCE_POLICY_ID,

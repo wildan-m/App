@@ -241,6 +241,7 @@ function useSearchBulkActionsWithDuplicateReport({queryJSON}: {queryJSON: Search
     const handleDuplicateReport = useBulkDuplicateReportAction({
         selectedReports: mockSelectedReports,
         allReports,
+        searchData: undefined,
     });
     useEffect(() => {
         setDuplicateReportHandler(handleDuplicateReport);
@@ -1284,7 +1285,10 @@ describe('useSearchBulkActions - duplicate report option', () => {
         expect(bulkDuplicateReports).toHaveBeenCalledTimes(1);
         expect(bulkDuplicateReports).toHaveBeenCalledWith(
             expect.objectContaining({
-                reportIDs: expect.arrayContaining(['rpt1', 'rpt2']),
+                selectedReports: expect.arrayContaining([
+                    expect.objectContaining({reportID: 'rpt1'}),
+                    expect.objectContaining({reportID: 'rpt2'}),
+                ]),
                 defaultExpensePolicy: teamPolicy,
             }),
         );
