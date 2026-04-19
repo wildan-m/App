@@ -837,7 +837,6 @@ function duplicateReport({
     shouldPlaySound = true,
 }: DuplicateReportParams) {
     if (!targetPolicy || !parentChatReport) {
-        console.debug(`[duplicateReport] SKIP reportID=${sourceReport?.reportID}: targetPolicy=${!!targetPolicy}, parentChatReport=${!!parentChatReport}`);
         return;
     }
 
@@ -851,39 +850,25 @@ function duplicateReport({
 
     const eligibleTransactions = sourceReportTransactions.filter((transaction) => {
         if (isFromCreditCardImport(transaction)) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: creditCardImport`);
             return false;
         }
         if (transaction.accountant) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: accountant`);
             return false;
         }
-        if (isPartialTransaction(transaction)) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: partialTransaction`);
-            return false;
-        }
-        if (isScanning(transaction)) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: scanning`);
+        if (isPartialTransaction(transaction) || isScanning(transaction)) {
             return false;
         }
         const txnViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`];
         if (hasCustomUnitOutOfPolicyViolation(txnViolations)) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: customUnitOutOfPolicy`);
             return false;
         }
         if (isCrossWorkspace && (isPerDiemRequest(transaction) || isDistanceRequest(transaction))) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID} txn=${transaction.transactionID} filtered: crossWorkspacePerDiem/Distance`);
             return false;
         }
         return true;
     });
 
-    console.debug(
-        `[duplicateReport] reportID=${sourceReport?.reportID}: ${sourceReportTransactions.length} total txns, ${eligibleTransactions.length} eligible, isCrossWorkspace=${isCrossWorkspace}`,
-    );
-
     if (eligibleTransactions.length === 0) {
-        console.debug(`[duplicateReport] SKIP reportID=${sourceReport?.reportID}: 0 eligible transactions`);
         return;
     }
 
@@ -902,12 +887,10 @@ function duplicateReport({
     for (let i = 0; i < eligibleTransactions.length; i++) {
         const transaction = eligibleTransactions.at(i);
         if (!transaction) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID}: txn at index ${i} is falsy`);
             continue;
         }
         const transactionDetails = getTransactionDetails(transaction);
         if (!transactionDetails) {
-            console.debug(`[duplicateReport] reportID=${sourceReport?.reportID}: txn=${transaction.transactionID} has no transactionDetails`);
             continue;
         }
 
@@ -1145,8 +1128,6 @@ function bulkDuplicateReports({
         transactionsByReportID.set(transaction.reportID, list);
     }
 
-    console.debug(`[bulkDuplicateReports] Starting: ${selectedReportsParam.length} selected reports, ${transactionsByReportID.size} reports with transactions`);
-
     for (const selectedReport of selectedReportsParam) {
         const reportID = selectedReport.reportID;
         if (!reportID) {
@@ -1172,10 +1153,6 @@ function bulkDuplicateReports({
 
         const reportTransactions = transactionsByReportID.get(reportID) ?? [];
 
-        console.debug(
-            `[bulkDuplicateReports] reportID=${reportID}: policyID=${report.policyID}, isSourcePolicyValid=${isSourcePolicyValid}, chatReportID=${chatReportID}, hasChatReport=${!!chatReport}, useSourcePolicy=${useSourcePolicy}, hasTargetPolicy=${!!targetPolicy}, hasParentChat=${!!parentChatReport}, txnCount=${reportTransactions.length}`,
-        );
-
         duplicateReport({
             sourceReport: report,
             sourceReportTransactions: reportTransactions,
@@ -1199,7 +1176,6 @@ function bulkDuplicateReports({
         });
     }
 
-    console.debug(`[bulkDuplicateReports] Done: processed ${selectedReportsParam.length} reports`);
     playSound(SOUNDS.DONE);
 }
 

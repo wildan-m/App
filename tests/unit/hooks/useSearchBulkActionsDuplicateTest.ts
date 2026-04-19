@@ -1285,10 +1285,7 @@ describe('useSearchBulkActions - duplicate report option', () => {
         expect(bulkDuplicateReports).toHaveBeenCalledTimes(1);
         expect(bulkDuplicateReports).toHaveBeenCalledWith(
             expect.objectContaining({
-                selectedReports: expect.arrayContaining([
-                    expect.objectContaining({reportID: 'rpt1'}),
-                    expect.objectContaining({reportID: 'rpt2'}),
-                ]),
+                selectedReports: expect.arrayContaining([expect.objectContaining({reportID: 'rpt1'}), expect.objectContaining({reportID: 'rpt2'})]),
                 defaultExpensePolicy: teamPolicy,
             }),
         );
