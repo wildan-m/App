@@ -3,4 +3,5 @@ import type {SortedReportActionsDerivedValue} from '@src/types/onyx/DerivedValue
 
 const sortedActionsSelector = (value: OnyxEntry<SortedReportActionsDerivedValue>) => value?.sortedActions;
 
+// eslint-disable-next-line import/prefer-default-export
 export {sortedActionsSelector};
