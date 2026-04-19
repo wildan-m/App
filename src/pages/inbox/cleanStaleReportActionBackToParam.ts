@@ -20,13 +20,14 @@ function cleanStaleReportActionBackToParam(reportID: string, reportActionID: str
 
     const staleSegment = `r/${reportID}/${reportActionID}`;
     const cleanSegment = `r/${reportID}`;
+    const stalePattern = new RegExp(staleSegment + '(?=[?/]|$)');
 
     function walk(routes: NavigationState['routes'], navigatorKey?: string) {
         for (const route of routes) {
             const backTo = (route.params as Record<string, unknown> | undefined)?.backTo;
-            if (typeof backTo === 'string' && backTo.includes(staleSegment)) {
+            if (typeof backTo === 'string' && stalePattern.test(backTo)) {
                 navigationRef.current?.dispatch({
-                    ...CommonActions.setParams({backTo: backTo.replace(staleSegment, cleanSegment)}),
+                    ...CommonActions.setParams({backTo: backTo.replace(stalePattern, cleanSegment)}),
                     source: route.key,
                     ...(navigatorKey && {target: navigatorKey}),
                 });

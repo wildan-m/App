@@ -156,6 +156,7 @@ describe('LinkedActionNotFoundGuard', () => {
 
         // The cleanup effect should clear reportActionID with the route key
         expect(mockSetParams).toHaveBeenCalledWith({reportActionID: undefined}, ROUTE_KEY, NAVIGATOR_KEY);
+        expect(mockCleanStaleBackToParam).toHaveBeenCalledWith(REPORT_ID, REPORT_ACTION_ID);
     });
 
     it('does not navigate away when action disappears but was never visible', () => {
