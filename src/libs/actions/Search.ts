@@ -1703,7 +1703,6 @@ function setOptimisticDataForTransactionThreadPreview(item: TransactionListItemT
 export {
     saveSearch,
     search,
-    revertSplitTransactionOnSearch,
     bulkDeleteReports,
     rejectMoneyRequestsOnSearch,
     exportSearchItemsToCSV,
@@ -1723,7 +1722,6 @@ export {
     getLastPolicyBankAccountID,
     exportToIntegrationOnSearch,
     getPayOption,
-    isValidBulkPayOption,
     handleBulkPayItemSelected,
     isCurrencySupportWalletBulkPay,
     getExportTemplates,

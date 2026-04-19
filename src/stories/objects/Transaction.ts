@@ -54,5 +54,4 @@ const transactionWithOptionalSearchFields: TransactionWithOptionalSearchFields =
     action: CONST.SEARCH.ACTION_TYPES.VIEW,
 };
 
-export default transaction;
 export {transactionWithOptionalSearchFields};

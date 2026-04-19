@@ -258,15 +258,6 @@ function setFastPath(fastPath: FastPathType, ...optimizations: Optimization[]) {
     getSpan(CONST.TELEMETRY.SPAN_SUBMIT_TO_DESTINATION_VISIBLE)?.setAttribute(CONST.TELEMETRY.ATTRIBUTE_FAST_PATH_HANDLER, fastPath);
 }
 
-function addOptimization(...optimizations: Optimization[]) {
-    if (!trackingState) {
-        return;
-    }
-    for (const opt of optimizations) {
-        trackingState.optimizations.add(opt);
-    }
-}
-
 function cancelTracking() {
     if (!trackingState) {
         return;
@@ -286,15 +277,5 @@ function isTracking(): boolean {
     return trackingState !== null;
 }
 
-export {
-    endSubmitFollowUpActionSpan,
-    setPendingSubmitFollowUpAction,
-    getPendingSubmitFollowUpAction,
-    cancelSubmitFollowUpActionSpan,
-    startTracking,
-    setFastPath,
-    addOptimization,
-    cancelTracking,
-    isTracking,
-};
+export {endSubmitFollowUpActionSpan, setPendingSubmitFollowUpAction, getPendingSubmitFollowUpAction, cancelSubmitFollowUpActionSpan, startTracking, setFastPath, isTracking};
 export type {SubmitFollowUpAction, PendingSubmitFollowUpAction, FastPathType, Optimization, SubmitExpenseContext, StartTrackingOptions};

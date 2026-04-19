@@ -1654,7 +1654,6 @@ export {
     clearAccountMessages,
     setAccountError,
     authenticatePusher,
-    reauthenticatePusher,
     invalidateCredentials,
     invalidateAuthToken,
     expireSessionWithDelay,
@@ -1676,5 +1675,4 @@ export {
     MergeIntoAccountAndLogin,
     resetSMSDeliveryFailureStatus,
     clearDisableTwoFactorAuthErrors,
-    getShortLivedLoginParams,
 };

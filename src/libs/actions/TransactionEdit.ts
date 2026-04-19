@@ -238,7 +238,6 @@ export {
     removeBackupTransactionWithImageCleanup,
     restoreOriginalTransactionFromBackup,
     restoreOriginalTransactionFromBackupWithImageCleanup,
-    createDraftTransaction,
     removeDraftTransaction,
     removeTransactionReceipt,
     getRemoveDraftTransactionsByIDsData,
