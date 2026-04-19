@@ -823,7 +823,6 @@ export {
     isValidUSPhone,
     isValidPhoneNumber,
     isValidWebsite,
-    validateIdentity,
     isValidTwoFactorCode,
     isNumericWithSpecialChars,
     isValidRoutingNumber,

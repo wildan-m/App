@@ -466,7 +466,6 @@ export {
     getCurrentAddress,
     getFormattedAddress,
     getFormattedStreet,
-    getStreetLines,
     getEffectiveDisplayName,
     createDisplayName,
     extractFirstAndLastNameFromAvailableDetails,

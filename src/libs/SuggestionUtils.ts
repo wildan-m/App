@@ -50,4 +50,4 @@ function getSortedPersonalDetails(personalDetails: Array<PersonalDetails & {weig
     });
 }
 
-export {trimLeadingSpace, hasEnoughSpaceForLargeSuggestionMenu, getSortedPersonalDetails};
+export {trimLeadingSpace, getSortedPersonalDetails};

@@ -83,4 +83,4 @@ function getReportFieldOptionsSection({
     return reportFieldOptionsSections;
 }
 
-export {getReportFieldOptionsSection, getReportFieldOptions};
+export {getReportFieldOptionsSection};

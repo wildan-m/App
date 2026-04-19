@@ -34,4 +34,4 @@ function shouldUseOldApp(tryNewDot: TryNewDot): boolean | undefined {
     return tryNewDot.classicRedirect.dismissed;
 }
 
-export {isLockedToNewApp, isOldAppRedirectBlocked, shouldBlockOldAppExit, shouldHideOldAppRedirect, shouldUseOldApp};
+export {isOldAppRedirectBlocked, shouldBlockOldAppExit, shouldHideOldAppRedirect, shouldUseOldApp};

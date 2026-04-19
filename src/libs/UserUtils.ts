@@ -178,7 +178,6 @@ export {
     generateAccountID,
     getLoginListBrickRoadIndicator,
     getProfilePageBrickRoadIndicator,
-    getSecondaryPhoneLogin,
     hasLoginListError,
     hasLoginListInfo,
     hashText,
