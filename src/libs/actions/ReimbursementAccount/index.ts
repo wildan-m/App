@@ -8,7 +8,7 @@ import resetNonUSDBankAccount from './resetNonUSDBankAccount';
 import resetUSDBankAccount from './resetUSDBankAccount';
 
 export {goToWithdrawalAccountSetupStep, navigateToBankAccountRoute} from './navigation';
-export {setBankAccountFormValidationErrors, resetReimbursementAccount} from './errors';
+export {resetReimbursementAccount} from './errors';
 
 /**
  * Set the current sub step in first step of adding withdrawal bank account:
@@ -18,10 +18,6 @@ export {setBankAccountFormValidationErrors, resetReimbursementAccount} from './e
  */
 function setBankAccountSubStep(subStep: ReimbursementAccountSubStep | null): Promise<void | void[]> {
     return Onyx.merge(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {achData: {subStep}});
-}
-
-function setBankAccountState(state: string): Promise<void | void[]> {
-    return Onyx.merge(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {achData: {state}});
 }
 
 function hideBankAccountErrors() {
@@ -76,7 +72,6 @@ export {
     cancelResetBankAccount,
     clearReimbursementAccount,
     clearReimbursementAccountDraft,
-    setBankAccountState,
     setReimbursementAccountOptionPressed,
     updateReimbursementAccount,
 };

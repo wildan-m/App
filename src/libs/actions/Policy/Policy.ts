@@ -7041,7 +7041,6 @@ function setWorkspaceConfirmationCurrency(currency: string) {
 export {
     leaveWorkspace,
     addBillingCardAndRequestPolicyOwnerChange,
-    hasActiveChatEnabledPolicies,
     deleteWorkspace,
     updateAddress,
     updateLastAccessedWorkspace,
@@ -7049,7 +7048,6 @@ export {
     setWorkspaceDefaultSpendCategory,
     getDisplayNameForWorkspace,
     newGenerateDefaultWorkspaceName,
-    generateDefaultWorkspaceName,
     updateGeneralSettings,
     deleteWorkspaceAvatar,
     updateWorkspaceAvatar,

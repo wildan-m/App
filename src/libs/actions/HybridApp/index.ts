@@ -144,4 +144,4 @@ function resetSignInFlow() {
     });
 }
 
-export {getHybridAppSettings, setReadyToShowAuthScreens, resetSignInFlow, setUseNewDotSignInPage, setClosingReactNativeApp, closeReactNativeApp};
+export {getHybridAppSettings, setReadyToShowAuthScreens, resetSignInFlow, setUseNewDotSignInPage, closeReactNativeApp};

@@ -21,4 +21,4 @@ function resetReimbursementAccount() {
     });
 }
 
-export {setBankAccountFormValidationErrors, resetReimbursementAccount};
+export {resetReimbursementAccount};

@@ -1739,7 +1739,6 @@ export {
     canIOUBePaid,
     canSubmitReport,
     canUnapproveIOU,
-    determineIouReportID,
     getIOUReportActionWithBadge,
     getReportOriginalCreationTimestamp,
     reopenReport,

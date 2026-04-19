@@ -79,4 +79,4 @@ function navigateToQuickAction(params: NavigateToQuickActionParams) {
         default:
     }
 }
-export {navigateToQuickAction, getQuickActionRequestType};
+export {navigateToQuickAction};
