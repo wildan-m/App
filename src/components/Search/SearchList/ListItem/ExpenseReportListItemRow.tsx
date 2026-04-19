@@ -243,8 +243,15 @@ function ExpenseReportListItemRow({
             DateUtils.doesDateBelongToAPastYear(item.created ?? '') ? CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT : CONST.DATE.MONTH_DAY_ABBR_FORMAT,
         );
 
+        const amountText = isScanning ? translate('iou.receiptStatusTitle') : convertToDisplayString(totalDisplaySpend, currency);
+        const groupAccessibilityLabel = [item.reportName, amountText, formattedDate, expenseCountText].filter(Boolean).join(', ');
         return (
-            <View style={[styles.flexColumn, styles.gap1]}>
+            <View
+                style={[styles.flexColumn, styles.gap1]}
+                accessible
+                accessibilityLabel={groupAccessibilityLabel}
+                role={CONST.ROLE.BUTTON}
+            >
                 <View style={[styles.flexRow, styles.gap2]}>
                     <Text
                         numberOfLines={2}
