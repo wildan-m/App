@@ -19,9 +19,13 @@ jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
         setParams: (...args: unknown[]) => mockSetParams(...args),
-        cleanStaleBackToParam: (...args: unknown[]) => mockCleanStaleBackToParam(...args),
         isNavigationReady: () => mockIsNavigationReady(),
     },
+}));
+
+jest.mock('@src/pages/inbox/cleanStaleReportActionBackToParam', () => ({
+    __esModule: true,
+    default: (...args: unknown[]) => mockCleanStaleBackToParam(...args),
 }));
 
 const mockRouteParams: {reportID?: string; reportActionID?: string} = {

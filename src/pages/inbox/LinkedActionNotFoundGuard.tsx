@@ -17,6 +17,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {getReportActionByIDSelector} from '@src/selectors/ReportAction';
 import {isLoadingInitialReportActionsSelector} from '@src/selectors/ReportMetaData';
 import type {ReportActions} from '@src/types/onyx';
+import cleanStaleReportActionBackToParam from './cleanStaleReportActionBackToParam';
 
 type LinkedActionNotFoundGuardProps = {
     children: ReactNode;
@@ -151,7 +152,7 @@ function LinkedActionNotFoundGate({reportActionIDFromRoute, children}: LinkedAct
         // Also strip the stale reportActionID from any `backTo` params on sibling routes
         // (e.g. the IOU report screen that was navigated to FROM this deep link).
         if (reportIDFromRoute) {
-            Navigation.cleanStaleBackToParam(reportIDFromRoute, reportActionIDFromRoute);
+            cleanStaleReportActionBackToParam(reportIDFromRoute, reportActionIDFromRoute);
         }
     }, [isLinkedActionDeleted, wasEverVisible, linkedAction, isLoadingInitialReportActions, route.key, navigatorKey, reportIDFromRoute, reportActionIDFromRoute]);
 
