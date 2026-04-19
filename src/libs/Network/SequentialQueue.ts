@@ -436,10 +436,6 @@ function isPaused(): boolean {
     return isQueuePaused;
 }
 
-function getShouldFailAllRequests(): boolean {
-    return shouldFailAllRequests;
-}
-
 // Flush the queue when the persisted requests are initialized
 onPersistedRequestsInitialization(flush);
 

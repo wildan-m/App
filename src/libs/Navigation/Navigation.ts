@@ -24,7 +24,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import SCREENS, {PROTECTED_SCREENS} from '@src/SCREENS';
-import type {Account, SidePanel} from '@src/types/onyx';
+import type {SidePanel} from '@src/types/onyx';
 import getInitialSplitNavigatorState from './AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
 import originalCloseRHPFlow from './helpers/closeRHPFlow';
 import findMatchingDynamicSuffix from './helpers/dynamicRoutesUtils/findMatchingDynamicSuffix';
@@ -70,15 +70,6 @@ const SET_UP_2FA_SCREENS = new Set<string>([
 ]);
 
 const MFA_FLOW_SCREENS = new Set<string>(Object.values(SCREENS.MULTIFACTOR_AUTHENTICATION));
-
-let account: OnyxEntry<Account>;
-// We have used `connectWithoutView` here because it is not connected to any UI
-Onyx.connectWithoutView({
-    key: ONYXKEYS.ACCOUNT,
-    callback: (value) => {
-        account = value;
-    },
-});
 
 let sidePanelNVP: OnyxEntry<SidePanel>;
 // `connectWithoutView` is used here because we want to avoid unnecessary re-renders when the side panel NVP changes

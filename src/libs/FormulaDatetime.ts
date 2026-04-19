@@ -249,4 +249,4 @@ function formatDate(dateString: string | undefined, format = 'yyyy-MM-dd'): stri
     }
 }
 
-export {formatDate};
+export default formatDate;
