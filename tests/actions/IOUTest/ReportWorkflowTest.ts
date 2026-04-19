@@ -2488,80 +2488,75 @@ describe('actions/IOU/ReportWorkflow', () => {
 
     describe('getIOUReportActionWithBadge', () => {
         it('should exclude deleted actions', async () => {
-            const reportID = '1';
-            const policyID = '2';
+            const chatReportID = '1';
+            const iouReportID = '2';
+            const policyID = '3';
             const fakePolicy: Policy = {
                 ...createRandomPolicy(Number(policyID)),
+                id: policyID,
                 approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
                 type: CONST.POLICY.TYPE.TEAM,
             };
 
-            const fakeReport: Report = {
-                ...createRandomReport(Number(reportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+            };
+
+            const fakeIouReport: Report = {
+                ...createRandomReport(Number(iouReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: iouReportID,
                 type: CONST.REPORT.TYPE.EXPENSE,
                 policyID,
                 stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
                 statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
                 managerID: RORY_ACCOUNT_ID,
             };
-            const fakeTransaction1: Transaction = {
+
+            const fakeTransaction: Transaction = {
                 ...createRandomTransaction(0),
-                reportID,
-                bank: CONST.EXPENSIFY_CARD.BANK,
-                status: CONST.TRANSACTION.STATUS.PENDING,
-            };
-            const fakeTransaction2: Transaction = {
-                ...createRandomTransaction(1),
-                reportID,
-                amount: 27,
-                receipt: {
-                    source: 'test',
-                    state: CONST.IOU.RECEIPT_STATE.SCANNING,
-                },
-                merchant: CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT,
-                modifiedMerchant: undefined,
-            };
-            const fakeTransaction3: Transaction = {
-                ...createRandomTransaction(2),
-                reportID,
+                reportID: iouReportID,
                 amount: 100,
                 status: CONST.TRANSACTION.STATUS.POSTED,
+                bank: '',
             };
 
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${fakeReport.reportID}`, fakeReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction1.transactionID}`, fakeTransaction1);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction2.transactionID}`, fakeTransaction2);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction3.transactionID}`, fakeTransaction3);
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
-            await waitForBatchedUpdates();
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`, fakeIouReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction.transactionID}`, fakeTransaction);
 
             const deletedReportAction = {
                 reportActionID: '0',
                 actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
-                created: '2024-08-08 18:70:44.171',
-                childReportID: reportID,
+                created: '2024-08-08 18:00:00.000',
+                childReportID: iouReportID,
+            };
+
+            const validReportAction = {
+                reportActionID: iouReportID,
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                created: '2024-08-08 19:00:00.000',
+                childReportID: iouReportID,
+                message: [
+                    {
+                        type: 'TEXT',
+                        text: 'Hello world!',
+                    },
+                ],
             };
 
             const MOCK_REPORT_ACTIONS: ReportActions = {
                 [deletedReportAction.reportActionID]: deletedReportAction,
-                [reportID]: {
-                    reportActionID: reportID,
-                    actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
-                    created: '2024-08-08 19:70:44.171',
-                    childReportID: reportID,
-                    message: [
-                        {
-                            type: 'TEXT',
-                            text: 'Hello world!',
-                        },
-                    ],
-                },
+                [validReportAction.reportActionID]: validReportAction,
             };
 
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${fakeReport.reportID}`, MOCK_REPORT_ACTIONS);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, MOCK_REPORT_ACTIONS);
+            await waitForBatchedUpdates();
 
-            const result = getIOUReportActionWithBadge(fakeReport, fakePolicy, {}, undefined);
-            expect(result.reportAction).toMatchObject(MOCK_REPORT_ACTIONS[reportID]);
+            const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined);
+            expect(result.reportAction).toMatchObject(validReportAction);
             expect(result.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.APPROVE);
         });
 
