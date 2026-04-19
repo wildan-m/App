@@ -4304,7 +4304,7 @@ function getReasonAndReportActionThatRequiresAttention(
             reason: CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION,
             reportAction: Object.values(reportActions)
                 // eslint-disable-next-line rulesdir/prefer-locale-compare-from-context
-                .sort((a, b) => a.created.localeCompare(b.created))
+                .sort((a, b) => (!a.created || !b.created ? 0 : a.created.localeCompare(b.created)))
                 .find((action) => action.childType === CONST.REPORT.TYPE.TASK && !isTaskCompleted(action)),
         };
     }
