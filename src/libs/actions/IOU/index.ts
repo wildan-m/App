@@ -2214,7 +2214,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         personalDetails,
         betas,
     } = moneyRequestInformation;
-    const {payeeAccountID = deprecatedUserAccountID, payeeEmail = deprecatedCurrentUserEmail, participant} = participantParams;
+    const {payeeAccountID = currentUserAccountIDParam, payeeEmail = currentUserEmailParam, participant} = participantParams;
     const {policy, policyCategories, policyTagList, policyRecentlyUsedCategories, policyRecentlyUsedTags} = policyParams;
 
     const {
@@ -3225,7 +3225,7 @@ function createSplitsAndOnyxData({
                 personalDetailListAction: oneOnOnePersonalDetailListAction,
             },
             currentUserAccountIDParam: currentUserAccountID,
-            currentUserEmailParam: deprecatedCurrentUserEmail,
+            currentUserEmailParam: currentUserLogin,
             hasViolations,
             quickAction,
             personalDetails,
@@ -3439,8 +3439,8 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             moneyRequestReportID,
             participantParams: {
                 participant,
-                payeeAccountID: deprecatedUserAccountID,
-                payeeEmail: deprecatedCurrentUserEmail,
+                payeeAccountID: currentUserAccountID,
+                payeeEmail: currentUserLogin,
             },
             policyParams: {
                 policy,
