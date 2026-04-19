@@ -8,4 +8,4 @@ type AddSubscriptionPaymentCardParams = {
     currency: string;
 };
 
-export type {AddSubscriptionPaymentCardParams};
+export default AddSubscriptionPaymentCardParams;
