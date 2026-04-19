@@ -851,26 +851,30 @@ function MoneyReportHeaderContent({reportID: reportIDProp, shouldDisplayBackButt
                     personalDetails,
                     recentWaypoints,
                     targetPolicyTags,
+                    currentUserAccountID: currentUserPersonalDetails?.accountID,
+                    currentUserLogin: currentUserPersonalDetails?.email ?? '',
                 });
             }
         },
         [
-            activePolicyExpenseChat,
-            activePolicyID,
             allPolicyCategories,
-            transactionDrafts,
             defaultExpensePolicy,
-            draftTransactionIDs,
-            introSelected,
+            transactionDrafts,
             isASAPSubmitBetaEnabled,
+            introSelected,
+            activePolicyID,
             quickAction,
             policyRecentlyUsedCurrencies,
-            policy?.id,
             isSelfTourViewed,
+            policy?.id,
+            activePolicyExpenseChat,
+            draftTransactionIDs,
             betas,
             personalDetails,
             recentWaypoints,
             targetPolicyTags,
+            currentUserPersonalDetails?.accountID,
+            currentUserPersonalDetails?.email,
         ],
     );
 
@@ -1557,6 +1561,8 @@ function MoneyReportHeaderContent({reportID: reportIDProp, shouldDisplayBackButt
                         transactionViolations: allTransactionViolations,
                         translate,
                         recentWaypoints: recentWaypoints ?? [],
+                        currentUserAccountID: currentUserPersonalDetails?.accountID,
+                        currentUserLogin: currentUserPersonalDetails?.email ?? '',
                     });
                 });
             },
