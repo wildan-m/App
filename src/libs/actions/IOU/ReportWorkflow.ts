@@ -262,6 +262,38 @@ function canSubmitReport(
     );
 }
 
+function getBadgeFromIOUReport(
+    iouReport: OnyxEntry<OnyxTypes.Report>,
+    chatReport: OnyxEntry<OnyxTypes.Report>,
+    policy: OnyxEntry<OnyxTypes.Policy>,
+    reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
+    invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
+): ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined {
+    if (
+        canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
+        canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
+    ) {
+        return CONST.REPORT.ACTION_BADGE.PAY;
+    }
+    if (canApproveIOU(iouReport, policy, reportMetadata)) {
+        return CONST.REPORT.ACTION_BADGE.APPROVE;
+    }
+    const isWaitingSubmitFromCurrentUser = canSubmitAndIsAwaitingForCurrentUser(
+        iouReport,
+        chatReport,
+        policy,
+        getReportTransactions(iouReport?.reportID),
+        getAllTransactionViolations(),
+        getCurrentUserEmail(),
+        getUserAccountID(),
+        getAllReportActions(iouReport?.reportID),
+    );
+    if (isWaitingSubmitFromCurrentUser) {
+        return CONST.REPORT.ACTION_BADGE.SUBMIT;
+    }
+    return undefined;
+}
+
 function getIOUReportActionWithBadge(
     chatReport: OnyxEntry<OnyxTypes.Report>,
     policy: OnyxEntry<OnyxTypes.Policy>,
@@ -272,30 +304,7 @@ function getIOUReportActionWithBadge(
     // since expense reports don't contain REPORT_PREVIEW actions
     if (isExpenseReport(chatReport)) {
         const parentChat = getReportOrDraftReport(chatReport?.chatReportID);
-        let expenseBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
-        if (
-            canIOUBePaid(chatReport, parentChat, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
-            canIOUBePaid(chatReport, parentChat, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
-        ) {
-            expenseBadge = CONST.REPORT.ACTION_BADGE.PAY;
-        } else if (canApproveIOU(chatReport, policy, reportMetadata)) {
-            expenseBadge = CONST.REPORT.ACTION_BADGE.APPROVE;
-        } else {
-            const isWaitingSubmitFromCurrentUser = canSubmitAndIsAwaitingForCurrentUser(
-                chatReport,
-                parentChat,
-                policy,
-                getReportTransactions(chatReport?.reportID),
-                getAllTransactionViolations(),
-                getCurrentUserEmail(),
-                getUserAccountID(),
-                getAllReportActions(chatReport?.reportID),
-            );
-            if (isWaitingSubmitFromCurrentUser) {
-                expenseBadge = CONST.REPORT.ACTION_BADGE.SUBMIT;
-            }
-        }
-        return {reportAction: undefined, actionBadge: expenseBadge};
+        return {reportAction: undefined, actionBadge: getBadgeFromIOUReport(chatReport, parentChat, policy, reportMetadata, invoiceReceiverPolicy)};
     }
 
     const chatReportActions = getAllReportActionsFromIOU()?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`] ?? {};
@@ -306,30 +315,9 @@ function getIOUReportActionWithBadge(
             return false;
         }
         const iouReport = getReportOrDraftReport(action.childReportID);
-        // Show to the actual payer, or to policy admins via the pay-elsewhere path for negative expenses
-        if (
-            canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, undefined, undefined, invoiceReceiverPolicy) ||
-            canIOUBePaid(iouReport, chatReport, policy, undefined, undefined, true, undefined, invoiceReceiverPolicy)
-        ) {
-            actionBadge = CONST.REPORT.ACTION_BADGE.PAY;
-            return true;
-        }
-        if (canApproveIOU(iouReport, policy, reportMetadata)) {
-            actionBadge = CONST.REPORT.ACTION_BADGE.APPROVE;
-            return true;
-        }
-        const isWaitingSubmitFromCurrentUser = canSubmitAndIsAwaitingForCurrentUser(
-            iouReport,
-            chatReport,
-            policy,
-            getReportTransactions(iouReport?.reportID),
-            getAllTransactionViolations(),
-            getCurrentUserEmail(),
-            getUserAccountID(),
-            getAllReportActions(iouReport?.reportID),
-        );
-        if (isWaitingSubmitFromCurrentUser) {
-            actionBadge = CONST.REPORT.ACTION_BADGE.SUBMIT;
+        const badge = getBadgeFromIOUReport(iouReport, chatReport, policy, reportMetadata, invoiceReceiverPolicy);
+        if (badge) {
+            actionBadge = badge;
             return true;
         }
         return false;
