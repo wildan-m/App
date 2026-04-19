@@ -334,8 +334,8 @@ type DistanceRequestTransactionParams = BaseTransactionParams & {
 type CreateDistanceRequestInformation = {
     report: OnyxEntry<OnyxTypes.Report>;
     participants: Participant[];
-    currentUserLogin?: string;
-    currentUserAccountID?: number;
+    currentUserLogin: string;
+    currentUserAccountID: number;
     iouType?: ValueOf<typeof CONST.IOU.TYPE>;
     existingIOUReport?: OnyxEntry<OnyxTypes.Report>;
     existingTransaction?: OnyxEntry<OnyxTypes.Transaction>;
@@ -3288,8 +3288,8 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
     const {
         report,
         participants,
-        currentUserLogin = '',
-        currentUserAccountID = -1,
+        currentUserLogin,
+        currentUserAccountID,
         iouType = CONST.IOU.TYPE.SUBMIT,
         existingIOUReport,
         existingTransaction,
