@@ -301,13 +301,6 @@ function getIOUReportActionWithBadge(
     reportMetadata: OnyxEntry<OnyxTypes.ReportMetadata>,
     invoiceReceiverPolicy: OnyxEntry<OnyxTypes.Policy>,
 ): {reportAction: OnyxEntry<ReportAction>; actionBadge?: ValueOf<typeof CONST.REPORT.ACTION_BADGE>} {
-    // When the report is an expense report itself (not a workspace chat) and the user doesn't
-    // have access to the workspace chat, check it directly since expense reports don't contain
-    // REPORT_PREVIEW actions
-    if (isExpenseReport(chatReport) && chatReport?.hasParentAccess === false) {
-        return {reportAction: undefined, actionBadge: getBadgeFromIOUReport(chatReport, undefined, policy, reportMetadata, invoiceReceiverPolicy)};
-    }
-
     const chatReportActions = getAllReportActionsFromIOU()?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`] ?? {};
 
     let actionBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
