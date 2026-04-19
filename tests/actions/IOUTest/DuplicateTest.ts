@@ -200,6 +200,8 @@ describe('actions/Duplicate', () => {
                 tag: 'UpdatedProject',
                 receiptID: 123,
                 reportID,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             };
 
             // When: Call mergeDuplicates
@@ -281,6 +283,8 @@ describe('actions/Duplicate', () => {
                 tag: 'UpdatedProject',
                 receiptID: 123,
                 reportID,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             };
 
             // When: Call mergeDuplicates with empty duplicate list
@@ -332,6 +336,8 @@ describe('actions/Duplicate', () => {
                 tag: 'UpdatedProject',
                 receiptID: 123,
                 reportID,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             };
 
             // When: Call mergeDuplicates without expense report
@@ -526,6 +532,8 @@ describe('actions/Duplicate', () => {
                 tag: 'UpdatedProject',
                 receiptID: 123,
                 reportID,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             };
 
             // When: Call mergeDuplicates
@@ -626,6 +634,8 @@ describe('actions/Duplicate', () => {
                 tag: 'UpdatedProject',
                 receiptID: 123,
                 reportID,
+                currentUserLogin: RORY_EMAIL,
+                currentUserAccountID: RORY_ACCOUNT_ID,
             };
 
             // When: Call mergeDuplicates with transactionThreadReportID
