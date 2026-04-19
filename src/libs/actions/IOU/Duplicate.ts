@@ -575,6 +575,8 @@ function createExpenseByType({
     customUnitPolicyID,
     personalDetails,
     recentWaypoints,
+    currentUserLogin,
+    currentUserAccountID,
 }: {
     transactionType: string;
     params: RequestMoneyInformation;
@@ -587,12 +589,16 @@ function createExpenseByType({
     customUnitPolicyID?: string;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 }) {
     switch (transactionType) {
         case CONST.SEARCH.TRANSACTION_TYPE.DISTANCE: {
             const distanceParams: CreateDistanceRequestInformation = {
                 ...params,
                 participants,
+                currentUserLogin,
+                currentUserAccountID,
                 existingTransaction: {
                     ...(params.transactionParams ?? {}),
                     comment: {
@@ -662,6 +668,8 @@ type DuplicateExpenseTransactionParams = {
     shouldDeferAutoSubmit?: boolean;
     existingIOUReport?: OnyxEntry<OnyxTypes.Report>;
     optimisticReportPreviewActionID?: string;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function duplicateExpenseTransaction({
@@ -688,6 +696,8 @@ function duplicateExpenseTransaction({
     shouldDeferAutoSubmit = false,
     existingIOUReport,
     optimisticReportPreviewActionID: externalReportPreviewActionID,
+    currentUserAccountID,
+    currentUserLogin,
 }: DuplicateExpenseTransactionParams) {
     if (!transaction) {
         return;
@@ -788,6 +798,8 @@ function duplicateExpenseTransaction({
         customUnitPolicyID,
         personalDetails,
         recentWaypoints,
+        currentUserAccountID,
+        currentUserLogin,
     });
 }
 
@@ -810,6 +822,8 @@ type DuplicateReportParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function duplicateReport({
@@ -831,6 +845,8 @@ function duplicateReport({
     transactionViolations,
     translate,
     recentWaypoints,
+    currentUserAccountID,
+    currentUserLogin,
 }: DuplicateReportParams) {
     if (!targetPolicy || !parentChatReport) {
         return;
@@ -931,6 +947,8 @@ function duplicateReport({
             customUnitPolicyID: targetPolicy?.id,
             personalDetails,
             recentWaypoints,
+            currentUserAccountID,
+            currentUserLogin,
         });
 
         if (result?.iouReport) {
@@ -1035,6 +1053,8 @@ function bulkDuplicateExpenses({
             shouldDeferAutoSubmit: !isLastExpense,
             existingIOUReport: optimisticIOUReport,
             optimisticReportPreviewActionID: sharedReportPreviewActionID,
+            currentUserAccountID: getUserAccountID(),
+            currentUserLogin: getCurrentUserEmail(),
         });
 
         if (result?.iouReport) {
