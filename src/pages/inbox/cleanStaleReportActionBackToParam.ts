@@ -20,7 +20,7 @@ function cleanStaleReportActionBackToParam(reportID: string, reportActionID: str
 
     const staleSegment = `r/${reportID}/${reportActionID}`;
     const cleanSegment = `r/${reportID}`;
-    const stalePattern = new RegExp(staleSegment + '(?=[?/]|$)');
+    const stalePattern = new RegExp(`${staleSegment}(?=[?/]|$)`);
 
     function walk(routes: NavigationState['routes'], navigatorKey?: string) {
         for (const route of routes) {

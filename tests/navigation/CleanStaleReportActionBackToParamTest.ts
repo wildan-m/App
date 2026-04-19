@@ -105,4 +105,23 @@ describe('cleanStaleReportActionBackToParam', () => {
 
         expect(mockDispatch).toHaveBeenCalledTimes(2);
     });
+
+    it('does not match when stale segment is a prefix of a longer reportActionID', () => {
+        mockRootState = buildState([buildRoute('route-1', {backTo: '/r/111/2225'})]);
+        cleanStaleReportActionBackToParam('111', '222');
+
+        expect(mockDispatch).not.toHaveBeenCalled();
+    });
+
+    it('matches when stale segment is followed by a slash', () => {
+        mockRootState = buildState([buildRoute('route-1', {backTo: '/r/111/222/details'})]);
+        cleanStaleReportActionBackToParam('111', '222');
+
+        expect(mockDispatch).toHaveBeenCalledTimes(1);
+        expect(mockDispatch).toHaveBeenCalledWith(
+            expect.objectContaining({
+                payload: {params: {backTo: '/r/111/details'}},
+            }),
+        );
+    });
 });
