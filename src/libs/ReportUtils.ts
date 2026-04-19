@@ -4195,27 +4195,30 @@ function getLastVisibleMessage(
 }
 
 /**
- * Checks if a report is waiting for the manager to complete an action.
+ * Returns the action type for the assignee to complete, or undefined if there is no pending action.
  * Example: the assignee of an open task report or the manager of a processing expense report.
  *
  * @param [parentReportAction] - The parent report action of the report (Used to check if the task has been canceled)
  */
-function isWaitingForAssigneeToCompleteAction(report: OnyxEntry<Report>, parentReportAction: OnyxEntry<ReportAction>): boolean {
+function getActionTypeForAssigneeToComplete(
+    report: OnyxEntry<Report>,
+    parentReportAction: OnyxEntry<ReportAction>,
+): ValueOf<typeof CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE> | undefined {
     if (report?.hasOutstandingChildTask) {
-        return true;
+        return CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE.TASK;
     }
 
     if (report?.hasParentAccess === false && isReportManager(report)) {
         if (isOpenTaskReport(report, parentReportAction)) {
-            return true;
+            return CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE.TASK;
         }
 
         if (isProcessingReport(report) && isExpenseReport(report)) {
-            return true;
+            return CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE.EXPENSE;
         }
     }
 
-    return false;
+    return undefined;
 }
 
 function isUnreadWithMention(reportOrOption: OnyxEntry<Report> | OptionData): boolean {
@@ -4307,17 +4310,18 @@ function getReasonAndReportActionThatRequiresAttention(
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const invoiceReceiverPolicy = invoiceReceiverPolicyID ? getPolicy(invoiceReceiverPolicyID) : undefined;
     const {reportAction: iouReportActionToApproveOrPay, actionBadge} = getIOUReportActionWithBadge(optionOrReport, policy, optionReportMetadata, invoiceReceiverPolicy);
-    const isExpenseReportOption = isExpenseReport(optionOrReport);
+    const actionTypeForAssigneeToComplete = getActionTypeForAssigneeToComplete(optionOrReport, parentReportAction);
+    const isAssigneeExpenseAction = actionTypeForAssigneeToComplete === CONST.REPORT.ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE.EXPENSE;
 
-    if (isWaitingForAssigneeToCompleteAction(optionOrReport, parentReportAction)) {
+    if (actionTypeForAssigneeToComplete) {
         return {
             reason: CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION,
             reportAction: Object.values(reportActions).find((action) => action.childType === CONST.REPORT.TYPE.TASK),
-            ...(isExpenseReportOption && actionBadge ? {actionBadge} : {}),
+            ...(isAssigneeExpenseAction && actionBadge ? {actionBadge} : {}),
         };
     }
 
-    const iouReportID = isExpenseReportOption ? optionOrReport.reportID : getIOUReportIDFromReportActionPreview(iouReportActionToApproveOrPay);
+    const iouReportID = getIOUReportIDFromReportActionPreview(iouReportActionToApproveOrPay);
     const transactions = getReportTransactions(iouReportID);
     const hasOnlyPendingTransactions = transactions.length > 0 && transactions.every((t) => isExpensifyCardTransaction(t) && isPending(t));
 
@@ -13752,7 +13756,7 @@ export {
     isUserCreatedPolicyRoom,
     isValidReport,
     isValidReportIDFromPath,
-    isWaitingForAssigneeToCompleteAction,
+    getActionTypeForAssigneeToComplete,
     isWaitingForSubmissionFromCurrentUser,
     isWorkspaceMemberLeavingWorkspaceRoom,
     isInvoiceRoom,

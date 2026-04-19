@@ -1408,6 +1408,10 @@ const CONST = {
             PAY: 'pay',
             FIX: 'fix',
         },
+        ACTION_TYPES_FOR_ASSIGNEE_TO_COMPLETE: {
+            EXPENSE: 'expense',
+            TASK: 'task',
+        },
         ACTIONS: {
             LIMIT: 50,
             // OldDot Actions render getMessage from Web-Expensify/lib/Report/Action PHP files via getMessageOfOldDotReportAction in ReportActionsUtils.ts
