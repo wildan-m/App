@@ -1285,14 +1285,6 @@ function getReportOrDraftReport(
     return searchReport ?? onyxReport ?? (reportDrafts ?? allReportsDraft)?.[`${ONYXKEYS.COLLECTION.REPORT_DRAFT}${reportID}`] ?? fallbackReport;
 }
 
-function reportTransactionsSelector(transactions: OnyxCollection<Transaction>, reportID: string | undefined): Transaction[] {
-    if (!transactions || !reportID) {
-        return [];
-    }
-
-    return Object.values(transactions).filter((transaction): transaction is Transaction => !!transaction && transaction.reportID === reportID);
-}
-
 /**
  * This function is being migrated to remove `deprecatedReportsTransactions`.
  * If you need to use this function, you must explicitly pass the `allReportsTransactions` parameter
@@ -1732,13 +1724,6 @@ function isCurrentUserInvoiceReceiver(report: OnyxEntry<Report>): boolean {
 }
 
 /**
- * Whether the provided report belongs to a Control policy and is an expense chat
- */
-function isControlPolicyExpenseChat(report: OnyxEntry<Report>): boolean {
-    return isPolicyExpenseChat(report) && getPolicyType(report, allPolicies) === CONST.POLICY.TYPE.CORPORATE;
-}
-
-/**
  * Whether the provided policyType is a Free, Collect or Control policy type
  */
 function isGroupPolicy(policyType: string): boolean {
@@ -1759,20 +1744,6 @@ function isReportInGroupPolicy(report: OnyxInputOrEntry<Report>, policy?: OnyxIn
 function isPaidGroupPolicy(report: OnyxEntry<Report>): boolean {
     const policyType = getPolicyType(report, allPolicies);
     return policyType === CONST.POLICY.TYPE.CORPORATE || policyType === CONST.POLICY.TYPE.TEAM;
-}
-
-/**
- * Whether the provided report belongs to a Control or Collect policy and is an expense chat
- */
-function isPaidGroupPolicyExpenseChat(report: OnyxEntry<Report>): boolean {
-    return isPolicyExpenseChat(report) && isPaidGroupPolicy(report);
-}
-
-/**
- * Whether the provided report belongs to a Control policy and is an expense report
- */
-function isControlPolicyExpenseReport(report: OnyxEntry<Report>): boolean {
-    return isExpenseReport(report) && getPolicyType(report, allPolicies) === CONST.POLICY.TYPE.CORPORATE;
 }
 
 /**
@@ -2397,16 +2368,6 @@ function getHarvestOriginalReportID(origin?: string, originalID?: string): strin
 }
 
 /**
- * Whether the report with the provided reportID is an archived non-expense report
- */
-function isArchivedNonExpenseReportWithID(report?: OnyxInputOrEntry<Report>, isReportArchived = false) {
-    if (!report) {
-        return false;
-    }
-    return !(isExpenseReport(report) || isExpenseRequest(report)) && isReportArchived;
-}
-
-/**
  * Whether the provided report is a closed report
  */
 function isClosedReport(report: OnyxInputOrEntry<Report>): boolean {
@@ -2490,19 +2451,6 @@ function isAllowedToComment(report: OnyxEntry<Report>): boolean {
 }
 
 /**
- * Checks if the current user is the admin of the policy given the policy expense chat.
- */
-function isPolicyExpenseChatAdmin(report: OnyxEntry<Report>, policies: OnyxCollection<Policy>): boolean {
-    if (!isPolicyExpenseChat(report)) {
-        return false;
-    }
-
-    const policyRole = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`]?.role;
-
-    return policyRole === CONST.POLICY.ROLE.ADMIN;
-}
-
-/**
  * Checks if the current user is the admin of the policy.
  */
 function isPolicyAdmin(policy: OnyxEntry<Policy>): boolean {
@@ -2535,13 +2483,6 @@ function hasOnlyTransactionsWithPendingRoutes(iouReportID: string | undefined): 
 function isWorkspaceThread(report: OnyxEntry<Report>): boolean {
     const chatType = getChatType(report);
     return isThread(report) && isChatReport(report) && CONST.WORKSPACE_ROOM_TYPES.some((type) => chatType === type);
-}
-
-/**
- * Checks if a report is a child report.
- */
-function isChildReport(report: OnyxEntry<Report>): boolean {
-    return isThread(report) || isTaskReport(report);
 }
 
 /**
@@ -3565,15 +3506,6 @@ function buildParticipantsFromAccountIDs(accountIDs: number[]): Participants {
         participants[accountID] = {notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS};
         return participants;
     }, finalParticipants);
-}
-
-function getParticipants(reportID: string) {
-    const report = getReportOrDraftReport(reportID);
-    if (!report) {
-        return {};
-    }
-
-    return report.participants;
 }
 
 function getParticipantIcon(accountID: number | undefined, personalDetails: OnyxInputOrEntry<PersonalDetailsList>, shouldUseShortForm = false): Icon {
@@ -9320,14 +9252,6 @@ function hasReceiptError(transaction: OnyxInputOrEntry<Transaction>): boolean {
 }
 
 /**
- * Checks to see if a report contains receipt error
- */
-function hasReceiptErrors(reportID: string | undefined): boolean {
-    const transactions = getReportTransactions(reportID);
-    return transactions.some(hasReceiptError);
-}
-
-/**
  * Checks to see if a report contains a violation of type `notice`
  */
 function hasNoticeTypeViolations(
@@ -10239,13 +10163,6 @@ function shouldReportShowSubscript(report: OnyxEntry<Report>, isReportArchived =
     }
 
     return false;
-}
-
-/**
- * Return true if reports data exists
- */
-function isReportDataReady(): boolean {
-    return !isEmptyObject(deprecatedAllReports) && Object.keys(deprecatedAllReports ?? {}).some((key) => deprecatedAllReports?.[key]?.reportID);
 }
 
 /**
@@ -11186,15 +11103,6 @@ function isAllowedToApproveExpenseReport(report: OnyxEntry<Report>, approverAcco
     const policy = reportPolicy ?? getPolicy(report?.policyID);
     const isOwner = (approverAccountID ?? deprecatedCurrentUserAccountID) === report?.ownerAccountID;
     return !(policy?.preventSelfApproval && isOwner);
-}
-
-function isAllowedToSubmitDraftExpenseReport(report: OnyxEntry<Report>): boolean {
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    const policy = getPolicy(report?.policyID);
-    const submitToAccountID = getSubmitToAccountID(policy, report);
-
-    return isAllowedToApproveExpenseReport(report, submitToAccountID);
 }
 
 /**
@@ -13325,53 +13233,6 @@ function isWorkspaceMemberLeavingWorkspaceRoom(report: OnyxEntry<Report>, isPoli
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const hasAccessPolicyExpenseChat = isPolicyExpenseChat(report) && (report.isOwnPolicyExpenseChat || isPolicyAdminParam);
     return (report.visibility === CONST.REPORT.VISIBILITY.RESTRICTED || hasAccessPolicyExpenseChat) && isPolicyEmployee;
-}
-
-/**
- * Checks if all selected items have the necessary Onyx data hydrated for bulk rejection.
- */
-function checkBulkRejectHydration(
-    selectedTransactions: Record<string, {reportID: string; policyID?: string}>,
-    policies: Record<string, unknown> | null | undefined,
-): {areHydrated: boolean; missingReportIDs: string[]; missingPolicyIDs: string[]} {
-    const transactionIDs = Object.keys(selectedTransactions);
-    const missingReportIDs: string[] = [];
-    const missingPolicyIDs: string[] = [];
-
-    for (const transactionID of transactionIDs) {
-        const transaction = selectedTransactions[transactionID];
-        const reportID = transaction?.reportID;
-
-        // Check if we have the report data
-        const report = getReportOrDraftReport(reportID);
-        if (!report) {
-            missingReportIDs.push(reportID);
-            continue;
-        }
-
-        const effectivePolicyID = transaction?.policyID ?? report.policyID;
-
-        // Check if we have the policy data (required for canRejectReportAction check)
-        if (effectivePolicyID) {
-            const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${effectivePolicyID}`];
-            if (!policy) {
-                missingPolicyIDs.push(effectivePolicyID);
-                continue;
-            }
-        }
-
-        // Check if essential report fields are present
-        if (report.managerID == null || report.stateNum == null || report.statusNum == null) {
-            missingReportIDs.push(reportID);
-            continue;
-        }
-    }
-
-    return {
-        areHydrated: missingReportIDs.length === 0 && missingPolicyIDs.length === 0,
-        missingReportIDs: [...new Set(missingReportIDs)],
-        missingPolicyIDs: [...new Set(missingPolicyIDs)],
-    };
 }
 
 function shouldHideSingleReportField(reportField: PolicyReportField) {

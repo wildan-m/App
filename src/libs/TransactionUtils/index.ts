@@ -39,9 +39,7 @@ import {
     isInvoiceReport,
     isOpenExpenseReport,
     isProcessingReport,
-    isReportApproved,
     isReportIDApproved,
-    isReportManuallyReimbursed,
     isSettled,
     isThread,
 } from '@libs/ReportUtils';
@@ -375,15 +373,6 @@ function getExpenseTypeTranslationKey(expenseType: ValueOf<typeof CONST.SEARCH.T
         case CONST.SEARCH.TRANSACTION_TYPE.TIME:
             return 'iou.time';
     }
-}
-
-function isManualRequest(transaction: Transaction): boolean {
-    // This is used during the expense creation flow before the transaction has been saved to the server
-    if (transaction && Object.hasOwn(transaction, 'iouRequestType')) {
-        return transaction.iouRequestType === CONST.IOU.REQUEST_TYPE.MANUAL;
-    }
-
-    return getRequestType(transaction) === CONST.IOU.REQUEST_TYPE.MANUAL;
 }
 
 function isPartialTransaction(transaction: OnyxEntry<Transaction>): boolean {
@@ -1407,16 +1396,6 @@ function isPending(transaction: OnyxEntry<Transaction>): boolean {
 }
 
 /**
- * Check if the transaction status is set to Posted.
- */
-function isPosted(transaction: Transaction): boolean {
-    if (!transaction.status) {
-        return false;
-    }
-    return transaction.status === CONST.TRANSACTION.STATUS.POSTED;
-}
-
-/**
  * The transaction is considered scanning if it is a partial transaction, has a receipt, and the receipt is being scanned.
  * Note that this does not include receipts that are being scanned in the background for auditing / smart scan everything, because there should be no indication to the user that the receipt is being scanned.
  */
@@ -1735,13 +1714,6 @@ function allHavePendingRTERViolation(
         return hasPendingRTERViolation(filteredTransactionViolations);
     });
     return transactionsWithRTERViolations.length > 0 && transactionsWithRTERViolations.every((value) => value === true);
-}
-
-function checkIfShouldShowMarkAsCashButton(hasRTERPendingViolation: boolean, shouldDisplayBrokenConnectionViolation: boolean, report: OnyxEntry<Report>, policy: OnyxEntry<Policy>) {
-    if (hasRTERPendingViolation) {
-        return true;
-    }
-    return shouldDisplayBrokenConnectionViolation && (!isPolicyAdmin(policy) || isCurrentUserSubmitter(report)) && !isReportApproved({report}) && !isReportManuallyReimbursed(report);
 }
 
 /**

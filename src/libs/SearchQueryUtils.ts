@@ -34,7 +34,6 @@ import FILTER_KEYS, {ALLOWED_TYPE_FILTERS, AMOUNT_FILTER_KEYS, DATE_FILTER_KEYS}
 import type {ExpenseTypeValue, ExpenseTypeValues, HasFilterValue, HasFilterValues, IsFilterValue, IsFilterValues, SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
-import arraysEqual from '@src/utils/arraysEqual';
 import {getCardFeedsForDisplay} from './CardFeedUtils';
 import {getCardDescription} from './CardUtils';
 import {convertToBackendAmount, convertToFrontendAmountAsInteger} from './CurrencyUtils';
@@ -1698,20 +1697,6 @@ function buildCannedSearchQuery({
     // Parse the query to fill all default query fields with values
     const normalizedQueryJSON = buildSearchQueryJSON(queryString);
     return buildSearchQueryString(normalizedQueryJSON);
-}
-
-/**
- * Returns whether a given search query is a Canned query.
- *
- * Canned queries are simple predefined queries, that are defined only using type and status and no additional filters.
- * In addition, they can contain an optional policyID.
- * For example: "type:trip" is a canned query.
- */
-function isCannedSearchQuery(queryJSON: SearchQueryJSON) {
-    const selectedColumns = [queryJSON.columns ?? []].flat();
-    const defaultColumns = Object.values(CONST.SEARCH.TYPE_DEFAULT_COLUMNS.EXPENSE_REPORT);
-    const hasCustomColumns = !arraysEqual(defaultColumns, selectedColumns) && selectedColumns.length > 0;
-    return !queryJSON.filters && !queryJSON.policyID && !queryJSON.status && !queryJSON.groupBy && !hasCustomColumns;
 }
 
 function isDefaultExpensesQuery(queryJSON: SearchQueryJSON) {

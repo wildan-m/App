@@ -38,8 +38,6 @@ import type {
     PolicyConnectionSyncProgress,
     PolicyFeatureName,
     Rate,
-    SageIntacctDataElement,
-    SageIntacctDataElementWithValue,
     Tenant,
 } from '@src/types/onyx/Policy';
 import type PolicyEmployee from '@src/types/onyx/PolicyEmployee';
@@ -1007,14 +1005,6 @@ function hasAccountingFeatureConnection(policy: OnyxEntry<Policy>) {
     return hasAccountingConnections(policy) || hasUnsupportedIntegration(policy);
 }
 
-function getPolicyEmployeeListByIdWithoutCurrentUser(policies: OnyxCollection<Pick<Policy, 'employeeList'>>, currentPolicyID?: string, currentUserAccountID?: number) {
-    const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${currentPolicyID}`] ?? null;
-    const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList);
-    return Object.values(policyMemberEmailsToAccountIDs)
-        .map((policyMemberAccountID) => Number(policyMemberAccountID))
-        .filter((policyMemberAccountID) => policyMemberAccountID !== currentUserAccountID);
-}
-
 function getPolicyEmployeeAccountIDs(policy: OnyxEntry<Pick<Policy, 'employeeList'>>, currentUserAccountID?: number) {
     if (!policy) {
         return [];
@@ -1402,11 +1392,6 @@ function settingsPendingAction(settings?: string[], pendingFields?: PendingField
 
 function findSelectedVendorWithDefaultSelect(vendors: NetSuiteVendor[] | undefined, selectedVendorId: string | undefined) {
     const selectedVendor = (vendors ?? []).find(({id}) => id === selectedVendorId);
-    return selectedVendor ?? vendors?.[0] ?? undefined;
-}
-
-function findSelectedSageVendorWithDefaultSelect(vendors: SageIntacctDataElementWithValue[] | SageIntacctDataElement[] | undefined, selectedVendorID: string | undefined) {
-    const selectedVendor = (vendors ?? []).find(({id}) => id === selectedVendorID);
     return selectedVendor ?? vendors?.[0] ?? undefined;
 }
 
@@ -2075,17 +2060,6 @@ function isCurrentUserMemberOfAnyPolicy(): boolean {
 }
 
 /**
- * Whether the given policy member is an admin of the given policy
- */
-function isMemberPolicyAdmin(policy: OnyxEntry<Policy>, memberEmail: string | undefined): boolean {
-    if (!policy || !memberEmail) {
-        return false;
-    }
-    const admins = getAdminEmployees(policy);
-    return admins.some((admin) => admin.email === memberEmail);
-}
-
-/**
  * Determines which travel step should be shown based on policy state
  */
 function getTravelStep(
@@ -2324,6 +2298,8 @@ export {
     isPolicyTaxEnabled,
     sortPoliciesByName,
     isPolicyApprover,
+    getHRConnectionNames,
+    isGustoConnected,
 };
 
 export type {MemberEmailsToAccountIDs};
