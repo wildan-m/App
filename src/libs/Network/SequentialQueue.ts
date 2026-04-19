@@ -595,11 +595,9 @@ function resetQueue(): void {
 export {
     flush,
     getCurrentRequest,
-    getShouldFailAllRequests,
     isPaused,
     isRunning,
     pause,
-    process,
     push,
     resetQueue,
     sequentialQueueRequestThrottle,

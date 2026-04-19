@@ -686,7 +686,6 @@ export {
     DERIVED_MERGE_FIELDS,
     getRateFromMerchant,
     getTransactionsAndReportsFromSearch,
-    MERGE_FIELDS,
 };
 
 export type {MergeFieldKey, MergeFieldData, MergeTransactionUpdateValues};

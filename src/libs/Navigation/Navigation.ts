@@ -98,10 +98,6 @@ function isMFAFlowScreen(screen: string | undefined): boolean {
     return screen ? MFA_FLOW_SCREENS.has(screen) : false;
 }
 
-function shouldShowRequire2FAPage() {
-    return !!account?.needsTwoFactorAuthSetup && !account?.requiresTwoFactorAuth;
-}
-
 let resolveNavigationIsReadyPromise: () => void;
 const navigationIsReadyPromise = new Promise<void>((resolve) => {
     resolveNavigationIsReadyPromise = resolve;
@@ -1180,4 +1176,4 @@ export default {
     navigateBackToLastSuperWideRHPScreen,
 };
 
-export {navigationRef, getDeepestFocusedScreen, isTwoFactorSetupScreen, isMFAFlowScreen, shouldShowRequire2FAPage};
+export {navigationRef, getDeepestFocusedScreen, isTwoFactorSetupScreen, isMFAFlowScreen};
