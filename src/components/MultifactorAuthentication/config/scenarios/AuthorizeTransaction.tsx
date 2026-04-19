@@ -112,15 +112,7 @@ const AlreadyReviewedFailureScreen = createScreenWithDefaults(
     'AlreadyReviewedFailureScreen',
 );
 
-export {
-    ApprovedTransactionSuccessScreen,
-    ApproveTransactionClientFailureScreen,
-    ApproveTransactionServerFailureScreen,
-    DeniedTransactionSuccessScreen,
-    DeniedTransactionClientFailureScreen,
-    DeniedTransactionServerFailureScreen,
-    AlreadyReviewedFailureScreen,
-};
+export {DeniedTransactionSuccessScreen, DeniedTransactionServerFailureScreen, AlreadyReviewedFailureScreen};
 
 export default {
     // Allowed methods are hardcoded here; keep in sync with allowedAuthenticationMethods in useNavigateTo3DSAuthorizationChallenge.
