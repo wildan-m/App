@@ -1814,7 +1814,6 @@ export {
     hasPendingExpensifyCardAction,
     isExpensifyCardPendingAction,
     getFundIdFromSettingsKey,
-    isCardPendingReplace,
     getCardsByCardholderName,
     filterCardsByPersonalDetails,
     getCompanyCardDescription,

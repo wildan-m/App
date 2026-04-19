@@ -2,4 +2,4 @@ type ResetBankAccountSetupParams = {
     policyID: string | undefined;
 };
 
-export default ResetBankAccountSetupParams;
+export type {ResetBankAccountSetupParams};
