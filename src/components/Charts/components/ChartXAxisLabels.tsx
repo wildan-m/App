@@ -1,6 +1,6 @@
 import {Group, Paragraph, vec} from '@shopify/react-native-skia';
 import type {SkTypefaceFontProvider} from '@shopify/react-native-skia';
-import React, {useMemo} from 'react';
+import React from 'react';
 import {AXIS_LABEL_GAP, GLYPH_PADDING, MAX_X_AXIS_LABEL_WIDTH} from '@components/Charts/constants';
 import useChartParagraphs from '@components/Charts/hooks/useChartParagraphs';
 import type {LabelRotation} from '@components/Charts/types';
@@ -68,7 +68,7 @@ function ChartXAxisLabels({
     centerRotatedLabels = false,
 }: ChartXAxisLabelsProps) {
     const angleRad = (Math.abs(labelRotation) * Math.PI) / 180;
-    const truncatedLabels = useMemo(() => {
+    const truncatedLabels = (() => {
         const lastIndex = labels.length - 1;
         return labels.map((label, i) => {
             let maxWidth = regularLabelMaxWidth;
@@ -79,14 +79,14 @@ function ChartXAxisLabels({
             }
             return truncateLabel(label, labelWidths.at(i) ?? 0, maxWidth, ellipsisWidth);
         });
-    }, [labels, labelWidths, regularLabelMaxWidth, firstLabelMaxWidth, lastLabelMaxWidth, ellipsisWidth]);
+        })();
 
     const paragraphs = useChartParagraphs(truncatedLabels, fontMgr, fontSize, labelColor, MAX_X_AXIS_LABEL_WIDTH);
 
     const renderedWidths = truncatedLabels.map((_, i) => paragraphs?.at(i)?.width ?? 0);
 
     // Derive ascent/descent from the first available paragraph's line metrics.
-    const {ascent, descent} = useMemo(() => getFontLineMetrics(fontMgr, fontSize), [fontMgr, fontSize]);
+    const {ascent, descent} = getFontLineMetrics(fontMgr, fontSize);
 
     const correction = rotatedLabelCenterCorrection(ascent, descent, angleRad);
     const centeredUpwardOffset = centerRotatedLabels && angleRad > 0 ? (Math.max(...renderedWidths) / 2) * Math.sin(angleRad) : 0;

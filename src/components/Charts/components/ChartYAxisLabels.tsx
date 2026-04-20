@@ -1,6 +1,6 @@
 import {Paragraph} from '@shopify/react-native-skia';
 import type {SkTypefaceFontProvider} from '@shopify/react-native-skia';
-import React, {useMemo} from 'react';
+import React from 'react';
 import type {ChartBounds, Scale} from 'victory-native';
 import {AXIS_LABEL_GAP, GLYPH_PADDING, MAX_Y_AXIS_LABEL_WIDTH} from '@components/Charts/constants';
 import useChartParagraphs from '@components/Charts/hooks/useChartParagraphs';
@@ -33,12 +33,12 @@ type ChartYAxisLabelsProps = {
 };
 
 function ChartYAxisLabels({yTicks, yScale, chartBounds, fontSize, fontMgr, labelColor, formatValue, leftAlign = false}: ChartYAxisLabelsProps) {
-    const formattedLabels = useMemo(() => yTicks.map((tick) => formatValue(tick)), [yTicks, formatValue]);
+    const formattedLabels = yTicks.map((tick) => formatValue(tick));
 
     const paragraphs = useChartParagraphs(formattedLabels, fontMgr, fontSize, labelColor, MAX_Y_AXIS_LABEL_WIDTH);
     const maxWidth = Math.max(0, ...paragraphs.map((item) => item.width));
 
-    const {ascent, descent} = useMemo(() => getFontLineMetrics(fontMgr, fontSize), [fontMgr, fontSize]);
+    const {ascent, descent} = getFontLineMetrics(fontMgr, fontSize);
     const lineHeight = ascent + descent;
 
     return yTicks.map((tick, i) => {

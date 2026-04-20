@@ -1,4 +1,4 @@
-import {useCallback, useMemo} from 'react';
+import {useCallback} from 'react';
 import {Gesture} from 'react-native-gesture-handler';
 import type {SharedValue} from 'react-native-reanimated';
 import {useDerivedValue, useSharedValue} from 'react-native-reanimated';
@@ -178,15 +178,35 @@ function useChartInteractions({handlePress, checkIsOver, isCursorOverLabel, reso
      * customGestures prop, because Victory's internal GestureHandler view only covers
      * the plot area and would drop events from the label area.
      */
-    const hoverGesture = useMemo(
-        () =>
-            Gesture.Hover()
-                .onBegin((e) => {
-                    'worklet';
+    const hoverGesture = () =>
+        Gesture.Hover()
+            .onBegin((e) => {
+                'worklet';
 
-                    chartInteractionState.isActive.set(true);
-                    chartInteractionState.cursor.x.set(e.x);
-                    chartInteractionState.cursor.y.set(e.y);
+                chartInteractionState.isActive.set(true);
+                chartInteractionState.cursor.x.set(e.x);
+                chartInteractionState.cursor.y.set(e.y);
+                const bottom = chartBottom?.get() ?? e.y;
+                const touchX = e.y >= bottom && resolveLabelTouchX ? resolveLabelTouchX(e.x, e.y) : e.x;
+                const ox = pointOX.get();
+                const oy = pointOY.get();
+                const idx = findClosestPoint(ox, touchX);
+                if (idx >= 0) {
+                    chartInteractionState.matchedIndex.set(idx);
+                    chartInteractionState.x.position.set(ox.at(idx) ?? 0);
+                    chartInteractionState.x.value.set(idx);
+                    chartInteractionState.y.y.position.set(oy.at(idx) ?? 0);
+                }
+            })
+            .onUpdate((e) => {
+                'worklet';
+
+                chartInteractionState.cursor.x.set(e.x);
+                chartInteractionState.cursor.y.set(e.y);
+                // Only update the matched index when the cursor is not over the current target.
+                // This keeps the active index locked while hovering over a bar/point/label,
+                // preventing it from jumping to a different point during continuous movement.
+                if (!isCursorOverTarget.get()) {
                     const bottom = chartBottom?.get() ?? e.y;
                     const touchX = e.y >= bottom && resolveLabelTouchX ? resolveLabelTouchX(e.x, e.y) : e.x;
                     const ox = pointOX.get();
@@ -198,75 +218,49 @@ function useChartInteractions({handlePress, checkIsOver, isCursorOverLabel, reso
                         chartInteractionState.x.value.set(idx);
                         chartInteractionState.y.y.position.set(oy.at(idx) ?? 0);
                     }
-                })
-                .onUpdate((e) => {
-                    'worklet';
+                }
+            })
+            .onEnd(() => {
+                'worklet';
 
-                    chartInteractionState.cursor.x.set(e.x);
-                    chartInteractionState.cursor.y.set(e.y);
-                    // Only update the matched index when the cursor is not over the current target.
-                    // This keeps the active index locked while hovering over a bar/point/label,
-                    // preventing it from jumping to a different point during continuous movement.
-                    if (!isCursorOverTarget.get()) {
-                        const bottom = chartBottom?.get() ?? e.y;
-                        const touchX = e.y >= bottom && resolveLabelTouchX ? resolveLabelTouchX(e.x, e.y) : e.x;
-                        const ox = pointOX.get();
-                        const oy = pointOY.get();
-                        const idx = findClosestPoint(ox, touchX);
-                        if (idx >= 0) {
-                            chartInteractionState.matchedIndex.set(idx);
-                            chartInteractionState.x.position.set(ox.at(idx) ?? 0);
-                            chartInteractionState.x.value.set(idx);
-                            chartInteractionState.y.y.position.set(oy.at(idx) ?? 0);
-                        }
-                    }
-                })
-                .onEnd(() => {
-                    'worklet';
-
-                    chartInteractionState.isActive.set(false);
-                }),
-        [chartInteractionState, chartBottom, isCursorOverTarget, resolveLabelTouchX, pointOX, pointOY],
-    );
+                chartInteractionState.isActive.set(false);
+            });
 
     /**
      * Tap gesture. Resolves the nearest data point entirely on the UI thread,
      * then schedules handlePress on the JS thread if the cursor is over the target.
      */
-    const tapGesture = useMemo(
-        () =>
-            Gesture.Tap().onEnd((e) => {
-                'worklet';
+    const tapGesture = () =>
+        Gesture.Tap().onEnd((e) => {
+            'worklet';
 
-                chartInteractionState.cursor.x.set(e.x);
-                chartInteractionState.cursor.y.set(e.y);
-                const ox = pointOX.get();
-                const oy = pointOY.get();
-                const idx = findClosestPoint(ox, e.x);
-                if (idx < 0) {
-                    return;
-                }
-                const targetX = ox.at(idx) ?? 0;
-                const targetY = oy.at(idx) ?? 0;
-                chartInteractionState.matchedIndex.set(idx);
-                chartInteractionState.x.position.set(targetX);
-                chartInteractionState.x.value.set(idx);
-                chartInteractionState.y.y.position.set(targetY);
-                const currentChartBottom = chartBottom?.get() ?? 0;
-                if (
-                    checkIsOver({
-                        cursorX: e.x,
-                        cursorY: e.y,
-                        targetX,
-                        targetY,
-                        chartBottom: currentChartBottom,
-                    })
-                ) {
-                    scheduleOnRN(handlePress, idx);
-                }
-            }),
-        [chartInteractionState, pointOX, pointOY, chartBottom, checkIsOver, handlePress],
-    );
+            chartInteractionState.cursor.x.set(e.x);
+            chartInteractionState.cursor.y.set(e.y);
+            const ox = pointOX.get();
+            const oy = pointOY.get();
+            const idx = findClosestPoint(ox, e.x);
+            if (idx < 0) {
+                return;
+            }
+            const targetX = ox.at(idx) ?? 0;
+            const targetY = oy.at(idx) ?? 0;
+            chartInteractionState.matchedIndex.set(idx);
+            chartInteractionState.x.position.set(targetX);
+            chartInteractionState.x.value.set(idx);
+            chartInteractionState.y.y.position.set(targetY);
+            const currentChartBottom = chartBottom?.get() ?? 0;
+            if (
+                checkIsOver({
+                    cursorX: e.x,
+                    cursorY: e.y,
+                    targetX,
+                    targetY,
+                    chartBottom: currentChartBottom,
+                })
+            ) {
+                scheduleOnRN(handlePress, idx);
+            }
+        });
 
     /**
      * Raw tooltip positioning data.
@@ -285,7 +279,7 @@ function useChartInteractions({handlePress, checkIsOver, isCursorOverLabel, reso
         };
     });
 
-    const customGestures = useMemo(() => Gesture.Race(hoverGesture, tapGesture), [hoverGesture, tapGesture]);
+    const customGestures = Gesture.Race(hoverGesture(), tapGesture());
 
     return {
         /** Custom gestures to be passed to CartesianChart */
