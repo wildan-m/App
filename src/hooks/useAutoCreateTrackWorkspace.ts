@@ -13,6 +13,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {lastWorkspaceNumberSelector} from '@src/selectors/Policy';
 import type {OnboardingPurpose, OnboardingRHPVariant, Policy} from '@src/types/onyx';
+import useAllPolicyExpenseChatReportActions from './useAllPolicyExpenseChatReportActions';
 import useArchivedReportsIdSet from './useArchivedReportsIdSet';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from './useHasActiveAdminPolicies';
@@ -57,6 +58,7 @@ function useAutoCreateTrackWorkspace() {
     const {translate, formatPhoneNumber} = useLocalize();
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
+    const filteredReportActions = useAllPolicyExpenseChatReportActions();
     const {onboardingMessages} = useOnboardingMessages();
 
     // We use isSmallScreenWidth instead of shouldUseNarrowLayout because navigateAfterOnboarding
@@ -92,6 +94,7 @@ function useAutoCreateTrackWorkspace() {
                       betas,
                       isSelfTourViewed,
                       hasActiveAdminPolicies,
+                      reportActionsList: filteredReportActions,
                   })
                 : {adminsChatReportID: onboardingAdminsChatReportID, policyID: onboardingPolicyID};
 

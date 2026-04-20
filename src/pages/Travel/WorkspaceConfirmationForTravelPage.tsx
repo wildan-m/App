@@ -4,6 +4,7 @@ import React from 'react';
 import ScreenWrapper from '@components/ScreenWrapper';
 import WorkspaceConfirmationForm from '@components/WorkspaceConfirmationForm';
 import type {WorkspaceConfirmationSubmitFunctionParams} from '@components/WorkspaceConfirmationForm';
+import useAllPolicyExpenseChatReportActions from '@hooks/useAllPolicyExpenseChatReportActions';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from '@hooks/useHasActiveAdminPolicies';
 import useOnyx from '@hooks/useOnyx';
@@ -24,6 +25,7 @@ function WorkspaceConfirmationForTravelPage({route}: WorkspaceConfirmationForTra
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
+    const filteredReportActions = useAllPolicyExpenseChatReportActions();
 
     const goBack = () => {
         Navigation.goBack(route.params?.backTo ?? ROUTES.TRAVEL_UPGRADE.route);
@@ -54,6 +56,7 @@ function WorkspaceConfirmationForTravelPage({route}: WorkspaceConfirmationForTra
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
+            reportActionsList: filteredReportActions,
         });
         goBack();
     };

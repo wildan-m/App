@@ -1155,6 +1155,45 @@ describe('actions/Policy', () => {
 
             expect(GoogleTagManager.publishEvent).not.toHaveBeenCalled();
         });
+
+        it('should pass reportActionsList through to createPolicyExpenseChats when adminParticipant is provided', async () => {
+            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
+            await waitForBatchedUpdates();
+
+            const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
+
+            const policyID = Policy.generatePolicyID();
+            const adminLogin = 'admin@test.com';
+
+            Policy.createWorkspace({
+                policyOwnerEmail: ESH_EMAIL,
+                makeMeAdmin: true,
+                policyName: WORKSPACE_NAME,
+                policyID,
+                introSelected: {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM},
+                currentUserAccountIDParam: ESH_ACCOUNT_ID,
+                currentUserEmailParam: ESH_EMAIL,
+                adminParticipant: {accountID: 100, login: adminLogin},
+                isSelfTourViewed: false,
+                betas: [],
+                hasActiveAdminPolicies: false,
+                reportActionsList: {},
+            });
+            await waitForBatchedUpdates();
+
+            // Verify the API write was called with memberData (proving createPolicyExpenseChats was called via buildPolicyData)
+            expect(apiWriteSpy).toHaveBeenCalled();
+            const writeCall = apiWriteSpy.mock.calls.at(0);
+            const params = writeCall?.at(1) as {memberData?: string};
+            expect(params?.memberData).toBeDefined();
+
+            const memberData = JSON.parse(params.memberData ?? '{}');
+            expect(memberData.email).toBe(adminLogin);
+            expect(memberData.accountID).toBe(100);
+            expect(memberData.workspaceChatReportID).toBeDefined();
+
+            apiWriteSpy.mockRestore();
+        });
     });
 
     describe('updateWorkspaceAvatar', () => {
