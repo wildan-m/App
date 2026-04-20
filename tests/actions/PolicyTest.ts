@@ -522,7 +522,7 @@ describe('actions/Policy', () => {
             const fakePolicy: PolicyType = {
                 ...basePolicy,
                 outputCurrency: 'EUR',
-                address: {addressStreet: '1 Rue de Rivoli', city: 'Paris', country: 'FR', state: '', zipCode: '75001'},
+                address: {addressStreet: '1 Main Street', city: 'Paris', country: 'FR', state: '', zipCode: '75001'},
                 isTravelEnabled: true,
                 tax: {trackingEnabled: true},
                 rules: {codingRules: {rule1: {filters: {left: 'merchant', operator: 'eq', right: 'Acme'}, category: 'Travel'}}},
