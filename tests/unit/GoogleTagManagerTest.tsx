@@ -173,6 +173,7 @@ describe('GoogleTagManagerTest', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            reportActionsList: undefined,
         });
         await waitForBatchedUpdatesWithAct();
         createWorkspace({
@@ -184,6 +185,7 @@ describe('GoogleTagManagerTest', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: true,
+            reportActionsList: undefined,
         });
         await waitForBatchedUpdatesWithAct();
         createWorkspace({
@@ -195,6 +197,7 @@ describe('GoogleTagManagerTest', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: true,
+            reportActionsList: undefined,
         });
         await waitForBatchedUpdatesWithAct();
 

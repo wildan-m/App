@@ -626,6 +626,8 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
             isSelfTourViewed,
             betas,
             hasActiveAdminPolicies,
+            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+            reportActionsList: undefined,
         });
         Navigation.navigate(routeToNavigate, {forceReplace: !transitionFromOldDot});
     });
@@ -668,6 +670,8 @@ function createWorkspaceWithPolicyDraft(params: CreateWorkspaceWithPolicyDraftPa
         isSelfTourViewed,
         betas,
         hasActiveAdminPolicies,
+        // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+        reportActionsList: undefined,
     });
 }
 
@@ -689,6 +693,8 @@ type SavePolicyDraftByNewWorkspaceParams = {
     type?: PolicyType;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     hasActiveAdminPolicies: boolean;
+    // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+    reportActionsList: OnyxCollection<OnyxTypes.ReportActions> | undefined;
 };
 
 /**
@@ -712,6 +718,7 @@ function savePolicyDraftByNewWorkspace({
     isSelfTourViewed,
     betas,
     hasActiveAdminPolicies,
+    reportActionsList,
 }: SavePolicyDraftByNewWorkspaceParams) {
     createWorkspace({
         policyOwnerEmail,
@@ -732,6 +739,7 @@ function savePolicyDraftByNewWorkspace({
         isSelfTourViewed,
         betas,
         hasActiveAdminPolicies,
+        reportActionsList,
     });
 }
 

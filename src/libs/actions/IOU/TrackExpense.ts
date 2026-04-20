@@ -974,6 +974,8 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
             activePolicyID,
             betas,
             isSelfTourViewed,
+            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+            reportActionsList: undefined,
         });
         createdWorkspaceParams = workspaceData.params;
         onyxData.optimisticData?.push(...(workspaceData.optimisticData ?? []));

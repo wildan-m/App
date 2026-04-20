@@ -177,6 +177,8 @@ function IOURequestStepUpgrade({
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
+            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+            reportActionsList: undefined,
         });
         setIsUpgraded(true);
         policyDataRef.current = policyData;
@@ -205,6 +207,8 @@ function IOURequestStepUpgrade({
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
+            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+            reportActionsList: undefined,
         });
         policyDataRef.current = policyData;
         setCreatedPolicyName(params.name);

@@ -173,6 +173,8 @@ function getPayMoneyRequestParams({
             companySize: introSelected?.companySize as OnboardingCompanySize,
             betas,
             isSelfTourViewed,
+            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
+            reportActionsList: undefined,
         });
         const {adminsChatReportID, adminsCreatedReportActionID, expenseChatReportID, expenseCreatedReportActionID, customUnitRateID, customUnitID, ownerEmail, policyName} = params;
 
