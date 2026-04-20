@@ -34,8 +34,7 @@ const getFallbackReason = (category: HttpStatusCategory | undefined): Multifacto
     return VALUES.REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE;
 };
 
-const hasHttpStatusCategory = (responseMap: ResponseToReasonMap, category: HttpStatusCategory): category is keyof ResponseToReasonMap =>
-    Object.keys(responseMap).some((key) => key === category);
+const hasHttpStatusCategory = (responseMap: ResponseToReasonMap, category: HttpStatusCategory): category is keyof ResponseToReasonMap => category in responseMap;
 
 const findReasonByBackendMessage = (messageMap: Record<string, MultifactorAuthenticationReason>, message: string): MultifactorAuthenticationReason | undefined => {
     const lowerMessage = message.toLowerCase();

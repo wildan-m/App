@@ -9,7 +9,7 @@ function addMFABreadcrumb(message: string, data?: BreadcrumbData, level: Severit
         message: `[MFA] ${message}`,
         category: CONST.TELEMETRY.BREADCRUMB_CATEGORY_MFA,
         level,
-        data: data ? {...data} : undefined,
+        data,
     });
 }
 

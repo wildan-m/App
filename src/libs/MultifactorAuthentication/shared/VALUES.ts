@@ -24,6 +24,7 @@ const REASON = {
     FLOW_OUTCOMES: {
         TRANSACTION_DENIED: 'Outcome: Transaction denied successfully',
     },
+    /** HTTP 4xx errors from the backend (not front-end errors despite the "Client" prefix). */
     CLIENT_ERRORS: {
         REGISTRATION_REQUIRED: 'Client: Registration required',
         INVALID_VALIDATE_CODE: 'Client: Invalid validate code',
