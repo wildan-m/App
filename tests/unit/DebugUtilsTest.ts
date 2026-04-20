@@ -1592,17 +1592,17 @@ describe('DebugUtils', () => {
             });
             it('forwards isOffline through to SidebarUtils so the live IOU transaction-thread receipt error surfaces only when isOffline=false excludes the deleted pending-delete action', () => {
                 // Given: an expense report with two IOU actions — one live (with a receipt-errored transaction) and one deleted-with-pending-delete.
-                const ISOFFLINE_EXPENSE_REPORT: Report = {
+                const OFFLINE_EXPENSE_REPORT: Report = {
                     reportID: '1',
                     type: CONST.REPORT.TYPE.EXPENSE,
                     chatReportID: '2',
                 };
-                const ISOFFLINE_CHAT_REPORT: Report = {
+                const OFFLINE_CHAT_REPORT: Report = {
                     reportID: '2',
                 };
                 const liveTransactionID = 'tx-debug-live';
                 const deletedTransactionID = 'tx-debug-deleted';
-                const ISOFFLINE_REPORT_ACTIONS: OnyxEntry<ReportActions> = {
+                const OFFLINE_REPORT_ACTIONS: OnyxEntry<ReportActions> = {
                     // eslint-disable-next-line @typescript-eslint/naming-convention
                     '1': {
                         reportActionID: '1',
@@ -1633,7 +1633,7 @@ describe('DebugUtils', () => {
                         },
                     } as ReportAction,
                 };
-                const ISOFFLINE_TRANSACTIONS: OnyxCollection<Transaction> = {
+                const OFFLINE_TRANSACTIONS: OnyxCollection<Transaction> = {
                     [`${ONYXKEYS.COLLECTION.TRANSACTION}${liveTransactionID}`]: {
                         transactionID: liveTransactionID,
                         amount: 10,
@@ -1648,20 +1648,20 @@ describe('DebugUtils', () => {
                 };
 
                 const offline = DebugUtils.getReasonAndReportActionForRBRInLHNRow(
-                    ISOFFLINE_EXPENSE_REPORT,
-                    ISOFFLINE_CHAT_REPORT,
-                    ISOFFLINE_REPORT_ACTIONS,
-                    ISOFFLINE_TRANSACTIONS,
+                    OFFLINE_EXPENSE_REPORT,
+                    OFFLINE_CHAT_REPORT,
+                    OFFLINE_REPORT_ACTIONS,
+                    OFFLINE_TRANSACTIONS,
                     {},
                     false,
                     {},
                     true,
                 );
                 const online = DebugUtils.getReasonAndReportActionForRBRInLHNRow(
-                    ISOFFLINE_EXPENSE_REPORT,
-                    ISOFFLINE_CHAT_REPORT,
-                    ISOFFLINE_REPORT_ACTIONS,
-                    ISOFFLINE_TRANSACTIONS,
+                    OFFLINE_EXPENSE_REPORT,
+                    OFFLINE_CHAT_REPORT,
+                    OFFLINE_REPORT_ACTIONS,
+                    OFFLINE_TRANSACTIONS,
                     {},
                     false,
                     {},
