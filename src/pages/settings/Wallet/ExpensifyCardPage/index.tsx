@@ -17,9 +17,9 @@ import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import {usePersonalDetails, useSession} from '@components/OnyxListItemProvider';
-import ScreenWrapper from '@components/ScreenWrapper'
-import Text from '@components/Text';;
+import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
+import Text from '@components/Text';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -175,7 +175,10 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const isWorkspaceAdmin = isPolicyAdmin(policyForCurrentCard, session?.email);
     const canUnfreezeCard = canManageCardFreeze && (frozenByAccountID === session?.accountID || isWorkspaceAdmin);
 
-    const spendRule = useMemo(() => getSpendRuleByCardID(cardSettings, cardID), [cardSettings, cardID]);
+    const spendRule = useMemo(
+        () => getSpendRuleByCardID(cardSettings ? {privateExpensifyCardSettings: cardSettings} : undefined, cardID),
+        [cardSettings, cardID],
+    );
     const spendRulesSummary = useMemo(
         () => (spendRule ? getSpendRuleSummaryText(spendRule.formValues, currency, translate, convertToDisplayString) : []),
         [currency, spendRule, translate, convertToDisplayString],
