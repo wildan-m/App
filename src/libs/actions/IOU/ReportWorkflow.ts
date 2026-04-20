@@ -642,17 +642,8 @@ function approveMoneyRequest(params: ApproveMoneyRequestFunctionParams) {
 
     // Remove duplicates violations if we approve the report
     if (hasDuplicates) {
-        const allViolations = getAllTransactionViolations();
         let transactions = getReportTransactions(expenseReport.reportID).filter((transaction) =>
-            isDuplicate(
-                transaction,
-                currentUserEmailParam,
-                currentUserAccountIDParam,
-                expenseReport,
-                policy,
-                allViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID],
-                allViolations,
-            ),
+            isDuplicate(transaction, currentUserEmailParam, currentUserAccountIDParam, expenseReport, policy, getAllTransactionViolations()),
         );
         if (!full) {
             transactions = transactions.filter((transaction) => !isOnHold(transaction));

@@ -1879,7 +1879,9 @@ function shouldShowDuplicateViolation(transactionID: string, violation: Transact
 
     return duplicateTransactionIDs.some((partnerID) => {
         const bidirectionalViolations = allTransactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${partnerID}`];
-        return bidirectionalViolations?.some((duplicateViolation) => duplicateViolation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION && duplicateViolation.data?.duplicates?.includes(transactionID));
+        return bidirectionalViolations?.some(
+            (duplicateViolation) => duplicateViolation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION && duplicateViolation.data?.duplicates?.includes(transactionID),
+        );
     });
 }
 
@@ -1893,19 +1895,16 @@ function isDuplicate(
     currentUserAccountID: number,
     iouReport: OnyxEntry<Report>,
     policy: OnyxEntry<Policy>,
-    transactionViolation: OnyxEntry<TransactionViolations>,
-    allTransactionViolations?: OnyxCollection<TransactionViolation[]>,
+    allTransactionViolations: OnyxCollection<TransactionViolation[]>,
 ): boolean {
     if (!transaction) {
         return false;
     }
+    const transactionViolation = allTransactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`];
     const duplicatedTransactionViolation = transactionViolation?.find((violation: TransactionViolation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
     const hasDuplicatedTransactionViolation = !!duplicatedTransactionViolation;
     const isDuplicatedTransactionViolationDismissed = isViolationDismissed(transaction, duplicatedTransactionViolation, currentUserEmail, currentUserAccountID, iouReport, policy);
-    const shouldDisplayDuplicate =
-        !duplicatedTransactionViolation ||
-        !allTransactionViolations ||
-        shouldShowDuplicateViolation(transaction.transactionID, duplicatedTransactionViolation, allTransactionViolations);
+    const shouldDisplayDuplicate = !duplicatedTransactionViolation || shouldShowDuplicateViolation(transaction.transactionID, duplicatedTransactionViolation, allTransactionViolations);
 
     return hasDuplicatedTransactionViolation && !isDuplicatedTransactionViolationDismissed && shouldDisplayDuplicate;
 }
@@ -2021,17 +2020,7 @@ function hasDuplicateTransactions(
 
     return (
         reportTransactions.length > 0 &&
-        reportTransactions.some((transaction) =>
-            isDuplicate(
-                transaction,
-                currentUserEmail,
-                currentUserAccountID,
-                iouReport,
-                policy,
-                allTransactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID],
-                allTransactionViolations,
-            ),
-        )
+        reportTransactions.some((transaction) => isDuplicate(transaction, currentUserEmail, currentUserAccountID, iouReport, policy, allTransactionViolations))
     );
 }
 

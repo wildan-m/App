@@ -328,9 +328,7 @@ function isReviewDuplicatesAction(
     policy: Policy | undefined,
     violations: OnyxCollection<TransactionViolation[]>,
 ) {
-    const hasDuplicates = reportTransactions.some((transaction) =>
-        isDuplicate(transaction, currentUserEmail, currentUserAccountID, report, policy, violations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID], violations),
-    );
+    const hasDuplicates = reportTransactions.some((transaction) => isDuplicate(transaction, currentUserEmail, currentUserAccountID, report, policy, violations));
 
     if (!hasDuplicates) {
         return false;
