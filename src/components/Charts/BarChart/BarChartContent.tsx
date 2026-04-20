@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import {View} from 'react-native';
 import {GestureDetector} from 'react-native-gesture-handler';
@@ -109,11 +109,11 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
     const totalDomainPadding = domainPadding.left + domainPadding.right;
     const paddingScale = barAreaWidth > 0 ? barAreaWidth / (barAreaWidth + totalDomainPadding) : 0;
 
-    const {labelWidths, ellipsisWidth} = useChartLabelMeasurements(data, fontMgr, variables.iconSizeExtraSmall);
+    const originalLabels = data.map((p) => p.label);
 
-    const originalLabels = useMemo(() => data.map((p) => p.label), [data]);
+    const measurements = useChartLabelMeasurements(data, fontMgr, variables.iconSizeExtraSmall);
 
-    const {labelRotation, labelSkipInterval, truncatedLabelWidths, xAxisLabelHeight, regularLabelMaxWidth, firstLabelMaxWidth, lastLabelMaxWidth} = useChartLabelLayout({
+    const {labelRotation, labelSkipInterval, truncatedLabelWidths, xAxisLabelHeight, regularLabelMaxWidth, firstLabelMaxWidth, lastLabelMaxWidth, ellipsisWidth} = useChartLabelLayout({
         data,
         fontMgr,
         fontSize: variables.iconSizeExtraSmall,
@@ -121,6 +121,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
         labelAreaWidth: barAreaWidth,
         firstTickLeftSpace: boundsLeft + domainPadding.left * paddingScale,
         lastTickRightSpace: chartWidth > 0 ? chartWidth - boundsRight + domainPadding.right * paddingScale : 0,
+        measurements,
     });
 
     const {formatValue} = useChartLabelFormats({
@@ -219,7 +220,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
             <>
                 <ChartXAxisLabels
                     labels={originalLabels}
-                    labelWidths={labelWidths}
+                    labelWidths={truncatedLabelWidths}
                     regularLabelMaxWidth={regularLabelMaxWidth}
                     firstLabelMaxWidth={firstLabelMaxWidth}
                     lastLabelMaxWidth={lastLabelMaxWidth}
