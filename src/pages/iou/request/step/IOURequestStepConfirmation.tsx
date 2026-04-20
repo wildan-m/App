@@ -62,6 +62,7 @@ import navigateAfterInteraction from '@libs/Navigation/navigateAfterInteraction'
 import Navigation from '@libs/Navigation/Navigation';
 import {rand64, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
+import {isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {
     findSelfDMReportID,
     generateReportID,
@@ -317,10 +318,6 @@ function IOURequestStepConfirmation({
     const receiptPath = transaction?.receipt?.source;
     const isEditingReceipt = hasReceipt(transaction);
     const customUnitRateID = getRateID(transaction) ?? '';
-    const defaultTaxCode = getDefaultTaxCode(policy, transaction);
-    const transactionTaxCode = isTimeRequest ? '' : ((transaction?.taxCode ? transaction?.taxCode : defaultTaxCode) ?? '');
-    const transactionTaxAmount = transaction?.taxAmount ?? 0;
-    const transactionTaxValue = transaction?.taxValue ?? getTaxValue(policy, transaction, transactionTaxCode) ?? '';
     const isSharingTrackExpense = action === CONST.IOU.ACTION.SHARE;
     const isCategorizingTrackExpense = action === CONST.IOU.ACTION.CATEGORIZE;
     const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseIOUUtils(action);
@@ -371,6 +368,13 @@ function IOURequestStepConfirmation({
     const shouldGenerateTransactionThreadReport = !isBetaEnabled(CONST.BETAS.NO_OPTIMISTIC_TRANSACTION_THREADS);
     const formHasBeenSubmitted = useRef(false);
     const isFromGlobalCreate = !!(transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton);
+
+    const defaultTaxCode = getDefaultTaxCode(policy, transaction);
+    const transactionTaxCode = isTaxTrackingEnabled(isPolicyExpenseChat || isUnreported, policy, isDistanceRequest, isPerDiemRequest, isTimeRequest)
+        ? ((transaction?.taxCode ? transaction?.taxCode : defaultTaxCode) ?? '')
+        : '';
+    const transactionTaxAmount = transaction?.taxAmount ?? 0;
+    const transactionTaxValue = transaction?.taxValue ?? getTaxValue(policy, transaction, transactionTaxCode) ?? '';
 
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
 
