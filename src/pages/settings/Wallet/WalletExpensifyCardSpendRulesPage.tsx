@@ -3,7 +3,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import SpendRulePageBase from '@pages/workspace/rules/SpendRules/SpendRulePageBase';
 import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
+import type SCREENS from '@src/SCREENS';
 
 type WalletExpensifyCardSpendRulesPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES>;
 
