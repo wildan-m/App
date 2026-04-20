@@ -1,7 +1,8 @@
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import type {CurrencyListActionsContextType} from '@components/CurrencyListContextProvider';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
-import {convertToBackendAmount, convertToDisplayString} from '@libs/CurrencyUtils';
+import {convertToBackendAmount} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -218,7 +219,13 @@ function getParentRoute(policyID: string, ruleID: string) {
     return ruleID === ROUTES.NEW ? ROUTES.RULES_SPEND_NEW.getRoute(policyID) : ROUTES.RULES_SPEND_EDIT.getRoute(policyID, ruleID);
 }
 
-function getSpendRuleSummaryParts(formValues: SpendRuleForm, selectedCurrency: string | undefined, actionLabel: string, translate: LocalizedTranslate): SpendRuleSummaryPart[] {
+function getSpendRuleSummaryParts(
+    formValues: SpendRuleForm,
+    selectedCurrency: string | undefined,
+    actionLabel: string,
+    translate: LocalizedTranslate,
+    convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+): SpendRuleSummaryPart[] {
     const summaryParts: SpendRuleSummaryPart[] = [];
     const merchantNames = getTruncatedSpendRuleSummary(formValues.merchantNames, (summary, count) => translate('workspace.rules.spendRules.summaryMoreCount', {summary, count}));
     const categories = getTruncatedSpendRuleSummary(
@@ -246,7 +253,12 @@ function getSpendRuleSummaryParts(formValues: SpendRuleForm, selectedCurrency: s
     return summaryParts;
 }
 
-function getSpendRuleSummaryText(formValues: SpendRuleForm, cardCurrency: string | undefined, translate: LocalizedTranslate) {
+function getSpendRuleSummaryText(
+    formValues: SpendRuleForm,
+    cardCurrency: string | undefined,
+    translate: LocalizedTranslate,
+    convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+) {
     const action = formValues.restrictionAction;
     const merchantSummary = formValues.merchantNames
         ? getTruncatedSpendRuleSummary(formValues.merchantNames, (merchants, hiddenCount, shownCount) =>

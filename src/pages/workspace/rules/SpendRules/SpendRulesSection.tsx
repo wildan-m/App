@@ -8,6 +8,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
 import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useDefaultFundID from '@hooks/useDefaultFundID';
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -34,6 +35,7 @@ type SpendRulesSectionProps = {
 };
 
 function SpendRulesSection({policyID}: SpendRulesSectionProps) {
+    const {convertToDisplayString} = useCurrencyListActions();
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -106,7 +108,7 @@ function SpendRulesSection({policyID}: SpendRulesSectionProps) {
                 ruleID,
                 actionLabel,
                 cardSummary,
-                summaryParts: getSpendRuleSummaryParts(formValues, selectedCurrency, actionLabel, translate),
+                summaryParts: getSpendRuleSummaryParts(formValues, selectedCurrency, actionLabel, translate, convertToDisplayString),
                 isBlock: formValues.restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK,
                 created: cardRule.created,
                 pendingAction: cardRule.pendingAction,
