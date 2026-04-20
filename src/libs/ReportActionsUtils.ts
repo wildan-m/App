@@ -551,7 +551,11 @@ function getHumanAgentAccountIDFromReportAction(reportAction: OnyxInputOrEntry<R
 
 function getHumanAgentDisplayName(reportAction: OnyxInputOrEntry<ReportAction>, personalDetails: OnyxEntry<PersonalDetailsList>): string | undefined {
     const humanAgentAccountID = getHumanAgentAccountIDFromReportAction(reportAction);
-    return humanAgentAccountID ? personalDetails?.[humanAgentAccountID]?.displayName : undefined;
+    if (!humanAgentAccountID) {
+        return undefined;
+    }
+    const displayName = personalDetails?.[humanAgentAccountID]?.displayName;
+    return displayName?.trim() ? displayName : undefined;
 }
 
 function isExportIntegrationAction(reportAction: OnyxInputOrEntry<ReportAction>): reportAction is ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION> {
