@@ -146,4 +146,4 @@ const Reauthentication: Middleware = (response, request, isFromSequentialQueue) 
         });
 
 export default Reauthentication;
-export {reauthenticate, resetReauthentication, reauthThrottle};
+export {resetReauthentication};
