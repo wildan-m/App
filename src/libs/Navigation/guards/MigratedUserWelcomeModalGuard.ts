@@ -25,6 +25,23 @@ function resetSessionFlag() {
     hasRedirectedToMigratedUserModal = false;
 }
 
+let pendingNavigationCheck: ReturnType<typeof setTimeout> | undefined;
+
+/**
+ * Schedules a deferred navigation check. The check is deferred to the next event loop tick
+ * so it doesn't run synchronously inside Onyx callbacks, which would interfere with
+ * Onyx batch processing and cause extra component renders.
+ */
+function scheduleNavigationCheck() {
+    if (pendingNavigationCheck !== undefined) {
+        return;
+    }
+    pendingNavigationCheck = setTimeout(() => {
+        pendingNavigationCheck = undefined;
+        navigateToMigratedUserWelcomeModalIfReady();
+    }, 0);
+}
+
 /**
  * Proactively navigate to the migrated user welcome modal when all conditions are met,
  * without waiting for a user-initiated navigation action.
@@ -53,7 +70,7 @@ function navigateToMigratedUserWelcomeModalIfReady() {
 function onSessionOrLoadingAppChanged(sessionValue: OnyxEntry<Session>, isLoadingAppValue: boolean) {
     session = sessionValue;
     isLoadingApp = isLoadingAppValue;
-    navigateToMigratedUserWelcomeModalIfReady();
+    scheduleNavigationCheck();
 }
 
 Onyx.connectWithoutView({
@@ -61,7 +78,7 @@ Onyx.connectWithoutView({
     callback: (value) => {
         const result = value ? tryNewDotOnyxSelector(value) : undefined;
         hasBeenAddedToNudgeMigration = result?.hasBeenAddedToNudgeMigration ?? false;
-        navigateToMigratedUserWelcomeModalIfReady();
+        scheduleNavigationCheck();
     },
 });
 
