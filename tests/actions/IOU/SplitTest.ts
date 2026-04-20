@@ -12,11 +12,9 @@ import OnyxUpdateManager from '@src/libs/actions/OnyxUpdateManager';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Policy, Report} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
-import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type Transaction from '@src/types/onyx/Transaction';
 import type {WaypointCollection} from '@src/types/onyx/Transaction';
 import currencyList from '../../unit/currencyList.json';
-import createPersonalDetails from '../../utils/collections/personalDetails';
 import createRandomPolicy from '../../utils/collections/policies';
 import {createRandomReport} from '../../utils/collections/reports';
 import getOnyxValue from '../../utils/getOnyxValue';
@@ -97,14 +95,6 @@ const VIT_ACCOUNT_ID = 4;
 
 OnyxUpdateManager();
 describe('actions/IOU/Split', () => {
-    const currentUserPersonalDetails: CurrentUserPersonalDetails = {
-        ...createPersonalDetails(RORY_ACCOUNT_ID),
-        login: RORY_EMAIL,
-        email: RORY_EMAIL,
-        displayName: RORY_EMAIL,
-        avatar: 'https://example.com/avatar.jpg',
-    };
-
     beforeAll(() => {
         Onyx.init({
             keys: ONYXKEYS,
