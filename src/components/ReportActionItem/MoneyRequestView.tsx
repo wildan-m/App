@@ -81,6 +81,7 @@ import {
 } from '@libs/ReportUtils';
 import {hasEnabledTags, shouldShowDependentTagList} from '@libs/TagsOptionsListUtils';
 import {
+    filterOutStaleTagViolations,
     getBillable,
     getCurrency,
     getDescription,
@@ -443,7 +444,8 @@ function MoneyRequestView({
     const tripID = getTripIDFromTransactionParentReportID(parentReport?.parentReportID);
     const shouldShowViewTripDetails = hasReservationList(transaction) && !!tripID;
 
-    const {getViolationsForField} = useViolations(transactionViolations ?? [], isTransactionScanning || !isPaidGroupPolicy(transactionThreadReport));
+    const visibleTransactionViolations = useMemo(() => filterOutStaleTagViolations(transaction, transactionViolations ?? [], policy), [transaction, transactionViolations, policy]);
+    const {getViolationsForField} = useViolations(visibleTransactionViolations, isTransactionScanning || !isPaidGroupPolicy(transactionThreadReport));
     const hasViolations = (field: ViolationField, data?: OnyxTypes.TransactionViolation['data'], policyHasDependentTags = false, tagValue?: string): boolean =>
         getViolationsForField(field, data, policyHasDependentTags, tagValue).length > 0;
     const isMarkAsCash = parentReport && currentUserEmailParam ? isMarkAsCashActionForTransaction(currentUserEmailParam, parentReport, transactionViolations, policy) : false;

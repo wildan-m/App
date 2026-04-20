@@ -138,6 +138,83 @@ type BuildOptimisticTransactionParams = {
     isDemoTransactionParam?: boolean;
 };
 
+let allPolicyTags: OnyxCollection<PolicyTagLists>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.POLICY_TAGS,
+    waitForCollectionCallback: true,
+    callback: (value) => {
+        allPolicyTags = value;
+    },
+});
+
+function getPolicyTagListForPolicyID(policyID: string | undefined): PolicyTagLists | undefined {
+    if (!policyID) {
+        return undefined;
+    }
+    return allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`] ?? undefined;
+}
+
+function policyHasAnyEnabledTags(policyTagList: PolicyTagLists | undefined): boolean {
+    if (!policyTagList) {
+        return false;
+    }
+    return Object.values(policyTagList).some((tagList) => Object.values(tagList?.tags ?? {}).some((tag) => !!tag?.enabled));
+}
+
+/**
+ * Strip stale `tagOutOfPolicy` / `missingTag` violations from a transaction's
+ * violations list at read time. This mirrors the invariants enforced at write
+ * time by `getTagViolationsForSingleLevelTags` in ViolationsUtils, but covers
+ * violations that arrive via the server's authoritative Pusher update after a
+ * tag is deleted — those updates SET the collection blindly and bypass the
+ * optimistic filter. For multi-level tags we only drop violations when the
+ * policy has no enabled tags anywhere, since the enabled/in-policy check for a
+ * specific level requires parsing the tag name and is handled elsewhere.
+ */
+function filterOutStaleTagViolations(transaction: OnyxEntry<Transaction> | undefined, violations: TransactionViolation[] | undefined, policy: OnyxEntry<Policy>): TransactionViolation[] {
+    if (!violations?.length) {
+        return violations ?? [];
+    }
+    if (!transaction || !policy?.id) {
+        return violations;
+    }
+    const policyTagList = getPolicyTagListForPolicyID(policy.id);
+    if (!policyTagList) {
+        return violations;
+    }
+
+    const policyTagKeys = Object.keys(policyTagList);
+    const isSingleLevel = policyTagKeys.length === 1;
+    const hasAnyEnabledTags = policyHasAnyEnabledTags(policyTagList);
+
+    if (isSingleLevel) {
+        const firstList = policyTagList[policyTagKeys.at(0) ?? ''];
+        const tagValue = transaction.tag ?? '';
+        const isTagInPolicy = tagValue ? !!firstList?.tags?.[tagValue]?.enabled : false;
+
+        return violations.filter((violation) => {
+            if (violation.name === CONST.VIOLATIONS.TAG_OUT_OF_POLICY) {
+                if (!tagValue || isTagInPolicy || !hasAnyEnabledTags) {
+                    return false;
+                }
+            }
+            if (violation.name === CONST.VIOLATIONS.MISSING_TAG) {
+                if (isTagInPolicy || !hasAnyEnabledTags) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    return violations.filter((violation) => {
+        if ((violation.name === CONST.VIOLATIONS.TAG_OUT_OF_POLICY || violation.name === CONST.VIOLATIONS.MISSING_TAG) && !hasAnyEnabledTags) {
+            return false;
+        }
+        return true;
+    });
+}
+
 function isDeletedTransaction(transaction: {reportID?: string}): boolean {
     return transaction.reportID === CONST.REPORT.TRASH_REPORT_ID;
 }
@@ -1514,10 +1591,9 @@ function getTransactionViolations(
         return undefined;
     }
 
-    const violations =
-        transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID]?.filter(
-            (violation) => !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy),
-        ) ?? [];
+    const rawViolations = transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID] ?? [];
+    const tagFilteredViolations = filterOutStaleTagViolations(transaction, rawViolations, policy);
+    const violations = tagFilteredViolations.filter((violation) => !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy));
 
     return violations;
 }
@@ -1968,7 +2044,8 @@ function hasViolation(
     if (!doesTransactionSupportViolations(transaction)) {
         return false;
     }
-    const violations = Array.isArray(transactionViolations) ? transactionViolations : transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID];
+    const rawViolations = Array.isArray(transactionViolations) ? transactionViolations : transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID];
+    const violations = filterOutStaleTagViolations(transaction, rawViolations, policy);
 
     return !!violations?.some(
         (violation) =>
@@ -2018,7 +2095,10 @@ function hasNoticeTypeViolation(
     if (!doesTransactionSupportViolations(transaction)) {
         return false;
     }
-    const violations = Array.isArray(transactionViolations) ? transactionViolations : transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction?.transactionID}`];
+    const rawViolations = Array.isArray(transactionViolations)
+        ? transactionViolations
+        : transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction?.transactionID}`];
+    const violations = filterOutStaleTagViolations(transaction, rawViolations, policy);
 
     return !!violations?.some(
         (violation: TransactionViolation) =>
@@ -2043,7 +2123,10 @@ function hasWarningTypeViolation(
     if (!doesTransactionSupportViolations(transaction)) {
         return false;
     }
-    const violations = Array.isArray(transactionViolations) ? transactionViolations : transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction?.transactionID}`];
+    const rawViolations = Array.isArray(transactionViolations)
+        ? transactionViolations
+        : transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction?.transactionID}`];
+    const violations = filterOutStaleTagViolations(transaction, rawViolations, policy);
 
     const warningTypeViolations =
         violations?.filter(
@@ -2959,6 +3042,7 @@ export {
     recalculateUnreportedTransactionDetails,
     hasSmartScanFailedWithMissingFields,
     isDeletedTransaction,
+    filterOutStaleTagViolations,
 };
 
 export type {TransactionChanges};
