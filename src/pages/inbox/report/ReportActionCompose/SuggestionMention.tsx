@@ -271,7 +271,7 @@ function SuggestionMention({
     const getUserMentionOptions = useCallback(
         (searchValue = ''): Mention[] => {
             const policyEmployeeAccountIDs = getPolicyEmployeeAccountIDs(policy, currentUserPersonalDetails.accountID);
-            const shouldWeightDetails = !isGroupChat(currentReport) && !doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
+            const shouldWeightDetails = isGroupChat(currentReport) && doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
 
             let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined;
 
