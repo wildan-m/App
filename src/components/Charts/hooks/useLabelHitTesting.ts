@@ -1,5 +1,4 @@
 import type {SkTypefaceFontProvider} from '@shopify/react-native-skia';
-import {useMemo} from 'react';
 import type {SharedValue} from 'react-native-reanimated';
 import {useSharedValue} from 'react-native-reanimated';
 import type {Scale} from 'victory-native';
@@ -69,8 +68,7 @@ type UseLabelHitTestingParams = {
     /**
      * Chart-specific geometry factory.
      * Receives font metrics, trig values, and per-label widths; returns the
-     * normalized geometry shape. Define as a module-level constant to keep
-     * the useMemo dependency stable.
+     * normalized geometry shape. Typically a module-level constant.
      */
     computeGeometry: ComputeGeometryFn;
 };
@@ -86,35 +84,26 @@ type UseLabelHitTestingParams = {
  * so no Skia measurement happens here.
  *
  * Chart-specific geometry (45° corner anchor offsets, 90° vertical bounds) is supplied
- * via the `computeGeometry` callback, which should be a stable module-level constant.
+ * via the `computeGeometry` callback, typically a module-level constant.
  */
 function useLabelHitTesting({fontMgr, fontSize, truncatedLabelWidths, labelRotation, labelSkipInterval, chartBottom, computeGeometry}: UseLabelHitTestingParams) {
     const tickXPositions = useSharedValue<number[]>([]);
 
     const angleRad = (Math.abs(labelRotation) * Math.PI) / 180;
 
-    const fontMetrics = useMemo(() => {
-        if (!fontMgr) {
-            return null;
-        }
-        return getFontLineMetrics(fontMgr, fontSize);
-    }, [fontMgr, fontSize]);
+    const fontMetrics = fontMgr ? getFontLineMetrics(fontMgr, fontSize) : null;
 
     /**
-     * Pre-computed geometry for label hit-testing.
-     * All per-label arrays and trig values are resolved once per layout/rotation change
-     * rather than on every hover event. The `computeGeometry` callback supplies the
+     * Geometry for label hit-testing. The `computeGeometry` callback supplies the
      * chart-specific differences (bar vs. line anchor offsets).
      */
-    const labelHitGeometry = useMemo((): LabelHitGeometry | null => {
-        if (!fontMetrics) {
-            return null;
-        }
+    let labelHitGeometry: LabelHitGeometry | null = null;
+    if (fontMetrics) {
         const {ascent, descent} = fontMetrics;
         const sinA = Math.sin(angleRad);
         const padding = variables.iconSizeExtraSmall / 2;
-        return computeGeometry({ascent, descent, sinA, angleRad, labelWidths: truncatedLabelWidths, padding});
-    }, [fontMetrics, angleRad, truncatedLabelWidths, computeGeometry]);
+        labelHitGeometry = computeGeometry({ascent, descent, sinA, angleRad, labelWidths: truncatedLabelWidths, padding});
+    }
 
     /**
      * Hit-tests whether the cursor is over the x-axis label at `activeIndex`.
