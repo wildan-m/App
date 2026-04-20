@@ -5,10 +5,10 @@ import type {ValueOf} from 'type-fest';
 import type {MultifactorAuthenticationReason, MultifactorAuthenticationResponseMap} from './types';
 import VALUES from './VALUES';
 
-type ParseHTTPSource = ValueOf<MultifactorAuthenticationResponseMap>;
+type ResponseToReasonMap = ValueOf<MultifactorAuthenticationResponseMap>;
 type HttpStatusCategory = ValueOf<typeof VALUES.HTTP_STATUS>;
 
-const getHttpStatusCategory = (httpStatusCode: number): HttpStatusCategory | undefined => {
+const categorizeHttpStatus = (httpStatusCode: number): HttpStatusCategory | undefined => {
     if (httpStatusCode >= 200 && httpStatusCode < 300) {
         return VALUES.HTTP_STATUS.SUCCESS;
     }
@@ -21,33 +21,52 @@ const getHttpStatusCategory = (httpStatusCode: number): HttpStatusCategory | und
     return undefined;
 };
 
-const httpStatusCategoryIsDefined = (source: ParseHTTPSource, category: HttpStatusCategory): category is keyof ParseHTTPSource => Object.keys(source).some((key) => key === category);
-
-const getCategoryFallbackReason = (httpStatusCategory: HttpStatusCategory): MultifactorAuthenticationReason | undefined => {
-    if (httpStatusCategory === VALUES.HTTP_STATUS.CLIENT_ERROR) {
+const getFallbackReason = (category: HttpStatusCategory | undefined): MultifactorAuthenticationReason | undefined => {
+    if (category === VALUES.HTTP_STATUS.CLIENT_ERROR) {
         return VALUES.REASON.CLIENT_ERRORS.UNRECOGNIZED;
     }
-    if (httpStatusCategory === VALUES.HTTP_STATUS.SERVER_ERROR) {
+    if (category === VALUES.HTTP_STATUS.SERVER_ERROR) {
         return VALUES.REASON.SERVER_ERRORS.UNRECOGNIZED;
     }
-    if (httpStatusCategory === VALUES.HTTP_STATUS.SUCCESS) {
+    if (category === VALUES.HTTP_STATUS.SUCCESS) {
         return undefined;
     }
     return VALUES.REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE;
 };
 
-const findMessageInSource = (source: Record<string, MultifactorAuthenticationReason>, message: string): MultifactorAuthenticationReason | undefined => {
+const hasHttpStatusCategory = (responseMap: ResponseToReasonMap, category: HttpStatusCategory): category is keyof ResponseToReasonMap =>
+    Object.keys(responseMap).some((key) => key === category);
+
+const findReasonByBackendMessage = (messageMap: Record<string, MultifactorAuthenticationReason>, message: string): MultifactorAuthenticationReason | undefined => {
     const lowerMessage = message.toLowerCase();
-    const entry = Object.entries(source).find(([backendMessage]) => lowerMessage.endsWith(backendMessage.toLowerCase()));
+    const entry = Object.entries(messageMap).find(([backendMessage]) => lowerMessage.endsWith(backendMessage.toLowerCase()));
     return entry?.[1];
 };
 
+const resolveReason = (responseMap: ResponseToReasonMap, category: HttpStatusCategory | undefined, message: string | undefined): MultifactorAuthenticationReason | undefined => {
+    if (!category || !hasHttpStatusCategory(responseMap, category)) {
+        return undefined;
+    }
+
+    const entry = responseMap[category];
+
+    if (typeof entry === 'string') {
+        return entry;
+    }
+
+    if (!message) {
+        return undefined;
+    }
+
+    return findReasonByBackendMessage(entry, message);
+};
+
 /**
- * Parses an HTTP response code along with a message and returns the corresponding HTTP status category and reason.
+ * Parses an HTTP response and resolves it to a reason using the provided response map.
  */
-function parseHttpRequest(
+function parseHttpResponse(
     jsonCode: string | number | undefined,
-    source: ParseHTTPSource,
+    responseMap: ResponseToReasonMap,
     message: string | undefined,
 ): {
     httpStatusCode: number;
@@ -55,50 +74,15 @@ function parseHttpRequest(
     message: string | undefined;
 } {
     const httpStatusCode = Number(jsonCode ?? 0);
-    const httpStatusCategory = getHttpStatusCategory(httpStatusCode);
+    const category = categorizeHttpStatus(httpStatusCode);
+    const reason = resolveReason(responseMap, category, message) ?? getFallbackReason(category);
 
-    if (!httpStatusCategory) {
-        return {
-            httpStatusCode,
-            reason: VALUES.REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE,
-            message,
-        };
-    }
-
-    const fallback = getCategoryFallbackReason(httpStatusCategory);
-
-    if (!httpStatusCategoryIsDefined(source, httpStatusCategory)) {
-        return {
-            httpStatusCode,
-            reason: fallback,
-            message,
-        };
-    }
-
-    const responseMapEntry = source[httpStatusCategory];
-
-    if (typeof responseMapEntry === 'string') {
-        return {
-            httpStatusCode,
-            reason: responseMapEntry,
-            message,
-        };
-    }
-
-    if (!message) {
-        return {httpStatusCode, reason: fallback, message};
-    }
-
-    return {
-        httpStatusCode,
-        reason: findMessageInSource(responseMapEntry, message) ?? fallback,
-        message,
-    };
+    return {httpStatusCode, reason, message};
 }
 
 function isHttpSuccess(httpStatusCode: number | undefined): boolean {
     return String(httpStatusCode).startsWith('2');
 }
 
-export default parseHttpRequest;
+export default parseHttpResponse;
 export {isHttpSuccess};
