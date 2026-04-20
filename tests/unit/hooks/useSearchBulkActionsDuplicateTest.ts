@@ -473,7 +473,7 @@ describe('useSearchBulkActions - duplicate option', () => {
         expect(result.current.headerButtonsOptions.find((o) => o.value === CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE)).toBeDefined();
     });
 
-    it('should show duplicate option when selection includes deleted and non-deleted duplicable expenses', async () => {
+    it('should show duplicate option when selection includes deleted and non-deleted expenses that can be duplicated', async () => {
         const deletedTransactionID = '1951';
         const nonDeletedTransactionID = '1952';
         const deletedTransaction = {
