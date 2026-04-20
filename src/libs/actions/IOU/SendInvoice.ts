@@ -805,7 +805,7 @@ function sendInvoice({
     };
 
     deferOrExecuteWrite(apiWrite, {
-        shouldDeferForSearch: !!(isFromGlobalCreate && !isReportTopmostSplitNavigator()),
+        shouldDeferForSearch: !!(shouldHandleNavigation && isFromGlobalCreate && !isReportTopmostSplitNavigator()),
         optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
         onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
     });
