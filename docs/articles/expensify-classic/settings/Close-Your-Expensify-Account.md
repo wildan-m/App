@@ -48,7 +48,7 @@ If you don't see the option to close your account, your account may be domain-co
 All unsubmitted expenses and personal data tied to the account are deleted. 
 
 Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and Admins on the Workspace where the expenses were submitted. 
-
+Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and the Admins on the workspace where the expenses were submitted. 
 ---
 
 # FAQ
