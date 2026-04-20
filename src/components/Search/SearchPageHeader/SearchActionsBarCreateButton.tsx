@@ -238,6 +238,7 @@ function SearchActionsBarCreateButton() {
             handleCreateWorkspaceReport,
             amountOwed,
             currentUserPersonalDetails.accountID,
+            defaultChatEnabledPolicy,
         ],
     );
 
