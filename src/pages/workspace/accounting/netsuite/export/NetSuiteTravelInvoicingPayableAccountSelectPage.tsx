@@ -17,7 +17,7 @@ import {clearNetSuiteErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 
-type CardListItem = ListItem & {
+type PayableAccountListItem = ListItem & {
     value: string;
 };
 
@@ -30,15 +30,15 @@ function NetSuiteTravelInvoicingPayableAccountSelectPage({policy}: WithPolicyCon
     const config = policy?.connections?.netsuite?.options?.config;
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const data: CardListItem[] =
+    const data: PayableAccountListItem[] =
         payableList?.map((account) => ({
             value: account.id,
             text: account.name,
-            keyForList: account.name,
+            keyForList: account.id,
             isSelected: account.id === config?.travelInvoicingPayableAccountID,
         })) ?? [];
 
-    const selectAccount = (row: CardListItem) => {
+    const selectAccount = (row: PayableAccountListItem) => {
         if (row.value !== config?.travelInvoicingPayableAccountID) {
             updateNetSuiteTravelInvoicingPayableAccount(policyID, row.value, config?.travelInvoicingPayableAccountID);
         }
@@ -67,7 +67,7 @@ function NetSuiteTravelInvoicingPayableAccountSelectPage({policy}: WithPolicyCon
             listItem={RadioListItem}
             onSelectRow={selectAccount}
             shouldSingleExecuteRowSelect
-            initiallyFocusedOptionKey={data.find((mode) => mode.isSelected)?.keyForList}
+            initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}

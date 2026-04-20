@@ -17,7 +17,7 @@ import {clearNetSuiteErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 
-type CardListItem = ListItem & {
+type VendorListItem = ListItem & {
     value: string;
 };
 
@@ -30,15 +30,15 @@ function NetSuiteTravelInvoicingVendorSelectPage({policy}: WithPolicyConnections
     const config = policy?.connections?.netsuite?.options?.config;
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const data: CardListItem[] =
+    const data: VendorListItem[] =
         vendors?.map((vendor) => ({
             value: vendor.id,
             text: vendor.name,
-            keyForList: vendor.name,
+            keyForList: vendor.id,
             isSelected: vendor.id === config?.travelInvoicingVendorID,
         })) ?? [];
 
-    const selectVendor = (row: CardListItem) => {
+    const selectVendor = (row: VendorListItem) => {
         if (row.value !== config?.travelInvoicingVendorID) {
             updateNetSuiteTravelInvoicingVendor(policyID, row.value, config?.travelInvoicingVendorID);
         }
@@ -67,7 +67,7 @@ function NetSuiteTravelInvoicingVendorSelectPage({policy}: WithPolicyConnections
             listItem={RadioListItem}
             onSelectRow={selectVendor}
             shouldSingleExecuteRowSelect
-            initiallyFocusedOptionKey={data.find((mode) => mode.isSelected)?.keyForList}
+            initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}

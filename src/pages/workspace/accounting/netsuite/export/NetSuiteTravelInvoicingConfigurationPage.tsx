@@ -11,16 +11,14 @@ import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnec
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
-import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
+import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
 type NetSuiteSectionType = {
     title?: string;
     description?: string;
     onPress: () => void;
-    hintText?: string;
     subscribedSettings: string[];
     pendingAction?: PendingAction;
-    errors?: Errors;
     brickRoadIndicator?: ValueOf<typeof CONST.BRICK_ROAD_INDICATOR_STATUS>;
 };
 
@@ -83,7 +81,6 @@ function NetSuiteTravelInvoicingConfigurationPage({policy}: WithPolicyConnection
                 <OfflineWithFeedback
                     pendingAction={section.pendingAction}
                     key={section.subscribedSettings.at(0)}
-                    errors={section.errors}
                     errorRowStyles={[styles.ph5]}
                 >
                     <MenuItemWithTopDescription
@@ -92,7 +89,6 @@ function NetSuiteTravelInvoicingConfigurationPage({policy}: WithPolicyConnection
                         onPress={section.onPress}
                         shouldShowRightIcon
                         brickRoadIndicator={section.brickRoadIndicator}
-                        hintText={section.hintText}
                     />
                 </OfflineWithFeedback>
             ))}
