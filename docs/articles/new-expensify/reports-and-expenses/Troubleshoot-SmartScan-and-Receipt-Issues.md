@@ -67,7 +67,7 @@ If the details of the expense are wrong, you can:
 
 ---
 
-# How to take better receipt photos for SmartScan
+## How to take better receipt photos for SmartScan
 
 Improving image quality helps prevent most SmartScan issues.
 
