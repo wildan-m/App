@@ -1534,6 +1534,7 @@ function verifySetupIntentAndRequestPolicyOwnerChange(policyID: string, currentU
 function createPolicyExpenseChats(
     policyID: string,
     invitedEmailsToAccountIDs: InvitedEmailsToAccountIDs,
+    currentUserAccountID: number,
     // TODO: Remove optional (?) once all is updated (https://github.com/Expensify/App/issues/66578)
     reportActionsList?: OnyxCollection<ReportActions>,
     hasOutstandingChildRequest = false,
@@ -1597,12 +1598,12 @@ function createPolicyExpenseChats(
             continue;
         }
         const optimisticReport = ReportUtils.buildOptimisticChatReport({
-            participantList: [deprecatedSessionAccountID, cleanAccountID],
+            participantList: [currentUserAccountID, cleanAccountID],
             chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
             policyID,
             ownerAccountID: cleanAccountID,
             notificationPreference,
-            currentUserAccountID: deprecatedSessionAccountID,
+            currentUserAccountID,
         });
 
         // Set correct notification preferences: visible for the submitter, hidden for others until there's activity
@@ -2930,6 +2931,7 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
         const employeeWorkspaceChat = createPolicyExpenseChats(
             policyID,
             {[adminParticipant.login]: adminParticipant.accountID ?? CONST.DEFAULT_NUMBER_ID},
+            currentUserAccountIDParam,
             undefined,
             hasOutstandingChildRequest,
         );
@@ -3971,7 +3973,7 @@ function createWorkspaceFromIOUPayment(
     }
 
     // Create the expense chat for the employee whose IOU is being paid
-    const employeeWorkspaceChat = createPolicyExpenseChats(policyID, {[iouReportOwnerEmail]: employeeAccountID}, reportActionsList, true);
+    const employeeWorkspaceChat = createPolicyExpenseChats(policyID, {[iouReportOwnerEmail]: employeeAccountID}, currentUserAccountID, reportActionsList, true);
     const newWorkspace = {
         id: policyID,
 

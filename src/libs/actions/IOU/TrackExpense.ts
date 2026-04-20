@@ -2126,7 +2126,7 @@ function categorizeTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
 }
 
 function shareTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
-    const {onyxData: trackedExpenseOnyxData, reportInformation, transactionParams, policyParams, createdWorkspaceParams, accountantParams} = trackedExpenseParams;
+    const {onyxData: trackedExpenseOnyxData, reportInformation, transactionParams, policyParams, createdWorkspaceParams, accountantParams, currentUserAccountID} = trackedExpenseParams;
 
     const policyID = policyParams?.policyID;
     const chatReportID = reportInformation?.chatReportID;
@@ -2185,7 +2185,14 @@ function shareTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
             optimisticData: addAccountantToWorkspaceOptimisticData,
             successData: addAccountantToWorkspaceSuccessData,
             failureData: addAccountantToWorkspaceFailureData,
-        } = buildAddMembersToWorkspaceOnyxData({[accountantEmail]: accountantAccountID}, policyParams.policy, policyMemberAccountIDs, CONST.POLICY.ROLE.ADMIN, formatPhoneNumber);
+        } = buildAddMembersToWorkspaceOnyxData(
+            {[accountantEmail]: accountantAccountID},
+            policyParams.policy,
+            policyMemberAccountIDs,
+            CONST.POLICY.ROLE.ADMIN,
+            formatPhoneNumber,
+            currentUserAccountID,
+        );
         onyxData.optimisticData?.push(...addAccountantToWorkspaceOptimisticData);
         onyxData.successData?.push(...addAccountantToWorkspaceSuccessData);
         onyxData.failureData?.push(...addAccountantToWorkspaceFailureData);
@@ -2481,6 +2488,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 transactionParams,
                 policyParams,
                 createdWorkspaceParams,
+                currentUserAccountID: currentUserAccountIDParam,
             };
 
             categorizeTrackedExpense(trackedExpenseParams);
@@ -2532,6 +2540,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 policyParams,
                 createdWorkspaceParams,
                 accountantParams,
+                currentUserAccountID: currentUserAccountIDParam,
             };
             shareTrackedExpense(trackedExpenseParams);
             break;

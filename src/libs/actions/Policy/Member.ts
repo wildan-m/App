@@ -809,6 +809,7 @@ function buildAddMembersToWorkspaceOnyxData(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number,
     approverEmail?: string,
     policyExpenseChatNotificationPreference?: NotificationPreference,
 ) {
@@ -832,7 +833,7 @@ function buildAddMembersToWorkspaceOnyxData(
 
     // create onyx data for policy expense chats for each new member
     // TODO: Update to include reportActionsList later (https://github.com/Expensify/App/issues/66578)
-    const membersChats = createPolicyExpenseChats(policyID, invitedEmailsToAccountIDs, undefined, undefined, policyExpenseChatNotificationPreference);
+    const membersChats = createPolicyExpenseChats(policyID, invitedEmailsToAccountIDs, currentUserAccountID, undefined, undefined, policyExpenseChatNotificationPreference);
 
     const optimisticMembersState: OnyxCollectionInputValue<PolicyEmployee> = {};
     const successMembersState: OnyxCollectionInputValue<PolicyEmployee> = {};
@@ -942,6 +943,7 @@ function addMembersToWorkspace(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number,
     approverEmail?: string,
 ) {
     if (!policy?.id) {
@@ -954,6 +956,7 @@ function addMembersToWorkspace(
         policyMemberAccountIDs,
         role,
         formatPhoneNumber,
+        currentUserAccountID,
         approverEmail,
     );
 

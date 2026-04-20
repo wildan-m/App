@@ -374,7 +374,7 @@ describe('actions/PolicyMember', () => {
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, policy);
 
             mockFetch?.pause?.();
-            Member.addMembersToWorkspace({[newUserEmail]: 1234}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber);
+            Member.addMembersToWorkspace({[newUserEmail]: 1234}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber, 1);
 
             await waitForBatchedUpdates();
 
@@ -428,9 +428,9 @@ describe('actions/PolicyMember', () => {
 
             // When adding a new admin, auditor, and user members
             mockFetch?.pause?.();
-            Member.addMembersToWorkspace({[adminEmail]: adminAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.ADMIN, TestHelper.formatPhoneNumber);
-            Member.addMembersToWorkspace({[auditorEmail]: auditorAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.AUDITOR, TestHelper.formatPhoneNumber);
-            Member.addMembersToWorkspace({[userEmail]: userAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber);
+            Member.addMembersToWorkspace({[adminEmail]: adminAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.ADMIN, TestHelper.formatPhoneNumber, 1);
+            Member.addMembersToWorkspace({[auditorEmail]: auditorAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.AUDITOR, TestHelper.formatPhoneNumber, 1);
+            Member.addMembersToWorkspace({[userEmail]: userAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber, 1);
 
             await waitForBatchedUpdates();
 
@@ -493,7 +493,7 @@ describe('actions/PolicyMember', () => {
             });
 
             // When adding the user to the workspace
-            Member.addMembersToWorkspace({[userEmail]: userAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber);
+            Member.addMembersToWorkspace({[userEmail]: userAccountID}, 'Welcome', policy, [], CONST.POLICY.ROLE.USER, TestHelper.formatPhoneNumber, 1);
 
             await waitForBatchedUpdates();
 
