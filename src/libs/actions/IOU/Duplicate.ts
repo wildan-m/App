@@ -840,12 +840,6 @@ function duplicateReport({
         return;
     }
 
-    const userAccountID = getUserAccountID();
-    const currentUserEmailValue = getCurrentUserEmail();
-
-    const newReportName = translate('common.copyOfReportName', sourceReportName);
-    const {reportPreviewReportActionID, ...newReport} = createNewReport(ownerPersonalDetails, false, isASAPSubmitBetaEnabled, targetPolicy, betas, false, undefined, newReportName);
-
     const isCrossWorkspace = !!sourceReport && sourceReport.policyID !== targetPolicy.id;
 
     const eligibleTransactions = sourceReportTransactions.filter((transaction) => {
@@ -871,6 +865,12 @@ function duplicateReport({
     if (eligibleTransactions.length === 0) {
         return;
     }
+
+    const userAccountID = getUserAccountID();
+    const currentUserEmailValue = getCurrentUserEmail();
+
+    const newReportName = translate('common.copyOfReportName', sourceReportName);
+    const {reportPreviewReportActionID, ...newReport} = createNewReport(ownerPersonalDetails, false, isASAPSubmitBetaEnabled, targetPolicy, betas, false, undefined, newReportName);
 
     const participants = getMoneyRequestParticipantsFromReport(parentChatReport, userAccountID);
 
