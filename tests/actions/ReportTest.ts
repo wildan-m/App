@@ -3563,6 +3563,67 @@ describe('actions/Report', () => {
 
             TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.CHANGE_REPORT_POLICY_AND_INVITE_SUBMITTER, 0);
         });
+
+        it('should invite the submitter and optimistically add them to the policy employee list with USER role', async () => {
+            const ownerAccountID = 42;
+            const ownerEmail = 'submitter-42@expensifail.com';
+            const existingAdminEmail = 'admin-1@expensifail.com';
+            const existingUserEmail = 'user-1@expensifail.com';
+            const expenseReport: OnyxTypes.Report = {
+                ...createRandomReport(1, undefined),
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID: 'sourcePolicy',
+                ownerAccountID,
+            };
+            const targetPolicy: OnyxTypes.Policy = {
+                ...createRandomPolicy(2),
+                id: 'targetPolicy',
+                role: CONST.POLICY.ROLE.ADMIN,
+                type: CONST.POLICY.TYPE.TEAM,
+                isPolicyExpenseChatEnabled: true,
+                employeeList: {
+                    [existingAdminEmail]: {email: existingAdminEmail, role: CONST.POLICY.ROLE.ADMIN},
+                    [existingUserEmail]: {email: existingUserEmail, role: CONST.POLICY.ROLE.USER},
+                },
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${targetPolicy.id}`, targetPolicy);
+            await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {[ownerAccountID]: {login: ownerEmail, accountID: ownerAccountID}});
+
+            const mockFetch = TestHelper.getGlobalFetchMock() as MockFetch;
+            global.fetch = mockFetch;
+            mockFetch.pause?.();
+
+            Report.changeReportPolicyAndInviteSubmitter({
+                report: expenseReport,
+                parentReport: undefined,
+                policy: targetPolicy,
+                currentUserAccountID: 1,
+                email: 'current-user@expensifail.com',
+                hasViolationsParam: false,
+                isChangePolicyTrainingModalDismissed: false,
+                isASAPSubmitBetaEnabled: false,
+                employeeList: targetPolicy.employeeList,
+                formatPhoneNumber: TestHelper.formatPhoneNumber,
+                isReportLastVisibleArchived: false,
+                reportNextStep: undefined,
+            });
+            await waitForBatchedUpdates();
+
+            // While the request is in-flight the optimistic data should show the submitter as a user pending addition
+            const optimisticPolicy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${targetPolicy.id}`);
+            expect(optimisticPolicy?.employeeList?.[ownerEmail]).toEqual(
+                expect.objectContaining({
+                    email: ownerEmail,
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                }),
+            );
+
+            await mockFetch.resume?.();
+            TestHelper.expectAPICommandToHaveBeenCalled(WRITE_COMMANDS.CHANGE_REPORT_POLICY_AND_INVITE_SUBMITTER, 1);
+        });
     });
 
     describe('moveIOUReportToPolicy', () => {
