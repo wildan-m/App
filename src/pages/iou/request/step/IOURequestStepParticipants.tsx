@@ -22,7 +22,7 @@ import {isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {findSelfDMReportID, generateReportID, isInvoiceRoomWithID} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {endSpan} from '@libs/telemetry/activeSpans';
-import {getRequestType, hasRoute, isCorporateCardTransaction, isDistanceRequest, isPerDiemRequest, isTimeRequest as isTimeRequestUtil} from '@libs/TransactionUtils';
+import {getRequestType, hasRoute, isDistanceRequest, isFromCreditCardImport, isPerDiemRequest, isTimeRequest as isTimeRequestUtil} from '@libs/TransactionUtils';
 import MoneyRequestParticipantsSelector from '@pages/iou/request/MoneyRequestParticipantsSelector';
 import {
     resetDraftTransactionsCustomUnit,
@@ -132,7 +132,7 @@ function IOURequestStepParticipants({
     const isMobileSafari = isMobileSafariBrowser();
     const isPerDiem = isPerDiemRequest(initialTransaction);
     const isTime = isTimeRequestUtil(initialTransaction);
-    const isCorporateCard = isCorporateCardTransaction(initialTransaction);
+    const isCardTransaction = isFromCreditCardImport(initialTransaction);
 
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
@@ -482,7 +482,7 @@ function IOURequestStepParticipants({
                 isPerDiemRequest={isPerDiem}
                 isTimeRequest={isTime}
                 isWorkspacesOnly={isWorkspacesOnly}
-                isCorporateCardTransaction={isCorporateCard}
+                isCardTransaction={isCardTransaction}
             />
         </StepScreenWrapper>
     );

@@ -78,8 +78,8 @@ type MoneyRequestParticipantsSelectorProps = {
     /** Whether this is a time expense request */
     isTimeRequest?: boolean;
 
-    /** Whether this is a corporate card transaction */
-    isCorporateCardTransaction?: boolean;
+    /** Whether the expense is a card-imported transaction (managed card or personal card imported via bank connection) */
+    isCardTransaction?: boolean;
 
     /** Reference to the outer element */
     ref?: Ref<InputFocusRef>;
@@ -105,7 +105,7 @@ function MoneyRequestParticipantsSelector({
     isPerDiemRequest = false,
     isTimeRequest = false,
     isWorkspacesOnly = false,
-    isCorporateCardTransaction = false,
+    isCardTransaction = false,
     ref,
 }: MoneyRequestParticipantsSelectorProps) {
     const icons = useMemoizedLazyExpensifyIcons(['UserPlus']);
@@ -187,7 +187,7 @@ function MoneyRequestParticipantsSelector({
             excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
             includeOwnedWorkspaceChats: iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.CREATE || iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.TRACK,
             excludeNonAdminWorkspaces: action === CONST.IOU.ACTION.SHARE,
-            includeP2P: !isCategorizeOrShareAction && !isPerDiemRequest && !isTimeRequest && !isCorporateCardTransaction,
+            includeP2P: !isCategorizeOrShareAction && !isPerDiemRequest && !isTimeRequest && !isCardTransaction,
             includeInvoiceRooms: iouType === CONST.IOU.TYPE.INVOICE,
             action,
             shouldSeparateSelfDMChat: iouType !== CONST.IOU.TYPE.INVOICE,
@@ -209,7 +209,7 @@ function MoneyRequestParticipantsSelector({
             isCategorizeOrShareAction,
             isPerDiemRequest,
             isTimeRequest,
-            isCorporateCardTransaction,
+            isCardTransaction,
             canShowManagerMcTest,
             isPaidGroupPolicy,
             isRestrictedToPreferredPolicy,
