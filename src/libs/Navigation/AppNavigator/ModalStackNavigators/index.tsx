@@ -417,7 +417,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.SETTINGS.WALLET.CARDS_DIGITAL_DETAILS_UPDATE_ADDRESS]: () => require<ReactComponentModule>('../../../../pages/settings/Profile/PersonalDetails/PersonalAddressPage').default,
     [SCREENS.SETTINGS.WALLET.DOMAIN_CARD]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/ExpensifyCardPage/index').default,
     [SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES]: () =>
-        require<ReactComponentModule>('../../../../pages/settings/Wallet/WalletExpensifyCardSpendRulesNavigator').default,
+        require<ReactComponentModule>('../../../../pages/settings/Wallet/WalletExpensifyCardSpendRulesPage').default,
     [SCREENS.SETTINGS.WALLET.DOMAIN_CARD_CONFIRM_MAGIC_CODE]: () =>
         require<ReactComponentModule>('../../../../pages/settings/Wallet/ExpensifyCardPage/ExpensifyCardVerifyAccountPage').default,
     [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_DETAILS]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/PersonalCardDetailsPage').default,

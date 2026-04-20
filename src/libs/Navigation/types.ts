@@ -199,10 +199,6 @@ type SettingsNavigatorParamList = {
         policyID: string;
         ruleID: string;
     };
-    [SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES_ROOT]: {
-        policyID: string;
-        ruleID: string;
-    };
     [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: {
         policyID: string;
     };
@@ -1623,16 +1619,6 @@ type SettingsNavigatorParamList = {
         domainAccountID: number;
     };
 } & ReimbursementAccountNavigatorParamList;
-
-type WalletExpensifyCardSpendRulesNestedParamList = Pick<
-    SettingsNavigatorParamList,
-    | typeof SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES_ROOT
-    | typeof SCREENS.WORKSPACE.RULES_SPEND_CARD
-    | typeof SCREENS.WORKSPACE.RULES_SPEND_CATEGORY
-    | typeof SCREENS.WORKSPACE.RULES_SPEND_MAX_AMOUNT
-    | typeof SCREENS.WORKSPACE.RULES_SPEND_MERCHANTS
-    | typeof SCREENS.WORKSPACE.RULES_SPEND_MERCHANT_EDIT
->;
 
 type DomainCardNavigatorParamList = {
     [SCREENS.DOMAIN_CARD.DOMAIN_CARD_DETAIL]: {
@@ -3354,7 +3340,6 @@ export type {
     TeachersUniteNavigatorParamList,
     TransactionDuplicateNavigatorParamList,
     TravelNavigatorParamList,
-    WalletExpensifyCardSpendRulesNestedParamList,
     WalletStatementNavigatorParamList,
     WorkspaceSplitNavigatorParamList,
     WorkspaceNavigatorParamList,

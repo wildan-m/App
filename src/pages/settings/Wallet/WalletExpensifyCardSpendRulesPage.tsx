@@ -1,16 +1,13 @@
 import React from 'react';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
-import type {WalletExpensifyCardSpendRulesNestedParamList} from '@libs/Navigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import SpendRulePageBase from '@pages/workspace/rules/SpendRules/SpendRulePageBase';
 import ROUTES from '@src/ROUTES';
-import type SCREENS from '@src/SCREENS';
+import SCREENS from '@src/SCREENS';
 
-type WalletExpensifyCardSpendRulesRootPageProps = PlatformStackScreenProps<
-    WalletExpensifyCardSpendRulesNestedParamList,
-    typeof SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES_ROOT
->;
+type WalletExpensifyCardSpendRulesPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.WALLET.EXPENSIFY_CARD_SPEND_RULES>;
 
-function WalletExpensifyCardSpendRulesRootPage({route}: WalletExpensifyCardSpendRulesRootPageProps) {
+function WalletExpensifyCardSpendRulesPage({route}: WalletExpensifyCardSpendRulesPageProps) {
     const {policyID, ruleID} = route.params;
     const isNewRule = ruleID === ROUTES.NEW;
 
@@ -24,6 +21,6 @@ function WalletExpensifyCardSpendRulesRootPage({route}: WalletExpensifyCardSpend
     );
 }
 
-WalletExpensifyCardSpendRulesRootPage.displayName = 'WalletExpensifyCardSpendRulesRootPage';
+WalletExpensifyCardSpendRulesPage.displayName = 'WalletExpensifyCardSpendRulesPage';
 
-export default WalletExpensifyCardSpendRulesRootPage;
+export default WalletExpensifyCardSpendRulesPage;
