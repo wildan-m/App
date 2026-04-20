@@ -789,6 +789,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             policyExpenseChatReportActions,
             formatPhoneNumber,
             clearSelectedTransactions,
+            accountID,
         ],
     );
 
