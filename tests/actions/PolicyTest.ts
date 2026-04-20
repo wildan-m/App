@@ -518,7 +518,6 @@ describe('actions/Policy', () => {
         });
 
         it('duplicate workspace with overview, travel, and codingRules options', async () => {
-            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
             const basePolicy = createRandomPolicy(15, CONST.POLICY.TYPE.TEAM);
             const fakePolicy: PolicyType = {
                 ...basePolicy,
@@ -572,15 +571,10 @@ describe('actions/Policy', () => {
                 });
             });
 
-            // When overview is selected, outputCurrency should come from the source policy
             expect(policy?.outputCurrency).toBe('EUR');
-            // When overview is selected, address should come from the source policy
             expect(policy?.address).toEqual(fakePolicy.address);
-            // When travel is selected, isTravelEnabled should come from the source policy
             expect(policy?.isTravelEnabled).toBe(true);
-            // When taxes is selected, tax should come from the source policy
             expect(policy?.tax).toEqual(fakePolicy.tax);
-            // When codingRules is selected, rules should contain codingRules from the source policy
             expect(policy?.rules).toEqual({codingRules: fakePolicy.rules?.codingRules});
         });
 

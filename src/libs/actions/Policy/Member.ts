@@ -809,7 +809,7 @@ function buildAddMembersToWorkspaceOnyxData(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
-    currentUserAccountID: number,
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
     policyExpenseChatNotificationPreference?: NotificationPreference,
 ) {
@@ -943,7 +943,7 @@ function addMembersToWorkspace(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
-    currentUserAccountID: number,
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
 ) {
     if (!policy?.id) {

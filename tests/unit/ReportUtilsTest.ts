@@ -7054,13 +7054,12 @@ describe('ReportUtils', () => {
             expect(result.announceChatData.onyxFailureData.length).toBeGreaterThan(0);
         });
 
-        it('should pass currentUserAccountID through to the optimistic chat report participants', () => {
+        it('should not assign a role to participants for workspace chat type', () => {
             const currentUser = 100;
             const result = buildOptimisticAnnounceChat('policyID123', [100, 200, 300], currentUser);
-            // The announce chat optimistic data should contain a report with participants
             const reportData = result.announceChatData.onyxOptimisticData.find((data) => data.key.startsWith(`${ONYXKEYS.COLLECTION.REPORT}`));
             const report = reportData?.value as Report | undefined;
-            expect(report?.participants?.[currentUser]?.role).toBeUndefined(); // workspace chat type doesn't assign roles
+            expect(report?.participants?.[currentUser]?.role).toBeUndefined();
         });
 
         it('should create announce chat with POLICY_ANNOUNCE chat type', () => {
