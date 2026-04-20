@@ -43,6 +43,7 @@ function ReviewDuplicatesPrimaryAction({reportID, chatReportID}: SimpleActionPro
                             moneyRequestReport,
                             policy,
                             allTransactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + reportTransaction.transactionID],
+                            allTransactionViolations,
                         ),
                     );
                     if (duplicateTransaction) {
