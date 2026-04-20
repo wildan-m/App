@@ -1,7 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
 import {FlashList} from '@shopify/flash-list';
 import type {FlashListRef, ListRenderItemInfo} from '@shopify/flash-list';
-import React, {useCallback, useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useDeferredValue, useEffect, useEffectEvent, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {ViewToken} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -376,11 +376,9 @@ function MoneyRequestReportPreviewContent({
     }, [carouselTransactions]);
 
     const isFocused = useIsFocused();
-    const isFocusedRef = useRef(isFocused);
-
-    useEffect(() => {
-        isFocusedRef.current = isFocused;
-    }, [isFocused]);
+    const getIsFocused = useEffectEvent(() => {
+        return isFocused;
+    });
 
     useEffect(() => {
         const index = carouselTransactions.findIndex((transaction) => newTransactionIDs?.has(transaction.transactionID));
@@ -390,9 +388,10 @@ function MoneyRequestReportPreviewContent({
         }
         const newTransaction = carouselTransactions.at(index);
         setTimeout(() => {
-            if (!isFocusedRef.current) {
+            if (!getIsFocused()) {
                 return;
             }
+
             // If the new transaction is not available at the index it was on before the delay, avoid the scrolling
             // because we are scrolling to either a wrong or unavailable transaction (which can cause crash).
             if (newTransaction?.transactionID !== carouselTransactionsRef.current.at(index)?.transactionID) {
