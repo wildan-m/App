@@ -66,7 +66,7 @@ type MoneyReportHeaderSelectionDropdownProps = {
 
 function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportInSearch, wrapperStyle}: MoneyReportHeaderSelectionDropdownProps) {
     const route = useRoute();
-    const {startAnimation, startApprovedAnimation, startSubmittingAnimation} = usePaymentAnimationsContext();
+    const {startApprovedAnimation, startSubmittingAnimation} = usePaymentAnimationsContext();
     const {openHoldMenu: openHoldMenuAsync, openRejectModal} = useMoneyReportHeaderModals();
     const openHoldMenu = (params: Parameters<typeof openHoldMenuAsync>[0]) => {
         openHoldMenuAsync(params);
@@ -268,9 +268,6 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
                 amountOwed,
                 ownerBillingGracePeriodEnd,
                 methodID: type === CONST.IOU.PAYMENT_TYPE.VBBA ? methodID : undefined,
-                onPaid: () => {
-                    startAnimation();
-                },
             });
             if (currentSearchQueryJSON && !isOffline) {
                 search({
