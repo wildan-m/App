@@ -1677,6 +1677,7 @@ const translations: TranslationDeepObject<typeof en> = {
             prompt: 'Activez le suivi des taxes dans l’espace de travail pour modifier les détails de la dépense ou supprimer la taxe de cette dépense.',
             confirmText: 'Supprimer la taxe',
         },
+        bulkDuplicateLimit: `Vous pouvez dupliquer jusqu’à ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} dépenses à la fois. Veuillez sélectionner moins de dépenses et réessayer.`,
         deleted: 'Supprimé',
     },
     transactionMerge: {
@@ -2619,6 +2620,9 @@ ${amount} pour ${merchant} - ${date}`,
     },
     workflowsExpensesFromPage: {
         title: 'Dépenses de',
+        memberAlreadyInWorkflowTitle: 'Membre déjà dans un workflow',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName} fait déjà partie d\u2019un workflow d\u2019approbation qui soumet à ${approverName}. L\u2019ajouter ici le déplacera vers ce workflow.`,
         header: 'Quand les membres suivants soumettent des dépenses :',
     },
     workflowsApproverPage: {
@@ -4307,6 +4311,7 @@ ${amount} pour ${merchant} - ${date}`,
             budgetTypeForNotificationMessage: {tag: 'tag', category: 'catégorie'},
             policyExpenseChatName: (displayName: string) => `Dépenses de ${displayName}`,
             deepDiveExpensifyCard: `<muted-text-label>Les transactions de la Carte Expensify seront automatiquement exportées vers un « compte de passif Carte Expensify » créé avec <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">notre intégration</a>.</muted-text-label>`,
+            hr: 'RH',
         },
         receiptPartners: {
             uber: {
@@ -6964,6 +6969,31 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             }),
             subscriptions: 'Abonnements',
         },
+        hr: {
+            title: 'RH',
+            subtitle: 'Connectez vos outils RH et gardez les approbations des employés synchronisées.',
+            settingsTitle: 'Paramètres Gusto',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return 'Importation des données Gusto';
+                    case 'gustoSyncLoadCompany':
+                        return "Chargement des données de l'entreprise Gusto";
+                    case 'gustoSyncImportEmployees':
+                        return 'Importation des employés';
+                    case 'gustoSyncBuildApprovalChains':
+                        return 'Création de chaînes d’approbation';
+                    case 'gustoSyncFinalize':
+                        return 'Finalisation de la synchronisation';
+                    case 'jobDone':
+                        return 'En attente du chargement des données importées';
+                    default: {
+                        return `Traduction manquante pour l’étape : ${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: 'Mode d’approbation', finalApprover: 'Approbateur final'},
+        },
     },
     getAssistancePage: {
         title: 'Obtenir de l’aide',
@@ -8628,6 +8658,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         details: {
             title: 'Détails de l’abonnement',
             annual: 'Abonnement annuel',
+            creditBalance: 'Solde créditeur',
             taxExempt: 'Demander le statut d’exonération fiscale',
             taxExemptEnabled: 'Exonéré d’impôt',
             taxExemptStatus: 'Statut d’exonération fiscale',
