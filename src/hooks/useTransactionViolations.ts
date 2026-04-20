@@ -10,6 +10,9 @@ import useOnyx from './useOnyx';
 function useTransactionViolations(transactionID?: string, shouldShowRterForSettledReport = true): TransactionViolations {
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
     const [transactionViolations = getEmptyArray<TransactionViolation>()] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`);
+    // Full collection subscription is intentional: shouldShowDuplicateViolation needs to
+    // look up duplicate transactions' violations to verify bidirectional links, and a selector
+    // approach introduces a loading-state ambiguity that causes stale violations to flash.
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID)}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${iouReport?.policyID}`);
