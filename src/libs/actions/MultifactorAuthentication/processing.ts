@@ -1,17 +1,10 @@
-import type {MultifactorAuthenticationScenarioConfig} from '@components/MultifactorAuthentication/config/types';
+import type {MultifactorAuthenticationScenarioConfig, MultifactorAuthenticationScenarioResponse} from '@components/MultifactorAuthentication/config/types';
 import {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
 import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
 import type {MfaResult} from '@libs/MultifactorAuthentication/shared/MfaResult';
-import type {MultifactorAuthenticationReason, RegistrationKeyInfo} from '@libs/MultifactorAuthentication/shared/types';
+import type {RegistrationKeyInfo} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import {registerAuthenticationKey} from './index';
-
-type ScenarioResponseData = {
-    httpStatusCode: number | undefined;
-    reason: MultifactorAuthenticationReason | undefined;
-    message: string | undefined;
-    body?: Record<string, unknown>;
-};
 
 type RegistrationParams = {
     keyInfo: RegistrationKeyInfo;
@@ -32,7 +25,7 @@ async function processRegistration(params: RegistrationParams): Promise<MfaResul
 async function processScenarioAction(
     action: MultifactorAuthenticationScenarioConfig['action'],
     params: Parameters<MultifactorAuthenticationScenarioConfig['action']>[0],
-): Promise<MfaResult<ScenarioResponseData>> {
+): Promise<MfaResult<MultifactorAuthenticationScenarioResponse>> {
     if (!params.signedChallenge) {
         return {
             success: false,
@@ -56,4 +49,4 @@ async function processScenarioAction(
 }
 
 export {processRegistration, processScenarioAction};
-export type {ScenarioResponseData, RegistrationParams};
+export type {RegistrationParams};
