@@ -1187,7 +1187,7 @@ describe('actions/Policy', () => {
             const params = writeCall?.at(1) as {memberData?: string};
             expect(params?.memberData).toBeDefined();
 
-            const memberData = JSON.parse(params.memberData ?? '{}');
+            const memberData = JSON.parse(params.memberData ?? '{}') as {email: string; accountID: number; workspaceChatReportID: string};
             expect(memberData.email).toBe(adminLogin);
             expect(memberData.accountID).toBe(100);
             expect(memberData.workspaceChatReportID).toBeDefined();

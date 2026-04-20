@@ -158,6 +158,7 @@ function useAutoCreateTrackWorkspace() {
             conciergeChatReportID,
             archivedReportsIdSet,
             mergedAccountConciergeReportID,
+            filteredReportActions,
         ],
     );
 
