@@ -882,6 +882,8 @@ const translations: TranslationDeepObject<typeof en> = {
     adminOnlyCanPost: 'Alleen beheerders kunnen berichten sturen in deze ruimte.',
     reportAction: {
         asCopilot: 'als copiloot voor',
+        assistedBy: (agentName: string) => `bijgestaan door ${agentName}`,
+        humanSupportAgent: 'een menselijke medewerker',
         harvestCreatedExpenseReport: (reportUrl: string, reportName: string) =>
             `heeft dit rapport gemaakt om alle uitgaven van <a href="${reportUrl}">${reportName}</a> te bewaren die niet konden worden ingediend op de door jou gekozen frequentie`,
         createdReportForUnapprovedTransactions: ({reportUrl, reportName, reportID, isReportDeleted}: CreatedReportForUnapprovedTransactionsParams) =>
@@ -1666,6 +1668,7 @@ const translations: TranslationDeepObject<typeof en> = {
             prompt: 'Schakel belastingregistratie in voor de workspace om de onkostendetails te bewerken of de belasting uit deze onkostendeclaratie te verwijderen.',
             confirmText: 'Belasting verwijderen',
         },
+        bulkDuplicateLimit: `Je kunt maximaal ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} uitgaven tegelijk dupliceren. Selecteer minder uitgaven en probeer het opnieuw.`,
         deleted: 'Verwijderd',
     },
     transactionMerge: {
@@ -2607,6 +2610,9 @@ ${amount} voor ${merchant} - ${date}`,
     workflowsExpensesFromPage: {
         title: 'Uitgaven vanaf',
         header: 'Wanneer de volgende leden onkosten indienen:',
+        memberAlreadyInWorkflowTitle: 'Lid bevindt zich al in een workflow',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName} bevindt zich al in een goedkeuringsworkflow die indient bij ${approverName}. Door het lid hier toe te voegen, wordt het naar deze workflow verplaatst.`,
     },
     workflowsApproverPage: {
         genericErrorMessage: 'De fiatteur kon niet worden gewijzigd. Probeer het opnieuw of neem contact op met support.',
@@ -4281,6 +4287,7 @@ ${amount} voor ${merchant} - ${date}`,
             budgetFrequencyUnit: {monthly: 'maand', yearly: 'jaar'},
             budgetTypeForNotificationMessage: {tag: 'tag', category: 'categorie'},
             deepDiveExpensifyCard: `<muted-text-label>Transacties met de Expensify Kaart worden automatisch geëxporteerd naar een "Expensify Kaart Passivarekening" dat wordt aangemaakt via <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">onze integratie</a>.</muted-text-label>`,
+            hr: 'HR',
         },
         receiptPartners: {
             uber: {
@@ -6907,6 +6914,31 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             }),
             subscriptions: 'Abonnementen',
         },
+        hr: {
+            title: 'HR',
+            subtitle: 'Koppel HR-tools en houd goedkeuringen van medewerkers gesynchroniseerd.',
+            settingsTitle: 'Gusto-instellingen',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return 'Gusto-gegevens importeren';
+                    case 'gustoSyncLoadCompany':
+                        return 'Gusto-bedrijfsgegevens laden';
+                    case 'gustoSyncImportEmployees':
+                        return 'Werknemers importeren';
+                    case 'gustoSyncBuildApprovalChains':
+                        return 'Goedkeuringstrajecten opbouwen';
+                    case 'gustoSyncFinalize':
+                        return 'Synchronisatie voltooien';
+                    case 'jobDone':
+                        return 'Wachten tot geïmporteerde gegevens zijn geladen';
+                    default: {
+                        return `Vertaling ontbreekt voor fase: ${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: 'Goedkeuringsmodus', finalApprover: 'Laatste fiatteur'},
+        },
     },
     getAssistancePage: {
         title: 'Hulp krijgen',
@@ -8568,6 +8600,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         details: {
             title: 'Abonnementsgegevens',
             annual: 'Jaarabonnement',
+            creditBalance: 'Creditsaldo',
             taxExempt: 'Vrijstelling van belasting aanvragen',
             taxExemptEnabled: 'Vrijgesteld van belasting',
             taxExemptStatus: 'Belastingvrijstellingstatus',

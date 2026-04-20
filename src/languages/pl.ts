@@ -883,6 +883,8 @@ const translations: TranslationDeepObject<typeof en> = {
     adminOnlyCanPost: 'Tylko administratorzy mogą wysyłać wiadomości w tym pokoju.',
     reportAction: {
         asCopilot: 'jako drugi pilot dla',
+        assistedBy: (agentName: string) => `wspierany przez ${agentName}`,
+        humanSupportAgent: 'ludzki agent wsparcia',
         harvestCreatedExpenseReport: (reportUrl: string, reportName: string) =>
             `utworzył(-a) ten raport, aby zawierał wszystkie wydatki z <a href="${reportUrl}">${reportName}</a>, których nie można było złożyć z wybraną przez Ciebie częstotliwością`,
         createdReportForUnapprovedTransactions: ({reportUrl, reportName, reportID, isReportDeleted}: CreatedReportForUnapprovedTransactionsParams) =>
@@ -1666,6 +1668,7 @@ const translations: TranslationDeepObject<typeof en> = {
             prompt: 'Włącz śledzenie podatku w przestrzeni roboczej, aby edytować szczegóły wydatku lub usunąć podatek z tego wydatku.',
             confirmText: 'Usuń podatek',
         },
+        bulkDuplicateLimit: `Możesz jednocześnie zduplikować maksymalnie ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} wydatków. Wybierz mniej wydatków i spróbuj ponownie.`,
         deleted: 'Usunięto',
     },
     transactionMerge: {
@@ -2602,6 +2605,9 @@ ${amount} dla ${merchant} - ${date}`,
     workflowsExpensesFromPage: {
         title: 'Wydatki od',
         header: 'Gdy następujący członkowie przesyłają wydatki:',
+        memberAlreadyInWorkflowTitle: 'Członek jest już w procesie',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName} jest już w procesie zatwierdzania, który przesyła do ${approverName}. Dodanie go tutaj przeniesie go do tego procesu.`,
     },
     workflowsApproverPage: {
         genericErrorMessage: 'Nie udało się zmienić osoby zatwierdzającej. Spróbuj ponownie lub skontaktuj się z pomocą techniczną.',
@@ -4272,6 +4278,7 @@ ${amount} dla ${merchant} - ${date}`,
             budgetTypeForNotificationMessage: {tag: 'znacznik', category: 'kategoria'},
             policyExpenseChatName: (displayName: string) => `Wydatki ${displayName}`,
             deepDiveExpensifyCard: `<muted-text-label>Transakcje z Karty Expensify będą automatycznie eksportowane do „Konta zobowiązań Karty Expensify” utworzonego dzięki <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">naszej integracji</a>.</muted-text-label>`,
+            hr: 'HR',
         },
         receiptPartners: {
             uber: {
@@ -6899,6 +6906,31 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             }),
             subscriptions: 'Subskrypcje',
         },
+        hr: {
+            title: 'HR',
+            subtitle: 'Połącz narzędzia HR i utrzymuj zgody pracowników w synchronizacji.',
+            settingsTitle: 'Ustawienia Gusto',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return 'Importowanie danych Gusto';
+                    case 'gustoSyncLoadCompany':
+                        return 'Wczytywanie danych firmy Gusto';
+                    case 'gustoSyncImportEmployees':
+                        return 'Importowanie pracowników';
+                    case 'gustoSyncBuildApprovalChains':
+                        return 'Tworzenie łańcuchów zatwierdzania';
+                    case 'gustoSyncFinalize':
+                        return 'Finalizowanie synchronizacji';
+                    case 'jobDone':
+                        return 'Oczekiwanie na załadowanie zaimportowanych danych';
+                    default: {
+                        return `Brak tłumaczenia dla etapu: ${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: 'Tryb zatwierdzania', finalApprover: 'Ostateczny zatwierdzający'},
+        },
     },
     getAssistancePage: {
         title: 'Uzyskaj pomoc',
@@ -8554,6 +8586,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         details: {
             title: 'Szczegóły subskrypcji',
             annual: 'Abonament roczny',
+            creditBalance: 'Saldo kredytowe',
             taxExempt: 'Poproś o status zwolnienia z podatku',
             taxExemptEnabled: 'Zwolnione z podatku',
             taxExemptStatus: 'Status zwolnienia z podatku',
