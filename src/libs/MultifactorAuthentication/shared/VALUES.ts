@@ -54,6 +54,9 @@ const REASON = {
             ABORT: 'Local WebAuthn: Operation aborted',
             NOT_SUPPORTED: 'Local WebAuthn: Not supported',
             CONSTRAINT_ERROR: 'Local WebAuthn: Constraint error',
+            TIMEOUT: 'Local WebAuthn: Operation timed out',
+            DATA_ERROR: 'Local WebAuthn: Malformed input data',
+            UNKNOWN: 'Local WebAuthn: Platform or authenticator failure',
             REGISTRATION_REQUIRED: 'Local WebAuthn: No matching passkey credentials found locally',
             UNEXPECTED_RESPONSE: 'Local WebAuthn: Credential response type is unexpected',
             GENERIC: 'Local WebAuthn: An unknown error occurred',
@@ -153,7 +156,7 @@ type DeepLeafValues<T> = T extends Record<string, unknown> ? DeepLeafValues<T[ke
 type ReasonValue = DeepLeafValues<typeof REASON>;
 
 /** Known errors the user is likely to encounter (cancellations, expired transactions, unsupported devices, etc.). Logged at 'info' level. */
-const ROUTINE_OUTCOMES = new Set<ReasonValue>([
+const ROUTINE_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.CANCELED,
     REASON.LOCAL_ERRORS.NO_AUTHENTICATION_METHODS_ENROLLED,
     REASON.LOCAL_ERRORS.AUTHENTICATION_TYPE_NOT_SUPPORTED,
@@ -167,6 +170,7 @@ const ROUTINE_OUTCOMES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.WEBAUTHN.NOT_ALLOWED,
     REASON.LOCAL_ERRORS.WEBAUTHN.ABORT,
     REASON.LOCAL_ERRORS.WEBAUTHN.NOT_SUPPORTED,
+    REASON.LOCAL_ERRORS.WEBAUTHN.TIMEOUT,
     REASON.LOCAL_ERRORS.HSM.CANCELED,
     REASON.LOCAL_ERRORS.HSM.NOT_AVAILABLE,
     REASON.LOCAL_ERRORS.HSM.LOCKOUT,
@@ -188,6 +192,8 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.WEBAUTHN.REGISTRATION_REQUIRED,
     REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE,
     REASON.LOCAL_ERRORS.WEBAUTHN.GENERIC,
+    REASON.LOCAL_ERRORS.WEBAUTHN.DATA_ERROR,
+    REASON.LOCAL_ERRORS.WEBAUTHN.UNKNOWN,
     REASON.LOCAL_ERRORS.HSM.LOCKOUT_PERMANENT,
     REASON.LOCAL_ERRORS.HSM.SIGNATURE_FAILED,
     REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND,
@@ -240,7 +246,7 @@ const SHARED_VALUES = {
     BACKEND_MESSAGE,
     REASON,
     HTTP_STATUS,
-    ROUTINE_OUTCOMES,
+    ROUTINE_FAILURES,
     ANOMALOUS_FAILURES,
 
     /**
