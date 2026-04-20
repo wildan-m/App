@@ -61,8 +61,6 @@ const ONYX_KEY_EXPORT_RULES: Record<string, ExportRule> = {
             'lastVisibleActionLastModified',
             'chatReportID',
             'iouReportID',
-            'total',
-            'unheldTotal',
             'currency',
             'managerID',
             'policyID',
