@@ -168,7 +168,10 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
 
             const authType = mapAuthTypeNumber(signResult.authType);
             if (!authType) {
-                onResult({success: false, error: MfaError.local(VALUES.REASON.CLIENT_ERRORS.BAD_REQUEST, `Unrecognized auth type from HSM sign result: ${signResult.authType}`)});
+                onResult({
+                    success: false,
+                    error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE, `Unrecognized auth type from HSM sign result: ${signResult.authType}`),
+                });
                 return;
             }
 

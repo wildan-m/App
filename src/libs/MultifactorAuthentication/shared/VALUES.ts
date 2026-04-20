@@ -67,6 +67,7 @@ const REASON = {
             KEY_ACCESS_FAILED: 'Local HSM: Failed to access cryptographic key',
             AUTHENTICATION_FAILED: 'Local HSM: Biometric authentication failed',
             GENERIC: 'Local HSM: An unknown error occurred',
+            UNRECOGNIZED_AUTH_TYPE: 'Local HSM: Unrecognized auth type in sign result',
         },
     },
 } as const;
@@ -194,6 +195,7 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.HSM.KEY_CREATION_FAILED,
     REASON.LOCAL_ERRORS.HSM.KEY_ACCESS_FAILED,
     REASON.LOCAL_ERRORS.HSM.GENERIC,
+    REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE,
 ]);
 
 const SHARED_VALUES = {
