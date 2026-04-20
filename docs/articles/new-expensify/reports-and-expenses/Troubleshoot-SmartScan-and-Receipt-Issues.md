@@ -74,7 +74,7 @@ Improving image quality helps prevent most SmartScan issues.
 - Lay the receipt flat on a contrasting surface (e.g., a dark receipt on a light table).
 - Capture the full receipt and make sure all edges, the total, date, and merchant name are visible.
 - Avoid shadows and glare. Hold your phone directly above the receipt and use even lighting.
-- Keep the camera steady - blurry images are the most common cause of scan failures.
+## How to take better receipt photos for SmartScan
 - Avoid folded or crumpled receipts. Flatten the receipt before photographing it.
 - Use the in-app camera. The Expensify camera is optimized for receipt scanning. 
 
