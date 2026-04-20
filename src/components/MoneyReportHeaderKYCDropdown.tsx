@@ -4,7 +4,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {isSecondaryActionAPaymentOption} from '@libs/PaymentUtils';
+import {isSecondaryActionAPaymentOption, isSecondaryActionAWorkspacePolicyOption} from '@libs/PaymentUtils';
 import type {KYCFlowEvent, TriggerKYCFlow} from '@libs/PaymentUtils';
 import shouldPopoverUseScrollView from '@libs/shouldPopoverUseScrollView';
 import CONST from '@src/CONST';
@@ -76,6 +76,10 @@ function MoneyReportHeaderKYCDropdown({
                     success={shouldShowSuccessStyle ?? false}
                     onPress={() => {}}
                     onSubItemSelected={(item, index, event) => {
+                        if (isSecondaryActionAWorkspacePolicyOption(item)) {
+                            triggerKYCFlow({policy: item.workspacePolicy});
+                            return;
+                        }
                         if (!isSecondaryActionAPaymentOption(item)) {
                             return;
                         }
