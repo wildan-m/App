@@ -61,7 +61,7 @@ function MigratedUserWelcomeModal() {
     const onClose = () => {
         Log.hmmm('[MigratedUserWelcomeModal] onClose called, dismissing product training');
         dismissProductTraining(CONST.MIGRATED_USER_WELCOME_MODAL);
-        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery()}));
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT})}));
     };
 
     const featureListContent = (
