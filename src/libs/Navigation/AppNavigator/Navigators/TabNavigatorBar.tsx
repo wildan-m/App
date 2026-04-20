@@ -12,20 +12,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import getFocusedLeafScreenName from '@libs/Navigation/helpers/getFocusedLeafScreenName';
 import NAVIGATORS from '@src/NAVIGATORS';
 import SCREENS from '@src/SCREENS';
-
-/**
- * Screen names that represent the root/landing view of each tab.
- * The tab bar is visible only when one of these screens is focused.
- */
-const ROOT_TAB_SCREENS = new Set<string>([
-    SCREENS.HOME,
-    SCREENS.INBOX,
-    SCREENS.SEARCH.ROOT,
-    SCREENS.SETTINGS.ROOT,
-    SCREENS.WORKSPACES_LIST,
-    SCREENS.WORKSPACE.INITIAL,
-    SCREENS.DOMAIN.INITIAL,
-]);
+import ROOT_TAB_SCREENS from './ROOT_TAB_SCREENS';
 
 const ROUTE_TO_NAVIGATION_TAB: Record<string, ValueOf<typeof NAVIGATION_TABS>> = {
     [SCREENS.HOME]: NAVIGATION_TABS.HOME,

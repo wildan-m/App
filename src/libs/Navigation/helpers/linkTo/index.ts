@@ -1,6 +1,7 @@
 import {getActionFromState} from '@react-navigation/core';
 import type {NavigationContainerRef, NavigationState, PartialState} from '@react-navigation/native';
 import {CommonActions, findFocusedRoute} from '@react-navigation/native';
+import ROOT_TAB_SCREENS from '@libs/Navigation/AppNavigator/Navigators/ROOT_TAB_SCREENS';
 import findMatchingDynamicSuffix from '@libs/Navigation/helpers/dynamicRoutesUtils/findMatchingDynamicSuffix';
 import {getMatchingFullScreenRoute, isFullScreenName} from '@libs/Navigation/helpers/getAdaptedStateFromPath';
 import getStateFromPath from '@libs/Navigation/helpers/getStateFromPath';
@@ -183,6 +184,18 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     const typedPayload = (action as {payload: {name?: string; params?: ActionPayloadParams}}).payload;
     if (currentTopRoute?.name !== NAVIGATORS.TAB_NAVIGATOR && typedPayload.name === NAVIGATORS.TAB_NAVIGATOR) {
         (action as {type: string}).type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
+    }
+
+    // Cross-tab navigation to a deep leaf (e.g. Settings → Concierge): PUSH a new TAB_NAVIGATOR so
+    // swipe-back reveals the original tab. Skipped when the target is a tab root (plain tab switch).
+    const targetTopRoute = stateFromPath.routes?.at(-1) as NavigationPartialRoute | undefined;
+    const currentActiveScreen = currentTopRoute?.name === NAVIGATORS.TAB_NAVIGATOR ? getActiveScreenInRoute(currentTopRoute as NavigationPartialRoute) : undefined;
+    const targetActiveScreen = targetTopRoute?.name === NAVIGATORS.TAB_NAVIGATOR ? getActiveScreenInRoute(targetTopRoute) : undefined;
+    const isTargetAtTabRoot = ROOT_TAB_SCREENS.has(focusedRouteFromPath?.name ?? '');
+    if (currentActiveScreen && targetActiveScreen && currentActiveScreen !== targetActiveScreen && !isTargetAtTabRoot) {
+        (action as {type: string}).type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
+        navigation.dispatch(action);
+        return;
     }
 
     // If we deep link to a RHP page, we want to make sure we have the correct full screen route under the overlay.
