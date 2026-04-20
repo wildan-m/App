@@ -47,7 +47,7 @@ If you don't see the option to close your account, your account may be domain-co
 
 All unsubmitted expenses and personal data tied to the account are deleted. 
 
-Expenses shared with others, such expenses submitted on a Workspace, may retained for regulatory compliance. Submitted expenses remain visible to approvers the Admins on the workspace where the expenses were submitted. 
+Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and Admins on the Workspace where the expenses were submitted. 
 
 ---
 
@@ -78,7 +78,7 @@ This error occurs when you are only remaining admin on a domain. To proceed with
 
 ## Why do I see the message "Expensify Card bank account owner" when closing my account?
 
-This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card.. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
+This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
 
 ## Can I close my account if I own a Workspace on an Annual Subscription?
 
