@@ -1600,3 +1600,92 @@ describe('Transaction', () => {
         });
     });
 });
+
+describe('shouldShowDuplicateViolation', () => {
+    const TXN_A = 'txnA';
+    const TXN_B = 'txnB';
+    const TXN_C = 'txnC';
+
+    function makeDuplicateViolation(duplicates: string[]): TransactionViolation {
+        return {
+            name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
+            type: CONST.VIOLATION_TYPES.VIOLATION,
+            data: {duplicates},
+        };
+    }
+
+    function makeCategoryViolation(): TransactionViolation {
+        return {
+            name: CONST.VIOLATIONS.MISSING_CATEGORY,
+            type: CONST.VIOLATION_TYPES.VIOLATION,
+        };
+    }
+
+    it('should return true for non-duplicate violations (pass-through)', () => {
+        const violation = makeCategoryViolation();
+        const allViolations = {};
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violation, allViolations)).toBe(true);
+    });
+
+    it('should return true when both sides reference each other', () => {
+        const violationA = makeDuplicateViolation([TXN_B]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B])],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [makeDuplicateViolation([TXN_A])],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(true);
+    });
+
+    it('should return false when partner does not reference back', () => {
+        const violationA = makeDuplicateViolation([TXN_B]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B])],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(false);
+    });
+
+    it('should return false when partner has no violations at all', () => {
+        const violationA = makeDuplicateViolation([TXN_B]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B])],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(false);
+    });
+
+    it('should return false when partner references a different transaction', () => {
+        const violationA = makeDuplicateViolation([TXN_B]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B])],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [makeDuplicateViolation([TXN_C])],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(false);
+    });
+
+    it('should return true if at least one partner in a multi-duplicate list references back', () => {
+        const violationA = makeDuplicateViolation([TXN_B, TXN_C]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B, TXN_C])],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_C}`]: [makeDuplicateViolation([TXN_A])],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(true);
+    });
+
+    it('should return false when data.duplicates is empty', () => {
+        const violationA = makeDuplicateViolation([]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [violationA],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_A, violationA, allViolations)).toBe(false);
+    });
+
+    it('should handle the stale backend response scenario — A cleared, B still has one-sided reference', () => {
+        const violationB = makeDuplicateViolation([TXN_A]);
+        const allViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [violationB],
+        };
+        expect(TransactionUtils.shouldShowDuplicateViolation(TXN_B, violationB, allViolations)).toBe(false);
+    });
+});
