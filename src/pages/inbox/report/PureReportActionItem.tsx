@@ -77,7 +77,6 @@ import {
     getIOUReportIDFromReportActionPreview,
     getOriginalMessage,
     getPlaidBalanceFailureMessage,
-    getReimbursedMessage,
     getRenamedAction,
     getReportActionHtml,
     getReportActionMessage,
@@ -149,6 +148,7 @@ import MentionWhisperContent from './actionContents/MentionWhisperContent';
 import ModifiedExpenseContent from './actionContents/ModifiedExpenseContent';
 import PaymentContent from './actionContents/PaymentContent';
 import PolicyChangeLogContent, {isHandledPolicyChangeLogAction} from './actionContents/PolicyChangeLogContent';
+import ReimbursedContent from './actionContents/ReimbursedContent';
 import ReimbursementDeQueuedContent from './actionContents/ReimbursementDeQueuedContent';
 import ReportMentionWhisperContent from './actionContents/ReportMentionWhisperContent';
 import SimpleMessageContent, {isSimpleMessageAction} from './actionContents/SimpleMessageContent';
@@ -942,7 +942,12 @@ function PureReportActionItem({
                 />
             );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.REIMBURSED)) {
-            children = <ReportActionItemBasicMessage message={getReimbursedMessage(translate, action, report, currentUserAccountID)} />;
+            children = (
+                <ReimbursedContent
+                    action={action}
+                    report={report}
+                />
+            );
         } else if (isSimpleMessageAction(action)) {
             children = <SimpleMessageContent action={action} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.FORWARDED)) {
@@ -1021,7 +1026,6 @@ function PureReportActionItem({
                     report={report}
                     originalReport={originalReport}
                     policy={policy}
-                    currentUserAccountID={currentUserAccountID}
                     personalPolicyID={personalPolicyID}
                     originalReportID={originalReportID}
                     resolveActionableMentionWhisper={resolveActionableMentionWhisper}
@@ -1186,7 +1190,6 @@ function PureReportActionItem({
                             accountIDs={oldestFourAccountIDs}
                             onSecondaryInteraction={showPopover}
                             isActive={isReportActionActive && !isContextMenuActive}
-                            currentUserAccountID={currentUserAccountID}
                         />
                     </View>
                 )}
