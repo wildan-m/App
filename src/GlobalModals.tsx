@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Suspense, useEffect, useState} from 'react';
 import DelegateNoAccessModalProvider from './components/DelegateNoAccessModalProvider';
 import EmojiPicker from './components/EmojiPicker/EmojiPicker';
 import GrowlNotification from './components/GrowlNotification';
@@ -7,21 +7,37 @@ import ScreenShareRequestModal from './components/ScreenShareRequestModal';
 import UpdateAppModal from './components/UpdateAppModal';
 import * as EmojiPickerAction from './libs/actions/EmojiPickerAction';
 import {growlRef} from './libs/Growl';
-import PopoverReportActionContextMenu from './pages/inbox/report/ContextMenu/PopoverReportActionContextMenu';
 import * as ReportActionContextMenu from './pages/inbox/report/ContextMenu/ReportActionContextMenu';
+
+const LazyPopoverReportActionContextMenu = React.lazy(() => import('./pages/inbox/report/ContextMenu/PopoverReportActionContextMenu'));
 
 /**
  * Renders global modals and overlays that are mounted once at the top level.
  */
 function GlobalModals() {
+    const [shouldRenderContextMenu, setShouldRenderContextMenu] = useState(false);
+
+    useEffect(() => {
+        // Defer loading the context menu until after startup to avoid pulling in heavy
+        // dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage, etc.)
+        // during the ManualAppStartup span. The ref-based API in ReportActionContextMenu
+        // already handles null refs gracefully.
+        const scheduleIdle = typeof requestIdleCallback === 'function' ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 0);
+        scheduleIdle(() => setShouldRenderContextMenu(true));
+    }, []);
+
     return (
         <>
             <UpdateAppModal />
             {/* Those below are only available to the authenticated user. */}
             <GrowlNotification ref={growlRef} />
             <DelegateNoAccessModalProvider>
-                {/* eslint-disable-next-line react-hooks/refs -- module-level createRef, safe to pass as ref prop */}
-                <PopoverReportActionContextMenu ref={ReportActionContextMenu.contextMenuRef} />
+                {shouldRenderContextMenu && (
+                    <Suspense fallback={null}>
+                        {/* eslint-disable-next-line react-hooks/refs -- module-level createRef, safe to pass as ref prop */}
+                        <LazyPopoverReportActionContextMenu ref={ReportActionContextMenu.contextMenuRef} />
+                    </Suspense>
+                )}
             </DelegateNoAccessModalProvider>
             {/* eslint-disable-next-line react-hooks/refs -- module-level createRef, safe to pass as ref prop */}
             <EmojiPicker ref={EmojiPickerAction.emojiPickerRef} />
