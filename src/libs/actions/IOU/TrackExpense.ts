@@ -100,18 +100,17 @@ import type ReportAction from '@src/types/onyx/ReportAction';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {Receipt, ReceiptSource} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import {deleteMoneyRequest, getCleanUpTransactionThreadReportOnyxData, getNavigationUrlOnMoneyRequestDelete} from './DeleteMoneyRequest';
 import type {BuildOnyxDataForMoneyRequestKeys, ReplaceReceipt, RequestMoneyInformation, StartSplitBilActionParams} from './index';
 import {
     buildMinimalTransactionForFormula,
-    deleteMoneyRequest,
     getAllReports,
     getAllTransactionDrafts,
     getAllTransactions,
     getAllTransactionViolations,
-    getCleanUpTransactionThreadReportOnyxData,
     getCurrentUserEmail,
     getMoneyRequestInformation,
-    getNavigationUrlOnMoneyRequestDelete,
+    getMoneyRequestPolicyTags,
     getReceiptError,
     getReportPreviewAction,
     getSearchOnyxUpdate,
@@ -192,6 +191,7 @@ type GetTrackExpenseInformationParams = {
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     isSelfTourViewed: boolean;
+    defaultWorkspaceName?: string;
 };
 
 type DeleteTrackExpenseParams = {
@@ -208,6 +208,7 @@ type DeleteTrackExpenseParams = {
     isChatIOUReportArchived: boolean | undefined;
     allTransactionViolationsParam: OnyxCollection<OnyxTypes.TransactionViolations>;
     currentUserAccountID: number;
+    currentUserEmail: string;
 };
 
 type BuildOnyxDataForTrackExpenseParams = {
@@ -828,6 +829,7 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
         quickAction,
         betas,
         isSelfTourViewed,
+        defaultWorkspaceName,
     } = params;
     const {payeeAccountID = getUserAccountID(), payeeEmail = getCurrentUserEmail(), participant} = participantParams;
     const {policy} = policyParams;
@@ -962,7 +964,7 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
         const workspaceData = buildPolicyData({
             policyOwnerEmail: undefined,
             makeMeAdmin: policy?.makeMeAdmin,
-            policyName: policy?.name,
+            policyName: policy?.name ?? defaultWorkspaceName ?? '',
             policyID: policy?.id,
             expenseReportId: chatReport?.reportID,
             engagementChoice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
@@ -1646,7 +1648,16 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         parentChatReport: isMovingTransactionFromTrackExpense ? undefined : currentChatReport,
         existingIOUReport,
         participantParams,
-        policyParams,
+        policyParams: {
+            ...policyParams,
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            policyTagList: getMoneyRequestPolicyTags({
+                existingIOUReport,
+                moneyRequestReportID,
+                parentChatReport: isMovingTransactionFromTrackExpense ? undefined : currentChatReport,
+                participant: participantParams.participant,
+            }),
+        },
         transactionParams,
         moneyRequestReportID,
         existingTransactionID,
@@ -2000,6 +2011,14 @@ function convertBulkTrackedExpensesToIOU({
             policyRecentlyUsedCurrencies,
             personalDetails,
             betas,
+            policyParams: {
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                policyTagList: getMoneyRequestPolicyTags({
+                    moneyRequestReportID: iouReportID,
+                    parentChatReport: chatReport,
+                    participant: participantParams.participant,
+                }),
+            },
         });
 
         const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
@@ -2247,6 +2266,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
         betas,
         draftTransactionIDs = [],
         isSelfTourViewed,
+        defaultWorkspaceName,
     } = params;
     const {participant, payeeAccountID, payeeEmail} = participantParams;
     const {policy, policyCategories, policyTagList} = policyData;
@@ -2387,6 +2407,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
         quickAction,
         betas,
         isSelfTourViewed,
+        defaultWorkspaceName,
     }) ?? {};
     const activeReportID = isMoneyRequestReport ? report?.reportID : chatReport?.reportID;
     const onyxData: TrackedExpenseParams['onyxData'] = trackExpenseInformationOnyxData;
@@ -2662,6 +2683,7 @@ function deleteTrackExpense({
     isChatIOUReportArchived,
     allTransactionViolationsParam,
     currentUserAccountID,
+    currentUserEmail,
 }: DeleteTrackExpenseParams) {
     if (!chatReportID || !transactionID) {
         return;
@@ -2674,8 +2696,8 @@ function deleteTrackExpense({
         reportAction,
         iouReport,
         chatIOUReport,
-        isSingleTransactionView,
         isChatIOUReportArchived,
+        isSingleTransactionView,
     );
 
     // STEP 1: Get all collections we're updating
@@ -2691,7 +2713,7 @@ function deleteTrackExpense({
             isSingleTransactionView,
             allTransactionViolationsParam,
             currentUserAccountID,
-            currentUserEmail: getCurrentUserEmail(),
+            currentUserEmail,
         });
         return urlToNavigateBack;
     }
