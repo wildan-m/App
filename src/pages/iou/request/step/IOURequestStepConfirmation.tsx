@@ -282,6 +282,7 @@ function IOURequestStepConfirmation({
         isCategorizingTrackExpense,
         isSharingTrackExpense,
         isUnreported,
+        isPolicyExpenseChat,
         draftTransactionIDs,
         privateIsArchivedMap,
         backToReport,

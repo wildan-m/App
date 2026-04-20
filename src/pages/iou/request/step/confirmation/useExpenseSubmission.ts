@@ -21,6 +21,7 @@ import dismissModalAndOpenReportInInboxTabHelper from '@libs/Navigation/helpers/
 import navigateAfterExpenseCreate from '@libs/Navigation/helpers/navigateAfterExpenseCreate';
 import Navigation from '@libs/Navigation/Navigation';
 import {rand64, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
+import {isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {findSelfDMReportID, generateReportID, getReportOrDraftReport, hasViolations as hasViolationsReportUtils, isMoneyRequestReport, isSelectedManagerMcTest} from '@libs/ReportUtils';
 import {endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import markSubmitExpenseEnd from '@libs/telemetry/markSubmitExpenseEnd';
@@ -109,6 +110,7 @@ type UseExpenseSubmissionParams = {
     isCategorizingTrackExpense: boolean;
     isSharingTrackExpense: boolean;
     isUnreported: boolean;
+    isPolicyExpenseChat: boolean;
 
     // Onyx values
     draftTransactionIDs: string[] | undefined;
@@ -142,6 +144,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
         isCategorizingTrackExpense,
         isSharingTrackExpense,
         isUnreported,
+        isPolicyExpenseChat,
         draftTransactionIDs,
         privateIsArchivedMap,
         backToReport,
@@ -216,7 +219,9 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
     const customUnitRateID = getRateID(transaction) ?? '';
     const transactionDistance = isManualDistanceRequest || isOdometerDistanceRequest || isGPSDistanceRequest ? (transaction?.comment?.customUnit?.quantity ?? undefined) : undefined;
     const defaultTaxCode = getDefaultTaxCode(policy, transaction);
-    const transactionTaxCode = (transaction?.taxCode ? transaction?.taxCode : defaultTaxCode) ?? '';
+    const transactionTaxCode = isTaxTrackingEnabled(isPolicyExpenseChat || isUnreported, policy, isDistanceRequest, isPerDiemRequest, isTimeRequest)
+        ? ((transaction?.taxCode ? transaction?.taxCode : defaultTaxCode) ?? '')
+        : '';
     const transactionTaxAmount = transaction?.taxAmount ?? 0;
     const transactionTaxValue = transaction?.taxValue ?? getTaxValue(policy, transaction, transactionTaxCode) ?? '';
 
