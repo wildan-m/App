@@ -6,9 +6,7 @@ import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxInputValue, OnyxKey, On
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {SearchQueryJSON} from '@components/Search/types';
-import * as API from '@libs/API';
-import type {AddReportApproverParams, AssignReportToMeParams, UpdateMoneyRequestParams} from '@libs/API/parameters';
-import {WRITE_COMMANDS} from '@libs/API/types';
+import type {UpdateMoneyRequestParams} from '@libs/API/parameters';
 import DateUtils from '@libs/DateUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorObject, getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
@@ -33,12 +31,11 @@ import {getManagerMcTestParticipant} from '@libs/OptionsListUtils';
 import {getCustomUnitID} from '@libs/PerDiemRequestUtils';
 import {addSMSDomainIfPhoneNumber} from '@libs/PhoneNumber';
 import {getDistanceRateCustomUnit, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
-import {getIOUActionForTransactionID, getOriginalMessage, isReportPreviewAction} from '@libs/ReportActionsUtils';
+import {getOriginalMessage, isReportPreviewAction} from '@libs/ReportActionsUtils';
 import type {OptimisticChatReport, OptimisticCreatedReportAction, OptimisticIOUReportAction} from '@libs/ReportUtils';
 import {
     buildOptimisticAddCommentReportAction,
     buildOptimisticChatReport,
-    buildOptimisticCreatedReportAction,
     buildOptimisticExpenseReport,
     buildOptimisticIOUReport,
     buildOptimisticIOUReportAction,
@@ -47,7 +44,6 @@ import {
     generateReportID,
     getChatByParticipants,
     getOutstandingChildRequest,
-    getParsedComment,
     getReportOrDraftReport,
     hasOutstandingChildRequest,
     hasViolations as hasViolationsReportUtils,
@@ -77,7 +73,6 @@ import {
     getCategoryTaxCodeAndAmount,
     getCurrency,
     getDistanceInMeters,
-    isDistanceExpenseType,
     isDistanceRequest as isDistanceRequestTransactionUtils,
     isManualDistanceRequest as isManualDistanceRequestTransactionUtils,
     isOdometerDistanceRequest as isOdometerDistanceRequestTransactionUtils,
@@ -87,8 +82,7 @@ import {
 } from '@libs/TransactionUtils';
 import ViolationsUtils from '@libs/Violations/ViolationsUtils';
 import {buildOptimisticPolicyRecentlyUsedTags} from '@userActions/Policy/Tag';
-import {createTransactionThreadReport} from '@userActions/Report';
-import {mergeTransactionIdsHighlightOnSearchRoute, stringifyWaypointsForAPI} from '@userActions/Transaction';
+import {mergeTransactionIdsHighlightOnSearchRoute} from '@userActions/Transaction';
 import {getRemoveDraftTransactionsByIDsData, removeDraftTransactionsByIDs} from '@userActions/TransactionEdit';
 import type {IOUAction, IOUActionParams, OdometerImageType} from '@src/CONST';
 import CONST from '@src/CONST';
