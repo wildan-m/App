@@ -2,7 +2,6 @@
 title: Close Your Expensify Account
 description: Learn how to close your Expensify account. 
 keywords: [New Expensify, close account, delete Expensify account, delete account, remove user, deactivate account, cancel account, cancel Expensify, terminate, how to delete Expensify, how to cancel Expensify]
-keywords: [Expensify Classic, close account, delete account, cancel account, delete Expensify account, cancel Expensify, deactivate account, how to delete Expensify, how to cancel Expensify]
 internalScope: Audience is all members. Covers how to close an Expensify account and resolve common errors that block account closure. Does not cover how to delete workspaces or how to remove members from the domain. 
 ---
 
@@ -27,7 +26,6 @@ Any member can close their own Expensify account, if:
 
 ---
 
-
 ## How to close your Expensify account 
 
 1. In the navigation tabs (on the left on web, and at the bottom on mobile), click **Account > Security**.
@@ -43,7 +41,7 @@ If you don't see the option to close your account, your account may be domain-co
 
 All unsubmitted expenses and personal data tied to the account are deleted. 
 
-Expenses shared with others, such expenses submitted on a Workspace, may retained for regulatory compliance. Submitted expenses remain visible to approvers the Admins on the workspace where the expenses were submitted. 
+Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and Admins on the Workspace where the expenses were submitted. 
 
 ---
 
