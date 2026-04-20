@@ -273,9 +273,9 @@ function SuggestionMention({
             const policyEmployeeAccountIDs = getPolicyEmployeeAccountIDs(policy, currentUserPersonalDetails.accountID);
             const shouldWeightDetails = !isGroupChat(currentReport) && !doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
 
-            let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined; 
+            let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined;
 
-            if(!shouldWeightDetails) {
+            if (!shouldWeightDetails) {
                 personalDetailsParam = personalDetails;
             } else {
                 // Smaller weight means higher order in suggestion list
@@ -290,7 +290,7 @@ function SuggestionMention({
                 };
                 personalDetailsParam = lodashMapValues(personalDetails, (detail) => (detail ? {...detail, weight: getPersonalDetailsWeight(detail)} : null));
             }
-            
+
             const suggestions: Mention[] = [];
 
             if (CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT.includes(searchValue.toLowerCase())) {
