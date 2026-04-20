@@ -407,7 +407,7 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    reason: VALUES.REASON.LOCAL_ERRORS.HSM.CANCELED,
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.CANCELED}),
                 }),
             );
         });
@@ -435,16 +435,16 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    reason: VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND,
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND}),
                 }),
             );
             expect(mockSignWithOptions).not.toHaveBeenCalled();
         });
 
-        it('should return BAD_REQUEST when mapAuthTypeNumber returns undefined', async () => {
+        it('should return UNRECOGNIZED_AUTH_TYPE when mapAuthTypeNumber returns undefined', async () => {
             // Given the biometric sign operation succeeds but returns an unrecognized authType number
             // When mapAuthTypeNumber cannot map the authType to a known value and returns undefined
-            // Then onResult should receive a failure with BAD_REQUEST because the response cannot be trusted without a valid auth type
+            // Then onResult should receive a failure with UNRECOGNIZED_AUTH_TYPE because the response cannot be trusted without a valid auth type
             mockSignWithOptions.mockResolvedValue({success: true, signature: 'dGVzdC1zaWduYXR1cmU=', authType: 999});
 
             const {result} = renderHook(() => useNativeBiometricsHSM());
@@ -457,7 +457,7 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    reason: VALUES.REASON.CLIENT_ERRORS.BAD_REQUEST,
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE}),
                 }),
             );
         });
@@ -478,7 +478,7 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    reason: VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC,
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC}),
                 }),
             );
         });
