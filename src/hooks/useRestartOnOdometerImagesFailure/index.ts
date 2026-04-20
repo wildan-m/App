@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
 import {checkIfLocalFileIsAccessible} from '@libs/actions/IOU/Receipt';
-import clearOdometerTransactionState from '@libs/actions/OdometerTransactionUtils';
+import clearOdometerDraftTransactionState from '@libs/actions/OdometerTransactionUtils';
 import {navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
 import {getOdometerImageUri} from '@libs/OdometerImageUtils';
 import type {IOUType} from '@src/CONST';
@@ -79,7 +79,7 @@ const useRestartOnOdometerImagesFailure = (transaction: OnyxEntry<Transaction>, 
                 return;
             }
 
-            clearOdometerTransactionState(transaction, true);
+            clearOdometerDraftTransactionState(transaction);
             navigateToStartMoneyRequestStep(CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER, iouType, transaction.transactionID, reportID, CONST.IOU.ACTION.CREATE, backToReport);
         });
     }, [draftTransactionsMetadata, transaction, iouType, reportID, backToReport]);

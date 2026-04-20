@@ -2,7 +2,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {useEffect, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useLocalize from '@hooks/useLocalize';
-import clearOdometerTransactionState from '@libs/actions/OdometerTransactionUtils';
+import clearOdometerDraftTransactionState from '@libs/actions/OdometerTransactionUtils';
 import {navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
 import Log from '@libs/Log';
 import {getOdometerImageName, getOdometerImageType, getOdometerImageUri} from '@libs/OdometerImageUtils';
@@ -141,7 +141,7 @@ function OdometerReceiptStitcher({
                 }
                 if (hasExpiredImages) {
                     onStitchingChange(false);
-                    clearOdometerTransactionState(transaction, true);
+                    clearOdometerDraftTransactionState(transaction);
                     navigateToStartMoneyRequestStep(CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER, iouType, transaction.transactionID, reportID, CONST.IOU.ACTION.CREATE, backToReport);
                     return;
                 }

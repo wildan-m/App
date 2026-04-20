@@ -75,17 +75,17 @@ function removeMoneyRequestOdometerImage(transaction: OnyxEntry<Transaction>, im
     });
 }
 
-function clearOdometerTransactionState(transaction: OnyxEntry<Transaction>, isDraft: boolean): void {
+function clearOdometerDraftTransactionState(transaction: OnyxEntry<Transaction>): void {
     if (!transaction) {
         return;
     }
-    setMoneyRequestReceipt(transaction.transactionID, '', '', isDraft);
-    setMoneyRequestOdometerReading(transaction.transactionID, null, null, isDraft);
-    removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.START, isDraft, true);
-    removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.END, isDraft, true);
+    setMoneyRequestReceipt(transaction.transactionID, '', '', true);
+    setMoneyRequestOdometerReading(transaction.transactionID, null, null, true);
+    removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.START, true, true);
+    removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.END, true, true);
     removeDraftTransactionsByIDs([transaction.transactionID], true);
     removeBackupTransaction(transaction.transactionID);
 }
 
 export {setMoneyRequestOdometerReading, setMoneyRequestOdometerImage, removeMoneyRequestOdometerImage};
-export default clearOdometerTransactionState;
+export default clearOdometerDraftTransactionState;
