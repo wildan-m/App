@@ -78,6 +78,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     const [cardFromCardList] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(cardID)});
     const [cardFeeds] = useCardFeeds(policyID);
     const expensifyCardSettings = useExpensifyCardFeeds(policyID);
+    const [fundCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${defaultFundID}`);
     const [allFeedsCards, allFeedsCardsResult] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST);
     const workspaceCards = getAllCardsForWorkspace(defaultFundID, allFeedsCards, cardFeeds, expensifyCardSettings);
 
@@ -102,12 +103,21 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     useEffect(() => fetchCardDetails(), [fetchCardDetails]);
 
     useEffect(() => {
-        if (!isAdmin || !expensifyCardSettings) {
+        if (!isAdmin) {
+            return;
+        }
+        if (!defaultFundID || defaultFundID === CONST.DEFAULT_NUMBER_ID) {
+            return;
+        }
+        if (fundCardSettings?.isLoading) {
+            return;
+        }
+        if (fundCardSettings?.hasOnceLoaded) {
             return;
         }
 
         openPolicyExpensifyCardsPage(policyID, defaultFundID);
-    }, [defaultFundID, expensifyCardSettings, isAdmin, policyID]);
+    }, [defaultFundID, fundCardSettings?.hasOnceLoaded, fundCardSettings?.isLoading, isAdmin, policyID]);
 
     const deactivateCard = () => {
         setIsDeactivateModalVisible(false);
@@ -142,20 +152,17 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
         setIsUnfreezeModalVisible(false);
     };
 
-    const spendRule = useMemo(() => getSpendRuleByCardID(expensifyCardSettings, cardID), [cardID, expensifyCardSettings]);
-    const spendRulesSummary = useMemo(
-        () => (spendRule ? getSpendRuleSummaryText(spendRule.formValues, currency, translate, convertToDisplayString) : []),
-        [currency, spendRule, translate, convertToDisplayString],
-    );
+    const spendRule = getSpendRuleByCardID(expensifyCardSettings, cardID);
+    const spendRulesSummary = spendRule ? getSpendRuleSummaryText(spendRule.formValues, currency, translate, convertToDisplayString) : [];
 
-    const navigateToSpendRules = useCallback(() => {
+    const navigateToSpendRules = () => {
         if (!spendRule) {
             navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_NEW, {policyID});
             return;
         }
 
         navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_EDIT, {policyID, ruleID: spendRule.ruleID});
-    }, [navigation, policyID, spendRule]);
+    };
 
     const spendRulesTitleComponent = useMemo(
         () => (

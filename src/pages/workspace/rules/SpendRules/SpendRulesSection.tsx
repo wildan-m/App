@@ -1,5 +1,3 @@
-import type {NavigationProp} from '@react-navigation/native';
-import {useNavigation} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -23,13 +21,13 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {openPolicyExpensifyCardsPage} from '@libs/actions/Policy/Policy';
 import {filterInactiveCards, getCardDescriptionForSearchTable, getSelectedCardsSharedCurrency} from '@libs/CardUtils';
-import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import Navigation from '@libs/Navigation/Navigation';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import {getSpendRuleFormValuesFromCardRule, getSpendRuleSummaryParts, getTruncatedSpendRuleSummary} from '@libs/SpendRulesUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import SCREENS from '@src/SCREENS';
+import ROUTES from '@src/ROUTES';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 type SpendRulesSectionProps = {
@@ -37,7 +35,6 @@ type SpendRulesSectionProps = {
 };
 
 function SpendRulesSection({policyID}: SpendRulesSectionProps) {
-    const navigation = useNavigation<NavigationProp<SettingsNavigatorParamList>>();
     const {convertToDisplayString} = useCurrencyListActions();
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
@@ -55,8 +52,18 @@ function SpendRulesSection({policyID}: SpendRulesSectionProps) {
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
 
     useEffect(() => {
+        if (!defaultFundID || defaultFundID === CONST.DEFAULT_NUMBER_ID) {
+            return;
+        }
+        if (expensifyCardSettings?.isLoading) {
+            return;
+        }
+        if (expensifyCardSettings?.hasOnceLoaded) {
+            return;
+        }
+
         openPolicyExpensifyCardsPage(policyID, defaultFundID);
-    }, [policyID, defaultFundID]);
+    }, [defaultFundID, expensifyCardSettings?.hasOnceLoaded, expensifyCardSettings?.isLoading, policyID]);
 
     const isSpendRulesListLoading = !isOffline && (isLoadingOnyxValue(cardsListResult) || !expensifyCardSettings || expensifyCardSettings.isLoading) && !expensifyCardSettings?.hasOnceLoaded;
 
@@ -233,7 +240,7 @@ function SpendRulesSection({policyID}: SpendRulesSectionProps) {
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.SPEND_RULE_ITEM}
                             shouldShowRightIcon
                             disabled={rule.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}
-                            onPress={() => navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_EDIT, {policyID, ruleID: rule.ruleID})}
+                            onPress={() => Navigation.navigate(ROUTES.RULES_SPEND_EDIT.getRoute(policyID, rule.ruleID))}
                         />
                     </OfflineWithFeedback>
                 ))
@@ -246,7 +253,7 @@ function SpendRulesSection({policyID}: SpendRulesSectionProps) {
                     iconHeight={20}
                     iconWidth={20}
                     style={[styles.sectionMenuItemTopDescription, styles.mt6, styles.mbn3]}
-                    onPress={() => navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_NEW, {policyID})}
+                    onPress={() => Navigation.navigate(ROUTES.RULES_SPEND_NEW.getRoute(policyID))}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.ADD_SPEND_RULE}
                 />
             )}
