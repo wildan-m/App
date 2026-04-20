@@ -5,6 +5,8 @@ const oldRoutes: Record<string, string> = {
     '/r/*/settings/name': '/r/$1/details/settings/name',
     '/workspaces/*/overview/address': '/workspaces/$1/overview/workspace-address',
     '/workspaces/*/accounting/*/card-reconciliation/account': '/workspaces/$1/accounting/$2/card-reconciliation/account-reconciliation-settings',
+    '/workspaces/*/accounting/sage-intacct/export/preferred-exporter': '/workspaces/$1/accounting/sage-intacct/export/sage-preferred-exporter',
+    '/workspaces/*/accounting/sage-intacct/export/reimbursable/destination': '/workspaces/$1/accounting/sage-intacct/export/reimbursable-expenses',
     '/flag/*/*': '/r/$1/flag/$1/$2',
     '/home-page': '/home',
     /* eslint-enable @typescript-eslint/naming-convention */
