@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import LocationPermissionModal from '@components/LocationPermissionModal';
 import DateUtils from '@libs/DateUtils';
 import {flushDeferredWrite, reserveDeferredWriteChannel} from '@libs/deferredLayoutWrite';
@@ -126,6 +126,16 @@ function SubmitExpenseOrchestrator({
     const [isConfirming, setIsConfirming] = useState(false);
     const [selectedParticipantList, setSelectedParticipantList] = useState<Participant[]>([]);
     const [startLocationPermissionFlow, setStartLocationPermissionFlow] = useState(false);
+    const confirmingSafetyTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    useEffect(() => {
+        if (!isConfirming) {
+            clearTimeout(confirmingSafetyTimeout.current);
+            return;
+        }
+        confirmingSafetyTimeout.current = setTimeout(() => setIsConfirming(false), CONST.MAX_TRANSITION_DURATION_MS * 5);
+        return () => clearTimeout(confirmingSafetyTimeout.current);
+    }, [isConfirming]);
 
     const startSubmitSpans = () => {
         const hasReceiptFiles = Object.values(receiptFiles).some((receipt) => !!receipt);

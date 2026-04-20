@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {View} from 'react-native';
 import Icon from '@components/Icon';
 import PulsingView from '@components/PulsingView';
@@ -22,43 +22,54 @@ function ReportActionComposePlaceholder() {
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Emoji', 'Send']);
 
+    const wrapperStyle = useMemo(() => [styles.chatFooter, {minHeight: CONST.CHAT_FOOTER_MIN_HEIGHT}], [styles.chatFooter]);
+
+    const plusButtonStyle = useMemo(
+        () => [
+            {flexBasis: (styles.composerSizeButton.width ?? 0) + (styles.composerSizeButton.marginHorizontal ?? 0) * 2},
+            styles.flexGrow0,
+            styles.flexShrink0,
+            styles.justifyContentCenter,
+            styles.alignItemsCenter,
+        ],
+        [styles.composerSizeButton.width, styles.composerSizeButton.marginHorizontal, styles.flexGrow0, styles.flexShrink0, styles.justifyContentCenter, styles.alignItemsCenter],
+    );
+
+    const textInputStyle = useMemo(
+        () => [styles.textInputComposeSpacing, styles.textInputComposeBorder, {paddingVertical: 0}],
+        [styles.textInputComposeSpacing, styles.textInputComposeBorder],
+    );
+
+    const placeholderTextStyle = useMemo(
+        () => [
+            styles.textNormal,
+            {
+                color: theme.placeholderText,
+                lineHeight: styles.textInputCompose.lineHeight,
+                paddingHorizontal: variables.avatarChatSpacing,
+                alignSelf: 'center' as const,
+            },
+        ],
+        [styles.textNormal, styles.textInputCompose.lineHeight, theme.placeholderText],
+    );
+
     return (
         <PulsingView
             shouldPulse
-            wrapperStyle={[styles.chatFooter, {minHeight: CONST.CHAT_FOOTER_MIN_HEIGHT}]}
+            wrapperStyle={wrapperStyle}
         >
             <View
                 style={[styles.chatItemComposeBoxColor, styles.flexRow, styles.chatItemComposeBox]}
                 pointerEvents="none"
             >
-                <View
-                    style={[
-                        {flexBasis: (styles.composerSizeButton.width ?? 0) + (styles.composerSizeButton.marginHorizontal ?? 0) * 2},
-                        styles.flexGrow0,
-                        styles.flexShrink0,
-                        styles.justifyContentCenter,
-                        styles.alignItemsCenter,
-                    ]}
-                >
+                <View style={plusButtonStyle}>
                     <Icon
                         src={icons.Plus}
                         fill={theme.icon}
                     />
                 </View>
-                <View style={[styles.textInputComposeSpacing, styles.textInputComposeBorder, {paddingVertical: 0}]}>
-                    <Text
-                        style={[
-                            styles.textNormal,
-                            {
-                                color: theme.placeholderText,
-                                lineHeight: styles.textInputCompose.lineHeight,
-                                paddingHorizontal: variables.avatarChatSpacing,
-                                alignSelf: 'center',
-                            },
-                        ]}
-                    >
-                        {translate('reportActionCompose.writeSomething')}
-                    </Text>
+                <View style={textInputStyle}>
+                    <Text style={placeholderTextStyle}>{translate('reportActionCompose.writeSomething')}</Text>
                 </View>
                 <View style={[styles.chatItemEmojiButton, styles.justifyContentCenter]}>
                     <Icon

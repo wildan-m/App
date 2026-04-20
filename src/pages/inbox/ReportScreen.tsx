@@ -71,9 +71,11 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                 },
                 waitForUpcomingTransition: true,
             });
+            const safetyTimeout = setTimeout(() => setShouldDeferNonEssentials(false), CONST.MAX_TRANSITION_DURATION_MS * 3);
             return () => {
                 handle.cancel();
                 cancelAnimationFrame(rafId);
+                clearTimeout(safetyTimeout);
             };
         }, [shouldDeferNonEssentials]),
     );

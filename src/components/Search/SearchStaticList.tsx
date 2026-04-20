@@ -13,7 +13,7 @@
  *    Do NOT add new subscriptions unless absolutely necessary for correctness.
  */
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import type {ListRenderItemInfo, StyleProp, ViewStyle} from 'react-native';
 import Button from '@components/Button';
@@ -101,7 +101,7 @@ function SearchStaticList({
     const validGroupBy = getValidGroupBy(groupBy);
     const searchData = searchResults?.data;
 
-    const sortedData = (() => {
+    const sortedData = useMemo(() => {
         if (!searchData) {
             return [] as TransactionListItemType[];
         }
@@ -121,7 +121,7 @@ function SearchStaticList({
         return getSortedSections(type, status, filteredData, localeCompare, translate, sortBy, sortOrder, validGroupBy)
             .filter((item): item is TransactionListItemType => 'transactionID' in item && item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
             .slice(0, STATIC_LIST_MAX_ITEMS);
-    })();
+    }, [searchData, type, status, sortBy, sortOrder, validGroupBy, accountID, email, translate, formatPhoneNumber, localeCompare]);
 
     // Sync the pending-expense placeholder on focus and notify the parent that
     // the destination is visible (focus signal for the dual-gate span ending).
@@ -298,7 +298,7 @@ function SearchStaticList({
         onLayoutProp?.();
     };
 
-    const pendingExpenseReasonAttributes = {context: 'SearchStaticList.PendingExpensePlaceholder'} as const;
+    const pendingExpenseReasonAttributes = useMemo(() => ({context: 'SearchStaticList.PendingExpensePlaceholder'}) as const, []);
 
     if (sortedData.length === 0 && showPendingExpensePlaceholder) {
         return (
@@ -328,13 +328,18 @@ function SearchStaticList({
             {!shouldUseNarrowLayout && columns.length > 0 && (
                 <View style={[styles.searchListHeaderContainerStyle, styles.listTableHeaderCompact, styles.searchListHeaderTableStyle, styles.mh5]}>
                     {canSelectMultiple && (
-                        <Checkbox
-                            accessibilityLabel=""
-                            isChecked={false}
-                            disabled
-                            containerStyle={styles.m0}
-                            onPress={() => {}}
-                        />
+                        <View
+                            accessibilityElementsHidden
+                            importantForAccessibility="no-hide-descendants"
+                        >
+                            <Checkbox
+                                accessibilityLabel={translate('workspace.people.selectAll')}
+                                isChecked={false}
+                                disabled
+                                containerStyle={styles.m0}
+                                onPress={() => {}}
+                            />
+                        </View>
                     )}
                     <View style={[styles.pr9, styles.flex1]}>
                         <SearchTableHeader
@@ -361,7 +366,7 @@ function SearchStaticList({
                 contentContainerStyle={shouldUseNarrowLayout ? contentContainerStyle : styles.pb3}
                 removeClippedSubviews
                 ListFooterComponent={
-                    showPendingExpensePlaceholder || !shouldUseNarrowLayout ? (
+                    showPendingExpensePlaceholder ? (
                         <SearchRowSkeleton
                             shouldAnimate
                             fixedNumItems={1}
@@ -384,5 +389,8 @@ export default React.memo(
         prev.queryJSON === next.queryJSON &&
         prev.contentContainerStyle === next.contentContainerStyle &&
         prev.onLayout === next.onLayout &&
-        prev.onDestinationVisible === next.onDestinationVisible,
+        prev.onDestinationVisible === next.onDestinationVisible &&
+        prev.shouldUseNarrowLayout === next.shouldUseNarrowLayout &&
+        prev.canSelectMultiple === next.canSelectMultiple &&
+        prev.columns === next.columns,
 );
