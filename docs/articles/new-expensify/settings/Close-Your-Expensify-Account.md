@@ -66,6 +66,6 @@ No. To proceed with closing your account, you must first set a new Primary Conta
 ## Can I close my account if I own a Workspace on an Annual Subscription?
 
 - [Downgrade to a free account](/articles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-request-early-cancellation-of-an-annual-subscription) (if eligible), or
-- [Downgrade to a free account](articles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-request-early-cancellation-of-an-annual-subscription) (if eligible), or
+- [Downgrade to a free account](a/rticles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-request-early-cancellation-of-an-annual-subscription) (if eligible), or
 - [Transfer billing ownership to another Workspace Admin](/articles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-transfer-billing-ownership-in-expensify).
 
