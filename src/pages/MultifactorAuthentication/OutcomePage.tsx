@@ -4,10 +4,13 @@ import {useMultifactorAuthenticationState} from '@components/MultifactorAuthenti
 import type {ErrorState} from '@components/MultifactorAuthentication/Context/State';
 import CONST from '@src/CONST';
 
+const SERVER_FAILURE_REASONS = new Set<string>([
+    ...Object.values(CONST.MULTIFACTOR_AUTHENTICATION.REASON.SERVER_ERRORS),
+    CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE,
+]);
+
 function shouldShowServerFailureScreen(error: ErrorState): boolean {
-    return (
-        error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.SERVER_ERRORS.UNRECOGNIZED || error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE
-    );
+    return SERVER_FAILURE_REASONS.has(error.reason);
 }
 
 function MultifactorAuthenticationOutcomePage() {
