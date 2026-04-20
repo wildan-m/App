@@ -12017,6 +12017,7 @@ describe('ReportUtils', () => {
             actionName: CONST.REPORT.ACTIONS.TYPE.CARD_MISSING_ADDRESS,
             childType: CONST.REPORT.TYPE.TASK,
             childReportID: 'task-11000',
+            childManagerAccountID: currentUserAccountID,
             created: DateUtils.getDBTime(),
             originalMessage: {
                 assigneeAccountID: currentUserAccountID,
@@ -12057,6 +12058,7 @@ describe('ReportUtils', () => {
             actionName: CONST.REPORT.ACTIONS.TYPE.CARD_MISSING_ADDRESS,
             childType: CONST.REPORT.TYPE.TASK,
             childReportID: 'task-incomplete',
+            childManagerAccountID: currentUserAccountID,
             created: '2024-01-02 00:00:00',
             originalMessage: {
                 assigneeAccountID: currentUserAccountID,
@@ -12102,6 +12104,7 @@ describe('ReportUtils', () => {
             actionName: CONST.REPORT.ACTIONS.TYPE.CARD_MISSING_ADDRESS,
             childType: CONST.REPORT.TYPE.TASK,
             childReportID: 'task-earlier',
+            childManagerAccountID: currentUserAccountID,
             created: '2024-01-01 00:00:00',
             originalMessage: {
                 assigneeAccountID: currentUserAccountID,
@@ -12176,6 +12179,55 @@ describe('ReportUtils', () => {
         expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
         // All tasks completed, so no matching reportAction
         expect(result?.reportAction).toBeUndefined();
+    });
+
+    it('should exclude tasks assigned to a different manager', async () => {
+        const otherManagerAccountID = 99999;
+
+        const taskAssignedToOtherManager: ReportAction = {
+            reportActionID: 'other-manager-task',
+            actionName: CONST.REPORT.ACTIONS.TYPE.CARD_MISSING_ADDRESS,
+            childType: CONST.REPORT.TYPE.TASK,
+            childReportID: 'task-other-manager',
+            childManagerAccountID: otherManagerAccountID,
+            created: '2024-01-01 00:00:00',
+            originalMessage: {
+                assigneeAccountID: currentUserAccountID,
+                cardID: 11007,
+            },
+        };
+
+        const taskAssignedToCurrentUser: ReportAction = {
+            reportActionID: 'current-user-task',
+            actionName: CONST.REPORT.ACTIONS.TYPE.CARD_MISSING_ADDRESS,
+            childType: CONST.REPORT.TYPE.TASK,
+            childReportID: 'task-current-user',
+            childManagerAccountID: currentUserAccountID,
+            created: '2024-01-02 00:00:00',
+            originalMessage: {
+                assigneeAccountID: currentUserAccountID,
+                cardID: 11008,
+            },
+        };
+
+        const workspaceChat = {
+            ...createPolicyExpenseChat(41004),
+            hasOutstandingChildTask: true,
+        };
+
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${workspaceChat.reportID}`, workspaceChat);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${workspaceChat.reportID}`, {
+            [taskAssignedToOtherManager.reportActionID]: taskAssignedToOtherManager,
+            [taskAssignedToCurrentUser.reportActionID]: taskAssignedToCurrentUser,
+        });
+        await waitForBatchedUpdates();
+
+        const {result: isReportArchived} = renderHook(() => useReportIsArchived(workspaceChat.reportID));
+        const result = getReasonAndReportActionThatRequiresAttention(workspaceChat, undefined, isReportArchived.current);
+
+        expect(result?.reason).toBe(CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION);
+        // Should only return the task where childManagerAccountID matches the current user
+        expect(result?.reportAction?.reportActionID).toBe('current-user-task');
     });
 
     it('should surface a GBR when reimbursement is queued and waiting on the payee bank account', async () => {
