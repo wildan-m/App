@@ -71,7 +71,7 @@ This error occurs when you are set as the Primary Contact on a domain. To procee
 ## Why do I see the message "Last domain admin" when closing my account?
 
 This error occurs when you are only remaining admin on a domain. To proceed with closing your account, you must first add another domain admin, or reset the domain. 
-
+This error occurs when you are the only remaining admin on a domain. To proceed with closing your account, you must first add another domain admin, or reset the domain. 
 [Learn how to promote a domain member to admin](/articles/expensify-classic/domains/Domain-Members#promote-a-domain-member-to-admin).
 
 [Learn how to reset a domain](/articles/expensify-classic/domains/Claim-And-Verify-A-Domain). 
