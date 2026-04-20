@@ -1,4 +1,4 @@
-import {useFocusEffect} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import BlockingView from '@components/BlockingViews/BlockingView';
@@ -23,7 +23,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {updateDraftSpendRule} from '@libs/actions/User';
 import {filterCardsByPersonalDetails, filterInactiveCards, getCardFeedIcon, sortCardsByCardholderName} from '@libs/CardUtils';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
-import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import {getHeaderMessage} from '@libs/OptionsListUtils';
@@ -37,7 +36,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Card, ExpensifyCardSettings, WorkspaceCardsList} from '@src/types/onyx';
 import type {ExpensifyCardRule} from '@src/types/onyx/ExpensifyCardSettings';
-import {getParentRoute, getSpendRuleFormValuesFromCardRule} from '@libs/SpendRulesUtils';
+import {getSpendRuleFormValuesFromCardRule} from '@libs/SpendRulesUtils';
 
 type ExpensifyCardListItem = ListItem &
     AdditionalCardProps & {
@@ -75,6 +74,7 @@ function getEligibleCards(cardsList: OnyxEntry<WorkspaceCardsList>, expensifyCar
 }
 
 function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
+    const navigation = useNavigation();
     const {policyID, ruleID} = route.params;
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
@@ -96,7 +96,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
         }, [spendRuleForm?.cardIDs]),
     );
 
-    const parentRoute = getParentRoute(policyID, ruleID);
+    const goBack = () => navigation.goBack();
 
     const {isOffline} = useNetwork({
         onReconnect: () => {
@@ -181,7 +181,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
         }
 
         updateDraftSpendRule({cardIDs: validSelectedCardIDs});
-        Navigation.goBack(parentRoute);
+        goBack();
     };
 
     const hasEligibleCards = eligibleCards.length > 0;
@@ -211,7 +211,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                 >
                     <HeaderWithBackButton
                         title={translate('workspace.rules.spendRules.cardPageTitle')}
-                        onBackButtonPress={() => Navigation.goBack(parentRoute)}
+                        onBackButtonPress={goBack}
                     />
                     <SelectionList
                         canSelectMultiple

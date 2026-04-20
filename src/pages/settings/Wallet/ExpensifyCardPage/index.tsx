@@ -188,11 +188,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
         if (!policyIDForCurrentCard) {
             return;
         }
-        if (spendRule?.ruleID) {
-            Navigation.navigate(ROUTES.RULES_SPEND_EDIT.getRoute(policyIDForCurrentCard, spendRule?.ruleID));
-            return;
-        }
-        Navigation.navigate(ROUTES.RULES_SPEND_NEW.getRoute(policyIDForCurrentCard));
+        Navigation.navigate(ROUTES.SETTINGS_WALLET_EXPENSIFY_CARD_SPEND_RULES.getRoute(policyIDForCurrentCard, spendRule?.ruleID));
     }, [policyIDForCurrentCard, spendRule?.ruleID]);
 
     const spendRulesTitleComponent = useMemo(

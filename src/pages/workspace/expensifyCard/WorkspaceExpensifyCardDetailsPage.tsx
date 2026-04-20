@@ -1,5 +1,7 @@
 import {cardByIdSelector} from '@selectors/Card';
 import {Str} from 'expensify-common';
+import type {NavigationProp} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 import cardScarf from '@assets/images/card-scarf.svg';
@@ -52,6 +54,7 @@ type WorkspaceExpensifyCardDetailsPageProps = PlatformStackScreenProps<
 >;
 
 function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetailsPageProps) {
+    const navigation = useNavigation<NavigationProp<SettingsNavigatorParamList>>();
     const {policyID, cardID, backTo} = route.params;
     const {convertToDisplayString} = useCurrencyListActions();
     const defaultFundID = useDefaultFundID(policyID);
@@ -145,13 +148,14 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
         [currency, spendRule, translate, convertToDisplayString],
     );
 
-    const spendRulesRoute = useMemo(() => {
+    const navigateToSpendRules = useCallback(() => {
         if (!spendRule) {
-            return ROUTES.RULES_SPEND_NEW.getRoute(policyID);
+            navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_NEW, {policyID});
+            return;
         }
 
-        return ROUTES.RULES_SPEND_EDIT.getRoute(policyID, spendRule.ruleID);
-    }, [policyID, spendRule]);
+        navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_EDIT, {policyID, ruleID: spendRule.ruleID});
+    }, [navigation, policyID, spendRule]);
 
     const spendRulesTitleComponent = useMemo(
         () => (
@@ -326,7 +330,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                             description={translate('cardPage.spendRules')}
                             descriptionTextStyle={[styles.fontSizeLabel]}
                             titleComponent={spendRulesTitleComponent}
-                            onPress={() => Navigation.navigate(spendRulesRoute)}
+                            onPress={navigateToSpendRules}
                             accessibilityLabel={spendRulesSummary.join('. ')}
                         />
                     )}
@@ -350,7 +354,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                         <MenuItem
                             icon={expensifyIcons.CreditCardLock}
                             title={translate('cardPage.editSpendRules')}
-                            onPress={() => Navigation.navigate(spendRulesRoute)}
+                            onPress={navigateToSpendRules}
                         />
                     )}
                     {canManageCardFreeze && !isCardFrozen(card) && (

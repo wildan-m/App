@@ -7,7 +7,6 @@ import {isSpendRuleCategory} from '@src/types/form/SpendRuleForm';
 import type {ExpensifyCardSettings} from '@src/types/onyx';
 import type {ExpensifyCardRule, ExpensifyCardRuleFilter} from '@src/types/onyx/ExpensifyCardSettings';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
 import {convertToBackendAmount} from './CurrencyUtils';
 import DateUtils from './DateUtils';
 
@@ -215,10 +214,6 @@ function getTruncatedSpendRuleSummary(values: string[] | undefined, formatMoreCo
     return text ? formatMoreCount(text, hiddenCount, shownCount) : '';
 }
 
-function getParentRoute(policyID: string, ruleID: string) {
-    return ruleID === ROUTES.NEW ? ROUTES.RULES_SPEND_NEW.getRoute(policyID) : ROUTES.RULES_SPEND_EDIT.getRoute(policyID, ruleID);
-}
-
 function getSpendRuleSummaryParts(
     formValues: SpendRuleForm,
     selectedCurrency: string | undefined,
@@ -293,5 +288,5 @@ function getSpendRuleSummaryText(
     return summaryArray;
 }
 
-export {buildSpendRuleAST, getParentRoute, getSpendRuleByCardID, getSpendRuleFormValuesFromCardRule, getSpendRuleSummaryParts, getSpendRuleSummaryText, getTruncatedSpendRuleSummary};
+export {buildSpendRuleAST, getSpendRuleByCardID, getSpendRuleFormValuesFromCardRule, getSpendRuleSummaryParts, getSpendRuleSummaryText, getTruncatedSpendRuleSummary};
 export type {SpendRuleByCardID, SpendRuleSummaryPart};
