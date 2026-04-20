@@ -29,7 +29,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {SpendRuleCategory} from '@src/types/form/SpendRuleForm';
 import SpendRuleRestrictionTypeToggle from './SpendRuleRestrictionTypeToggle';
-import {getSpendRuleFormValuesFromCardRule, getTruncatedSpendRuleSummary} from './SpendRulesUtils';
+import {getSpendRuleFormValuesFromCardRule, getTruncatedSpendRuleSummary} from '@libs/SpendRulesUtils';
 
 type SpendRulePageBaseProps = {
     policyID: string;

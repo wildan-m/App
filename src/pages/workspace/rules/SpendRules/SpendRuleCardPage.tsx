@@ -37,7 +37,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Card, ExpensifyCardSettings, WorkspaceCardsList} from '@src/types/onyx';
 import type {ExpensifyCardRule} from '@src/types/onyx/ExpensifyCardSettings';
-import {getParentRoute, getSpendRuleFormValuesFromCardRule} from './SpendRulesUtils';
+import {getParentRoute, getSpendRuleFormValuesFromCardRule} from '@libs/SpendRulesUtils';
 
 type ExpensifyCardListItem = ListItem &
     AdditionalCardProps & {

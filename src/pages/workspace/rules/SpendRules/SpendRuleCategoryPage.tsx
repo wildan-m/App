@@ -23,7 +23,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 import {SPEND_RULE_CATEGORIES} from '@src/types/form/SpendRuleForm';
 import type {SpendRuleCategory} from '@src/types/form/SpendRuleForm';
-import {getParentRoute} from './SpendRulesUtils';
+import {getParentRoute} from '@libs/SpendRulesUtils';
 
 type CategoryListItem = ListItem & {
     value: SpendRuleCategory;

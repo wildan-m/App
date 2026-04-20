@@ -48,6 +48,7 @@ import type {DomainCardNavigatorParamList, SettingsNavigatorParamList} from '@li
 import {isPolicyAdmin} from '@libs/PolicyUtils';
 import {getPolicyExpenseChat} from '@libs/ReportUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
+import {getSpendRuleByCardID} from '@libs/SpendRulesUtils';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import RedDotCardSection from '@pages/settings/Wallet/RedDotCardSection';
 import CardDetails from '@pages/settings/Wallet/WalletPage/CardDetails';
@@ -101,7 +102,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const pageTitle = shouldDisplayCardDomain ? expensifyCardTitle : (cardList?.[cardID]?.nameValuePairs?.cardTitle ?? expensifyCardTitle);
     const {displayName} = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Flag', 'MoneySearch', 'FreezeCard', 'Key', 'Eye']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Flag', 'MoneySearch', 'FreezeCard', 'Key', 'Eye', 'CreditCardLock']);
 
     const cardsToShow = useMemo(() => {
         if (shouldDisplayCardDomain) {
@@ -122,6 +123,8 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const {setCardsDetails} = useExpensifyCardActions();
     const currentPhysicalCard = useMemo(() => physicalCards?.find((card) => String(card?.cardID) === cardID) ?? physicalCards?.at(0), [physicalCards, cardID]);
     const revealedPIN = useRevealedPIN(String(currentPhysicalCard?.cardID));
+
+    const spendRule = useMemo(() => getSpendRuleByCardID(cardSettings, cardID), [cardSettings, cardID]);
 
     // Resets card details and revealed PIN when navigating away from the page.
     useFocusEffect(
@@ -498,6 +501,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 />
                             </>
                         )}
+
                         <MenuItem
                             icon={expensifyIcons.MoneySearch}
                             title={translate('workspace.common.viewTransactions')}
@@ -510,6 +514,13 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 );
                             }}
                         />
+                        {isWorkspaceAdmin && !!ruleID && (
+                            <MenuItem
+                                icon={expensifyIcons.CreditCardLock}
+                                title={translate('cardPage.editSpendRules')}
+                                onPress={() => Navigation.navigate(ROUTES.RULES_SPEND_EDIT.getRoute(ruleID))}
+                            />
+                        )}
                         {canManageCardFreeze && !isCardFrozen(currentCard) && (
                             <MenuItem
                                 icon={expensifyIcons.FreezeCard}
