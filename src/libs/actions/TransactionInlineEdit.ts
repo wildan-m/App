@@ -67,69 +67,6 @@ Onyx.connectWithoutView({
     },
 });
 
-let allReports: OnyxCollection<Report>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.REPORT,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allReports = value;
-    },
-});
-
-let allPolicies: OnyxCollection<Policy>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.POLICY,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicies = value;
-    },
-});
-
-let allPolicyTags: OnyxCollection<PolicyTagLists> = {};
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.POLICY_TAGS,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicyTags = value ?? {};
-    },
-});
-
-let allPolicyCategories: OnyxCollection<PolicyCategories>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.POLICY_CATEGORIES,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicyCategories = value;
-    },
-});
-
-let allPolicyRecentlyUsedCategories: OnyxCollection<RecentlyUsedCategories>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicyRecentlyUsedCategories = value;
-    },
-});
-
-let allPolicyRecentlyUsedTags: OnyxCollection<RecentlyUsedTags> = {};
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicyRecentlyUsedTags = value ?? {};
-    },
-});
-
-let allNextSteps: OnyxCollection<ReportNextStepDeprecated>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.NEXT_STEP,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allNextSteps = value;
-    },
-});
-
 let currentUserAccountID: number = CONST.DEFAULT_NUMBER_ID;
 let currentUserEmail = '';
 Onyx.connectWithoutView({
@@ -176,28 +113,47 @@ type TransactionEditPermissionsParams = {
 
     chatReportNVP?: OnyxEntry<ReportNameValuePairs>;
 
+    originalTransaction?: OnyxEntry<Transaction>;
+
     /** When true, all editing is disabled regardless of permissions. */
     disabled?: boolean;
 };
 
+type GetIouParamsInput = {
+    transactionID: string;
+    parentReport: OnyxEntry<Report>;
+    transactionThreadReport: OnyxEntry<Report>;
+    policy: OnyxEntry<Policy>;
+    policyCategories: OnyxEntry<PolicyCategories>;
+    policyTags: OnyxEntry<PolicyTagLists>;
+    policyRecentlyUsedCategories: OnyxEntry<RecentlyUsedCategories>;
+    policyRecentlyUsedTags: OnyxEntry<RecentlyUsedTags>;
+    parentReportNextStep: OnyxEntry<ReportNextStepDeprecated>;
+};
+
+type TransactionInlineEditParams = GetIouParamsInput & {
+    hash: number | undefined;
+};
+
 /**
  * @private
- * Builds all params needed for IOU action calls from module-level Onyx caches.
+ * Builds all params needed for IOU action calls.
  * The returned object can be spread directly into any updateMoneyRequest* call
  * (all shared fields are at the top level); field-specific extras like
  * policyTagList, policyRecentlyUsedCategories, and transaction are also included.
  */
-function getIouParamsForTransaction(transactionID: string, transactionThreadReportID: string | undefined) {
+function getIouParamsForTransaction({
+    transactionID,
+    parentReport,
+    transactionThreadReport,
+    policy,
+    policyCategories,
+    policyTags,
+    policyRecentlyUsedCategories,
+    policyRecentlyUsedTags,
+    parentReportNextStep,
+}: GetIouParamsInput) {
     const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
-    const reportID = transaction?.reportID;
-    const parentReport = reportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] : undefined;
-    const policyID = parentReport?.policyID;
-    const policy = policyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`] : undefined;
-    const policyTagList = policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`] : undefined;
-    const policyCategories = policyID ? allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`] : undefined;
-    const policyRecentlyUsedCategories = policyID ? allPolicyRecentlyUsedCategories?.[`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${policyID}`] : undefined;
-    const parentReportNextStep = reportID ? allNextSteps?.[`${ONYXKEYS.COLLECTION.NEXT_STEP}${reportID}`] : undefined;
-    const transactionThreadReport = transactionThreadReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`] : undefined;
 
     return {
         // Shared base fields — spread directly into any updateMoneyRequest* call
@@ -212,15 +168,15 @@ function getIouParamsForTransaction(transactionID: string, transactionThreadRepo
         isASAPSubmitBetaEnabled: Permissions.isBetaEnabled(CONST.BETAS.ASAP_SUBMIT, allBetas),
         // Field-specific extras
         transaction,
-        policyTagList,
+        policyTagList: policyTags,
         policyRecentlyUsedCategories,
-        policyRecentlyUsedTags: policyID ? allPolicyRecentlyUsedTags?.[`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${policyID}`] : undefined,
+        policyRecentlyUsedTags,
     };
 }
 
 /** Updates the date of an expense from the Search results table or the Expense Report page. */
-function editTransactionDateInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newDate: string) {
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+function editTransactionDateInline(params: TransactionInlineEditParams, newDate: string) {
+    const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestDate({
         ...iouParams,
         // updateMoneyRequestDate uses 'policyTags' (not policyTagList)
@@ -228,51 +184,51 @@ function editTransactionDateInline(hash: number | undefined, transactionID: stri
         value: newDate,
         transactions: allTransactions,
         transactionViolations: allTransactionViolations,
-        hash,
+        hash: params.hash,
     });
 }
 
 /** Updates the merchant of an expense from the Search results table or the Expense Report page. */
-function editTransactionMerchantInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newMerchant: string) {
+function editTransactionMerchantInline(params: TransactionInlineEditParams, newMerchant: string) {
     // Merchant must be a non-empty string. An empty merchant is not a valid
     // state and the IOU action would save it as a blank row label.
     if (!newMerchant.trim()) {
         return;
     }
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+    const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestMerchant({
         ...iouParams,
         value: newMerchant,
-        hash,
+        hash: params.hash,
     });
 }
 
 /** Updates the description of an expense from the Search results table or the Expense Report page. */
-function editTransactionDescriptionInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newDescription: string) {
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+function editTransactionDescriptionInline(params: TransactionInlineEditParams, newDescription: string) {
+    const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestDescription({
         ...iouParams,
         comment: newDescription,
-        hash,
+        hash: params.hash,
     });
 }
 
 /** Updates the category of an expense from the Search results table or the Expense Report page. */
-function editTransactionCategoryInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newCategory: string) {
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+function editTransactionCategoryInline(params: TransactionInlineEditParams, newCategory: string) {
+    const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestCategory({
         ...iouParams,
         category: newCategory,
-        hash,
+        hash: params.hash,
     });
 }
 
 /** Updates the amount and currency of an expense from the Search results table or the Expense Report page. */
-function editTransactionAmountInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newAmount: number) {
+function editTransactionAmountInline(params: TransactionInlineEditParams, newAmount: number) {
     if (newAmount < 0) {
         return;
     }
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+    const iouParams = getIouParamsForTransaction(params);
     // Keep the existing currency — only the amount is changing from the search table
     const currency = iouParams.transaction?.modifiedCurrency ?? iouParams.transaction?.currency ?? CONST.CURRENCY.USD;
     // Recalculate tax from the existing tax code and the new amount
@@ -291,18 +247,18 @@ function editTransactionAmountInline(hash: number | undefined, transactionID: st
         transactions: allTransactions,
         transactionViolations: allTransactionViolations,
         policyRecentlyUsedCurrencies: [],
-        hash,
+        hash: params.hash,
     });
 }
 
 /** Updates the tag of an expense from the Search results table or the Expense Report page. */
-function editTransactionTagInline(hash: number | undefined, transactionID: string, transactionThreadReportID: string | undefined, newTag: string) {
-    const iouParams = getIouParamsForTransaction(transactionID, transactionThreadReportID);
+function editTransactionTagInline(params: TransactionInlineEditParams, newTag: string) {
+    const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestTag({
         ...iouParams,
         tag: newTag,
         policyRecentlyUsedTags: iouParams.policyRecentlyUsedTags,
-        hash,
+        hash: params.hash,
     });
 }
 
@@ -324,6 +280,7 @@ function getTransactionEditPermissions({
     policyTags,
     transactionThreadNVP,
     chatReportNVP,
+    originalTransaction,
     disabled,
 }: TransactionEditPermissionsParams): TransactionEditPermissions {
     if (disabled) {
@@ -365,8 +322,6 @@ function getTransactionEditPermissions({
     const canEditRestricted = (field: ValueOf<typeof CONST.EDIT_REQUEST_FIELD>) => {
         if (field === CONST.EDIT_REQUEST_FIELD.AMOUNT) {
             // Split expense children cannot have their amount edited inline
-            const originalTransactionID = transaction?.comment?.originalTransactionID;
-            const originalTransaction = originalTransactionID ? allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`] : undefined;
             const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
 
             if (isExpenseSplit) {
@@ -411,4 +366,4 @@ export {
     getTransactionEditPermissions,
 };
 
-export type {TransactionEditPermissions};
+export type {TransactionInlineEditParams, TransactionEditPermissions};

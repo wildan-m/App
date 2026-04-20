@@ -7,6 +7,7 @@ import {useCallback, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
+import type {TransactionInlineEditParams} from '@libs/actions/TransactionInlineEdit';
 import {
     editTransactionAmountInline,
     editTransactionCategoryInline,
@@ -134,6 +135,12 @@ function useTransactionInlineEdit({
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${getNonEmptyStringOnyxID(policyID)}`);
     const [transactionThreadNVP] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${getNonEmptyStringOnyxID(transactionThreadReportID)}`);
     const [chatReportNVP] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${getNonEmptyStringOnyxID(chatReportID)}`);
+    const [policyRecentlyUsedCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${getNonEmptyStringOnyxID(policyID)}`);
+    const [policyRecentlyUsedTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${getNonEmptyStringOnyxID(policyID)}`);
+    const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(reportID)}`);
+
+    const originalTransactionID = transaction?.comment?.originalTransactionID;
+    const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(originalTransactionID)}`);
 
     const {hasSelectedTransactions} = useSearchStateContext();
 
@@ -147,33 +154,49 @@ function useTransactionInlineEdit({
         policyTags,
         transactionThreadNVP,
         chatReportNVP,
+        originalTransaction,
         disabled: hasSelectedTransactions,
     });
 
     const wasEditingOnMouseDownRef = useRef(false);
 
+    const getEditParams = (): TransactionInlineEditParams => {
+        return {
+            hash,
+            transactionID,
+            parentReport: parentReport ?? fallbackReport,
+            transactionThreadReport,
+            policy,
+            policyCategories,
+            policyTags,
+            policyRecentlyUsedCategories,
+            policyRecentlyUsedTags,
+            parentReportNextStep,
+        };
+    };
+
     const onEditDate = (newDate: string) => {
-        editTransactionDateInline(hash, transactionID, transactionThreadReportID, newDate);
+        editTransactionDateInline(getEditParams(), newDate);
     };
 
     const onEditMerchant = (newMerchant: string) => {
-        editTransactionMerchantInline(hash, transactionID, transactionThreadReportID, newMerchant);
+        editTransactionMerchantInline(getEditParams(), newMerchant);
     };
 
     const onEditDescription = (newDescription: string) => {
-        editTransactionDescriptionInline(hash, transactionID, transactionThreadReportID, newDescription);
+        editTransactionDescriptionInline(getEditParams(), newDescription);
     };
 
     const onEditCategory = (newCategory: string) => {
-        editTransactionCategoryInline(hash, transactionID, transactionThreadReportID, newCategory);
+        editTransactionCategoryInline(getEditParams(), newCategory);
     };
 
     const onEditAmount = (newAmount: number) => {
-        editTransactionAmountInline(hash, transactionID, transactionThreadReportID, newAmount);
+        editTransactionAmountInline(getEditParams(), newAmount);
     };
 
     const onEditTag = (newTag: string) => {
-        editTransactionTagInline(hash, transactionID, transactionThreadReportID, newTag);
+        editTransactionTagInline(getEditParams(), newTag);
     };
 
     return {
