@@ -76,7 +76,7 @@ This error occurs when you are the only remaining admin on a domain. To proceed 
 
 [Learn how to reset a domain](/articles/expensify-classic/domains/Claim-And-Verify-A-Domain). 
 
-## Why do I see the message "Expensify Card bank account owner" when closing my account?
+This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
 
 This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
 
