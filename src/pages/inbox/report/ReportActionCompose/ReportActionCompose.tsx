@@ -242,7 +242,6 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
                     isCreatedUsingMarkdown: true,
                     quickAction,
                     ancestors: reportAncestors,
-                    delegateEmail,
                 });
                 return;
             }
@@ -270,6 +269,7 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
             shouldPlaySound: true,
             isInSidePanel,
             reportActionID: optimisticReportActionID,
+            delegateEmail,
         });
     };
 
