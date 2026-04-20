@@ -1,5 +1,6 @@
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
@@ -14,11 +15,11 @@ type ModifiedExpenseContentProps = {
     report: OnyxEntry<Report>;
     childReport: OnyxEntry<Report>;
     originalReport: OnyxEntry<Report>;
-    currentUserEmail: string | undefined;
 };
 
-function ModifiedExpenseContent({action, report, childReport, originalReport, currentUserEmail}: ModifiedExpenseContentProps) {
+function ModifiedExpenseContent({action, report, childReport, originalReport}: ModifiedExpenseContentProps) {
     const {translate} = useLocalize();
+    const {email: currentUserEmail} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
 

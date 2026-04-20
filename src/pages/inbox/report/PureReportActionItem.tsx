@@ -1158,7 +1158,6 @@ function PureReportActionItem({
                     report={report}
                     childReport={childReport}
                     originalReport={originalReport}
-                    currentUserEmail={currentUserEmail}
                 />
             );
         } else if (isApprovalFlowAction(action)) {
