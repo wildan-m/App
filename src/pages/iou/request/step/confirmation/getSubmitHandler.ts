@@ -75,7 +75,7 @@ function getSubmitHandler(snapshot: SubmitNavigationSnapshot): SubmitHandler {
     if (canUseDismissModalFastPath(snapshot)) {
         return SUBMIT_HANDLER.DISMISS_MODAL;
     }
-    if (snapshot.isReportInRHP && snapshot.destinationReportID) {
+    if (snapshot.isReportInRHP && snapshot.destinationReportID && !snapshot.isSplitRequest) {
         return SUBMIT_HANDLER.REPORT_IN_RHP_DISMISS;
     }
     if (snapshot.isFromGlobalCreate && snapshot.canDismissFromSearch && snapshot.isSearchTopmostFullScreen) {

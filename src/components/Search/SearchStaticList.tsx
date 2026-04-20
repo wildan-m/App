@@ -13,7 +13,7 @@
  *    Do NOT add new subscriptions unless absolutely necessary for correctness.
  */
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import type {ListRenderItemInfo, StyleProp, ViewStyle} from 'react-native';
 import Button from '@components/Button';
@@ -104,7 +104,7 @@ function SearchStaticList({
     const validGroupBy = getValidGroupBy(groupBy);
     const searchData = searchResults?.data;
 
-    const sortedData = useMemo(() => {
+    const sortedData = (() => {
         if (!searchData) {
             return [] as TransactionListItemType[];
         }
@@ -124,7 +124,7 @@ function SearchStaticList({
         return getSortedSections(type, status, filteredData, localeCompare, translate, sortBy, sortOrder, validGroupBy)
             .filter((item): item is TransactionListItemType => 'transactionID' in item && item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
             .slice(0, STATIC_LIST_MAX_ITEMS);
-    }, [searchData, type, status, sortBy, sortOrder, validGroupBy, accountID, email, translate, formatPhoneNumber, localeCompare]);
+    })();
 
     // Sync the pending-expense placeholder on focus and notify the parent that
     // the destination is visible (focus signal for the dual-gate span ending).
@@ -385,15 +385,4 @@ function SearchStaticList({
 
 SearchStaticList.displayName = 'SearchStaticList';
 
-export default React.memo(
-    SearchStaticList,
-    (prev, next) =>
-        prev.searchResults?.data === next.searchResults?.data &&
-        prev.queryJSON === next.queryJSON &&
-        prev.contentContainerStyle === next.contentContainerStyle &&
-        prev.onLayout === next.onLayout &&
-        prev.onDestinationVisible === next.onDestinationVisible &&
-        prev.shouldUseNarrowLayout === next.shouldUseNarrowLayout &&
-        prev.canSelectMultiple === next.canSelectMultiple &&
-        prev.columns === next.columns,
-);
+export default SearchStaticList;

@@ -316,7 +316,9 @@ function IOURequestStepConfirmation({
         // pushing a duplicate route (which would require an extra back press).
 
         // Only eligible when search pre-insert didn't win, and the flow ends at a report (not Search).
-        const canUseReportPreInsert = !shouldPreInsertSearch && (!isFromGlobalCreate || isReportTopmostSplitNavigator());
+        // Split flows handle their own dismiss/navigation, so pre-inserting would cause double navigation.
+        const isSplitRequest = iouType === CONST.IOU.TYPE.SPLIT;
+        const canUseReportPreInsert = !isSplitRequest && !shouldPreInsertSearch && (!isFromGlobalCreate || isReportTopmostSplitNavigator());
 
         // RHP has its own dismiss handler; pre-inserting under it would break the stack.
         const isOutsideRHP = !isReportOpenInRHP(navigationRef.getRootState());
