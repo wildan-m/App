@@ -1,8 +1,8 @@
 ---
 title: Troubleshoot SmartScan Issues
 description: Fix common SmartScan problems, including failed, stuck and incorrect scans. 
-keywords: [New Expensify, SmartScan, scan failed, receipt not scanning, illegible receipt, blurry receipt, stuck scanning, SmartScan error, scan not working, SmartScan troubleshooting, SCANREADY, wrong amount, wrong merchant, wrong date, SmartScan incorrect]
-internalScope: Audience is all Expensify members. Covers troubleshooting SmartScan failures, image quality tips, and what to do when SmartScan returns incorrect data. Does not cover how to attach, replace, or crop receipts — see Attach-and-edit-receipts-on-expenses for those topics.
+keywords: [Expensify Classic, SmartScan, scan failed, receipt not scanning, illegible receipt, blurry receipt, stuck scanning, SmartScan error, scan not working, SmartScan troubleshooting, SCANREADY, wrong amount, wrong merchant, wrong date, SmartScan incorrect]
+internalScope: Audience is all Expensify members. Covers troubleshooting SmartScan failures, image quality tips, and what to do when SmartScan returns incorrect data. Does not cover how to attach, replace, or crop receipts.
 ---
 
 # Troubleshoot SmartScan Issues
@@ -27,17 +27,31 @@ Common reasons include:
 
 If SmartScan cannot confidently read these required fields, the scan will fail and will show the message: "Receipt scanning failed. Enter details manually".  
 
+---
+
 ## How to fix when SmartScan fails to complete a scan
 
 SmartScan may fail if the receipt image is unreadable, or if the image is missing a clear expense date or amount. 
 
 To retry:
 
-1. In the navigation tabs (on the left on web, on the bottom on mobile), select **Spend > Expenses**.
-2. Click to open the expense with the failed scan. It will show a red dot indicator with the message "receipt scanning failed".
-3. Click the receipt image. 
-4. Click **Replace**.
-5. Take a photo or upload a receipt image file from your device.
+**On web:** 
+
+1. In the navigation tabs on the left, go to **Expenses**.
+2. Click the expense with the failed scan to open it.
+3. Drag and drop a receipt image onto the window to replace the existing receipt.
+
+**On mobile:** 
+
+1. Tap the hamburger menu in the top-left corner.
+2. Tap **Expenses**.
+3. Tap the expense with the failed scan to open it.
+4. Tap the receipt image.
+5. Tap **Retake**.
+
+Once a new receipt image is added, SmartScan will run again. 
+
+---
 
 ## How to troubleshoot stuck or delayed scans
 
@@ -47,15 +61,15 @@ SmartScan usually completes within a few seconds, but delays can happen.
 - **Check your internet connection**. SmartScan requires an active connection to process. If you were offline when you took the photo, the scan will begin once you reconnect.
 - **Check the photo library on your device**. If SmartScan fails to process the images, it will be saved to the photo library on your device.
 
+If the scan is still stuck after several minutes, you can retry SmartScan with a new photo to trigger a fresh scan.
+
+---
+
 ## How to fix incorrect scans
 
 SmartScan extracts data automatically, but it may misread certain receipts — especially handwritten receipts, faded ink, or unusual formats.
 
-If the details of the expense are wrong, you can: 
- - [Ask Concierge to fix it for you](/articles/new-expensify/concierge-ai/What-Concierge-Can-Do#what-actions-concierge-can-take-on-expenses), or
- - Edit the expense manually.
-
-[Learn how to edit expenses](/articles/expensify-classic/expenses/Edit-expenses). 
+To fix an incorrectly scanned merchant name, date or amount you can edit the expense manually. [Learn how to edit expenses](/articles/expensify-classic/expenses/Edit-expenses). 
 
 ---
 
