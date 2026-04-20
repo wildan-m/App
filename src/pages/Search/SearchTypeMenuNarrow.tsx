@@ -2,7 +2,7 @@
 // used for fast perceived performance. If you change the UI here, verify the
 // static version still looks visually identical.
 import {useNavigation} from '@react-navigation/native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState, useTransition} from 'react';
 import {View} from 'react-native';
 import type BaseModalProps from '@components/Modal/types';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -24,12 +24,12 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
 import {getAllTaxRates} from '@libs/PolicyUtils';
-import {buildSearchQueryJSON, buildUserReadableQueryString} from '@libs/SearchQueryUtils';
 import {getItemBadgeText, getOverflowMenu} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {accountIDSelector} from '@src/selectors/Session';
 import todosReportCountsSelector from '@src/selectors/Todos';
+import useSavedSearchTitles from './hooks/useSavedSearchTitles';
 
 type SearchTypeMenuNarrowProps = {
     /** Search query JSON */
@@ -46,6 +46,13 @@ type SearchTypeMenuNarrowContentProps = {
     onLongTabPress?: (key: string) => void;
     containerRef?: React.RefObject<View | null>;
     children?: React.ReactNode;
+};
+
+type ComputedMenuData = {
+    queryMap: Map<string, {query: string; name?: string}>;
+    tabItems: TabSelectorBaseItem[];
+    savedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]>;
+    activeKey: string;
 };
 
 function SearchTypeMenuNarrowContent({tabs, activeTabKey, onActiveTabPress, onTabPress: onTabPressContent, onLongTabPress, containerRef, children}: SearchTypeMenuNarrowContentProps) {
@@ -91,10 +98,26 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
 
     const taxRates = getAllTaxRates(allPolicies);
     const cardsForSavedSearchDisplay = mergeCardListWithWorkspaceFeeds(workspaceCardList ?? CONST.EMPTY_OBJECT, cardList);
+    const savedSearchTitles = useSavedSearchTitles({
+        savedSearches,
+        personalDetails,
+        reports,
+        taxRates,
+        cardsForSavedSearchDisplay,
+        allFeeds,
+        allPolicies,
+        currentUserAccountID,
+        translate,
+        feedKeysWithCards,
+        reportAttributes,
+        shouldBuildTitles: !!queryJSON,
+        allowEmptyQueryJSONFallback: false,
+    });
 
     const [savedSearchToModifyKey, setSavedSearchToModifyKey] = useState<string | null>(null);
     const menuAnchorRef = useRef<View>(null);
     const {showDeleteModal} = useDeleteSavedSearch();
+    const [, startTransition] = useTransition();
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
@@ -118,78 +141,81 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         'CheckCircle',
     ] as const);
 
-    const queryMap = new Map<string, {query: string; name?: string}>();
-    const tabItems: TabSelectorBaseItem[] = [];
-    const savedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]> = {};
-    let activeKey = '';
+    const [computedMenuData, setComputedMenuData] = useState<ComputedMenuData>({
+        queryMap: new Map(),
+        tabItems: [],
+        savedSearchesPopoverMenuItems: {},
+        activeKey: '',
+    });
 
-    const savedSearchesTabItems: TabSelectorBaseItem[] = savedSearches
-        ? Object.entries(savedSearches)
-              .map(([key, item]): TabSelectorBaseItem | null => {
-                  if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !isOffline) {
-                      return null;
-                  }
+    useEffect(() => {
+        startTransition(() => {
+            const nextQueryMap = new Map<string, {query: string; name?: string}>();
+            const nextTabItems: TabSelectorBaseItem[] = [];
+            const nextSavedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]> = {};
+            let nextActiveKey = '';
 
-                  let title = item.name;
-                  const itemJsonQuery = buildSearchQueryJSON(item.query);
-                  if (queryJSON && itemJsonQuery && title === item.query) {
-                      title = buildUserReadableQueryString({
-                          queryJSON: itemJsonQuery,
-                          PersonalDetails: personalDetails,
-                          reports,
-                          taxRates,
-                          cardList: cardsForSavedSearchDisplay,
-                          cardFeeds: allFeeds,
-                          policies: allPolicies,
-                          currentUserAccountID,
-                          autoCompleteWithSpace: false,
-                          translate,
-                          feedKeysWithCards,
-                          reportAttributes,
-                      });
-                  }
+            const savedSearchesTabItems: TabSelectorBaseItem[] = savedSearches
+                ? Object.entries(savedSearches)
+                      .map(([key, item]): TabSelectorBaseItem | null => {
+                          if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !isOffline) {
+                              return null;
+                          }
 
-                  queryMap.set(key, {query: item.query ?? '', name: item.name});
-                  savedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, Number(key), item.query, translate, showDeleteModal, true, () =>
-                      setSavedSearchToModifyKey(null),
-                  );
+                          const title = item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name;
 
-                  if (queryJSON && Number(key) === queryJSON.hash) {
-                      activeKey = key;
-                  }
+                          nextQueryMap.set(key, {query: item.query ?? '', name: item.name});
+                          nextSavedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, Number(key), item.query, translate, showDeleteModal, true, () =>
+                              setSavedSearchToModifyKey(null),
+                          );
 
-                  return {
-                      key,
-                      icon: expensifyIcons.Bookmark,
-                      title,
-                      isDisabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                      pendingAction: item.pendingAction,
-                  };
-              })
-              .filter((item) => item !== null)
-        : [];
+                          if (queryJSON && Number(key) === queryJSON.hash) {
+                              nextActiveKey = key;
+                          }
 
-    for (const section of typeMenuSections) {
-        if (section.translationPath === 'search.savedSearchesMenuItemTitle') {
-            tabItems.push(...savedSearchesTabItems);
-        } else {
-            for (const item of section.menuItems) {
-                const badgeText = getItemBadgeText(item.key, reportCounts);
-                const title = translate(item.translationPath);
+                          return {
+                              key,
+                              icon: expensifyIcons.Bookmark,
+                              title,
+                              isDisabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                              pendingAction: item.pendingAction,
+                          };
+                      })
+                      .filter((item) => item !== null)
+                : [];
 
-                tabItems.push({
-                    key: item.key,
-                    icon: expensifyIcons[item.icon],
-                    title,
-                    badgeText,
-                });
-                queryMap.set(item.key, {query: item.searchQuery});
-                if (queryJSON && item.similarSearchHash === queryJSON.similarSearchHash) {
-                    activeKey = item.key;
+            for (const section of typeMenuSections) {
+                if (section.translationPath === 'search.savedSearchesMenuItemTitle') {
+                    nextTabItems.push(...savedSearchesTabItems);
+                } else {
+                    for (const item of section.menuItems) {
+                        const badgeText = getItemBadgeText(item.key, reportCounts);
+                        const title = translate(item.translationPath);
+
+                        nextTabItems.push({
+                            key: item.key,
+                            icon: expensifyIcons[item.icon],
+                            title,
+                            badgeText,
+                        });
+                        nextQueryMap.set(item.key, {query: item.searchQuery});
+                        if (queryJSON && item.similarSearchHash === queryJSON.similarSearchHash) {
+                            nextActiveKey = item.key;
+                        }
+                    }
                 }
             }
-        }
-    }
+
+            setComputedMenuData({
+                queryMap: nextQueryMap,
+                tabItems: nextTabItems,
+                savedSearchesPopoverMenuItems: nextSavedSearchesPopoverMenuItems,
+                activeKey: nextActiveKey,
+            });
+        });
+    }, [savedSearches, isOffline, savedSearchTitles, expensifyIcons, translate, showDeleteModal, queryJSON, typeMenuSections, reportCounts, startTransition]);
+
+    const {queryMap, tabItems, savedSearchesPopoverMenuItems, activeKey} = computedMenuData;
 
     const popoverMenuItems = savedSearchToModifyKey ? savedSearchesPopoverMenuItems?.[savedSearchToModifyKey] : [];
     const shouldShowSavedSearchPopover = savedSearchToModifyKey && popoverMenuItems.length > 0;
