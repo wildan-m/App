@@ -840,6 +840,12 @@ function duplicateReport({
         return;
     }
 
+    const userAccountID = getUserAccountID();
+    const currentUserEmailValue = getCurrentUserEmail();
+
+    const newReportName = translate('common.copyOfReportName', sourceReportName);
+    const {reportPreviewReportActionID, ...newReport} = createNewReport(ownerPersonalDetails, false, isASAPSubmitBetaEnabled, targetPolicy, betas, false, undefined, newReportName);
+
     const isCrossWorkspace = !!sourceReport && sourceReport.policyID !== targetPolicy.id;
 
     const eligibleTransactions = sourceReportTransactions.filter((transaction) => {
@@ -861,16 +867,6 @@ function duplicateReport({
         }
         return true;
     });
-
-    if (eligibleTransactions.length === 0) {
-        return;
-    }
-
-    const userAccountID = getUserAccountID();
-    const currentUserEmailValue = getCurrentUserEmail();
-
-    const newReportName = translate('common.copyOfReportName', sourceReportName);
-    const {reportPreviewReportActionID, ...newReport} = createNewReport(ownerPersonalDetails, false, isASAPSubmitBetaEnabled, targetPolicy, betas, false, undefined, newReportName);
 
     const participants = getMoneyRequestParticipantsFromReport(parentChatReport, userAccountID);
 
@@ -1134,10 +1130,15 @@ function bulkDuplicateReports({
             continue;
         }
 
-        const report =
-            (searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] as OnyxTypes.Report | undefined) ??
-            allReports[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] ??
-            (selectedReport as OnyxTypes.Report);
+        const snapshotReport = searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] as OnyxTypes.Report | undefined;
+        const onyxReport = allReports[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
+        const report = snapshotReport ?? onyxReport ?? (selectedReport as OnyxTypes.Report);
+
+        const reportTransactions = transactionsByReportID.get(reportID) ?? [];
+
+        if (!snapshotReport && !onyxReport && reportTransactions.length === 0) {
+            continue;
+        }
 
         const reportPolicy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
         const isSourcePolicyValid = !!reportPolicy && isPolicyAccessible(reportPolicy, currentUserLogin);
@@ -1150,8 +1151,6 @@ function bulkDuplicateReports({
         const parentChatReport = useSourcePolicy ? chatReport : activePolicyExpenseChat;
         const targetPolicyCategories = allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${targetPolicy?.id}`] ?? {};
         const targetPolicyTags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${targetPolicy?.id}`] ?? {};
-
-        const reportTransactions = transactionsByReportID.get(reportID) ?? [];
 
         duplicateReport({
             sourceReport: report,
