@@ -59,7 +59,7 @@ No. To proceed with closing your account, you must first delete any workspaces s
 [Learn how to transfer billing ownership](/articles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-transfer-billing-ownership-in-expensify)).
 [Learn how to transfer billing ownership](/articles/new-expensify/billing-and-subscriptions/Add-a-payment-card-and-view-your-subscription#how-to-transfer-billing-ownership-in-expensify).
 ## Can I close my account if am the Primary Contact on a domain? 
-
+## Can I close my account if I am the Primary Contact on a domain? 
 No. To proceed with closing your account, you must first set a new Primary Contact on the domain. You can set a new Primary Contact on a domain under **Domain admins > Settings > Primary Contact**. 
 
 
