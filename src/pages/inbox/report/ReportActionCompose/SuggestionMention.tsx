@@ -271,20 +271,25 @@ function SuggestionMention({
     const getUserMentionOptions = useCallback(
         (searchValue = ''): Mention[] => {
             const policyEmployeeAccountIDs = getPolicyEmployeeAccountIDs(policy, currentUserPersonalDetails.accountID);
-            const shouldWeightDetails = isGroupChat(currentReport) || doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
-            // Smaller weight means higher order in suggestion list
-            const getPersonalDetailsWeight = (detail: PersonalDetails): number => {
-                if (isReportParticipant(detail.accountID, currentReport)) {
-                    return 0;
-                }
-                if (policyEmployeeAccountIDs.includes(detail.accountID)) {
-                    return 1;
-                }
-                return 2;
-            };
-            const personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined = shouldWeightDetails
-                ? lodashMapValues(personalDetails, (detail) => (detail ? {...detail, weight: getPersonalDetailsWeight(detail)} : null))
-                : personalDetails;
+            const shouldWeightDetails = !isGroupChat(currentReport) && !doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
+
+            let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined; 
+
+            if(!shouldWeightDetails) {
+                personalDetailsParam = personalDetails;
+            } else {
+                // Smaller weight means higher order in suggestion list
+                const getPersonalDetailsWeight = (detail: PersonalDetails): number => {
+                    if (isReportParticipant(detail.accountID, currentReport)) {
+                        return 0;
+                    }
+                    if (policyEmployeeAccountIDs.includes(detail.accountID)) {
+                        return 1;
+                    }
+                    return 2;
+                };
+                personalDetailsParam = lodashMapValues(personalDetails, (detail) => (detail ? {...detail, weight: getPersonalDetailsWeight(detail)} : null));
+            }
             
             const suggestions: Mention[] = [];
 
