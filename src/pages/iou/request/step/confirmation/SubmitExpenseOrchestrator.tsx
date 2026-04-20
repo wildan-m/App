@@ -355,6 +355,23 @@ function SubmitExpenseOrchestrator({
     };
 
     const dismissRHPToReport = (reportID: string, runAfterDismiss: () => void) => {
+        const report = getReportOrDraftReport(reportID);
+        const hasExistingTransactions = (report?.transactionCount ?? 0) > 0;
+
+        if (!hasExistingTransactions) {
+            setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, reportID);
+            const rootState = navigationRef.getRootState();
+            const rhpKey = rootState?.routes?.at(-1)?.state?.key;
+            if (rhpKey) {
+                Navigation.pop(rhpKey);
+            }
+            TransitionTracker.runAfterTransitions({
+                callback: runAfterDismiss,
+                waitForUpcomingTransition: true,
+            });
+            return;
+        }
+
         setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, reportID);
         const isNarrowLayout = getIsNarrowLayout();
         if (isNarrowLayout) {
