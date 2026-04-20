@@ -7,9 +7,9 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import WorkspaceConfirmationForm from '@components/WorkspaceConfirmationForm';
 import type {WorkspaceConfirmationSubmitFunctionParams} from '@components/WorkspaceConfirmationForm';
-import useAllPolicyExpenseChatReportActions from '@hooks/useAllPolicyExpenseChatReportActions';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from '@hooks/useHasActiveAdminPolicies';
+import useLastWorkspaceNumber from '@hooks/useLastWorkspaceNumber';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -46,7 +46,7 @@ function IOURequestStepUpgrade({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
-    const filteredReportActions = useAllPolicyExpenseChatReportActions();
+    const lastWorkspaceNumber = useLastWorkspaceNumber();
 
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`);
     const [onboardingPurposeSelected] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
@@ -154,9 +154,10 @@ function IOURequestStepUpgrade({
             return;
         }
 
+        const email = currentUserPersonalDetails?.email ?? '';
         const policyData = Policy.createWorkspace({
             policyOwnerEmail: undefined,
-            policyName: undefined,
+            policyName: Policy.generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
             policyID: undefined,
             engagementChoice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
             currency: currentUserPersonalDetails?.localCurrencyCode ?? '',
@@ -171,12 +172,11 @@ function IOURequestStepUpgrade({
             introSelected,
             activePolicyID,
             currentUserAccountIDParam: currentUserPersonalDetails.accountID,
-            currentUserEmailParam: currentUserPersonalDetails.email ?? '',
+            currentUserEmailParam: email,
             onboardingPurposeSelected,
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
-            reportActionsList: filteredReportActions,
         });
         setIsUpgraded(true);
         policyDataRef.current = policyData;
@@ -205,7 +205,6 @@ function IOURequestStepUpgrade({
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
-            reportActionsList: filteredReportActions,
         });
         policyDataRef.current = policyData;
         setCreatedPolicyName(params.name);

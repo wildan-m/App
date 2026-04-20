@@ -3485,7 +3485,7 @@ describe('actions/Policy', () => {
                 accountID: TEST_ACCOUNT_ID,
             });
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_NON_PUBLIC_DOMAIN_EMAIL, undefined, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_NON_PUBLIC_DOMAIN_EMAIL, undefined, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
@@ -3498,7 +3498,7 @@ describe('actions/Policy', () => {
                 accountID: TEST_ACCOUNT_ID,
             });
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_EMAIL, undefined, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL, undefined, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
@@ -3513,7 +3513,7 @@ describe('actions/Policy', () => {
                 accountID: TEST_ACCOUNT_ID,
             });
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_EMAIL_2, undefined, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL_2, undefined, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', displayNameForWorkspace));
         });
 
@@ -3531,7 +3531,7 @@ describe('actions/Policy', () => {
 
             await Onyx.set(ONYXKEYS.COLLECTION.POLICY, existingPolicies);
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_EMAIL, 1, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL, 1, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', TEST_DISPLAY_NAME, 2));
         });
 
@@ -3542,7 +3542,7 @@ describe('actions/Policy', () => {
                 accountID: TEST_ACCOUNT_ID,
             });
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_SMS_DOMAIN_EMAIL, undefined, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_SMS_DOMAIN_EMAIL, undefined, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.myGroupWorkspace', {}));
         });
 
@@ -3564,7 +3564,7 @@ describe('actions/Policy', () => {
 
             await Onyx.set(ONYXKEYS.COLLECTION.POLICY, existingPolicies);
 
-            const workspaceName = Policy.newGenerateDefaultWorkspaceName(TEST_EMAIL, 1, TestHelper.translateLocal);
+            const workspaceName = Policy.generateDefaultWorkspaceName(TEST_EMAIL, 1, TestHelper.translateLocal);
             expect(workspaceName).toBe(TestHelper.translateLocal('workspace.new.workspaceName', TEST_DISPLAY_NAME, 2));
         });
     });
