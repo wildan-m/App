@@ -106,7 +106,7 @@ jest.mock('@hooks/useConfirmModal', () => ({
 
 jest.mock('@hooks/usePermissions', () => ({
     __esModule: true,
-    default: () => ({isBetaEnabled: () => false}),
+    default: () => ({isBetaEnabled: (beta: string) => beta === 'bulkDuplicateReport'}),
 }));
 
 jest.mock('@hooks/useSelfDMReport', () => ({
