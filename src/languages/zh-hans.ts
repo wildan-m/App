@@ -434,7 +434,6 @@ const translations: TranslationDeepObject<typeof en> = {
         collapsed: '已折叠',
         expanded: '已展开',
         expenseReport: '报销报告',
-        expenseReports: '报销报告',
         rateOutOfPolicy: '超出政策的费率',
         leaveWorkspace: '离开工作区',
         leaveWorkspaceConfirmation: '如果你离开此工作区，将无法再向其提交报销。',
@@ -449,9 +448,6 @@ const translations: TranslationDeepObject<typeof en> = {
         comments: '评论',
         sharedIn: '共享于',
         unreported: '未报销',
-        explore: '探索',
-        insights: '洞察',
-        todo: '待办事项',
         invoice: '发票',
         expense: '报销',
         chat: '聊天',
@@ -858,6 +854,8 @@ const translations: TranslationDeepObject<typeof en> = {
     adminOnlyCanPost: '只有管理员可以在此房间中发送消息。',
     reportAction: {
         asCopilot: '作为副驾驶，用于',
+        assistedBy: (agentName: string) => `由${agentName}协助`,
+        humanSupportAgent: '人工客服',
         harvestCreatedExpenseReport: (reportUrl: string, reportName: string) => `创建了此报销单，用于保存所有来自 <a href="${reportUrl}">${reportName}</a> 且无法按照你选择的频率提交的费用`,
         createdReportForUnapprovedTransactions: ({reportUrl, reportName, reportID, isReportDeleted}: CreatedReportForUnapprovedTransactionsParams) =>
             isReportDeleted ? `为已删除报销单 #${reportID} 中的所有暂挂报销创建了此报销单` : `为从<a href="${reportUrl}">${reportName}</a>中被暂挂的任何报销创建了此报表`,
@@ -1616,6 +1614,7 @@ const translations: TranslationDeepObject<typeof en> = {
         failedToApproveViaDEW: (reason: string) => `批准失败。${reason}`,
         cannotDuplicateDistanceExpense: '你无法在不同工作区之间复制里程报销，因为各个工作区的费率可能不同。',
         taxDisabledAlert: {title: '税费已禁用', prompt: '请在工作区中启用税费跟踪，以便编辑此报销的详细信息或从该报销中删除税费。', confirmText: '删除税费'},
+        bulkDuplicateLimit: `您一次最多可以复制 ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} 笔报销。请减少选择的报销数量后重试。`,
         deleted: '已删除',
     },
     transactionMerge: {
@@ -2538,6 +2537,9 @@ ${amount}，商户：${merchant} - 日期：${date}`,
     workflowsExpensesFromPage: {
         title: '支出起始于',
         header: '当以下成员提交报销时：',
+        memberAlreadyInWorkflowTitle: '成员已在工作流中',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName}已在提交给${approverName}的审批流程中。在此处添加将把该成员移动到此工作流。`,
     },
     workflowsApproverPage: {
         genericErrorMessage: '无法更改审批人。请重试或联系支持。',
@@ -2834,9 +2836,11 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         },
         employees: {
             title: '您有多少名员工？',
-            [CONST.ONBOARDING_COMPANY_SIZE.MICRO]: '1–10 名员工',
-            [CONST.ONBOARDING_COMPANY_SIZE.SMALL]: '11-50 名员工',
-            [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM_SMALL]: '51-100 名员工',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL]: '1–4 名员工',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM]: '5–10 名员工',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO]: '1-10 名员工',
+            [CONST.ONBOARDING_COMPANY_SIZE.SMALL]: '11–50 名员工',
+            [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM_SMALL]: '51–100 名员工',
             [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM]: '101–1,000 名员工',
             [CONST.ONBOARDING_COMPANY_SIZE.LARGE]: '超过 1,000 名员工',
         },
@@ -4059,7 +4063,6 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             everyone: '所有人',
             delete: '删除工作区',
             settings: '设置',
-            reimburse: '报销',
             categories: '类别',
             tags: '标签',
             customField1: '自定义字段 1',
@@ -4181,6 +4184,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             budgetTypeForNotificationMessage: {tag: '标签', category: '类别'},
             policyExpenseChatName: (displayName: string) => `${displayName} 的报销费用`,
             deepDiveExpensifyCard: `<muted-text-label>Expensify 卡交易将自动导出到使用<a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">我们的集成</a>创建的“Expensify 卡负债账户”。</muted-text-label>`,
+            hr: '人力资源',
         },
         receiptPartners: {
             uber: {
@@ -6731,6 +6735,31 @@ ${reportName}
             }),
             subscriptions: '订阅',
         },
+        hr: {
+            title: '人力资源',
+            subtitle: '连接人力资源工具，保持员工审批同步。',
+            settingsTitle: 'Gusto 设置',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return '正在导入 Gusto 数据';
+                    case 'gustoSyncLoadCompany':
+                        return '正在加载 Gusto 公司数据';
+                    case 'gustoSyncImportEmployees':
+                        return '正在导入员工';
+                    case 'gustoSyncBuildApprovalChains':
+                        return '构建审批链';
+                    case 'gustoSyncFinalize':
+                        return '正在完成同步';
+                    case 'jobDone':
+                        return '正在加载导入的数据';
+                    default: {
+                        return `阶段缺少翻译：${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: '审批模式', finalApprover: '最终审批人'},
+        },
     },
     getAssistancePage: {
         title: '获取帮助',
@@ -7354,20 +7383,11 @@ ${reportName}
         resetColumns: '重置列',
         groupColumns: '分组列',
         expenseColumns: '报销列',
-        statements: '对账单',
-        cardStatements: '卡对账单',
-        monthlyAccrual: '月度计提',
-        unapprovedCash: '未批准现金',
-        unapprovedCard: '未批准的卡片',
-        reconciliation: '对账',
-        topSpenders: '最高支出者',
         saveSearch: '保存搜索',
         deleteSavedSearch: '删除已保存的搜索',
         deleteSavedSearchConfirm: '确定要删除此搜索吗？',
         searchName: '搜索名称',
         savedSearchesMenuItemTitle: '已保存',
-        topCategories: '热门类别',
-        topMerchants: '热门商家',
         groupedExpenses: '已分组的报销费用',
         bulkActions: {
             editMultiple: '批量编辑',
@@ -7522,6 +7542,24 @@ ${reportName}
             pleaseSelectDatesForBothFromAndTo: '请选择起始和结束日期',
         },
         spendOverTime: '随时间支出',
+        tabs: {
+            expenseReports: '报销报告',
+            reports: '所有报表',
+            expenses: '所有报销',
+            submit: '草稿',
+            approve: '待审批',
+            pay: '准备付款',
+            accounting: '会计',
+            export: '等待导出',
+            unapprovedCash: '现金应计',
+            unapprovedCard: '卡应计费用',
+            statements: '卡片对账单',
+            reconciliation: '银行对账',
+            insights: '洞察',
+            topSpenders: '最高消费者',
+            topCategories: '热门类别',
+            topMerchants: '热门商家',
+        },
     },
     genericErrorPage: {
         title: '哎呀，出错了！',
@@ -8338,6 +8376,7 @@ ${reportName}
         details: {
             title: '订阅详情',
             annual: '年度订阅',
+            creditBalance: '积分余额',
             taxExempt: '申请免税状态',
             taxExemptEnabled: '免税',
             taxExemptStatus: '免税状态',

@@ -434,8 +434,7 @@ const translations: TranslationDeepObject<typeof en> = {
         collapsed: 'Recolhido',
         expanded: 'Expandido',
         expenseReport: 'Relatório de despesas',
-        expenseReports: 'Relatórios de despesas',
-        rateOutOfPolicy: 'Taxa fora da política',
+        rateOutOfPolicy: 'Tarifa fora da política',
         leaveWorkspace: 'Sair do espaço de trabalho',
         leaveWorkspaceConfirmation: 'Se você sair deste workspace, não poderá enviar despesas para ele.',
         leaveWorkspaceConfirmationAuditor: 'Se você sair deste espaço de trabalho, não poderá visualizar seus relatórios e configurações.',
@@ -452,9 +451,6 @@ const translations: TranslationDeepObject<typeof en> = {
         comments: 'Comentários',
         sharedIn: 'Compartilhado em',
         unreported: 'Não informado',
-        explore: 'Explorar',
-        insights: 'Insights',
-        todo: 'Pendências',
         invoice: 'Fatura',
         expense: 'Despesa',
         chat: 'Chat',
@@ -882,6 +878,8 @@ const translations: TranslationDeepObject<typeof en> = {
     adminOnlyCanPost: 'Apenas administradores podem enviar mensagens nesta sala.',
     reportAction: {
         asCopilot: 'como copiloto de',
+        assistedBy: (agentName: string) => `assistido por ${agentName}`,
+        humanSupportAgent: 'um agente de suporte humano',
         harvestCreatedExpenseReport: (reportUrl: string, reportName: string) =>
             `criou este relatório para manter todas as despesas de <a href="${reportUrl}">${reportName}</a> que não puderam ser enviadas na frequência escolhida por você`,
         createdReportForUnapprovedTransactions: ({reportUrl, reportName, reportID, isReportDeleted}: CreatedReportForUnapprovedTransactionsParams) =>
@@ -1663,6 +1661,7 @@ const translations: TranslationDeepObject<typeof en> = {
             prompt: 'Ative o acompanhamento de impostos no espaço de trabalho para editar os detalhes da despesa ou excluir o imposto desta despesa.',
             confirmText: 'Excluir imposto',
         },
+        bulkDuplicateLimit: `Você pode duplicar até ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} despesas por vez. Selecione menos despesas e tente novamente.`,
         deleted: 'Excluído',
     },
     transactionMerge: {
@@ -2600,6 +2599,9 @@ ${amount} para ${merchant} - ${date}`,
     workflowsExpensesFromPage: {
         title: 'Despesas de',
         header: 'Quando os seguintes membros enviarem despesas:',
+        memberAlreadyInWorkflowTitle: 'Membro já está em um fluxo de trabalho',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName} já está em um fluxo de aprovação que envia para ${approverName}. Adicioná-lo aqui irá movê-lo para este fluxo de trabalho.`,
     },
     workflowsApproverPage: {
         genericErrorMessage: 'O aprovador não pôde ser alterado. Tente novamente ou entre em contato com o suporte.',
@@ -2902,9 +2904,11 @@ ${amount} para ${merchant} - ${date}`,
         },
         employees: {
             title: 'Quantos funcionários você tem?',
-            [CONST.ONBOARDING_COMPANY_SIZE.MICRO]: '1–10 funcionários',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL]: '1–4 funcionários',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM]: '5–10 funcionários',
+            [CONST.ONBOARDING_COMPANY_SIZE.MICRO]: '1-10 funcionários',
             [CONST.ONBOARDING_COMPANY_SIZE.SMALL]: '11–50 funcionários',
-            [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM_SMALL]: '51–100 funcionários',
+            [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM_SMALL]: '51 a 100 funcionários',
             [CONST.ONBOARDING_COMPANY_SIZE.MEDIUM]: '101–1.000 funcionários',
             [CONST.ONBOARDING_COMPANY_SIZE.LARGE]: 'Mais de 1.000 funcionários',
         },
@@ -4148,7 +4152,6 @@ ${amount} para ${merchant} - ${date}`,
             everyone: 'Todos',
             delete: 'Excluir workspace',
             settings: 'Configurações',
-            reimburse: 'Reembolsos',
             categories: 'Categorias',
             tags: 'Tags',
             customField1: 'Campo personalizado 1',
@@ -4272,6 +4275,7 @@ ${amount} para ${merchant} - ${date}`,
             budgetFrequencyUnit: {monthly: 'mês', yearly: 'ano'},
             budgetTypeForNotificationMessage: {tag: 'etiqueta', category: 'categoria'},
             deepDiveExpensifyCard: `<muted-text-label>As transações do Cartão Expensify serão exportadas automaticamente para uma “Conta de Responsabilidade do Cartão Expensify” criada com <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">nossa integração</a>.</muted-text-label>`,
+            hr: 'RH',
         },
         receiptPartners: {
             uber: {
@@ -6903,6 +6907,31 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             }),
             subscriptions: 'Assinaturas',
         },
+        hr: {
+            title: 'RH',
+            subtitle: 'Conecte ferramentas de RH e mantenha as aprovações de funcionários em sincronia.',
+            settingsTitle: 'Configurações do Gusto',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return 'Importando dados do Gusto';
+                    case 'gustoSyncLoadCompany':
+                        return 'Carregando dados da empresa Gusto';
+                    case 'gustoSyncImportEmployees':
+                        return 'Importando funcionários';
+                    case 'gustoSyncBuildApprovalChains':
+                        return 'Criando cadeias de aprovação';
+                    case 'gustoSyncFinalize':
+                        return 'Finalizando a sincronização';
+                    case 'jobDone':
+                        return 'Aguardando o carregamento dos dados importados';
+                    default: {
+                        return `Tradução ausente para o estágio: ${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: 'Modo de aprovação', finalApprover: 'Aprovador final'},
+        },
     },
     getAssistancePage: {
         title: 'Obter ajuda',
@@ -7543,20 +7572,11 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         resetColumns: 'Redefinir colunas',
         groupColumns: 'Agrupar colunas',
         expenseColumns: 'Colunas de despesas',
-        statements: 'Extratos',
-        cardStatements: 'Extratos de cartão',
-        monthlyAccrual: 'Acréscimo mensal',
-        unapprovedCash: 'Dinheiro não aprovado',
-        unapprovedCard: 'Cartão não aprovado',
-        reconciliation: 'Conciliação',
-        topSpenders: 'Maiores gastadores',
         saveSearch: 'Salvar pesquisa',
         deleteSavedSearch: 'Excluir pesquisa salva',
         deleteSavedSearchConfirm: 'Tem certeza de que deseja excluir esta pesquisa?',
         searchName: 'Pesquisar nome',
         savedSearchesMenuItemTitle: 'Salvo',
-        topCategories: 'Categorias principais',
-        topMerchants: 'Principais comerciantes',
         groupedExpenses: 'despesas agrupadas',
         bulkActions: {
             editMultiple: 'Editar múltiplos',
@@ -7717,6 +7737,24 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             pleaseSelectDatesForBothFromAndTo: 'Selecione datas para De e Até',
         },
         spendOverTime: 'Gastos ao longo do tempo',
+        tabs: {
+            expenseReports: 'Relatórios de despesas',
+            reports: 'Todos os relatórios',
+            expenses: 'Todas as despesas',
+            submit: 'Rascunhos',
+            approve: 'Precisa de aprovação',
+            pay: 'Pronto para pagar',
+            accounting: 'Contabilidade',
+            export: 'Aguardando exportação',
+            unapprovedCash: 'Provisões de caixa',
+            unapprovedCard: 'Provisões de cartão',
+            statements: 'Extratos do cartão',
+            reconciliation: 'Conciliação bancária',
+            insights: 'Insights',
+            topSpenders: 'Maiores gastadores',
+            topCategories: 'Principais categorias',
+            topMerchants: 'Principais estabelecimentos',
+        },
     },
     genericErrorPage: {
         title: 'Opa, algo deu errado!',
@@ -8559,6 +8597,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         details: {
             title: 'Detalhes da assinatura',
             annual: 'Assinatura anual',
+            creditBalance: 'Saldo de crédito',
             taxExempt: 'Solicitar isenção de impostos',
             taxExemptEnabled: 'Isento de impostos',
             taxExemptStatus: 'Status de isenção de impostos',
