@@ -269,8 +269,9 @@ function handlePushFullscreenAction(
 
     const lastFullScreenRoute = resultState.routes.at(-1);
 
-    // Transitioning to all central screens in each split should be animated
-    if (lastFullScreenRoute?.key && targetScreen && !SCREENS_WITH_NAVIGATION_TAB_BAR.has(targetScreen)) {
+    // Cross-tab TAB_NAVIGATOR pushes animate/allow swipe-back even though targetScreen names a tab.
+    const isTabNavigatorPush = navigatorName === NAVIGATORS.TAB_NAVIGATOR;
+    if (lastFullScreenRoute?.key && targetScreen && (isTabNavigatorPush || !SCREENS_WITH_NAVIGATION_TAB_BAR.has(targetScreen))) {
         screensWithEnteringAnimation.add(lastFullScreenRoute.key);
     }
     return resultState;
