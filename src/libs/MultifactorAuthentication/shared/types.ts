@@ -27,9 +27,6 @@ type AuthTypeInfo = {
 
 type MultifactorAuthenticationMethodCode = ValueOf<typeof NATIVE_BIOMETRICS_HSM_VALUES.AUTH_TYPE>['CODE'];
 
-/**
- * Represents the reason for a multifactor authentication response from the backend.
- */
 type MultifactorAuthenticationReason = ReasonValue;
 
 /**
