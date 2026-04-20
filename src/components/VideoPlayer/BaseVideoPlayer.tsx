@@ -91,11 +91,6 @@ function BaseVideoPlayer({
     // `useEvent` — direct `.playing` read wouldn't re-render when play state changes.
     const {isPlaying} = useEvent(videoPlayerRef.current, 'playingChange', {isPlaying: videoPlayerRef.current.playing, oldIsPlaying: false} as PlayingChangeEventPayload);
 
-    // Keep in an effect — the web setter synchronously emits `timeUpdate`, so a render-time write re-enters `useEvent`.
-    useEffect(() => {
-        videoPlayerRef.current.timeUpdateEventInterval = isPlaying ? 0.1 : 0;
-    }, [isPlaying]);
-
     const {currentTime, bufferedPosition} = useEvent(videoPlayerRef.current, 'timeUpdate', {currentTime: 0, bufferedPosition: 0} as TimeUpdateEventPayload);
     const {status} = useEvent(videoPlayerRef.current, 'statusChange', {status: shouldUseSharedVideoElement ? playerStatus.current : 'loading'} as StatusChangeEventPayload);
 
@@ -292,6 +287,8 @@ function BaseVideoPlayer({
 
     useEventListener(videoPlayerRef.current, 'playingChange', (payload: PlayingChangeEventPayload) => {
         const isVideoPlaying = payload.isPlaying;
+        // Toggled in the listener (not a `useEffect`) — the web setter synchronously emits `timeUpdate`, which would re-enter `useEvent` from render.
+        videoPlayerRef.current.timeUpdateEventInterval = isVideoPlaying ? 0.1 : 0;
         if (isVideoPlaying && isEnded) {
             setIsEnded(false);
         }
