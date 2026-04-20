@@ -97,7 +97,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
         if (!policyID) {
             return '';
         }
-        const backTo = ROUTES.WORKSPACE_ACCOUNTING_CARD_RECONCILIATION.getRoute(policyID, connection);
+
         switch (connection) {
             case CONST.POLICY.CONNECTIONS.ROUTE.QBO:
                 return `${environmentURL}/${ROUTES.WORKSPACE_ACCOUNTING_CARD_RECONCILIATION.getRoute(policyID, connection)}/${DYNAMIC_ROUTES.WORKSPACE_ACCOUNTING_QUICKBOOKS_ONLINE_AUTO_SYNC.path}`;
