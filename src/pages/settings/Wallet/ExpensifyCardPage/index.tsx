@@ -184,16 +184,16 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
         [currency, spendRule, translate, convertToDisplayString],
     );
 
-    const spendRulesRoute = useMemo(() => {
+    const navigateToSpendRulesPage = useCallback(() => {
         if (!policyIDForCurrentCard) {
-            return undefined;
+            return;
         }
-        if (!spendRule) {
-            return ROUTES.RULES_SPEND_NEW.getRoute(policyIDForCurrentCard);
+        if (spendRule?.ruleID) {
+            Navigation.navigate(ROUTES.RULES_SPEND_EDIT.getRoute(policyIDForCurrentCard, spendRule?.ruleID));
+            return;
         }
-
-        return ROUTES.RULES_SPEND_EDIT.getRoute(policyIDForCurrentCard, spendRule.ruleID);
-    }, [policyIDForCurrentCard, spendRule]);
+        Navigation.navigate(ROUTES.RULES_SPEND_NEW.getRoute(policyIDForCurrentCard));
+    }, [policyIDForCurrentCard, spendRule?.ruleID]);
 
     const spendRulesTitleComponent = useMemo(
         () => (
@@ -542,7 +542,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 description={translate('cardPage.spendRules')}
                                 descriptionTextStyle={[styles.fontSizeLabel]}
                                 titleComponent={spendRulesTitleComponent}
-                                onPress={() => Navigation.navigate(spendRulesRoute ?? '')}
+                                onPress={navigateToSpendRulesPage}
                                 accessibilityLabel={spendRulesSummary.join('. ')}
                             />
                         )}
@@ -563,7 +563,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             <MenuItem
                                 icon={expensifyIcons.CreditCardLock}
                                 title={translate('cardPage.editSpendRules')}
-                                onPress={() => Navigation.navigate(spendRulesRoute ?? '')}
+                                onPress={navigateToSpendRulesPage}
                             />
                         )}
                         {canManageCardFreeze && !isCardFrozen(currentCard) && (
