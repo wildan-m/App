@@ -8,9 +8,7 @@ import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/Multifa
 import type {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
 import type {AuthTypeInfo} from '@libs/MultifactorAuthentication/shared/types';
 
-type ErrorState = MfaError & {
-    payload?: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario>;
-};
+type ErrorState = MfaError;
 
 type MultifactorAuthenticationState = {
     /** Current error state - stops the flow and navigates to failure outcome */
