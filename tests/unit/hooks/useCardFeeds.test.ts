@@ -111,11 +111,6 @@ describe('useCardFeeds', () => {
     });
 
     describe('linkedPolicyIDs predicate filtering', () => {
-        // Regression guard for https://github.com/Expensify/Expensify/issues/548636. Domain feeds
-        // can persist `linkedPolicyIDs: ['']` (legacy shape from older clients and from the backend
-        // default in DomainAPI when `preferredPolicy` was empty). The predicate previously treated
-        // any truthy `linkedPolicyIDs` as the source of truth and short-circuited, dropping feeds
-        // that had a matching `preferredPolicy`. These tests pin the corrected behavior.
         it('includes domain feeds when linkedPolicyIDs contains only an empty string and preferredPolicy matches', async () => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
             await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
