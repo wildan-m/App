@@ -74,6 +74,7 @@ import {buildSearchQueryJSON, buildSearchQueryString, getCurrentSearchQueryJSON}
 import {getSuggestedSearches} from '@libs/SearchUIUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {startSpan} from '@libs/telemetry/activeSpans';
+import {addOptimization} from '@libs/telemetry/submitFollowUpAction';
 import {
     buildOptimisticTransaction,
     getAmount,
@@ -3431,6 +3432,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
     deferOrExecuteWrite(apiWrite, {
         shouldDeferForSearch: !!(shouldHandleNavigation && isFromGlobalCreate && !isReportTopmostSplitNavigator()),
         optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${parameters.transactionID}`,
+        onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
     });
 
     // eslint-disable-next-line @typescript-eslint/no-deprecated

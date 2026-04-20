@@ -55,6 +55,11 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     // During dismiss_modal_and_open_report, defer heavy non-content components
     // (composer, invisible handlers) so the first render is lighter.
     // Real content (header + messages) still renders immediately.
+    //
+    // ReportFetchHandler is intentionally included in the deferred set: it fetches
+    // new actions from the server, but at this point the report's local Onyx data
+    // is already sufficient for the initial render. The fetch handler mounts once
+    // the transition commits and backfills server-side updates.
     const [shouldDeferNonEssentials, setShouldDeferNonEssentials] = useState(
         () => getPendingSubmitFollowUpAction()?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT,
     );
@@ -71,6 +76,8 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                 },
                 waitForUpcomingTransition: true,
             });
+            // *3: shorter than the orchestrator's *5 because this only defers rendering
+            // of non-essential components - the user already sees the report content.
             const safetyTimeout = setTimeout(() => setShouldDeferNonEssentials(false), CONST.MAX_TRANSITION_DURATION_MS * 3);
             return () => {
                 handle.cancel();
@@ -99,9 +106,10 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                 return;
             }
             // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
+            const handle = InteractionManager.runAfterInteractions(() => {
                 flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
             });
+            return () => handle.cancel();
         }, []),
     );
 
@@ -117,10 +125,14 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                         shouldEnableKeyboardAvoidingView={isTopMostReportId || isInNarrowPaneModal}
                         testID={`report-screen-${reportIDFromRoute}`}
                     >
-                        {!shouldDeferNonEssentials && <DeleteTransactionNavigateBackHandler />}
-                        {!shouldDeferNonEssentials && <ReportRouteParamHandler />}
-                        {!shouldDeferNonEssentials && <ReportFetchHandler />}
-                        {!shouldDeferNonEssentials && <ReportNavigateAwayHandler />}
+                        {!shouldDeferNonEssentials && (
+                            <>
+                                <DeleteTransactionNavigateBackHandler />
+                                <ReportRouteParamHandler />
+                                <ReportFetchHandler />
+                                <ReportNavigateAwayHandler />
+                            </>
+                        )}
                         <ReportNotFoundGuard>
                             <LinkedActionNotFoundGuard>
                                 <ReportDragAndDropProvider>

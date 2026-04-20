@@ -15,6 +15,12 @@ import CONST from '@src/CONST';
  * while deferring the real (heavy) composer during navigation transitions.
  * Renders the same container, icons, and placeholder text without any
  * functional hooks, Onyx connections, or event handlers.
+ *
+ * Source of truth: ReportActionCompose (same directory).
+ * Mirrors: chatFooter, chatItemComposeBox, composerSizeButton (width/marginHorizontal),
+ * textInputComposeSpacing, textInputComposeBorder, chatItemEmojiButton, chatItemSubmitButton,
+ * chatItemComposeSecondaryRow, and icons [Plus, Emoji, Send].
+ * If the real composer changes its layout or icon set, update this placeholder to match.
  */
 function ReportActionComposePlaceholder() {
     const theme = useTheme();

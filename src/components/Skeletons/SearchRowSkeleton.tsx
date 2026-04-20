@@ -55,6 +55,9 @@ function SearchRowSkeleton({
     const styles = useThemeStyles();
     const {windowWidth} = useWindowDimensions();
     const {shouldUseNarrowLayout: shouldUseNarrowLayoutResponsive, isLargeScreenWidth} = useResponsiveLayout();
+    // The prop lets callers (e.g. SearchStaticList) pin the layout independently of the
+    // global responsive breakpoint - useful when the skeleton is rendered in a context
+    // whose container width doesn't match the window (e.g. inside a split pane).
     const shouldUseNarrowLayout = shouldUseNarrowLayoutProp ?? shouldUseNarrowLayoutResponsive;
     useSkeletonSpan('SearchRowSkeleton', reasonAttributes);
 

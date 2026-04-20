@@ -1526,7 +1526,11 @@ function Search({
     // submitting an expense), show a lightweight static list instead of the skeleton.
     // This gives the user real-looking content during the animation while avoiding
     // the expensive hooks and renders of the full Search component.
-    if (isDeferringHeavyWork && searchResults?.data) {
+    // Restricted to transaction-based search types (expense/invoice) because
+    // SearchStaticList only renders rows with a transactionID - non-transaction
+    // types (chat, task, report) would render empty/blank during the deferral.
+    const isTransactionSearchType = type === CONST.SEARCH.DATA_TYPES.EXPENSE || type === CONST.SEARCH.DATA_TYPES.INVOICE;
+    if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType) {
         return (
             <SearchStaticList
                 searchResults={searchResults}

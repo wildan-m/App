@@ -80,6 +80,8 @@ import MoneyRequestReportTotalSpend from './MoneyRequestReportTotalSpend';
 import MoneyRequestReportTransactionItem from './MoneyRequestReportTransactionItem';
 import SearchMoneyRequestReportEmptyState from './SearchMoneyRequestReportEmptyState';
 
+const PENDING_EXPENSE_REASON_ATTRIBUTES = {context: 'MoneyRequestReportTransactionList.PendingExpensePlaceholder'} as const;
+
 type MoneyRequestReportTransactionListProps = {
     /** The money request report containing the transactions */
     report: OnyxTypes.Report;
@@ -230,9 +232,13 @@ function MoneyRequestReportTransactionList({
 
     const reportID = report?.reportID;
 
+    // Skeleton placeholder for super-wide RHP: shown while the deferred write is pending
+    // and dismissed when the optimistic transaction appears. If the deferred write is delayed
+    // (up to 5s safety timeout), the skeleton may linger - this is acceptable as a visual
+    // hint that the expense is being processed. The transaction count comparison is a
+    // heuristic; simultaneous add+remove is rare enough not to warrant a dedicated signal.
     const [showPendingExpensePlaceholder, setShowPendingExpensePlaceholder] = useState(false);
     const transactionCountWhenSkeletonShown = useRef<number | null>(null);
-    const pendingExpenseReasonAttributes = useMemo(() => ({context: 'MoneyRequestReportTransactionList.PendingExpensePlaceholder'}) as const, []);
 
     const hasOptimisticNewTransaction = useMemo(() => transactions.some((t) => getTransactionPendingAction(t) === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD), [transactions]);
 
@@ -245,17 +251,21 @@ function MoneyRequestReportTransactionList({
                     pending?.reportID === reportID &&
                     isReportOpenInSuperWideRHP(navigationRef.getRootState());
 
-                if (hasPendingSubmit && !hasOptimisticNewTransaction) {
-                    transactionCountWhenSkeletonShown.current = transactions.length;
-                    setShowPendingExpensePlaceholder(true);
+                if (!hasPendingSubmit || hasOptimisticNewTransaction) {
+                    return;
                 }
+
+                transactionCountWhenSkeletonShown.current = transactions.length;
+                setShowPendingExpensePlaceholder(true);
                 return;
             }
 
-            if (hasOptimisticNewTransaction || (transactionCountWhenSkeletonShown.current !== null && transactions.length > transactionCountWhenSkeletonShown.current)) {
-                transactionCountWhenSkeletonShown.current = null;
-                setShowPendingExpensePlaceholder(false);
+            if (!hasOptimisticNewTransaction && (transactionCountWhenSkeletonShown.current === null || transactions.length <= transactionCountWhenSkeletonShown.current)) {
+                return;
             }
+
+            transactionCountWhenSkeletonShown.current = null;
+            setShowPendingExpensePlaceholder(false);
         }, [showPendingExpensePlaceholder, reportID, transactions.length, hasOptimisticNewTransaction]),
     );
 
@@ -629,7 +639,7 @@ function MoneyRequestReportTransactionList({
                     isLoadMore
                     containerStyle={styles.mhn5}
                     shouldUseNarrowLayout={false}
-                    reasonAttributes={pendingExpenseReasonAttributes}
+                    reasonAttributes={PENDING_EXPENSE_REASON_ATTRIBUTES}
                 />
             )}
         </View>

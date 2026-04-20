@@ -42,7 +42,7 @@ import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTop
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
 import {getReportOrDraftReport, isMoneyRequestReport, isProcessingReport, isReportOutstanding, isSelectedManagerMcTest} from '@libs/ReportUtils';
-import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
+import {buildCannedSearchQuery, getCurrentSearchQueryJSON} from '@libs/SearchQueryUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {
     getRequestType,
@@ -305,18 +305,29 @@ function IOURequestStepConfirmation({
         }
 
         // Search pre-insert: global create flows that navigate to Search after submit.
-        const shouldPreInsertSearch = isFromGlobalCreate && canPreInsertSearch && !isReportTopmostSplitNavigator() && !isSearchTopmostFullScreenRoute();
+        // Also pre-insert when Search is already on top but showing a different type
+        // (e.g. Invoice tab when submitting an Expense) so the correct tab is revealed on dismiss.
+        const searchType = iouType === CONST.IOU.TYPE.INVOICE ? CONST.SEARCH.DATA_TYPES.INVOICE : CONST.SEARCH.DATA_TYPES.EXPENSE;
+        const isSearchOnTopWithDifferentType = isSearchTopmostFullScreenRoute() && getCurrentSearchQueryJSON()?.type !== searchType;
+        const shouldPreInsertSearch = isFromGlobalCreate && canPreInsertSearch && !isReportTopmostSplitNavigator() && (!isSearchTopmostFullScreenRoute() || isSearchOnTopWithDifferentType);
 
         // Report pre-insert: dismiss modal flows that open an existing report after submit.
         // Skip when the destination is already the topmost fullscreen report to avoid
         // pushing a duplicate route (which would require an extra back press).
-        const shouldPreInsertReport =
-            !shouldPreInsertSearch &&
-            (!isFromGlobalCreate || isReportTopmostSplitNavigator()) &&
-            !isReportOpenInRHP(navigationRef.getRootState()) &&
-            !!destinationReportID &&
-            Navigation.getTopmostReportId() !== destinationReportID &&
-            !!getReportOrDraftReport(destinationReportID)?.reportID;
+
+        // Only eligible when search pre-insert didn't win, and the flow ends at a report (not Search).
+        const canUseReportPreInsert = !shouldPreInsertSearch && (!isFromGlobalCreate || isReportTopmostSplitNavigator());
+
+        // RHP has its own dismiss handler; pre-inserting under it would break the stack.
+        const isOutsideRHP = !isReportOpenInRHP(navigationRef.getRootState());
+
+        // Don't pre-insert if the report is already showing - it would push a duplicate route.
+        const hasValidDestination = !!destinationReportID && Navigation.getTopmostReportId() !== destinationReportID;
+
+        // The report must be in Onyx so the pre-inserted screen can render immediately.
+        const isDestinationReportLoaded = !!destinationReportID && !!getReportOrDraftReport(destinationReportID)?.reportID;
+
+        const shouldPreInsertReport = canUseReportPreInsert && isOutsideRHP && hasValidDestination && isDestinationReportLoaded;
 
         if (!shouldPreInsertSearch && !shouldPreInsertReport) {
             return;
@@ -324,13 +335,7 @@ function IOURequestStepConfirmation({
 
         hasPreInsertFired.current = true;
 
-        let route: Route;
-        if (shouldPreInsertSearch) {
-            const type = iouType === CONST.IOU.TYPE.INVOICE ? CONST.SEARCH.DATA_TYPES.INVOICE : CONST.SEARCH.DATA_TYPES.EXPENSE;
-            route = ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type})});
-        } else {
-            route = ROUTES.REPORT_WITH_ID.getRoute(destinationReportID);
-        }
+        const route: Route = shouldPreInsertSearch ? ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: searchType})}) : ROUTES.REPORT_WITH_ID.getRoute(destinationReportID);
 
         const timer = setTimeout(() => {
             Navigation.preInsertFullscreenUnderRHP(route);
@@ -348,8 +353,11 @@ function IOURequestStepConfirmation({
         };
         // isFromGlobalCreate, iouType, and canPreInsertSearch are stable for the lifetime of
         // this screen instance. isTransactionReady and destinationReportID may each flip once
-        // (false -> true / undefined→ID) as data loads asynchronously, re-triggering the effect.
-        // hasPreInsertFired prevents double-firing.
+        // (false -> true / undefined -> ID) as data loads asynchronously, re-triggering the effect.
+        // hasPreInsertFired prevents double-firing. Note: if destinationReportID were to change
+        // from one valid ID to another (extremely unlikely with Onyx), the pre-insert would not
+        // re-fire. This is acceptable because the pre-inserted route is already correct for
+        // the original destination, and the submit handler will navigate correctly regardless.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isTransactionReady, destinationReportID]);
 

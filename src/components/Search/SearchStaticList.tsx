@@ -43,6 +43,9 @@ import SearchTableHeader from './SearchTableHeader';
 import type {SearchColumnType, SearchQueryJSON} from './types';
 
 const STATIC_LIST_MAX_ITEMS = 10;
+const DEFAULT_COLUMNS: SearchColumnType[] = [];
+
+const PENDING_EXPENSE_REASON_ATTRIBUTES = {context: 'SearchStaticList.PendingExpensePlaceholder'} as const;
 
 type SearchStaticListProps = {
     searchResults: SearchResults | undefined;
@@ -83,7 +86,7 @@ function SearchStaticList({
     onDestinationVisible,
     shouldUseNarrowLayout = true,
     canSelectMultiple = false,
-    columns: columnsProp,
+    columns = DEFAULT_COLUMNS,
 }: SearchStaticListProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -139,8 +142,6 @@ function SearchStaticList({
             onDestinationVisible?.(sortedData.length === 0, 'focus');
         }, [showPendingExpensePlaceholder, sortedData.length, onDestinationVisible]),
     );
-
-    const columns = columnsProp ?? [];
 
     const onPressItem = (item: TransactionListItemType) => {
         const backTo = Navigation.getActiveRoute();
@@ -218,7 +219,8 @@ function SearchStaticList({
                             isSelected={false}
                             shouldShowTooltip={false}
                             shouldShowCheckbox={false}
-                            shouldShowErrors={false}
+                            shouldShowErrors
+                            violations={item.violations}
                             dateColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
                             amountColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
                             taxAmountColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
@@ -273,7 +275,8 @@ function SearchStaticList({
                         isSelected={false}
                         isDisabled
                         shouldShowCheckbox={canSelectMultiple}
-                        shouldShowErrors={false}
+                        shouldShowErrors
+                        violations={item.violations}
                         dateColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
                         amountColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
                         taxAmountColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
@@ -298,7 +301,7 @@ function SearchStaticList({
         onLayoutProp?.();
     };
 
-    const pendingExpenseReasonAttributes = useMemo(() => ({context: 'SearchStaticList.PendingExpensePlaceholder'}) as const, []);
+    const pendingExpenseReasonAttributes = PENDING_EXPENSE_REASON_ATTRIBUTES;
 
     if (sortedData.length === 0 && showPendingExpensePlaceholder) {
         return (

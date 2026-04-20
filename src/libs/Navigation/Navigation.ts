@@ -776,7 +776,7 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
 function dismissModal({ref = navigationRef, afterTransition, waitForTransition}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedTextIfComposerBlurred();
     const runImmediately = !waitForTransition;
-    const run = () => {
+    const performDismiss = () => {
         TransitionTracker.runAfterTransitions({
             callback: () => {
                 ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
@@ -790,9 +790,9 @@ function dismissModal({ref = navigationRef, afterTransition, waitForTransition}:
     };
 
     if (ref.isReady()) {
-        run();
+        performDismiss();
     } else {
-        isNavigationReady().then(run);
+        isNavigationReady().then(performDismiss);
     }
 }
 
@@ -807,7 +807,7 @@ const dismissModalWithReport = (
     ref = navigationRef,
     options?: {onBeforeNavigate?: (willOpenReport: boolean) => void},
 ) => {
-    const run = () => {
+    const dismissAndOpenReport = () => {
         const topmostSuperWideRHPReportID = getTopmostSuperWideRHPReportID();
         let areReportsIDsDefined = !!topmostSuperWideRHPReportID && !!reportID;
 
@@ -840,9 +840,9 @@ const dismissModalWithReport = (
     };
 
     if (ref.isReady()) {
-        run();
+        dismissAndOpenReport();
     } else {
-        isNavigationReady().then(run);
+        isNavigationReady().then(dismissAndOpenReport);
     }
 };
 
@@ -1003,13 +1003,12 @@ function revealRouteBeforeDismissingModal(route: Route, options?: {afterTransiti
             type: CONST.NAVIGATION.ACTION_TYPE.REPLACE_FULLSCREEN_UNDER_RHP,
             payload: {route},
         });
-        // Use setTimeout(0) instead of a nested rAF to start the dismiss as soon
-        // as React commits the route insertion. A separate macrotask ensures React 18
-        // doesn't batch both dispatches into a single render (which would lose the
-        // dismiss animation), while avoiding the ~16ms idle gap of a second rAF.
-        setTimeout(() => {
+        // Nested rAF: the first frame commits the route insertion, the second
+        // frame starts the dismiss. This ensures React processes the two dispatches
+        // in separate renders so the dismiss animation is preserved.
+        requestAnimationFrame(() => {
             dismissModal({afterTransition: options?.afterTransition});
-        }, 0);
+        });
     });
 }
 
