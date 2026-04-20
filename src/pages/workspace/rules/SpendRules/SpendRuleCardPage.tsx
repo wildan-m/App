@@ -185,6 +185,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
         Navigation.goBack(parentRoute);
     };
 
+    const hasCards = listData.length > 0;
     const hasEligibleCards = eligibleCards.length > 0;
     const headerMessage = hasEligibleCards ? getHeaderMessage(listData.length > 0, false, inputValue, countryCode, false) : '';
 
@@ -240,7 +241,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                         shouldUpdateFocusedIndex
                         shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                         listEmptyContent={
-                            !inputValue.trim() || hasEligibleCards ? (
+                            !inputValue.trim() || hasCards ? (
                                 <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                                     <BlockingView
                                         icon={illustrations.HandCard}
