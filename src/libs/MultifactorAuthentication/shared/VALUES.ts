@@ -153,12 +153,11 @@ type DeepLeafValues<T> = T extends Record<string, unknown> ? DeepLeafValues<T[ke
 type ReasonValue = DeepLeafValues<typeof REASON>;
 
 /** Known errors the user is likely to encounter (cancellations, expired transactions, unsupported devices, etc.). Logged at 'info' level. */
-const ROUTINE_FAILURES = new Set<ReasonValue>([
+const ROUTINE_OUTCOMES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.CANCELED,
     REASON.LOCAL_ERRORS.NO_AUTHENTICATION_METHODS_ENROLLED,
     REASON.LOCAL_ERRORS.AUTHENTICATION_TYPE_NOT_SUPPORTED,
     REASON.CLIENT_ERRORS.TRANSACTION_EXPIRED,
-    REASON.FLOW_OUTCOMES.TRANSACTION_DENIED,
     REASON.CLIENT_ERRORS.INVALID_VALIDATE_CODE,
     REASON.CLIENT_ERRORS.ALREADY_APPROVED_APPROVE_ATTEMPTED,
     REASON.CLIENT_ERRORS.ALREADY_APPROVED_DENY_ATTEMPTED,
@@ -241,7 +240,7 @@ const SHARED_VALUES = {
     BACKEND_MESSAGE,
     REASON,
     HTTP_STATUS,
-    ROUTINE_FAILURES,
+    ROUTINE_OUTCOMES,
     ANOMALOUS_FAILURES,
 
     /**
