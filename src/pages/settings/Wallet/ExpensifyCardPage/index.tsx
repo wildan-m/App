@@ -175,10 +175,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const isWorkspaceAdmin = isPolicyAdmin(policyForCurrentCard, session?.email);
     const canUnfreezeCard = canManageCardFreeze && (frozenByAccountID === session?.accountID || isWorkspaceAdmin);
 
-    const spendRule = useMemo(
-        () => getSpendRuleByCardID(cardSettings ? {privateExpensifyCardSettings: cardSettings} : undefined, cardID),
-        [cardSettings, cardID],
-    );
+    const spendRule = useMemo(() => getSpendRuleByCardID(cardSettings ? {privateExpensifyCardSettings: cardSettings} : undefined, cardID), [cardSettings, cardID]);
     const spendRulesSummary = useMemo(
         () => (spendRule ? getSpendRuleSummaryText(spendRule.formValues, currency, translate, convertToDisplayString) : []),
         [currency, spendRule, translate, convertToDisplayString],

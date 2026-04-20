@@ -2,11 +2,11 @@ import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {CurrencyListActionsContextType} from '@components/CurrencyListContextProvider';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
+import CONST from '@src/CONST';
 import type {SpendRuleForm} from '@src/types/form';
 import {isSpendRuleCategory} from '@src/types/form/SpendRuleForm';
 import type {ExpensifyCardSettings} from '@src/types/onyx';
 import type {ExpensifyCardRule, ExpensifyCardRuleFilter} from '@src/types/onyx/ExpensifyCardSettings';
-import CONST from '@src/CONST';
 import {convertToBackendAmount} from './CurrencyUtils';
 import DateUtils from './DateUtils';
 

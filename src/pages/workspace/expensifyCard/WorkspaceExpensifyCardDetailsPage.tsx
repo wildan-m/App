@@ -1,7 +1,7 @@
-import {cardByIdSelector} from '@selectors/Card';
-import {Str} from 'expensify-common';
 import type {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
+import {cardByIdSelector} from '@selectors/Card';
+import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 import cardScarf from '@assets/images/card-scarf.svg';
