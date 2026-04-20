@@ -31,8 +31,8 @@ Any member can close their own Expensify account, if:
 1. Click **Settings > Account**
 2. Click **Profile**
 3. Scroll to the bottom of the page and click **Close Account**.
-4. Confirm the closure using your phone or email.
-
+2. Click **Profile**.
+3. Scroll to the bottom of the page and click **Close Account**.
 **Mobile:**
 1. Tap the **Menu (≡)** at the top left.
 2. Tap **Settings**.
