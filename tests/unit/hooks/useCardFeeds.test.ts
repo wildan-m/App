@@ -109,4 +109,119 @@ describe('useCardFeeds', () => {
             });
         });
     });
+
+    describe('linkedPolicyIDs predicate filtering', () => {
+        // Regression guard for https://github.com/Expensify/Expensify/issues/548636. Domain feeds
+        // can persist `linkedPolicyIDs: ['']` (legacy shape from older clients and from the backend
+        // default in DomainAPI when `preferredPolicy` was empty). The predicate previously treated
+        // any truthy `linkedPolicyIDs` as the source of truth and short-circuited, dropping feeds
+        // that had a matching `preferredPolicy`. These tests pin the corrected behavior.
+        it('includes domain feeds when linkedPolicyIDs contains only an empty string and preferredPolicy matches', async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
+                settings: {
+                    companyCards: {
+                        [oauthFeed]: {preferredPolicy: policyID, linkedPolicyIDs: [''], liabilityType: 'corporate'},
+                    },
+                    oAuthAccountDetails: {
+                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
+                    },
+                },
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
+                '123': {cardID: 123, cardName: 'Card 1'},
+            });
+            await waitForBatchedUpdates();
+
+            const {result} = renderHook(() => useCardFeeds(policyID));
+            await waitForBatchedUpdates();
+
+            await waitFor(() => {
+                const [workspaceFeeds] = result.current;
+                const feedKeys = Object.keys(workspaceFeeds ?? {});
+                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
+            });
+        });
+
+        it('includes domain feeds when linkedPolicyIDs is an empty array and preferredPolicy matches', async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
+                settings: {
+                    companyCards: {
+                        [oauthFeed]: {preferredPolicy: policyID, linkedPolicyIDs: [], liabilityType: 'corporate'},
+                    },
+                    oAuthAccountDetails: {
+                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
+                    },
+                },
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
+                '123': {cardID: 123, cardName: 'Card 1'},
+            });
+            await waitForBatchedUpdates();
+
+            const {result} = renderHook(() => useCardFeeds(policyID));
+            await waitForBatchedUpdates();
+
+            await waitFor(() => {
+                const [workspaceFeeds] = result.current;
+                const feedKeys = Object.keys(workspaceFeeds ?? {});
+                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
+            });
+        });
+
+        it('excludes feeds when linkedPolicyIDs explicitly lists other policies and preferredPolicy does not match', async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
+                settings: {
+                    companyCards: {
+                        [oauthFeed]: {preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY'], liabilityType: 'corporate'},
+                    },
+                    oAuthAccountDetails: {
+                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
+                    },
+                },
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
+                '123': {cardID: 123, cardName: 'Card 1'},
+            });
+            await waitForBatchedUpdates();
+
+            const {result} = renderHook(() => useCardFeeds(policyID));
+            await waitForBatchedUpdates();
+
+            await waitFor(() => {
+                const [workspaceFeeds] = result.current;
+                const feedKeys = Object.keys(workspaceFeeds ?? {});
+                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(false);
+            });
+        });
+
+        it('includes feeds when policyID is one of multiple meaningful entries in linkedPolicyIDs', async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
+                settings: {
+                    companyCards: {
+                        [oauthFeed]: {preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY', policyID], liabilityType: 'corporate'},
+                    },
+                    oAuthAccountDetails: {
+                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
+                    },
+                },
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
+                '123': {cardID: 123, cardName: 'Card 1'},
+            });
+            await waitForBatchedUpdates();
+
+            const {result} = renderHook(() => useCardFeeds(policyID));
+            await waitForBatchedUpdates();
+
+            await waitFor(() => {
+                const [workspaceFeeds] = result.current;
+                const feedKeys = Object.keys(workspaceFeeds ?? {});
+                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
+            });
+        });
+    });
 });
