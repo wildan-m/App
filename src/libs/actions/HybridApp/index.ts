@@ -83,7 +83,13 @@ function getHybridAppSettings(): Promise<HybridAppSettings | null> {
     });
 }
 
-function closeReactNativeApp({shouldSetNVP, isTrackingGPS}: {shouldSetNVP: boolean; isTrackingGPS: boolean}) {
+type CloseReactNativeAppParams = {
+    shouldSetNVP: boolean;
+    isTrackingGPS: boolean;
+    shouldIgnoreTryNewDotLoading?: boolean;
+};
+
+function closeReactNativeApp({shouldSetNVP, isTrackingGPS, shouldIgnoreTryNewDotLoading = false}: CloseReactNativeAppParams) {
     if (isLockedToNewApp(currentTryNewDot)) {
         return;
     }
@@ -93,7 +99,7 @@ function closeReactNativeApp({shouldSetNVP, isTrackingGPS}: {shouldSetNVP: boole
         return;
     }
 
-    if (shouldBlockOldAppExit(currentTryNewDot, isLoadingTryNewDot, shouldSetNVP)) {
+    if (!shouldIgnoreTryNewDotLoading && shouldBlockOldAppExit(currentTryNewDot, isLoadingTryNewDot, shouldSetNVP)) {
         return;
     }
 
