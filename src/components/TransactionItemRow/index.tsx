@@ -149,6 +149,7 @@ type TransactionItemRowProps = {
     isLargeScreenWidth?: boolean;
     policyForMovingExpenses?: Policy;
     nonPersonalAndWorkspaceCards?: CardList;
+    isActionColumnWide?: boolean;
     /** Callbacks for inline cell editing */
     onEditDate?: (newDate: string) => void;
     onEditMerchant?: (newMerchant: string) => void;
@@ -218,6 +219,7 @@ function TransactionItemRow({
     nonPersonalAndWorkspaceCards = {},
     isLargeScreenWidth: isLargeScreenWidthProp,
     policyForMovingExpenses,
+    isActionColumnWide: isActionColumnWideProp,
     onEditDate,
     onEditMerchant,
     onEditDescription,
@@ -459,7 +461,7 @@ function TransactionItemRow({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ACTION)]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ACTION, {isActionColumnWide: isActionColumnWideProp ?? isDeletedTransaction})]}
                     >
                         {!!transactionItem.action && (
                             <ActionCell

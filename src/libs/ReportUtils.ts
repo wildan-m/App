@@ -247,6 +247,7 @@ import {
 } from './ReportNameUtils';
 import type {ArchivedReportsIDSet} from './SearchUIUtils';
 import {shouldRestrictUserBillableActions} from './SubscriptionUtils';
+import {isTaskCompleted} from './TaskUtils';
 import {
     getAttendees,
     getBillable,
@@ -4301,7 +4302,11 @@ function getReasonAndReportActionThatRequiresAttention(
     if (isWaitingForAssigneeToCompleteAction(optionOrReport, parentReportAction)) {
         return {
             reason: CONST.REQUIRES_ATTENTION_REASONS.IS_WAITING_FOR_ASSIGNEE_TO_COMPLETE_ACTION,
-            reportAction: Object.values(reportActions).find((action) => action.childType === CONST.REPORT.TYPE.TASK),
+            reportAction: Object.values(reportActions)
+                .filter((action) => action.childType === CONST.REPORT.TYPE.TASK && !isTaskCompleted(action) && action.childManagerAccountID === deprecatedCurrentUserAccountID)
+                // eslint-disable-next-line rulesdir/prefer-locale-compare-from-context
+                .sort((a, b) => (!a.created || !b.created ? 0 : a.created.localeCompare(b.created)))
+                .at(0),
         };
     }
 
@@ -5132,7 +5137,15 @@ function canModifyHoldStatus(report: Report, reportAction: ReportAction, current
         return isActionOwner || isManager;
     }
 
-    return isAdmin || isActionOwner || isManager;
+    if (isOpenExpenseReport(report)) {
+        return isActionOwner || isManager;
+    }
+
+    if (isActionOwner && !isAdmin) {
+        return isAwaitingFirstLevelApproval(report);
+    }
+
+    return (isAdmin || isManager) && isProcessingReport(report);
 }
 
 function canHoldUnholdReportAction(
@@ -5158,13 +5171,12 @@ function canHoldUnholdReportAction(
     const isAdmin = isPolicyAdminPolicyUtils(policy);
     const isOnHold = isOnHoldTransactionUtils(transaction);
     const isClosed = isClosedReport(report);
-    const isSubmitted = isProcessingReport(report);
 
     const canModifyStatus = canModifyHoldStatus(report, reportAction, currentUserAccountID);
     const canModifyUnholdStatus = !isTrackExpenseMoneyReport && (isAdmin || (isActionOwner && isHoldActionCreator) || isApprover);
 
     const canHoldOrUnholdRequest = !isRequestSettled && !isApproved && !isClosed && !isDeletedParentAction(reportAction);
-    const canHoldRequest = canHoldOrUnholdRequest && !isOnHold && canModifyStatus && !isScanning(transaction) && (isSubmitted || isActionOwner);
+    const canHoldRequest = canHoldOrUnholdRequest && !isOnHold && canModifyStatus && !isScanning(transaction);
 
     const canUnholdRequest = !!(canHoldOrUnholdRequest && isOnHold && (isRequestIOU ? isHoldActionCreator : canModifyUnholdStatus));
 
