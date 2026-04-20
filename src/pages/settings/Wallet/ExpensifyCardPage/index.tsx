@@ -17,7 +17,8 @@ import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {useMultifactorAuthentication} from '@components/MultifactorAuthentication/Context';
 import {usePersonalDetails, useSession} from '@components/OnyxListItemProvider';
-import ScreenWrapper from '@components/ScreenWrapper';
+import ScreenWrapper from '@components/ScreenWrapper'
+import Text from '@components/Text';;
 import ScrollView from '@components/ScrollView';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -48,7 +49,7 @@ import type {DomainCardNavigatorParamList, SettingsNavigatorParamList} from '@li
 import {isPolicyAdmin} from '@libs/PolicyUtils';
 import {getPolicyExpenseChat} from '@libs/ReportUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
-import {getSpendRuleByCardID} from '@libs/SpendRulesUtils';
+import {getSpendRuleByCardID, getSpendRuleSummaryText} from '@libs/SpendRulesUtils';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import RedDotCardSection from '@pages/settings/Wallet/RedDotCardSection';
 import CardDetails from '@pages/settings/Wallet/WalletPage/CardDetails';
@@ -124,8 +125,6 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const currentPhysicalCard = useMemo(() => physicalCards?.find((card) => String(card?.cardID) === cardID) ?? physicalCards?.at(0), [physicalCards, cardID]);
     const revealedPIN = useRevealedPIN(String(currentPhysicalCard?.cardID));
 
-    const spendRule = useMemo(() => getSpendRuleByCardID(cardSettings, cardID), [cardSettings, cardID]);
-
     // Resets card details and revealed PIN when navigating away from the page.
     useFocusEffect(
         useCallback(() => {
@@ -175,6 +174,39 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const policyIDForCurrentCard = policyForCurrentCard?.id;
     const isWorkspaceAdmin = isPolicyAdmin(policyForCurrentCard, session?.email);
     const canUnfreezeCard = canManageCardFreeze && (frozenByAccountID === session?.accountID || isWorkspaceAdmin);
+
+    const spendRule = useMemo(() => getSpendRuleByCardID(cardSettings, cardID), [cardSettings, cardID]);
+    const spendRulesSummary = useMemo(
+        () => (spendRule ? getSpendRuleSummaryText(spendRule.formValues, currency, translate, convertToDisplayString) : []),
+        [currency, spendRule, translate, convertToDisplayString],
+    );
+
+    const spendRulesRoute = useMemo(() => {
+        if (!policyIDForCurrentCard) {
+            return undefined;
+        }
+        if (!spendRule) {
+            return ROUTES.RULES_SPEND_NEW.getRoute(policyIDForCurrentCard);
+        }
+
+        return ROUTES.RULES_SPEND_EDIT.getRoute(policyIDForCurrentCard, spendRule.ruleID);
+    }, [policyIDForCurrentCard, spendRule]);
+
+    const spendRulesTitleComponent = useMemo(
+        () => (
+            <View>
+                {spendRulesSummary.map((summary) => (
+                    <Text
+                        key={summary}
+                        numberOfLines={2}
+                    >
+                        {summary}
+                    </Text>
+                ))}
+            </View>
+        ),
+        [spendRulesSummary],
+    );
 
     const scarfOverlayStyle = useMemo<ViewStyle>(
         () => ({
@@ -502,6 +534,16 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             </>
                         )}
 
+                        {isWorkspaceAdmin && spendRulesSummary.length > 0 && (
+                            <MenuItemWithTopDescription
+                                description={translate('cardPage.spendRules')}
+                                descriptionTextStyle={[styles.fontSizeLabel]}
+                                titleComponent={spendRulesTitleComponent}
+                                onPress={() => Navigation.navigate(spendRulesRoute ?? '')}
+                                accessibilityLabel={spendRulesSummary.join('. ')}
+                            />
+                        )}
+
                         <MenuItem
                             icon={expensifyIcons.MoneySearch}
                             title={translate('workspace.common.viewTransactions')}
@@ -514,11 +556,11 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 );
                             }}
                         />
-                        {isWorkspaceAdmin && !!ruleID && (
+                        {isWorkspaceAdmin && (
                             <MenuItem
                                 icon={expensifyIcons.CreditCardLock}
                                 title={translate('cardPage.editSpendRules')}
-                                onPress={() => Navigation.navigate(ROUTES.RULES_SPEND_EDIT.getRoute(ruleID))}
+                                onPress={() => Navigation.navigate(spendRulesRoute ?? '')}
                             />
                         )}
                         {canManageCardFreeze && !isCardFrozen(currentCard) && (
