@@ -1,8 +1,8 @@
 import React, {Activity, useState} from 'react';
 import type {ActivityProps, RefObject} from 'react';
 import {View} from 'react-native';
+import CompactMenuContext from '@components/CompactMenuContext';
 import FocusTrapForModal from '@components/FocusTrap/FocusTrapForModal';
-import {CompactMenuContext} from '@components/MenuItem';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';

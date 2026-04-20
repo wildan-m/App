@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import CompactMenuContext from '@components/CompactMenuContext';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import MenuItem, {CompactMenuContext} from '@components/MenuItem';
+import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';

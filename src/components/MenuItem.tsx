@@ -1,6 +1,6 @@
 import type {ImageContentFit} from 'expo-image';
 import type {ReactElement, ReactNode, Ref} from 'react';
-import React, {createContext, useContext, useMemo, useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import type {GestureResponderEvent, Role, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
@@ -32,6 +32,7 @@ import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import ActivityIndicator from './ActivityIndicator';
 import Avatar from './Avatar';
 import Badge from './Badge';
+import {useIsCompactMenu} from './CompactMenuContext';
 import CopyTextToClipboard from './CopyTextToClipboard';
 import DisplayNames from './DisplayNames';
 import type {DisplayNameWithTooltip} from './DisplayNames/types';
@@ -49,12 +50,6 @@ import Text from './Text';
 import EducationalTooltip from './Tooltip/EducationalTooltip';
 import getContextMenuAccessibilityHint from './utils/getContextMenuAccessibilityHint';
 import getContextMenuAccessibilityProps from './utils/getContextMenuAccessibilityProps';
-
-const CompactMenuContext = createContext(false);
-
-function useIsCompactMenu() {
-    return useContext(CompactMenuContext);
-}
 
 type IconProps = {
     /** Flag to choose between avatar image or an icon */
@@ -1231,6 +1226,5 @@ function MenuItem({
     );
 }
 
-export {CompactMenuContext};
 export type {MenuItemBaseProps, MenuItemProps};
 export default MenuItem;
