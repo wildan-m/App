@@ -74,7 +74,7 @@ describe('MultifactorAuthentication shared helpers', () => {
             const result = parseHttpRequest(200, responseMap, undefined);
 
             expect(result.httpStatusCode).toBe(200);
-            expect(result.reason).toBe(VALUES.REASON.CLIENT_ERRORS.TRANSACTION_DENIED);
+            expect(result.reason).toBe(VALUES.REASON.FLOW_OUTCOMES.TRANSACTION_DENIED);
         });
 
         it('should fall back to CLIENT_ERROR for a 4xx response when the source map is empty', () => {

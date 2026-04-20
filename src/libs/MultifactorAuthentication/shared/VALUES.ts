@@ -21,10 +21,12 @@ const REASON = {
         /** Unrecognized 5xx response from the backend. */
         UNRECOGNIZED: 'Server: Unrecognized server error',
     },
+    FLOW_OUTCOMES: {
+        TRANSACTION_DENIED: 'Outcome: Transaction denied successfully',
+    },
     CLIENT_ERRORS: {
         REGISTRATION_REQUIRED: 'Client: Registration required',
         INVALID_VALIDATE_CODE: 'Client: Invalid validate code',
-        TRANSACTION_DENIED: 'Client: Transaction denied successfully',
         TRANSACTION_EXPIRED: 'Client: Transaction review period has expired',
         ALREADY_APPROVED_APPROVE_ATTEMPTED: 'Client: Already approved, approve attempted',
         ALREADY_APPROVED_DENY_ATTEMPTED: 'Client: Already approved, deny attempted',
@@ -122,14 +124,12 @@ const API_RESPONSE_MAP = {
     },
 
     /**
-     * DENY_TRANSACTION intentionally keeps a SUCCESS entry mapping to TRANSACTION_DENIED.
-     * TRANSACTION_DENIED is an *error* reason — it represents "authorization denied by user" —
-     * used in failureScreens (→ DeniedTransactionSuccessScreen) and checked directly in
-     * AuthorizeTransactionPage. The HTTP 200 here is the deny API call succeeding, not the
-     * MFA authorization succeeding.
+     * DENY_TRANSACTION maps HTTP 200 to FLOW_OUTCOMES.TRANSACTION_DENIED because the deny API
+     * call succeeding (200) is not an MFA authorization success — it's a completed flow outcome
+     * that routes to DeniedTransactionSuccessScreen.
      */
     DENY_TRANSACTION: {
-        [HTTP_STATUS.SUCCESS]: REASON.CLIENT_ERRORS.TRANSACTION_DENIED,
+        [HTTP_STATUS.SUCCESS]: REASON.FLOW_OUTCOMES.TRANSACTION_DENIED,
         [HTTP_STATUS.CLIENT_ERROR]: {
             [BACKEND_MESSAGE.REGISTRATION_REQUIRED]: REASON.CLIENT_ERRORS.REGISTRATION_REQUIRED,
             [BACKEND_MESSAGE.TRANSACTION_EXPIRED]: REASON.CLIENT_ERRORS.TRANSACTION_EXPIRED,
@@ -158,7 +158,7 @@ const ROUTINE_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.NO_AUTHENTICATION_METHODS_ENROLLED,
     REASON.LOCAL_ERRORS.AUTHENTICATION_TYPE_NOT_SUPPORTED,
     REASON.CLIENT_ERRORS.TRANSACTION_EXPIRED,
-    REASON.CLIENT_ERRORS.TRANSACTION_DENIED,
+    REASON.FLOW_OUTCOMES.TRANSACTION_DENIED,
     REASON.CLIENT_ERRORS.INVALID_VALIDATE_CODE,
     REASON.CLIENT_ERRORS.ALREADY_APPROVED_APPROVE_ATTEMPTED,
     REASON.CLIENT_ERRORS.ALREADY_APPROVED_DENY_ATTEMPTED,
