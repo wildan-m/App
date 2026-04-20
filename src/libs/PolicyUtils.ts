@@ -1299,10 +1299,7 @@ function hasIndependentTags(policy: OnyxEntry<Policy>, policyTagList: OnyxEntry<
 
 /** Get the Xero organizations connected to the policy */
 function getXeroTenants(policy: Policy | undefined): Tenant[] {
-    if (!policy || !policy.connections || !policy.connections.xero || !policy.connections.xero.data) {
-        return [];
-    }
-    return policy.connections.xero.data.tenants ?? [];
+    return policy?.connections?.xero?.data?.tenants ?? [];
 }
 
 function findCurrentXeroOrganization(tenants: Tenant[] | undefined, organizationID: string | undefined): Tenant | undefined {
