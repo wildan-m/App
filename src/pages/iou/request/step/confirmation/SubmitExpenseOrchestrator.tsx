@@ -356,7 +356,7 @@ function SubmitExpenseOrchestrator({
 
     const dismissRHPToReport = (reportID: string, runAfterDismiss: () => void) => {
         const report = getReportOrDraftReport(reportID);
-        const hasExistingTransactions = (report?.transactionCount ?? 0) > 0;
+        const hasExistingTransactions = report?.transactionCount !== 0;
 
         if (!hasExistingTransactions) {
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, reportID);
