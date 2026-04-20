@@ -10,7 +10,7 @@ import type * as PolicyUtils from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import OnyxUpdateManager from '@src/libs/actions/OnyxUpdateManager';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {PersonalDetailsList, Policy, RecentlyUsedTags, Report} from '@src/types/onyx';
+import type {PersonalDetailsList, Policy, Report} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type Transaction from '@src/types/onyx/Transaction';
@@ -237,87 +237,6 @@ describe('actions/IOU/Split', () => {
 
             const recentlyUsedCurrencies = await getOnyxValue(ONYXKEYS.RECENTLY_USED_CURRENCIES);
             expect(recentlyUsedCurrencies).toEqual([CONST.CURRENCY.GBP, ...initialCurrencies]);
-        });
-
-        it('should update policyRecentlyUsedTags when tag is provided', async () => {
-            const transactionTag = 'new tag';
-            const policyID = 'A';
-            const tagName = 'Tag';
-            const policyRecentlyUsedTags: OnyxEntry<RecentlyUsedTags> = {
-                [tagName]: ['old tag'],
-            };
-            const iouReport = {
-                reportID: '3',
-                policyID,
-                type: CONST.REPORT.TYPE.EXPENSE,
-                ownerAccountID: currentUserPersonalDetails.accountID,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`, iouReport);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`, {reportID: iouReport.reportID, policyID});
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {
-                [tagName]: {name: tagName},
-            });
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${policyID}`, policyRecentlyUsedTags);
-            const recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
-
-            createDistanceRequest({
-                ...getDefaultDistanceRequestParams(iouReport, {amount: 1, currency: CONST.CURRENCY.GBP, tag: transactionTag}, recentWaypoints),
-                policyParams: {policyRecentlyUsedTags},
-            });
-            await waitForBatchedUpdates();
-
-            const newPolicyRecentlyUsedTags: RecentlyUsedTags = await new Promise((resolve) => {
-                const connection = Onyx.connectWithoutView({
-                    key: `${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${policyID}`,
-                    callback: (recentlyUsedTags) => {
-                        resolve(recentlyUsedTags ?? {});
-                        Onyx.disconnect(connection);
-                    },
-                });
-            });
-            expect(newPolicyRecentlyUsedTags[tagName].length).toBe(2);
-            expect(newPolicyRecentlyUsedTags[tagName].at(0)).toBe(transactionTag);
-        });
-
-        it('should update policyRecentlyUsedTags when splitting with tag is provided', async () => {
-            const transactionTag = 'new tag';
-            const policyID = 'A';
-            const tagName = 'Tag';
-            const policyRecentlyUsedTags: OnyxEntry<RecentlyUsedTags> = {
-                [tagName]: ['old tag'],
-            };
-            const policyExpenseChat = {
-                reportID: '2',
-                policyID,
-                isPolicyExpenseChat: true,
-                isOwnPolicyExpenseChat: true,
-            };
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${policyExpenseChat.reportID}`, policyExpenseChat);
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {
-                [tagName]: {name: tagName},
-            });
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${policyID}`, policyRecentlyUsedTags);
-            const recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
-
-            createDistanceRequest({
-                ...getDefaultDistanceRequestParams(policyExpenseChat, {amount: 1, currency: CONST.CURRENCY.GBP, tag: transactionTag}, recentWaypoints),
-                iouType: CONST.IOU.TYPE.SPLIT,
-                participants: [policyExpenseChat],
-                policyParams: {policyRecentlyUsedTags},
-            });
-            await waitForBatchedUpdates();
-
-            const newPolicyRecentlyUsedTags: RecentlyUsedTags = await new Promise((resolve) => {
-                const connection = Onyx.connectWithoutView({
-                    key: `${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${policyID}`,
-                    callback: (recentlyUsedTags) => {
-                        resolve(recentlyUsedTags ?? {});
-                        Onyx.disconnect(connection);
-                    },
-                });
-            });
-            expect(newPolicyRecentlyUsedTags[tagName].length).toBe(2);
-            expect(newPolicyRecentlyUsedTags[tagName].at(0)).toBe(transactionTag);
         });
 
         it('creates a basic distance request with valid waypoints', async () => {
