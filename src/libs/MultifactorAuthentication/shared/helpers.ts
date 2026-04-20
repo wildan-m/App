@@ -96,4 +96,9 @@ function parseHttpRequest(
     };
 }
 
+function isHttpSuccess(httpStatusCode: number | undefined): boolean {
+    return String(httpStatusCode).startsWith('2');
+}
+
 export default parseHttpRequest;
+export {isHttpSuccess};

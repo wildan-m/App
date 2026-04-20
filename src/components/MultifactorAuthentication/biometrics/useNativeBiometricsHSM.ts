@@ -6,6 +6,7 @@ import useLocalize from '@hooks/useLocalize';
 import {getErrorMessage} from '@libs/ErrorUtils';
 import {buildSigningData, getKeyAlias, mapAuthTypeNumber, mapLibraryErrorToReason, mapSignErrorCodeToReason} from '@libs/MultifactorAuthentication/NativeBiometricsHSM/helpers';
 import type NativeBiometricsHSMKeyInfo from '@libs/MultifactorAuthentication/NativeBiometricsHSM/types';
+import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import CONST from '@src/CONST';
 import Base64URL from '@src/utils/Base64URL';
@@ -122,8 +123,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             onResult({
                 success: false,
-                reason,
-                message: getErrorMessage(error),
+                error: MfaError.local(reason, getErrorMessage(error)),
             });
         }
     };
@@ -138,7 +138,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
 
             if (!isCredentialAllowed(credentialID, allowedIDs)) {
                 await deleteLocalKeysForAccount();
-                onResult({success: false, reason: VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND});
+                onResult({success: false, error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND, 'Local credential not in server allowed list, keys deleted')});
                 return;
             }
 
@@ -161,15 +161,14 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 }
                 onResult({
                     success: false,
-                    reason: failReason,
-                    message: failReason === VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC ? signResult.errorCode : undefined,
+                    error: MfaError.local(failReason, `Error Code: ${signResult.errorCode}`),
                 });
                 return;
             }
 
             const authType = mapAuthTypeNumber(signResult.authType);
             if (!authType) {
-                onResult({success: false, reason: VALUES.REASON.CLIENT_ERRORS.BAD_REQUEST});
+                onResult({success: false, error: MfaError.local(VALUES.REASON.CLIENT_ERRORS.BAD_REQUEST, `Unrecognized auth type from HSM sign result: ${signResult.authType}`)});
                 return;
             }
 
@@ -193,8 +192,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             onResult({
                 success: false,
-                reason,
-                message: getErrorMessage(error),
+                error: MfaError.local(reason, getErrorMessage(error)),
             });
         }
     };

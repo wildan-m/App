@@ -14,6 +14,7 @@ import {
     PASSKEY_AUTH_TYPE,
 } from '@libs/MultifactorAuthentication/Passkeys/WebAuthn';
 import type {RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
+import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import {addLocalPasskeyCredential, deleteLocalPasskeyCredentials, getPasskeyOnyxKey, reconcileLocalPasskeysWithBackend} from '@userActions/Passkey';
 import CONST from '@src/CONST';
@@ -59,8 +60,7 @@ function usePasskeys(): UseBiometricsReturn {
             const {reason, message} = decodeWebAuthnError(error);
             await onResult({
                 success: false,
-                reason,
-                message,
+                error: MfaError.local(reason, message),
             });
             return;
         }
@@ -68,7 +68,7 @@ function usePasskeys(): UseBiometricsReturn {
         if (!(credential.response instanceof AuthenticatorAttestationResponse)) {
             await onResult({
                 success: false,
-                reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE,
+                error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE, 'Registration credential response is not AuthenticatorAttestationResponse'),
             });
             return;
         }
@@ -122,7 +122,7 @@ function usePasskeys(): UseBiometricsReturn {
         if (reconciled.length === 0) {
             await onResult({
                 success: false,
-                reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.REGISTRATION_REQUIRED,
+                error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.REGISTRATION_REQUIRED, 'No local passkey credentials match server-allowed list'),
             });
             return;
         }
@@ -137,8 +137,7 @@ function usePasskeys(): UseBiometricsReturn {
             const {reason, message} = decodeWebAuthnError(error);
             await onResult({
                 success: false,
-                reason,
-                message,
+                error: MfaError.local(reason, message),
             });
             return;
         }
@@ -146,7 +145,7 @@ function usePasskeys(): UseBiometricsReturn {
         if (!(assertion.response instanceof AuthenticatorAssertionResponse)) {
             await onResult({
                 success: false,
-                reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE,
+                error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE, 'Authentication assertion response is not AuthenticatorAssertionResponse'),
             });
             return;
         }

@@ -5,13 +5,11 @@ import type {
     MultifactorAuthenticationScenarioResponse,
 } from '@components/MultifactorAuthentication/config/types';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
-import type {AuthTypeInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
+import type {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import type {AuthTypeInfo} from '@libs/MultifactorAuthentication/shared/types';
 
-type ErrorState = {
-    reason: MultifactorAuthenticationReason;
+type ErrorState = MfaError & {
     payload?: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario>;
-    httpStatusCode?: number;
-    message?: string;
 };
 
 type MultifactorAuthenticationState = {
