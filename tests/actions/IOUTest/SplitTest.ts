@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {deepEqual} from 'fast-equals';
 import Onyx from 'react-native-onyx';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry, OnyxMergeCollectionInput} from 'react-native-onyx';
 import {getReportPreviewAction} from '@libs/actions/IOU';
 import {putOnHold} from '@libs/actions/IOU/Hold';
 import {requestMoney} from '@libs/actions/IOU/TrackExpense';
@@ -14,22 +14,18 @@ import {WRITE_COMMANDS} from '@libs/API/types';
 import {rand64} from '@libs/NumberUtils';
 import {getIOUActionForReportID, getOriginalMessage, isActionOfType, isAddCommentAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {buildOptimisticIOUReportAction, getAncestors, getReportOrDraftReport} from '@libs/ReportUtils';
+import {completeSplitBill, setDraftSplitTransaction, splitBill, startSplitBill} from '@userActions/IOU/Split';
 import {
     addSplitExpenseField,
-    completeSplitBill,
     evenlyDistributeSplitExpenseAmounts,
     initDraftSplitExpenseDataForEdit,
     initSplitExpenseItemData,
     removeSplitExpenseField,
     resetSplitExpensesByDateRange,
-    setDraftSplitTransaction,
-    splitBill,
-    startSplitBill,
     updateSplitExpenseAmountField,
     updateSplitExpenseField,
-    updateSplitTransactions,
-    updateSplitTransactionsFromSplitExpensesFlow,
-} from '@userActions/IOU/Split';
+} from '@userActions/IOU/SplitExpenseItems';
+import {updateSplitTransactions, updateSplitTransactionsFromSplitExpensesFlow} from '@userActions/IOU/SplitTransactionUpdate';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import DateUtils from '@src/libs/DateUtils';
@@ -360,17 +356,13 @@ describe('split expense', () => {
             (item) => item[julesChatCreatedAction.reportActionID].reportID,
         );
 
-        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-        return Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT, {
-            ...reportCollectionDataSet,
-        })
+        return Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT, reportCollectionDataSet as OnyxMergeCollectionInput<typeof ONYXKEYS.COLLECTION.REPORT>)
             .then(() =>
-                // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                 Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {
                     ...carlosActionsCollectionDataSet,
                     ...julesCreatedActionsCollectionDataSet,
                     ...julesActionsCollectionDataSet,
-                }),
+                } as OnyxMergeCollectionInput<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>),
             )
             .then(() => Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${julesExistingTransaction?.transactionID}`, julesExistingTransaction))
             .then(() => {

@@ -1,55 +1,25 @@
-/* eslint-disable max-lines */
-import {eachDayOfInterval, format, parse} from 'date-fns';
 import {fastMerge} from 'expensify-common';
 import {InteractionManager} from 'react-native';
-import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxInputValue, OnyxUpdate} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry, OnyxInputValue, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import ReceiptGeneric from '@assets/images/receipt-generic.png';
-import type {SearchActionsContextValue, SearchStateContextValue} from '@components/Search/types';
 import * as API from '@libs/API';
-import type {
-    CompleteSplitBillParams,
-    CreateDistanceRequestParams,
-    RevertSplitTransactionParams,
-    SplitBillParams,
-    SplitTransactionParams,
-    SplitTransactionSplitsParam,
-    StartSplitBillParams,
-} from '@libs/API/parameters';
+import type {CompleteSplitBillParams, CreateDistanceRequestParams, SplitBillParams, StartSplitBillParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
-import {getCurrencySymbol} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {registerDeferredWrite} from '@libs/deferredLayoutWrite';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import {calculateAmount as calculateIOUAmount, updateIOUOwnerAndTotal} from '@libs/IOUUtils';
-import {toLocaleDigit} from '@libs/LocaleDigitUtils';
 import {formatPhoneNumber} from '@libs/LocalePhoneNumber';
 import * as Localize from '@libs/Localize';
-import Log from '@libs/Log';
 import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopmostSplitNavigator';
-import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
-import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
+import Navigation from '@libs/Navigation/Navigation';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
 import {addSMSDomainIfPhoneNumber} from '@libs/PhoneNumber';
-import {getDistanceRateCustomUnitRate} from '@libs/PolicyUtils';
+import {getReportActionHtml, getReportActionText} from '@libs/ReportActionsUtils';
 import {
-    getAllReportActions,
-    getIOUActionForReportID,
-    getIOUActionForTransactionID,
-    getLastVisibleAction,
-    getOriginalMessage,
-    getReportAction,
-    getReportActionHtml,
-    getReportActionText,
-    isActionOfType,
-    isAddCommentAction,
-    isDeletedAction,
-    isMoneyRequestAction,
-} from '@libs/ReportActionsUtils';
-import {
-    buildOptimisticAddCommentReportAction,
     buildOptimisticChatReport,
     buildOptimisticCreatedReportAction,
     buildOptimisticExpenseReport,
@@ -57,7 +27,6 @@ import {
     buildOptimisticIOUReportAction,
     buildOptimisticMoneyRequestEntities,
     buildOptimisticReportPreview,
-    canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     generateReportID,
     getChatByParticipants,
     getParsedComment,
@@ -65,52 +34,35 @@ import {
     getReportOrDraftReport,
     getTransactionDetails,
     hasViolations as hasViolationsReportUtils,
-    isArchivedReport,
     isExpenseReport,
     isMoneyRequestReport as isMoneyRequestReportReportUtils,
     isOneOnOneChat,
     isOptimisticPersonalDetail,
     isPolicyExpenseChat as isPolicyExpenseChatReportUtil,
-    navigateBackOnDeleteTransaction,
     shouldCreateNewMoneyRequestReport as shouldCreateNewMoneyRequestReportReportUtils,
-    updateOptimisticParentReportAction,
     updateReportPreview,
 } from '@libs/ReportUtils';
 import type {OptimisticChatReport} from '@libs/ReportUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
-import {getSpan} from '@libs/telemetry/activeSpans';
 import {setPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import {
     buildOptimisticTransaction,
-    getAmount,
-    getChildTransactions,
-    getCurrency,
     getUpdatedTransaction,
     isDistanceRequest as isDistanceRequestTransactionUtils,
-    isOnHold,
-    isPerDiemRequest as isPerDiemRequestTransactionUtils,
     isScanRequest as isScanRequestTransactionUtils,
 } from '@libs/TransactionUtils';
 import {buildOptimisticPolicyRecentlyUsedTags} from '@userActions/Policy/Tag';
-import {notifyNewAction, setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
+import {notifyNewAction} from '@userActions/Report';
 import {sanitizeWaypointsForAPI} from '@userActions/Transaction';
-import {removeDraftSplitTransaction, removeDraftTransaction} from '@userActions/TransactionEdit';
+import {removeDraftTransaction} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
-import IntlStore from '@src/languages/IntlStore';
-import DistanceRequestUtils from '@src/libs/DistanceRequestUtils';
-import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
-import type {Attendee, Participant, Split, SplitExpense} from '@src/types/onyx/IOU';
-import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
-import type {Unit} from '@src/types/onyx/Policy';
+import type {Attendee, Participant, Split} from '@src/types/onyx/IOU';
 import type RecentlyUsedTags from '@src/types/onyx/RecentlyUsedTags';
 import type {OnyxData} from '@src/types/onyx/Request';
-import type {Receipt, ReceiptSource, SplitShares, TransactionChanges, TransactionCustomUnit, WaypointCollection} from '@src/types/onyx/Transaction';
+import type {Receipt, ReceiptSource, SplitShares, TransactionChanges, WaypointCollection} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
 import {
     buildMinimalTransactionForFormula,
     buildOnyxDataForMoneyRequest,
@@ -121,54 +73,20 @@ import {
     getAllTransactions,
     getCurrentUserEmail,
     getMoneyRequestInformation,
-    getMoneyRequestParticipantsFromReport,
     getPolicyTags,
     getReceiptError,
     getReportPreviewAction,
-    getUpdateMoneyRequestParams,
     getUserAccountID,
     handleNavigateAfterExpenseCreate,
     highlightTransactionOnSearchRouteIfNeeded,
     mergePolicyRecentlyUsedCategories,
     mergePolicyRecentlyUsedCurrencies,
 } from './index';
-import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams, OneOnOneIOUReport, StartSplitBilActionParams, UpdateMoneyRequestDataKeys} from './index';
-import {getDeleteTrackExpenseInformation} from './TrackExpense';
+import type {BuildOnyxDataForMoneyRequestKeys, OneOnOneIOUReport, StartSplitBilActionParams} from './index';
 import type BasePolicyParams from './types/BasePolicyParams';
 import type BaseTransactionParams from './types/BaseTransactionParams';
 
 type IOURequestType = ValueOf<typeof CONST.IOU.REQUEST_TYPE>;
-
-type UpdateSplitTransactionsParams = {
-    allTransactionsList: OnyxCollection<OnyxTypes.Transaction>;
-    allReportsList: OnyxCollection<OnyxTypes.Report>;
-    allReportNameValuePairsList: OnyxCollection<OnyxTypes.ReportNameValuePairs>;
-    allSnapshots?: OnyxCollection<OnyxTypes.SearchResults>;
-    transactionData: {
-        reportID: string;
-        originalTransactionID: string;
-        splitExpenses: SplitExpense[];
-        splitExpensesTotal?: number;
-    };
-    searchContext?: (Partial<SearchStateContextValue & SearchActionsContextValue> & {activeGroupSearchHashes?: number[]}) | undefined;
-    policyCategories: OnyxTypes.PolicyCategories | undefined;
-    policy: OnyxTypes.Policy | undefined;
-    policyRecentlyUsedCategories: OnyxTypes.RecentlyUsedCategories | undefined;
-    iouReport: OnyxEntry<OnyxTypes.Report>;
-    firstIOU: OnyxEntry<OnyxTypes.ReportAction> | undefined;
-    isASAPSubmitBetaEnabled: boolean;
-    currentUserPersonalDetails: CurrentUserPersonalDetails;
-    transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
-    quickAction: OnyxEntry<OnyxTypes.QuickAction>;
-    policyRecentlyUsedCurrencies: string[];
-    iouReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
-    betas: OnyxEntry<OnyxTypes.Beta[]>;
-    isFromSplitExpensesFlow?: boolean;
-    policyTags: OnyxTypes.PolicyTagLists;
-    personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
-    transactionReport: OnyxEntry<OnyxTypes.Report>;
-    expenseReport: OnyxEntry<OnyxTypes.Report>;
-};
 
 type SplitBillActionsParams = {
     participants: Participant[];
@@ -1155,7 +1073,6 @@ function completeSplitBill(
     dismissModalAndOpenReportInInboxTab(chatReportID);
     notifyNewAction(chatReportID, undefined, true);
 }
-
 
 /**
  * Sets the `splitShares` map that holds individual shares of a split bill
@@ -2175,18 +2092,6 @@ export {
     splitBill,
     splitBillAndOpenReport,
     startSplitBill,
-    updateSplitTransactions,
-    updateSplitTransactionsFromSplitExpensesFlow,
-    initSplitExpenseItemData,
-    updateSplitExpenseField,
-    updateSplitExpenseAmountField,
-    updateSplitExpenseDistanceFromAmount,
-    clearSplitTransactionDraftErrors,
-    addSplitExpenseField,
-    resetSplitExpensesByDateRange,
-    evenlyDistributeSplitExpenseAmounts,
-    removeSplitExpenseField,
-    initDraftSplitExpenseDataForEdit,
     adjustRemainingSplitShares,
     setDraftSplitTransaction,
     setIndividualShare,
@@ -2194,4 +2099,4 @@ export {
     resetSplitShares,
 };
 
-export type {CreateDistanceRequestInformation, SplitBillActionsParams, UpdateSplitTransactionsParams};
+export type {CreateDistanceRequestInformation, SplitBillActionsParams};

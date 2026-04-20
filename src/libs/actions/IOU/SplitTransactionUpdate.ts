@@ -40,14 +40,7 @@ import {
 } from '@libs/ReportUtils';
 import {getSpan} from '@libs/telemetry/activeSpans';
 import {setPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
-import {
-    buildOptimisticTransaction,
-    getChildTransactions,
-    isDistanceRequest as isDistanceRequestTransactionUtils,
-    isOnHold,
-    isPerDiemRequest as isPerDiemRequestTransactionUtils,
-} from '@libs/TransactionUtils';
-import ViolationsUtils from '@libs/Violations/ViolationsUtils';
+import {getChildTransactions, isDistanceRequest as isDistanceRequestTransactionUtils, isOnHold, isPerDiemRequest as isPerDiemRequestTransactionUtils} from '@libs/TransactionUtils';
 import {setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import {removeDraftSplitTransaction} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
@@ -56,16 +49,16 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
-import type {Attendee, Participant, Split, SplitExpense} from '@src/types/onyx/IOU';
+import type {Attendee, Participant, SplitExpense} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
-import type RecentlyUsedTags from '@src/types/onyx/RecentlyUsedTags';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
-import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getReportPreviewAction, getUpdateMoneyRequestParams} from './index';
-import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams, OneOnOneIOUReport, StartSplitBilActionParams, UpdateMoneyRequestDataKeys} from './index';
+import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getReportPreviewAction} from './index';
+import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams} from './index';
 import {getDeleteTrackExpenseInformation} from './TrackExpense';
+import {getUpdateMoneyRequestParams} from './UpdateMoneyRequest';
+import type {UpdateMoneyRequestDataKeys} from './UpdateMoneyRequest';
 
 type UpdateSplitTransactionsParams = {
     allTransactionsList: OnyxCollection<OnyxTypes.Transaction>;
