@@ -26,6 +26,7 @@ import {
     getReimbursable,
     getTaxName,
     getWaypoints,
+    hasValidModifiedAmount,
     isDistanceRequest,
     isExpenseSplit,
     isFetchingWaypointsFromServer,
@@ -604,14 +605,13 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
     searchReports,
     policy,
 }: GetMergeFieldUpdatedValuesParams<K>): MergeTransactionUpdateValues {
-    const transactionDetails = getTransactionDetails(transaction);
-    const amount = getMergeFieldValue(transactionDetails, transaction, 'amount') as number;
     const updatedValues: MergeTransactionUpdateValues = {
         [field]: fieldValue,
     };
 
     if (field === 'amount') {
         updatedValues.currency = getCurrency(transaction);
+        const amount = hasValidModifiedAmount(transaction) ? Number(transaction?.modifiedAmount) : (transaction?.amount ?? 0);
         if (mergeTransaction?.taxValue && amount) {
             updatedValues.taxAmount = convertToBackendAmount(calculateTaxAmount(mergeTransaction?.taxValue, amount, getCurrencyDecimals(getCurrency(transaction))));
         }
@@ -623,7 +623,8 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
     }
 
     if (field === 'merchant' && isDistanceRequest(transaction)) {
-        updatedValues.amount = amount;
+        const transactionDetails = getTransactionDetails(transaction);
+        updatedValues.amount = getMergeFieldValue(transactionDetails, transaction, 'amount') as number;
         updatedValues.currency = getCurrency(transaction);
         updatedValues.customUnit = transaction?.comment?.customUnit;
         updatedValues.iouRequestType = transaction?.iouRequestType;
