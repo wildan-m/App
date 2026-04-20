@@ -36,7 +36,7 @@ Any member can close their own Expensify account, if:
 **Mobile:**
 1. Tap the **Menu (≡)** at the top left.
 2. Tap **Settings**.
-3. Scroll to the **Others** section and tap **Close Account**.
+1. Tap the hamburger menu in the top-left corner.
 4. Confirm the closure using your phone or email.
 
 If you don't see the option to close your account, your account may be domain-controlled. Contact your Domain Admin and ask them to [remove you as a domain member](/articles/expensify-classic/domains/Domain-Members#remove-a-domain-member). 
