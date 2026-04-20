@@ -4254,6 +4254,9 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             budgetFrequencyUnit: {monthly: '月', yearly: '年'},
             budgetTypeForNotificationMessage: {tag: 'タグ', category: 'カテゴリ'},
             hr: '人事',
+            travelInvoicing: 'Expensify Travel 買掛金のエクスポート先',
+            travelInvoicingVendor: '出張業者',
+            travelInvoicingPayableAccount: '旅費未払勘定',
         },
         receiptPartners: {
             uber: {
@@ -4534,9 +4537,6 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
                     [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '自己負担経費は支払われた時点でエクスポートされます',
                 },
             },
-            travelInvoicing: 'Expensify Travel 買掛金のエクスポート先',
-            travelInvoicingVendor: '出張業者',
-            travelInvoicingPayableAccount: '旅費未払勘定',
         },
         workspaceList: {
             joinNow: '今すぐ参加',
@@ -4847,9 +4847,6 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             noAccountsFoundDescription: 'NetSuite にアカウントを追加して、接続をもう一度同期してください',
             noVendorsFound: 'ベンダーが見つかりません',
             noVendorsFoundDescription: 'NetSuite に仕入先を追加して、接続をもう一度同期してください',
-            travelInvoicing: 'Expensify Travel の買掛金を書き出す送信先',
-            travelInvoicingVendor: '旅行代理店',
-            travelInvoicingPayableAccount: '旅費未払勘定',
             noItemsFound: '請求書項目が見つかりません',
             noItemsFoundDescription: 'NetSuite で請求書アイテムを追加し、接続をもう一度同期してください',
             noSubsidiariesFound: '子会社が見つかりません',
