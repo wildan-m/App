@@ -7527,6 +7527,7 @@ ${reportName}
         withdrawalType: '提款类型',
         recentSearches: '最近搜索',
         recentChats: '最近聊天',
+        searchResultsHeader: '搜索结果',
         searchIn: '搜索范围',
         searchPlaceholder: '搜索内容...',
         suggestions: '建议',

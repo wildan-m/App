@@ -7761,6 +7761,7 @@ const translations = {
         withdrawalType: 'Withdrawal type',
         recentSearches: 'Recent searches',
         recentChats: 'Recent chats',
+        searchResultsHeader: 'Search results',
         searchIn: 'Search in',
         searchPlaceholder: 'Search for something...',
         suggestions: 'Suggestions',

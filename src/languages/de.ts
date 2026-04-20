@@ -7765,6 +7765,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         withdrawalType: 'Auszahlungsart',
         recentSearches: 'Letzte Suchen',
         recentChats: 'Neueste Chats',
+        searchResultsHeader: 'Suchergebnisse',
         searchIn: 'Suchen in',
         searchPlaceholder: 'Nach etwas suchen...',
         suggestions: 'Vorschläge',

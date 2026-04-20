@@ -159,6 +159,7 @@ function SearchAutocompleteList({
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER);
     const allCards = personalAndWorkspaceCards ?? CONST.EMPTY_OBJECT;
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [isSearchingForReports] = useOnyx(ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
     const currentUserAccountID = currentUserPersonalDetails.accountID;
@@ -373,6 +374,26 @@ function SearchAutocompleteList({
         return reportOptions.slice(0, 20);
     }, [autocompleteQueryValue, searchOptions]);
 
+    // Snapshot of the ordered keyForLists present in the local result set the first time we render
+    // for a given non-empty query. Rows whose key is in the snapshot render in the top "Recent
+    // chats" section in snapshot order (frozen); any later-arriving rows render in the bottom
+    // "Search results" section. This keeps the top section from reordering when the
+    // SEARCH_FOR_REPORTS response merges new reports into the Onyx REPORT collection.
+    const trimmedAutocompleteQuery = autocompleteQueryValue.trim();
+    const [localSnapshot, setLocalSnapshot] = useState<{query: string; orderedKeys: string[]}>({query: '', orderedKeys: []});
+    if (trimmedAutocompleteQuery === '' && localSnapshot.query !== '') {
+        setLocalSnapshot({query: '', orderedKeys: []});
+    } else if (trimmedAutocompleteQuery !== '' && localSnapshot.query !== trimmedAutocompleteQuery) {
+        const capturedKeys: string[] = [];
+        for (const option of recentReportsOptions) {
+            const key = String(option.keyForList ?? option.reportID ?? (option.accountID ? String(option.accountID) : ''));
+            if (key !== '') {
+                capturedKeys.push(key);
+            }
+        }
+        setLocalSnapshot({query: trimmedAutocompleteQuery, orderedKeys: capturedKeys});
+    }
+
     const debounceHandleSearch = useDebounce(() => {
         if (!handleSearch || !autocompleteQueryWithoutFilters) {
             return;
@@ -435,37 +456,85 @@ function SearchAutocompleteList({
             } as AutocompleteListItem;
         });
 
-        if (!isLoadingOptions) {
-            pushSection({
-                title: autocompleteQueryValue.trim() === '' ? translate('search.recentChats') : undefined,
-                data: nextStyledRecentReports,
-                sectionIndex: sectionIndex++,
-            });
-        } else if (autocompleteQueryValue.trim() !== '' && nextStyledRecentReports.length > 0) {
-            // When options aren't fully initialized but we have a search query with available results,
-            // render them immediately so they're selectable instead of hiding the section entirely.
-            pushSection({
-                data: nextStyledRecentReports,
-                sectionIndex: sectionIndex++,
-            });
-        } else if (autocompleteQueryValue.trim() === '') {
-            pushSection({
-                title: translate('search.recentChats'),
-                data: [],
-                sectionIndex: sectionIndex++,
-                customHeader: (
-                    <OptionsListSkeletonView
-                        fixedNumItems={3}
-                        shouldStyleAsTable
-                        speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
-                        reasonAttributes={{
-                            context: 'SearchAutocompleteList',
-                            isRecentSearchesDataLoaded,
-                            isLoadingOptions,
-                        }}
-                    />
-                ),
-            });
+        if (trimmedAutocompleteQuery === '') {
+            if (!isLoadingOptions) {
+                pushSection({title: translate('search.recentChats'), data: nextStyledRecentReports, sectionIndex: sectionIndex++});
+            } else {
+                pushSection({
+                    title: translate('search.recentChats'),
+                    data: [],
+                    sectionIndex: sectionIndex++,
+                    customHeader: (
+                        <OptionsListSkeletonView
+                            fixedNumItems={3}
+                            shouldStyleAsTable
+                            speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
+                            reasonAttributes={{
+                                context: 'SearchAutocompleteList',
+                                isRecentSearchesDataLoaded,
+                                isLoadingOptions,
+                            }}
+                        />
+                    ),
+                });
+            }
+        } else {
+            // Partition current rows by whether their keyForList was captured in the local snapshot.
+            // Rows in the snapshot render on top in the snapshot's recorded order (frozen); rows not
+            // in the snapshot — which arrived after SEARCH_FOR_REPORTS responded — render below.
+            const snapshotKeys = localSnapshot.query === trimmedAutocompleteQuery ? localSnapshot.orderedKeys : [];
+            const snapshotKeySet = new Set(snapshotKeys);
+            const itemsByKey = new Map<string, AutocompleteListItem>();
+            const serverItems: AutocompleteListItem[] = [];
+            for (const item of nextStyledRecentReports) {
+                const key = String(item.keyForList ?? '');
+                if (key !== '' && snapshotKeySet.has(key)) {
+                    itemsByKey.set(key, item);
+                } else {
+                    serverItems.push(item);
+                }
+            }
+            const localItems: AutocompleteListItem[] = [];
+            for (const key of snapshotKeys) {
+                const item = itemsByKey.get(key);
+                if (item) {
+                    localItems.push(item);
+                }
+            }
+
+            const hasLocalItems = localItems.length > 0;
+            const hasServerItems = serverItems.length > 0;
+            const isAwaitingServerResults = !!isSearchingForReports && !hasServerItems;
+
+            if (!isLoadingOptions && hasLocalItems) {
+                pushSection({title: translate('search.recentChats'), data: localItems, sectionIndex: sectionIndex++});
+            } else if (isLoadingOptions && hasLocalItems) {
+                // Options not fully initialized but we have results for this query — render them now
+                // so they're selectable rather than hiding the section entirely.
+                pushSection({data: localItems, sectionIndex: sectionIndex++});
+            }
+
+            if (hasServerItems) {
+                pushSection({title: translate('search.searchResultsHeader'), data: serverItems, sectionIndex: sectionIndex++});
+            } else if (isAwaitingServerResults) {
+                pushSection({
+                    title: translate('search.searchResultsHeader'),
+                    data: [],
+                    sectionIndex: sectionIndex++,
+                    customHeader: (
+                        <OptionsListSkeletonView
+                            fixedNumItems={3}
+                            shouldStyleAsTable
+                            speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
+                            reasonAttributes={{
+                                context: 'SearchAutocompleteList',
+                                isRecentSearchesDataLoaded,
+                                isLoadingOptions,
+                            }}
+                        />
+                    ),
+                });
+            }
         }
 
         if (autocompleteSuggestions.length > 0) {
@@ -487,6 +556,9 @@ function SearchAutocompleteList({
         return {sections: nextSections, styledRecentReports: nextStyledRecentReports, suggestionsCount: nextSuggestionsCount};
     }, [
         autocompleteQueryValue,
+        trimmedAutocompleteQuery,
+        localSnapshot.query,
+        localSnapshot.orderedKeys,
         autocompleteSuggestions,
         expensifyIcons,
         getAdditionalSections,
@@ -498,11 +570,12 @@ function SearchAutocompleteList({
         translate,
         isLoadingOptions,
         isRecentSearchesDataLoaded,
+        isSearchingForReports,
     ]);
 
     const sectionItemText = sections?.at(1)?.data?.[0]?.text ?? '';
     const normalizedReferenceText = sectionItemText.toLowerCase();
-    const trimmedAutocompleteQueryValue = autocompleteQueryValue.trim();
+    const trimmedAutocompleteQueryValue = trimmedAutocompleteQuery;
     const isLoading = !isRecentSearchesDataLoaded;
     const suggestionsAnnouncement = suggestionsCount > 0 ? translate('search.suggestionsAvailable', {count: suggestionsCount}, trimmedAutocompleteQueryValue) : '';
     useDebouncedAccessibilityAnnouncement(suggestionsAnnouncement, !!suggestionsAnnouncement, autocompleteQueryValue);

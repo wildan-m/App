@@ -7656,6 +7656,7 @@ ${reportName}
         withdrawalType: '出金の種類',
         recentSearches: '最近の検索',
         recentChats: '最近のチャット',
+        searchResultsHeader: '検索結果',
         searchIn: '検索対象',
         searchPlaceholder: '何かを検索...',
         suggestions: '提案',
