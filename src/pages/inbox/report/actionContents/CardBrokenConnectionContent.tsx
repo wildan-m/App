@@ -1,3 +1,4 @@
+import {cardByIdSelector} from '@selectors/Card';
 import React from 'react';
 import RenderHTML from '@components/RenderHTML';
 import useEnvironment from '@hooks/useEnvironment';
@@ -9,10 +10,10 @@ import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBa
 import type CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type * as OnyxTypes from '@src/types/onyx';
+import type {ReportAction} from '@src/types/onyx';
 
 type CardBrokenConnectionContentProps = {
-    action: OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.PERSONAL_CARD_CONNECTION_BROKEN>;
+    action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.PERSONAL_CARD_CONNECTION_BROKEN>;
 };
 
 function CardBrokenConnectionContent({action}: CardBrokenConnectionContentProps) {
@@ -23,7 +24,7 @@ function CardBrokenConnectionContent({action}: CardBrokenConnectionContentProps)
     const cardID = message?.cardID;
     const cardName = message?.cardName;
 
-    const [card] = useOnyx(ONYXKEYS.CARD_LIST, {selector: (cardList) => (cardID ? cardList?.[cardID] : undefined)});
+    const [card] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(String(cardID))});
 
     const connectionLink = cardID && isPersonalCardBrokenConnection(card) ? `${environmentURL}/${ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(String(cardID))}` : undefined;
 
