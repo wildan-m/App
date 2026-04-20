@@ -81,7 +81,7 @@ function parseHttpResponse(
 }
 
 function isHttpSuccess(httpStatusCode: number | undefined): boolean {
-    return String(httpStatusCode).startsWith('2');
+    return httpStatusCode !== undefined && httpStatusCode >= 200 && httpStatusCode < 300;
 }
 
 export default parseHttpResponse;
