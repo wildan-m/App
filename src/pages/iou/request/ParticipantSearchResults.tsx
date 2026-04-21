@@ -1,6 +1,6 @@
 import lodashPick from 'lodash/pick';
 import React, {useEffect} from 'react';
-import type {MutableRefObject, Ref} from 'react';
+import type {Ref, RefObject} from 'react';
 import type {GestureResponderEvent} from 'react-native';
 import {InteractionManager} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
@@ -87,7 +87,7 @@ type ParticipantSearchResultsProps = {
     allPolicies: OnyxCollection<Policy>;
 
     /** Ref holding current billing values, read inside onSelectRow's billing gate */
-    billingDataRef: MutableRefObject<BillingData>;
+    billingDataRef: RefObject<BillingData>;
 
     /** Forwarded ref for the SelectionList — used by the parent's useImperativeHandle */
     selectionListRef: Ref<SelectionListWithSectionsHandle | null>;
