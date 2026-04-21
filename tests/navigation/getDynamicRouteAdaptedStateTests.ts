@@ -38,7 +38,6 @@ jest.mock('@libs/Log', () => ({
 }));
 
 jest.mock('@libs/Navigation/helpers/getMatchingNewRoute', () => jest.fn());
-jest.mock('@libs/Navigation/helpers/getRedirectedPath', () => jest.fn((path: string) => path));
 jest.mock('@libs/Navigation/helpers/dynamicRoutesUtils/getStateForDynamicRoute', () => jest.fn());
 jest.mock('@libs/Navigation/helpers/getStateFromPath', () => jest.fn());
 
