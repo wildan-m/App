@@ -1,5 +1,4 @@
 import passthroughPolicyTagListSelector from '@selectors/PolicyTagList';
-import {sortedActionsSelector} from '@selectors/SortedReportActions';
 import {useState} from 'react';
 import type {PermissionStatus} from 'react-native-permissions';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
