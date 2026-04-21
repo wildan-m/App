@@ -370,7 +370,9 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                         // - The server no longer accepts the local public key (not in allowCredentials)
                         if (
                             result.error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.HSM.KEY_ACCESS_FAILED ||
-                            result.error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND
+                            result.error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND ||
+                            result.error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL ||
+                            result.error.reason === CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.WEBAUTHN.NO_MATCHING_LOCAL_CREDENTIAL
                         ) {
                             addMFABreadcrumb('Authorization key reset', result.error, 'warning');
                             await biometrics.deleteLocalKeysForAccount();
