@@ -177,8 +177,8 @@ describe('NativeBiometricsHSM helpers', () => {
         it('should return GENERIC for unrecognized error codes', () => {
             // Given an error code that does not match any known library error code constant
             // When mapping the error code
-            // Then it should fall back to HSM.GENERIC so the error is still surfaced to the user with a general error message
-            expect(mapSignErrorCodeToReason('some_unknown_error')).toBe(VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC);
+            // Then it should fall back to HSM.UNRECOGNIZED so the error is still surfaced to the user with a general error message
+            expect(mapSignErrorCodeToReason('some_unknown_error')).toBe(VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED);
         });
     });
 

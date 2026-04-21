@@ -56,7 +56,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
         } catch (error) {
             let reason = mapLibraryErrorToReason(error);
             if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC;
+                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
             }
             const errorMessage = getErrorMessage(error);
             addMFABreadcrumb('Failed to get local credential ID', {reason, message: errorMessage}, 'error');
@@ -76,7 +76,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
         } catch (error) {
             let reason = mapLibraryErrorToReason(error);
             if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC;
+                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
             }
             const errorMessage = getErrorMessage(error);
             addMFABreadcrumb('Failed to delete local keys', {reason, message: errorMessage}, 'error');
@@ -160,7 +160,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             if (!hasValidSignature(signResult)) {
                 let failReason = mapSignErrorCodeToReason(signResult.errorCode);
                 if (failReason === undefined) {
-                    failReason = VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC;
+                    failReason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
                 }
                 onResult({
                     success: false,
@@ -194,7 +194,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
         } catch (error) {
             let reason = mapLibraryErrorToReason(error);
             if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC;
+                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
             }
             onResult({
                 success: false,

@@ -478,7 +478,7 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC}),
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED}),
                 }),
             );
         });
