@@ -460,6 +460,17 @@ function goUp(backToRoute: Route, options?: GoBackOptions) {
             Log.hmmm('[Navigation] Unable to go up. Tab target missing screen name.');
             return;
         }
+        // Cross-tab PUSH stacks a new TAB_NAVIGATOR on the root. When an underlying TAB_NAVIGATOR
+        // already has the target tab active, pop to it instead of jumping — otherwise the pushed
+        // tab's deep leaf lingers and resurfaces with a close animation on later tab switches.
+        const topRootIndex = rootState.index ?? rootState.routes.length - 1;
+        const underlyingTabNavIndex = rootState.routes.findIndex(
+            (route, idx) => idx < topRootIndex && route.name === NAVIGATORS.TAB_NAVIGATOR && route.state?.routes?.at(route.state?.index ?? 0)?.name === payload.name,
+        );
+        if (underlyingTabNavIndex !== -1) {
+            navigationRef.current.dispatch(StackActions.pop(topRootIndex - underlyingTabNavIndex));
+            return;
+        }
         const jumpParams = 'params' in payload ? payload.params : undefined;
         navigationRef.current.dispatch({
             ...TabActions.jumpTo(payload.name, jumpParams),
