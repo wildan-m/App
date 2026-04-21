@@ -204,7 +204,6 @@ type BuildPolicyDataOptions = {
     currentUserAccountIDParam: number;
     currentUserEmailParam: string;
     allReportsParam?: OnyxCollection<Report>;
-    reportActionsList?: OnyxCollection<ReportActions>;
     onboardingPurposeSelected?: OnboardingPurpose;
     shouldAddGuideWelcomeMessage?: boolean;
     shouldCreateControlPolicy?: boolean;
@@ -2427,7 +2426,6 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
         currentUserAccountIDParam,
         currentUserEmailParam,
         allReportsParam,
-        reportActionsList,
         shouldAddGuideWelcomeMessage = true,
         onboardingPurposeSelected,
         shouldCreateControlPolicy = false,
@@ -2929,10 +2927,13 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
     }
 
     if (adminParticipant?.login) {
+        // reportActionsList is not needed here because buildPolicyData always uses a freshly generated policyID,
+        // so getPolicyExpenseChat() inside createPolicyExpenseChats will never find an existing chat.
+        // TODO: Update to include reportActionsList later if this assumption changes (https://github.com/Expensify/App/issues/66578)
         const employeeWorkspaceChat = createPolicyExpenseChats(
             policyID,
             {[adminParticipant.login]: adminParticipant.accountID ?? CONST.DEFAULT_NUMBER_ID},
-            reportActionsList,
+            undefined,
             hasOutstandingChildRequest,
         );
         params.memberData = JSON.stringify({
