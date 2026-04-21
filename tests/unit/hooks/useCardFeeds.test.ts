@@ -131,11 +131,11 @@ describe('useCardFeeds', () => {
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
-            await waitFor(() => {
-                const [workspaceFeeds] = result.current;
-                const feedKeys = Object.keys(workspaceFeeds ?? {});
-                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
-            });
+            await waitFor(() => expect(result.current[1].status).toBe('loaded'));
+
+            const [workspaceFeeds] = result.current;
+            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
 
         it('includes domain feeds when linkedPolicyIDs is an empty array and preferredPolicy matches', async () => {
@@ -158,11 +158,11 @@ describe('useCardFeeds', () => {
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
-            await waitFor(() => {
-                const [workspaceFeeds] = result.current;
-                const feedKeys = Object.keys(workspaceFeeds ?? {});
-                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
-            });
+            await waitFor(() => expect(result.current[1].status).toBe('loaded'));
+
+            const [workspaceFeeds] = result.current;
+            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
 
         it('excludes feeds when linkedPolicyIDs explicitly lists other policies and preferredPolicy does not match', async () => {
@@ -185,11 +185,11 @@ describe('useCardFeeds', () => {
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
-            await waitFor(() => {
-                const [workspaceFeeds] = result.current;
-                const feedKeys = Object.keys(workspaceFeeds ?? {});
-                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(false);
-            });
+            await waitFor(() => expect(result.current[1].status).toBe('loaded'));
+
+            const [workspaceFeeds] = result.current;
+            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(false);
         });
 
         it('includes feeds when policyID is one of multiple meaningful entries in linkedPolicyIDs', async () => {
@@ -212,11 +212,11 @@ describe('useCardFeeds', () => {
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
-            await waitFor(() => {
-                const [workspaceFeeds] = result.current;
-                const feedKeys = Object.keys(workspaceFeeds ?? {});
-                expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
-            });
+            await waitFor(() => expect(result.current[1].status).toBe('loaded'));
+
+            const [workspaceFeeds] = result.current;
+            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
     });
 });
