@@ -36,7 +36,14 @@ function ReviewDuplicatesPrimaryAction({reportID, chatReportID}: SimpleActionPro
                 let threadID: string | undefined | null = transactionThreadReportID;
                 if (!threadID) {
                     const duplicateTransaction = transactions.find((reportTransaction) =>
-                        isDuplicate(reportTransaction, email ?? '', accountID, moneyRequestReport, policy, allTransactionViolations),
+                        isDuplicate(
+                            reportTransaction,
+                            email ?? '',
+                            accountID,
+                            moneyRequestReport,
+                            policy,
+                            allTransactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + reportTransaction.transactionID],
+                        ),
                     );
                     if (duplicateTransaction) {
                         const existingThreadID = getThreadReportIDsForTransactions(reportActions, [duplicateTransaction]).at(0);

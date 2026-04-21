@@ -524,7 +524,6 @@ describe('getSecondaryAction', () => {
             approver: EMPLOYEE_EMAIL,
         } as unknown as Policy;
         const TRANSACTION_ID = 'TRANSACTION_ID';
-        const DUPLICATE_TRANSACTION_ID = 'DUPLICATE_TRANSACTION_ID';
         const transaction = {
             transactionID: TRANSACTION_ID,
         } as unknown as Transaction;
@@ -533,7 +532,6 @@ describe('getSecondaryAction', () => {
 
         const violation = {
             name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-            data: {duplicates: [DUPLICATE_TRANSACTION_ID]},
         } as TransactionViolation;
 
         await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
@@ -545,15 +543,7 @@ describe('getSecondaryAction', () => {
             chatReport,
             reportTransactions: [transaction],
             originalTransaction: {} as Transaction,
-            violations: {
-                [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TRANSACTION_ID}`]: [violation],
-                [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${DUPLICATE_TRANSACTION_ID}`]: [
-                    {
-                        name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                        data: {duplicates: [TRANSACTION_ID]},
-                    } as TransactionViolation,
-                ],
-            },
+            violations: {[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TRANSACTION_ID}`]: [violation]},
             bankAccountList: {},
             policy,
         });
@@ -601,7 +591,6 @@ describe('getSecondaryAction', () => {
     it('includes APPROVE option for DEW policy report without pending approval', async () => {
         // Given a submitted expense report on a DEW policy without any pending approval action
         const TRANSACTION_ID = 'TRANSACTION_ID_DEW';
-        const DUPLICATE_TRANSACTION_ID = 'DUPLICATE_TRANSACTION_ID_DEW';
         const report = {
             reportID: REPORT_ID,
             type: CONST.REPORT.TYPE.EXPENSE,
@@ -619,21 +608,12 @@ describe('getSecondaryAction', () => {
         } as unknown as Transaction;
         const violation = {
             name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-            data: {duplicates: [DUPLICATE_TRANSACTION_ID]},
         } as TransactionViolation;
 
         await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, transaction);
         await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
 
-        const violations = {
-            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TRANSACTION_ID}`]: [violation],
-            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${DUPLICATE_TRANSACTION_ID}`]: [
-                {
-                    name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                    data: {duplicates: [TRANSACTION_ID]},
-                } as TransactionViolation,
-            ],
-        };
+        const violations = {[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TRANSACTION_ID}`]: [violation]};
 
         // When getting secondary report actions
         const result = getSecondaryReportActions({

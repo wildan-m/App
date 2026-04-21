@@ -1100,7 +1100,6 @@ describe('isReviewDuplicatesAction', () => {
         } as unknown as Report;
         await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
         const TRANSACTION_ID = 'TRANSACTION_ID';
-        const DUPLICATE_TRANSACTION_ID = 'DUPLICATE_TRANSACTION_ID';
         const transaction = {
             transactionID: TRANSACTION_ID,
         } as unknown as Transaction;
@@ -1110,13 +1109,6 @@ describe('isReviewDuplicatesAction', () => {
             [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TRANSACTION_ID}`]: [
                 {
                     name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                    data: {duplicates: [DUPLICATE_TRANSACTION_ID]},
-                } as TransactionViolation,
-            ],
-            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${DUPLICATE_TRANSACTION_ID}`]: [
-                {
-                    name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                    data: {duplicates: [TRANSACTION_ID]},
                 } as TransactionViolation,
             ],
         };
@@ -1228,7 +1220,6 @@ describe('getTransactionThreadPrimaryAction', () => {
         const policy = {};
         const REPORT_ACTION_ID = 'REPORT_ACTION_ID';
         const TRANSACTION_ID = 'TRANSACTION_ID';
-        const DUPLICATE_TRANSACTION_ID = 'DUPLICATE_TRANSACTION_ID';
         const transaction = {
             transactionID: TRANSACTION_ID,
             comment: {
@@ -1239,7 +1230,6 @@ describe('getTransactionThreadPrimaryAction', () => {
         await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, transaction);
         const violation = {
             name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-            data: {duplicates: [DUPLICATE_TRANSACTION_ID]},
         } as unknown as TransactionViolation;
 
         expect(getTransactionThreadPrimaryAction(CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, {} as Report, report, transaction, [violation], policy as Policy, false)).toBe(

@@ -105,12 +105,9 @@ const smartScanFailedViolation = {
     type: CONST.VIOLATION_TYPES.WARNING,
 };
 
-const DUPLICATE_PARTNER_TRANSACTION_ID = 'duplicate-partner-txn';
-
 const duplicatedTransactionViolation = {
     name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
     type: CONST.VIOLATION_TYPES.WARNING,
-    data: {duplicates: [DUPLICATE_PARTNER_TRANSACTION_ID]},
 };
 
 describe('getViolationsOnyxData', () => {
@@ -1376,13 +1373,6 @@ describe('getViolations', () => {
 
         const transactionViolationsCollection = {
             [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`]: [duplicatedTransactionViolation, smartScanFailedViolation, tagOutOfPolicyViolation],
-            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${DUPLICATE_PARTNER_TRANSACTION_ID}`]: [
-                {
-                    name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                    type: CONST.VIOLATION_TYPES.WARNING,
-                    data: {duplicates: [transaction.transactionID]},
-                },
-            ],
         };
 
         await Onyx.multiSet({...transactionCollectionDataSet});
@@ -1424,13 +1414,6 @@ describe('getViolations', () => {
 
         const transactionViolationsCollection = {
             [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`]: [duplicatedTransactionViolation, smartScanFailedViolation, tagOutOfPolicyViolation],
-            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${DUPLICATE_PARTNER_TRANSACTION_ID}`]: [
-                {
-                    name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION,
-                    type: CONST.VIOLATION_TYPES.WARNING,
-                    data: {duplicates: [transaction.transactionID]},
-                },
-            ],
         };
 
         await Onyx.multiSet({...transactionCollectionDataSet});

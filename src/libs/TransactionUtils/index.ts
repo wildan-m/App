@@ -1516,9 +1516,7 @@ function getTransactionViolations(
 
     const violations =
         transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID]?.filter(
-            (violation) =>
-                !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy) &&
-                shouldShowDuplicateViolation(transaction.transactionID, violation, transactionViolations),
+            (violation) => !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy),
         ) ?? [];
 
     return violations;
@@ -1863,29 +1861,6 @@ function getRecentTransactions(transactions: Record<string, string>, size = 2): 
 }
 
 /**
- * A duplicatedTransaction violation is only valid for display if the link is bidirectional:
- * transaction A must reference B AND B must reference A back. This prevents showing stale
- * one-sided duplicate violations when the backend only re-evaluated one side of the pair.
- */
-function shouldShowDuplicateViolation(transactionID: string, violation: TransactionViolation, allTransactionViolations: OnyxCollection<TransactionViolation[]>): boolean {
-    if (violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION) {
-        return true;
-    }
-
-    const duplicateTransactionIDs = violation.data?.duplicates;
-    if (!duplicateTransactionIDs?.length) {
-        return false;
-    }
-
-    return duplicateTransactionIDs.some((partnerID) => {
-        const bidirectionalViolations = allTransactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${partnerID}`];
-        return bidirectionalViolations?.some(
-            (duplicateViolation) => duplicateViolation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION && duplicateViolation.data?.duplicates?.includes(transactionID),
-        );
-    });
-}
-
-/**
  * Check if transaction has duplicatedTransaction violation.
  * @param transactionID - the transaction to check
  */
@@ -1895,18 +1870,16 @@ function isDuplicate(
     currentUserAccountID: number,
     iouReport: OnyxEntry<Report>,
     policy: OnyxEntry<Policy>,
-    allTransactionViolations: OnyxCollection<TransactionViolation[]>,
+    transactionViolation: OnyxEntry<TransactionViolations>,
 ): boolean {
     if (!transaction) {
         return false;
     }
-    const transactionViolation = allTransactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`];
     const duplicatedTransactionViolation = transactionViolation?.find((violation: TransactionViolation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
     const hasDuplicatedTransactionViolation = !!duplicatedTransactionViolation;
     const isDuplicatedTransactionViolationDismissed = isViolationDismissed(transaction, duplicatedTransactionViolation, currentUserEmail, currentUserAccountID, iouReport, policy);
-    const shouldDisplayDuplicate = !duplicatedTransactionViolation || shouldShowDuplicateViolation(transaction.transactionID, duplicatedTransactionViolation, allTransactionViolations);
 
-    return hasDuplicatedTransactionViolation && !isDuplicatedTransactionViolationDismissed && shouldDisplayDuplicate;
+    return hasDuplicatedTransactionViolation && !isDuplicatedTransactionViolationDismissed;
 }
 
 /**
@@ -1995,16 +1968,13 @@ function hasViolation(
     if (!doesTransactionSupportViolations(transaction)) {
         return false;
     }
-    const isCollection = !Array.isArray(transactionViolations);
-    const violations = isCollection ? transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID] : transactionViolations;
-    const allViolations = isCollection ? transactionViolations : undefined;
+    const violations = Array.isArray(transactionViolations) ? transactionViolations : transactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID];
 
     return !!violations?.some(
         (violation) =>
             violation.type === CONST.VIOLATION_TYPES.VIOLATION &&
             (showInReview === undefined || showInReview === (violation.showInReview ?? false)) &&
-            !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy) &&
-            (!allViolations || shouldShowDuplicateViolation(transaction.transactionID, violation, allViolations)),
+            !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, policy),
     );
 }
 
@@ -2020,7 +1990,16 @@ function hasDuplicateTransactions(
 
     return (
         reportTransactions.length > 0 &&
-        reportTransactions.some((transaction) => isDuplicate(transaction, currentUserEmail, currentUserAccountID, iouReport, policy, allTransactionViolations))
+        reportTransactions.some((transaction) =>
+            isDuplicate(
+                transaction,
+                currentUserEmail,
+                currentUserAccountID,
+                iouReport,
+                policy,
+                allTransactionViolations?.[ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS + transaction.transactionID],
+            ),
+        )
     );
 }
 
@@ -2944,7 +2923,6 @@ export {
     getCategoryTaxCodeAndAmount,
     isPerDiemRequest,
     isViolationDismissed,
-    shouldShowDuplicateViolation,
     isBrokenConnectionViolation,
     isPartialTransaction,
     isPendingCardOrScanningTransaction,
