@@ -11,6 +11,7 @@ import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import {getExistingTransactionID} from '@libs/IOUUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
+import {isInstantSubmitEnabled, isSubmitAndClose} from '@libs/PolicyUtils';
 import {getIOUActionForReportID, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     buildOptimisticCreatedReportAction,
@@ -1007,6 +1008,13 @@ function bulkDuplicateExpenses({
     let currentTargetReport = targetReport;
     let optimisticIOUReport: OnyxEntry<OnyxTypes.Report>;
 
+    // When instant-submit + submit-and-close is active, every expense closes
+    // its report immediately, so each iteration will always create a new
+    // report.  In that case we must never defer auto-submit — otherwise the
+    // first expense's report stays in Draft because the server was told to
+    // wait for more expenses that will never arrive on that report.
+    const policyAlwaysSplits = isInstantSubmitEnabled(targetPolicy) && isSubmitAndClose(targetPolicy);
+
     for (let i = 0; i < transactionsToDuplicate.length; i++) {
         const item = transactionsToDuplicate.at(i);
         if (!item) {
@@ -1018,17 +1026,19 @@ function bulkDuplicateExpenses({
 
         // If the previous iteration's report can't accept more transactions,
         // reset so this iteration creates its own independent report.
-        let isNewReportForThisExpense = false;
+        let reportWasSplit = false;
         if (optimisticIOUReport && !canAddTransaction(optimisticIOUReport)) {
             optimisticIOUReport = undefined;
             currentOptimisticIOUReportID = generateReportID();
             currentReportPreviewActionID = NumberUtils.rand64();
-            isNewReportForThisExpense = true;
+            reportWasSplit = true;
         }
 
-        // Don't defer auto-submit if this is the last expense, or if this
-        // expense starts a new report (the previous report was closed).
-        const shouldDeferAutoSubmit = !isLastExpense && !isNewReportForThisExpense;
+        // Defer auto-submit only when this isn't the last expense AND the
+        // report wasn't just split.  Once a split happens every subsequent
+        // expense will also split (the policy closes reports immediately),
+        // so none of them should defer.
+        const shouldDeferAutoSubmit = !isLastExpense && !reportWasSplit && !policyAlwaysSplits;
 
         const result = duplicateExpenseTransaction({
             transaction: item,
