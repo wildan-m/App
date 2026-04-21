@@ -7,6 +7,7 @@ import type {SearchOption} from '@libs/OptionsListUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Login, PersonalDetails, PersonalDetailsList} from '@src/types/onyx';
 import type NewGroupChatDraft from '@src/types/onyx/NewGroupChatDraft';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import type SelectedOption from './types';
 
 function useGroupDraftRestore(
@@ -30,7 +31,7 @@ function useGroupDraftRestore(
         return draft?.participants;
     };
 
-    const [draftParticipants, {status: draftParticipantsOnyxLoadingStatus}] = useOnyx(ONYXKEYS.NEW_GROUP_CHAT_DRAFT, {
+    const [draftParticipants, draftParticipantsMetadata] = useOnyx(ONYXKEYS.NEW_GROUP_CHAT_DRAFT, {
         selector: draftParticipantsSelector,
     });
 
@@ -89,7 +90,7 @@ function useGroupDraftRestore(
         syncDraftRemovals();
     }, [draftParticipants]);
 
-    const areRestoreInputsReady = areAllPersonalDetailOptionsLoaded && draftParticipantsOnyxLoadingStatus === 'loaded';
+    const areRestoreInputsReady = areAllPersonalDetailOptionsLoaded && !isLoadingOnyxValue(draftParticipantsMetadata);
 
     // handle reload with existing draft participants
     useEffect(() => {
