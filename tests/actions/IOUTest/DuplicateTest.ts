@@ -2370,8 +2370,10 @@ describe('actions/Duplicate', () => {
 
         const mockPolicy: Policy = {
             ...createRandomPolicy(1),
+            type: CONST.POLICY.TYPE.TEAM,
             autoReporting: false,
             harvesting: {enabled: false},
+            approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
         };
         const fakePolicyCategories = createRandomPolicyCategories(3);
         const policyExpenseChat = createRandomReport(1, CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT);
