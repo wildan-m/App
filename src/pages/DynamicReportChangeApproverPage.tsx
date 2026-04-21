@@ -56,9 +56,9 @@ function DynamicReportChangeApproverPage({report, policy, isLoadingReportData}: 
     const hasNavigatedToAddApproverRef = useRef(false);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.REPORT_CHANGE_APPROVER.path);
 
-    const goBack = useCallback(() => {
+    const goBack = () => {
         Navigation.goBack(backPath);
-    }, [backPath]);
+    }, [backPath];
 
     const changeApprover = useCallback(() => {
         if (!selectedApproverType) {
