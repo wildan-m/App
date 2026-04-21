@@ -1,9 +1,22 @@
+import {differenceInDays} from 'date-fns';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {TryNewDot} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
+const CLASSIC_REDIRECT_STALE_THRESHOLD_IN_DAYS = 30;
+
 function isLockedToNewApp(tryNewDot: OnyxEntry<TryNewDot>): boolean {
     return tryNewDot?.isLockedToNewApp === true;
+}
+
+function isClassicRedirectStale(tryNewDot: OnyxEntry<TryNewDot>): boolean {
+    const classicRedirect = tryNewDot?.classicRedirect;
+    if (!classicRedirect || classicRedirect.dismissed !== false || !classicRedirect.timestamp) {
+        return false;
+    }
+
+    const daysSinceNudge = differenceInDays(new Date(), new Date(classicRedirect.timestamp));
+    return daysSinceNudge >= CLASSIC_REDIRECT_STALE_THRESHOLD_IN_DAYS;
 }
 
 function shouldBlockOldAppExit(tryNewDot: OnyxEntry<TryNewDot>, isLoadingTryNewDot: boolean, shouldSetNVP: boolean): boolean {
@@ -34,4 +47,4 @@ function shouldUseOldApp(tryNewDot: TryNewDot): boolean | undefined {
     return tryNewDot.classicRedirect.dismissed;
 }
 
-export {isLockedToNewApp, isOldAppRedirectBlocked, shouldBlockOldAppExit, shouldHideOldAppRedirect, shouldUseOldApp};
+export {isClassicRedirectStale, isLockedToNewApp, isOldAppRedirectBlocked, shouldBlockOldAppExit, shouldHideOldAppRedirect, shouldUseOldApp};
