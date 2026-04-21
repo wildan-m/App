@@ -1,4 +1,5 @@
 import {Str} from 'expensify-common';
+import type {ValueOf} from 'type-fest';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type OnyxState from '@src/types/onyx/OnyxState';
 import type {MaskOnyxState} from './types';
@@ -92,7 +93,7 @@ const ONYX_KEY_EXPORT_RULES: Record<string, ExportRule> = {
     },
 };
 
-const onyxKeysToRemove = new Set<string>([
+const onyxKeysToRemove = new Set<ValueOf<typeof ONYXKEYS> | ValueOf<typeof ONYXKEYS.DERIVED>>([
     ONYXKEYS.NVP_PRIVATE_PUSH_NOTIFICATION_ID,
     ONYXKEYS.NVP_PRIVATE_STRIPE_CUSTOMER_ID,
     ONYXKEYS.NVP_PRIVATE_BILLING_DISPUTE_PENDING,
@@ -358,7 +359,7 @@ const removePrivateOnyxKeys = (onyxState: OnyxState): OnyxState => {
     const newState: OnyxState = {};
 
     for (const key of Object.keys(onyxState)) {
-        if (onyxKeysToRemove.has(key)) {
+        if (onyxKeysToRemove.has(key as ValueOf<typeof ONYXKEYS> | ValueOf<typeof ONYXKEYS.DERIVED>)) {
             continue;
         }
         newState[key] = onyxState[key];
