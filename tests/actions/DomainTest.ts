@@ -1058,7 +1058,7 @@ describe('actions/Domain', () => {
                     failureData: expect.arrayContaining([
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: currentSecurityGroup},
+                            value: {[SECURITY_GROUP_KEY]: {[settingsName]: currentSecurityGroup[settingsName]}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
