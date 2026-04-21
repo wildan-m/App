@@ -4254,8 +4254,8 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             budgetFrequencyUnit: {monthly: '月', yearly: '年'},
             budgetTypeForNotificationMessage: {tag: 'タグ', category: 'カテゴリ'},
             travelInvoicing: 'Expensify Travel 買掛金のエクスポート先',
-            travelInvoicingVendor: '出張業者',
-            travelInvoicingPayableAccount: '旅費未払勘定',
+            travelInvoicingVendor: '出張ベンダー',
+            travelInvoicingPayableAccount: '旅費未払金勘定',
             hr: '人事',
         },
         receiptPartners: {
