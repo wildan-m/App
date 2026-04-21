@@ -43,55 +43,40 @@ function useSavedSearchTitles({
     const deferredAllFeeds = useDeferredValue(allFeeds);
     const deferredFeedKeysWithCards = useDeferredValue(feedKeysWithCards);
 
-    return useMemo(() => {
-        const titles = new Map<string, string>();
+    const titles = new Map<string, string>();
 
-        if (!savedSearches || !enabled) {
-            return titles;
-        }
-
-        for (const item of Object.values(savedSearches)) {
-            if (item.name !== item.query || titles.has(item.query)) {
-                continue;
-            }
-
-            const itemJsonQuery = buildSearchQueryJSON(item.query);
-            if (!itemJsonQuery) {
-                continue;
-            }
-
-            const title = buildUserReadableQueryString({
-                queryJSON: itemJsonQuery,
-                PersonalDetails: deferredPersonalDetails,
-                reports: deferredReports,
-                taxRates: deferredTaxRates,
-                cardList: deferredCardsForSavedSearchDisplay,
-                cardFeeds: deferredAllFeeds,
-                policies: deferredPolicies,
-                currentUserAccountID,
-                autoCompleteWithSpace: false,
-                translate,
-                feedKeysWithCards: deferredFeedKeysWithCards,
-                reportAttributes: deferredReportAttributes,
-            });
-            titles.set(item.query, title);
-        }
-
+    if (!savedSearches || !enabled) {
         return titles;
-    }, [
-        deferredAllFeeds,
-        deferredPolicies,
-        deferredCardsForSavedSearchDisplay,
-        currentUserAccountID,
-        deferredFeedKeysWithCards,
-        deferredPersonalDetails,
-        deferredReportAttributes,
-        deferredReports,
-        savedSearches,
-        enabled,
-        deferredTaxRates,
-        translate,
-    ]);
+    }
+
+    for (const item of Object.values(savedSearches)) {
+        if (item.name !== item.query || titles.has(item.query)) {
+            continue;
+        }
+
+        const itemJsonQuery = buildSearchQueryJSON(item.query);
+        if (!itemJsonQuery) {
+            continue;
+        }
+
+        const title = buildUserReadableQueryString({
+            queryJSON: itemJsonQuery,
+            PersonalDetails: deferredPersonalDetails,
+            reports: deferredReports,
+            taxRates: deferredTaxRates,
+            cardList: deferredCardsForSavedSearchDisplay,
+            cardFeeds: deferredAllFeeds,
+            policies: deferredPolicies,
+            currentUserAccountID,
+            autoCompleteWithSpace: false,
+            translate,
+            feedKeysWithCards: deferredFeedKeysWithCards,
+            reportAttributes: deferredReportAttributes,
+        });
+        titles.set(item.query, title);
+    }
+
+    return titles;
 }
 
 export default useSavedSearchTitles;
