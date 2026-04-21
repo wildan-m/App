@@ -136,8 +136,10 @@ describe('Pop to sidebar after resize from wide to narrow layout', () => {
                 Navigation.navigate(ROUTES.SETTINGS_ABOUT);
             });
 
-            const tabStateAfterNav = navigationRef.current?.getRootState().routes.at(0)?.state;
-            const activeTabAfterNav = tabStateAfterNav?.routes.find((route) => route.name === NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR);
+            // Cross-tab navigate pushes a new TAB_NAVIGATOR on top (for swipe-back UX),
+            // with SETTINGS_SPLIT_NAVIGATOR active and SETTINGS.ABOUT in its nested stack.
+            const pushedTabState = navigationRef.current?.getRootState().routes.at(-1)?.state;
+            const activeTabAfterNav = pushedTabState?.routes.at(pushedTabState?.index ?? 0);
             expect(activeTabAfterNav?.name).toBe(NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR);
             expect(activeTabAfterNav?.state?.routes.at(-1)?.name).toBe(SCREENS.SETTINGS.ABOUT);
 
@@ -147,7 +149,7 @@ describe('Pop to sidebar after resize from wide to narrow layout', () => {
             });
 
             // Then the top screen should be replaced with LHN
-            const tabStateAfterPop = navigationRef.current?.getRootState().routes.at(0)?.state;
+            const tabStateAfterPop = navigationRef.current?.getRootState().routes.at(-1)?.state;
             const activeTabAfterPop = tabStateAfterPop?.routes.at(tabStateAfterPop?.index ?? 0);
             expect(activeTabAfterPop?.state?.index).toBe(0);
             expect(activeTabAfterPop?.state?.routes.at(-1)?.name).toBe(SCREENS.SETTINGS.ROOT);

@@ -111,14 +111,9 @@ describe('getActiveScreenInRoute', () => {
 });
 
 describe('shouldChangeToMatchingFullScreen', () => {
-    it('returns true when names differ (non-HOME)', () => {
+    it('returns true when names differ', () => {
         const result = shouldChangeToMatchingFullScreen({name: 'SomeRHPScreen', key: 'k1'}, {name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR}, {name: NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR});
         expect(result).toBe(true);
-    });
-
-    it('returns false when lastFullScreenRoute is HOME and names differ', () => {
-        const result = shouldChangeToMatchingFullScreen({name: 'SomeRHPScreen', key: 'k1'}, {name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR}, {name: SCREENS.HOME});
-        expect(result).toBe(false);
     });
 
     it('returns false when names are the same and active screens match', () => {

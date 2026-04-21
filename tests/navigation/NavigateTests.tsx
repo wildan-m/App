@@ -181,10 +181,12 @@ describe('Navigate', () => {
                 Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute('1'));
             });
 
-            // Then switch to the reports split navigator tab
+            // Then a new TAB_NAVIGATOR is pushed on top with the reports split navigator active,
+            // so swipe-back reveals the original tab (the settings split navigator).
             const rootStateAfterNavigate = navigationRef.current?.getRootState();
-            const tabStateAfterNavigate = rootStateAfterNavigate?.routes.at(0)?.state;
-            const activeTabAfterNavigate = tabStateAfterNavigate?.routes.at(tabStateAfterNavigate?.index ?? 0);
+            const pushedTabState = rootStateAfterNavigate?.routes.at(-1)?.state;
+            const activeTabAfterNavigate = pushedTabState?.routes.at(pushedTabState?.index ?? 0);
+            expect(rootStateAfterNavigate?.routes.at(-1)?.name).toBe(NAVIGATORS.TAB_NAVIGATOR);
             expect(activeTabAfterNavigate?.name).toBe(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR);
         });
 
