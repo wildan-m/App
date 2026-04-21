@@ -1018,11 +1018,17 @@ function bulkDuplicateExpenses({
 
         // If the previous iteration's report can't accept more transactions,
         // reset so this iteration creates its own independent report.
+        let isNewReportForThisExpense = false;
         if (optimisticIOUReport && !canAddTransaction(optimisticIOUReport)) {
             optimisticIOUReport = undefined;
             currentOptimisticIOUReportID = generateReportID();
             currentReportPreviewActionID = NumberUtils.rand64();
+            isNewReportForThisExpense = true;
         }
+
+        // Don't defer auto-submit if this is the last expense, or if this
+        // expense starts a new report (the previous report was closed).
+        const shouldDeferAutoSubmit = !isLastExpense && !isNewReportForThisExpense;
 
         const result = duplicateExpenseTransaction({
             transaction: item,
@@ -1045,7 +1051,7 @@ function bulkDuplicateExpenses({
             recentWaypoints,
             targetPolicyTags,
             shouldPlaySound: false,
-            shouldDeferAutoSubmit: !isLastExpense,
+            shouldDeferAutoSubmit,
             existingIOUReport: optimisticIOUReport,
             optimisticReportPreviewActionID: currentReportPreviewActionID,
         });
