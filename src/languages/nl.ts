@@ -435,7 +435,6 @@ const translations: TranslationDeepObject<typeof en> = {
         collapsed: 'Ingeklapt',
         expanded: 'Uitgeklapt',
         expenseReport: 'Declaratie',
-        expenseReports: 'Declaraties',
         rateOutOfPolicy: 'Tarief buiten beleid',
         leaveWorkspace: 'Werkruimte verlaten',
         leaveWorkspaceConfirmation: 'Als je deze workspace verlaat, kun je er geen declaraties meer naartoe indienen.',
@@ -454,9 +453,6 @@ const translations: TranslationDeepObject<typeof en> = {
         comments: 'Opmerkingen',
         sharedIn: 'Gedeeld in',
         unreported: 'Niet gerapporteerd',
-        explore: 'Ontdekken',
-        insights: 'Inzichten',
-        todo: 'To-do',
         invoice: 'Factuur',
         expense: 'Declaratie',
         chat: 'Chat',
@@ -883,6 +879,8 @@ const translations: TranslationDeepObject<typeof en> = {
     adminOnlyCanPost: 'Alleen beheerders kunnen berichten sturen in deze ruimte.',
     reportAction: {
         asCopilot: 'als copiloot voor',
+        assistedBy: (agentName: string) => `bijgestaan door ${agentName}`,
+        humanSupportAgent: 'een menselijke medewerker',
         harvestCreatedExpenseReport: (reportUrl: string, reportName: string) =>
             `heeft dit rapport gemaakt om alle uitgaven van <a href="${reportUrl}">${reportName}</a> te bewaren die niet konden worden ingediend op de door jou gekozen frequentie`,
         createdReportForUnapprovedTransactions: ({reportUrl, reportName, reportID, isReportDeleted}: CreatedReportForUnapprovedTransactionsParams) =>
@@ -1667,6 +1665,7 @@ const translations: TranslationDeepObject<typeof en> = {
             prompt: 'Schakel belastingregistratie in voor de workspace om de onkostendetails te bewerken of de belasting uit deze onkostendeclaratie te verwijderen.',
             confirmText: 'Belasting verwijderen',
         },
+        bulkDuplicateLimit: `Je kunt maximaal ${CONST.SEARCH.BULK_DUPLICATE_LIMIT} uitgaven tegelijk dupliceren. Selecteer minder uitgaven en probeer het opnieuw.`,
         deleted: 'Verwijderd',
     },
     transactionMerge: {
@@ -2608,6 +2607,9 @@ ${amount} voor ${merchant} - ${date}`,
     workflowsExpensesFromPage: {
         title: 'Uitgaven vanaf',
         header: 'Wanneer de volgende leden onkosten indienen:',
+        memberAlreadyInWorkflowTitle: 'Lid bevindt zich al in een workflow',
+        memberAlreadyInWorkflowPrompt: ({memberName, approverName}: {memberName: string; approverName: string}) =>
+            `${memberName} bevindt zich al in een goedkeuringsworkflow die indient bij ${approverName}. Door het lid hier toe te voegen, wordt het naar deze workflow verplaatst.`,
     },
     workflowsApproverPage: {
         genericErrorMessage: 'De fiatteur kon niet worden gewijzigd. Probeer het opnieuw of neem contact op met support.',
@@ -4158,7 +4160,6 @@ ${amount} voor ${merchant} - ${date}`,
             everyone: 'Iedereen',
             delete: 'Werkruimte verwijderen',
             settings: 'Instellingen',
-            reimburse: 'Terugbetalingen',
             categories: 'Categorieën',
             tags: 'Tags',
             customField1: 'Aangepast veld 1',
@@ -4282,6 +4283,7 @@ ${amount} voor ${merchant} - ${date}`,
             budgetFrequencyUnit: {monthly: 'maand', yearly: 'jaar'},
             budgetTypeForNotificationMessage: {tag: 'tag', category: 'categorie'},
             deepDiveExpensifyCard: `<muted-text-label>Transacties met de Expensify Kaart worden automatisch geëxporteerd naar een "Expensify Kaart Passivarekening" dat wordt aangemaakt via <a href="${CONST.DEEP_DIVE_EXPENSIFY_CARD}">onze integratie</a>.</muted-text-label>`,
+            hr: 'HR',
         },
         receiptPartners: {
             uber: {
@@ -4885,6 +4887,9 @@ ${amount} voor ${merchant} - ${date}`,
             noAccountsFoundDescription: 'Voeg het account toe in NetSuite en synchroniseer de verbinding opnieuw',
             noVendorsFound: 'Geen leveranciers gevonden',
             noVendorsFoundDescription: 'Voeg leveranciers toe in NetSuite en synchroniseer de verbinding opnieuw',
+            travelInvoicing: 'Expensify Travel-tegoed exporteren naar',
+            travelInvoicingVendor: 'Reisaanbieder',
+            travelInvoicingPayableAccount: 'Rekening te betalen reizen',
             noItemsFound: 'Geen factuurregels gevonden',
             noItemsFoundDescription: 'Voeg factuurregels toe in NetSuite en synchroniseer de verbinding opnieuw',
             noSubsidiariesFound: 'Geen dochterondernemingen gevonden',
@@ -6608,6 +6613,13 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 upgradeWorkspaceWarning: `Kan werkruimte niet upgraden`,
                 upgradeWorkspaceWarningForRestrictedPolicyCreationPrompt: 'Je bedrijf heeft het aanmaken van werkruimtes beperkt. Neem contact op met een admin voor hulp.',
             },
+            hr: {
+                title: 'HR-integraties',
+                description:
+                    'Koppel je HR-provider om automatisch werknemers te synchroniseren en goedkeuringsworkflows te beheren. Houd je teamoverzicht en rapportagestructuur up-to-date zonder handmatig werk.',
+                onlyAvailableOnPlan: ({formattedPrice, hasTeam2025Pricing}: {formattedPrice: string; hasTeam2025Pricing: boolean}) =>
+                    `<muted-text>HR-integraties zijn alleen beschikbaar in het Control-abonnement, vanaf <strong>${formattedPrice}</strong> ${hasTeam2025Pricing ? `per lid per maand.` : `per actief lid per maand.`}</muted-text>`,
+            },
         },
         downgrade: {
             commonFeatures: {
@@ -6907,6 +6919,31 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 other: `Je hebt je vastgelegd op ${count} actieve leden op het Control-abonnement totdat je jaarlijkse abonnement eindigt op ${annualSubscriptionEndDate}. Je kunt overschakelen naar een betaling-per-gebruik-abonnement en downgraden naar het Collect-abonnement vanaf ${annualSubscriptionEndDate} door automatisch verlengen uit te schakelen in`,
             }),
             subscriptions: 'Abonnementen',
+        },
+        hr: {
+            title: 'HR',
+            subtitle: 'Koppel HR-tools en houd goedkeuringen van medewerkers gesynchroniseerd.',
+            settingsTitle: 'Gusto-instellingen',
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
+                switch (stage) {
+                    case 'startingImportGusto':
+                        return 'Gusto-gegevens importeren';
+                    case 'gustoSyncLoadCompany':
+                        return 'Gusto-bedrijfsgegevens laden';
+                    case 'gustoSyncImportEmployees':
+                        return 'Werknemers importeren';
+                    case 'gustoSyncBuildApprovalChains':
+                        return 'Goedkeuringstrajecten opbouwen';
+                    case 'gustoSyncFinalize':
+                        return 'Synchronisatie voltooien';
+                    case 'jobDone':
+                        return 'Wachten tot geïmporteerde gegevens zijn geladen';
+                    default: {
+                        return `Vertaling ontbreekt voor fase: ${stage}`;
+                    }
+                }
+            },
+            gusto: {title: 'Gusto', approvalMode: 'Goedkeuringsmodus', finalApprover: 'Laatste fiatteur'},
         },
     },
     getAssistancePage: {
@@ -7553,20 +7590,11 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         resetColumns: 'Kolommen opnieuw instellen',
         groupColumns: 'Kolommen groeperen',
         expenseColumns: 'Onkostencolommen',
-        statements: 'Afschriften',
-        cardStatements: 'Kaartafschriften',
-        monthlyAccrual: 'Maandelijkse opbouw',
-        unapprovedCash: 'Niet-goedgekeurde contante uitgaven',
-        unapprovedCard: 'Niet-goedgekeurde kaart',
-        reconciliation: 'Afstemming',
-        topSpenders: 'Grootste uitgaven doeners',
         saveSearch: 'Zoekopdracht opslaan',
         deleteSavedSearch: 'Opgeslagen zoekopdracht verwijderen',
         deleteSavedSearchConfirm: 'Weet je zeker dat je deze zoekopdracht wilt verwijderen?',
         searchName: 'Zoeknaam',
         savedSearchesMenuItemTitle: 'Opgeslagen',
-        topCategories: 'Topcategorieën',
-        topMerchants: 'Topverkopers',
         groupedExpenses: 'gegroepeerde uitgaven',
         bulkActions: {
             editMultiple: 'Meerdere bewerken',
@@ -7727,6 +7755,24 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             [CONST.SEARCH.GROUP_BY.QUARTER]: 'Kwartalen',
         },
         spendOverTime: 'Uitgaven in de tijd',
+        tabs: {
+            expenseReports: 'Declaraties',
+            reports: 'Alle rapporten',
+            expenses: 'Alle uitgaven',
+            submit: 'Concepten',
+            approve: 'Moet worden goedgekeurd',
+            pay: 'Klaar om te betalen',
+            accounting: 'Boekhouding',
+            export: 'Wachten op export',
+            unapprovedCash: 'Kasverplichtingen',
+            unapprovedCard: 'Kaartoplopende posten',
+            statements: 'Kaartafschriften',
+            reconciliation: 'Bankafstemming',
+            insights: 'Inzichten',
+            topSpenders: 'Grootste uitgaven doeners',
+            topCategories: 'Topcategorieën',
+            topMerchants: 'Topverkopers',
+        },
     },
     genericErrorPage: {
         title: 'Oeps, er is iets misgegaan!',
@@ -8569,6 +8615,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         details: {
             title: 'Abonnementsgegevens',
             annual: 'Jaarabonnement',
+            creditBalance: 'Creditsaldo',
             taxExempt: 'Vrijstelling van belasting aanvragen',
             taxExemptEnabled: 'Vrijgesteld van belasting',
             taxExemptStatus: 'Belastingvrijstellingstatus',

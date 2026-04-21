@@ -43,7 +43,6 @@ import initSplitExpense from '@libs/actions/SplitExpenses';
 import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {getBrokenConnectionUrlToFixPersonalCard, getCompanyCardDescription} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getRateFromMerchant} from '@libs/MergeTransactionUtils';
@@ -179,7 +178,7 @@ function MoneyRequestView({
     const {isOffline} = useNetwork();
     const {environmentURL} = useEnvironment();
     const {translate, toLocaleDigit, localeCompare} = useLocalize();
-    const {getCurrencySymbol} = useCurrencyListActions();
+    const {convertToDisplayString, getCurrencySymbol} = useCurrencyListActions();
     const {getReportRHPActiveRoute} = useActiveRoute();
     const {showConfirmModal} = useConfirmModal();
     const [lastVisitedPath] = useOnyx(ONYXKEYS.LAST_VISITED_PATH);
@@ -322,7 +321,7 @@ function MoneyRequestView({
     const fallbackTaxRateTitle = transaction?.taxValue;
 
     const isSettled = isSettledReportUtils(moneyRequestReport);
-    const isCancelled = moneyRequestReport && moneyRequestReport?.isCancelledIOU;
+    const isCancelled = moneyRequestReport?.isCancelledIOU;
     const isChatReportArchived = useReportIsArchived(moneyRequestReport?.chatReportID);
     const pendingAction = transaction?.pendingAction;
     const shouldShowPaid = isSettled && transactionReimbursable && !pendingAction;
@@ -355,15 +354,34 @@ function MoneyRequestView({
     const canEditAmount =
         !isGPSDistanceRequest &&
         isEditable &&
-        (canEditFieldOfMoneyRequest({reportAction: parentReportAction, fieldToEdit: CONST.EDIT_REQUEST_FIELD.AMOUNT, isChatReportArchived, transaction}) ||
+        (canEditFieldOfMoneyRequest({
+            reportAction: parentReportAction,
+            fieldToEdit: CONST.EDIT_REQUEST_FIELD.AMOUNT,
+            isChatReportArchived,
+            transaction,
+        }) ||
             (shouldShowSplitIndicator && isSplitAvailable));
     const canEditMerchant =
         isEditable &&
-        canEditFieldOfMoneyRequest({reportAction: parentReportAction, fieldToEdit: CONST.EDIT_REQUEST_FIELD.MERCHANT, isChatReportArchived, transaction, report: moneyRequestReport, policy});
+        canEditFieldOfMoneyRequest({
+            reportAction: parentReportAction,
+            fieldToEdit: CONST.EDIT_REQUEST_FIELD.MERCHANT,
+            isChatReportArchived,
+            transaction,
+            report: moneyRequestReport,
+            policy,
+        });
 
     const canEditDate =
         isEditable &&
-        canEditFieldOfMoneyRequest({reportAction: parentReportAction, fieldToEdit: CONST.EDIT_REQUEST_FIELD.DATE, isChatReportArchived, transaction, report: moneyRequestReport, policy});
+        canEditFieldOfMoneyRequest({
+            reportAction: parentReportAction,
+            fieldToEdit: CONST.EDIT_REQUEST_FIELD.DATE,
+            isChatReportArchived,
+            transaction,
+            report: moneyRequestReport,
+            policy,
+        });
 
     const canEditDistanceOrRate = isPolicyAccessible(policy, currentUserEmailParam) || isTrackExpense || isP2PDistanceRequest;
 
@@ -455,12 +473,19 @@ function MoneyRequestView({
 
     const isTaxEnabled = isTaxTrackingEnabled(isPolicyExpenseChat || isExpenseUnreported, policy, isDistanceRequest, isPerDiemRequest, isTimeRequest);
     const shouldShowTaxDisabledAlert = !isTaxEnabled && !!transaction?.taxCode && !isTimeRequest && !isPerDiemRequest;
-    const shouldShowTax = isTaxEnabled || !!transaction?.taxName || shouldShowTaxDisabledAlert;
+    const shouldShowTax = isFromMergeTransaction ? !!transaction?.taxName : isTaxEnabled || shouldShowTaxDisabledAlert;
 
     let amountDescription = `${translate('iou.amount')}`;
     let dateDescription = `${translate('common.date')}`;
 
-    const {unit, rate, name: rateName} = DistanceRequestUtils.getRate({transaction: updatedTransaction ?? transaction, policy});
+    const {
+        unit,
+        rate,
+        name: rateName,
+    } = DistanceRequestUtils.getRate({
+        transaction: updatedTransaction ?? transaction,
+        policy,
+    });
     const distance = getDistanceInMeters(transactionBackup ?? updatedTransaction ?? transaction, unit);
     const currency = transactionCurrency ?? CONST.CURRENCY.USD;
     const hasRequiredCompanyCardViolation = transactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.COMPANY_CARD_REQUIRED);
@@ -1217,7 +1242,7 @@ function MoneyRequestView({
                 {shouldShowReimbursable && (
                     <OfflineWithFeedback
                         pendingAction={getPendingFieldAction('reimbursable')}
-                        contentContainerStyle={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.ml5, styles.mr8]}
+                        contentContainerStyle={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.mh5]}
                     >
                         <View>
                             <Text
@@ -1238,7 +1263,7 @@ function MoneyRequestView({
                 {shouldShowBillable && (
                     <OfflineWithFeedback
                         pendingAction={getPendingFieldAction('billable')}
-                        contentContainerStyle={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.ml5, styles.mr8]}
+                        contentContainerStyle={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.mh5]}
                     >
                         <View>
                             <Text
