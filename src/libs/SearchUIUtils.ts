@@ -4132,7 +4132,27 @@ function getOverflowMenu(
     showDeleteModal: (hash: number) => void,
     isMobileMenu?: boolean,
     closeMenu?: () => void,
+    shareOptions?: {
+        isCopied: boolean;
+        onShare: (hash: number, query: string, name: string) => void;
+        sendIcon: IconAsset;
+        checkmarkIcon: IconAsset;
+    },
 ) {
+    const shareItem = shareOptions
+        ? [
+              {
+                  text: shareOptions.isCopied ? translate('common.copied') : translate('common.share'),
+                  onSelected: () => {
+                      shareOptions.onShare(hash, inputQuery, itemName);
+                  },
+                  icon: shareOptions.isCopied ? shareOptions.checkmarkIcon : shareOptions.sendIcon,
+                  shouldShowRightIcon: false,
+                  shouldShowRightComponent: false,
+                  shouldKeepModalOpen: true,
+              },
+          ]
+        : [];
     return [
         {
             text: translate('common.rename'),
@@ -4147,6 +4167,7 @@ function getOverflowMenu(
             shouldShowRightComponent: false,
             shouldCallAfterModalHide: true,
         },
+        ...shareItem,
         {
             text: translate('common.delete'),
             onSelected: () => {

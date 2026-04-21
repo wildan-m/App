@@ -1,6 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import {accountIDSelector} from '@selectors/Session';
-import React from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import MenuItemList from '@components/MenuItemList';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
@@ -15,6 +15,8 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
+import Clipboard from '@libs/Clipboard';
+import {getEnvironmentURL} from '@libs/Environment/Environment';
 import Navigation from '@libs/Navigation/Navigation';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import {buildSearchQueryJSON, buildUserReadableQueryString} from '@libs/SearchQueryUtils';
@@ -26,6 +28,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 import SavedSearchItemThreeDotMenu from './SavedSearchItemThreeDotMenu';
+
+const COPIED_INDICATOR_DURATION_MS = 1800;
 
 type SavedSearchListProps = {
     hash: number | undefined;
@@ -55,12 +59,36 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         hideProductTrainingTooltip: hideSavedSearchTooltip,
     } = useProductTrainingContext(CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.RENAME_SAVED_SEARCH, isFocused);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark', 'Pencil', 'Trashcan']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark', 'Pencil', 'Trashcan', 'Send', 'Checkmark']);
 
     const taxRates = getAllTaxRates(allPolicies);
     const cardsForSavedSearchDisplay = mergeCardListWithWorkspaceFeeds(workspaceCardList ?? CONST.EMPTY_OBJECT, cardList);
 
-    const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal);
+    const [copiedHash, setCopiedHash] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (copiedHash === null) {
+            return;
+        }
+        const timer = setTimeout(() => setCopiedHash(null), COPIED_INDICATOR_DURATION_MS);
+        return () => clearTimeout(timer);
+    }, [copiedHash]);
+
+    const handleShareSavedSearch = useCallback((itemHash: number, itemQuery: string, itemTitle: string) => {
+        getEnvironmentURL().then((environmentURL) => {
+            const sharePath = ROUTES.SEARCH_ROOT.getRoute({query: itemQuery, name: itemTitle});
+            Clipboard.setString(`${environmentURL}/${sharePath}`);
+            setCopiedHash(itemHash);
+        });
+    }, []);
+
+    const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) =>
+        getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal, undefined, undefined, {
+            isCopied: copiedHash === itemHash,
+            onShare: handleShareSavedSearch,
+            sendIcon: expensifyIcons.Send,
+            checkmarkIcon: expensifyIcons.Checkmark,
+        });
 
     const createSavedSearchMenuItem = (item: SaveSearchItem, key: string, index: number) => {
         let title = item.name;
