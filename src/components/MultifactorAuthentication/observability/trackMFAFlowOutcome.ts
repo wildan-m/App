@@ -5,7 +5,7 @@ import Log from '@libs/Log';
 import type {AuthTypeName, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import CONST from '@src/CONST';
 
-type FailureClassification = 'routine' | 'anomalous' | 'unclassified';
+type FailureClassification = 'routine' | 'alternative_outcome' | 'anomalous' | 'unclassified';
 
 function classifyFailure(reason: MultifactorAuthenticationReason | undefined): FailureClassification {
     if (!reason) {
@@ -13,6 +13,9 @@ function classifyFailure(reason: MultifactorAuthenticationReason | undefined): F
     }
     if (CONST.MULTIFACTOR_AUTHENTICATION.ROUTINE_FAILURES.has(reason)) {
         return 'routine';
+    }
+    if (CONST.MULTIFACTOR_AUTHENTICATION.ALTERNATIVE_OUTCOMES.has(reason)) {
+        return 'alternative_outcome';
     }
     if (CONST.MULTIFACTOR_AUTHENTICATION.ANOMALOUS_FAILURES.has(reason)) {
         return 'anomalous';
@@ -52,7 +55,7 @@ function trackMFAFlowOutcome(context: MFAFlowOutcomeContext): void {
         }
 
         const eventMessage = context.isSuccessful ? 'MFA Flow Success' : `MFA Flow Error: ${context.error?.reason ?? ''}`;
-        const level = context.isSuccessful || failureClassification === 'routine' ? 'info' : 'error';
+        const level = context.isSuccessful || failureClassification === 'routine' || failureClassification === 'alternative_outcome' ? 'info' : 'error';
 
         const extra = {
             isSuccessful: context.isSuccessful,

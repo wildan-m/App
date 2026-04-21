@@ -179,6 +179,9 @@ const ROUTINE_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.HSM.AUTHENTICATION_FAILED,
 ]);
 
+/** Non-error flow outcomes that are not MFA successes but represent valid, expected terminal states (e.g. user-initiated deny). Logged at 'info' level. */
+const ALTERNATIVE_OUTCOMES = new Set<ReasonValue>([REASON.FLOW_OUTCOMES.TRANSACTION_DENIED]);
+
 /** Known errors that should rarely happen and may indicate a bug or unexpected state. Logged at 'error' level. Any reason not in either set is treated as UNCLASSIFIED (e.g. missing reason). */
 const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.CLIENT_ERRORS.REGISTRATION_REQUIRED,
@@ -250,6 +253,7 @@ const SHARED_VALUES = {
     REASON,
     HTTP_STATUS,
     ROUTINE_FAILURES,
+    ALTERNATIVE_OUTCOMES,
     ANOMALOUS_FAILURES,
 
     /**
