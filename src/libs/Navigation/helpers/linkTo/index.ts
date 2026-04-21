@@ -49,7 +49,7 @@ function arePathAndBackToEqual(stateFromPath: PartialState<NavigationState<RootN
 }
 
 function shouldCheckFullScreenRouteMatching(action: StackNavigationAction): action is StackNavigationAction & {type: 'PUSH'; payload: {name: typeof NAVIGATORS.RIGHT_MODAL_NAVIGATOR}} {
-    return action !== undefined && action.type === 'PUSH' && action.payload.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
+    return action?.type === 'PUSH' && action.payload.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
 }
 
 function isNavigatingToAttachmentScreen(focusedRouteName?: string) {
@@ -97,12 +97,6 @@ function shouldChangeToMatchingFullScreen(
     lastFullScreenRoute: NavigationPartialRoute,
 ) {
     if (matchingFullScreenRoute.name !== lastFullScreenRoute.name) {
-        // HOME has no RHP children (HOME_TO_RHP maps to []).
-        // Pushing another fullscreen under HOME causes Android to trim HOME
-        // from the render tree, reversing the back animation direction.
-        if (lastFullScreenRoute.name === SCREENS.HOME) {
-            return false;
-        }
         return true;
     }
 
