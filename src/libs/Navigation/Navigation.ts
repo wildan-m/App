@@ -451,7 +451,7 @@ function goUp(backToRoute: Route, options?: GoBackOptions) {
         // already has the target tab active, pop to it instead of jumping — otherwise the pushed
         // tab's deep leaf lingers and resurfaces with a close animation on later tab switches.
         const topRootIndex = rootState.index ?? rootState.routes.length - 1;
-        const underlyingTabNavIndex = rootState.routes.findIndex(
+        const underlyingTabNavIndex = rootState.routes.findLastIndex(
             (route, idx) => idx < topRootIndex && route.name === NAVIGATORS.TAB_NAVIGATOR && route.state?.routes?.at(route.state?.index ?? 0)?.name === payload.name,
         );
         if (underlyingTabNavIndex !== -1) {
@@ -1126,7 +1126,7 @@ function removePreInsertedFullscreenIfNeeded() {
         if (originalTabName) {
             requestAnimationFrame(() => {
                 const currentState = navigationRef.getRootState();
-                const tabNavRoute = currentState?.routes.find((r) => r.name === NAVIGATORS.TAB_NAVIGATOR);
+                const tabNavRoute = currentState?.routes.findLast((r) => r.name === NAVIGATORS.TAB_NAVIGATOR);
                 if (!tabNavRoute?.state?.key) {
                     return;
                 }
