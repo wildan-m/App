@@ -1,4 +1,4 @@
-import {useDeferredValue, useMemo} from 'react';
+import {useDeferredValue} from 'react';
 import {buildSearchQueryJSON, buildUserReadableQueryString} from '@libs/SearchQueryUtils';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 
