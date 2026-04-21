@@ -1,10 +1,12 @@
 import sortBy from 'lodash/sortBy';
 import React, {useContext, useRef} from 'react';
 import {InteractionManager, View} from 'react-native';
+import {importEmojiLocale} from '@assets/emojis';
 import type {Emoji} from '@assets/emojis/types';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Tooltip from '@components/Tooltip/PopoverAnchorTooltip';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getEmojiReactionDetails} from '@libs/EmojiUtils';
@@ -14,6 +16,7 @@ import type {ReactionListAnchor, ReactionListEvent} from '@pages/inbox/ReportScr
 import {toggleEmojiReaction} from '@userActions/Report';
 import {isAnonymousUser, signOutAndRedirectToSignIn} from '@userActions/Session';
 import CONST from '@src/CONST';
+import {isFullySupportedLocale} from '@src/CONST/LOCALES';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction, ReportActionReactions} from '@src/types/onyx';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
@@ -71,6 +74,7 @@ type FormattedReaction = {
 
 function ReportActionItemEmojiReactions({reportAction, reportID, shouldBlockReactions = false, setIsEmojiPickerActive}: ReportActionItemEmojiReactionsProps) {
     const styles = useThemeStyles();
+    const {preferredLocale} = useLocalize();
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const reactionListRef = useContext(ReactionListContext);
     const popoverReactionListAnchors = useRef<PopoverReactionListAnchors>({});
@@ -78,6 +82,12 @@ function ReportActionItemEmojiReactions({reportAction, reportID, shouldBlockReac
 
     const reportActionID = reportAction.reportActionID;
     const [emojiReactions = getEmptyObject<ReportActionReactions>()] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${reportActionID}`);
+
+    // Prime the locale emoji table when this action has reactions.
+    // Skip the default locale since getLocalizedEmojiName never reads localeEmojis for it.
+    if (preferredLocale && preferredLocale !== CONST.LOCALES.DEFAULT && emojiReactions !== CONST.EMPTY_OBJECT && isFullySupportedLocale(preferredLocale)) {
+        importEmojiLocale(preferredLocale);
+    }
 
     const toggleReaction = (emoji: Emoji, skinTone: number, ignoreSkinToneOnCompare?: boolean) => {
         if (isAnonymousUser()) {

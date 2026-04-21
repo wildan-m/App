@@ -1,5 +1,4 @@
 import React, {useMemo, useRef} from 'react';
-import {importEmojiLocale} from '@assets/emojis';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -9,7 +8,7 @@ import type {ListItem} from '@components/SelectionList/ListItem/types';
 import useLocalize from '@hooks/useLocalize';
 import Navigation from '@libs/Navigation/Navigation';
 import {setLocale} from '@userActions/App';
-import {isFullySupportedLocale, LOCALE_TO_LANGUAGE_STRING, SORTED_LOCALES} from '@src/CONST/LOCALES';
+import {LOCALE_TO_LANGUAGE_STRING, SORTED_LOCALES} from '@src/CONST/LOCALES';
 import type Locale from '@src/types/onyx/Locale';
 
 type LanguageEntry = ListItem & {
@@ -40,9 +39,6 @@ function LanguagePage() {
         isOptionSelected.current = true;
 
         setLocale(selectedLanguage.value, preferredLocale);
-        if (isFullySupportedLocale(selectedLanguage.value)) {
-            importEmojiLocale(selectedLanguage.value);
-        }
         Navigation.goBack();
     };
 
