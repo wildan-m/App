@@ -1,5 +1,6 @@
 const oldRoutes: Record<string, string> = {
     /* eslint-disable @typescript-eslint/naming-convention */
+    '/settings/*/category/*/edit': '/settings/$1/category/$2/category-edit',
     '/settings/workspaces/*': '/workspaces/$1',
     '/settings/workspaces': '/workspaces',
     '/r/*/settings/name': '/r/$1/details/settings/name',
