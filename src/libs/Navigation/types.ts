@@ -385,12 +385,6 @@ type SettingsNavigatorParamList = {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
-        policyID: string;
-    };
-    [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
-        policyID: string;
-    };
     [SCREENS.WORKSPACE.CATEGORY_REQUIRE_RECEIPTS_OVER]: {
         policyID: string;
         categoryName: string;
@@ -2743,12 +2737,6 @@ type WorkspaceSplitNavigatorParamList = {
         policyID: string;
     };
     [SCREENS.WORKSPACE.HR]: {
-        policyID: string;
-    };
-    [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
-        policyID: string;
-    };
-    [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
         policyID: string;
     };
     [SCREENS.WORKSPACE.TAGS]: {

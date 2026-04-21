@@ -1040,12 +1040,6 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.CATEGORY_APPROVER]: {
                             path: ROUTES.WORKSPACE_CATEGORY_APPROVER.route,
                         },
-                        [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
-                            path: ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.route,
-                        },
-                        [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
-                            path: ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.route,
-                        },
                         [SCREENS.WORKSPACE.CATEGORY_REQUIRE_RECEIPTS_OVER]: {
                             path: ROUTES.WORKSPACE_CATEGORY_REQUIRE_RECEIPTS_OVER.route,
                         },

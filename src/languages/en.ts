@@ -6353,27 +6353,7 @@ const translations = {
             gusto: {
                 title: 'Gusto',
                 connect: 'Connect',
-                connected: 'Connected',
                 connectionDescription: 'Connect Gusto to keep employee approvals in sync with your workspace.',
-                lastSync: ({relativeDate}: {relativeDate: string}) => `Last synced ${relativeDate}`,
-                syncError: ({message}: {message: string}) => `Sync error: ${message}`,
-                disconnectPrompt: 'Disconnect Gusto from this workspace? You can reconnect it later.',
-                approvalMode: 'Approval mode',
-                approvalModeDescription: 'Choose how Gusto approval chains should be built in this workspace.',
-                approvalModeWarningTitle: 'Save approval mode',
-                approvalModeWarningPrompt: 'Changing the approval mode will rebuild Gusto approval chains on the next sync.',
-                finalApprover: 'Final approver',
-                notConfigured: 'Not configured',
-                approvalModes: {
-                    basic: 'Basic',
-                    manager: 'Manager',
-                    custom: 'Custom',
-                },
-                approvalModeDescriptions: {
-                    basic: 'Use a basic approval chain.',
-                    manager: 'Route approvals to each employee’s manager.',
-                    custom: 'Use the custom final approver for approvals.',
-                },
             },
         },
         export: {
