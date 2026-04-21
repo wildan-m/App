@@ -139,7 +139,6 @@ function IOURequestStepDistanceOdometer({
     const isTransactionDraft = shouldUseTransactionDraft(action, iouType);
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
-    const shouldEnableDiscardConfirmation = !isEditing;
     const isFocused = useIsFocused();
 
     const shouldUseDefaultExpensePolicy = useMemo(
@@ -555,7 +554,7 @@ function IOURequestStepDistanceOdometer({
 
     useDiscardChangesConfirmation({
         getHasUnsavedChanges: () => {
-            if (!isFocused || !shouldEnableDiscardConfirmation || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current) {
+            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current) {
                 return false;
             }
             const hasReadingChanges = startReadingRef.current !== initialStartReadingRef.current || endReadingRef.current !== initialEndReadingRef.current;
