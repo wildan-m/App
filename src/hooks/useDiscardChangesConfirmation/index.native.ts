@@ -8,7 +8,7 @@ import Log from '@libs/Log';
 import navigationRef from '@libs/Navigation/navigationRef';
 import type UseDiscardChangesConfirmationOptions from './types';
 
-function useDiscardChangesConfirmation({getHasUnsavedChanges, onVisibilityChange, onConfirm}: UseDiscardChangesConfirmationOptions) {
+function useDiscardChangesConfirmation({getHasUnsavedChanges, onCancel, onVisibilityChange, onConfirm}: UseDiscardChangesConfirmationOptions) {
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const [shouldAllowNavigation, setShouldAllowNavigation] = useState(false);
@@ -36,6 +36,7 @@ function useDiscardChangesConfirmation({getHasUnsavedChanges, onVisibilityChange
                 }).then((result) => {
                     onVisibilityChange?.(false);
                     if (result.action !== ModalActions.CONFIRM) {
+                        onCancel?.();
                         return;
                     }
                     const confirmNavigation = () => {
@@ -56,7 +57,7 @@ function useDiscardChangesConfirmation({getHasUnsavedChanges, onVisibilityChange
                         });
                 });
             },
-            [getHasUnsavedChanges, onVisibilityChange, onConfirm, showConfirmModal, translate],
+            [getHasUnsavedChanges, onCancel, onVisibilityChange, onConfirm, showConfirmModal, translate],
         ),
     );
 }
