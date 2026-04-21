@@ -34,7 +34,6 @@ const REASON = {
         ALREADY_DENIED_DENY_ATTEMPTED: 'Client: Already denied, deny attempted',
         ALREADY_DENIED_APPROVE_ATTEMPTED: 'Client: Already denied, approve attempted',
         ALREADY_REVIEWED: 'Client: Transaction already reviewed',
-        BAD_REQUEST: 'Client: Bad request',
         /** Unrecognized 4xx response from the backend with no specific handler. */
         UNRECOGNIZED: 'Client: Unrecognized client error',
     },
@@ -185,7 +184,6 @@ const ALTERNATIVE_OUTCOMES = new Set<ReasonValue>([REASON.FLOW_OUTCOMES.TRANSACT
 /** Known errors that should rarely happen and may indicate a bug or unexpected state. Logged at 'error' level. Any reason not in either set is treated as UNCLASSIFIED (e.g. missing reason). */
 const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.CLIENT_ERRORS.REGISTRATION_REQUIRED,
-    REASON.CLIENT_ERRORS.BAD_REQUEST,
     REASON.CLIENT_ERRORS.UNRECOGNIZED,
     REASON.SERVER_ERRORS.UNRECOGNIZED,
     REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE,
