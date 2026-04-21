@@ -23,7 +23,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import SCREENS, {PROTECTED_SCREENS} from '@src/SCREENS';
-import type {Account, SidePanel} from '@src/types/onyx';
+import type {SidePanel} from '@src/types/onyx';
 import getInitialSplitNavigatorState from './AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
 import originalCloseRHPFlow from './helpers/closeRHPFlow';
 import getPathFromState from './helpers/getPathFromState';
@@ -69,15 +69,6 @@ const SET_UP_2FA_SCREENS = new Set<string>([
 
 const MFA_FLOW_SCREENS = new Set<string>(Object.values(SCREENS.MULTIFACTOR_AUTHENTICATION));
 
-let account: OnyxEntry<Account>;
-// We have used `connectWithoutView` here because it is not connected to any UI
-Onyx.connectWithoutView({
-    key: ONYXKEYS.ACCOUNT,
-    callback: (value) => {
-        account = value;
-    },
-});
-
 let sidePanelNVP: OnyxEntry<SidePanel>;
 // `connectWithoutView` is used here because we want to avoid unnecessary re-renders when the side panel NVP changes
 // Also it is not directly connected to any UI
@@ -94,10 +85,6 @@ function isTwoFactorSetupScreen(screen: string | undefined): boolean {
 
 function isMFAFlowScreen(screen: string | undefined): boolean {
     return screen ? MFA_FLOW_SCREENS.has(screen) : false;
-}
-
-function shouldShowRequire2FAPage() {
-    return !!account?.needsTwoFactorAuthSetup && !account?.requiresTwoFactorAuth;
 }
 
 let resolveNavigationIsReadyPromise: () => void;
@@ -230,7 +217,7 @@ function getActiveRoute(): string {
         return '';
     }
 
-    const currentRoute = navigationRef.current && navigationRef.current.getCurrentRoute();
+    const currentRoute = navigationRef.current?.getCurrentRoute();
     if (!currentRoute?.name) {
         return '';
     }
@@ -590,11 +577,17 @@ function goBackToHome() {
 
 /**
  * Update route params for the specified route.
+ *
+ * @param targetKey - Optional navigator key to target the dispatch at. When provided,
+ *   the SET_PARAMS action is delivered directly to that navigator, which is required for
+ *   routes nested inside split navigators (where the default dispatch would fail if a
+ *   modal is focused). Can be obtained via `navigation.getState()?.key` in a component.
  */
-function setParams(params: Record<string, unknown>, routeKey = '') {
+function setParams(params: Record<string, unknown>, routeKey = '', targetKey?: string) {
     navigationRef.current?.dispatch({
         ...CommonActions.setParams(params),
         source: routeKey,
+        ...(targetKey && {target: targetKey}),
     });
 }
 
@@ -715,7 +708,7 @@ function getTopmostSuperWideRHPReportParams(
     }
     const topmostRightModalNavigator = state.routes?.at(-1);
 
-    if (!topmostRightModalNavigator || topmostRightModalNavigator.name !== NAVIGATORS.RIGHT_MODAL_NAVIGATOR) {
+    if (topmostRightModalNavigator?.name !== NAVIGATORS.RIGHT_MODAL_NAVIGATOR) {
         return;
     }
 
@@ -752,7 +745,7 @@ function getTopmostSuperWideRHPReportID(state: NavigationState = navigationRef.g
 function dismissModal({ref = navigationRef, afterTransition, waitForTransition}: {ref?: NavigationRef; afterTransition?: () => void; waitForTransition?: boolean} = {}) {
     clearSelectedTextIfComposerBlurred();
     const runImmediately = !waitForTransition;
-    isNavigationReady().then(() => {
+    const performDismiss = () => {
         TransitionTracker.runAfterTransitions({
             callback: () => {
                 ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
@@ -763,7 +756,13 @@ function dismissModal({ref = navigationRef, afterTransition, waitForTransition}:
             },
             runImmediately,
         });
-    });
+    };
+
+    if (ref.isReady()) {
+        performDismiss();
+    } else {
+        isNavigationReady().then(performDismiss);
+    }
 }
 
 /**
@@ -777,7 +776,7 @@ const dismissModalWithReport = (
     ref = navigationRef,
     options?: {onBeforeNavigate?: (willOpenReport: boolean) => void},
 ) => {
-    isNavigationReady().then(() => {
+    const dismissAndOpenReport = () => {
         const topmostSuperWideRHPReportID = getTopmostSuperWideRHPReportID();
         let areReportsIDsDefined = !!topmostSuperWideRHPReportID && !!reportID;
 
@@ -807,7 +806,13 @@ const dismissModalWithReport = (
                 navigate(reportRoute);
             },
         });
-    });
+    };
+
+    if (ref.isReady()) {
+        dismissAndOpenReport();
+    } else {
+        isNavigationReady().then(dismissAndOpenReport);
+    }
 };
 
 function popRootToTop() {
@@ -951,7 +956,7 @@ function dismissToSuperWideRHP(options: {afterTransition?: () => void} = {}) {
  *             useLinking detects the stale Home+RHP entry and replaces it with a Search
  *             push, yielding correct browser history [Home, Search].
  */
-function revealRouteBeforeDismissingModal(route: Route) {
+function revealRouteBeforeDismissingModal(route: Route, options?: {afterTransition?: () => void}) {
     if (getIsNarrowLayout()) {
         Log.warn('[Navigation] revealRouteBeforeDismissingModal should only be used on wide layouts.');
         return;
@@ -967,8 +972,11 @@ function revealRouteBeforeDismissingModal(route: Route) {
             type: CONST.NAVIGATION.ACTION_TYPE.REPLACE_FULLSCREEN_UNDER_RHP,
             payload: {route},
         });
+        // Nested rAF: the first frame commits the route insertion, the second
+        // frame starts the dismiss. This ensures React processes the two dispatches
+        // in separate renders so the dismiss animation is preserved.
         requestAnimationFrame(() => {
-            dismissModal();
+            dismissModal({afterTransition: options?.afterTransition});
         });
     });
 }
@@ -1030,6 +1038,10 @@ function preInsertFullscreenUnderRHP(route: Route) {
 
 function getIsFullscreenPreInsertedUnderRHP() {
     return isFullscreenPreInsertedUnderRHP;
+}
+
+function getPreInsertedFullscreenRouteName() {
+    return preInsertedFullscreenRouteName;
 }
 
 function clearFullscreenPreInsertedFlag() {
@@ -1148,6 +1160,7 @@ export default {
     revealRouteBeforeDismissingModal,
     preInsertFullscreenUnderRHP,
     getIsFullscreenPreInsertedUnderRHP,
+    getPreInsertedFullscreenRouteName,
     clearFullscreenPreInsertedFlag,
     removePreInsertedFullscreenIfNeeded,
     getTopmostSearchReportID,
@@ -1157,4 +1170,4 @@ export default {
     navigateBackToLastSuperWideRHPScreen,
 };
 
-export {navigationRef, getDeepestFocusedScreen, isTwoFactorSetupScreen, isMFAFlowScreen, shouldShowRequire2FAPage};
+export {navigationRef, getDeepestFocusedScreen, isTwoFactorSetupScreen, isMFAFlowScreen};
