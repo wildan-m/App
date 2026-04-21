@@ -101,7 +101,16 @@ function SearchEditMultiplePage() {
     const policyTags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`];
     const policyTagLists = getTagLists(policyTags);
 
-    const isTaxTrackingEnabled = !hasPerDiemOrTimeTransaction && selectedTransactionContexts.every(({transactionPolicy}) => !!transactionPolicy?.tax?.trackingEnabled);
+    const isTaxTrackingEnabled =
+        !hasPerDiemOrTimeTransaction &&
+        selectedTransactionContexts.every(({transaction, transactionPolicy}) => {
+            // Unreported (track) expenses have no report, so no per-transaction policy can be resolved.
+            // Fall back to the bulk-edit workspace policy (the same policy used to render the Tax row and picker).
+            if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
+                return !!policy?.tax?.trackingEnabled;
+            }
+            return !!transactionPolicy?.tax?.trackingEnabled;
+        });
     const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
         if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
             return true;
