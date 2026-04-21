@@ -46,7 +46,7 @@ function IOURequestStepUpgrade({
 }: IOURequestStepUpgradeProps) {
     const styles = useThemeStyles();
 
-    const {translate, toLocaleDigit} = useLocalize();
+    const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
@@ -82,7 +82,6 @@ function IOURequestStepUpgrade({
     const [allReportNextSteps] = useOnyx(ONYXKEYS.COLLECTION.NEXT_STEP);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [session] = useOnyx(ONYXKEYS.SESSION);
-    const [betas] = useOnyx(ONYXKEYS.BETAS);
 
     // Build transactions map from selectedTransactions (search results) instead of Onyx TRANSACTION collection
     // This ensures that transactions selected from search are properly included in the map passed to changeTransactionsReport
@@ -104,11 +103,9 @@ function IOURequestStepUpgrade({
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const hasViolations = hasViolationsReportUtils(undefined, transactionViolations, session?.accountID ?? CONST.DEFAULT_NUMBER_ID, session?.email ?? '');
+    const ownerAccountID = selectedReport?.ownerAccountID ?? currentUserPersonalDetails.accountID;
 
-    const ownerPersonalDetails = useMemo(
-        () => getPersonalDetailsForAccountID(selectedReport?.ownerAccountID, personalDetails) as PersonalDetails,
-        [personalDetails, selectedReport?.ownerAccountID],
-    );
+    const ownerPersonalDetails = useMemo(() => getPersonalDetailsForAccountID(ownerAccountID, personalDetails) as PersonalDetails, [personalDetails, ownerAccountID]);
 
     const feature = Object.values(CONST.UPGRADE_FEATURE_INTRO_MAPPING)
         .filter((value) => value.id !== CONST.UPGRADE_FEATURE_INTRO_MAPPING.policyPreventMemberChangingTitle.id)
@@ -145,8 +142,6 @@ function IOURequestStepUpgrade({
                 reportNextStep,
                 policyCategories: allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`],
                 allTransactions,
-                translate,
-                toLocaleDigit,
             });
 
             clearSelectedTransactions();
@@ -230,8 +225,8 @@ function IOURequestStepUpgrade({
         ownerPersonalDetails,
         allTransactions,
         betas,
-        translate,
-        toLocaleDigit,
+        iouType,
+        isTrack,
     ]);
 
     const participant = transaction?.participants?.[0];
