@@ -121,7 +121,6 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
-        'ChatBubbles',
         'MoneyBag',
         'CreditCard',
         'MoneyHourglass',
@@ -132,11 +131,9 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         'Basket',
         'CalendarSolid',
         'Bookmark',
-        'ExpensifyCard',
         'Pencil',
         'Trashcan',
         'Document',
-        'Send',
         'ThumbsUp',
         'CheckCircle',
     ] as const);
@@ -169,9 +166,9 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                               setSavedSearchToModifyKey(null),
                           );
 
-                          if (queryJSON && Number(key) === queryJSON.hash) {
-                              nextActiveKey = key;
-                          }
+                  if (Number(key) === queryJSON?.hash) {
+                      nextActiveKey = key;
+                  }
 
                           return {
                               key,
@@ -199,7 +196,7 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                             badgeText,
                         });
                         nextQueryMap.set(item.key, {query: item.searchQuery});
-                        if (queryJSON && item.similarSearchHash === queryJSON.similarSearchHash) {
+                        if (item.similarSearchHash === queryJSON?.similarSearchHash) {
                             nextActiveKey = item.key;
                         }
                     }
