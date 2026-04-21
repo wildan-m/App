@@ -17,8 +17,7 @@ type SavedSearchTitlesHookParams = {
     translate: UserReadableQueryParams['translate'];
     feedKeysWithCards: UserReadableQueryParams['feedKeysWithCards'];
     reportAttributes: UserReadableQueryParams['reportAttributes'];
-    shouldBuildTitles?: boolean;
-    allowEmptyQueryJSONFallback?: boolean;
+    enabled?: boolean;
 };
 
 function useSavedSearchTitles({
@@ -33,8 +32,7 @@ function useSavedSearchTitles({
     translate,
     feedKeysWithCards,
     reportAttributes,
-    shouldBuildTitles = true,
-    allowEmptyQueryJSONFallback = true,
+    enabled = true,
 }: SavedSearchTitlesHookParams): Map<string, string> {
     const deferredReports = useDeferredValue(reports);
     const deferredPolicies = useDeferredValue(allPolicies);
@@ -48,7 +46,7 @@ function useSavedSearchTitles({
     return useMemo(() => {
         const titles = new Map<string, string>();
 
-        if (!savedSearches || !shouldBuildTitles) {
+        if (!savedSearches || !enabled) {
             return titles;
         }
 
@@ -58,12 +56,12 @@ function useSavedSearchTitles({
             }
 
             const itemJsonQuery = buildSearchQueryJSON(item.query);
-            if (!itemJsonQuery && !allowEmptyQueryJSONFallback) {
+            if (!itemJsonQuery) {
                 continue;
             }
 
             const title = buildUserReadableQueryString({
-                queryJSON: itemJsonQuery ?? ({} as UserReadableQueryParams['queryJSON']),
+                queryJSON: itemJsonQuery,
                 PersonalDetails: deferredPersonalDetails,
                 reports: deferredReports,
                 taxRates: deferredTaxRates,
@@ -83,7 +81,6 @@ function useSavedSearchTitles({
     }, [
         deferredAllFeeds,
         deferredPolicies,
-        allowEmptyQueryJSONFallback,
         deferredCardsForSavedSearchDisplay,
         currentUserAccountID,
         deferredFeedKeysWithCards,
@@ -91,7 +88,7 @@ function useSavedSearchTitles({
         deferredReportAttributes,
         deferredReports,
         savedSearches,
-        shouldBuildTitles,
+        enabled,
         deferredTaxRates,
         translate,
     ]);

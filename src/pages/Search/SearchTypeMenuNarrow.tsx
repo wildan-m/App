@@ -103,8 +103,7 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         translate,
         feedKeysWithCards,
         reportAttributes,
-        shouldBuildTitles: !!queryJSON,
-        allowEmptyQueryJSONFallback: false,
+        enabled: !!queryJSON,
     });
 
     const [savedSearchToModifyKey, setSavedSearchToModifyKey] = useState<string | null>(null);
@@ -128,7 +127,7 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         'Document',
         'ThumbsUp',
         'CheckCircle',
-    ] as const);
+    ]);
 
     const queryMap = new Map<string, {query: string; name?: string}>();
     const tabItems: TabSelectorBaseItem[] = [];

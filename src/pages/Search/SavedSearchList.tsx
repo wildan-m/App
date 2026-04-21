@@ -24,7 +24,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 import useSavedSearchTitles from './hooks/useSavedSearchTitles';
-import type {SavedSearchCollection} from './hooks/useSavedSearchTitles';
 import SavedSearchItemThreeDotMenu from './SavedSearchItemThreeDotMenu';
 
 type SavedSearchListProps = {
@@ -133,15 +132,17 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         reportAttributes,
     });
 
+    const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal);
+
     const savedSearchesMenuItems = savedSearches
-        ? Object.entries(savedSearches as SavedSearchCollection).map(([key, item], index) =>
+        ? Object.entries(savedSearches).map(([key, item], index) =>
               buildSavedSearchMenuItem({
                   item,
                   key,
                   index,
                   hash,
                   title: item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name,
-                  getOverflowMenu: (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal),
+                  getOverflowMenu,
                   shouldShowSavedSearchTooltip,
                   hideSavedSearchTooltip,
                   renderSavedSearchTooltip,
