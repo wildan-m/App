@@ -138,7 +138,10 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
 
             if (!isCredentialAllowed(credentialID, allowedIDs)) {
                 await deleteLocalKeysForAccount();
-                onResult({success: false, error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND, 'Local credential not in server allowed list, keys deleted')});
+                onResult({
+                    success: false,
+                    error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL, 'Local HSM credential not in challenge allowCredentials, keys deleted'),
+                });
                 return;
             }
 

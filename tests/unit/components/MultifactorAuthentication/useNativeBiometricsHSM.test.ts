@@ -412,10 +412,10 @@ describe('useNativeBiometricsHSM hook', () => {
             );
         });
 
-        it('should delete local keys and return KEY_NOT_FOUND when local credential is not in allowCredentials', async () => {
+        it('should delete local keys and return NO_MATCHING_LOCAL_CREDENTIAL when local credential is not in allowCredentials', async () => {
             // Given a local HSM key exists but its credential ID does not match any ID in the challenge's allowCredentials list
             // When the authorize flow checks for a matching credential
-            // Then it should delete the orphaned local key and return KEY_NOT_FOUND so the app can prompt re-registration
+            // Then it should delete the orphaned local key and return NO_MATCHING_LOCAL_CREDENTIAL so the app can prompt re-registration
             const keyAlias = '12345_HSM_KEY';
             mockGetAllKeys.mockResolvedValue({keys: [{alias: keyAlias, publicKey: 'abc+def/ghi='}]});
 
@@ -435,7 +435,7 @@ describe('useNativeBiometricsHSM hook', () => {
             expect(onResult).toHaveBeenCalledWith(
                 expect.objectContaining({
                     success: false,
-                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND}),
+                    error: expect.objectContaining({reason: VALUES.REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL}),
                 }),
             );
             expect(mockSignWithOptions).not.toHaveBeenCalled();

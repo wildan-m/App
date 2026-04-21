@@ -120,9 +120,10 @@ function usePasskeys(): UseBiometricsReturn {
         });
 
         if (reconciled.length === 0) {
+            await deleteLocalKeysForAccount();
             await onResult({
                 success: false,
-                error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.REGISTRATION_REQUIRED, 'No local passkey credentials match server-allowed list'),
+                error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.NO_MATCHING_LOCAL_CREDENTIAL, 'No local passkey credentials match challenge allowCredentials, credentials cleared'),
             });
             return;
         }

@@ -58,7 +58,7 @@ const REASON = {
             TIMEOUT: 'Local WebAuthn: Operation timed out',
             DATA_ERROR: 'Local WebAuthn: Malformed input data',
             UNKNOWN: 'Local WebAuthn: Platform or authenticator failure',
-            REGISTRATION_REQUIRED: 'Local WebAuthn: No matching passkey credentials found locally',
+            NO_MATCHING_LOCAL_CREDENTIAL: 'Local WebAuthn: No local passkey credential matches the challenge allowCredentials list',
             UNEXPECTED_RESPONSE: 'Local WebAuthn: Credential response type is unexpected',
             GENERIC: 'Local WebAuthn: An unknown error occurred',
         },
@@ -68,6 +68,7 @@ const REASON = {
             LOCKOUT: 'Local HSM: Biometric authentication locked out',
             LOCKOUT_PERMANENT: 'Local HSM: Biometric authentication permanently locked out',
             KEY_NOT_FOUND: 'Local HSM: Cryptographic key not found',
+            NO_MATCHING_LOCAL_CREDENTIAL: 'Local HSM: Local HSM credential is not present in the challenge allowCredentials list',
             SIGNATURE_FAILED: 'Local HSM: Signature creation failed',
             KEY_CREATION_FAILED: 'Local HSM: Key creation failed',
             KEY_ACCESS_FAILED: 'Local HSM: Failed to access cryptographic key',
@@ -190,11 +191,11 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.WEBAUTHN.INVALID_STATE,
     REASON.LOCAL_ERRORS.WEBAUTHN.SECURITY_ERROR,
     REASON.LOCAL_ERRORS.WEBAUTHN.CONSTRAINT_ERROR,
-    REASON.LOCAL_ERRORS.WEBAUTHN.REGISTRATION_REQUIRED,
     REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE,
     REASON.LOCAL_ERRORS.WEBAUTHN.GENERIC,
     REASON.LOCAL_ERRORS.WEBAUTHN.DATA_ERROR,
     REASON.LOCAL_ERRORS.WEBAUTHN.UNKNOWN,
+    REASON.LOCAL_ERRORS.WEBAUTHN.NO_MATCHING_LOCAL_CREDENTIAL,
     REASON.LOCAL_ERRORS.HSM.LOCKOUT_PERMANENT,
     REASON.LOCAL_ERRORS.HSM.SIGNATURE_FAILED,
     REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND,
@@ -202,6 +203,7 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.HSM.KEY_ACCESS_FAILED,
     REASON.LOCAL_ERRORS.HSM.GENERIC,
     REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE,
+    REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL,
 ]);
 
 const SHARED_VALUES = {
