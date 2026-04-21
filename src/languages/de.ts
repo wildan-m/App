@@ -7863,7 +7863,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             emptyReportConfirmationTitle: 'Sie haben bereits einen leeren Bericht',
             emptyReportConfirmationPrompt: ({workspaceName}: {workspaceName: string}) =>
                 `Möchtest du wirklich einen weiteren Bericht in ${workspaceName} erstellen? Du kannst auf deine leeren Berichte zugreifen in`,
-            emptyReportConfirmationPromptLink: 'Berichte',
+            emptyReportConfirmationPromptLink: 'Alle Berichte',
             emptyReportConfirmationDontShowAgain: 'Nicht mehr anzeigen',
             genericWorkspaceName: 'dieser Workspace',
         },

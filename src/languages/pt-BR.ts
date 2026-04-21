@@ -7820,7 +7820,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             emptyReportConfirmationTitle: 'Você já tem um relatório em branco',
             emptyReportConfirmationPrompt: ({workspaceName}: {workspaceName: string}) =>
                 `Tem certeza de que deseja criar outro relatório em ${workspaceName}? Você pode acessar seus relatórios em branco em`,
-            emptyReportConfirmationPromptLink: 'Relatórios',
+            emptyReportConfirmationPromptLink: 'Todos os relatórios',
             emptyReportConfirmationDontShowAgain: 'Não mostrar isso novamente',
             genericWorkspaceName: 'este workspace',
         },
