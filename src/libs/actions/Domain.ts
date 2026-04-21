@@ -1877,7 +1877,9 @@ function updateDomainSecurityGroup(
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
-                [SECURITY_GROUP_KEY]: currentSecurityGroup,
+                [SECURITY_GROUP_KEY]: {
+                    [settingsName]: currentSecurityGroup[settingsName],
+                }
             } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
         },
         {
