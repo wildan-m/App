@@ -73,8 +73,6 @@ type LogSizeAndDateParams = {size: number; date: string};
 
 type ChangeFieldParams = {oldValue?: string; newValue: string; fieldName: string};
 
-type AddedOrDeletedPolicyReportFieldParams = {fieldType: string; fieldName?: string; defaultValue?: string};
-
 type ExportedToIntegrationParams = {label: string; markedManually?: boolean; inProgress?: boolean; lastModified?: string};
 
 type IntegrationsMessageParams = {
@@ -208,5 +206,4 @@ export type {
     DisconnectTitleParams,
     OptionalParam,
     WorkspaceLockedPlanTypeParams,
-    AddedOrDeletedPolicyReportFieldParams,
 };
