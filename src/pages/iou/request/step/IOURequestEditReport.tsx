@@ -71,7 +71,7 @@ function IOURequestEditReport({route}: IOURequestEditReportProps) {
         }
 
         const newReport = report ?? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${item.value}`];
-        const policyTagList = item ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
+        const policyTagList = item?.policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
 
         setNavigationActionToMicrotaskQueue(() => {
             changeTransactionsReport({

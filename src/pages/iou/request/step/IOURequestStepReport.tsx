@@ -175,7 +175,7 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
                 );
 
                 if (isEditing) {
-                    const policyTagList = item ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
+                    const policyTagList = item?.policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
                     changeTransactionsReport({
                         transactionIDs: [transaction.transactionID],
                         isASAPSubmitBetaEnabled,
