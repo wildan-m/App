@@ -2,7 +2,7 @@
 // used for fast perceived performance. If you change the UI here, verify the
 // static version still looks visually identical.
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState, useTransition} from 'react';
+import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 import type BaseModalProps from '@components/Modal/types';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -46,13 +46,6 @@ type SearchTypeMenuNarrowContentProps = {
     onLongTabPress?: (key: string) => void;
     containerRef?: React.RefObject<View | null>;
     children?: React.ReactNode;
-};
-
-type ComputedMenuData = {
-    queryMap: Map<string, {query: string; name?: string}>;
-    tabItems: TabSelectorBaseItem[];
-    savedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]>;
-    activeKey: string;
 };
 
 function SearchTypeMenuNarrowContent({tabs, activeTabKey, onActiveTabPress, onTabPress: onTabPressContent, onLongTabPress, containerRef, children}: SearchTypeMenuNarrowContentProps) {
@@ -117,7 +110,6 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
     const [savedSearchToModifyKey, setSavedSearchToModifyKey] = useState<string | null>(null);
     const menuAnchorRef = useRef<View>(null);
     const {showDeleteModal} = useDeleteSavedSearch();
-    const [, startTransition] = useTransition();
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
@@ -138,81 +130,61 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         'CheckCircle',
     ] as const);
 
-    const [computedMenuData, setComputedMenuData] = useState<ComputedMenuData>({
-        queryMap: new Map(),
-        tabItems: [],
-        savedSearchesPopoverMenuItems: {},
-        activeKey: '',
-    });
+    const queryMap = new Map<string, {query: string; name?: string}>();
+    const tabItems: TabSelectorBaseItem[] = [];
+    const savedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]> = {};
+    let activeKey = '';
 
-    useEffect(() => {
-        startTransition(() => {
-            const nextQueryMap = new Map<string, {query: string; name?: string}>();
-            const nextTabItems: TabSelectorBaseItem[] = [];
-            const nextSavedSearchesPopoverMenuItems: Record<string, PopoverMenuItem[]> = {};
-            let nextActiveKey = '';
-
-            const savedSearchesTabItems: TabSelectorBaseItem[] = savedSearches
-                ? Object.entries(savedSearches)
-                      .map(([key, item]): TabSelectorBaseItem | null => {
-                          if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !isOffline) {
-                              return null;
-                          }
-
-                          const title = item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name;
-
-                          nextQueryMap.set(key, {query: item.query ?? '', name: item.name});
-                          nextSavedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, Number(key), item.query, translate, showDeleteModal, true, () =>
-                              setSavedSearchToModifyKey(null),
-                          );
-
-                  if (Number(key) === queryJSON?.hash) {
-                      nextActiveKey = key;
+    const savedSearchesTabItems: TabSelectorBaseItem[] = savedSearches
+        ? Object.entries(savedSearches)
+              .map(([key, item]): TabSelectorBaseItem | null => {
+                  if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && !isOffline) {
+                      return null;
                   }
 
-                          return {
-                              key,
-                              icon: expensifyIcons.Bookmark,
-                              title,
-                              isDisabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                              pendingAction: item.pendingAction,
-                          };
-                      })
-                      .filter((item) => item !== null)
-                : [];
+                  const title = item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name;
 
-            for (const section of typeMenuSections) {
-                if (section.translationPath === 'search.savedSearchesMenuItemTitle') {
-                    nextTabItems.push(...savedSearchesTabItems);
-                } else {
-                    for (const item of section.menuItems) {
-                        const badgeText = getItemBadgeText(item.key, reportCounts);
-                        const title = translate(item.translationPath);
+                  queryMap.set(key, {query: item.query ?? '', name: item.name});
+                  savedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, Number(key), item.query, translate, showDeleteModal, true, () =>
+                      setSavedSearchToModifyKey(null),
+                  );
 
-                        nextTabItems.push({
-                            key: item.key,
-                            icon: expensifyIcons[item.icon],
-                            title,
-                            badgeText,
-                        });
-                        nextQueryMap.set(item.key, {query: item.searchQuery});
-                        if (item.similarSearchHash === queryJSON?.similarSearchHash) {
-                            nextActiveKey = item.key;
-                        }
-                    }
+                  if (Number(key) === queryJSON?.hash) {
+                      activeKey = key;
+                  }
+
+                  return {
+                      key,
+                      icon: expensifyIcons.Bookmark,
+                      title,
+                      isDisabled: item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                      pendingAction: item.pendingAction,
+                  };
+              })
+              .filter((item) => item !== null)
+        : [];
+
+    for (const section of typeMenuSections) {
+        if (section.translationPath === 'search.savedSearchesMenuItemTitle') {
+            tabItems.push(...savedSearchesTabItems);
+        } else {
+            for (const item of section.menuItems) {
+                const badgeText = getItemBadgeText(item.key, reportCounts);
+                const title = translate(item.translationPath);
+
+                tabItems.push({
+                    key: item.key,
+                    icon: expensifyIcons[item.icon],
+                    title,
+                    badgeText,
+                });
+                queryMap.set(item.key, {query: item.searchQuery});
+                if (item.similarSearchHash === queryJSON?.similarSearchHash) {
+                    activeKey = item.key;
                 }
             }
-
-            setComputedMenuData({
-                queryMap: nextQueryMap,
-                tabItems: nextTabItems,
-                savedSearchesPopoverMenuItems: nextSavedSearchesPopoverMenuItems,
-                activeKey: nextActiveKey,
-            });
-        });
-    }, [savedSearches, isOffline, savedSearchTitles, expensifyIcons, translate, showDeleteModal, queryJSON, typeMenuSections, reportCounts, startTransition]);
-
-    const {queryMap, tabItems, savedSearchesPopoverMenuItems, activeKey} = computedMenuData;
+        }
+    }
 
     const popoverMenuItems = savedSearchToModifyKey ? savedSearchesPopoverMenuItems?.[savedSearchToModifyKey] : [];
     const shouldShowSavedSearchPopover = savedSearchToModifyKey && popoverMenuItems.length > 0;

@@ -1,6 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import {accountIDSelector} from '@selectors/Session';
-import React, {useEffect, useState, useTransition} from 'react';
+import React from 'react';
 import MenuItemList from '@components/MenuItemList';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
@@ -133,48 +133,23 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         reportAttributes,
     });
 
-    const [, startTransition] = useTransition();
-    const [savedSearchesMenuItems, setSavedSearchesMenuItems] = useState<SavedSearchMenuItem[]>([]);
-
-    useEffect(() => {
-        startTransition(() => {
-            const nextMenuItems = savedSearches
-                ? Object.entries(savedSearches as SavedSearchCollection).map(([key, item], index) =>
-                      buildSavedSearchMenuItem({
-                          item,
-                          key,
-                          index,
-                          hash,
-                          title: item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name,
-                          getOverflowMenu: (itemName: string, itemHash: number, itemQuery: string) =>
-                              getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal),
-                          shouldShowSavedSearchTooltip,
-                          hideSavedSearchTooltip,
-                          renderSavedSearchTooltip,
-                          itemStyle: [styles.alignItemsCenter],
-                          tooltipWrapperStyle: [styles.mh4, styles.pv2, styles.productTrainingTooltipWrapper],
-                      }),
-                  )
-                : [];
-
-            setSavedSearchesMenuItems(nextMenuItems);
-        });
-    }, [
-        savedSearches,
-        hash,
-        savedSearchTitles,
-        expensifyIcons,
-        translate,
-        showDeleteModal,
-        shouldShowSavedSearchTooltip,
-        hideSavedSearchTooltip,
-        renderSavedSearchTooltip,
-        styles.alignItemsCenter,
-        styles.mh4,
-        styles.pv2,
-        styles.productTrainingTooltipWrapper,
-        startTransition,
-    ]);
+    const savedSearchesMenuItems = savedSearches
+        ? Object.entries(savedSearches as SavedSearchCollection).map(([key, item], index) =>
+              buildSavedSearchMenuItem({
+                  item,
+                  key,
+                  index,
+                  hash,
+                  title: item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name,
+                  getOverflowMenu: (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal),
+                  shouldShowSavedSearchTooltip,
+                  hideSavedSearchTooltip,
+                  renderSavedSearchTooltip,
+                  itemStyle: [styles.alignItemsCenter],
+                  tooltipWrapperStyle: [styles.mh4, styles.pv2, styles.productTrainingTooltipWrapper],
+              }),
+          )
+        : [];
 
     return (
         <MenuItemList
