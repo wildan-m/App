@@ -50,7 +50,7 @@ function UserPills({users, maxVisible = DEFAULT_MAX_VISIBLE}: UserPillsProps) {
         <View style={[styles.flexRow, styles.flexWrap, styles.userPillsContainer]}>
             {visibleUsers.map((user) => (
                 <UserPill
-                    key={user.accountID ?? user.displayName}
+                    key={user.accountID ?? user.email ?? user.displayName}
                     avatar={user.avatar}
                     displayName={user.displayName}
                     accountID={user.accountID}

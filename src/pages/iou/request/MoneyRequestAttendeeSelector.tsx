@@ -81,7 +81,7 @@ function MoneyRequestAttendeeSelector({attendees = [], onFinish, onAttendeesAdde
     const isPaidGroupPolicy = isPaidGroupPolicyFn(policy);
     const recentAttendeeLists = getFilteredRecentAttendees(personalDetails, attendees, recentAttendees ?? [], currentUserEmail, currentUserAccountID);
 
-    const initialSelectedOptions = sortAlphabetically(attendees, 'displayName', localeCompare).map((attendee) => ({
+    const initialSelectedOptions = sortAlphabetically([...attendees], 'displayName', localeCompare).map((attendee) => ({
         ...attendee,
         reportID: CONST.DEFAULT_NUMBER_ID.toString(),
         keyForList: String(attendee.accountID) ?? (attendee.email || attendee.displayName),
