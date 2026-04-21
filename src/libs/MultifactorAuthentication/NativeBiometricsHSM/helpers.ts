@@ -70,7 +70,7 @@ function mapSignErrorCodeToReason(errorCode?: string): MultifactorAuthentication
     if (!errorCode) {
         return undefined;
     }
-    return SIGN_ERROR_CODE_MAP[errorCode] ?? VALUES.REASON.LOCAL_ERRORS.HSM.GENERIC;
+    return SIGN_ERROR_CODE_MAP[errorCode] ?? VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
 }
 
 /**

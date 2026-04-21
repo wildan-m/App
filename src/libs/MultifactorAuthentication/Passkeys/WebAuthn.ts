@@ -158,7 +158,7 @@ function decodeWebAuthnError(error: unknown): DecodedWebAuthnError {
         }
     }
 
-    return {reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.GENERIC, message: getErrorMessage(error)};
+    return {reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNRECOGNIZED, message: getErrorMessage(error)};
 }
 
 export {

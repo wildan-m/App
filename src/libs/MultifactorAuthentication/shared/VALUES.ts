@@ -59,7 +59,8 @@ const REASON = {
             UNKNOWN: 'Local WebAuthn: Platform or authenticator failure',
             NO_MATCHING_LOCAL_CREDENTIAL: 'Local WebAuthn: No local passkey credential matches the challenge allowCredentials list',
             UNEXPECTED_RESPONSE: 'Local WebAuthn: Credential response type is unexpected',
-            GENERIC: 'Local WebAuthn: An unknown error occurred',
+            /** Unrecognized WebAuthn error with no specific handler. */
+            UNRECOGNIZED: 'Local WebAuthn: Unrecognized error',
         },
         HSM: {
             CANCELED: 'Local HSM: Biometric authentication canceled by user',
@@ -72,7 +73,8 @@ const REASON = {
             KEY_CREATION_FAILED: 'Local HSM: Key creation failed',
             KEY_ACCESS_FAILED: 'Local HSM: Failed to access cryptographic key',
             AUTHENTICATION_FAILED: 'Local HSM: Biometric authentication failed',
-            GENERIC: 'Local HSM: An unknown error occurred',
+            /** Unrecognized HSM error with no specific handler. */
+            UNRECOGNIZED: 'Local HSM: Unrecognized error',
             UNRECOGNIZED_AUTH_TYPE: 'Local HSM: Unrecognized auth type in sign result',
         },
     },
@@ -193,7 +195,7 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.WEBAUTHN.SECURITY_ERROR,
     REASON.LOCAL_ERRORS.WEBAUTHN.CONSTRAINT_ERROR,
     REASON.LOCAL_ERRORS.WEBAUTHN.UNEXPECTED_RESPONSE,
-    REASON.LOCAL_ERRORS.WEBAUTHN.GENERIC,
+    REASON.LOCAL_ERRORS.WEBAUTHN.UNRECOGNIZED,
     REASON.LOCAL_ERRORS.WEBAUTHN.DATA_ERROR,
     REASON.LOCAL_ERRORS.WEBAUTHN.UNKNOWN,
     REASON.LOCAL_ERRORS.WEBAUTHN.NO_MATCHING_LOCAL_CREDENTIAL,
@@ -202,7 +204,7 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.LOCAL_ERRORS.HSM.KEY_NOT_FOUND,
     REASON.LOCAL_ERRORS.HSM.KEY_CREATION_FAILED,
     REASON.LOCAL_ERRORS.HSM.KEY_ACCESS_FAILED,
-    REASON.LOCAL_ERRORS.HSM.GENERIC,
+    REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED,
     REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE,
     REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL,
 ]);
