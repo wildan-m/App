@@ -427,7 +427,7 @@ const SCREENS = {
         SETTINGS_CATEGORY_SETTINGS: 'Settings_Category_Settings',
         SETTINGS_CATEGORIES_SETTINGS: 'Settings_Categories_Settings',
         SETTINGS_CATEGORY_CREATE: 'Settings_Category_Create',
-        SETTINGS_CATEGORY_EDIT: 'Settings_Category_Edit',
+        DYNAMIC_SETTINGS_CATEGORY_EDIT: 'Dynamic_Settings_Category_Edit',
         SETTINGS_CATEGORIES_ROOT: 'Settings_Categories',
         SETTINGS_CATEGORIES_IMPORT: 'Settings_Categories_Import',
         SETTINGS_CATEGORIES_IMPORTED: 'Settings_Categories_Imported',
@@ -974,7 +974,7 @@ const SCREENS = {
         CONFIRMATION: 'ScheduleCall_Confirmation',
     },
     REPORT_CHANGE_APPROVER: {
-        ROOT: 'Report_Change_Approver_Root',
+        DYNAMIC_ROOT: 'Dynamic_Report_Change_Approver_Root',
         ADD_APPROVER: 'Report_Change_Approver_Add_Approver',
     },
     TEST_TOOLS_MODAL: {
