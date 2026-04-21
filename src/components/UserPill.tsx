@@ -10,19 +10,10 @@ import Text from './Text';
 import UserDetailsTooltip from './UserDetailsTooltip';
 
 type UserPillProps = {
-    /** Avatar source (URL or icon) */
     avatar?: AvatarSource;
-
-    /** Display name of the user */
     displayName: string;
-
-    /** Account ID for proper avatar rendering */
     accountID?: number;
-
-    /** Email/login for tooltip subtitle */
     email?: string;
-
-    /** Additional styles to apply to the pill wrapper */
     style?: StyleProp<ViewStyle>;
 };
 

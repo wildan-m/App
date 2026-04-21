@@ -8,24 +8,14 @@ import Tooltip from './Tooltip';
 import UserPill from './UserPill';
 
 type UserPillData = {
-    /** Avatar source (URL or icon) */
     avatar?: AvatarSource;
-
-    /** Display name of the user */
     displayName: string;
-
-    /** Account ID for proper avatar rendering */
     accountID?: number;
-
-    /** Email/login for tooltip subtitle */
     email?: string;
 };
 
 type UserPillsProps = {
-    /** Array of user data to render as pills */
     users: UserPillData[];
-
-    /** Maximum number of pills to display before showing "+X more" */
     maxVisible?: number;
 };
 
@@ -35,7 +25,7 @@ function UserPills({users, maxVisible = DEFAULT_MAX_VISIBLE}: UserPillsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    // "+1 more" edge case: if only 1 user would be hidden, show it instead of "+1 more"
+    // Show the extra pill instead of "+1 more" when only 1 would be hidden.
     const visibleUsers = users.length <= maxVisible + 1 ? users : users.slice(0, maxVisible);
     const hiddenCount = users.length - visibleUsers.length;
     const hiddenNames =
