@@ -204,7 +204,7 @@ type BuildPolicyDataOptions = {
     currentUserAccountIDParam: number;
     currentUserEmailParam: string;
     allReportsParam?: OnyxCollection<Report>;
-    reportActionsList: OnyxCollection<ReportActions> | undefined;
+    reportActionsList?: OnyxCollection<ReportActions>;
     onboardingPurposeSelected?: OnboardingPurpose;
     shouldAddGuideWelcomeMessage?: boolean;
     shouldCreateControlPolicy?: boolean;

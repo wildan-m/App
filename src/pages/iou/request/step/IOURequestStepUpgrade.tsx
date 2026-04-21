@@ -7,6 +7,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import WorkspaceConfirmationForm from '@components/WorkspaceConfirmationForm';
 import type {WorkspaceConfirmationSubmitFunctionParams} from '@components/WorkspaceConfirmationForm';
+import useAllPolicyExpenseChatReportActions from '@hooks/useAllPolicyExpenseChatReportActions';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from '@hooks/useHasActiveAdminPolicies';
 import useLastWorkspaceNumber from '@hooks/useLastWorkspaceNumber';
@@ -46,6 +47,7 @@ function IOURequestStepUpgrade({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
+    const filteredReportActions = useAllPolicyExpenseChatReportActions();
     const lastWorkspaceNumber = useLastWorkspaceNumber();
 
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`);
@@ -177,8 +179,7 @@ function IOURequestStepUpgrade({
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
-            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
-            reportActionsList: undefined,
+            reportActionsList: filteredReportActions,
         });
         setIsUpgraded(true);
         policyDataRef.current = policyData;
@@ -207,8 +208,7 @@ function IOURequestStepUpgrade({
             betas,
             isSelfTourViewed,
             hasActiveAdminPolicies,
-            // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
-            reportActionsList: undefined,
+            reportActionsList: filteredReportActions,
         });
         policyDataRef.current = policyData;
         setCreatedPolicyName(params.name);

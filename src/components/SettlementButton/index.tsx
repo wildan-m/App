@@ -426,8 +426,6 @@ function SettlementButton({
                     isSelfTourViewed,
                     hasActiveAdminPolicies: !!activeAdminPolicies.length,
                     policyName: generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
-                    // TODO: Update to pass reportActionsList once migrated (https://github.com/Expensify/App/issues/66578)
-                    reportActionsList: undefined,
                 }).policyID;
             };
 

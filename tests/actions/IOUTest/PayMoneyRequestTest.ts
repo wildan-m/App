@@ -371,7 +371,6 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
-                        reportActionsList: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -533,7 +532,6 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
-                        reportActionsList: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -1106,7 +1104,6 @@ describe('actions/IOU/PayMoneyRequest', () => {
                         isSelfTourViewed: false,
                         betas: undefined,
                         hasActiveAdminPolicies: false,
-                        reportActionsList: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -1229,7 +1226,6 @@ describe('actions/IOU/PayMoneyRequest', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1333,7 +1329,6 @@ describe('actions/IOU/PayMoneyRequest', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 

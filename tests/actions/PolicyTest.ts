@@ -85,7 +85,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: [CONST.BETAS.SUGGESTED_FOLLOWUPS],
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -531,7 +530,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -563,7 +561,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 hasActiveAdminPolicies: false,
                 betas: [CONST.BETAS.SUGGESTED_FOLLOWUPS],
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -597,7 +594,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -634,7 +630,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -667,7 +662,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -697,7 +691,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -728,7 +721,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -757,7 +749,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -786,7 +777,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -815,7 +805,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -844,7 +833,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -885,7 +873,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -921,7 +908,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: true,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -957,7 +943,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -995,7 +980,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: true,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1038,7 +1022,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1083,7 +1066,6 @@ describe('actions/Policy', () => {
                 betas: undefined,
                 hasActiveAdminPolicies: false,
                 adminParticipant: {login: adminEmail, accountID: adminAccountID},
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1122,7 +1104,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1151,7 +1132,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
-                reportActionsList: undefined,
             });
 
             expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
@@ -1171,7 +1151,6 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: true,
-                reportActionsList: undefined,
             });
 
             expect(GoogleTagManager.publishEvent).not.toHaveBeenCalled();
