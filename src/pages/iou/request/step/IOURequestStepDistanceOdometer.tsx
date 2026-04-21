@@ -158,7 +158,9 @@ function IOURequestStepDistanceOdometer({
         setShouldEnableDiscardConfirmation(!isEditingConfirmation && !isEditing);
     }, [isEditing, isEditingConfirmation]);
 
-    useRestartOnOdometerImagesFailure(transaction, reportID, iouType, action);
+    useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, () => {
+        backupHandledManually.current = true;
+    });
 
     // Get odometer images from transaction (only for display, not for initialization)
     const odometerStartImage = transaction?.comment?.odometerStartImage;

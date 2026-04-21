@@ -17,7 +17,7 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 // This is because until the request is saved, the image files are only stored in the browser's memory as blob:// URLs
 // and if the browser is refreshed, then the images cease to exist.
 // The best way for the user to recover from this is to start over from the start of the request process.
-const useRestartOnOdometerImagesFailure = (transaction: OnyxEntry<Transaction>, reportID: string, iouType: IOUType, backToReport: string | undefined) => {
+const useRestartOnOdometerImagesFailure = (transaction: OnyxEntry<Transaction>, reportID: string, iouType: IOUType, backToReport: string | undefined, onBackupHandled?: () => void) => {
     const [, draftTransactionsMetadata] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
     const hasCheckedRef = useRef(false);
 
@@ -79,10 +79,11 @@ const useRestartOnOdometerImagesFailure = (transaction: OnyxEntry<Transaction>, 
                 return;
             }
 
+            onBackupHandled?.();
             clearOdometerDraftTransactionState(transaction);
             navigateToStartMoneyRequestStep(CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER, iouType, transaction.transactionID, reportID, CONST.IOU.ACTION.CREATE, backToReport);
         });
-    }, [draftTransactionsMetadata, transaction, iouType, reportID, backToReport]);
+    }, [draftTransactionsMetadata, transaction, iouType, reportID, backToReport, onBackupHandled]);
 };
 
 export default useRestartOnOdometerImagesFailure;

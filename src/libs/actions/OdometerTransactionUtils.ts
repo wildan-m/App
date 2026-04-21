@@ -7,7 +7,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Transaction} from '@src/types/onyx';
 import type {FileObject} from '@src/types/utils/Attachment';
 import {setMoneyRequestReceipt} from './IOU/Receipt';
-import {removeBackupTransaction, removeDraftTransactionsByIDs} from './TransactionEdit';
+import {removeBackupTransaction} from './TransactionEdit';
 
 /**
  * Set the odometer readings for a transaction
@@ -83,7 +83,6 @@ function clearOdometerDraftTransactionState(transaction: OnyxEntry<Transaction>)
     setMoneyRequestOdometerReading(transaction.transactionID, null, null, true);
     removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.START, true, true);
     removeMoneyRequestOdometerImage(transaction, CONST.IOU.ODOMETER_IMAGE_TYPE.END, true, true);
-    removeDraftTransactionsByIDs([transaction.transactionID], true);
     removeBackupTransaction(transaction.transactionID);
 }
 
