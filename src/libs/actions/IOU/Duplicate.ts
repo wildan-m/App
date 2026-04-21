@@ -18,6 +18,7 @@ import {
     buildOptimisticHoldReportAction,
     buildOptimisticResolvedDuplicatesReportAction,
     buildTransactionThread,
+    canAddTransaction,
     generateReportID,
     getTransactionDetails,
 } from '@libs/ReportUtils';
@@ -989,8 +990,12 @@ function bulkDuplicateExpenses({
     }
 
     const optimisticChatReportID = generateReportID();
-    const optimisticIOUReportID = generateReportID();
-    const sharedReportPreviewActionID = NumberUtils.rand64();
+
+    // These are mutable: when the current IOU report can't accept more
+    // transactions (e.g. instant-submit + submit-and-close with non-reimbursable
+    // expenses), we generate fresh IDs so each expense gets its own report.
+    let currentOptimisticIOUReportID = generateReportID();
+    let currentReportPreviewActionID = NumberUtils.rand64();
 
     // After the first iteration creates a new optimistic IOU report, subsequent
     // iterations must know its ID so getMoneyRequestInformation can find and
@@ -1011,10 +1016,18 @@ function bulkDuplicateExpenses({
         const existingTransactionID = getExistingTransactionID(item.linkedTrackedExpenseReportAction);
         const existingTransactionDraft = existingTransactionID ? transactionDrafts?.[existingTransactionID] : undefined;
 
+        // If the previous iteration's report can't accept more transactions,
+        // reset so this iteration creates its own independent report.
+        if (optimisticIOUReport && !canAddTransaction(optimisticIOUReport)) {
+            optimisticIOUReport = undefined;
+            currentOptimisticIOUReportID = generateReportID();
+            currentReportPreviewActionID = NumberUtils.rand64();
+        }
+
         const result = duplicateExpenseTransaction({
             transaction: item,
             optimisticChatReportID,
-            optimisticIOUReportID,
+            optimisticIOUReportID: currentOptimisticIOUReportID,
             isASAPSubmitBetaEnabled,
             introSelected,
             activePolicyID,
@@ -1034,7 +1047,7 @@ function bulkDuplicateExpenses({
             shouldPlaySound: false,
             shouldDeferAutoSubmit: !isLastExpense,
             existingIOUReport: optimisticIOUReport,
-            optimisticReportPreviewActionID: sharedReportPreviewActionID,
+            optimisticReportPreviewActionID: currentReportPreviewActionID,
         });
 
         if (result?.iouReport) {
@@ -1042,7 +1055,7 @@ function bulkDuplicateExpenses({
         }
 
         if (currentTargetReport && !currentTargetReport.iouReportID) {
-            currentTargetReport = {...currentTargetReport, iouReportID: optimisticIOUReportID};
+            currentTargetReport = {...currentTargetReport, iouReportID: currentOptimisticIOUReportID};
         }
     }
 
