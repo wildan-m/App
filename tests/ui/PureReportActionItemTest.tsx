@@ -2169,10 +2169,11 @@ describe('PureReportActionItem', () => {
         });
 
         it('isCardBrokenConnectionAction falls back to card.cardName from CARD_LIST when originalMessage has no cardName', async () => {
+            const CARD_ID_KEY = '100';
+
             await act(async () => {
                 await Onyx.merge(ONYXKEYS.CARD_LIST, {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    '100': {cardID: 100, cardName: 'Onyx Card'},
+                    [CARD_ID_KEY]: {cardID: 100, cardName: 'Onyx Card'},
                 });
             });
             await waitForBatchedUpdatesWithAct();
@@ -2185,11 +2186,12 @@ describe('PureReportActionItem', () => {
         });
 
         it('isCardBrokenConnectionAction renders tappable bank login link for personal broken connection', async () => {
+            const CARD_ID_KEY = '100';
+
             (openLink as jest.Mock).mockClear();
             await act(async () => {
                 await Onyx.merge(ONYXKEYS.CARD_LIST, {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    '100': {cardID: 100, cardName: 'Broken Card', lastScrapeResult: 401},
+                    [CARD_ID_KEY]: {cardID: 100, cardName: 'Broken Card', lastScrapeResult: 401},
                 });
             });
             await waitForBatchedUpdatesWithAct();
@@ -2206,11 +2208,12 @@ describe('PureReportActionItem', () => {
         });
 
         it('isCardBrokenConnectionAction renders no tappable link when card connection is not broken', async () => {
+            const CARD_ID_KEY = '100';
+
             (openLink as jest.Mock).mockClear();
             await act(async () => {
                 await Onyx.merge(ONYXKEYS.CARD_LIST, {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention
-                    '100': {cardID: 100, cardName: 'Healthy Card', lastScrapeResult: 200},
+                    [CARD_ID_KEY]: {cardID: 100, cardName: 'Healthy Card', lastScrapeResult: 200},
                 });
             });
             await waitForBatchedUpdatesWithAct();
