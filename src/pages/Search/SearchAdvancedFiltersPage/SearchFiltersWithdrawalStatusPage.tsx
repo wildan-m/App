@@ -76,7 +76,12 @@ function SearchFiltersWithdrawalStatusPage() {
             context: 'SearchFiltersWithdrawalStatusPage',
             isLoading: searchAdvancedFiltersFormResult.status === 'loading',
         };
-        return <FullScreenLoadingIndicator reasonAttributes={reasonAttributes} />;
+        return (
+            <FullScreenLoadingIndicator
+                reasonAttributes={reasonAttributes}
+                shouldUseGoBackButton
+            />
+        );
     }
 
     return (

@@ -33,7 +33,7 @@ import {
     isSearchDatePreset,
     sortOptionsWithEmptyValue,
 } from '@libs/SearchQueryUtils';
-import {getStatusOptions} from '@libs/SearchUIUtils';
+import {getStatusOptions, getWithdrawalStatusDisplayText} from '@libs/SearchUIUtils';
 import {getExpenseTypeTranslationKey} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -501,17 +501,7 @@ function getFilterDisplayTitle(
     }
 
     if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_STATUS) {
-        const filterValue = filters[key];
-        let selectedValues: Array<ValueOf<typeof CONST.SEARCH.SETTLEMENT_STATUS>> = [];
-        if (Array.isArray(filterValue)) {
-            selectedValues = filterValue;
-        } else if (filterValue) {
-            selectedValues = [filterValue];
-        }
-        if (!selectedValues.length) {
-            return undefined;
-        }
-        return selectedValues.map((value) => translate(`settlement.status.${value}`)).join(', ');
+        return getWithdrawalStatusDisplayText(filters[key], translate);
     }
 
     if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS) {
