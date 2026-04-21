@@ -82,6 +82,8 @@ function ReportActionItemEmojiReactions({reportAction, reportID, shouldBlockReac
     const toggleReaction = (emoji: Emoji, skinTone: number, ignoreSkinToneOnCompare?: boolean) => {
         if (isAnonymousUser()) {
             hideContextMenu(false);
+
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.runAfterInteractions(() => {
                 signOutAndRedirectToSignIn();
             });
