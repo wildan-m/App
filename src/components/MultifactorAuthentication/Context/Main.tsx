@@ -532,9 +532,9 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
         }
 
         if (state.scenario.onCancel) {
-            const result = await state.scenario.onCancel(state.payload);
-            addMFABreadcrumb('Flow cancelled with onCancel', {reason: result.reason}, 'warning');
-            dispatch({type: 'SET_ERROR', payload: {reason: result.reason, message: undefined}});
+            const error = await state.scenario.onCancel(state.payload);
+            addMFABreadcrumb('Flow cancelled with onCancel', error, 'warning');
+            dispatch({type: 'SET_ERROR', payload: error});
             return;
         }
 

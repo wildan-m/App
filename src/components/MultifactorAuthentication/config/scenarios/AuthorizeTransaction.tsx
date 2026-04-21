@@ -14,6 +14,7 @@ import type {
     MultifactorAuthenticationScenarioAdditionalParams,
     MultifactorAuthenticationScenarioCustomConfig,
 } from '@components/MultifactorAuthentication/config/types';
+import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
 import variables from '@styles/variables';
 import {authorizeTransaction, denyTransaction, fireAndForgetDenyTransaction} from '@userActions/MultifactorAuthentication';
 import CONST from '@src/CONST';
@@ -147,10 +148,10 @@ export default {
      */
     onCancel: async (payload) => {
         if (!isAuthorizeTransactionPayload(payload)) {
-            return {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED};
+            return MfaError.local(CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED, undefined);
         }
-        const result = await denyTransaction({transactionID: payload.transactionID});
-        return {reason: result.reason ?? CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED, payload};
+        const {httpStatusCode, reason, message} = await denyTransaction({transactionID: payload.transactionID});
+        return MfaError.fromApiResponse(httpStatusCode, reason ?? CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED, message);
     },
     failureScreens: {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.FLOW_OUTCOMES.TRANSACTION_DENIED]: <DeniedTransactionSuccessScreen />,
