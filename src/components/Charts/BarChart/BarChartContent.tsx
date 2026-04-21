@@ -220,7 +220,7 @@ function BarChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left'
             <>
                 <ChartXAxisLabels
                     labels={originalLabels}
-                    labelWidths={truncatedLabelWidths}
+                    labelWidths={measurements.labelWidths}
                     regularLabelMaxWidth={regularLabelMaxWidth}
                     firstLabelMaxWidth={firstLabelMaxWidth}
                     lastLabelMaxWidth={lastLabelMaxWidth}

@@ -213,7 +213,7 @@ function LineChartContent({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left
                 {xAxisLabelHeight !== undefined && !!fontMgr && (
                     <ChartXAxisLabels
                         labels={originalLabels}
-                        labelWidths={truncatedLabelWidths}
+                        labelWidths={measurements.labelWidths}
                         regularLabelMaxWidth={regularLabelMaxWidth}
                         firstLabelMaxWidth={firstLabelMaxWidth}
                         lastLabelMaxWidth={lastLabelMaxWidth}
