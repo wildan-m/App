@@ -111,12 +111,12 @@ describe('useCardFeeds', () => {
     });
 
     describe('linkedPolicyIDs predicate filtering', () => {
-        it('includes domain feeds when linkedPolicyIDs contains only an empty string and preferredPolicy matches', async () => {
+        const setupDomainFeed = async (companyCardSettings: {preferredPolicy: string; linkedPolicyIDs?: string[]}) => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
             await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
                 settings: {
                     companyCards: {
-                        [oauthFeed]: {preferredPolicy: policyID, linkedPolicyIDs: [''], liabilityType: 'corporate'},
+                        [oauthFeed]: {...companyCardSettings, liabilityType: 'corporate'},
                     },
                     oAuthAccountDetails: {
                         [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
@@ -127,95 +127,53 @@ describe('useCardFeeds', () => {
                 '123': {cardID: 123, cardName: 'Card 1'},
             });
             await waitForBatchedUpdates();
+        };
+
+        it('includes domain feeds when linkedPolicyIDs contains only an empty string and preferredPolicy matches', async () => {
+            await setupDomainFeed({preferredPolicy: policyID, linkedPolicyIDs: ['']});
 
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
             await waitFor(() => expect(result.current[1].status).toBe('loaded'));
 
-            const [workspaceFeeds] = result.current;
-            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            const feedKeys = Object.keys(result.current[0] ?? {});
             expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
 
         it('includes domain feeds when linkedPolicyIDs is an empty array and preferredPolicy matches', async () => {
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
-                settings: {
-                    companyCards: {
-                        [oauthFeed]: {preferredPolicy: policyID, linkedPolicyIDs: [], liabilityType: 'corporate'},
-                    },
-                    oAuthAccountDetails: {
-                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
-                    },
-                },
-            });
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
-                '123': {cardID: 123, cardName: 'Card 1'},
-            });
-            await waitForBatchedUpdates();
+            await setupDomainFeed({preferredPolicy: policyID, linkedPolicyIDs: []});
 
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
             await waitFor(() => expect(result.current[1].status).toBe('loaded'));
 
-            const [workspaceFeeds] = result.current;
-            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            const feedKeys = Object.keys(result.current[0] ?? {});
             expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
 
         it('excludes feeds when linkedPolicyIDs explicitly lists other policies and preferredPolicy does not match', async () => {
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
-                settings: {
-                    companyCards: {
-                        [oauthFeed]: {preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY'], liabilityType: 'corporate'},
-                    },
-                    oAuthAccountDetails: {
-                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
-                    },
-                },
-            });
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
-                '123': {cardID: 123, cardName: 'Card 1'},
-            });
-            await waitForBatchedUpdates();
+            await setupDomainFeed({preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY']});
 
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
             await waitFor(() => expect(result.current[1].status).toBe('loaded'));
 
-            const [workspaceFeeds] = result.current;
-            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            const feedKeys = Object.keys(result.current[0] ?? {});
             expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(false);
         });
 
         it('includes feeds when policyID is one of multiple meaningful entries in linkedPolicyIDs', async () => {
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {workspaceAccountID: 0});
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainID}`, {
-                settings: {
-                    companyCards: {
-                        [oauthFeed]: {preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY', policyID], liabilityType: 'corporate'},
-                    },
-                    oAuthAccountDetails: {
-                        [oauthFeed]: {credentials: 'xxxx', expiration: 9999999999, accountList: ['Card 1']},
-                    },
-                },
-            });
-            await Onyx.merge(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainID}_${oauthFeed}`, {
-                '123': {cardID: 123, cardName: 'Card 1'},
-            });
-            await waitForBatchedUpdates();
+            await setupDomainFeed({preferredPolicy: 'OTHER_POLICY', linkedPolicyIDs: ['OTHER_POLICY', policyID]});
 
             const {result} = renderHook(() => useCardFeeds(policyID));
             await waitForBatchedUpdates();
 
             await waitFor(() => expect(result.current[1].status).toBe('loaded'));
 
-            const [workspaceFeeds] = result.current;
-            const feedKeys = Object.keys(workspaceFeeds ?? {});
+            const feedKeys = Object.keys(result.current[0] ?? {});
             expect(feedKeys.some((key) => key.includes(oauthFeed))).toBe(true);
         });
     });
