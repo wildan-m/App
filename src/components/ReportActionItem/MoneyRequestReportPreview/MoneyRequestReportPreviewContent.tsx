@@ -109,9 +109,10 @@ function MoneyRequestReportPreviewContent({
 }: MoneyRequestReportPreviewContentProps) {
     const [chatReportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${chatReportID}`);
 
-    const [isTransitionPending, setIsTransitionPending] = useState(
-        () => getPendingSubmitFollowUpAction()?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT,
-    );
+    const [isTransitionPending, setIsTransitionPending] = useState(() => {
+        const pending = getPendingSubmitFollowUpAction();
+        return pending?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT && (pending?.reportID === chatReportID || pending?.reportID === iouReportID);
+    });
 
     useFocusEffect(
         useCallback(() => {

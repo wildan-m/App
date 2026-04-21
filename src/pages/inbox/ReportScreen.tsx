@@ -60,9 +60,10 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     // new actions from the server, but at this point the report's local Onyx data
     // is already sufficient for the initial render. The fetch handler mounts once
     // the transition commits and backfills server-side updates.
-    const [shouldDeferNonEssentials, setShouldDeferNonEssentials] = useState(
-        () => getPendingSubmitFollowUpAction()?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT,
-    );
+    const [shouldDeferNonEssentials, setShouldDeferNonEssentials] = useState(() => {
+        const pending = getPendingSubmitFollowUpAction();
+        return pending?.followUpAction === CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT && pending?.reportID === reportIDFromRoute;
+    });
 
     useFocusEffect(
         useCallback(() => {
