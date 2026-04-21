@@ -29,6 +29,7 @@ import {useCurrencyListState} from './useCurrencyList';
 import useExportedToFilterOptions from './useExportedToFilterOptions';
 import type {FeedKeysWithAssignedCards} from './useFeedKeysWithAssignedCards';
 import useOnyx from './useOnyx';
+import useSortedActions from './useSortedActions';
 
 type AutocompleteItemData = {
     filterKey: UserFriendlyKey;
@@ -110,6 +111,7 @@ function useAutocompleteSuggestions({
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [allPoliciesTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
     const [allRecentTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS);
+    const sortedActions = useSortedActions();
     const {currencyList} = useCurrencyListState();
     const {exportedToFilterOptions} = useExportedToFilterOptions();
 
@@ -238,6 +240,7 @@ function useAutocompleteSuggestions({
                 currentUserAccountID,
                 currentUserEmail,
                 personalDetails,
+                sortedActions,
                 conciergeReportID,
             }).personalDetails.filter((participant) => participant.text && !alreadyAutocompletedKeys.has(participant.text.toLowerCase()));
 
@@ -275,6 +278,7 @@ function useAutocompleteSuggestions({
                 currentUserAccountID,
                 currentUserEmail,
                 personalDetails,
+                sortedActions,
                 conciergeReportID,
             }).recentReports.filter((chat) => {
                 if (!chat.text) {
