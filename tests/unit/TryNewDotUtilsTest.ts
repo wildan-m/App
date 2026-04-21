@@ -69,6 +69,28 @@ describe('TryNewDotUtils', () => {
         expect(shouldBlockOldAppExit({isLockedToNewApp: true} as TryNewDot, false, false)).toBe(true);
     });
 
+    it('blocks the OldDot redirect when the classicRedirect nudge has gone stale', () => {
+        const tryNewDot = {
+            classicRedirect: {
+                dismissed: false,
+                timestamp: subDays(new Date(), 31).toISOString(),
+            },
+        } as unknown as TryNewDot;
+
+        expect(isOldAppRedirectBlocked(tryNewDot, false)).toBe(true);
+    });
+
+    it('still shows the OldDot redirect when the classicRedirect nudge is fresh', () => {
+        const tryNewDot = {
+            classicRedirect: {
+                dismissed: false,
+                timestamp: subDays(new Date(), 5).toISOString(),
+            },
+        } as unknown as TryNewDot;
+
+        expect(isOldAppRedirectBlocked(tryNewDot, false)).toBe(false);
+    });
+
     it('treats classicRedirect as stale when the user has not dismissed the nudge for over a month', () => {
         const tryNewDot = {
             classicRedirect: {
