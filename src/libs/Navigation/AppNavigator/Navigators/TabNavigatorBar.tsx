@@ -22,6 +22,16 @@ const ROUTE_TO_NAVIGATION_TAB: Record<string, ValueOf<typeof NAVIGATION_TABS>> =
     [NAVIGATORS.WORKSPACE_NAVIGATOR]: NAVIGATION_TABS.WORKSPACES,
 };
 
+// Tab wrapper navigators — when `getFocusedLeafScreenName` bottoms out on one of these
+// (because the nested stack state hasn't hydrated yet), the user is landing on the tab root,
+// so treat it as "at root" to keep the tab bar visible during the transition.
+const TAB_WRAPPER_NAVIGATORS = new Set<string>([
+    NAVIGATORS.REPORTS_SPLIT_NAVIGATOR,
+    NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR,
+    NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR,
+    NAVIGATORS.WORKSPACE_NAVIGATOR,
+]);
+
 /**
  * Custom tab bar rendered by the BottomTabNavigator. Only receives `state` (not the
  * full BottomTabBarProps) to avoid `descriptors` thrashing memoization.
@@ -34,9 +44,8 @@ function TabNavigatorBar({state}: Pick<BottomTabBarProps, 'state'>) {
     const StyleUtils = useStyleUtils();
     const activeRoute = state.routes[state.index];
     const selectedTab = ROUTE_TO_NAVIGATION_TAB[activeRoute?.name ?? SCREENS.HOME] ?? NAVIGATION_TABS.HOME;
-    // Fall back to tab-level name while lazy nested state resolves, to avoid a tab-bar flash.
-    const focusedScreen = getFocusedLeafScreenName(activeRoute?.state) ?? activeRoute?.name;
-    const isAtRoot = !focusedScreen || ROOT_TAB_SCREENS.has(focusedScreen);
+    const focusedScreen = getFocusedLeafScreenName(activeRoute?.state);
+    const isAtRoot = !focusedScreen || ROOT_TAB_SCREENS.has(focusedScreen) || TAB_WRAPPER_NAVIGATORS.has(focusedScreen);
     // --- Narrow-only animation logic (hooks must run unconditionally per Rules of Hooks) ---
     // On native, screens also render the tab bar via bottomContent for swipe-back animations.
     // Delay showing this navigator's tab bar only when navigating back from a deeper screen
