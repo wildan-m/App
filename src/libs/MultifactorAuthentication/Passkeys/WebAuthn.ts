@@ -164,7 +164,6 @@ function decodeWebAuthnError(error: unknown): DecodedWebAuthnError {
 export {
     PASSKEY_AUTH_TYPE,
     arrayBufferToBase64URL,
-    base64URLToArrayBuffer,
     isWebAuthnSupported,
     buildPublicKeyCredentialCreationOptions,
     buildPublicKeyCredentialRequestOptions,
