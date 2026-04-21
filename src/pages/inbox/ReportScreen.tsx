@@ -69,10 +69,10 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
             if (!shouldDeferNonEssentials) {
                 return;
             }
-            let rafId: number;
+            let animationFrameId: number;
             const handle = TransitionTracker.runAfterTransitions({
                 callback: () => {
-                    rafId = requestAnimationFrame(() => setShouldDeferNonEssentials(false));
+                    animationFrameId = requestAnimationFrame(() => setShouldDeferNonEssentials(false));
                 },
                 waitForUpcomingTransition: true,
             });
@@ -81,7 +81,7 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
             const safetyTimeout = setTimeout(() => setShouldDeferNonEssentials(false), CONST.MAX_TRANSITION_DURATION_MS * 3);
             return () => {
                 handle.cancel();
-                cancelAnimationFrame(rafId);
+                cancelAnimationFrame(animationFrameId);
                 clearTimeout(safetyTimeout);
             };
         }, [shouldDeferNonEssentials]),

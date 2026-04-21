@@ -1605,7 +1605,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         count,
         rate,
         unit,
-        isFromGlobalCreate,
+        isFromGlobalCreate = false,
     } = transactionParams;
 
     const testDriveCommentReportActionID = isTestDrive ? NumberUtils.rand64() : undefined;
@@ -1840,7 +1840,7 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
     // hasDeferredWrite() check on mount always sees the pending channel.
     if (deferredAPIWrite) {
         deferOrExecuteWrite(deferredAPIWrite, {
-            shouldDeferForSearch: !!(shouldHandleNavigation && !requestMoneyInformation.isRetry && isFromGlobalCreate && !isReportTopmostSplitNavigator()),
+            shouldDeferForSearch: shouldHandleNavigation && !requestMoneyInformation.isRetry && isFromGlobalCreate && !isReportTopmostSplitNavigator(),
             isRetry: requestMoneyInformation.isRetry,
             optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
             onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
@@ -1850,12 +1850,13 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
     if (!requestMoneyInformation.isRetry) {
         highlightTransactionOnSearchRouteIfNeeded(isFromGlobalCreate, transaction.transactionID, CONST.SEARCH.DATA_TYPES.EXPENSE);
 
-        handleNavigateAfterExpenseCreate({
-            activeReportID: backToReport ?? activeReportID,
-            transactionID: transaction.transactionID,
-            isFromGlobalCreate,
-            shouldHandleNavigation,
-        });
+        if (shouldHandleNavigation) {
+            handleNavigateAfterExpenseCreate({
+                activeReportID: backToReport ?? activeReportID,
+                transactionID: transaction.transactionID,
+                isFromGlobalCreate,
+            });
+        }
     }
 
     if (activeReportID && !isMoneyRequestReport) {
@@ -2298,7 +2299,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
         attendees,
         odometerStart,
         odometerEnd,
-        isFromGlobalCreate,
+        isFromGlobalCreate = false,
         gpsCoordinates,
     } = transactionData;
     const isMoneyRequestReport = isMoneyRequestReportReportUtils(report);
@@ -2606,7 +2607,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
             };
 
             deferOrExecuteWrite(apiWrite, {
-                shouldDeferForSearch: !!(shouldHandleNavigation && !params.isRetry && isFromGlobalCreate && !isReportTopmostSplitNavigator()),
+                shouldDeferForSearch: shouldHandleNavigation && !params.isRetry && isFromGlobalCreate && !isReportTopmostSplitNavigator(),
                 isRetry: params.isRetry,
                 optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction?.transactionID}`,
                 onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
@@ -2621,12 +2622,13 @@ function trackExpense(params: CreateTrackExpenseParams) {
     if (!params.isRetry) {
         highlightTransactionOnSearchRouteIfNeeded(isFromGlobalCreate, transaction?.transactionID, CONST.SEARCH.DATA_TYPES.EXPENSE);
 
-        handleNavigateAfterExpenseCreate({
-            activeReportID,
-            transactionID: transaction?.transactionID,
-            isFromGlobalCreate,
-            shouldHandleNavigation,
-        });
+        if (shouldHandleNavigation) {
+            handleNavigateAfterExpenseCreate({
+                activeReportID,
+                transactionID: transaction?.transactionID,
+                isFromGlobalCreate,
+            });
+        }
     }
 
     notifyNewAction(activeReportID, undefined, payeeAccountID === currentUserAccountIDParam);

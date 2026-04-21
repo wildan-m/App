@@ -12,7 +12,7 @@ import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTop
 import navigateAfterInteraction from '@libs/Navigation/navigateAfterInteraction';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
-import {getReportOrDraftReport} from '@libs/ReportUtils';
+import {getReportOrDraftReport, isMoneyRequestReport} from '@libs/ReportUtils';
 import {buildCannedSearchQuery, getCurrentSearchQueryJSON} from '@libs/SearchQueryUtils';
 import getSubmitExpenseScenario from '@libs/telemetry/getSubmitExpenseScenario';
 import {endSubmitFollowUpActionSpan, setFastPath, setPendingSubmitFollowUpAction, startTracking} from '@libs/telemetry/submitFollowUpAction';
@@ -356,7 +356,7 @@ function SubmitExpenseOrchestrator({
 
     const dismissRHPToReport = (reportID: string, runAfterDismiss: () => void) => {
         const report = getReportOrDraftReport(reportID);
-        const hasExistingTransactions = report?.transactionCount !== 0;
+        const hasExistingTransactions = isMoneyRequestReport(report) && report?.transactionCount !== 0;
 
         if (!hasExistingTransactions) {
             setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY, reportID);
@@ -429,10 +429,6 @@ function SubmitExpenseOrchestrator({
     // frequently from Onyx subscriptions anyway, and wrapping this properly would require
     // memoizing every handler + all their captured props for no measurable gain.
     const onConfirm = (listOfParticipants: Participant[]) => {
-        if (isConfirming) {
-            return;
-        }
-
         setIsConfirming(true);
         setSelectedParticipantList(listOfParticipants);
 

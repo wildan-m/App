@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import Icon from '@components/Icon';
 import PulsingView from '@components/PulsingView';
@@ -28,36 +28,27 @@ function ReportActionComposePlaceholder() {
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Emoji', 'Send']);
 
-    const wrapperStyle = useMemo(() => [styles.chatFooter, {minHeight: CONST.CHAT_FOOTER_MIN_HEIGHT}], [styles.chatFooter]);
+    const wrapperStyle = [styles.chatFooter, {minHeight: CONST.CHAT_FOOTER_MIN_HEIGHT}];
 
-    const plusButtonStyle = useMemo(
-        () => [
-            {flexBasis: (styles.composerSizeButton.width ?? 0) + (styles.composerSizeButton.marginHorizontal ?? 0) * 2},
-            styles.flexGrow0,
-            styles.flexShrink0,
-            styles.justifyContentCenter,
-            styles.alignItemsCenter,
-        ],
-        [styles.composerSizeButton.width, styles.composerSizeButton.marginHorizontal, styles.flexGrow0, styles.flexShrink0, styles.justifyContentCenter, styles.alignItemsCenter],
-    );
+    const plusButtonStyle = [
+        {flexBasis: (styles.composerSizeButton.width ?? 0) + (styles.composerSizeButton.marginHorizontal ?? 0) * 2},
+        styles.flexGrow0,
+        styles.flexShrink0,
+        styles.justifyContentCenter,
+        styles.alignItemsCenter,
+    ];
 
-    const textInputStyle = useMemo(
-        () => [styles.textInputComposeSpacing, styles.textInputComposeBorder, {paddingVertical: 0}],
-        [styles.textInputComposeSpacing, styles.textInputComposeBorder],
-    );
+    const textInputStyle = [styles.textInputComposeSpacing, styles.textInputComposeBorder, {paddingVertical: 0}];
 
-    const placeholderTextStyle = useMemo(
-        () => [
-            styles.textNormal,
-            {
-                color: theme.placeholderText,
-                lineHeight: styles.textInputCompose.lineHeight,
-                paddingHorizontal: variables.avatarChatSpacing,
-                alignSelf: 'center' as const,
-            },
-        ],
-        [styles.textNormal, styles.textInputCompose.lineHeight, theme.placeholderText],
-    );
+    const placeholderTextStyle = [
+        styles.textNormal,
+        {
+            color: theme.placeholderText,
+            lineHeight: styles.textInputCompose.lineHeight,
+            paddingHorizontal: variables.avatarChatSpacing,
+            alignSelf: 'center' as const,
+        },
+    ];
 
     return (
         <PulsingView

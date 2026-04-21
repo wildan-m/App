@@ -658,16 +658,14 @@ function handleNavigateAfterExpenseCreate({
     transactionID,
     isFromGlobalCreate,
     isInvoice,
-    shouldHandleNavigation = true,
 }: {
     activeReportID?: string;
     transactionID?: string;
     isFromGlobalCreate?: boolean;
     isInvoice?: boolean;
-    shouldHandleNavigation?: boolean;
 }) {
     const hasMultipleTransactions = Object.values(allTransactions).filter((transaction) => transaction?.reportID === activeReportID).length > 0;
-    navigateAfterExpenseCreate({activeReportID, transactionID, isFromGlobalCreate, isInvoice, hasMultipleTransactions, shouldHandleNavigation});
+    navigateAfterExpenseCreate({activeReportID, transactionID, isFromGlobalCreate, isInvoice, hasMultipleTransactions});
 }
 
 /**

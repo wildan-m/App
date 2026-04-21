@@ -234,11 +234,11 @@ function SearchStaticList({
 
     const hasWideFooter = !shouldUseNarrowLayout || showPendingExpensePlaceholder;
 
-    const renderWideItem = ({item, index}: ListRenderItemInfo<TransactionListItemType>) => {
+    const renderWideItem = ({item, index}: ListRenderItemInfo<TransactionListItemType>, dataLength: number) => {
         if (!('transactionID' in item)) {
             return null;
         }
-        const isLastItem = index === sortedData.length - 1 && !hasWideFooter;
+        const isLastItem = index === dataLength - 1 && !hasWideFooter;
 
         return (
             <View
@@ -363,7 +363,7 @@ function SearchStaticList({
             )}
             <FlatList
                 data={sortedData}
-                renderItem={shouldUseNarrowLayout ? renderItem : renderWideItem}
+                renderItem={shouldUseNarrowLayout ? renderItem : (info) => renderWideItem(info, sortedData.length)}
                 keyExtractor={keyExtractor}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={shouldUseNarrowLayout ? contentContainerStyle : styles.pb3}

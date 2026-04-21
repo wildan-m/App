@@ -735,7 +735,7 @@ function sendInvoice({
     companyWebsite,
     policyRecentlyUsedCategories,
     policyRecentlyUsedTags,
-    isFromGlobalCreate,
+    isFromGlobalCreate = false,
     senderPolicyTags,
     shouldHandleNavigation = true,
 }: SendInvoiceOptions) {
@@ -805,7 +805,7 @@ function sendInvoice({
     };
 
     deferOrExecuteWrite(apiWrite, {
-        shouldDeferForSearch: !!(shouldHandleNavigation && isFromGlobalCreate && !isReportTopmostSplitNavigator()),
+        shouldDeferForSearch: shouldHandleNavigation && isFromGlobalCreate && !isReportTopmostSplitNavigator(),
         optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
         onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
     });
@@ -815,13 +815,14 @@ function sendInvoice({
 
     highlightTransactionOnSearchRouteIfNeeded(isFromGlobalCreate, transactionID, CONST.SEARCH.DATA_TYPES.INVOICE);
 
-    handleNavigateAfterExpenseCreate({
-        activeReportID: invoiceRoom.reportID,
-        transactionID,
-        isFromGlobalCreate,
-        isInvoice: true,
-        shouldHandleNavigation,
-    });
+    if (shouldHandleNavigation) {
+        handleNavigateAfterExpenseCreate({
+            activeReportID: invoiceRoom.reportID,
+            transactionID,
+            isFromGlobalCreate,
+            isInvoice: true,
+        });
+    }
 
     notifyNewAction(invoiceRoom.reportID, undefined, true);
 }
