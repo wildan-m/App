@@ -1,11 +1,11 @@
 import React, {useCallback, useEffect} from 'react';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import MenuItem from '@components/MenuItem';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import usePermissions from '@hooks/usePermissions';
@@ -32,6 +32,7 @@ function WorkspaceHRPage({
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const icons = useMemoizedLazyExpensifyIcons(['GustoSquare']);
+    const illustrations = useMemoizedLazyIllustrations(['NewUser']);
 
     useWorkspaceDocumentTitle(undefined, 'workspace.common.hr');
 
@@ -60,19 +61,19 @@ function WorkspaceHRPage({
                 offlineIndicatorStyle={styles.mtAuto}
             >
                 <HeaderWithBackButton
+                    icon={illustrations.NewUser}
                     title={translate('workspace.common.hr')}
                     shouldShowBackButton={shouldUseNarrowLayout}
+                    shouldUseHeadlineHeader
                     onBackButtonPress={() => Navigation.goBack()}
                 />
                 <ScrollView contentContainerStyle={styles.pb5}>
                     <Section
-                        title={translate('workspace.hr.title')}
-                        subtitle={translate('workspace.hr.subtitle')}
+                        title={translate('workspace.accounting.title')}
                         isCentralPane
                     >
-                        <MenuItemWithTopDescription
+                        <MenuItem
                             title={translate('workspace.hr.gusto.title')}
-                            description={translate('workspace.hr.gusto.connectionDescription')}
                             icon={icons.GustoSquare}
                             iconType={CONST.ICON_TYPE_ICON}
                             interactive={false}
@@ -84,7 +85,6 @@ function WorkspaceHRPage({
                                     onPress={() => {}}
                                 />
                             }
-                            wrapperStyle={styles.mt3}
                         />
                     </Section>
                 </ScrollView>
