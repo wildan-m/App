@@ -1399,7 +1399,7 @@ function buildOnyxDataForTestDriveIOU(
     });
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const text = Localize.translateLocal('testDrive.employeeInviteMessage', personalDetailsList?.[deprecatedUserAccountID]?.firstName ?? '');
-    // Will be refactored in PR 15; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value; tracked in https://github.com/Expensify/App/issues/66425
+    // delegateEmailParam: will be threaded in PR 15; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value (https://github.com/Expensify/App/issues/66425)
     const textComment = buildOptimisticAddCommentReportAction({
         text,
         actorAccountID: deprecatedUserAccountID,
