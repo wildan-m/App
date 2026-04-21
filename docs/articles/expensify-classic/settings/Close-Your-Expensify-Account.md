@@ -14,6 +14,7 @@ Instead of closing your account, you can downgrade to a free account to retain a
 **Note:** If you are the Billing Owner of a Workspace on an Annual Subscription, you can’t close your account directly. You may be able to downgrade to a free account if you meet eligibility criteria, or you must transfer billing ownership before closing your account.
 
 ---
+
 ## Who can close an Expensify account 
 
 Any member can close their own Expensify account, if: 
@@ -33,6 +34,7 @@ Any member can close their own Expensify account, if:
 1. Click **Settings > Account**.
 2. Click **Profile**.
 3. Scroll to the bottom of the page and click **Close Account**.
+   
 **Mobile:**
 1. Tap the **Menu (≡)** at the top left.
 2. Tap **Settings**.
@@ -48,7 +50,7 @@ If you don't see the option to close your account, your account may be domain-co
 All unsubmitted expenses and personal data tied to the account are deleted. 
 
 Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and Admins on the Workspace where the expenses were submitted. 
-Expenses shared with others, such as expenses submitted on a Workspace, may be retained for regulatory compliance. Submitted expenses remain visible to approvers and the Admins on the workspace where the expenses were submitted. 
+
 ---
 
 # FAQ
@@ -76,9 +78,9 @@ This error occurs when you are the only remaining admin on a domain. To proceed 
 
 [Learn how to reset a domain](/articles/expensify-classic/domains/Claim-And-Verify-A-Domain). 
 
-This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
+## Why do I see the message "Expensify Card bank account owner" when closing my account?
 
-This error occurs when you are the owner of the bank account that your company uses to manage the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
+This error occurs when you are the owner of the bank account that your company uses to settle the Expensify Card. To proceed with closing your account, [message Concierge](https://new.expensify.com/concierge). 
 
 ## Can I close my account if I own a Workspace on an Annual Subscription?
 
