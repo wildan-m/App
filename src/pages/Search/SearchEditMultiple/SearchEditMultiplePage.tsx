@@ -25,7 +25,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
-import {getTransactionEditContext, withSnapshotReportActions, withSnapshotReports, withSnapshotTransactions} from './SearchEditMultipleUtils';
+import {getTransactionEditContext, isBulkEditTaxTrackingEnabled, withSnapshotReportActions, withSnapshotReports, withSnapshotTransactions} from './SearchEditMultipleUtils';
 
 function SearchEditMultiplePage() {
     const {translate} = useLocalize();
@@ -101,16 +101,7 @@ function SearchEditMultiplePage() {
     const policyTags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`];
     const policyTagLists = getTagLists(policyTags);
 
-    const isTaxTrackingEnabled =
-        !hasPerDiemOrTimeTransaction &&
-        selectedTransactionContexts.every(({transaction, transactionPolicy}) => {
-            // Unreported (track) expenses have no report, so no per-transaction policy can be resolved.
-            // Fall back to the bulk-edit workspace policy (the same policy used to render the Tax row and picker).
-            if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
-                return !!policy?.tax?.trackingEnabled;
-            }
-            return !!transactionPolicy?.tax?.trackingEnabled;
-        });
+    const isTaxTrackingEnabled = isBulkEditTaxTrackingEnabled(selectedTransactionContexts, policy, hasPerDiemOrTimeTransaction);
     const areSelectedTransactionsExpenses = selectedTransactionContexts.every(({transaction, report}) => {
         if (!transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
             return true;
