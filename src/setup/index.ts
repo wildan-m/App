@@ -70,6 +70,7 @@ export default function () {
             ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS,
             ONYXKEYS.RAM_ONLY_WALLET_ONFIDO,
             ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN,
+            ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD,
         ],
     });
 

@@ -808,7 +808,7 @@ const ONYXKEYS = {
         NVP_EXPENSIFY_REPORT_PDF_FILENAME: 'nvp_expensify_report_PDFFilename_',
 
         /** Stores the information about the state of issuing a new card */
-        ISSUE_NEW_EXPENSIFY_CARD: 'issueNewExpensifyCard_',
+        RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD: 'issueNewExpensifyCard_',
 
         /** Stored the user information with whom bank account is being shared */
         BANK_ACCOUNT_SHARE_DETAILS: 'expensify_bankAccountShare_',
@@ -1294,7 +1294,7 @@ type OnyxCollectionValuesMapping = {
     [ONYXKEYS.COLLECTION.LAST_SELECTED_FEED]: OnyxTypes.CompanyCardFeedWithDomainID;
     [ONYXKEYS.COLLECTION.LAST_SELECTED_EXPENSIFY_CARD_FEED]: OnyxTypes.FundID;
     [ONYXKEYS.COLLECTION.NVP_EXPENSIFY_ON_CARD_WAITLIST]: OnyxTypes.CardOnWaitlist;
-    [ONYXKEYS.COLLECTION.ISSUE_NEW_EXPENSIFY_CARD]: OnyxTypes.IssueNewCard;
+    [ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD]: OnyxTypes.IssueNewCard;
     [ONYXKEYS.COLLECTION.SAML_METADATA]: OnyxTypes.SamlMetadata;
     [ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS]: OnyxTypes.DomainPendingActions;
     [ONYXKEYS.COLLECTION.DOMAIN_ERRORS]: OnyxTypes.DomainErrors;
