@@ -6940,7 +6940,13 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Modo de aprovação', finalApprover: 'Aprovador final'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Modo de aprovação',
+                finalApprover: 'Aprovador final',
+                connect: 'Conectar',
+                connectionDescription: 'Conecte o Gusto para manter as aprovações de funcionários sincronizadas com seu workspace.',
+            },
         },
     },
     getAssistancePage: {
