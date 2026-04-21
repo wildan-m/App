@@ -1265,8 +1265,8 @@ describe('actions/Policy', () => {
             const calls = apiWriteSpy.mock.calls.filter((call) => call.at(0) === WRITE_COMMANDS.CREATE_WORKSPACE);
             expect(calls).toHaveLength(2);
 
-            const memberData1 = JSON.parse((calls[0][1] as {memberData: string}).memberData) as {workspaceChatReportID: string};
-            const memberData2 = JSON.parse((calls[1][1] as {memberData: string}).memberData) as {workspaceChatReportID: string};
+            const memberData1 = JSON.parse((calls.at(0)?.at(1) as {memberData: string}).memberData) as {workspaceChatReportID: string};
+            const memberData2 = JSON.parse((calls.at(1)?.at(1) as {memberData: string}).memberData) as {workspaceChatReportID: string};
             expect(memberData1.workspaceChatReportID).toBeTruthy();
             expect(memberData2.workspaceChatReportID).toBeTruthy();
             expect(memberData1.workspaceChatReportID).not.toBe(memberData2.workspaceChatReportID);
