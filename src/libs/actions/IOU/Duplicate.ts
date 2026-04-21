@@ -599,6 +599,7 @@ function createExpenseByType({
                     ...(params.transactionParams ?? {}),
                     comment: {
                         ...transaction.comment,
+                        hold: undefined,
                         originalTransactionID: undefined,
                         source: undefined,
                         waypoints,
@@ -746,6 +747,7 @@ function duplicateExpenseTransaction({
                 ...(params.transactionParams ?? {}),
                 comment: {
                     ...transaction.comment,
+                    hold: undefined,
                     originalTransactionID: undefined,
                     source: undefined,
                     waypoints,
