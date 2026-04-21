@@ -79,7 +79,7 @@ function ChartXAxisLabels({
             }
             return truncateLabel(label, labelWidths.at(i) ?? 0, maxWidth, ellipsisWidth);
         });
-        })();
+    })();
 
     const paragraphs = useChartParagraphs(truncatedLabels, fontMgr, fontSize, labelColor, MAX_X_AXIS_LABEL_WIDTH);
 
