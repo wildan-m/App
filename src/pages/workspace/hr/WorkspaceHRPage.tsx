@@ -5,6 +5,7 @@ import MenuItem from '@components/MenuItem';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
+import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -62,6 +63,9 @@ function WorkspaceHRPage({
             >
                 <HeaderWithBackButton
                     icon={illustrations.NewUser}
+                    iconWidth={40}
+                    iconHeight={40}
+                    iconStyles={styles.mr1}
                     title={translate('workspace.common.hr')}
                     shouldShowBackButton={shouldUseNarrowLayout}
                     shouldUseHeadlineHeader
@@ -69,13 +73,19 @@ function WorkspaceHRPage({
                 />
                 <ScrollView contentContainerStyle={styles.pb5}>
                     <Section
-                        title={translate('workspace.accounting.title')}
+                        contentPaddingOnLargeScreens={{padding: 24}}
                         isCentralPane
+                        renderTitle={() => <Text style={[styles.textStrong]}>{translate('workspace.accounting.title')}</Text>}
                     >
                         <MenuItem
                             title={translate('workspace.hr.gusto.title')}
                             icon={icons.GustoSquare}
                             iconType={CONST.ICON_TYPE_ICON}
+                            iconWidth={32}
+                            iconHeight={32}
+                            iconStyles={styles.mr2}
+                            shouldIconUseAutoWidthStyle
+                            wrapperStyle={[styles.ph0, styles.pv2, styles.mt4]}
                             interactive={false}
                             shouldShowRightComponent
                             rightComponent={
