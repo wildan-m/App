@@ -6354,6 +6354,8 @@ const translations = {
                 title: 'Gusto',
                 connect: 'Connect',
                 connectionDescription: 'Connect Gusto to keep employee approvals in sync with your workspace.',
+                approvalMode: 'Approval mode',
+                finalApprover: 'Final approver',
             },
         },
         export: {
