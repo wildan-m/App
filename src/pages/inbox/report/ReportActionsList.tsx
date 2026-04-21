@@ -233,6 +233,9 @@ function ReportActionsList({
     const hasHeaderRendered = useRef(false);
 
     const lastAction = sortedVisibleReportActions.at(0);
+    const isLastActionFromCurrentUser = (isReportPreviewAction(lastAction) ? lastAction?.childLastActorAccountID : lastAction?.actorAccountID) === currentUserAccountID;
+    const prevLastActionID = usePrevious(lastAction?.reportActionID);
+    const shouldMaintainVisibleContentPosition = prevLastActionID !== undefined && prevLastActionID !== lastAction?.reportActionID && !isLastActionFromCurrentUser;
     const sortedVisibleReportActionsObjects: OnyxTypes.ReportActions = useMemo(
         () =>
             sortedVisibleReportActions.reduce((actions, action) => {
@@ -900,6 +903,7 @@ function ReportActionsList({
                     extraData={extraData}
                     key={listID}
                     getItemType={(item) => item.actionName}
+                    shouldMaintainVisibleContentPosition={shouldMaintainVisibleContentPosition}
                     initialScrollKey={linkedReportActionID}
                     onContentSizeChange={() => {
                         trackVerticalScrolling(undefined);

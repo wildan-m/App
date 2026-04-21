@@ -1,6 +1,9 @@
 import type {FlashListProps} from '@shopify/flash-list';
 import {useEffect, useState} from 'react';
 
+// How long to keep MVCP enabled after `shouldMaintainVisibleContentPosition` drops back to false
+const MVCP_FALLOFF_MS = 500;
+
 type FlashListScrollKeyProps<T> = {
     /** The array of items to render in the list. */
     data: T[];
@@ -13,9 +16,12 @@ type FlashListScrollKeyProps<T> = {
 
     /** Callback invoked when the user scrolls close to the start of the list. */
     onStartReached: FlashListProps<T>['onStartReached'];
+
+    /** Whether the list should handle `maintainVisibleContentPosition` */
+    shouldMaintainVisibleContentPosition?: boolean;
 };
 
-export default function useFlashListScrollKey<T>({data, keyExtractor, initialScrollKey, onStartReached}: FlashListScrollKeyProps<T>) {
+export default function useFlashListScrollKey<T>({data, keyExtractor, initialScrollKey, onStartReached, shouldMaintainVisibleContentPosition}: FlashListScrollKeyProps<T>) {
     const [isInitialRender, setIsInitialRender] = useState(true);
     const [hasLinkingSettled, setHasLinkingSettled] = useState(!initialScrollKey);
 
@@ -33,9 +39,20 @@ export default function useFlashListScrollKey<T>({data, keyExtractor, initialScr
         });
     }, [isInitialRender, initialScrollKey]);
 
-    // `undefined` = leave FlashList's default (MVCP enabled) while we're still pinning the linked item.
-    // `{disabled: true}` once that's done so MVCP can't interfere afterward.
-    const maintainVisibleContentPosition: FlashListProps<T>['maintainVisibleContentPosition'] = hasLinkingSettled ? {disabled: true} : undefined;
+    // FlashList captures MVCP anchors on the render BEFORE a data change. Keep MVCP on at mount
+    // (warmup) and while the caller raises the prop, then disable after a short falloff.
+    const [isKeepingMVCPOn, setIsKeepingMVCPOn] = useState(true);
+    useEffect(() => {
+        if (shouldMaintainVisibleContentPosition) {
+            setIsKeepingMVCPOn(true);
+            return;
+        }
+        const timeoutID = setTimeout(() => setIsKeepingMVCPOn(false), MVCP_FALLOFF_MS);
+        return () => clearTimeout(timeoutID);
+    }, [shouldMaintainVisibleContentPosition]);
+
+    const shouldEnableMVCP = !!shouldMaintainVisibleContentPosition || isKeepingMVCPOn || !hasLinkingSettled;
+    const maintainVisibleContentPosition: FlashListProps<T>['maintainVisibleContentPosition'] = {disabled: !shouldEnableMVCP};
 
     if (!isInitialRender || !initialScrollKey) {
         return {displayedData: data, onStartReached, maintainVisibleContentPosition};
