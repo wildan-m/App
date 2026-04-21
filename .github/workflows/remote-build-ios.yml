@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: blacksmith-12vcpu-macos-latest
+    runs-on: ${{ github.repository_owner == 'Expensify' && 'blacksmith-12vcpu-macos-latest' || 'macos-latest' }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
     strategy:
