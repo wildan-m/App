@@ -63,9 +63,6 @@ function WorkspaceHRPage({
             >
                 <HeaderWithBackButton
                     icon={illustrations.NewUser}
-                    iconWidth={40}
-                    iconHeight={40}
-                    iconStyles={styles.mr1}
                     title={translate('workspace.common.hr')}
                     shouldShowBackButton={shouldUseNarrowLayout}
                     shouldUseHeadlineHeader
@@ -81,6 +78,7 @@ function WorkspaceHRPage({
                             title={translate('workspace.hr.gusto.title')}
                             icon={icons.GustoSquare}
                             iconType={CONST.ICON_TYPE_ICON}
+                            displayInDefaultIconColor
                             iconWidth={32}
                             iconHeight={32}
                             iconStyles={styles.mr2}
