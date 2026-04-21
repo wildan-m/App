@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useDeferredValue, useMemo} from 'react';
 import {buildSearchQueryJSON, buildUserReadableQueryString} from '@libs/SearchQueryUtils';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 
@@ -36,6 +36,15 @@ function useSavedSearchTitles({
     shouldBuildTitles = true,
     allowEmptyQueryJSONFallback = true,
 }: SavedSearchTitlesHookParams): Map<string, string> {
+    const deferredReports = useDeferredValue(reports);
+    const deferredPolicies = useDeferredValue(allPolicies);
+    const deferredPersonalDetails = useDeferredValue(personalDetails);
+    const deferredReportAttributes = useDeferredValue(reportAttributes);
+    const deferredTaxRates = useDeferredValue(taxRates);
+    const deferredCardsForSavedSearchDisplay = useDeferredValue(cardsForSavedSearchDisplay);
+    const deferredAllFeeds = useDeferredValue(allFeeds);
+    const deferredFeedKeysWithCards = useDeferredValue(feedKeysWithCards);
+
     return useMemo(() => {
         const titles = new Map<string, string>();
 
@@ -55,35 +64,35 @@ function useSavedSearchTitles({
 
             const title = buildUserReadableQueryString({
                 queryJSON: itemJsonQuery ?? ({} as UserReadableQueryParams['queryJSON']),
-                PersonalDetails: personalDetails,
-                reports,
-                taxRates,
-                cardList: cardsForSavedSearchDisplay,
-                cardFeeds: allFeeds,
-                policies: allPolicies,
+                PersonalDetails: deferredPersonalDetails,
+                reports: deferredReports,
+                taxRates: deferredTaxRates,
+                cardList: deferredCardsForSavedSearchDisplay,
+                cardFeeds: deferredAllFeeds,
+                policies: deferredPolicies,
                 currentUserAccountID,
                 autoCompleteWithSpace: false,
                 translate,
-                feedKeysWithCards,
-                reportAttributes,
+                feedKeysWithCards: deferredFeedKeysWithCards,
+                reportAttributes: deferredReportAttributes,
             });
             titles.set(item.query, title);
         }
 
         return titles;
     }, [
-        allFeeds,
-        allPolicies,
+        deferredAllFeeds,
+        deferredPolicies,
         allowEmptyQueryJSONFallback,
-        cardsForSavedSearchDisplay,
+        deferredCardsForSavedSearchDisplay,
         currentUserAccountID,
-        feedKeysWithCards,
-        personalDetails,
-        reportAttributes,
-        reports,
+        deferredFeedKeysWithCards,
+        deferredPersonalDetails,
+        deferredReportAttributes,
+        deferredReports,
         savedSearches,
         shouldBuildTitles,
-        taxRates,
+        deferredTaxRates,
         translate,
     ]);
 }
