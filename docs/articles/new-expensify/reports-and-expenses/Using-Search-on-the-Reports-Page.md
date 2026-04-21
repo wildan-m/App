@@ -1,7 +1,7 @@
 ---
 title: Using Search on the Reports Page
-description: Learn how role-based search simplifies submitting, approving, or paying expense reports in New Expensify.
-keywords: [New Expensify, search, Submit, Approve, Pay, To-do, LHN, batch processing, filters, expense report actions]
+description: Learn how suggested searches in the Reports page help you quickly find reports to submit, approve, pay, or export in New Expensify.
+keywords: [New Expensify, search, Drafts, Needs approval, Ready to pay, Awaiting export, LHN, batch processing, filters, expense report actions, Expense reports, Accounting]
 ---
 
 
@@ -11,13 +11,18 @@ Using the search function on the reports page helps you quickly take action on r
 
 # Search on the Reports Page
 
-**Navigation: In the navigation tabs (on the left on web, and at the bottom on mobile), select Reports > Expense Reports > To-do**.
+**Navigation: In the navigation tabs (on the left on web, and at the bottom on mobile), select Reports > Expense reports**.
 
-The **To-do** section surfaces key report actions so you can:
+The **Expense reports** section surfaces key report actions so you can:
+- View all reports and expenses
 - Submit expenses waiting on you
 - Approve reports that need your review
 - Pay approved reports ready for reimbursement
+
+The **Accounting** section surfaces reports related to accounting workflows:
 - Export finalized reports to accounting platforms
+- Review cash and card accruals
+- Access card statements and bank reconciliation
 
 These shortcuts are personalized based on your role and workspace configuration, helping you process reports in batches without manually building advanced searches.
 
@@ -27,47 +32,53 @@ These shortcuts are personalized based on your role and workspace configuration,
 
 # How to Use Search Shortcuts
 
-Search options appear under the **To-do** section in the navigation tabs (on the left on web, and at the bottom on mobile).
+Search options appear under the **Expense reports** and **Accounting** sections in the navigation tabs (on the left on web, and at the bottom on mobile).
 
-Depending on your role, you’ll see shortcuts like:
-- **Submit** – Reports you’ve drafted and need to submit.
-- **Approve** – Reports awaiting your review.
-- **Pay** – Reports ready for reimbursement.
-- **Export** – Reports ready for accounting export (e.g., to QuickBooks).
+Depending on your role, you'll see shortcuts like:
 
-Admins may also see:
-- **Monthly accrual** -- Unapproved cash, Unapproved card.
-- **Reconciliation** -- Card statements, Expensify Card, Reimbursements.
+Under **Expense reports**:
+- **All reports** -- All expense reports across your workspaces.
+- **All expenses** -- All individual expenses.
+- **Drafts** -- Reports you've drafted and need to submit.
+- **Needs approval** -- Reports awaiting your review.
+- **Ready to pay** -- Reports ready for reimbursement.
+
+Under **Accounting**:
+- **Awaiting export** -- Reports ready for accounting export (e.g., to QuickBooks).
+- **Cash accruals** -- Unapproved cash expenses.
+- **Card accruals** -- Unapproved card expenses.
+- **Card statements** -- Card statement data.
+- **Bank reconciliation** -- Expensify Card and reimbursement reconciliation.
 
 ---
 
 # Member Views and Access
 
 ## All members
-- Can access **Reports**, **Expenses**, and **Chats (Inbox tab)** from the **Explore** section.
-- If no reports exist, the To-do section will prompt you to create one.
+- Can access **All reports**, **All expenses**, and **Chats (Inbox tab)** from the **Expense reports** section.
+- If no reports exist, you will be prompted to create one.
 
 ## Employees (Submitters)
-- See **Submit** when they have unsubmitted reports.
-- See a confirmation message (e.g., “All caught up!”) when nothing remains.
+- See **Drafts** when they have unsubmitted reports.
+- See a confirmation message (e.g., "All caught up!") when nothing remains.
 
 ## Approvers
-- See **Approve** for reports awaiting their review.
-- See a message like “Nothing left to review” when done.
+- See **Needs approval** for reports awaiting their review.
+- See a message like "Nothing left to review" when done.
 
 ## Admins (Payments)
-- See **Pay** for reports ready to reimburse.
-- See a celebratory message (e.g., “All reports paid!”) when cleared.
+- See **Ready to pay** for reports ready to reimburse.
+- See a celebratory message (e.g., "All reports paid!") when cleared.
 
 ### Admins (Exports)
-- See **Export** for reports eligible for accounting export (e.g., to QuickBooks Online).
+- See **Awaiting export** for reports eligible for accounting export (e.g., to QuickBooks Online).
 - Filter uses `exported:never` to show only unexported reports.
 
 ---
 
 # Best Practices
 
-- Start with the **To-do** section to prioritize daily report actions.
+- Start with the **Expense reports** section to prioritize daily report actions.
 - Save your favorite filters or searches for reuse.
 - Use advanced search only when needed for specific cases.
 
@@ -75,7 +86,7 @@ Admins may also see:
 
 # FAQ
 
-## What if I don't see the Submit, Approve, Pay or Export options?
+## What if I don't see the Drafts, Needs approval, Ready to pay, or Awaiting export options?
 
 These search shortcuts only appear when:
 - You have reports that require those actions.
@@ -85,8 +96,7 @@ These search shortcuts only appear when:
 
 Not yet. The **Workspace filter** is currently single-select. Multi-workspace support is planned for a future update.
 
-## What is the difference between Explore and To-do?
+## What is the difference between Expense reports and Accounting?
 
-- **Explore** = General browsing (e.g., Expenses, Chats)
-- **To-do** = Personalized actions based on your role (e.g., Submit, Approve, Pay, Export)
-
+- **Expense reports** = Report actions based on your role (e.g., Drafts, Needs approval, Ready to pay)
+- **Accounting** = Reports related to accounting workflows (e.g., Awaiting export, Cash accruals, Card accruals, Bank reconciliation)

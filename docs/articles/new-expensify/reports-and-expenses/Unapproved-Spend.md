@@ -1,14 +1,14 @@
 ---
 title: Unapproved Spend
 description: See all unapproved cash and card spend in one place so you can close the books without missing anything.
-keywords: [unapproved spend, unapproved cash, unapproved card, accounting, liabilities, month-end close, New Expensify, workspace admin, approvals, reimbursements, card feed]
+keywords: [unapproved spend, cash accruals, card accruals, unapproved cash, unapproved card, accounting, liabilities, month-end close, New Expensify, workspace admin, approvals, reimbursements, card feed]
 ---
 
 Unapproved expenses that haven’t been recorded yet can create hidden liabilities. The Unapproved Spend views bring them together in one place so you can post accruals, follow up with submitters, and keep your general ledger accurate.
 
 # Unapproved Spend
 
-The Unapproved Spend section includes two views: **Unapproved Cash** and **Unapproved Card**. Both show expenses that are waiting for approval and have not yet been posted to your books, so you can take action before closing the period.
+The Unapproved Spend section includes two views: **Cash accruals** and **Card accruals**. Both show expenses that are waiting for approval and have not yet been posted to your books, so you can take action before closing the period.
 
 ---
 
@@ -21,15 +21,15 @@ Workspace Admins with:
 
 ## How to get there
 Go to:
-- **Reports > Monthly accrual > Unapproved cash** — reimbursable expenses paid out-of-pocket
-- **Reports > Monthly accrual > Unapproved card** — expenses from connected card feeds
+- **Reports > Accounting > Cash accruals** — reimbursable expenses paid out-of-pocket
+- **Reports > Accounting > Card accruals** — expenses from connected card feeds
 
 These views come with filters already applied:
 
-**Unapproved Cash**
+**Cash accruals**
 `type:expense group-by:from status:drafts,outstanding reimbursable:yes`
 
-**Unapproved Card**
+**Card accruals**
 `type:expense group-by:from status:drafts,outstanding feed:"Your Bank"`
 
 
@@ -60,10 +60,10 @@ These views come with filters already applied:
 Because even if it’s not approved yet, it’s still money your business owes. Seeing it all in one place helps you stay on top of liabilities.
 
 ## Can I group unapproved expenses by submitter?
-Yes. Both Unapproved Cash and Unapproved Card group expenses by submitter so you can see who has unapproved items and the per-person subtotal.
+Yes. Both Cash accruals and Card accruals group expenses by submitter so you can see who has unapproved items and the per-person subtotal.
 
-## What if I don’t see the Monthly accrual section on the Reports page?
-You’ll need to be a Workspace Admin with approvals turned on, plus either reimbursements or at least one card feed connected. If your workspace has only cash, only **Unapproved cash** appears under Monthly accrual; if it has only card feeds, only **Unapproved card** appears.
+## What if I don’t see the Accounting section on the Reports page?
+You’ll need to be a Workspace Admin with approvals turned on, plus either reimbursements or at least one card feed connected. If your workspace has only cash, only **Cash accruals** appears under Accounting; if it has only card feeds, only **Card accruals** appears.
 
 ## Can I filter unapproved card expenses by feed?
 Yes. If you have more than one card feed, a **Feed** filter will appear so you can review one account at a time.

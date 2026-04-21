@@ -17,8 +17,8 @@ To pay Workspace expenses, you’ll first need to:
 
 ## Where to Find Workspaces Expenses to Pay
 
-- On web, go to the **navigation tabs on the left** and select **Reports > To-do > Pay**  
-- On mobile, go to the **navigation tabs on the bottom** and select **Reports > To-do > Pay**  
+- On web, go to the **navigation tabs on the left** and select **Reports > Expense reports > Ready to pay**  
+- On mobile, go to the **navigation tabs on the bottom** and select **Reports > Expense reports > Ready to pay**  
 - Or, tap the notification you received via email, push, or text
 
 ## How to Pay Workspace Expenses
@@ -42,8 +42,8 @@ To send a personal payment, you must first [set up your Wallet](https://help.exp
 
 ## Where to find Personal Expenses to Pay
 
-- On web, go to the **navigation tabs on the left** and select **Reports > To-do > Pay**  
-- On mobile, go to the **navigation tabs on the bottom** and select **Reports > To-do > Pay**  
+- On web, go to the **navigation tabs on the left** and select **Reports > Expense reports > Ready to pay**  
+- On mobile, go to the **navigation tabs on the bottom** and select **Reports > Expense reports > Ready to pay**  
 - Or, click the notification you received
 
 ## How to Pay a Personal Expense

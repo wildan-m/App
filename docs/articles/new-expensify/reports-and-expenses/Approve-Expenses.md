@@ -97,7 +97,7 @@ Unapproving a report returns it to the Outstanding state. The last approver will
 
 As the assigned approver, you can reject an entire expense report to return it to the submitter or a previous approver while keeping the report's expense grouping intact.
 
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Reports > Approve**.
+1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Reports > Expense reports > Needs approval**.
 2. Locate the Outstanding report you want to reject.
 3. Click the report to open it. 
 4. Click **More** at the top of the report. 
