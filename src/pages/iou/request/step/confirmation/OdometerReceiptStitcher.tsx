@@ -121,43 +121,37 @@ function OdometerReceiptStitcher({
             {uri: endUri, image: odometerEndImage},
         ].filter((item): item is {uri: string; image: typeof odometerStartImage} => !!item.uri && item.uri.startsWith('blob:'));
 
-        const cleanup = () => {
+        let hasExpiredImages = false;
+        Promise.all(
+            localImages.map(({uri, image}) =>
+                checkIfLocalFileIsAccessible(
+                    getOdometerImageName(image),
+                    uri,
+                    typeof image === 'object' ? image?.type : undefined,
+                    () => {},
+                    () => {
+                        hasExpiredImages = true;
+                    },
+                ),
+            ),
+        ).then(() => {
+            if (ignore) {
+                return;
+            }
+            if (hasExpiredImages) {
+                onStitchingChange(false);
+                clearOdometerDraftTransactionState(transaction);
+                navigateToStartMoneyRequestStep(CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER, iouType, transaction.transactionID, reportID, CONST.IOU.ACTION.CREATE, backToReport);
+                return;
+            }
+            runStitch();
+        });
+
+        return () => {
             ignore = true;
             onStitchingChange(false);
             cancelSpan(CONST.TELEMETRY.SPAN_ODOMETER_IMAGE_STITCH);
         };
-
-        if (localImages.length > 0) {
-            let hasExpiredImages = false;
-            Promise.all(
-                localImages.map(({uri, image}) =>
-                    checkIfLocalFileIsAccessible(
-                        getOdometerImageName(image),
-                        uri,
-                        typeof image === 'object' ? image?.type : undefined,
-                        () => {},
-                        () => {
-                            hasExpiredImages = true;
-                        },
-                    ),
-                ),
-            ).then(() => {
-                if (ignore) {
-                    return;
-                }
-                if (hasExpiredImages) {
-                    onStitchingChange(false);
-                    clearOdometerDraftTransactionState(transaction);
-                    navigateToStartMoneyRequestStep(CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER, iouType, transaction.transactionID, reportID, CONST.IOU.ACTION.CREATE, backToReport);
-                    return;
-                }
-                runStitch();
-            });
-            return cleanup;
-        }
-        runStitch();
-
-        return cleanup;
     }, [isOdometerDistanceRequest, isFocused, odometerStartImage, odometerEndImage, transaction, reportID, backToReport, translate, iouType, onStitchingChange, onStitchError]);
 
     return null;
