@@ -55,7 +55,7 @@ function IOURequestStepOdometerImage({
     const iouTypeValue: IOUType = iouType ?? CONST.IOU.TYPE.REQUEST;
     const isTransactionDraft = shouldUseTransactionDraft(actionValue, iouTypeValue);
 
-    useRestartOnOdometerImagesFailure(transaction, reportID, iouTypeValue, actionValue);
+    useRestartOnOdometerImagesFailure(transaction, reportID, iouTypeValue, backToReport);
     const dropBlobUrlsRef = useRef<string[]>([]);
     const shouldRevokeOnUnmountRef = useRef(true);
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout because drag and drop is not supported on mobile.
