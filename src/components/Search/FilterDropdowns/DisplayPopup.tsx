@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import ScrollView from '@components/ScrollView';
 import type {SearchQueryJSON} from '@components/Search/types';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -71,7 +72,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
         const viewValue = searchAdvancedFilters[CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW];
 
         return (
-            <View style={[styles.pv4]}>
+            <ScrollView contentContainerStyle={[styles.pv4]}>
                 <MenuItemWithTopDescription
                     shouldShowRightIcon
                     description={translate('search.display.sortBy')}
@@ -126,7 +127,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
                         sentryLabel={CONST.SENTRY_LABEL.SEARCH.COLUMNS_BUTTON}
                     />
                 )}
-            </View>
+            </ScrollView>
         );
     }
 
