@@ -162,7 +162,7 @@ export default {
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.CLIENT_ERRORS.ALREADY_DENIED_APPROVE_ATTEMPTED]: <AlreadyReviewedFailureScreen />,
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.CLIENT_ERRORS.ALREADY_REVIEWED]: <AlreadyReviewedFailureScreen />,
 
-        // Client-side errors (not returned by the backend API)
+        // Local errors (not returned by the backend API)
         [CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.NO_AUTHENTICATION_METHODS_ENROLLED]: (
             <NoEligibleMethodsFailureScreen headerTitle="multifactorAuthentication.reviewTransaction.transactionFailed" />
         ),
