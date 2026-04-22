@@ -1051,7 +1051,7 @@ function MenuItem({
                                                             />
                                                         )}
                                                         {furtherDetailsComponent}
-                                                        {!!titleComponent && (icon && !Array.isArray(icon) ? <View style={styles.ml3}>{titleComponent}</View> : titleComponent)}
+                                                        {titleComponent}
                                                     </View>
                                                 </View>
                                             </View>

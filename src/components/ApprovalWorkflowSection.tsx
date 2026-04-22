@@ -92,7 +92,13 @@ function ApprovalWorkflowSection({approvalWorkflow, onPress, currency = CONST.CU
                     iconFill={theme.icon}
                     onPress={onPress}
                     shouldRemoveBackground
-                    titleComponent={!approvalWorkflow.isDefault ? <UserPills users={memberPills} /> : undefined}
+                    titleComponent={
+                        !approvalWorkflow.isDefault ? (
+                            <View style={styles.ml3}>
+                                <UserPills users={memberPills} />
+                            </View>
+                        ) : undefined
+                    }
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.APPROVAL_SECTION_EXPENSES_FROM}
                 />
 
@@ -115,12 +121,14 @@ function ApprovalWorkflowSection({approvalWorkflow, onPress, currency = CONST.CU
                             onPress={onPress}
                             shouldRemoveBackground
                             titleComponent={
-                                <UserPill
-                                    avatar={approver.avatar}
-                                    displayName={approver.displayName}
-                                    email={approver.email}
-                                    style={styles.userPillStandalone}
-                                />
+                                <View style={styles.ml3}>
+                                    <UserPill
+                                        avatar={approver.avatar}
+                                        displayName={approver.displayName}
+                                        email={approver.email}
+                                        style={styles.userPillStandalone}
+                                    />
+                                </View>
                             }
                             helperText={getApprovalLimitDescription({approver, currency, translate, personalDetailsByEmail})}
                             helperTextStyle={styles.workflowApprovalLimitText}
