@@ -11,6 +11,7 @@ import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import {getExistingTransactionID} from '@libs/IOUUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
+import {isInstantSubmitEnabled, isSubmitAndClose} from '@libs/PolicyUtils';
 import {getIOUActionForReportID, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     buildOptimisticCreatedReportAction,
@@ -24,6 +25,7 @@ import {
 } from '@libs/ReportUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {
+    getReimbursable,
     getRequestType,
     getTransactionType,
     hasCustomUnitOutOfPolicyViolation,
@@ -1009,6 +1011,19 @@ function bulkDuplicateExpenses({
     let currentTargetReport = targetReport;
     let optimisticIOUReport: OnyxEntry<OnyxTypes.Report>;
 
+    // When instant-submit + submit-and-close is active AND the duplicated
+    // expenses are all non-reimbursable (or the policy disables reimbursement
+    // entirely), canAddTransaction will reject the optimistic report after
+    // the first expense auto-submits and closes it.  In that scenario every
+    // iteration will create a new report, so we must never defer auto-submit
+    // — otherwise the first expense's report stays in Draft because the
+    // server was told to wait for more expenses that will never arrive.
+    const allNonReimbursable = transactionsToDuplicate.every((t) => !getReimbursable(t));
+    const policyWillSplitReport =
+        isInstantSubmitEnabled(targetPolicy) &&
+        isSubmitAndClose(targetPolicy) &&
+        (allNonReimbursable || targetPolicy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO);
+
     for (let i = 0; i < transactionsToDuplicate.length; i++) {
         const item = transactionsToDuplicate.at(i);
         if (!item) {
@@ -1029,10 +1044,11 @@ function bulkDuplicateExpenses({
         }
 
         // Defer auto-submit only when this isn't the last expense AND the
-        // report wasn't just split.  Once a split happens every subsequent
-        // expense will also split (the policy closes reports immediately),
-        // so none of them should defer.
-        const shouldDeferAutoSubmit = !isLastExpense && !reportWasSplit;
+        // report wasn't just split AND the policy won't force each expense
+        // onto its own report.  Once a split happens every subsequent expense
+        // will also split (the policy closes reports immediately), so none of
+        // them should defer.
+        const shouldDeferAutoSubmit = !isLastExpense && !reportWasSplit && !policyWillSplitReport;
 
         const result = duplicateExpenseTransaction({
             transaction: item,
