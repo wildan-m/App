@@ -87,6 +87,10 @@ function useParticipantSubmission({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const [draftTransactions] = useOptimisticDraftTransactions(initialTransaction);
+    // React Compiler memoizes `transactionIDs` — it only gets a new reference when `draftTransactions`
+    // changes (i.e. on actual Onyx writes to COLLECTION.TRANSACTION_DRAFT). The search hot-path updates
+    // RAM_ONLY_IS_SEARCHING_FOR_REPORTS instead, so `transactionIDs` stays stable during search and no
+    // explicit useMemo is needed here.
     const transactionIDs = draftTransactions?.map((transaction) => transaction.transactionID);
     const [transactions] = useTransactionsByID(transactionIDs);
 
@@ -265,36 +269,38 @@ function useParticipantSubmission({
         }
     };
 
-    const goToNextStep = (_value?: string, _participants?: Participant[]) => {
+    const goToNextStep = (_value?: string, nextParticipants?: Participant[]) => {
         const {
             allPolicies: policies,
             draftTransactions: drafts,
             currentUserPersonalDetails: userDetails,
             introSelected: intro,
             participants: currentParticipants,
-            initialTransaction: txn,
+            initialTransaction: splitTransaction,
             policyForMovingExpenses: movingPolicy,
-            translate: t,
         } = dataRef.current;
 
         const isCategorizing = action === CONST.IOU.ACTION.CATEGORIZE;
         const isShareAction = action === CONST.IOU.ACTION.SHARE;
 
-        const isPolicyExpenseChat = currentParticipants?.some((participant) => participant.isPolicyExpenseChat);
-        if (iouType === CONST.IOU.TYPE.SPLIT && !isPolicyExpenseChat && txn?.amount && txn?.currency) {
-            const participantAccountIDs = currentParticipants?.map((participant) => participant.accountID) as number[];
-            setSplitShares(txn, txn.amount, txn.currency, participantAccountIDs);
+        // Prefer nextParticipants (passed directly from the selector callback) over currentParticipants
+        // (last-rendered value from dataRef) because the Onyx write from addParticipant may not have
+        // caused a re-render yet by the time goToNextStep is called.
+        const effectiveParticipants = nextParticipants ?? currentParticipants;
+        const isPolicyExpenseChat = effectiveParticipants?.some((participant) => participant.isPolicyExpenseChat);
+        if (iouType === CONST.IOU.TYPE.SPLIT && !isPolicyExpenseChat && splitTransaction?.amount && splitTransaction?.currency) {
+            const participantAccountIDs = effectiveParticipants?.map((participant) => participant.accountID) as number[];
+            setSplitShares(splitTransaction, splitTransaction.amount, splitTransaction.currency, participantAccountIDs);
         }
 
         const newReportID = selectedReportID.current;
         const currentSelfDMReportID = dataRef.current.selfDMReportID;
-        const shouldUpdateTransactionReportID = currentParticipants?.at(0)?.reportID !== newReportID;
+        const shouldUpdateTransactionReportID = effectiveParticipants?.at(0)?.reportID !== newReportID;
         const transactionReportID = newReportID === currentSelfDMReportID ? CONST.REPORT.UNREPORTED_REPORT_ID : newReportID;
-        // TODO: probably should also change participants here for selectedParticipants.current, but out of scope of this PR
+        const firstParticipant = effectiveParticipants?.at(0);
         for (const transaction of drafts) {
             const tag = isMovingTransactionFromTrackExpense && transaction?.tag ? transaction?.tag : '';
             setMoneyRequestTag(transaction.transactionID, tag);
-            const firstParticipant = _participants?.at(0);
             const policy = isPolicyExpenseChat && firstParticipant?.policyID ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${firstParticipant.policyID}`] : undefined;
             const policyDistance = Object.values(policy?.customUnits ?? {}).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
             const defaultCategory = isDistanceRequest(transaction) && policyDistance?.defaultCategory ? policyDistance?.defaultCategory : '';
@@ -307,7 +313,12 @@ function useParticipantSubmission({
         if ((isCategorizing || isShareAction) && numberOfParticipants.current === 0) {
             const email = userDetails.email ?? '';
             const lastWorkspaceNumber = lastWorkspaceNumberSelector(policies, email);
-            const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(intro, generateDefaultWorkspaceName(email, lastWorkspaceNumber, t), userDetails.accountID, email);
+            const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(
+                intro,
+                generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
+                userDetails.accountID,
+                email,
+            );
             for (const transaction of drafts) {
                 setMoneyRequestParticipants(transaction.transactionID, [
                     {
