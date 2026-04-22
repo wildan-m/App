@@ -6,7 +6,7 @@ import useLocalize from '@hooks/useLocalize';
 import {getErrorMessage} from '@libs/ErrorUtils';
 import {buildSigningData, getKeyAlias, mapAuthTypeNumber, mapLibraryErrorToReason, mapSignErrorCodeToReason} from '@libs/MultifactorAuthentication/NativeBiometricsHSM/helpers';
 import type NativeBiometricsHSMKeyInfo from '@libs/MultifactorAuthentication/NativeBiometricsHSM/types';
-import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import CONST from '@src/CONST';
 import Base64URL from '@src/utils/Base64URL';
@@ -123,7 +123,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             onResult({
                 success: false,
-                error: MfaError.local(reason, getErrorMessage(error)),
+                error: MFAError.local(reason, getErrorMessage(error)),
             });
         }
     };
@@ -140,7 +140,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 await deleteLocalKeysForAccount();
                 onResult({
                     success: false,
-                    error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL, 'Local HSM credential not in challenge allowCredentials, keys deleted'),
+                    error: MFAError.local(VALUES.REASON.LOCAL_ERRORS.HSM.NO_MATCHING_LOCAL_CREDENTIAL, 'Local HSM credential not in challenge allowCredentials, keys deleted'),
                 });
                 return;
             }
@@ -164,7 +164,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 }
                 onResult({
                     success: false,
-                    error: MfaError.local(failReason, `Error Code: ${signResult.errorCode}`),
+                    error: MFAError.local(failReason, `Error Code: ${signResult.errorCode}`),
                 });
                 return;
             }
@@ -173,7 +173,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             if (!authType) {
                 onResult({
                     success: false,
-                    error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE, `Unrecognized auth type from HSM sign result: ${signResult.authType}`),
+                    error: MFAError.local(VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED_AUTH_TYPE, `Unrecognized auth type from HSM sign result: ${signResult.authType}`),
                 });
                 return;
             }
@@ -198,7 +198,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             onResult({
                 success: false,
-                error: MfaError.local(reason, getErrorMessage(error)),
+                error: MFAError.local(reason, getErrorMessage(error)),
             });
         }
     };

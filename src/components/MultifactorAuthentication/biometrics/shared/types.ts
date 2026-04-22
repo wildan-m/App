@@ -1,6 +1,6 @@
 import type {ValueOf} from 'type-fest';
 import type {AuthenticationChallenge, RegistrationChallenge, SignedChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
-import type {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {AuthTypeInfo, MultifactorAuthenticationReason, RegistrationKeyInfo} from '@libs/MultifactorAuthentication/shared/types';
 import type CONST from '@src/CONST';
 
@@ -14,7 +14,7 @@ type RegisterResult =
       } & BaseRegisterResult)
     | ({
           success: false;
-          error: MfaError;
+          error: MFAError;
       } & Partial<BaseRegisterResult>);
 
 type AuthorizeParams = {
@@ -29,7 +29,7 @@ type AuthorizeResultSuccess = {
 
 type AuthorizeResultFailure = {
     success: false;
-    error: MfaError;
+    error: MFAError;
 };
 
 type AuthorizeResult = AuthorizeResultSuccess | AuthorizeResultFailure;

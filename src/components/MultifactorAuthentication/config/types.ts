@@ -4,7 +4,7 @@
 import type {EmptyObject, ValueOf} from 'type-fest';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
 import type {CancelConfirmModalProps} from '@components/MultifactorAuthentication/components/Modals/createCancelConfirmModal';
-import type {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {
     AllMultifactorAuthenticationBaseParameters,
     MultifactorAuthenticationActionParams,
@@ -111,10 +111,10 @@ type MultifactorAuthenticationScenarioBase<T extends Record<string, unknown> = E
 
     /**
      * Called when the user cancels the MFA flow. When provided, cancel() awaits this function
-     * and uses the returned MfaError to navigate to the appropriate failure screen.
+     * and uses the returned MFAError to navigate to the appropriate failure screen.
      * When absent, cancel() falls back to the default behavior (SET_ERROR with LOCAL_ERRORS.CANCELED).
      */
-    onCancel?: (payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined) => Promise<MfaError>;
+    onCancel?: (payload: MultifactorAuthenticationScenarioAdditionalParams<MultifactorAuthenticationScenario> | undefined) => Promise<MFAError>;
 };
 
 /**

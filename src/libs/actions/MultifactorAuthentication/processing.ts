@@ -1,7 +1,7 @@
 import type {MultifactorAuthenticationScenarioConfig, MultifactorAuthenticationScenarioResponse} from '@components/MultifactorAuthentication/config/types';
 import {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
-import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
-import type {MfaResult} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import type {MFAResult} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {RegistrationKeyInfo} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import {registerAuthenticationKey} from './index';
@@ -10,7 +10,7 @@ type RegistrationParams = {
     keyInfo: RegistrationKeyInfo;
 };
 
-async function processRegistration(params: RegistrationParams): Promise<MfaResult> {
+async function processRegistration(params: RegistrationParams): Promise<MFAResult> {
     const {httpStatusCode, reason, message} = await registerAuthenticationKey({
         keyInfo: params.keyInfo,
     });
@@ -19,17 +19,17 @@ async function processRegistration(params: RegistrationParams): Promise<MfaResul
         return {success: true};
     }
 
-    return {success: false, error: MfaError.fromApiResponse(httpStatusCode, reason, message)};
+    return {success: false, error: MFAError.fromApiResponse(httpStatusCode, reason, message)};
 }
 
 async function processScenarioAction(
     action: MultifactorAuthenticationScenarioConfig['action'],
     params: Parameters<MultifactorAuthenticationScenarioConfig['action']>[0],
-): Promise<MfaResult<MultifactorAuthenticationScenarioResponse>> {
+): Promise<MFAResult<MultifactorAuthenticationScenarioResponse>> {
     if (!params.signedChallenge) {
         return {
             success: false,
-            error: MfaError.local(VALUES.REASON.LOCAL_ERRORS.SIGNATURE_MISSING, 'Signed challenge is missing from scenario action params'),
+            error: MFAError.local(VALUES.REASON.LOCAL_ERRORS.SIGNATURE_MISSING, 'Signed challenge is missing from scenario action params'),
         };
     }
 
@@ -45,7 +45,7 @@ async function processScenarioAction(
         };
     }
 
-    return {success: false, error: MfaError.fromApiResponse(httpStatusCode, reason, message)};
+    return {success: false, error: MFAError.fromApiResponse(httpStatusCode, reason, message)};
 }
 
 export {processRegistration, processScenarioAction};

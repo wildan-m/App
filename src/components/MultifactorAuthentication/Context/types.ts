@@ -5,10 +5,10 @@ import type {
     MultifactorAuthenticationScenarioResponse,
 } from '@components/MultifactorAuthentication/config/types';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
-import type {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {AuthTypeInfo} from '@libs/MultifactorAuthentication/shared/types';
 
-type ErrorState = MfaError;
+type ErrorState = MFAError;
 
 type MultifactorAuthenticationState = {
     /** Current error state - stops the flow and navigates to failure outcome */

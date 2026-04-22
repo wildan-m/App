@@ -14,7 +14,7 @@ import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import {getErrorMessage} from '@libs/ErrorUtils';
 import getPlatform from '@libs/getPlatform';
-import {MfaError} from '@libs/MultifactorAuthentication/shared/MfaResult';
+import {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {ChallengeType, MultifactorAuthenticationCallbackInput} from '@libs/MultifactorAuthentication/shared/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, getDeviceBiometricsOnyxKey, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
@@ -216,7 +216,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 {reason, deviceVerificationType: biometrics.deviceVerificationType, allowedAuthenticationMethods: allowedAuthenticationMethods.join(', '), message},
                 'warning',
             );
-            dispatch({type: 'SET_ERROR', payload: MfaError.local(reason, message)});
+            dispatch({type: 'SET_ERROR', payload: MFAError.local(reason, message)});
             return;
         }
 
@@ -225,7 +225,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             const reason = biometrics.deviceCheckFailureReason;
             const message = `Device check failed (deviceVerificationType: ${biometrics.deviceVerificationType})`;
             addMFABreadcrumb('Device check failed', {reason, deviceVerificationType: biometrics.deviceVerificationType, message}, 'warning');
-            dispatch({type: 'SET_ERROR', payload: MfaError.local(reason, message)});
+            dispatch({type: 'SET_ERROR', payload: MFAError.local(reason, message)});
             return;
         }
 
@@ -262,7 +262,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     addMFABreadcrumb('Invalid registration challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
                     dispatch({
                         type: 'SET_ERROR',
-                        payload: MfaError.local(
+                        payload: MFAError.local(
                             CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
                             `Invalid registration challenge type: ${challengeType ?? 'unknown'}`,
                         ),
@@ -341,7 +341,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     addMFABreadcrumb('Invalid authorization challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
                     dispatch({
                         type: 'SET_ERROR',
-                        payload: MfaError.local(
+                        payload: MFAError.local(
                             CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
                             `Invalid authorization challenge type: ${challengeType ?? 'unknown'}`,
                         ),
@@ -445,7 +445,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
             addMFABreadcrumb('Unhandled error', {message: getErrorMessage(error)}, 'error');
             dispatch({
                 type: 'SET_ERROR',
-                payload: MfaError.local(CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION, getErrorMessage(error)),
+                payload: MFAError.local(CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION, getErrorMessage(error)),
             });
         });
         // We intentionally omit `process` and `state` from dependencies.
@@ -541,7 +541,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
         addMFABreadcrumb('Flow cancelled', {reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED}, 'warning');
         dispatch({
             type: 'SET_ERROR',
-            payload: MfaError.local(CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED, 'User cancelled the MFA flow'),
+            payload: MFAError.local(CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.CANCELED, 'User cancelled the MFA flow'),
         });
     }, [dispatch, state.scenario, state.payload]);
 
