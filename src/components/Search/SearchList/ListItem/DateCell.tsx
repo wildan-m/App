@@ -19,7 +19,7 @@ function DateCell({date, showTooltip, isLargeScreenWidth, suffixText, canEdit, o
     const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, startEditing, cancelEditing} = usePopoverEditState({canEdit});
 
     const formattedDate = DateUtils.formatWithUTCTimeZone(date, DateUtils.doesDateBelongToAPastYear(date) ? CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT : CONST.DATE.MONTH_DAY_ABBR_FORMAT);
-    const displayText = suffixText ? `${formattedDate} \u2022 ${suffixText}` : formattedDate;
+    const displayText = suffixText ? `${formattedDate} • ${suffixText}` : formattedDate;
 
     const handleDateSelected = (newDate: string) => {
         onSave?.(newDate);
