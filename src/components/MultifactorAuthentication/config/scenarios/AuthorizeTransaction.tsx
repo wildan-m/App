@@ -76,19 +76,6 @@ const DeniedTransactionSuccessScreen = createScreenWithDefaults(
     'DeniedTransactionSuccessScreen',
 );
 
-const DeniedTransactionClientFailureScreen = createScreenWithDefaults(
-    DefaultClientFailureScreen,
-    {
-        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
-        illustration: 'DeniedTransactionHand',
-        iconWidth: variables.transactionHandWidth,
-        iconHeight: variables.transactionHandHeight,
-        title: 'multifactorAuthentication.reviewTransaction.transactionFailed',
-        subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompletedReachOut',
-    },
-    'DeniedTransactionClientFailureScreen',
-);
-
 const DeniedTransactionServerFailureScreen = createScreenWithDefaults(
     DefaultServerFailureScreen,
     {
