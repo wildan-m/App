@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
+import CONST from '@src/CONST';
 import Text from './Text';
 import Tooltip from './Tooltip';
 import UserPill from './UserPill';
@@ -38,15 +39,18 @@ function UserPills({users, maxVisible = DEFAULT_MAX_VISIBLE}: UserPillsProps) {
 
     return (
         <View style={[styles.flexRow, styles.flexWrap, styles.userPillsContainer]}>
-            {visibleUsers.map((user) => (
-                <UserPill
-                    key={user.accountID ?? user.email ?? user.displayName}
-                    avatar={user.avatar}
-                    displayName={user.displayName}
-                    accountID={user.accountID}
-                    email={user.email}
-                />
-            ))}
+            {visibleUsers.map((user) => {
+                const hasRealAccountID = user.accountID !== undefined && user.accountID !== CONST.DEFAULT_NUMBER_ID;
+                return (
+                    <UserPill
+                        key={hasRealAccountID ? user.accountID : (user.email ?? user.displayName)}
+                        avatar={user.avatar}
+                        displayName={user.displayName}
+                        accountID={user.accountID}
+                        email={user.email}
+                    />
+                );
+            })}
             {hiddenCount > 0 && (
                 <Tooltip text={hiddenNames}>
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
