@@ -288,7 +288,7 @@ function TransactionListItem<TItem extends ListItem>({
                     animatedHighlightStyle,
                     styles.userSelectNone,
                     isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
+                    !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
                     !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
                     !isLargeScreenWidth && !isLastItem && styles.borderBottom,
                 ]}
