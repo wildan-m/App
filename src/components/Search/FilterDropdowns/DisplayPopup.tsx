@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
