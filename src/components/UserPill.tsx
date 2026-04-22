@@ -2,6 +2,7 @@ import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
 import CONST from '@src/CONST';
@@ -19,6 +20,7 @@ type UserPillProps = {
 
 function UserPill({avatar, displayName, accountID, email, style}: UserPillProps) {
     const styles = useThemeStyles();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     return (
         <UserDetailsTooltip
@@ -29,7 +31,7 @@ function UserPill({avatar, displayName, accountID, email, style}: UserPillProps)
                 login: email ?? displayName,
             }}
         >
-            <View style={[styles.flexRow, styles.alignItemsCenter, styles.alignSelfStart, styles.userPill, style]}>
+            <View style={[styles.flexRow, styles.alignItemsCenter, styles.alignSelfStart, styles.userPill, shouldUseNarrowLayout && styles.mw100, style]}>
                 <Avatar
                     source={avatar}
                     size={CONST.AVATAR_SIZE.MENTION_ICON}
