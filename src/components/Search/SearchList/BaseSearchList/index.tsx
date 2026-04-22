@@ -10,7 +10,7 @@ import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import {isMobileChrome} from '@libs/Browser';
 import {addKeyDownPressListener, removeKeyDownPressListener} from '@libs/KeyboardShortcut/KeyDownPressListener';
 import CONST from '@src/CONST';
-import type {SearchListItem} from '../ListItem/types';
+import type {SearchListItem} from '@components/Search/SearchList/ListItem/types';
 import type BaseSearchListProps from './types';
 
 const AnimatedFlashListComponent = Animated.createAnimatedComponent(FlashList<SearchListItem>);
