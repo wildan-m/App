@@ -763,11 +763,19 @@ function TransactionItemRow({
                                         isDescription={!merchant}
                                     />
                                 ) : null}
-                                <TotalCell
-                                    transactionItem={transactionItem}
-                                    shouldShowTooltip={shouldShowTooltip}
-                                    shouldUseNarrowLayout={shouldUseNarrowLayout}
-                                />
+                                <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
+                                    {shouldRenderChatBubbleCell && (
+                                        <ChatBubbleCell
+                                            transaction={transactionItem}
+                                            isInSingleTransactionReport={isInSingleTransactionReport}
+                                        />
+                                    )}
+                                    <TotalCell
+                                        transactionItem={transactionItem}
+                                        shouldShowTooltip={shouldShowTooltip}
+                                        shouldUseNarrowLayout={shouldUseNarrowLayout}
+                                    />
+                                </View>
                             </View>
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.gap2]}>
                                 <DateCell
@@ -815,13 +823,6 @@ function TransactionItemRow({
                             missingFieldError={missingFieldError}
                             transactionThreadReportID={transactionThreadReportID}
                             shouldUseNarrowLayout
-                        />
-                    )}
-                    {shouldRenderChatBubbleCell && (
-                        <ChatBubbleCell
-                            transaction={transactionItem}
-                            containerStyles={[styles.mt2]}
-                            isInSingleTransactionReport={isInSingleTransactionReport}
                         />
                     )}
                 </View>
