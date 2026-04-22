@@ -45,7 +45,6 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
     const [pendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
 
-
     const data = groups.map((group) => {
         return {
             keyForList: group.id,
