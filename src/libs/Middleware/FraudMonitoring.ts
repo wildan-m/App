@@ -14,6 +14,11 @@ type FraudSignal = {
 
 type FraudSignalFactory = (requestData?: Record<string, unknown>, responseData?: Record<string, unknown>) => FraudSignal;
 
+const createNewAccountCountSignal: FraudSignalFactory = (_, responseData) => {
+    const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
+    return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
+};
+
 const fraudSignalFactoryByApiCommand: Record<string, FraudSignalFactory> = {
     [READ_COMMANDS.SIGN_IN_WITH_SUPPORT_AUTH_TOKEN]: () => ({event: FRAUD_PROTECTION_EVENT.START_SUPPORT_SESSION}),
     [SIDE_EFFECT_REQUEST_COMMANDS.CONNECT_AS_DELEGATE]: () => ({event: FRAUD_PROTECTION_EVENT.START_COPILOT_SESSION}),
@@ -37,22 +42,10 @@ const fraudSignalFactoryByApiCommand: Record<string, FraudSignalFactory> = {
     [WRITE_COMMANDS.CONNECT_BANK_ACCOUNT_MANUALLY]: () => ({event: FRAUD_PROTECTION_EVENT.BUSINESS_BANK_ACCOUNT_SETUP}),
     [WRITE_COMMANDS.CONNECT_BANK_ACCOUNT_WITH_PLAID]: () => ({event: FRAUD_PROTECTION_EVENT.BUSINESS_BANK_ACCOUNT_SETUP}),
     [WRITE_COMMANDS.ADD_PERSONAL_BANK_ACCOUNT]: () => ({event: FRAUD_PROTECTION_EVENT.PERSONAL_BANK_ACCOUNT_SETUP}),
-    [WRITE_COMMANDS.INVITE_TO_GROUP_CHAT]: (_, responseData) => {
-        const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
-        return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
-    },
-    [WRITE_COMMANDS.INVITE_TO_ROOM]: (_, responseData) => {
-        const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
-        return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
-    },
-    [WRITE_COMMANDS.SEND_MONEY_ELSEWHERE]: (_, responseData) => {
-        const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
-        return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
-    },
-    [WRITE_COMMANDS.SEND_MONEY_WITH_WALLET]: (_, responseData) => {
-        const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
-        return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
-    },
+    [WRITE_COMMANDS.INVITE_TO_GROUP_CHAT]: createNewAccountCountSignal,
+    [WRITE_COMMANDS.INVITE_TO_ROOM]: createNewAccountCountSignal,
+    [WRITE_COMMANDS.SEND_MONEY_ELSEWHERE]: createNewAccountCountSignal,
+    [WRITE_COMMANDS.SEND_MONEY_WITH_WALLET]: createNewAccountCountSignal,
 };
 
 const FraudMonitoring: Middleware = (response, request) =>
