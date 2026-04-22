@@ -832,7 +832,10 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                                 }}
                             >
                                 <Text style={[styles.mutedTextLabel, styles.mb2]}>{translate('workspace.rules.customRules.policyDocument')}</Text>
-                                <AttachmentPicker acceptedFileTypes={['pdf']}>
+                                <AttachmentPicker
+                                    acceptedFileTypes={['pdf']}
+                                    shouldSkipAttachmentTypeModal
+                                >
                                     {({openPicker}) => {
                                         if (policy?.rulesDocumentURL) {
                                             return (
