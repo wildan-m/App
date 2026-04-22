@@ -12,11 +12,13 @@ type FraudSignal = {
     };
 };
 
-type FraudSignalFactory = (requestData?: Record<string, unknown>, responseData?: Record<string, unknown>) => FraudSignal;
+type FraudSignalFactory = (requestData?: Record<string, unknown>, responseData?: Record<string, unknown>) => FraudSignal | undefined;
 
 const createNewAccountCountSignal: FraudSignalFactory = (_, responseData) => {
-    const newAccountCountAttribute = responseData?.newAccountCount ? {key: 'new_account_count', value: responseData?.newAccountCount as string} : undefined;
-    return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: newAccountCountAttribute};
+    if (!responseData?.newAccountCount) {
+        return undefined;
+    }
+    return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: {key: 'new_account_count', value: responseData.newAccountCount as string}};
 };
 
 const fraudSignalFactoryByApiCommand: Record<string, FraudSignalFactory> = {
@@ -60,6 +62,10 @@ const FraudMonitoring: Middleware = (response, request) =>
         }
 
         const signal = createFraudSignal(request.data, responseData);
+        if (!signal) {
+            return responseData;
+        }
+
         FraudProtection.sendEvent(signal.event);
 
         if (!signal.attribute) {
