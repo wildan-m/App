@@ -1,3 +1,4 @@
+import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
@@ -33,7 +34,7 @@ function UserPills({users, maxVisible = DEFAULT_MAX_VISIBLE}: UserPillsProps) {
         hiddenCount > 0
             ? users
                   .slice(visibleUsers.length)
-                  .map((u) => u.displayName)
+                  .map((u) => Str.removeSMSDomain(u.displayName))
                   .join(', ')
             : '';
 
