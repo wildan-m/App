@@ -6175,6 +6175,8 @@ describe('actions/IOU', () => {
                 expect(result.current.report).toBeDefined();
             });
 
+            const policyTagList = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${mockPolicy.id}`)) ?? {};
+
             changeTransactionsReport({
                 transactionIDs: [transaction?.transactionID],
                 isASAPSubmitBetaEnabled: false,
@@ -6183,6 +6185,7 @@ describe('actions/IOU', () => {
                 newReport: result.current.report,
                 policy: mockPolicy,
                 allTransactions,
+                policyTagList,
             });
 
             let updatedTransaction: OnyxEntry<Transaction>;
@@ -6363,7 +6366,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 updateSplitTransactionsFromSplitExpensesFlow({
@@ -6539,7 +6542,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 updateSplitTransactionsFromSplitExpensesFlow({
@@ -6728,7 +6731,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 // it should use splitExpensesTotal in its calculation
@@ -6941,7 +6944,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 // When splitting the held expense
