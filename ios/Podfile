@@ -126,6 +126,15 @@ target 'NewExpensify' do
 end
 
 target 'NotificationServiceExtension' do
+  project 'NewExpensify',
+    'DebugDevelopment' => :debug,
+    'DebugAdHoc' => :debug,
+    'DebugProduction' => :debug,
+    'ReleaseDevelopment' => :release,
+    'ReleaseAdHoc' => :release,
+    'ReleaseProduction' => :release,
+    'Debug' => :debug
+
   pod 'AirshipServiceExtension'
   pod 'GzipSwift'
   pod 'AppLogs', :path => '../node_modules/react-native-app-logs/AppLogsPod'
