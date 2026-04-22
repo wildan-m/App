@@ -144,6 +144,7 @@ import {
     getSearchReportName,
     hasHeldExpenses,
     hasInvoiceReports,
+    hasOnlyNonReimbursableTransactions,
     isAllowedToApproveExpenseReport as isAllowedToApproveExpenseReportUtils,
     isArchivedReport,
     isClosedReport,
@@ -2311,7 +2312,9 @@ function getActions(
     const chatReport = getChatReport(data, report);
     const canBePaid = canIOUBePaid(report, chatReport, policy, bankAccountList, allReportTransactions, false, chatReportRNVP, invoiceReceiverPolicy);
     const canOnlyBePaidElsewhere = canIOUBePaid(report, chatReport, policy, bankAccountList, allReportTransactions, true, chatReportRNVP, invoiceReceiverPolicy);
-    const shouldOnlyShowElsewhere = !canBePaid && canOnlyBePaidElsewhere;
+    // Pay-elsewhere is intentionally hidden from listing surfaces when every transaction is non-reimbursable (see #87552),
+    // so the PAY action should only come from the pay-elsewhere branch when the report has at least one reimbursable transaction.
+    const shouldOnlyShowElsewhere = !canBePaid && canOnlyBePaidElsewhere && !hasOnlyNonReimbursableTransactions(report.reportID, allReportTransactions);
 
     // We're not supporting pay partial amount on search page now.
     if ((canBePaid || shouldOnlyShowElsewhere) && !hasHeldExpenses(report.reportID, allReportTransactions)) {
