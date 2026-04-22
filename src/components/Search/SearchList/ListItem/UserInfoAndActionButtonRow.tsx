@@ -2,7 +2,7 @@
 // (src/components/Search/SearchStaticList.tsx) used for fast perceived
 // performance. If you change the UI here, verify the static version still
 // looks visually identical.
-import React, {useMemo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import type {StyleProp, ViewStyle} from 'react-native';
 import StatusBadge from '@components/StatusBadge';
@@ -30,8 +30,8 @@ function UserInfoAndActionButtonRow({
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const statusText = useMemo(() => getReportStatusTranslation({stateNum, statusNum, translate}), [stateNum, statusNum, translate]);
-    const reportStatusColorStyle = useMemo(() => getReportStatusColorStyle(theme, stateNum, statusNum), [theme, stateNum, statusNum]);
+    const statusText = getReportStatusTranslation({stateNum, statusNum, translate});
+    const reportStatusColorStyle = getReportStatusColorStyle(theme, stateNum, statusNum);
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';
     return (
         <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, shouldShowUserInfo ? styles.justifyContentBetween : styles.justifyContentEnd, styles.gap2, containerStyles]}>
