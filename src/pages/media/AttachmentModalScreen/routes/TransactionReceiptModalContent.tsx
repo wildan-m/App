@@ -97,7 +97,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         isDraftTransaction && isOdometerDistanceRequest(transaction) ? transaction : undefined,
         reportID,
         iouTypeParam ?? CONST.IOU.TYPE.SUBMIT,
-        action ?? CONST.IOU.ACTION.CREATE,
+        backToReport,
     );
 
     const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`);
