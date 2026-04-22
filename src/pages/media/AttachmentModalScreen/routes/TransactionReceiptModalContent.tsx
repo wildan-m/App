@@ -93,12 +93,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         return transactionMain;
     }, [isDraftTransaction, mergeTransaction, mergeTransactionID, transactionDraft, transactionMain]);
 
-    useRestartOnOdometerImagesFailure(
-        isDraftTransaction && isOdometerDistanceRequest(transaction) ? transaction : undefined,
-        reportID,
-        iouTypeParam ?? CONST.IOU.TYPE.SUBMIT,
-        backToReport,
-    );
+    useRestartOnOdometerImagesFailure(isDraftTransaction && isOdometerDistanceRequest(transaction) ? transaction : undefined, reportID, iouTypeParam ?? CONST.IOU.TYPE.SUBMIT, backToReport);
 
     const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`);
     const receiptURIs = getThumbnailAndImageURIs(transaction);
