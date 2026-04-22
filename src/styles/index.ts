@@ -6374,42 +6374,16 @@ const dynamicStyles = (theme: ThemeColors) =>
             const HEADER_HEIGHT = hasHeader ? 48 : 0;
             const TITLE_HEIGHT = hasTitle ? 34 : 0;
             const SEARCHBAR_HEIGHT = isSearchable ? 64 : 0;
-            const ESTIMATED_LIST_HEIGHT = itemCount * itemHeight + SEARCHBAR_HEIGHT + BUTTON_HEIGHT + TITLE_HEIGHT + HEADER_HEIGHT + MODAL_VERTICAL_PADDING + extraHeight;
 
-            const popoverHeight = isInLandscapeMode
-                ? CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO_LANDSCAPE_MODE * windowHeight - MODAL_VERTICAL_PADDING
-                : CONST.POPOVER_DROPDOWN_MAX_HEIGHT;
+            const ESTIMATED_LIST_HEIGHT = itemCount * itemHeight + SEARCHBAR_HEIGHT + extraHeight;
+            const ESTIMATED_NON_LIST_HEIGHT = BUTTON_HEIGHT + HEADER_HEIGHT + TITLE_HEIGHT + MODAL_VERTICAL_PADDING;
 
-            // Native platforms don't support maxHeight in the way thats expected, so lets manually set the height to either
-            // the listHeight, the max height of the popover, or 90% of the window height, such that we never overflow the screen
-            // and never expand over the max height
-            const height = Math.min(ESTIMATED_LIST_HEIGHT, popoverHeight, windowHeight * CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO);
-
-            return {height};
-        },
-
-        getCardSelectionListPopoverHeight: (
-            itemCount: number,
-            sectionHeaderCount: number,
-            windowHeight: number,
-            shouldUseNarrowLayout: boolean,
-            isInLandscapeMode: boolean,
-            isSearchable = true,
-        ) => {
-            const MODAL_PADDING = 32;
-            const BUTTON_HEIGHT = 48;
-            const SEARCHBAR_HEIGHT = isSearchable ? 64 : 0;
-            const TITLE_HEIGHT = shouldUseNarrowLayout ? 34 : 0;
-            const PADDING = shouldUseNarrowLayout ? 0 : MODAL_PADDING;
-            const ESTIMATED_LIST_HEIGHT = itemCount * variables.optionRowHeight + sectionHeaderCount * 28 + SEARCHBAR_HEIGHT + BUTTON_HEIGHT + TITLE_HEIGHT + PADDING;
-
-            const popoverHeight = isInLandscapeMode ? CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO_LANDSCAPE_MODE * windowHeight - MODAL_PADDING : CONST.POPOVER_DROPDOWN_MAX_HEIGHT;
+            const heightRatio = isInLandscapeMode ? CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO_LANDSCAPE_MODE : CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO;
 
             // Native platforms don't support maxHeight in the way thats expected, so lets manually set the height to either
             // the listHeight, the max height of the popover, or 90% of the window height, such that we never overflow the screen
             // and never expand over the max height
-            const height = Math.min(ESTIMATED_LIST_HEIGHT, popoverHeight, windowHeight * CONST.MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO);
-
+            const height = Math.min(ESTIMATED_LIST_HEIGHT, CONST.POPOVER_DROPDOWN_MAX_HEIGHT - ESTIMATED_NON_LIST_HEIGHT, windowHeight * heightRatio - ESTIMATED_NON_LIST_HEIGHT);
             return {height};
         },
 

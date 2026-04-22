@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
@@ -192,21 +193,31 @@ function InSelectPopup({closeOverlay, updateFilterForm}: InSelectPopupProps) {
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_REPORT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_REPORT}
-            style={[
-                styles.getSelectionListPopoverHeight({itemCount, itemHeight: variables.optionRowHeight, windowHeight, isInLandscapeMode, hasTitle: isSmallScreenWidth, isSearchable: true}),
-            ]}
         >
-            <SelectionListWithSections
-                sections={sections}
-                onSelectRow={handleParticipantSelection}
-                ListItem={InviteMemberListItem}
-                canSelectMultiple
-                shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
-                textInputOptions={textInputOptions}
-                isLoadingNewOptions={isLoadingNewOptions}
-                shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
-                shouldShowTextInput
-            />
+            <View
+                style={[
+                    styles.getSelectionListPopoverHeight({
+                        itemCount,
+                        itemHeight: variables.optionRowHeight,
+                        windowHeight,
+                        isInLandscapeMode,
+                        hasTitle: isSmallScreenWidth,
+                        isSearchable: true,
+                    }),
+                ]}
+            >
+                <SelectionListWithSections
+                    sections={sections}
+                    onSelectRow={handleParticipantSelection}
+                    ListItem={InviteMemberListItem}
+                    canSelectMultiple
+                    shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
+                    textInputOptions={textInputOptions}
+                    isLoadingNewOptions={isLoadingNewOptions}
+                    shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
+                    shouldShowTextInput
+                />
+            </View>
         </BasePopup>
     );
 }

@@ -120,28 +120,29 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_MULTI_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_MULTI_SELECT}
-            style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle})]}
         >
-            {!!loading && (
-                <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
-                    <ActivityIndicator
-                        size={CONST.ACTIVITY_INDICATOR_SIZE.SMALL}
-                        color={theme.spinner}
-                        reasonAttributes={reasonAttributes}
-                    />
-                </View>
-            )}
+            <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle})]}>
+                {!!loading && (
+                    <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
+                        <ActivityIndicator
+                            size={CONST.ACTIVITY_INDICATOR_SIZE.SMALL}
+                            color={theme.spinner}
+                            reasonAttributes={reasonAttributes}
+                        />
+                    </View>
+                )}
 
-            {!loading && (
-                <SelectionList
-                    shouldSingleExecuteRowSelect
-                    data={listData}
-                    ListItem={MultiSelectListItem}
-                    onSelectRow={updateSelectedItems}
-                    textInputOptions={textInputOptions}
-                    style={{contentContainerStyle: [styles.pb0]}}
-                />
-            )}
+                {!loading && (
+                    <SelectionList
+                        shouldSingleExecuteRowSelect
+                        data={listData}
+                        ListItem={MultiSelectListItem}
+                        onSelectRow={updateSelectedItems}
+                        textInputOptions={textInputOptions}
+                        style={{contentContainerStyle: [styles.pb0]}}
+                    />
+                )}
+            </View>
         </BasePopup>
     );
 }

@@ -1,5 +1,6 @@
 import React, {Activity, useCallback, useMemo, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
+import {View} from 'react-native';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem, SelectionListStyle} from '@components/SelectionList/types';
@@ -143,31 +144,34 @@ function SingleSelectPopup<T extends string>({
             onBackButtonPress={onBackButtonPress}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_SINGLE_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_SINGLE_SELECT}
-            style={[
-                style,
-                styles.getSelectionListPopoverHeight({
-                    itemCount: options.length || 1,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasTitle,
-                    hasHeader: !!onBackButtonPress,
-                    isSearchable: isSearchable ?? false,
-                }),
-            ]}
+            style={[style]}
         >
-            <Activity mode={shouldShowList ? 'visible' : 'hidden'}>
-                <SelectionList
-                    data={options}
-                    shouldSingleExecuteRowSelect
-                    ListItem={SingleSelectListItem}
-                    onSelectRow={updateSelectedItem}
-                    textInputOptions={textInputOptions}
-                    style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
-                    shouldUpdateFocusedIndex={isSearchable}
-                    initiallyFocusedItemKey={isSearchable ? value?.value : undefined}
-                    shouldShowLoadingPlaceholder={!noResultsFound}
-                />
-            </Activity>
+            <View
+                style={[
+                    styles.getSelectionListPopoverHeight({
+                        itemCount: options.length || 1,
+                        windowHeight,
+                        isInLandscapeMode,
+                        hasTitle,
+                        hasHeader: !!onBackButtonPress,
+                        isSearchable: isSearchable ?? false,
+                    }),
+                ]}
+            >
+                <Activity mode={shouldShowList ? 'visible' : 'hidden'}>
+                    <SelectionList
+                        data={options}
+                        shouldSingleExecuteRowSelect
+                        ListItem={SingleSelectListItem}
+                        onSelectRow={updateSelectedItem}
+                        textInputOptions={textInputOptions}
+                        style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
+                        shouldUpdateFocusedIndex={isSearchable}
+                        initiallyFocusedItemKey={isSearchable ? value?.value : undefined}
+                        shouldShowLoadingPlaceholder={!noResultsFound}
+                    />
+                </Activity>
+            </View>
         </BasePopup>
     );
 }

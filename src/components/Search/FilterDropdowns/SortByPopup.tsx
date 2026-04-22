@@ -99,30 +99,33 @@ function SortByPopup({searchResults, queryJSON, groupBy, onSort, onSortOrderPres
             onBackButtonPress={onBackButtonPress}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_SINGLE_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_SINGLE_SELECT}
-            style={[
-                styles.getSelectionListPopoverHeight({
-                    itemCount: sortableColumns.length,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasHeader: true,
-                    extraHeight: variables.optionRowHeight + DIVIDER_HEIGHT,
-                }),
-            ]}
         >
-            <MenuItemWithTopDescription
-                shouldShowRightIcon
-                description={translate('search.display.sortOrder')}
-                title={sortOrder ? translate(`search.filters.sortOrder.${sortOrder}`) : undefined}
-                onPress={onSortOrderPress}
-            />
-            <View style={styles.dividerLine} />
-            <SelectionList
-                data={options}
-                shouldSingleExecuteRowSelect
-                ListItem={SingleSelectListItem}
-                onSelectRow={updateSelectedItem}
-                style={{contentContainerStyle: [styles.pb0]}}
-            />
+            <View
+                style={[
+                    styles.getSelectionListPopoverHeight({
+                        itemCount: sortableColumns.length,
+                        windowHeight,
+                        isInLandscapeMode,
+                        hasHeader: true,
+                        extraHeight: variables.optionRowHeight + DIVIDER_HEIGHT,
+                    }),
+                ]}
+            >
+                <MenuItemWithTopDescription
+                    shouldShowRightIcon
+                    description={translate('search.display.sortOrder')}
+                    title={sortOrder ? translate(`search.filters.sortOrder.${sortOrder}`) : undefined}
+                    onPress={onSortOrderPress}
+                />
+                <View style={styles.dividerLine} />
+                <SelectionList
+                    data={options}
+                    shouldSingleExecuteRowSelect
+                    ListItem={SingleSelectListItem}
+                    onSelectRow={updateSelectedItem}
+                    style={{contentContainerStyle: [styles.pb0]}}
+                />
+            </View>
         </BasePopup>
     );
 }

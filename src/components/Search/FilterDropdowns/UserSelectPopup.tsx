@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import SelectionList from '@components/SelectionList';
 import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelectionListItem';
@@ -177,28 +178,31 @@ function UserSelectPopup({value, label, closeOverlay, onChange, isSearchable}: U
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_USER}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_USER}
-            style={[
-                styles.getSelectionListPopoverHeight({
-                    itemCount: listData.length || 1,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasTitle: isSmallScreenWidth,
-                    isSearchable: shouldShowSearchInput,
-                }),
-            ]}
         >
-            <SelectionList
-                data={listData}
-                ref={selectionListRef}
-                textInputOptions={textInputOptions}
-                canSelectMultiple
-                ListItem={UserSelectionListItem}
-                onSelectRow={selectUser}
-                isLoadingNewOptions={isLoadingNewOptions}
-                shouldShowLoadingPlaceholder={!areOptionsInitialized}
-                onEndReached={onListEndReached}
-                style={{contentContainerStyle: [styles.pb0]}}
-            />
+            <View
+                style={[
+                    styles.getSelectionListPopoverHeight({
+                        itemCount: listData.length || 1,
+                        windowHeight,
+                        isInLandscapeMode,
+                        hasTitle: isSmallScreenWidth,
+                        isSearchable: shouldShowSearchInput,
+                    }),
+                ]}
+            >
+                <SelectionList
+                    data={listData}
+                    ref={selectionListRef}
+                    textInputOptions={textInputOptions}
+                    canSelectMultiple
+                    ListItem={UserSelectionListItem}
+                    onSelectRow={selectUser}
+                    isLoadingNewOptions={isLoadingNewOptions}
+                    shouldShowLoadingPlaceholder={!areOptionsInitialized}
+                    onEndReached={onListEndReached}
+                    style={{contentContainerStyle: [styles.pb0]}}
+                />
+            </View>
         </BasePopup>
     );
 }
