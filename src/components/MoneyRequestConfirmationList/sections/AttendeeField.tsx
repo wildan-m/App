@@ -49,10 +49,13 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
                         users={sortAlphabetically(
                             iouAttendees.map((a) => {
                                 const pd = a?.accountID ? personalDetailsList?.[a.accountID] : undefined;
+                                const freshAvatar = typeof pd?.avatar === 'string' ? pd.avatar : undefined;
                                 return {
                                     ...a,
-                                    displayName: pd?.displayName ?? a?.displayName,
-                                    avatarUrl: (typeof pd?.avatar === 'string' ? pd.avatar : undefined) ?? a?.avatarUrl,
+                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                                    displayName: pd?.displayName || a?.displayName,
+                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                                    avatarUrl: freshAvatar || a?.avatarUrl,
                                 };
                             }),
                             'displayName',
