@@ -39,10 +39,11 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
         <MenuItemWithTopDescription
             key="attendees"
             shouldShowRightIcon={!isReadOnly}
-            accessibilityLabel={iouAttendees?.map((a) => a?.displayName ?? a?.login).join(', ')}
+            accessibilityLabel={`${translate('iou.attendees')}, ${iouAttendees?.map((a) => a?.displayName ?? a?.login).join(', ')}`}
             description={`${translate('iou.attendees')} ${
                 iouAttendees?.length && iouAttendees.length > 1 && formattedAmountPerAttendee ? `\u00B7 ${formattedAmountPerAttendee} ${translate('common.perPerson')}` : ''
             }`}
+            descriptionTextStyle={styles.textLabelSupportingNormal}
             titleComponent={
                 Array.isArray(iouAttendees) ? (
                     <UserPills

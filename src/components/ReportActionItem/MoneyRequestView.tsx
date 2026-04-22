@@ -1170,12 +1170,13 @@ function MoneyRequestView({
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('attendees')}>
                         <MenuItemWithTopDescription
                             key="attendees"
-                            accessibilityLabel={getAttendeesTitle}
+                            accessibilityLabel={`${translate('iou.attendees')}, ${getAttendeesTitle}`}
                             description={`${translate('iou.attendees')} ${
                                 Array.isArray(actualAttendees) && actualAttendees.length > 1 && formattedPerAttendeeAmount
                                     ? `${CONST.DOT_SEPARATOR} ${formattedPerAttendeeAmount} ${translate('common.perPerson')}`
                                     : ''
                             }`}
+                            descriptionTextStyle={styles.textLabelSupportingNormal}
                             titleComponent={
                                 Array.isArray(actualAttendees) ? (
                                     <UserPills
