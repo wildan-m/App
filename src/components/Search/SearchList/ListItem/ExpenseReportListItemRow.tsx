@@ -247,25 +247,40 @@ function ExpenseReportListItemRow({
         const groupAccessibilityLabel = [item.reportName, amountText, formattedDate, expenseCountText].filter(Boolean).join(', ');
         return (
             <View
-                style={[styles.flexColumn, styles.gap1]}
+                style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}
                 accessible
                 accessibilityLabel={groupAccessibilityLabel}
                 role={CONST.ROLE.BUTTON}
             >
-                <View style={[styles.flexRow, styles.gap2]}>
-                    <Text
-                        numberOfLines={2}
-                        style={[styles.lh20, styles.flex1]}
-                    >
-                        {item.reportName ?? ''}
-                    </Text>
-                    <Text style={[styles.lh20, styles.flexShrink0, styles.textAlignRight]}>
-                        {isScanning ? translate('iou.receiptStatusTitle') : convertToDisplayString(totalDisplaySpend, currency)}
-                    </Text>
-                </View>
-                <View style={[styles.flexRow, styles.gap2]}>
-                    <Text style={[styles.mutedNormalTextLabel, styles.flex1]}>{formattedDate}</Text>
-                    <Text style={[styles.mutedNormalTextLabel, styles.flexShrink0, styles.textAlignRight]}>{expenseCountText}</Text>
+                {!!canSelectMultiple && (
+                    <Checkbox
+                        onPress={onCheckboxPress}
+                        isChecked={isSelectAllChecked}
+                        isIndeterminate={isIndeterminate}
+                        containerStyle={[StyleUtils.getCheckboxContainerStyle(20), StyleUtils.getMultiselectListStyles(!!item.isSelected, !!item.isDisabled), styles.m0]}
+                        disabled={isDisabledCheckbox}
+                        accessibilityLabel={item.text ?? ''}
+                        shouldStopMouseDownPropagation
+                        style={[styles.cursorUnset, StyleUtils.getCheckboxPressableStyle(), isDisabledCheckbox && styles.cursorDisabled]}
+                        sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPENSE_REPORT_CHECKBOX}
+                    />
+                )}
+                <View style={[styles.flexColumn, styles.gap1, styles.flex1]}>
+                    <View style={[styles.flexRow, styles.gap2]}>
+                        <Text
+                            numberOfLines={2}
+                            style={[styles.lh20, styles.flex1]}
+                        >
+                            {item.reportName ?? ''}
+                        </Text>
+                        <Text style={[styles.lh20, styles.flexShrink0, styles.textAlignRight]}>
+                            {isScanning ? translate('iou.receiptStatusTitle') : convertToDisplayString(totalDisplaySpend, currency)}
+                        </Text>
+                    </View>
+                    <View style={[styles.flexRow, styles.gap2]}>
+                        <Text style={[styles.mutedNormalTextLabel, styles.flex1]}>{formattedDate}</Text>
+                        <Text style={[styles.mutedNormalTextLabel, styles.flexShrink0, styles.textAlignRight]}>{expenseCountText}</Text>
+                    </View>
                 </View>
             </View>
         );
