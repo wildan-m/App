@@ -7081,7 +7081,7 @@ describe('ReportUtils', () => {
     });
 
     describe('buildOptimisticWorkspaceChats', () => {
-        const policyID = 'policy-wschats-1';
+        const policyID = 'policy-workspace-chats-1';
         const policyName = 'Workspace Chats Policy';
 
         it('should build #admins and expense chats using the explicit currentUserAccountID for participants and pending members', () => {
