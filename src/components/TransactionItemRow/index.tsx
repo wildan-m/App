@@ -238,6 +238,8 @@ function TransactionItemRow({
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const isLargeScreenWidth = isLargeScreenWidthProp ?? !shouldUseNarrowLayout;
+
+    // For unreported expenses (SelfDM), use active policy to show policy-specific fields like categories and tags
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const reportPolicyID = report?.policyID ?? transactionItem.report?.policyID;
     const effectivePolicyID = isExpenseUnreported(transactionItem) ? activePolicyID : reportPolicyID;
