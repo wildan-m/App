@@ -1106,7 +1106,6 @@ function getSecondaryTransactionThreadActions(
 export {
     getSecondaryReportActions,
     getSecondaryTransactionThreadActions,
-    isMergeAction,
     isMergeActionForSelectedTransactions,
     getSecondaryExportReportActions,
     isSplitAction,
