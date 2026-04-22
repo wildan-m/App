@@ -19,6 +19,12 @@ import reportNameUtilsPlugin from './eslint-plugin-report-name-utils/index.mjs';
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+// The App root, two levels up from this file (config/eslint/eslint.config.mjs).
+// Used as `basePath` on every config object so that `files`/`ignores` patterns
+// continue to resolve relative to the App root (their original location),
+// rather than relative to this config file's directory (which is the default).
+const projectRoot = path.resolve(dirname, '../..');
+
 const restrictedImportPaths = [
     {
         name: 'react-native',
@@ -167,7 +173,7 @@ const config = defineConfig([
     },
 
     {
-        extends: new FlatCompat({baseDirectory: dirname}).extends(
+        extends: new FlatCompat({baseDirectory: projectRoot}).extends(
             'airbnb-typescript',
             'plugin:storybook/recommended',
             'plugin:react-native-a11y/basic',
@@ -189,7 +195,7 @@ const config = defineConfig([
             parser: tsParser,
 
             parserOptions: {
-                project: path.resolve(dirname, './tsconfig.json'),
+                project: path.resolve(projectRoot, 'tsconfig.json'),
             },
 
             globals: {
@@ -642,4 +648,10 @@ const config = defineConfig([
     ]),
 ]);
 
-export default config;
+// Attach the App root as `basePath` to every config object. ESLint resolves
+// `files`/`ignores` patterns relative to each config object's `basePath` (which
+// defaults to the directory containing the config file). Since this config
+// lives in `config/eslint/` rather than the App root, we override `basePath`
+// so existing relative patterns (e.g. `src/**/*.ts`) keep matching the intended
+// files. The spread preserves any `basePath` that a config already specifies.
+export default config.map((cfg) => ({basePath: projectRoot, ...cfg}));

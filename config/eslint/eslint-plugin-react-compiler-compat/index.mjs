@@ -16,7 +16,7 @@ import _ from 'lodash';
 import {createRequire} from 'module';
 
 const require = createRequire(import.meta.url);
-const ReactCompilerConfig = require('../config/babel/reactCompilerConfig');
+const ReactCompilerConfig = require('../../babel/reactCompilerConfig');
 
 // Rules that are entirely unnecessary when React Compiler successfully compiles
 // all functions in a file. Add more rules here as needed.

@@ -1,6 +1,12 @@
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'eslint/config';
 import reportNameUtilsPlugin from './eslint-plugin-report-name-utils/index.mjs';
 import mainConfig from './eslint.config.mjs';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+// App root; see `eslint.config.mjs` for why we override `basePath` on every config.
+const projectRoot = path.resolve(dirname, '../..');
 
 const restrictedIconImportPaths = [];
 
@@ -93,4 +99,4 @@ const config = defineConfig([
     },
 ]);
 
-export default config;
+export default config.map((cfg) => ({basePath: projectRoot, ...cfg}));
