@@ -9676,8 +9676,8 @@ describe('getWithdrawalStatusDisplayText', () => {
         expect(SearchUIUtils.getWithdrawalStatusDisplayText([], translateLocal)).toBeUndefined();
     });
 
-    it('returns the translated label for a single scalar value', () => {
-        expect(SearchUIUtils.getWithdrawalStatusDisplayText(CONST.SEARCH.SETTLEMENT_STATUS.PENDING, translateLocal)).toBe('Pending');
+    it('returns the translated label for a single-element selection', () => {
+        expect(SearchUIUtils.getWithdrawalStatusDisplayText([CONST.SEARCH.SETTLEMENT_STATUS.PENDING], translateLocal)).toBe('Pending');
     });
 
     it('joins translated labels for a multi-value selection, preserving options order', () => {

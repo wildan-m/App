@@ -5036,17 +5036,11 @@ function getWithdrawalStatusOptions(translate: LocaleContextProps['translate']) 
 }
 
 function getWithdrawalStatusDisplayText(value: SearchWithdrawalStatus | undefined, translate: LocaleContextProps['translate']): string | undefined {
-    let selectedValues: Array<ValueOf<typeof CONST.SEARCH.SETTLEMENT_STATUS>> = [];
-    if (Array.isArray(value)) {
-        selectedValues = value;
-    } else if (value) {
-        selectedValues = [value];
-    }
-    if (!selectedValues.length) {
+    if (!value?.length) {
         return undefined;
     }
     return getWithdrawalStatusOptions(translate)
-        .filter((option) => selectedValues.includes(option.value))
+        .filter((option) => value.includes(option.value))
         .map((option) => option.text)
         .join(', ');
 }

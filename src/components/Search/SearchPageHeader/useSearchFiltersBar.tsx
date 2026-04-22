@@ -328,10 +328,6 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                     formValues = Array.isArray(formValues) ? formValues : formValues.split(',');
                 }
 
-                if (filterKey === FILTER_KEYS.WITHDRAWAL_STATUS && !Array.isArray(formValues)) {
-                    formValues = [formValues];
-                }
-
                 const items = getMultiSelectFilterOptions(filterKey, type, translate);
                 const value = items.filter((item) => formValues.includes(item.value));
 
