@@ -1,6 +1,5 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
-import ErrorMessageRow from '@components/ErrorMessageRow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -56,7 +55,6 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                             shouldShowRightIcon
                             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_EDIT_NAME.getRoute(domainAccountID, groupID))}
                         />
-                        <ErrorMessageRow />
                     </OfflineWithFeedback>
                 </ScrollView>
             </ScreenWrapper>
