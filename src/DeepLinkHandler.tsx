@@ -30,9 +30,9 @@ function DeepLinkHandler({onInitialUrl}: DeepLinkHandlerProps) {
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const [, sessionMetadata] = useOnyx(ONYXKEYS.SESSION);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [introSelected, introSelectedMetadata] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed, isSelfTourViewedMetadata] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const [betas, betasMetadata] = useOnyx(ONYXKEYS.BETAS);
     const isAuthenticated = useIsAuthenticated();
 
     useEffect(() => {
@@ -74,7 +74,7 @@ function DeepLinkHandler({onInitialUrl}: DeepLinkHandlerProps) {
             linkingChangeListener.current?.remove();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excluding allReports, isAuthenticated, and onInitialUrl to avoid re-triggering deep link handling on every report update
-    }, [sessionMetadata?.status, conciergeReportID, introSelected, isSelfTourViewedMetadata, betas]);
+    }, [sessionMetadata?.status, conciergeReportID, introSelectedMetadata?.status, isSelfTourViewedMetadata?.status, betasMetadata?.status]);
 
     return null;
 }
