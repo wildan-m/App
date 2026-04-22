@@ -36,7 +36,6 @@ import {
     clearAddMemberError,
     clearDeleteMemberError,
     clearInviteDraft,
-    clearUpdateMemberRoleError,
     clearWorkspaceOwnerChangeFlow,
     downloadMembersCSV,
     openWorkspaceMembersPage,
@@ -374,15 +373,9 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         (item: MemberOption) => {
             if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
                 clearDeleteMemberError(route.params.policyID, item.login);
-                return;
+            } else {
+                clearAddMemberError(route.params.policyID, item.login, item.accountID);
             }
-
-            if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE) {
-                clearUpdateMemberRoleError(route.params.policyID, item.login);
-                return;
-            }
-
-            clearAddMemberError(route.params.policyID, item.login, item.accountID);
         },
         [route.params.policyID],
     );
