@@ -158,7 +158,10 @@ function PDFView({onToggleKeyboard, onLoadComplete, fileName, onPress, isFocused
         const pdfWidth = isUsedAsChatAttachment ? LOADING_THUMBNAIL_WIDTH : windowWidth - insets.left - insets.right;
         const pdfHeight = isUsedAsChatAttachment ? LOADING_THUMBNAIL_HEIGHT : windowHeight;
 
-        const pdfStyles: StyleProp<ViewStyle> = [themeStyles.imageModalPDF, StyleUtils.getPDFViewStyle(pdfWidth, pdfHeight)];
+        const pdfStyles: StyleProp<ViewStyle> = [
+            themeStyles.imageModalPDF,
+            isUsedAsChatAttachment ? StyleUtils.getWidthAndHeightStyle(pdfWidth, pdfHeight) : StyleUtils.getPDFViewStyle(pdfWidth, pdfHeight),
+        ];
 
         // If we haven't yet successfully validated the password and loaded the PDF,
         // then we need to hide the react-native-pdf/PDF component so that PDFPasswordForm
