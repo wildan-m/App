@@ -82,22 +82,14 @@ If you don't hold one of these roles or your workspace has no transactions yet, 
 
 ## How the Getting started section works on Home
 
-The **Getting started** section shows a checklist of key setup steps to help new Workspace Admins configure their workspace during onboarding.
+The **Getting started** section shows a checklist of key setup steps to help Workspace Admins configure their workspace during onboarding.
 
-This section appears when:
-- You selected the **manage my team** intent during onboarding
-- You are within the free trial period (60 days from trial start)
-- You have an active paid workspace
+This section appears only if:
 
-The checklist can include up to four items:
-- **Create a workspace** — always shown and marked complete
-- **Connect to [accounting system]** — shown if you selected a direct-connect integration (such as QuickBooks Online, QuickBooks Desktop, Xero, NetSuite, or Sage Intacct) during onboarding. Otherwise, **Customize accounting categories** appears instead
-- **Link company cards** — shown if company cards are enabled on the workspace
-- **Set up spend rules** — shown if rules are enabled on the workspace
+ - The workspace is on a free trial
+ - The workspace owner selected **manage my team** during setup
 
-Each item links to the relevant workspace setting. Completed items show a filled checkmark, and incomplete items show an empty checkbox.
-
-If none of the conditions above apply, this section will not appear.
+If these conditions aren’t met, the section won’t appear.
 
 ---
 
