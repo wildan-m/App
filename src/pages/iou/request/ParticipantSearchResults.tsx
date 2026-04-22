@@ -1,9 +1,8 @@
 import lodashPick from 'lodash/pick';
 import React, {useEffect} from 'react';
-import type {Ref, RefObject} from 'react';
+import type {Ref} from 'react';
 import type {GestureResponderEvent} from 'react-native';
 import {InteractionManager} from 'react-native';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {RESULTS} from 'react-native-permissions';
 import ContactPermissionModal from '@components/ContactPermissionModal';
 import EmptySelectionListContent from '@components/EmptySelectionListContent';
@@ -18,36 +17,35 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import useSearchSelector from '@hooks/useSearchSelector';
+import useTransactionDraftValues from '@hooks/useTransactionDraftValues';
 import useUserToInviteReports from '@hooks/useUserToInviteReports';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import goToSettings from '@libs/goToSettings';
+import {isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {formatSectionsFromSearchTerm, getHeaderMessage, getParticipantsOption, getPolicyExpenseReportOption, isCurrentUser} from '@libs/OptionsListUtils';
 import type {Option} from '@libs/OptionsListUtils';
 import {doesPersonalDetailMatchSearchTerm} from '@libs/OptionsListUtils/searchMatchUtils';
 import type {OptionWithKey} from '@libs/OptionsListUtils/types';
+import {getActiveAdminWorkspaces, isPaidGroupPolicy as isPaidGroupPolicyUtil} from '@libs/PolicyUtils';
 import type {OptionData} from '@libs/ReportUtils';
+import {isInvoiceRoom} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
+import {getInvoicePrimaryWorkspace} from '@userActions/Policy/Policy';
 import {searchUserInServer} from '@userActions/Report';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {BillingGraceEndPeriod, Policy} from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import ImportContactButton from './ImportContactButton';
 import ParticipantSelectorFooter from './ParticipantSelectorFooter';
-
-type BillingData = {
-    userBillingGracePeriodEnds: OnyxCollection<BillingGraceEndPeriod>;
-    ownerBillingGracePeriodEnd: OnyxEntry<number>;
-    amountOwed: OnyxEntry<number>;
-};
 
 const sanitizedSelectedParticipant = (option: Option | OptionData, iouType: IOUType) => ({
     ...lodashPick(option, 'accountID', 'login', 'isPolicyExpenseChat', 'reportID', 'searchText', 'policyID', 'isSelfDM', 'text', 'phoneNumber', 'displayName'),
@@ -77,17 +75,8 @@ type ParticipantSearchResultsProps = {
     /** Whether the platform is native (iOS/Android) */
     isNative: boolean;
 
-    /** Whether the Manager McTest nudge can be shown */
-    canShowManagerMcTest: boolean;
-
-    /** Config passed to useSearchSelector's getValidOptions */
-    getValidOptionsConfig: Parameters<typeof useSearchSelector>[0]['getValidOptionsConfig'];
-
-    /** Policy collection, used for section formatting and user-to-invite policy lookup */
-    allPolicies: OnyxCollection<Policy>;
-
-    /** Ref holding current billing values, read inside onSelectRow's billing gate */
-    billingDataRef: RefObject<BillingData>;
+    /** Whether this is a corporate card transaction */
+    isCorporateCardTransaction: boolean;
 
     /** Forwarded ref for the SelectionList — used by the parent's useImperativeHandle */
     selectionListRef: Ref<SelectionListWithSectionsHandle | null>;
@@ -97,9 +86,6 @@ type ParticipantSearchResultsProps = {
 
     /** Setter to toggle textInputAutoFocus from the ContactPermissionModal */
     setTextInputAutoFocus: (value: boolean) => void;
-
-    /** Adds a single participant; owns invoice-sender injection, provided by the parent */
-    addSingleParticipant: (option: Participant & Option) => void;
 
     /** Callback to propagate selected participants to the parent flow */
     onParticipantsAdded: (value: Participant[]) => void;
@@ -116,14 +102,10 @@ function ParticipantSearchResults({
     isPerDiemRequest,
     isTimeRequest,
     isNative,
-    canShowManagerMcTest,
-    getValidOptionsConfig,
-    allPolicies,
-    billingDataRef,
+    isCorporateCardTransaction,
     selectionListRef,
     textInputAutoFocus,
     setTextInputAutoFocus,
-    addSingleParticipant,
     onParticipantsAdded,
     onFinish,
 }: ParticipantSearchResultsProps) {
@@ -148,8 +130,73 @@ function ParticipantSearchResults({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
     const currentUserAccountID = currentUserPersonalDetails.accountID;
+    const currentUserLogin = currentUserPersonalDetails.login;
     const reportAttributesDerived = useReportAttributes();
     const privateIsArchivedMap = usePrivateIsArchivedMap();
+
+    // Policy and billing data — owned here, used for getValidOptionsConfig and billing gate in onSelectRow
+    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const policy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`];
+    const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
+    const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
+    const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
+    const [hasBeenAddedToNudgeMigration] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT, {
+        selector: (tryNewDot) => !!tryNewDot?.nudgeMigration?.timestamp,
+    });
+    const {isRestrictedToPreferredPolicy, preferredPolicyID} = usePreferredPolicy();
+    const optimisticTransactions = useTransactionDraftValues();
+
+    const isPaidGroupPolicy = isPaidGroupPolicyUtil(policy);
+    const activeAdminWorkspaces = getActiveAdminWorkspaces(allPolicies, currentUserLogin);
+
+    // This is necessary to prevent showing the Manager McTest when there are multiple transactions being created
+    const hasMultipleTransactions = optimisticTransactions.length > 1;
+    const canShowManagerMcTest = !hasBeenAddedToNudgeMigration && action !== CONST.IOU.ACTION.SUBMIT && !hasMultipleTransactions;
+
+    const getValidOptionsConfig = {
+        selectedOptions: participants as Participant[],
+        excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
+        includeOwnedWorkspaceChats: iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.CREATE || iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.TRACK,
+        excludeNonAdminWorkspaces: action === CONST.IOU.ACTION.SHARE,
+        includeP2P: !isCategorizeOrShareAction && !isPerDiemRequest && !isTimeRequest && !isCorporateCardTransaction,
+        includeInvoiceRooms: iouType === CONST.IOU.TYPE.INVOICE,
+        action,
+        shouldSeparateSelfDMChat: iouType !== CONST.IOU.TYPE.INVOICE,
+        shouldSeparateWorkspaceChat: true,
+        includeSelfDM: !isMovingTransactionFromTrackExpense(action) && iouType !== CONST.IOU.TYPE.INVOICE,
+        canShowManagerMcTest,
+        isPerDiemRequest,
+        isTimeRequest,
+        showRBR: false,
+        preferPolicyExpenseChat: isPaidGroupPolicy,
+        preferRecentExpenseReports: action === CONST.IOU.ACTION.CREATE,
+        isRestrictedToPreferredPolicy,
+        preferredPolicyID,
+    };
+
+    /**
+     * Adds a single participant to the expense
+     */
+    const addSingleParticipant = (option: Participant & Option) => {
+        const newParticipants: Participant[] = [sanitizedSelectedParticipant(option, iouType)];
+
+        if (iouType === CONST.IOU.TYPE.INVOICE) {
+            const policyID = option.item && isInvoiceRoom(option.item) ? option.policyID : getInvoicePrimaryWorkspace(policy, activeAdminWorkspaces)?.id;
+            newParticipants.push({
+                policyID,
+                isSender: true,
+                selected: false,
+                iouType,
+            });
+        }
+
+        onParticipantsAdded(newParticipants);
+
+        if (!option.isSelfDM) {
+            onFinish(undefined, newParticipants);
+        }
+    };
 
     const offlineMessage: string = isOffline ? `${translate('common.youAppearToBeOffline')} ${translate('search.resultsAreLimited')}` : '';
 
@@ -208,7 +255,11 @@ function ParticipantSearchResults({
         !(contactPermissionState === RESULTS.GRANTED || contactPermissionState === RESULTS.LIMITED) &&
         inputHelperText === translate('common.noResultsFound');
 
-    const newSections: Array<Section<OptionWithKey>> = [];
+    /**
+     * Returns the sections needed for the OptionsSelector
+     * @returns {Array}
+     */
+    const sections: Array<Section<OptionWithKey>> = [];
     let header = '';
     if (areOptionsInitialized && didScreenTransitionEnd) {
         const formatResults = formatSectionsFromSearchTerm(
@@ -224,10 +275,10 @@ function ParticipantSearchResults({
             undefined,
             reportAttributesDerived,
         );
-        newSections.push({...formatResults.section, sectionIndex: 0});
+        sections.push({...formatResults.section, sectionIndex: 0});
 
         if ((availableOptions.workspaceChats ?? []).length > 0) {
-            newSections.push({
+            sections.push({
                 title: translate('workspace.common.workspace'),
                 data: availableOptions.workspaceChats ?? [],
                 sectionIndex: 1,
@@ -235,7 +286,7 @@ function ParticipantSearchResults({
         }
 
         if (availableOptions.selfDMChat) {
-            newSections.push({
+            sections.push({
                 title: translate('workspace.invoices.paymentMethods.personal'),
                 data: availableOptions.selfDMChat ? [availableOptions.selfDMChat] : [],
                 sectionIndex: 2,
@@ -246,7 +297,7 @@ function ParticipantSearchResults({
             const shouldFilterRecentReportsToWorkspaceOnly = isPerDiemRequest || isTimeRequest;
             const recentReports = shouldFilterRecentReportsToWorkspaceOnly ? availableOptions.recentReports.filter((report) => report.isPolicyExpenseChat) : availableOptions.recentReports;
             if (recentReports.length > 0) {
-                newSections.push({
+                sections.push({
                     title: translate('common.recents'),
                     data: recentReports,
                     sectionIndex: 3,
@@ -254,7 +305,7 @@ function ParticipantSearchResults({
             }
 
             if (availableOptions.personalDetails.length > 0 && !isPerDiemRequest && !isTimeRequest) {
-                newSections.push({
+                sections.push({
                     title: translate('common.contacts'),
                     data: availableOptions.personalDetails,
                     sectionIndex: 4,
@@ -277,7 +328,7 @@ function ParticipantSearchResults({
             !isPerDiemRequest &&
             !isTimeRequest
         ) {
-            newSections.push({
+            sections.push({
                 title: undefined,
                 data: [availableOptions.userToInvite].map((participant) => {
                     const isPolicyExpenseChat = participant?.isPolicyExpenseChat ?? false;
@@ -295,12 +346,17 @@ function ParticipantSearchResults({
         }
     }
 
-    const sections = newSections;
-
+    /**
+     * Removes a selected option from list if already selected. If not already selected add this option to the list.
+     * @param option
+     */
     const addParticipantToSelection = (option: Participant) => {
         toggleSelection(option as OptionData);
     };
 
+    // Right now you can't split a request with a workspace and other additional participants
+    // This is getting properly fixed in https://github.com/Expensify/App/issues/27508, but as a stop-gap to prevent
+    // the app from crashing on native when you try to do this, we'll going to hide the button if you have a workspace and other participants
     const hasPolicyExpenseChatParticipant = selectedOptions.some((participant) => participant.isPolicyExpenseChat);
     const shouldShowSplitBillErrorMessage = selectedOptions.length > 1 && hasPolicyExpenseChatParticipant;
 
@@ -351,16 +407,7 @@ function ParticipantSearchResults({
     );
 
     const onSelectRow = (option: Participant) => {
-        if (
-            option.isPolicyExpenseChat &&
-            option.policyID &&
-            shouldRestrictUserBillableActions(
-                option.policyID,
-                billingDataRef.current.ownerBillingGracePeriodEnd,
-                billingDataRef.current.userBillingGracePeriodEnds,
-                billingDataRef.current.amountOwed,
-            )
-        ) {
+        if (option.isPolicyExpenseChat && option.policyID && shouldRestrictUserBillableActions(option.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(option.policyID));
             return;
         }
@@ -373,34 +420,25 @@ function ParticipantSearchResults({
         addSingleParticipant(option);
     };
 
-    const importContactsButtonComponent = (() => {
-        const shouldShowImportContactsButton = contactState?.showImportUI ?? showImportContacts;
-        if (!shouldShowImportContactsButton) {
-            return null;
-        }
-        return (
-            <MenuItem
-                title={translate('contact.importContacts')}
-                icon={icons.UserPlus}
-                onPress={goToSettings}
-                shouldShowRightIcon
-                sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_IMPORT_CONTACTS_ITEM}
-            />
-        );
-    })();
+    const shouldShowImportContactsButton = contactState?.showImportUI ?? showImportContacts;
+    const importContactsButtonComponent = shouldShowImportContactsButton ? (
+        <MenuItem
+            title={translate('contact.importContacts')}
+            icon={icons.UserPlus}
+            onPress={goToSettings}
+            shouldShowRightIcon
+            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_IMPORT_CONTACTS_ITEM}
+        />
+    ) : null;
 
-    const ClickableImportContactTextComponent = (() => {
-        if (searchTerm.length || isSearchingForReports) {
-            return undefined;
-        }
-        return (
+    const ClickableImportContactTextComponent =
+        !searchTerm.length && !isSearchingForReports ? (
             <ImportContactButton
                 showImportContacts={contactState?.showImportUI ?? showImportContacts}
                 inputHelperText={translate('contact.importContactsTitle')}
                 isInSearch={false}
             />
-        );
-    })();
+        ) : undefined;
 
     const EmptySelectionListContentWithPermission = (
         <>
@@ -463,4 +501,4 @@ function ParticipantSearchResults({
 
 export default ParticipantSearchResults;
 export {sanitizedSelectedParticipant};
-export type {ParticipantSearchResultsProps, BillingData};
+export type {ParticipantSearchResultsProps};
