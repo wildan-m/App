@@ -34,6 +34,7 @@ import {
     getValidWaypoints,
     isGPSDistanceRequest as isGPSDistanceRequestTransactionUtils,
     isManualDistanceRequest as isManualDistanceRequestTransactionUtils,
+    isScanRequest as isScanRequestTransactionUtils,
 } from '@libs/TransactionUtils';
 import type {GpsPoint} from '@userActions/IOU';
 import {createDistanceRequest as createDistanceRequestIOUActions} from '@userActions/IOU';
@@ -758,8 +759,8 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
 
         if (!isPerDiemRequest && (iouType === CONST.IOU.TYPE.TRACK || isCategorizingTrackExpense || isSharingTrackExpense)) {
             if (Object.values(receiptFiles).filter((receipt) => !!receipt).length && transaction) {
-                // If the transaction amount is zero, then the money is being requested through the "Scan" flow and the GPS coordinates need to be included.
-                if (transaction.amount === 0 && !isSharingTrackExpense && !isCategorizingTrackExpense && locationPermissionGranted) {
+                // If this is a scan request, then the GPS coordinates need to be included.
+                if (isScanRequestTransactionUtils(transaction) && !isSharingTrackExpense && !isCategorizingTrackExpense && locationPermissionGranted) {
                     if (userLocation) {
                         trackExpense(selectedParticipantsArg, shouldHandleNavigation, {
                             lat: userLocation.latitude,
@@ -790,9 +791,9 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
         }
 
         if (Object.values(receiptFiles).filter((receipt) => !!receipt).length && !!transaction) {
-            // If the transaction amount is zero, then the money is being requested through the "Scan" flow and the GPS coordinates need to be included.
+            // If this is a scan request, then the GPS coordinates need to be included.
             if (
-                transaction.amount === 0 &&
+                isScanRequestTransactionUtils(transaction) &&
                 !isSharingTrackExpense &&
                 !isCategorizingTrackExpense &&
                 locationPermissionGranted &&
