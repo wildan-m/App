@@ -30,6 +30,7 @@ import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getButtonState from '@libs/getButtonState';
 import Navigation from '@libs/Navigation/Navigation';
 import Parser from '@libs/Parser';
+import {getOriginalMessage} from '@libs/ReportActionsUtils';
 import {isCanceledTaskReport, isOpenTaskReport, isReportManager} from '@libs/ReportUtils';
 import type {ContextMenuAnchor} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import CONST from '@src/CONST';
@@ -42,9 +43,6 @@ type TaskPreviewProps = WithCurrentUserPersonalDetailsProps & {
     /** The ID of the associated policy */
     // eslint-disable-next-line react/no-unused-prop-types
     policyID: string | undefined;
-
-    /** The task report associated with this action, if any */
-    taskReport: OnyxEntry<Report>;
 
     /** Whether the task preview is hovered so we can modify its style */
     isHovered: boolean;
@@ -72,7 +70,6 @@ type TaskPreviewProps = WithCurrentUserPersonalDetailsProps & {
 };
 
 function TaskPreview({
-    taskReport,
     action,
     contextMenuAnchor,
     chatReportID,
@@ -89,6 +86,9 @@ function TaskPreview({
     const {translate} = useLocalize();
     const theme = useTheme();
     const {originalReportID} = useShowContextMenuState();
+    const originalMessage = getOriginalMessage(action);
+    const taskReportIDFromOriginalMessage = originalMessage && 'taskReportID' in originalMessage ? originalMessage.taskReportID : undefined;
+    const [taskReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${taskReportIDFromOriginalMessage}`);
     const taskReportID = taskReport?.reportID ?? action?.childReportID;
     // Prefer the live task report name so offline title edits are reflected immediately.
     const taskTitle = taskReport?.reportName ?? action?.childReportName ?? '';
