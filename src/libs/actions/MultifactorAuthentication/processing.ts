@@ -1,6 +1,6 @@
 import type {MultifactorAuthenticationScenarioConfig, MultifactorAuthenticationScenarioResponse} from '@components/MultifactorAuthentication/config/types';
 import {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
-import {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import {createLocalMFAError, createMFAErrorFromApiResponse} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {MFAResult} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {RegistrationKeyInfo} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
@@ -19,7 +19,7 @@ async function processRegistration(params: RegistrationParams): Promise<MFAResul
         return {success: true};
     }
 
-    return {success: false, error: MFAError.fromApiResponse(httpStatusCode, reason, message)};
+    return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
 }
 
 async function processScenarioAction(
@@ -29,7 +29,7 @@ async function processScenarioAction(
     if (!params.signedChallenge) {
         return {
             success: false,
-            error: MFAError.local(VALUES.REASON.LOCAL_ERRORS.SIGNATURE_MISSING, 'Signed challenge is missing from scenario action params'),
+            error: createLocalMFAError(VALUES.REASON.LOCAL_ERRORS.SIGNATURE_MISSING, 'Signed challenge is missing from scenario action params'),
         };
     }
 
@@ -45,7 +45,7 @@ async function processScenarioAction(
         };
     }
 
-    return {success: false, error: MFAError.fromApiResponse(httpStatusCode, reason, message)};
+    return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
 }
 
 export {processRegistration, processScenarioAction};
