@@ -45,7 +45,7 @@ import type {SelectedParticipant} from '@src/types/onyx/NewGroupChatDraft';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import KeyboardUtils from '@src/utils/keyboard';
 import type SelectedOption from './types';
-import useGroupDraftRestore from './useGroupDraftRestore';
+import useGroupChatDraftParticipantSync from './useGroupDraftRestore';
 
 const excludedGroupEmails = new Set<string>(CONST.EXPENSIFY_EMAILS.filter((value) => value !== CONST.EMAIL.CONCIERGE));
 
@@ -88,7 +88,7 @@ function useOptions(reportAttributesDerived: ReportAttributesDerivedValue['repor
 
     const reports = listOptions?.reports ?? [];
     const personalDetails = listOptions?.personalDetails ?? [];
-    useGroupDraftRestore(personalDetails, !isLoading, allPersonalDetails, loginList, currentUserEmail, currentUserAccountID, selectedOptions, setSelectedOptions);
+    useGroupChatDraftParticipantSync(personalDetails, !isLoading, allPersonalDetails, loginList, currentUserEmail, currentUserAccountID, selectedOptions, setSelectedOptions);
 
     const defaultOptions = getValidOptions(
         {

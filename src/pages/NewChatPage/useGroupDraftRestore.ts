@@ -10,7 +10,16 @@ import type NewGroupChatDraft from '@src/types/onyx/NewGroupChatDraft';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import type SelectedOption from './types';
 
-function useGroupDraftRestore(
+/**
+ * Keeps the NewChatPage's `selectedOptions` state aligned with the `NEW_GROUP_CHAT_DRAFT` Onyx draft.
+ *
+ * - On mount / reload, restores the draft participants into `selectedOptions` once so an
+ *   in-progress group chat survives refreshes.
+ * - While the screen is backgrounded (e.g. the user navigated to NewChatConfirmPage), mirrors
+ *   participant removals made against the draft back into `selectedOptions` so the two stay
+ *   consistent when the user returns.
+ */
+function useGroupChatDraftParticipantSync(
     allPersonalDetailOptions: Array<SearchOption<PersonalDetails>>,
     areAllPersonalDetailOptionsLoaded: boolean,
     allPersonalDetails: OnyxEntry<PersonalDetailsList>,
@@ -25,21 +34,18 @@ function useGroupDraftRestore(
 
     const draftParticipantsSelector = (draft: NewGroupChatDraft | undefined) => {
         const isSubscriptionActive = shouldRestoreSelectedOptionsRef.current || isScreenInBackgroundRef.current;
-        if (!isSubscriptionActive) {
-            return undefined;
-        }
-        return draft?.participants;
+        return isSubscriptionActive ? draft?.participants : undefined;
     };
 
     const [draftParticipants, draftParticipantsMetadata] = useOnyx(ONYXKEYS.NEW_GROUP_CHAT_DRAFT, {
         selector: draftParticipantsSelector,
     });
 
-    const restoreFromDraft = useEffectEvent(() => {
+    const restoreParticipantsFromDraft = useEffectEvent(() => {
         // Flip the ref first so the useOnyx selector disables the subscription
         shouldRestoreSelectedOptionsRef.current = false;
 
-        const restored = (draftParticipants ?? []).reduce<SelectedOption[]>((result, participant) => {
+        const restoredOptionsFromDraft = (draftParticipants ?? []).reduce<SelectedOption[]>((result, participant) => {
             if (participant.accountID === currentUserAccountID) {
                 return result;
             }
@@ -58,18 +64,21 @@ function useGroupDraftRestore(
         }, []);
 
         // No draft or only original creator in draft
-        if (!restored.length) {
+        if (!restoredOptionsFromDraft.length) {
             return;
         }
 
-        setSelectedOptions(restored);
+        setSelectedOptions(restoredOptionsFromDraft);
     });
 
-    const syncDraftRemovals = useEffectEvent(() => {
+    // NewChatConfirmPage can only deselect participants,
+    // so we don't need the complex logic from the restoreParticipantsFromDraft.
+    // Simple filtering out of deselected participants is enough here
+    const syncSelectedOptionsWithDraft = useEffectEvent(() => {
         const draftLogins = new Set((draftParticipants ?? []).map((participant) => participant.login));
-        const synced = selectedOptions.filter((option) => draftLogins.has(option.login));
+        const filteredSelectionOptions = selectedOptions.filter((option) => draftLogins.has(option.login));
 
-        setSelectedOptions(synced);
+        setSelectedOptions(filteredSelectionOptions);
     });
 
     useFocusEffect(
@@ -82,23 +91,23 @@ function useGroupDraftRestore(
         }, []),
     );
 
-    // handle removing participants on other pages (e.g. NewChatConfirmPage)
+    // Handle removing participants on other pages (e.g. NewChatConfirmPage)
     useEffect(() => {
         if (!isScreenInBackgroundRef.current) {
             return;
         }
-        syncDraftRemovals();
+        syncSelectedOptionsWithDraft();
     }, [draftParticipants]);
 
     const areRestoreInputsReady = areAllPersonalDetailOptionsLoaded && !isLoadingOnyxValue(draftParticipantsMetadata);
 
-    // handle reload with existing draft participants
+    // Handle reload with existing draft participants
     useEffect(() => {
         if (!shouldRestoreSelectedOptionsRef.current || !areRestoreInputsReady) {
             return;
         }
-        restoreFromDraft();
+        restoreParticipantsFromDraft();
     }, [draftParticipants, areRestoreInputsReady]);
 }
 
-export default useGroupDraftRestore;
+export default useGroupChatDraftParticipantSync;

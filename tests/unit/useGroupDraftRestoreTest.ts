@@ -7,7 +7,7 @@ import type {SearchOption} from '@libs/OptionsListUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import type {PersonalDetails} from '@src/types/onyx';
 import type {SelectedParticipant} from '@src/types/onyx/NewGroupChatDraft';
-import useGroupDraftRestore from '../../src/pages/NewChatPage/useGroupDraftRestore';
+import useGroupChatDraftParticipantSync from '../../src/pages/NewChatPage/useGroupDraftRestore';
 
 const mockUseOnyx = useOnyx as jest.MockedFunction<typeof useOnyx>;
 const mockGetUserToInviteOption = OptionsListUtilsModule.getUserToInviteOption as jest.MockedFunction<typeof OptionsListUtilsModule.getUserToInviteOption>;
@@ -110,7 +110,16 @@ describe('useGroupDraftRestore', () => {
         setupUseOnyx(draftParticipants, draftStatus);
 
         const {rerender} = renderHook(() =>
-            useGroupDraftRestore(allPersonalDetailOptions, areAllPersonalDetailOptionsLoaded, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedOptions, setSelectedOptions),
+            useGroupChatDraftParticipantSync(
+                allPersonalDetailOptions,
+                areAllPersonalDetailOptionsLoaded,
+                {},
+                {},
+                CURRENT_USER_EMAIL,
+                CURRENT_USER_ACCOUNT_ID,
+                selectedOptions,
+                setSelectedOptions,
+            ),
         );
 
         return {setSelectedOptions, rerender};
@@ -159,7 +168,9 @@ describe('useGroupDraftRestore', () => {
             setupUseOnyx(draftParticipants);
 
             const setSelectedOptions = jest.fn();
-            const {rerender} = renderHook(() => useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions));
+            const {rerender} = renderHook(() =>
+                useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions),
+            );
 
             expect(setSelectedOptions).toHaveBeenCalledTimes(1);
 
@@ -192,7 +203,7 @@ describe('useGroupDraftRestore', () => {
             const {rerender} = renderHook(
                 ({draftParticipants}) => {
                     setupUseOnyx(draftParticipants);
-                    return useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
+                    return useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
                 },
                 {initialProps: {draftParticipants: initialDraftParticipants}},
             );
@@ -236,7 +247,7 @@ describe('useGroupDraftRestore', () => {
             const {rerender} = renderHook(
                 ({draftParticipants}) => {
                     setupUseOnyx(draftParticipants);
-                    return useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
+                    return useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
                 },
                 {initialProps: {draftParticipants: initialDraftParticipants}},
             );
@@ -269,7 +280,7 @@ describe('useGroupDraftRestore', () => {
             const {rerender} = renderHook(
                 ({draft}) => {
                     setupUseOnyx(draft);
-                    return useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
+                    return useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, selectedAfterRestore, setSelectedOptions);
                 },
                 {initialProps: {draft: draftParticipants}},
             );
@@ -297,7 +308,7 @@ describe('useGroupDraftRestore', () => {
             const {rerender} = renderHook(
                 ({draft}) => {
                     setupUseOnyx(draft);
-                    return useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions);
+                    return useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, true, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions);
                 },
                 {initialProps: {draft: draftParticipants}},
             );
@@ -345,7 +356,7 @@ describe('useGroupDraftRestore', () => {
             setupUseOnyx(draftParticipants);
 
             const {rerender} = renderHook(
-                ({areLoaded}) => useGroupDraftRestore(ALL_PERSONAL_DETAIL_OPTIONS, areLoaded, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions),
+                ({areLoaded}) => useGroupChatDraftParticipantSync(ALL_PERSONAL_DETAIL_OPTIONS, areLoaded, {}, {}, CURRENT_USER_EMAIL, CURRENT_USER_ACCOUNT_ID, [], setSelectedOptions),
                 {initialProps: {areLoaded: false}},
             );
 
