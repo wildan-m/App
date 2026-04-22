@@ -121,7 +121,7 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_MULTI_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_MULTI_SELECT}
         >
-            <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle})]}>
+            <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle, isSearchable})]}>
                 {!!loading && (
                     <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
                         <ActivityIndicator
