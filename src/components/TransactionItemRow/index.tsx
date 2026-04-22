@@ -110,6 +110,9 @@ type TransactionWithOptionalSearchFields = TransactionWithOptionalHighlight & {
 
     /** Policy to which the transaction belongs */
     policy?: Policy;
+
+    /** Identifier of the withdrawal that paid this transaction, when populated by the Expenses search backend */
+    withdrawalID?: string;
 };
 
 type TransactionItemRowProps = {
@@ -636,6 +639,15 @@ function TransactionItemRow({
                         style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.REPORT_ID)]}
                     >
                         <TextCell text={transactionItem.reportID === CONST.REPORT.UNREPORTED_REPORT_ID ? '' : transactionItem.reportID} />
+                    </View>
+                );
+            case CONST.SEARCH.TABLE_COLUMNS.WITHDRAWAL_ID:
+                return (
+                    <View
+                        key={column}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.WITHDRAWAL_ID)]}
+                    >
+                        <TextCell text={transactionItem.withdrawalID ?? ''} />
                     </View>
                 );
             case CONST.SEARCH.TABLE_COLUMNS.BASE_62_REPORT_ID:
