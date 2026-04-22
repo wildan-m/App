@@ -4864,7 +4864,7 @@ const staticStyles = (theme: ThemeColors) =>
 
         listTableHeader: {
             paddingVertical: 12,
-            paddingHorizontal: 32,
+            paddingHorizontal: 36,
         },
 
         listTableHeaderCompact: {
