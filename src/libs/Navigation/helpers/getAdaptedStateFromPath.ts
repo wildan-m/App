@@ -170,22 +170,31 @@ function getMatchingFullScreenRoute(route: NavigationPartialRoute) {
     }
 
     if (RHP_TO_DOMAIN[route.name]) {
-        const paramsFromRoute = getParamsFromRoute(RHP_TO_DOMAIN[route.name]);
+        const sidebarParamsFromRoute = getParamsFromRoute(SCREENS.DOMAIN.INITIAL);
+        const centralParamsFromRoute = getParamsFromRoute(RHP_TO_DOMAIN[route.name]);
 
         const domainSplitRoute = getInitialSplitNavigatorState(
             {
                 name: SCREENS.DOMAIN.INITIAL,
-                params: paramsFromRoute.length > 0 ? pick(route.params, paramsFromRoute) : undefined,
+                params: sidebarParamsFromRoute.length > 0 ? pick(route.params, sidebarParamsFromRoute) : undefined,
             },
             {
                 name: RHP_TO_DOMAIN[route.name],
-                params: paramsFromRoute.length > 0 ? pick(route.params, paramsFromRoute) : undefined,
+                params: centralParamsFromRoute.length > 0 ? pick(route.params, centralParamsFromRoute) : undefined,
             },
         );
 
         return {
             name: NAVIGATORS.WORKSPACE_NAVIGATOR,
-            state: getRoutesWithIndex([{name: SCREENS.WORKSPACES_LIST}, domainSplitRoute]),
+            state: getRoutesWithIndex([
+                {
+                    name: SCREENS.WORKSPACES_LIST,
+                    // prepending a slash to ensure closing the RHP after refreshing the page
+                    // replaces the whole path with "/workspaces", instead of just replacing the last url segment ("/x/y/workspaces")
+                    path: normalizePath(ROUTES.WORKSPACES_LIST.route),
+                },
+                domainSplitRoute,
+            ]),
         };
     }
 
