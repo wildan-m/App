@@ -121,6 +121,12 @@ function OdometerReceiptStitcher({
             {uri: endUri, image: odometerEndImage},
         ].filter((item): item is {uri: string; image: typeof odometerStartImage} => !!item.uri && item.uri.startsWith('blob:'));
 
+        const cleanup = () => {
+            ignore = true;
+            onStitchingChange(false);
+            cancelSpan(CONST.TELEMETRY.SPAN_ODOMETER_IMAGE_STITCH);
+        };
+
         if (localImages.length > 0) {
             let hasExpiredImages = false;
             Promise.all(
@@ -147,14 +153,11 @@ function OdometerReceiptStitcher({
                 }
                 runStitch();
             });
-            return;
+            return cleanup;
         }
         runStitch();
 
-        return () => {
-            ignore = true;
-            cancelSpan(CONST.TELEMETRY.SPAN_ODOMETER_IMAGE_STITCH);
-        };
+        return cleanup;
     }, [isOdometerDistanceRequest, isFocused, odometerStartImage, odometerEndImage, transaction, reportID, backToReport, translate, iouType, onStitchingChange, onStitchError]);
 
     return null;
