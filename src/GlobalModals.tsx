@@ -22,8 +22,13 @@ function GlobalModals() {
         // dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage, etc.)
         // during the ManualAppStartup span. The ref-based API in ReportActionContextMenu
         // already handles null refs gracefully.
-        const scheduleIdle = typeof requestIdleCallback === 'function' ? requestIdleCallback : (cb: () => void) => setTimeout(cb, 0);
-        scheduleIdle(() => setShouldRenderContextMenu(true));
+        if (typeof requestIdleCallback !== 'function') {
+            // React Native / Safari < 16.4: no native requestIdleCallback. Render eagerly — matches pre-change behavior.
+            setShouldRenderContextMenu(true);
+            return;
+        }
+        const id = requestIdleCallback(() => setShouldRenderContextMenu(true), {timeout: 2000});
+        return () => cancelIdleCallback(id);
     }, []);
 
     return (
