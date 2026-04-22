@@ -15,7 +15,7 @@ import type SelectedOption from './types';
  *
  * - On mount / reload, restores the draft participants into `selectedOptions` once so an
  *   in-progress group chat survives refreshes.
- * - While the screen is backgrounded (e.g. the user navigated to NewChatConfirmPage), mirrors
+ * - While the screen is in the background (e.g. the user navigated to NewChatConfirmPage), mirrors
  *   participant removals made against the draft back into `selectedOptions` so the two stay
  *   consistent when the user returns.
  */
