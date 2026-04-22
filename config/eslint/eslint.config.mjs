@@ -13,8 +13,8 @@ import globals from 'globals';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import typescriptEslint from 'typescript-eslint';
-import reactCompilerCompatProcessor from './eslint-processor-react-compiler-compat/index.mjs';
-import reportNameUtilsPlugin from './eslint-plugin-report-name-utils/index.mjs';
+import reportNameUtilsPlugin from './plugins/eslint-plugin-report-name-utils.mjs';
+import reactCompilerCompatProcessor from './processors/eslint-processor-react-compiler-compat.mjs';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {defineConfig} from 'eslint/config';
-import reportNameUtilsPlugin from './eslint-plugin-report-name-utils/index.mjs';
+import reportNameUtilsPlugin from './plugins/eslint-plugin-report-name-utils.mjs';
 import mainConfig from './eslint.config.mjs';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
