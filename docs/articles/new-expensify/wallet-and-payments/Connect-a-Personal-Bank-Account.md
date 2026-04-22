@@ -46,13 +46,10 @@ To update your bank account information:
 
 1. Go to **Account > Wallet > Bank Accounts**.
 2. Tap the bank account row that displays the **Action required** badge.
-3. Complete the steps that appear. You will only be prompted for information that is currently missing:
-   - **Legal name** — Enter your first and last name as it appears on your bank account.
-   - **Address** — Enter your current residential address.
-   - **Phone number** — Enter your phone number.
-4. Review your information on the confirmation screen. Tap any item to edit it.
-5. Tap **Confirm** to save your changes.
-6. On the success screen, tap **Continue** to return to your Wallet.
+3. Click **Continue setup**.
+4. Complete the steps that appear. You will only be prompted for information that is currently missing.
+5. Review your information on the confirmation screen. Tap any item to edit it.
+6. Click **Confirm** to save your changes.
 
 Once updated, the **Action required** badge will be removed from the bank account.
 
