@@ -93,6 +93,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     onSelectRow={(item: GroupOption) => Navigation.navigate(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, item.groupID))}
                     customListHeader={getCustomListHeader()}
                     shouldShowRightCaret
+                    addBottomSafeAreaPadding
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
