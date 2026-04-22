@@ -1,6 +1,6 @@
 import type {NavigatorScreenParams} from '@react-navigation/native';
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {Animated, DeviceEventEmitter, InteractionManager} from 'react-native';
 import {DialogLabelProvider} from '@components/DialogLabelContext';
@@ -61,18 +61,13 @@ function MissingPersonalDetailsWithPINContext(props: Record<string, unknown>) {
     );
 }
 
-type SecondaryOverlayProps = {
-    disabled: boolean;
-};
-
-function SecondaryOverlay({disabled}: SecondaryOverlayProps) {
+function SecondaryOverlay() {
     const {shouldRenderSecondaryOverlayForWideRHP, shouldRenderSecondaryOverlayForRHPOnWideRHP, shouldRenderSecondaryOverlayForRHPOnSuperWideRHP} = useWideRHPState();
     const {sidePanelOffset} = useSidePanelState();
 
     if (shouldRenderSecondaryOverlayForWideRHP) {
         return (
             <Overlay
-                disabled={disabled}
                 progress={secondOverlayWideRHPProgress}
                 positionRightValue={Animated.add(sidePanelOffset.current, animatedWideRHPWidth)}
                 onPress={() => Navigation.closeRHPFlow()}
@@ -83,7 +78,6 @@ function SecondaryOverlay({disabled}: SecondaryOverlayProps) {
     if (shouldRenderSecondaryOverlayForRHPOnWideRHP) {
         return (
             <Overlay
-                disabled={disabled}
                 progress={secondOverlayRHPOnWideRHPProgress}
                 positionRightValue={Animated.add(sidePanelOffset.current, variables.sideBarWidth)}
                 onPress={Navigation.dismissToPreviousRHP}
@@ -94,7 +88,6 @@ function SecondaryOverlay({disabled}: SecondaryOverlayProps) {
     if (shouldRenderSecondaryOverlayForRHPOnSuperWideRHP) {
         return (
             <Overlay
-                disabled={disabled}
                 progress={secondOverlayRHPOnSuperWideRHPProgress}
                 positionRightValue={Animated.add(sidePanelOffset.current, variables.sideBarWidth)}
                 onPress={Navigation.dismissToSuperWideRHP}
@@ -114,14 +107,6 @@ function RightModalNavigator({navigation, route}: RightModalNavigatorProps) {
     const {isSmallScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const containerRef = useRef(null);
     const isExecutingRef = useRef<boolean>(false);
-    // Tracks whether the inner RHP stack is currently running a non-closing push/pop animation.
-    // Clicking the overlay mid-push leaves stale animation state (see issue #87174), so we
-    // ignore the dismiss press until the in-flight transition finishes. The ref gates the
-    // synchronous dispatchers; the state mirror drives the `disabled` prop on the overlays so
-    // the Pressable itself no-ops (defense in depth against cases where the dispatcher path
-    // bypasses the ref guard, e.g. inline Navigation.dismissToPreviousRHP).
-    const isOverlayDismissEnabledRef = useRef<boolean>(true);
-    const [isOverlayDismissEnabled, setIsOverlayDismissEnabled] = useState<boolean>(true);
     const screenOptions = useRHPScreenOptions();
     const {superWideRHPRouteKeys, shouldRenderTertiaryOverlay} = useWideRHPState();
     const {clearWideRHPKeys, syncRHPKeys} = useWideRHPActions();
@@ -180,31 +165,12 @@ function RightModalNavigator({navigation, route}: RightModalNavigatorProps) {
                     abandonReviewDuplicateTransactions();
                 });
             },
-            transitionStart: (event: {data?: {closing?: boolean}}) => {
-                // Only disable dismiss when a screen is starting to open. A starting close is
-                // either the user's own dismiss (benign) or a cancellation of an in-flight open
-                // (handled by transitionEnd below).
-                if (event.data?.closing) {
-                    return;
-                }
-                isOverlayDismissEnabledRef.current = false;
-                setIsOverlayDismissEnabled(false);
-            },
-            transitionEnd: () => {
-                // Re-enable on ANY transitionEnd (opening or closing). If an opening transition
-                // is interrupted by a pop, React Navigation cancels the open and only emits
-                // transitionEnd with closing: true for the popped route — the opening's own
-                // closing: false end never fires. Ignoring closing: true here would leave the
-                // gate stuck false forever and swallow subsequent overlay dismiss clicks.
-                isOverlayDismissEnabledRef.current = true;
-                setIsOverlayDismissEnabled(true);
-            },
         }),
         [navigation, route.params?.screen],
     );
 
     const handleOverlayPress = useCallback(() => {
-        if (isExecutingRef.current || !isOverlayDismissEnabledRef.current) {
+        if (isExecutingRef.current) {
             return;
         }
         isExecutingRef.current = true;
@@ -249,7 +215,6 @@ function RightModalNavigator({navigation, route}: RightModalNavigatorProps) {
                 <NoDropZone>
                     {!shouldUseNarrowLayout && (
                         <Overlay
-                            disabled={!isOverlayDismissEnabled}
                             positionLeftValue={overlayPositionLeft}
                             onPress={handleOverlayPress}
                         />
@@ -501,10 +466,9 @@ function RightModalNavigator({navigation, route}: RightModalNavigatorProps) {
                     {/* The third and second overlays are displayed here to cover RHP screens wider than the currently focused screen. */}
                     {/* Clicking on these overlays redirects you to the RHP screen below them. */}
                     {/* The width of these overlays is equal to the width of the screen minus the width of the currently focused RHP screen (positionRightValue) */}
-                    {!shouldUseNarrowLayout && <SecondaryOverlay disabled={!isOverlayDismissEnabled} />}
+                    {!shouldUseNarrowLayout && <SecondaryOverlay />}
                     {!shouldUseNarrowLayout && shouldRenderTertiaryOverlay && (
                         <Overlay
-                            disabled={!isOverlayDismissEnabled}
                             progress={thirdOverlayProgress}
                             positionRightValue={Animated.add(sidePanelOffset.current, variables.sideBarWidth)}
                             onPress={Navigation.dismissToPreviousRHP}

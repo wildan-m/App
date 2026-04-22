@@ -1,5 +1,5 @@
 import {useCardAnimation} from '@react-navigation/stack';
-import React, {useCallback} from 'react';
+import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {Animated, View} from 'react-native';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
@@ -21,24 +21,13 @@ type BaseOverlayProps = {
 
     /* Overlay position from the right edge of the container */
     positionRightValue?: number | Animated.Value | Animated.AnimatedAddition<number>;
-
-    /* When true, the overlay stays visible but swallows clicks without invoking onPress.
-       Used to block dismiss while an RHP stack transition is in flight (see issue #87174). */
-    disabled?: boolean;
 };
 
 // The default value of positionLeftValue is equal to -2 * variables.sideBarWidth, because we need to stretch the overlay to cover the sidebar and the translate animation distance.
-function BaseOverlay({onPress, progress, positionLeftValue = -2 * variables.sideBarWidth, positionRightValue = 0, disabled = false}: BaseOverlayProps) {
+function BaseOverlay({onPress, progress, positionLeftValue = -2 * variables.sideBarWidth, positionRightValue = 0}: BaseOverlayProps) {
     const styles = useThemeStyles();
     const {current} = useCardAnimation();
     const {translate} = useLocalize();
-
-    const guardedPress = useCallback(() => {
-        if (disabled) {
-            return;
-        }
-        onPress?.();
-    }, [disabled, onPress]);
 
     return (
         <Animated.View
@@ -53,22 +42,20 @@ function BaseOverlay({onPress, progress, positionLeftValue = -2 * variables.side
              everything behaves normally like one big pressable */}
                 <PressableWithoutFeedback
                     style={[styles.draggableTopBar, styles.boxShadowNone, styles.cursorAuto]}
-                    onPress={guardedPress}
+                    onPress={onPress}
                     accessibilityLabel={translate('common.close')}
                     role={CONST.ROLE.BUTTON}
                     id={CONST.OVERLAY.TOP_BUTTON_NATIVE_ID}
                     tabIndex={-1}
-                    disabled={disabled}
                 />
                 <PressableWithoutFeedback
                     style={[styles.flex1, styles.boxShadowNone, styles.cursorAuto]}
-                    onPress={guardedPress}
+                    onPress={onPress}
                     accessibilityLabel={translate('common.close')}
                     role={CONST.ROLE.BUTTON}
                     noDragArea
                     id={CONST.OVERLAY.BOTTOM_BUTTON_NATIVE_ID}
                     tabIndex={-1}
-                    disabled={disabled}
                 />
             </View>
         </Animated.View>
