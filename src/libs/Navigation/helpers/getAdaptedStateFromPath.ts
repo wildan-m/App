@@ -13,6 +13,7 @@ import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Screen} from '@src/SCREENS';
 import findMatchingDynamicSuffix from './dynamicRoutesUtils/findMatchingDynamicSuffix';
+import getDynamicRouteAdaptedState from './dynamicRoutesUtils/getDynamicRouteAdaptedState';
 import getPathWithoutDynamicSuffix from './dynamicRoutesUtils/getPathWithoutDynamicSuffix';
 import isDynamicRouteScreen from './dynamicRoutesUtils/isDynamicRouteScreen';
 import findFocusedRouteWithOnyxTabGuard from './findFocusedRouteWithOnyxTabGuard';
@@ -315,16 +316,28 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
     if (!fullScreenRoute) {
         const focusedRoute = findFocusedRouteWithOnyxTabGuard(state);
 
+        let currentState = state;
+        if (focusedRoute?.path && isDynamicRouteScreen(focusedRoute.name as Screen)) {
+            currentState = getDynamicRouteAdaptedState(state, focusedRoute.path) as PartialState<NavigationState<RootNavigatorParamList>>;
+
+            // getDynamicRouteAdaptedState may have already resolved the full screen route.
+            // In that case, skip the default full screen route injection below - the state is already complete.
+            const hasFullScreenRoute = currentState.routes.some((route) => isFullScreenName(route.name));
+            if (hasFullScreenRoute) {
+                return currentState;
+            }
+        }
+
         if (focusedRoute) {
             const matchingRootRoute = getMatchingFullScreenRoute(focusedRoute);
 
             // If there is a matching root route, add it to the state.
             if (matchingRootRoute) {
-                return getRoutesWithIndex([matchingRootRoute, ...state.routes]);
+                return getRoutesWithIndex([matchingRootRoute, ...currentState.routes]);
             }
         }
 
-        const onboardingNavigator = state.routes.find((route) => route.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR);
+        const onboardingNavigator = currentState.routes.find((route) => route.name === NAVIGATORS.ONBOARDING_MODAL_NAVIGATOR);
 
         // The onboarding flow consists of several screens. If we open any of the screens, the previous screens from that flow should be in the state.
         if (onboardingNavigator?.state) {
@@ -336,16 +349,16 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
             return getRoutesWithIndex([getTabNavigatorState({name: SCREENS.HOME}), adaptedOnboardingNavigator]);
         }
 
-        const isRightModalNavigator = state.routes.find((route) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR);
+        const isRightModalNavigator = currentState.routes.find((route) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR);
 
         if (isRightModalNavigator) {
-            return getRoutesWithIndex([getTabNavigatorState({name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR}), ...state.routes]);
+            return getRoutesWithIndex([getTabNavigatorState({name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR}), ...currentState.routes]);
         }
 
         const defaultFullScreenRoute = getDefaultFullScreenRoute(focusedRoute);
 
         // If not, add the default full screen route.
-        return getRoutesWithIndex([defaultFullScreenRoute, ...state.routes]);
+        return getRoutesWithIndex([defaultFullScreenRoute, ...currentState.routes]);
     }
 
     return state;
