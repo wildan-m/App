@@ -38,9 +38,9 @@ To connect a U.S. bank account:
 
 ---
 
-# Update a U.S. bank account with missing information
+# Update a bank account with missing information
 
-If a U.S. personal bank account is missing required information (such as your legal name, address, or phone number), an **Action required** badge will appear on the bank account row in your Wallet. This information is needed for reimbursement payments to process successfully.
+If a bank account is missing required information (such as your legal name, address, or phone number), an **Action required** badge will appear on the bank account row in your Wallet. This information is needed for reimbursement payments to process successfully.
 
 To update your bank account information:
 
@@ -63,7 +63,7 @@ Yes. You can add multiple accounts, but only one can be selected as the default 
 
 ## Why does my bank account show "Action required"?
 
-Your U.S. personal bank account is missing required information — such as your legal name, address, or phone number — that is needed for reimbursement payments. Tap the bank account row and follow the prompts to provide the missing details. The badge will be removed once the information is saved.
+Your bank account is missing required information — such as your legal name, address, or phone number — that is needed for reimbursement payments. Tap the bank account row and follow the prompts to provide the missing details. The badge will be removed once the information is saved.
 
 ## Can I delete a bank account?
 
