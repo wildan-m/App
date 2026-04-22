@@ -5,10 +5,16 @@ import {sha256} from '@sbaiahmed1/react-native-biometrics';
 import type {AuthType} from '@sbaiahmed1/react-native-biometrics/types';
 import {Buffer} from 'buffer';
 import type {ValueOf} from 'type-fest';
+import {getErrorMessage} from '@libs/ErrorUtils';
 import type {AuthTypeInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import CONST from '@src/CONST';
 import NATIVE_BIOMETRICS_HSM_VALUES from './VALUES';
+
+type DecodedLibraryError = {
+    reason: MultifactorAuthenticationReason;
+    message: string | undefined;
+};
 
 type NativeBiometricsHSMTypeEntry = ValueOf<typeof NATIVE_BIOMETRICS_HSM_VALUES.AUTH_TYPE>;
 
@@ -86,13 +92,18 @@ const LIBRARY_ERROR_CODE_MAP: Record<string, MultifactorAuthenticationReason> = 
 };
 
 /**
- * Maps caught exceptions from the library to REASON values.
+ * Decodes caught exceptions from the library into a reason and message.
+ * Falls back to UNRECOGNIZED for errors without a known code — mirrors decodeWebAuthnError.
  */
-function mapLibraryErrorToReason(error: unknown): MultifactorAuthenticationReason | undefined {
-    if (!(error instanceof Error && 'code' in error && typeof error.code === 'string')) {
-        return undefined;
+function decodeLibraryError(error: unknown): DecodedLibraryError {
+    const message = getErrorMessage(error);
+    if (error instanceof Error && 'code' in error && typeof error.code === 'string') {
+        const reason = LIBRARY_ERROR_CODE_MAP[error.code];
+        if (reason) {
+            return {reason, message};
+        }
     }
-    return LIBRARY_ERROR_CODE_MAP[error.code];
+    return {reason: VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED, message};
 }
 
 /**
@@ -122,4 +133,4 @@ async function buildSigningData(rpId: string, challenge: string): Promise<{authe
     return {authenticatorData, clientDataJSON, dataToSignB64};
 }
 
-export {getKeyAlias, mapAuthTypeNumber, mapSignErrorCodeToReason, mapLibraryErrorToReason, buildSigningData};
+export {getKeyAlias, mapAuthTypeNumber, mapSignErrorCodeToReason, decodeLibraryError, buildSigningData};

@@ -3,8 +3,7 @@ import type {SignatureResult} from '@sbaiahmed1/react-native-biometrics';
 import addMFABreadcrumb from '@components/MultifactorAuthentication/observability/breadcrumbs';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
-import {getErrorMessage} from '@libs/ErrorUtils';
-import {buildSigningData, getKeyAlias, mapAuthTypeNumber, mapLibraryErrorToReason, mapSignErrorCodeToReason} from '@libs/MultifactorAuthentication/NativeBiometricsHSM/helpers';
+import {buildSigningData, decodeLibraryError, getKeyAlias, mapAuthTypeNumber, mapSignErrorCodeToReason} from '@libs/MultifactorAuthentication/NativeBiometricsHSM/helpers';
 import type NativeBiometricsHSMKeyInfo from '@libs/MultifactorAuthentication/NativeBiometricsHSM/types';
 import {createLocalMFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
@@ -54,12 +53,8 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             return Base64URL.base64ToBase64url(entry.publicKey);
         } catch (error) {
-            let reason = mapLibraryErrorToReason(error);
-            if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
-            }
-            const errorMessage = getErrorMessage(error);
-            addMFABreadcrumb('Failed to get local credential ID', {reason, message: errorMessage}, 'error');
+            const {reason, message} = decodeLibraryError(error);
+            addMFABreadcrumb('Failed to get local credential ID', {reason, message}, 'error');
             return undefined;
         }
     };
@@ -74,12 +69,8 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             const keyAlias = getKeyAlias(accountID);
             await deleteKeys(keyAlias);
         } catch (error) {
-            let reason = mapLibraryErrorToReason(error);
-            if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
-            }
-            const errorMessage = getErrorMessage(error);
-            addMFABreadcrumb('Failed to delete local keys', {reason, message: errorMessage}, 'error');
+            const {reason, message} = decodeLibraryError(error);
+            addMFABreadcrumb('Failed to delete local keys', {reason, message}, 'error');
         }
     };
 
@@ -117,13 +108,10 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 keyInfo,
             });
         } catch (error) {
-            let reason = mapLibraryErrorToReason(error);
-            if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.KEY_CREATION_FAILED;
-            }
+            const {reason, message} = decodeLibraryError(error);
             onResult({
                 success: false,
-                error: createLocalMFAError(reason, getErrorMessage(error)),
+                error: createLocalMFAError(reason, message),
             });
         }
     };
@@ -192,13 +180,10 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 authenticationMethod: authType,
             });
         } catch (error) {
-            let reason = mapLibraryErrorToReason(error);
-            if (reason === undefined) {
-                reason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
-            }
+            const {reason, message} = decodeLibraryError(error);
             onResult({
                 success: false,
-                error: createLocalMFAError(reason, getErrorMessage(error)),
+                error: createLocalMFAError(reason, message),
             });
         }
     };
