@@ -79,12 +79,7 @@ function WorkspaceHRPage({
                             <MenuItem
                                 title={translate('workspace.hr.gusto.title')}
                                 icon={icons.GustoSquare}
-                                iconType={CONST.ICON_TYPE_ICON}
-                                displayInDefaultIconColor
-                                iconWidth={32}
-                                iconHeight={32}
-                                iconStyles={styles.mr2}
-                                shouldIconUseAutoWidthStyle
+                                iconType={CONST.ICON_TYPE_AVATAR}
                                 wrapperStyle={[styles.ph0, styles.pv2, styles.mt4]}
                                 interactive={false}
                                 shouldShowRightComponent
