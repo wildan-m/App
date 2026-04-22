@@ -617,7 +617,6 @@ export {
     hasCardAuthenticatedError,
     hasCardExpiredError,
     hasGracePeriodOverdue,
-    hasRetryBillingError,
     hasSubscriptionGreenDotInfo,
     hasSubscriptionRedDotError,
     hasUserFreeTrialEnded,
