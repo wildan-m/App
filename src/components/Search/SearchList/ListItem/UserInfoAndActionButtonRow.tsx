@@ -18,17 +18,18 @@ function UserInfoAndActionButtonRow({
     item,
     shouldShowUserInfo,
     containerStyles,
+    stateNum,
+    statusNum,
 }: {
     item: TransactionReportGroupListItemType | TransactionListItemType | ExpenseReportListItemType;
     shouldShowUserInfo: boolean;
     containerStyles?: StyleProp<ViewStyle>;
+    stateNum: ExpenseReportListItemType['stateNum'];
+    statusNum: ExpenseReportListItemType['statusNum'];
 }) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const transactionItem = item as unknown as TransactionListItemType;
-    const stateNum = transactionItem.report?.stateNum ?? (item as unknown as ExpenseReportListItemType).stateNum;
-    const statusNum = transactionItem.report?.statusNum ?? (item as unknown as ExpenseReportListItemType).statusNum;
     const statusText = useMemo(() => getReportStatusTranslation({stateNum, statusNum, translate}), [stateNum, statusNum, translate]);
     const reportStatusColorStyle = useMemo(() => getReportStatusColorStyle(theme, stateNum, statusNum), [theme, stateNum, statusNum]);
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';

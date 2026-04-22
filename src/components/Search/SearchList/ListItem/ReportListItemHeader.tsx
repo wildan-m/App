@@ -249,6 +249,8 @@ function ReportListItemHeader<TItem extends ListItem>({
                 item={reportItem}
                 shouldShowUserInfo={showUserInfo}
                 containerStyles={[styles.pr3, styles.mb2]}
+                stateNum={reportItem.stateNum}
+                statusNum={reportItem.statusNum}
             />
             <HeaderFirstRow
                 report={reportItem}

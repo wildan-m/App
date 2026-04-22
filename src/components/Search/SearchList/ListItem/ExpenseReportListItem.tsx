@@ -296,6 +296,8 @@ function ExpenseReportListItem<TItem extends ListItem>({
                         <UserInfoAndActionButtonRow
                             item={reportItem}
                             shouldShowUserInfo={!!reportItem?.from}
+                            stateNum={reportItem.stateNum}
+                            statusNum={reportItem.statusNum}
                         />
                     )}
                     {!isLargeScreenWidth && (

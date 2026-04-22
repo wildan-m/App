@@ -299,6 +299,8 @@ function TransactionListItem<TItem extends ListItem>({
                             <UserInfoAndActionButtonRow
                                 item={transactionItem}
                                 shouldShowUserInfo={!isDeletedTransaction && !!transactionItem?.from}
+                                stateNum={transactionItem.report?.stateNum}
+                                statusNum={transactionItem.report?.statusNum}
                             />
                         )}
                         <TransactionItemRow
