@@ -37,7 +37,6 @@ import type {
 import type {
     GroupedItem,
     QueryFilters,
-    SearchAction,
     SearchAmountFilterKeys,
     SearchColumnType,
     SearchCustomColumnIds,
@@ -1212,27 +1211,6 @@ function isTransactionGroupListItemType(item: ListItem): item is TransactionGrou
  */
 function isTransactionReportGroupListItemType(item: ListItem): item is TransactionReportGroupListItemType {
     return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
-}
-
-/**
- * Type guard that checks if something is a TransactionMemberGroupListItemType
- */
-function isTransactionMemberGroupListItemType(item: ListItem): item is TransactionMemberGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.FROM;
-}
-
-/**
- * Type guard that checks if something is a TransactionCardGroupListItemType
- */
-function isTransactionCardGroupListItemType(item: ListItem): item is TransactionCardGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.CARD;
-}
-
-/**
- * Type guard that checks if something is a TransactionWithdrawalIDGroupListItemType
- */
-function isTransactionWithdrawalIDGroupListItemType(item: ListItem): item is TransactionWithdrawalIDGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID;
 }
 
 /**
@@ -2672,7 +2650,11 @@ function getReportSections({
             }
 
             if (shouldShow) {
-                const reportPendingAction = reportItem?.pendingAction ?? reportItem?.pendingFields?.preview;
+                const reportPendingAction =
+                    reportItem?.pendingAction ??
+                    (reportItem?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE
+                        ? reportItem.pendingFields.preview
+                        : (reportItem?.pendingFields?.total ?? reportItem?.pendingFields?.preview));
                 const shouldShowBlankTo = !reportItem || isOpenExpenseReport(reportItem);
                 const reportMetadata = allReportMetadata?.[`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportItem.reportID}`] ?? {};
                 const allReportTransactions = transactionsByReportID.get(reportItem.reportID) ?? [];
@@ -4481,10 +4463,6 @@ function getTypeOptions(translate: LocalizedTranslate, policies: OnyxCollection<
     return shouldHideInvoiceOption ? typeOptions.filter((typeOption) => typeOption.value !== CONST.SEARCH.DATA_TYPES.INVOICE) : typeOptions;
 }
 
-function getGroupByOptions(translate: LocalizedTranslate) {
-    return Object.values(CONST.SEARCH.GROUP_BY).map<SingleSelectItem<SearchGroupBy>>((value) => ({text: translate(`search.filters.groupBy.${value}`), value}));
-}
-
 function getSortByOptions(columns: SearchColumnType[], translate: LocalizedTranslate) {
     const sortableColumns: Array<SingleSelectItem<SearchColumnType>> = [];
     for (const column of columns) {
@@ -5071,10 +5049,6 @@ function getWithdrawalStatusDisplayText(value: SearchWithdrawalStatus | undefine
         .filter((option) => selectedValues.includes(option.value))
         .map((option) => option.text)
         .join(', ');
-}
-
-function getActionOptions(translate: LocaleContextProps['translate']) {
-    return Object.values(CONST.SEARCH.ACTION_FILTERS).map<SingleSelectItem<SearchAction>>((value) => ({text: translate(`search.filters.action.${value}`), value}));
 }
 
 /**
@@ -5780,9 +5754,6 @@ export {
     getSortedSections,
     isTransactionGroupListItemType,
     isTransactionReportGroupListItemType,
-    isTransactionMemberGroupListItemType,
-    isTransactionCardGroupListItemType,
-    isTransactionWithdrawalIDGroupListItemType,
     isTransactionCategoryGroupListItemType,
     isTransactionMerchantGroupListItemType,
     isTransactionTagGroupListItemType,
@@ -5810,7 +5781,6 @@ export {
     getValidGroupBy,
     getStatusOptions,
     getTypeOptions,
-    getGroupByOptions,
     getSortByOptions,
     getSortOrderOptions,
     getGroupBySections,
@@ -5818,7 +5788,6 @@ export {
     getCurrencyOptions,
     getFeedOptions,
     getWideAmountIndicators,
-    hasDeletedTransactionInData,
     isTransactionAmountTooLong,
     isTransactionTaxAmountTooLong,
     getDatePresets,
@@ -5826,14 +5795,11 @@ export {
     getWithdrawalTypeOptions,
     getWithdrawalStatusOptions,
     getWithdrawalStatusDisplayText,
-    getActionOptions,
     getColumnsToShow,
     getHasOptions,
     getSettlementStatus,
     getSettlementStatusBadgeProps,
-    getTransactionFromTransactionListItem,
     getSearchColumnTranslationKey,
-    isColumnSortable,
     getTableMinWidth,
     getCustomColumns,
     getCustomColumnDefault,
@@ -5849,7 +5815,6 @@ export {
     mapFiltersFormToLabelValueList,
     getSingleSelectFilterOptions,
     getMultiSelectFilterOptions,
-    isEligibleForApproveSuggestion,
     applySelectionToItem,
     GENERIC_SEARCH_KEYS,
     TODO_SEARCH_KEYS,
