@@ -8,14 +8,12 @@ import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/Multifa
 import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {AuthTypeInfo} from '@libs/MultifactorAuthentication/shared/types';
 
-type ErrorState = MFAError;
-
 type MultifactorAuthenticationState = {
     /** Current error state - stops the flow and navigates to failure outcome */
-    error: ErrorState | undefined;
+    error: MFAError | undefined;
 
     /** Continuable error - displayed on current screen without stopping the flow */
-    continuableError: ErrorState | undefined;
+    continuableError: MFAError | undefined;
 
     /** Validate code entered by user */
     validateCode: string | undefined;
@@ -60,7 +58,7 @@ type InitPayload = {
 };
 
 type Action =
-    | {type: 'SET_ERROR'; payload: ErrorState | undefined}
+    | {type: 'SET_ERROR'; payload: MFAError | undefined}
     | {type: 'CLEAR_CONTINUABLE_ERROR'}
     | {type: 'SET_VALIDATE_CODE'; payload: string | undefined}
     | {type: 'SET_REGISTRATION_CHALLENGE'; payload: RegistrationChallenge | undefined}
@@ -85,4 +83,4 @@ type MultifactorAuthenticationActionsContextType = {
     dispatch: (action: Action) => void;
 };
 
-export type {ErrorState, MultifactorAuthenticationState, InitPayload, Action, MultifactorAuthenticationStateContextType, MultifactorAuthenticationActionsContextType};
+export type {MultifactorAuthenticationState, InitPayload, Action, MultifactorAuthenticationStateContextType, MultifactorAuthenticationActionsContextType};
