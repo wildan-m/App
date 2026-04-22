@@ -43,6 +43,8 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         onyxMetadata: {cardListMetadata},
     } = companyCards;
 
+    const hasRecentLocalImport = !!selectedFeed?.status?.hasRecentLocalImport;
+
     const domainOrWorkspaceAccountID = getDomainOrWorkspaceAccountID(workspaceAccountID, selectedFeed);
 
     // Use a ref so that changes to the employee list (e.g. after inviting a member) don't
@@ -82,8 +84,15 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
     }, [bankName, domainOrWorkspaceAccountID, isFeedPending, isLoading, policyID, translate, isOffline]);
 
     useEffect(() => {
+        // When the feed was just populated via a local CSV import, skip the on-mount refetch:
+        // openPolicyCompanyCardsFeed would race the async backend import job and SET the cardList
+        // back to an empty server response. User-initiated refreshes (onReloadFeed) still pass
+        // through directly and will clear the marker once the backend returns fresh data.
+        if (hasRecentLocalImport) {
+            return;
+        }
         loadPolicyCompanyCardsFeed();
-    }, [loadPolicyCompanyCardsFeed]);
+    }, [loadPolicyCompanyCardsFeed, hasRecentLocalImport]);
 
     const [shouldShowOfflineModal, setShouldShowOfflineModal] = useState(false);
     const {assignCard, isAssigningCardDisabled} = useAssignCard({feedName, policyID, setShouldShowOfflineModal});

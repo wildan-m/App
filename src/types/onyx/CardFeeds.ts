@@ -206,6 +206,13 @@ type CardFeedsStatus = {
 
     /** Collection of errors coming from BE */
     errors?: OnyxCommon.Errors;
+
+    /**
+     * Set when cards have just been populated locally (e.g. via CSV import) and the backend
+     * may not yet reflect them. Suppresses the on-mount auto-refetch so a stale server response
+     * cannot clobber the freshly imported cardList. Cleared on the next network-confirmed read.
+     */
+    hasRecentLocalImport?: boolean;
 };
 
 /**

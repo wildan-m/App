@@ -996,6 +996,7 @@ function openPolicyCompanyCardsFeed(domainAccountID: number, policyID: string, f
                     cardFeedsStatus: {
                         [feed]: {
                             isLoading: false,
+                            hasRecentLocalImport: null,
                         },
                     },
                 },
@@ -1220,9 +1221,27 @@ function importCSVCompanyCards({
             key: `${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${policyID}`,
             value: feedNameWithDomainID as CompanyCardFeedWithDomainID,
         },
+        // Mark the feed as just-imported so the Company Cards page skips the on-mount
+        // openPolicyCompanyCardsFeed refetch that would otherwise race the async import job
+        // and overwrite the optimistic cardList with a stale empty response.
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${workspaceAccountID}`,
+            value: {
+                settings: {
+                    cardFeedsStatus: {
+                        [feedName]: {
+                            hasRecentLocalImport: true,
+                        },
+                    },
+                },
+            },
+        },
     ];
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.IMPORTED_SPREADSHEET>> = [
+    const successData: Array<
+        OnyxUpdate<typeof ONYXKEYS.IMPORTED_SPREADSHEET | typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST | typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER>
+    > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.IMPORTED_SPREADSHEET,
@@ -1327,12 +1346,39 @@ function importCSVCompanyCards({
             },
         });
 
+        // Re-assert the optimistic cardList once the write is acknowledged. If any concurrent
+        // code path SETs this key between the optimistic merge and the backend ack (e.g. a
+        // racing openPolicyCompanyCardsFeed response), this second merge restores the imported
+        // card names so they remain visible on the page.
+        successData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${workspaceAccountID}_${feedName}`,
+            value: {
+                cardList: mergedCardList,
+            },
+        });
+
         failureData.push({
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${workspaceAccountID}_${feedName}`,
             value: existingCardsList ?? null,
         });
     }
+
+    // On failure, clear the just-imported marker so the page resumes fetching normally.
+    failureData.push({
+        onyxMethod: Onyx.METHOD.MERGE,
+        key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${workspaceAccountID}`,
+        value: {
+            settings: {
+                cardFeedsStatus: {
+                    [feedName]: {
+                        hasRecentLocalImport: null,
+                    },
+                },
+            },
+        },
+    });
 
     API.write(WRITE_COMMANDS.IMPORT_CSV_COMPANY_CARDS, parameters, {optimisticData, successData, failureData});
 }
