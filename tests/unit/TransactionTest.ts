@@ -864,6 +864,7 @@ describe('Transaction', () => {
                     newReport: destinationExpenseReport,
                     policy: undefined,
                     allTransactions,
+                    policyTagList: undefined,
                 });
 
                 await waitForBatchedUpdates();
