@@ -37,7 +37,6 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
-                shouldShowOfflineIndicatorInWideScreen
                 testID="DomainGroupDetailsPage"
             >
                 <HeaderWithBackButton
