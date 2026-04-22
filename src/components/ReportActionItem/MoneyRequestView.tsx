@@ -1200,6 +1200,7 @@ function MoneyRequestView({
                                             accountID: a?.accountID,
                                             email: a?.email ?? a?.login,
                                         }))}
+                                        maxVisible={canEdit ? undefined : actualAttendees.length}
                                     />
                                 ) : undefined
                             }

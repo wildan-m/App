@@ -67,6 +67,7 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
                             accountID: a?.accountID,
                             email: a?.email ?? a?.login,
                         }))}
+                        maxVisible={isReadOnly ? iouAttendees.length : undefined}
                     />
                 ) : undefined
             }
