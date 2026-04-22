@@ -14,6 +14,7 @@ type FraudSignal = {
 
 type FraudSignalFactory = (requestData?: Record<string, unknown>, responseData?: Record<string, unknown>) => FraudSignal | undefined;
 
+// Flag commands that create new accounts so the fraud protection backend can detect invite spam.
 const createNewAccountCountSignal: FraudSignalFactory = (_, responseData) => {
     if (!responseData?.newAccountCount) {
         return undefined;
