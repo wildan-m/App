@@ -3,7 +3,6 @@ import type {GestureResponderEvent} from 'react-native';
 import Button from '@components/Button';
 import FormHelpMessage from '@components/FormHelpMessage';
 import ReferralProgramCTA from '@components/ReferralProgramCTA';
-import useDismissedReferralBanners from '@hooks/useDismissedReferralBanners';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {IOUType} from '@src/CONST';
@@ -25,6 +24,9 @@ type ParticipantSelectorFooterProps = {
     /** Whether the list is showing its empty state — suppresses the referral banner */
     shouldShowListEmptyContent: boolean;
 
+    /** Whether the referral banner has been dismissed — controls banner visibility and is used by the parent to gate rendering */
+    isDismissedReferralBanner: boolean;
+
     /** Confirm-selection handler from the parent */
     onConfirmSelection: (keyEvent?: GestureResponderEvent | KeyboardEvent) => void;
 
@@ -38,25 +40,20 @@ function ParticipantSelectorFooter({
     selectedOptionsLength,
     shouldShowSplitBillErrorMessage,
     shouldShowListEmptyContent,
+    isDismissedReferralBanner,
     onConfirmSelection,
     onNewWorkspace,
 }: ParticipantSelectorFooterProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const referralContentType = CONST.REFERRAL_PROGRAM.CONTENT_TYPES.SUBMIT_EXPENSE;
-    const {isDismissed} = useDismissedReferralBanners({referralContentType});
 
-    if (isDismissed && !shouldShowSplitBillErrorMessage && !selectedOptionsLength) {
-        return null;
-    }
-
-    const shouldShowReferralBanner = !isDismissed && iouType !== CONST.IOU.TYPE.INVOICE && !shouldShowListEmptyContent;
+    const shouldShowReferralBanner = !isDismissedReferralBanner && iouType !== CONST.IOU.TYPE.INVOICE && !shouldShowListEmptyContent;
 
     return (
         <>
             {shouldShowReferralBanner && !isCategorizeOrShareAction && (
                 <ReferralProgramCTA
-                    referralContentType={referralContentType}
+                    referralContentType={CONST.REFERRAL_PROGRAM.CONTENT_TYPES.SUBMIT_EXPENSE}
                     style={[styles.flexShrink0, !!selectedOptionsLength && !shouldShowSplitBillErrorMessage && styles.mb5]}
                 />
             )}

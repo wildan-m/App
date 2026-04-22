@@ -13,6 +13,7 @@ import SelectionListWithSections from '@components/SelectionList/SelectionListWi
 import type {Section, SelectionListWithSectionsHandle} from '@components/SelectionList/SelectionListWithSections/types';
 import useContactImport from '@hooks/useContactImport';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDismissedReferralBanners from '@hooks/useDismissedReferralBanners';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -146,6 +147,8 @@ function ParticipantSearchResults({
     });
     const {isRestrictedToPreferredPolicy, preferredPolicyID} = usePreferredPolicy();
     const optimisticTransactions = useTransactionDraftValues();
+
+    const {isDismissed: isDismissedReferralBanner} = useDismissedReferralBanners({referralContentType: CONST.REFERRAL_PROGRAM.CONTENT_TYPES.SUBMIT_EXPENSE});
 
     const isPaidGroupPolicy = isPaidGroupPolicyUtil(policy);
     const activeAdminWorkspaces = getActiveAdminWorkspaces(allPolicies, currentUserLogin);
@@ -394,17 +397,19 @@ function ParticipantSearchResults({
         InteractionManager.runAfterInteractions(importAndSaveContacts);
     };
 
-    const footerContent = (
-        <ParticipantSelectorFooter
-            iouType={iouType}
-            isCategorizeOrShareAction={isCategorizeOrShareAction}
-            selectedOptionsLength={selectedOptions.length}
-            shouldShowSplitBillErrorMessage={shouldShowSplitBillErrorMessage}
-            shouldShowListEmptyContent={shouldShowListEmptyContent}
-            onConfirmSelection={handleConfirmSelection}
-            onNewWorkspace={() => onFinish()}
-        />
-    );
+    const footerContent =
+        isDismissedReferralBanner && !shouldShowSplitBillErrorMessage && !selectedOptions.length ? undefined : (
+            <ParticipantSelectorFooter
+                iouType={iouType}
+                isCategorizeOrShareAction={isCategorizeOrShareAction}
+                selectedOptionsLength={selectedOptions.length}
+                shouldShowSplitBillErrorMessage={shouldShowSplitBillErrorMessage}
+                shouldShowListEmptyContent={shouldShowListEmptyContent}
+                isDismissedReferralBanner={isDismissedReferralBanner}
+                onConfirmSelection={handleConfirmSelection}
+                onNewWorkspace={() => onFinish()}
+            />
+        );
 
     const onSelectRow = (option: Participant) => {
         if (option.isPolicyExpenseChat && option.policyID && shouldRestrictUserBillableActions(option.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
