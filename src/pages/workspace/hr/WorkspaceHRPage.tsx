@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
+import {View} from 'react-native';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
@@ -68,33 +69,35 @@ function WorkspaceHRPage({
                     shouldUseHeadlineHeader
                     onBackButtonPress={() => Navigation.goBack()}
                 />
-                <ScrollView contentContainerStyle={styles.pb5}>
-                    <Section
-                        contentPaddingOnLargeScreens={{padding: 24}}
-                        isCentralPane
-                        renderTitle={() => <Text style={[styles.textStrong]}>{translate('workspace.accounting.title')}</Text>}
-                    >
-                        <MenuItem
-                            title={translate('workspace.hr.gusto.title')}
-                            icon={icons.GustoSquare}
-                            iconType={CONST.ICON_TYPE_ICON}
-                            displayInDefaultIconColor
-                            iconWidth={32}
-                            iconHeight={32}
-                            iconStyles={styles.mr2}
-                            shouldIconUseAutoWidthStyle
-                            wrapperStyle={[styles.ph0, styles.pv2, styles.mt4]}
-                            interactive={false}
-                            shouldShowRightComponent
-                            rightComponent={
-                                <Button
-                                    small
-                                    text={translate('workspace.hr.gusto.connect')}
-                                    onPress={() => {}}
-                                />
-                            }
-                        />
-                    </Section>
+                <ScrollView contentContainerStyle={styles.pt3}>
+                    <View style={[styles.flex1, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
+                        <Section
+                            contentPaddingOnLargeScreens={{padding: 24}}
+                            isCentralPane
+                            renderTitle={() => <Text style={[styles.textStrong]}>{translate('workspace.accounting.title')}</Text>}
+                        >
+                            <MenuItem
+                                title={translate('workspace.hr.gusto.title')}
+                                icon={icons.GustoSquare}
+                                iconType={CONST.ICON_TYPE_ICON}
+                                displayInDefaultIconColor
+                                iconWidth={32}
+                                iconHeight={32}
+                                iconStyles={styles.mr2}
+                                shouldIconUseAutoWidthStyle
+                                wrapperStyle={[styles.ph0, styles.pv2, styles.mt4]}
+                                interactive={false}
+                                shouldShowRightComponent
+                                rightComponent={
+                                    <Button
+                                        small
+                                        text={translate('workspace.hr.gusto.connect')}
+                                        onPress={() => {}}
+                                    />
+                                }
+                            />
+                        </Section>
+                    </View>
                 </ScrollView>
             </ScreenWrapper>
         </AccessOrNotFoundWrapper>
