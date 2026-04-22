@@ -4850,6 +4850,7 @@ describe('actions/IOU', () => {
                 personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                 transactionReport: reports.transactionReport,
                 expenseReport: reports.expenseReport,
+                isOffline: false,
             });
 
             await waitForBatchedUpdates();
@@ -5032,6 +5033,7 @@ describe('actions/IOU', () => {
                 personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                 transactionReport: reports.transactionReport,
                 expenseReport: reports.expenseReport,
+                isOffline: false,
             });
 
             await waitForBatchedUpdates();
@@ -5151,6 +5153,7 @@ describe('actions/IOU', () => {
                 personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                 transactionReport: reports.transactionReport,
                 expenseReport: reports.expenseReport,
+                isOffline: false,
             });
 
             await waitForBatchedUpdates();
@@ -5282,6 +5285,7 @@ describe('actions/IOU', () => {
                 personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                 transactionReport: reports.transactionReport,
                 expenseReport: reports.expenseReport,
+                isOffline: false,
             });
 
             await waitForBatchedUpdates();
@@ -6398,6 +6402,7 @@ describe('actions/IOU', () => {
                     personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                     transactionReport: reports.transactionReport,
                     expenseReport: reports.expenseReport,
+                    isOffline: false,
                 });
                 await waitForBatchedUpdates();
 
@@ -6574,6 +6579,7 @@ describe('actions/IOU', () => {
                     personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                     transactionReport: reports.transactionReport,
                     expenseReport: reports.expenseReport,
+                    isOffline: false,
                 });
                 await waitForBatchedUpdates();
 
@@ -6764,6 +6770,7 @@ describe('actions/IOU', () => {
                     personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                     transactionReport: reports.transactionReport,
                     expenseReport: reports.expenseReport,
+                    isOffline: false,
                 });
                 await waitForBatchedUpdates();
 
@@ -6977,6 +6984,7 @@ describe('actions/IOU', () => {
                     personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
                     transactionReport: reports.transactionReport,
                     expenseReport: reports.expenseReport,
+                    isOffline: false,
                 });
 
                 await waitForBatchedUpdates();
