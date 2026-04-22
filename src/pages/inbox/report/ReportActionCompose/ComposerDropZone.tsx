@@ -127,7 +127,6 @@ function ComposerDropZone({reportID, children}: ComposerDropZoneProps) {
 
     const onAttachmentDrop = (dragEvent: DragEvent) => pickAttachments({dragEvent});
 
-    // Cheap gate: rooms, groups, and invoices never show the dual drop zone.
     if (isChatRoom(report) || isGroupChat(report) || isInvoiceReport(report)) {
         return (
             <>

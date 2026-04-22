@@ -1,5 +1,4 @@
 import {validTransactionDraftIDsSelector} from '@selectors/TransactionDraft';
-import {useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useFilesValidation from '@hooks/useFilesValidation';
@@ -39,14 +38,12 @@ function useReceiptDrop({reportID, report, shouldAddOrReplaceReceipt, transactio
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
 
-    const isReceiptReplace = useRef(false);
-
     const onFilesValidated = (files: FileObject[]) => {
         if (files.length === 0) {
             return;
         }
 
-        if (isReceiptReplace.current && transactionID) {
+        if (shouldAddOrReplaceReceipt && transactionID) {
             const source = URL.createObjectURL(files.at(0) as Blob);
             replaceReceipt({transactionID, file: files.at(0) as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories});
             return;
@@ -105,12 +102,10 @@ function useReceiptDrop({reportID, report, shouldAddOrReplaceReceipt, transactio
                 return;
             }
 
-            isReceiptReplace.current = true;
             validateFiles([file], items);
             return;
         }
 
-        isReceiptReplace.current = false;
         validateFiles(files, items, {isValidatingReceipts: true});
     };
 
