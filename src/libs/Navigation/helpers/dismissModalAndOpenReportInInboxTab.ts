@@ -70,17 +70,14 @@ function dismissModalAndOpenReportInInboxTab(reportID: string | undefined, isInv
         return;
     }
     if (hasActiveTracking) {
-        Navigation.dismissModalWithReport(
-            {reportID},
-            {
-                onBeforeNavigate: (willOpenReport: boolean) => {
-                    setPendingSubmitFollowUpAction(
-                        willOpenReport ? CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT : CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY,
-                        reportID,
-                    );
-                },
+        Navigation.dismissModalWithReport({reportID}, undefined, {
+            onBeforeNavigate: (willOpenReport: boolean) => {
+                setPendingSubmitFollowUpAction(
+                    willOpenReport ? CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT : CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY,
+                    reportID,
+                );
             },
-        );
+        });
     } else {
         Navigation.dismissModalWithReport({reportID});
     }
