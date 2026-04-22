@@ -13,7 +13,7 @@ import globals from 'globals';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import typescriptEslint from 'typescript-eslint';
-import reactCompilerCompat from './eslint-plugin-react-compiler-compat/index.mjs';
+import reactCompilerCompatProcessor from './eslint-processor-react-compiler-compat/index.mjs';
 import reportNameUtilsPlugin from './eslint-plugin-report-name-utils/index.mjs';
 
 const filename = fileURLToPath(import.meta.url);
@@ -169,7 +169,7 @@ const config = defineConfig([
     // The processor runs React Compiler on each file and filters out redundant lint messages.
     {
         files: ['**/*.tsx', '**/*.jsx'],
-        processor: reactCompilerCompat.processors['react-compiler-compat'],
+        processor: reactCompilerCompatProcessor,
     },
 
     {
