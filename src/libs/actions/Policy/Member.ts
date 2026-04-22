@@ -638,17 +638,8 @@ function buildUpdateWorkspaceMembersRoleOnyxData(policy: OnyxEntry<Policy>, sele
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
             value: {
-                employeeList: {
-                    ...memberRoles.reduce((member: Record<string, PolicyEmployee>, current) => {
-                        // eslint-disable-next-line no-param-reassign
-                        member[current.email] = {
-                            ...(previousEmployeeList[current.email] ?? {}),
-                            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
-                            errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.editor.genericFailureMessage'),
-                        };
-                        return member;
-                    }, {}),
-                },
+                employeeList: previousEmployeeList,
+                errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.editor.genericFailureMessage'),
             },
         },
     ];
@@ -818,6 +809,7 @@ function buildAddMembersToWorkspaceOnyxData(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
     policyExpenseChatNotificationPreference?: NotificationPreference,
 ) {
@@ -836,7 +828,7 @@ function buildAddMembersToWorkspaceOnyxData(
         policyID,
         role === CONST.POLICY.ROLE.ADMIN || role === CONST.POLICY.ROLE.AUDITOR ? accountIDs : [],
     );
-    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(policyID, [...policyMemberAccountIDs, ...accountIDs]);
+    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(policyID, [...policyMemberAccountIDs, ...accountIDs], currentUserAccountID);
     const announceRoomChat = optimisticAnnounceChat.announceChatData;
 
     // create onyx data for policy expense chats for each new member
@@ -951,6 +943,7 @@ function addMembersToWorkspace(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
 ) {
     if (!policy?.id) {
@@ -963,6 +956,7 @@ function addMembersToWorkspace(
         policyMemberAccountIDs,
         role,
         formatPhoneNumber,
+        currentUserAccountID,
         approverEmail,
     );
 
@@ -1148,20 +1142,6 @@ function clearAddMemberError(policyID: string, login: string, accountID: number)
     });
     Onyx.merge(`${ONYXKEYS.PERSONAL_DETAILS_LIST}`, {
         [accountID]: null,
-    });
-}
-
-/**
- * Removes an error after trying to update a member role
- */
-function clearUpdateMemberRoleError(policyID: string, login: string) {
-    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
-        employeeList: {
-            [login]: {
-                pendingAction: null,
-                errors: null,
-            },
-        },
     });
 }
 
@@ -1376,7 +1356,6 @@ export {
     addMembersToWorkspace,
     clearDeleteMemberError,
     clearAddMemberError,
-    clearUpdateMemberRoleError,
     openWorkspaceMembersPage,
     setWorkspaceInviteMembersDraft,
     inviteMemberToWorkspace,
