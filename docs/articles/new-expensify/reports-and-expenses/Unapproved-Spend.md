@@ -21,8 +21,8 @@ Workspace Admins with:
 
 ## How to get there
 Go to:
-- **Reports > Accounting > Cash accruals** — reimbursable expenses paid out-of-pocket
-- **Reports > Accounting > Card accruals** — expenses from connected card feeds
+- **Spend > Monthly accrual > Unapproved cash** — reimbursable expenses paid out-of-pocket
+- **Spend > Monthly accrual > Unapproved card** — expenses from connected card feeds
 
 These views come with filters already applied:
 
@@ -62,8 +62,8 @@ Because even if it’s not approved yet, it’s still money your business owes. 
 ## Can I group unapproved expenses by submitter?
 Yes. Both Cash accruals and Card accruals group expenses by submitter so you can see who has unapproved items and the per-person subtotal.
 
-## What if I don’t see the Accounting section on the Reports page?
-You’ll need to be a Workspace Admin with approvals turned on, plus either reimbursements or at least one card feed connected. If your workspace has only cash, only **Cash accruals** appears under Accounting; if it has only card feeds, only **Card accruals** appears.
+## What if I don’t see the Monthly accrual section on the Spend page?
+You’ll need to be a Workspace Admin with approvals turned on, plus either reimbursements or at least one card feed connected. If your workspace has only cash, only **Unapproved cash** appears under Monthly accrual; if it has only card feeds, only **Unapproved card** appears.
 
 ## Can I filter unapproved card expenses by feed?
 Yes. If you have more than one card feed, a **Feed** filter will appear so you can review one account at a time.
