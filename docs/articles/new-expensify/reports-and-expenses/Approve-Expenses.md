@@ -69,7 +69,7 @@ Workspace admins can bypass the approval workflow on a report to final approve i
 
 ## How to hold an expense
 
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > Expenses**.
+1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > All expenses**.
 2. Locate the expense you want to hold. 
 3. Click the expense to open it. 
 4. Click **More** at the top of the expense.
