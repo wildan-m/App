@@ -14,4 +14,4 @@
 
 - Upstream PR/issue: https://github.com/justjake/eslint-seatbelt/pull/27
 - E/App issue: N/A
-- PR introducing patch: TBD
+- PR introducing patch: https://github.com/Expensify/App/pull/88566
