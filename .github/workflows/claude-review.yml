@@ -7,6 +7,8 @@ permissions:
 on:
   pull_request_target:
     types: [opened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
 
 concurrency:
   group: claude-review-${{ github.event.pull_request.html_url }}
@@ -14,18 +16,43 @@ concurrency:
 
 jobs:
   validate:
+    if: github.event_name == 'pull_request_target'
     uses: ./.github/workflows/contributorValidationGate.yml
     with:
       PR_NUMBER: ${{ github.event.pull_request.number }}
       PR_AUTHOR: ${{ github.event.pull_request.user.login }}
       AUTHOR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
 
+  checkCPlusApproval:
+    if: github.event_name == 'pull_request_review' && github.event.review.state == 'approved'
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      IS_CPLUS: ${{ steps.check.outputs.IS_CPLUS }}
+    steps:
+      - name: Check Contributor+ membership
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.OS_BOTIFY_TOKEN }}
+          REVIEWER: ${{ github.event.review.user.login }}
+        run: |
+          if gh api "/orgs/Expensify/teams/contributor-plus/memberships/$REVIEWER" --silent; then
+            echo "::notice::✅ Reviewer $REVIEWER is a Contributor+ member"
+            echo "IS_CPLUS=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Reviewer $REVIEWER is not a Contributor+ member; skipping Claude review"
+            echo "IS_CPLUS=false" >> "$GITHUB_OUTPUT"
+          fi
+
   review:
-    needs: [validate]
+    needs: [validate, checkCPlusApproval]
     if: |
-      needs.validate.outputs.IS_AUTHORIZED == 'true'
+      !cancelled()
       && github.event.pull_request.draft != true
       && !contains(github.event.pull_request.title, 'Revert')
+      && (
+        (github.event_name == 'pull_request_target' && needs.validate.outputs.IS_AUTHORIZED == 'true')
+        || (github.event_name == 'pull_request_review' && needs.checkCPlusApproval.outputs.IS_CPLUS == 'true')
+      )
     runs-on: blacksmith-2vcpu-ubuntu-2404
     env:
       PR_NUMBER: ${{ github.event.pull_request.number }}
