@@ -22,6 +22,12 @@ async function processRegistration(params: RegistrationParams): Promise<MFAResul
     return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
 }
 
+/**
+ * Executes the scenario-specific action with the signed challenge and additional parameters.
+ *
+ * @param action - The scenario's action function from the scenario config
+ * @param params - Action parameters including signedChallenge and authenticationMethod
+ */
 async function processScenarioAction(
     action: MultifactorAuthenticationScenarioConfig['action'],
     params: Parameters<MultifactorAuthenticationScenarioConfig['action']>[0],
