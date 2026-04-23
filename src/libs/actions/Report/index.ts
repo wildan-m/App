@@ -1306,11 +1306,12 @@ function openReport(params: OpenReportActionParams) {
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.NVP_ONBOARDING
             | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
+            | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
         >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`,
+            key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
             value: {
                 isLoadingInitialReportActions: true,
                 isLoadingOlderReportActions: false,
@@ -1338,6 +1339,7 @@ function openReport(params: OpenReportActionParams) {
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
             | typeof ONYXKEYS.NVP_ONBOARDING
+            | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
         >
     > = [
         {
@@ -1351,7 +1353,7 @@ function openReport(params: OpenReportActionParams) {
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`,
+            key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
             value: {
                 hasOnceLoadedReportActions: true,
                 isLoadingInitialReportActions: false,
@@ -1368,11 +1370,12 @@ function openReport(params: OpenReportActionParams) {
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
             | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
         >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`,
+            key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
             value: {
                 isLoadingInitialReportActions: false,
             },
