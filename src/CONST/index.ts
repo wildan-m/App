@@ -9642,6 +9642,12 @@ const CONST = {
                 url: 'https://use.expensify.com/blog/expensify-april-2026-product-update',
                 publishedDate: '2026-04-15',
             },
+            {
+                title: 'Expensify Partners With IOCP to Expand Access to Modern Spend Management',
+                subtitle: 'Press release',
+                url: 'https://www.businesswire.com/news/home/20260421550894/en/Expensify-Partners-With-IOCP-to-Expand-Access-to-Modern-Spend-Management',
+                publishedDate: '2026-04-21',
+            },
         ],
     },
 
