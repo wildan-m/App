@@ -143,10 +143,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             });
 
             if (!hasValidSignature(signResult)) {
-                let failReason = mapSignErrorCodeToReason(signResult.errorCode);
-                if (failReason === undefined) {
-                    failReason = VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
-                }
+                const failReason = mapSignErrorCodeToReason(signResult.errorCode) ?? VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED;
                 onResult({
                     success: false,
                     error: createLocalMFAError(failReason, `Error Code: ${signResult.errorCode}`),
