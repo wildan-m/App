@@ -1183,6 +1183,149 @@ describe('actions/IOU/ReportWorkflow', () => {
         });
     });
 
+    describe('submitReport with approval rules', () => {
+        const RULE_APPROVER_EMAIL = 'rule-approver@expensifail.com';
+        const RULE_APPROVER_ACCOUNT_ID = 42;
+        const REPORT_OWNER_ACCOUNT_ID = RORY_ACCOUNT_ID;
+        const CATEGORY_NAME = 'Travel';
+
+        beforeEach(async () => {
+            jest.clearAllMocks();
+            jest.spyOn(API, 'write');
+            await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [RULE_APPROVER_ACCOUNT_ID]: {
+                    accountID: RULE_APPROVER_ACCOUNT_ID,
+                    login: RULE_APPROVER_EMAIL,
+                    displayName: 'Rule Approver',
+                },
+                [REPORT_OWNER_ACCOUNT_ID]: {
+                    accountID: REPORT_OWNER_ACCOUNT_ID,
+                    login: RORY_EMAIL,
+                    displayName: 'Rory',
+                },
+            });
+            await waitForBatchedUpdates();
+        });
+
+        it('uses rule-based approver for both optimistic managerID and API managerAccountID', async () => {
+            const reportID = '999';
+            const transactionID = 'txn-rule-test';
+
+            // Set up a transaction with the matching category in Onyx
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
+                ...createRandomTransaction(1),
+                transactionID,
+                reportID,
+                category: CATEGORY_NAME,
+            });
+            await waitForBatchedUpdates();
+
+            const expenseReport: Report = {
+                ...createRandomReport(1, undefined),
+                reportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                ownerAccountID: REPORT_OWNER_ACCOUNT_ID,
+                managerID: CARLOS_ACCOUNT_ID,
+                total: 10000,
+                currency: CONST.CURRENCY.USD,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+            };
+
+            const policy = {
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.ADVANCED,
+                rules: {
+                    approvalRules: [
+                        {
+                            id: 'rule-1',
+                            approver: RULE_APPROVER_EMAIL,
+                            applyWhen: [
+                                {
+                                    condition: CONST.POLICY.RULE_CONDITIONS.MATCHES,
+                                    field: CONST.POLICY.FIELDS.CATEGORY,
+                                    value: CATEGORY_NAME,
+                                },
+                            ],
+                        },
+                    ],
+                },
+            } as unknown as Policy;
+
+            submitReport({
+                expenseReport,
+                policy,
+                currentUserAccountIDParam: REPORT_OWNER_ACCOUNT_ID,
+                currentUserEmailParam: RORY_EMAIL,
+                hasViolations: false,
+                isASAPSubmitBetaEnabled: false,
+                expenseReportCurrentNextStepDeprecated: undefined,
+                userBillingGracePeriodEnds: undefined,
+                amountOwed: 0,
+                ownerBillingGracePeriodEnd: undefined,
+                delegateEmail: undefined,
+            });
+
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting mock call args to verify optimistic data and API params
+            const calls = (API.write as jest.Mock).mock.calls;
+            const [command, params, onyxData] = calls.at(0) as [string, {managerAccountID: number}, OnyxData<typeof ONYXKEYS.COLLECTION.REPORT>];
+
+            // Verify the API parameter uses the rule approver
+            expect(command).toBe('SubmitReport');
+            expect(params.managerAccountID).toBe(RULE_APPROVER_ACCOUNT_ID);
+
+            // Verify the optimistic report update also uses the rule approver
+            const optimisticData = onyxData.optimisticData ?? [];
+            const reportUpdate = optimisticData.find((update: {key: string}) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
+            expect(reportUpdate).toBeDefined();
+            expect((reportUpdate?.value as Report)?.managerID).toBe(RULE_APPROVER_ACCOUNT_ID);
+        });
+
+        it('falls back to expenseReport.managerID when getSubmitToAccountID returns 0', async () => {
+            const reportID = '998';
+
+            const expenseReport: Report = {
+                ...createRandomReport(1, undefined),
+                reportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                ownerAccountID: REPORT_OWNER_ACCOUNT_ID,
+                managerID: CARLOS_ACCOUNT_ID,
+                total: 10000,
+                currency: CONST.CURRENCY.USD,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+            };
+
+            // Empty policy with no approval config — getSubmitToAccountID falls through to
+            // getManagerAccountID which returns -1 for an empty policy, triggering the fallback
+            const policy = {} as Policy;
+
+            submitReport({
+                expenseReport,
+                policy,
+                currentUserAccountIDParam: REPORT_OWNER_ACCOUNT_ID,
+                currentUserEmailParam: RORY_EMAIL,
+                hasViolations: false,
+                isASAPSubmitBetaEnabled: false,
+                expenseReportCurrentNextStepDeprecated: undefined,
+                userBillingGracePeriodEnds: undefined,
+                amountOwed: 0,
+                ownerBillingGracePeriodEnd: undefined,
+                delegateEmail: undefined,
+            });
+
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting mock call args to verify fallback behavior
+            const calls = (API.write as jest.Mock).mock.calls;
+            const [, params, onyxData] = calls.at(0) as [unknown, {managerAccountID: number}, OnyxData<typeof ONYXKEYS.COLLECTION.REPORT>];
+
+            // When getSubmitToAccountID returns a non-positive value, fall back to expenseReport.managerID
+            expect(params.managerAccountID).toBe(CARLOS_ACCOUNT_ID);
+
+            const optimisticData = onyxData.optimisticData ?? [];
+            const reportUpdate = optimisticData.find((update: {key: string}) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
+            expect(reportUpdate).toBeDefined();
+            expect((reportUpdate?.value as Report)?.managerID).toBe(CARLOS_ACCOUNT_ID);
+        });
+    });
+
     describe('delegateAccountID forwarding', () => {
         const DELEGATE_EMAIL = 'delegate@example.com';
         const DELEGATE_ACCOUNT_ID = 99;

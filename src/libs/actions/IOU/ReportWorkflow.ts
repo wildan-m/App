@@ -1284,7 +1284,8 @@ function submitReport({
               isASAPSubmitBetaEnabled,
               isUnapprove: true,
           });
-    const managerID = getSubmitToAccountID(policy, expenseReport) || expenseReport.managerID;
+    const submitToAccountID = getSubmitToAccountID(policy, expenseReport);
+    const managerID = submitToAccountID > 0 ? submitToAccountID : expenseReport.managerID;
 
     const optimisticData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.NEXT_STEP | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>
