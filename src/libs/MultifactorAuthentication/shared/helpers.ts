@@ -2,6 +2,7 @@
  * Shared helper utilities for multifactor authentication operations.
  */
 import type {ValueOf} from 'type-fest';
+import type {AuthenticationChallenge, RegistrationChallenge} from './challengeTypes';
 import type {MultifactorAuthenticationReason, MultifactorAuthenticationResponseMap} from './types';
 import VALUES from './VALUES';
 
@@ -83,5 +84,13 @@ function isHttpSuccess(httpStatusCode: number | undefined): boolean {
     return httpStatusCode !== undefined && httpStatusCode >= 200 && httpStatusCode < 300;
 }
 
+function isRegistrationChallenge(challenge: unknown): challenge is RegistrationChallenge {
+    return typeof challenge === 'object' && challenge !== null && 'user' in challenge && 'rp' in challenge;
+}
+
+function isAuthenticationChallenge(challenge: unknown): challenge is AuthenticationChallenge {
+    return typeof challenge === 'object' && challenge !== null && 'allowCredentials' in challenge && 'rpId' in challenge;
+}
+
 export default parseHttpResponse;
-export {isHttpSuccess};
+export {isHttpSuccess, isRegistrationChallenge, isAuthenticationChallenge};

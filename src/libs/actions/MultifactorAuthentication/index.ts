@@ -9,7 +9,7 @@ import type {DenyTransactionParams, RevokeMultifactorAuthenticationCredentialsPa
 import {SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
 import Log from '@libs/Log';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
-import parseHttpResponse from '@libs/MultifactorAuthentication/shared/helpers';
+import parseHttpResponse, {isAuthenticationChallenge, isRegistrationChallenge} from '@libs/MultifactorAuthentication/shared/helpers';
 import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -132,9 +132,20 @@ async function requestRegistrationChallenge(validateCode: string): Promise<Regis
         const {jsonCode, challenge, publicKeys, message} = response ?? {};
         const parsedResponse = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
 
+        if (challenge && !isRegistrationChallenge(challenge)) {
+            Log.hmmm('[MFA] Received non-registration challenge from registration endpoint');
+            return {
+                ...parsedResponse,
+                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
+                message: 'Invalid registration challenge type: received non-registration challenge',
+                challenge: undefined,
+                publicKeys,
+            };
+        }
+
         return {
             ...parsedResponse,
-            challenge: challenge as RegistrationChallenge | undefined,
+            challenge,
             publicKeys,
         };
     } catch (error) {
@@ -159,9 +170,20 @@ async function requestAuthorizationChallenge(): Promise<AuthenticationChallengeR
         const {jsonCode, challenge, publicKeys, message} = response ?? {};
         const parsedResponse = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
 
+        if (challenge && !isAuthenticationChallenge(challenge)) {
+            Log.hmmm('[MFA] Received non-authentication challenge from authorization endpoint');
+            return {
+                ...parsedResponse,
+                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
+                message: 'Invalid authorization challenge type: received non-authentication challenge',
+                challenge: undefined,
+                publicKeys,
+            };
+        }
+
         return {
             ...parsedResponse,
-            challenge: challenge as AuthenticationChallenge | undefined,
+            challenge,
             publicKeys,
         };
     } catch (error) {

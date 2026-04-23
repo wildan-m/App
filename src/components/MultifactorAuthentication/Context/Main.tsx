@@ -16,7 +16,7 @@ import {getErrorMessage} from '@libs/ErrorUtils';
 import getPlatform from '@libs/getPlatform';
 import {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
 import {createLocalMFAError, createMFAErrorFromApiResponse} from '@libs/MultifactorAuthentication/shared/MFAResult';
-import type {ChallengeType, MultifactorAuthenticationCallbackInput} from '@libs/MultifactorAuthentication/shared/types';
+import type {MultifactorAuthenticationCallbackInput} from '@libs/MultifactorAuthentication/shared/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, getDeviceBiometricsOnyxKey, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
 import {processRegistration, processScenarioAction} from '@userActions/MultifactorAuthentication/processing';
@@ -42,23 +42,6 @@ const MultifactorAuthenticationContext = createContext<MultifactorAuthentication
 type MultifactorAuthenticationContextProviderProps = {
     children: ReactNode;
 };
-
-/**
- * Identifies the challenge type based on its properties.
- * Registration challenges (require prior validateCode verification) have 'user' and 'rp'.
- * Authorization challenges (no prior verification) have 'allowCredentials' and 'rpId'.
- */
-function getChallengeType(challenge: unknown): ChallengeType | undefined {
-    if (typeof challenge === 'object' && challenge !== null) {
-        if ('user' in challenge && 'rp' in challenge) {
-            return CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.REGISTRATION;
-        }
-        if ('allowCredentials' in challenge && 'rpId' in challenge) {
-            return CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.AUTHENTICATION;
-        }
-    }
-    return undefined;
-}
 
 function MultifactorAuthenticationContextProvider({children}: MultifactorAuthenticationContextProviderProps) {
     const state = useMultifactorAuthenticationState();
@@ -254,26 +237,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 }
 
                 addMFABreadcrumb('Registration challenge received', {success: true});
-
-                // IMPORTANT: Validate that we received a registration challenge.
-                // This check is safe here because the backend only issues registration challenges AFTER
-                // validateCode verification. The prior validation gate guarantees that if we receive
-                // a challenge of type 'registration', it's genuinely from the registration path. This security guarantee
-                // does NOT apply to authorization challenges (which skip validateCode verification). If the WebAuthN spec
-                // ever changes the structure of these challenges, update getChallengeType() accordingly.
-                const challengeType = getChallengeType(challenge);
-                if (challengeType !== CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.REGISTRATION) {
-                    addMFABreadcrumb('Invalid registration challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
-                    dispatch({
-                        type: 'SET_ERROR',
-                        payload: createLocalMFAError(
-                            CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
-                            `Invalid registration challenge type: ${challengeType ?? 'unknown'}`,
-                        ),
-                    });
-                    return;
-                }
-
                 dispatch({type: 'SET_REGISTRATION_CHALLENGE', payload: challenge});
                 return;
             }
@@ -341,21 +304,6 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 }
 
                 addMFABreadcrumb('Authorization challenge received', {success: true});
-
-                // Validate that we received an authentication challenge
-                const challengeType = getChallengeType(challenge);
-                if (challengeType !== CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.AUTHENTICATION) {
-                    addMFABreadcrumb('Invalid authorization challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
-                    dispatch({
-                        type: 'SET_ERROR',
-                        payload: createLocalMFAError(
-                            CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
-                            `Invalid authorization challenge type: ${challengeType ?? 'unknown'}`,
-                        ),
-                    });
-                    return;
-                }
-
                 dispatch({type: 'SET_AUTHORIZATION_CHALLENGE', payload: challenge});
                 return;
             }
