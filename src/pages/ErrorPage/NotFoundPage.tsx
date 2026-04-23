@@ -1,4 +1,3 @@
-import {useRoute} from '@react-navigation/native';
 import React from 'react';
 import type {FullPageNotFoundViewProps} from '@components/BlockingViews/FullPageNotFoundView';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
@@ -8,8 +7,6 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import Navigation from '@libs/Navigation/Navigation';
 import useAbsentPageSpan from '@libs/telemetry/useAbsentPageSpan';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
 
 type NotFoundPageProps = {
     onBackButtonPress?: () => void;
@@ -24,9 +21,6 @@ function NotFoundPage({onBackButtonPress = () => Navigation.goBack(), isReportRe
     const {isSmallScreenWidth} = useResponsiveLayout();
     const topmostReportId = Navigation.getTopmostReportId();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${topmostReportId}`);
-    const route = useRoute();
-    const isOnGenericErrorScreen = route.name === SCREENS.NOT_FOUND;
-
     useAbsentPageSpan();
 
     return (
@@ -51,7 +45,7 @@ function NotFoundPage({onBackButtonPress = () => Navigation.goBack(), isReportRe
                 }}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...fullPageNotFoundViewProps}
-                onLinkPress={isOnGenericErrorScreen ? () => Navigation.goBack(ROUTES.HOME) : fullPageNotFoundViewProps.onLinkPress}
+                onLinkPress={fullPageNotFoundViewProps.onLinkPress}
             />
         </ScreenWrapper>
     );

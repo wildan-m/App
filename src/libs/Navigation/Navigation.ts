@@ -564,7 +564,7 @@ function goBackToHome() {
     const isNarrowLayout = getIsNarrowLayout();
 
     // This set the right split navigator.
-    goBack(ROUTES.INBOX);
+    goBack(ROUTES.HOME);
 
     // We want to keep the report screen in the split navigator on wide layout.
     if (!isNarrowLayout) {
@@ -572,7 +572,7 @@ function goBackToHome() {
     }
 
     // This set the right route in this split navigator.
-    goBack(ROUTES.INBOX);
+    goBack(ROUTES.HOME);
 }
 
 /**
