@@ -81,11 +81,20 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SETUP_AS_APP: false
 
-      # If the push races with another commit to `main` (or fails for any other
-      # reason) we just give up: the next push to `main` will re-tighten.
+      # If the push races with another commit to `main` we rebase once and
+      # retry. If even the retry fails, give up — the next push to `main`
+      # will re-tighten the baseline.
       - name: Auto-commit tightened eslint-seatbelt baseline
         if: steps.seatbelt_diff.outputs.tightened == 'true'
         run: |
           git add config/eslint/eslint.seatbelt.tsv
           git commit -m "Auto-tighten eslint-seatbelt baseline"
+
+          if git push origin main; then
+            exit 0
+          fi
+
+          echo "::warning::Push failed, rebasing onto origin/main and retrying..."
+          git fetch origin main
+          git rebase origin/main
           git push origin main
