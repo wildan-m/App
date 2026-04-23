@@ -2347,7 +2347,7 @@ function removeTransactionFromDuplicateTransactionViolation(
             continue;
         }
 
-        const optimisticViolations = duplicateTransactionViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
+        const optimisticViolations = duplicateViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
 
         if (duplicateTransactionIDs.length > 0) {
             optimisticViolations.push({

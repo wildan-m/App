@@ -1702,6 +1702,23 @@ describe('removeTransactionFromDuplicateTransactionViolation', () => {
         expect(failureEntry?.value).toEqual(originalBViolations);
     });
 
+    it('should preserve non-duplicate violations on partner when cleaning duplicate reference', () => {
+        const onyxData: OnyxData<UpdateMoneyRequestDataKeys> = {optimisticData: [], successData: [], failureData: []};
+
+        const transactionViolations = {
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_A}`]: [makeDuplicateViolation([TXN_B])],
+            [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${TXN_B}`]: [makeDuplicateViolation([TXN_A]), makeCategoryViolation()],
+        };
+
+        TransactionUtils.removeTransactionFromDuplicateTransactionViolation(onyxData, TXN_A, makeTransactionCollection(TXN_A, TXN_B), transactionViolations);
+
+        const successEntry = onyxData.successData?.at(0);
+        expect(successEntry?.value).toEqual([makeCategoryViolation()]);
+
+        const optimisticEntry = onyxData.optimisticData?.at(0);
+        expect(optimisticEntry?.value).toEqual([makeCategoryViolation()]);
+    });
+
     it('should not push any data when successData array is undefined', () => {
         const onyxData: OnyxData<UpdateMoneyRequestDataKeys> = {
             optimisticData: [],
