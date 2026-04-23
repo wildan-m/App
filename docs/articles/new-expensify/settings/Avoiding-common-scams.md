@@ -58,6 +58,20 @@ Here’s how you can protect your Expensify account:
 
 ---
 
+## What to do if you receive a magic code you didn't request
+
+If you receive a magic code email but didn't try to log in, **don't panic** — this does not mean your account has been compromised. It usually means someone mistyped their email address when trying to log in.
+
+Here's what to do:
+
+1. **Do not share the code with anyone** — simply ignore or delete the email.
+2. **Do not click any links** in the email unless you're sure it's from Expensify (sender address ends in @expensify.com).
+3. **Consider enabling [two-factor authentication](https://help.expensify.com/articles/new-expensify/settings/Two-Factor-Authentication)** for extra security.
+
+You do **not** need to lock your account just because you received an unexpected magic code. Only lock your account if you believe someone has gained access to your email account or if you shared your magic code with someone.
+
+---
+
 ## What to do if you shared your Magic Code
 
 If you accidentally gave someone your Magic Code, act fast:
@@ -91,6 +105,10 @@ Expensify uses Magic Codes instead of passwords to simplify login while keeping 
 ## How do I know if an email is really from Expensify?
 
 Legitimate Expensify emails always come from an address ending in **@expensify.com** or **@team.expensify.com**. If you’re unsure, don’t click any links — just log into the Expensify app directly and message Concierge.
+
+## I received a magic code I didn't request. Is my account compromised?
+
+No. Receiving an unrequested magic code does not mean your account is compromised. It most likely means someone entered your email address by mistake when trying to log in. As long as you don't share the code with anyone, your account is safe. You can simply ignore or delete the email. If you want extra protection, enable [two-factor authentication](https://help.expensify.com/articles/new-expensify/settings/Two-Factor-Authentication).
 
 ## Can Expensify call me?
 
