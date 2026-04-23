@@ -2,6 +2,7 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import ReportActionsSkeletonView from '@components/ReportActionsSkeletonView';
+import useConciergeMainReportActions from '@hooks/useConciergeMainReportActions';
 import useConciergeSidePanelReportActions from '@hooks/useConciergeSidePanelReportActions';
 import useCopySelectionHelper from '@hooks/useCopySelectionHelper';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -90,7 +91,9 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const isInSidePanel = useIsInSidePanel();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const isConciergeSidePanel = isInSidePanel && isConciergeChatReport(report, conciergeReportID);
+    const isConciergeChat = isConciergeChatReport(report, conciergeReportID);
+    const isConciergeSidePanel = isInSidePanel && isConciergeChat;
+    const isConciergeMainDM = !isInSidePanel && isConciergeChat;
 
     const {sessionStartTime} = useSidePanelState();
 
@@ -296,9 +299,9 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         filteredVisibleActions: conciergeSidePanelFilteredVisibleActions,
         filteredReportActions: conciergeSidePanelFilteredReportActions,
         showConciergeSidePanelWelcome,
-        showFullHistory,
-        hasPreviousMessages,
-        handleShowPreviousMessages,
+        showFullHistory: sidePanelShowFullHistory,
+        hasPreviousMessages: sidePanelHasPreviousMessages,
+        handleShowPreviousMessages: sidePanelHandleShowPreviousMessages,
     } = useConciergeSidePanelReportActions({
         report,
         reportActions,
@@ -311,6 +314,30 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         greetingText: translate('common.concierge.sidePanelGreeting'),
         loadOlderChats,
     });
+
+    const {
+        filteredVisibleActions: conciergeMainFilteredVisibleActions,
+        filteredReportActions: conciergeMainFilteredReportActions,
+        showFullHistory: mainShowFullHistory,
+        hasPreviousMessages: mainHasPreviousMessages,
+        handleShowPreviousMessages: mainHandleShowPreviousMessages,
+    } = useConciergeMainReportActions({
+        report,
+        reportActions,
+        visibleReportActions,
+        isConciergeMainDM,
+        hasOlderActions,
+        greetingText: translate('common.concierge.sidePanelGreeting'),
+        loadOlderChats,
+    });
+
+    // isConciergeSidePanel and isConciergeMainDM are mutually exclusive, so
+    // at most one hook produces a filtered view at a time; pick whichever is active.
+    const conciergeFilteredVisibleActions = isConciergeMainDM ? conciergeMainFilteredVisibleActions : conciergeSidePanelFilteredVisibleActions;
+    const conciergeFilteredReportActions = isConciergeMainDM ? conciergeMainFilteredReportActions : conciergeSidePanelFilteredReportActions;
+    const showFullHistory = isConciergeMainDM ? mainShowFullHistory : sidePanelShowFullHistory;
+    const hasPreviousMessages = isConciergeMainDM ? mainHasPreviousMessages : sidePanelHasPreviousMessages;
+    const handleShowPreviousMessages = isConciergeMainDM ? mainHandleShowPreviousMessages : sidePanelHandleShowPreviousMessages;
 
     /**
      * Runs when the FlatList finishes laying out
@@ -371,13 +398,14 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
                 parentReportAction={parentReportAction}
                 parentReportActionForTransactionThread={parentReportActionForTransactionThread}
                 onLayout={recordTimeToMeasureItemLayout}
-                sortedReportActions={conciergeSidePanelFilteredReportActions}
-                sortedVisibleReportActions={conciergeSidePanelFilteredVisibleActions}
+                sortedReportActions={conciergeFilteredReportActions}
+                sortedVisibleReportActions={conciergeFilteredVisibleActions}
                 loadOlderChats={loadOlderChats}
                 loadNewerChats={loadNewerChats}
                 listID={listID}
                 hasCreatedActionAdded={shouldAddCreatedAction}
                 isConciergeSidePanel={isConciergeSidePanel}
+                isConciergeMainDM={isConciergeMainDM}
                 showHiddenHistory={!showFullHistory}
                 hasPreviousMessages={hasPreviousMessages}
                 onShowPreviousMessages={handleShowPreviousMessages}

@@ -124,6 +124,9 @@ type ReportActionsListProps = {
     /** Whether this is a Concierge chat in the side panel */
     isConciergeSidePanel?: boolean;
 
+    /** Whether this is the main Concierge DM (fresh-start on open) */
+    isConciergeMainDM?: boolean;
+
     /** Whether the chat history is hidden (concierge side panel fresh state) */
     showHiddenHistory?: boolean;
 
@@ -168,6 +171,7 @@ function ReportActionsList({
     parentReportActionForTransactionThread,
     hasCreatedActionAdded,
     isConciergeSidePanel,
+    isConciergeMainDM,
     showHiddenHistory,
     hasPreviousMessages,
     onShowPreviousMessages,
@@ -708,7 +712,8 @@ function ReportActionsList({
     const renderItem = useCallback(
         ({item: reportAction, index}: ListRenderItemInfo<OnyxTypes.ReportAction>) => {
             const originalReportID = getOriginalReportID(report.reportID, reportAction, reportActionsFromOnyx);
-            const showPreviousMessagesButton = reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && !!isConciergeSidePanel && !!showHiddenHistory && !!hasPreviousMessages;
+            const showPreviousMessagesButton =
+                reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && (!!isConciergeSidePanel || !!isConciergeMainDM) && !!showHiddenHistory && !!hasPreviousMessages;
 
             // Use the action's actual index in sortedVisibleReportActions rather than the FlashList-provided index,
             // because useFlashListScrollKey may slice the data for deep-link scroll positioning, making the
@@ -785,6 +790,7 @@ function ReportActionsList({
             reportNameValuePairs?.originalID,
             reportActionsFromOnyx,
             isConciergeSidePanel,
+            isConciergeMainDM,
             showHiddenHistory,
             hasPreviousMessages,
             onShowPreviousMessages,
