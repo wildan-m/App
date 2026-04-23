@@ -2,6 +2,15 @@ name: ESLint check
 
 on:
   workflow_call:
+    secrets:
+      OS_BOTIFY_COMMIT_TOKEN:
+        required: false
+      OS_BOTIFY_APP_ID:
+        required: false
+      OS_BOTIFY_PRIVATE_KEY:
+        required: false
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: false
   pull_request:
     types: [opened, synchronize]
     branches-ignore: [staging, production]
@@ -20,6 +29,10 @@ jobs:
       - name: Checkout
         # v6
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          # OSBotify token lets the auto-commit step below push to the protected `main` branch.
+          # Safe to pass unconditionally; it's only used when the push-on-main auto-commit step runs.
+          token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN }}
 
       - name: Setup Node
         uses: ./.github/actions/composite/setupNode
@@ -48,8 +61,6 @@ jobs:
             rm -rf node_modules/.cache/eslint
             npm run lint
           fi
-        env:
-          CI: true
 
       - name: Save ESLint cache
         # v5.0.1
@@ -58,3 +69,52 @@ jobs:
         with:
           path: node_modules/.cache/eslint
           key: ${{ runner.os }}-eslint-${{ hashFiles('eslint.config.mjs', 'config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
+
+      # If lint tightened the seatbelt baseline (i.e. fewer baselined errors than last time),
+      # commit the updated TSV back to `main` as OSBotify. Only runs on direct `push: main`.
+      - name: Setup git for OSBotify
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: Expensify/GitHub-Actions/setupGitForOSBotify@main
+        with:
+          OP_VAULT: ${{ vars.OP_VAULT }}
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          SETUP_AS_APP: false
+
+      - name: Auto-commit tightened eslint-seatbelt baseline
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet config/eslint/eslint.seatbelt.tsv; then
+            echo "::notice::eslint.seatbelt.tsv unchanged; nothing to commit."
+            exit 0
+          fi
+
+          git add config/eslint/eslint.seatbelt.tsv
+          git commit -m "Auto-tighten eslint-seatbelt baseline"
+
+          MAX_RETRIES=5
+          RETRY_DELAY=2
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            if git push origin main; then
+              echo "::notice::Successfully pushed tightened baseline on attempt $i"
+              exit 0
+            fi
+
+            echo "::warning::Push attempt $i failed, retrying in ${RETRY_DELAY}s..."
+            sleep $RETRY_DELAY
+            RETRY_DELAY=$((RETRY_DELAY * 2))
+
+            if ! git fetch origin main; then
+              echo "::error::Unable to fetch main on attempt $i"
+              continue
+            fi
+
+            if ! git rebase origin/main; then
+              echo "::warning::Rebase failed on attempt $i, aborting and retrying..."
+              git rebase --abort || true
+              continue
+            fi
+          done
+
+          echo "::error::Failed to push tightened baseline after $MAX_RETRIES attempts"
+          exit 1
