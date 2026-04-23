@@ -158,6 +158,7 @@ function WorkspaceInviteMessageComponent({
             policyMemberAccountIDs,
             workspaceInviteRoleDraft,
             formatPhoneNumber,
+            currentUserPersonalDetails?.accountID,
             shouldShowApproverRow ? validatedApprover : undefined,
             filteredReportActions,
         );

@@ -183,6 +183,7 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
             policyMemberAccountIDs,
             CONST.POLICY.ROLE.USER,
             formatPhoneNumber,
+            currentUserPersonalDetails.accountID,
             undefined,
             filteredReportActions,
         );
