@@ -1,17 +1,11 @@
 import type {LinkingOptions} from '@react-navigation/native';
 import {findFocusedRoute} from '@react-navigation/native';
-import {Linking, Platform, TurboModuleRegistry} from 'react-native';
-import type {TurboModule} from 'react-native';
+import {Linking} from 'react-native';
+import continuePlaidOAuth from '@libs/continuePlaidOAuth';
 import navigationRef from '@libs/Navigation/navigationRef';
 import type {RootNavigatorParamList} from '@libs/Navigation/types';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
-
-type PlaidNativeBridge = TurboModule & {
-    continueFromRedirectUri: (urlString: string) => void;
-};
-
-const plaidNativeBridge = Platform.OS === 'ios' ? TurboModuleRegistry.get<PlaidNativeBridge>('RNLinksdk') : null;
 
 const subscribe: LinkingOptions<RootNavigatorParamList>['subscribe'] = (listener) => {
     const subscription = Linking.addEventListener('url', ({url}: {url: string}) => {
@@ -34,7 +28,7 @@ const subscribe: LinkingOptions<RootNavigatorParamList>['subscribe'] = (listener
             // Forward the OAuth redirect URI into the Plaid SDK so it can finalize OAuth.
             // Without this, the native SDK never sees the callback URL and retries OAuth in a loop
             // after app-to-app bank auth returns. See issue #87757.
-            plaidNativeBridge?.continueFromRedirectUri(url);
+            continuePlaidOAuth(url);
             return;
         }
         listener(url);
