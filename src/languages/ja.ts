@@ -6895,7 +6895,13 @@ ${reportName}
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: '承認モード', finalApprover: '最終承認者'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: '承認モード',
+                finalApprover: '最終承認者',
+                connect: '接続',
+                connectionDescription: 'Gusto を接続して、従業員の承認をワークスペースと同期させましょう。',
+            },
         },
     },
     getAssistancePage: {
