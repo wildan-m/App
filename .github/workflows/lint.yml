@@ -61,10 +61,11 @@ jobs:
           key: ${{ runner.os }}-eslint-${{ hashFiles('eslint.config.mjs', 'config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
 
       # If lint tightened the seatbelt baseline (i.e. fewer baselined errors than last time),
-      # commit the updated TSV back to `main` as OSBotify. Only runs on direct `push: main`.
+      # commit the updated TSV back to `main` as OSBotify. Only runs under `workflow_call`
+      # (i.e. invoked from preDeploy.yml, which only triggers on push to main).
       - name: Check for tightened eslint-seatbelt baseline
         id: seatbelt_diff
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'workflow_call'
         run: |
           if git diff --quiet config/eslint/eslint.seatbelt.tsv; then
             echo "tightened=false" >> "$GITHUB_OUTPUT"
