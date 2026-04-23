@@ -988,11 +988,6 @@ function dismissToSuperWideRHP(options: {afterTransition?: () => void} = {}) {
  *             useLinking syncs browser history to the new top fullscreen route.
  */
 function revealRouteBeforeDismissingModal(route: Route, options?: {afterTransition?: () => void}) {
-    if (getIsNarrowLayout()) {
-        Log.warn('[Navigation] revealRouteBeforeDismissingModal should only be used on wide layouts.');
-        return;
-    }
-
     if (!canNavigate('revealRouteBeforeDismissingModal', {route}) || !navigationRef.current) {
         Log.hmmm(`[Navigation] Unable to reveal route before dismissing modal. Can't navigate.`, {route});
         return;
