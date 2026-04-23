@@ -117,7 +117,7 @@ function getAppliedDisplays(searchAdvancedFiltersForm: Partial<SearchAdvancedFil
         appliedDisplays.push({label: translate('search.display.sortOrder'), value: translate(`search.filters.sortOrder.${queryJSON.sortOrder}`)});
     }
 
-    if (!!searchAdvancedFiltersForm.columns?.length) {
+    if (searchAdvancedFiltersForm.columns?.length) {
         appliedDisplays.push({label: translate('search.columns'), value: searchAdvancedFiltersForm.columns?.map((column) => translate(getSearchColumnTranslationKey(column))).join(', ')});
     }
 
