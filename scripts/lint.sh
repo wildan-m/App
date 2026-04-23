@@ -9,7 +9,7 @@
 set -euo pipefail
 
 NODE_OPTIONS="${NODE_OPTIONS:---max_old_space_size=8192}" \
-SEATBELT_FROZEN=0 \
+SEATBELT_FROZEN="${SEATBELT_FROZEN:-0}" \
     exec npx eslint \
         --cache \
         --cache-location=node_modules/.cache/eslint \

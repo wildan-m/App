@@ -27,10 +27,10 @@ if ! GIT_DIFF_OUTPUT="$(git diff --diff-filter=AMR --name-only "$MERGE_BASE_SHA_
     exit 1
 fi
 
-# Run eslint on the changed files
+# Run eslint on the changed files, forwarding any user-provided flags
 if [[ -n "$GIT_DIFF_OUTPUT" ]] ; then
     # shellcheck disable=SC2086 # For multiple files in variable
-    exec "${TOP}/scripts/lint.sh" $GIT_DIFF_OUTPUT
+    exec "${TOP}/scripts/lint.sh" "$@" $GIT_DIFF_OUTPUT
 else
     info "No lintable files changed"
 fi
