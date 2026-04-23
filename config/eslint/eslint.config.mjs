@@ -8,6 +8,7 @@ import react from 'eslint-plugin-react';
 import reactNativeA11Y from 'eslint-plugin-react-native-a11y';
 import testingLibrary from 'eslint-plugin-testing-library';
 import youDontNeedLodashUnderscore from 'eslint-plugin-you-dont-need-lodash-underscore';
+import seatbelt from 'eslint-seatbelt';
 import {defineConfig, globalIgnores} from 'eslint/config';
 import globals from 'globals';
 import path from 'node:path';
@@ -170,6 +171,23 @@ const config = defineConfig([
     {
         files: ['**/*.tsx', '**/*.jsx'],
         processor: expensifyProcessor,
+    },
+
+    // eslint-seatbelt config. The processor is stitched into `expensifyProcessor`
+    // above, so we only wire up the plugin, settings, and `configure` rule here.
+    {
+        settings: {
+            seatbelt: {
+                seatbeltFile: new URL('./eslint.seatbelt.tsv', import.meta.url).pathname,
+                threadsafe: true,
+            },
+        },
+        plugins: {
+            'eslint-seatbelt': seatbelt,
+        },
+        rules: {
+            'eslint-seatbelt/configure': 'error',
+        },
     },
 
     {
