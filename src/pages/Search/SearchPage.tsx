@@ -26,9 +26,9 @@ type SearchPageProps = PlatformStackScreenProps<SearchFullscreenNavigatorParamLi
 
 function SearchPage({route}: SearchPageProps) {
     const {translate} = useLocalize();
+    useDocumentTitle(translate('common.spend'));
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
-    useDocumentTitle(translate('common.spend'));
     const {selectedTransactions, lastSearchType, areAllMatchingItemsSelected, currentSearchKey, currentSearchResults, currentSearchQueryJSON} = useSearchStateContext();
     const {clearSelectedTransactions, setLastSearchType} = useSearchActionsContext();
 
