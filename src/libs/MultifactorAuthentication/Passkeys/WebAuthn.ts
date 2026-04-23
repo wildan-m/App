@@ -10,7 +10,6 @@ import Base64URL from '@src/utils/Base64URL';
 
 /**
  * Passkey authentication type metadata.
- * Not part of SecureStore — passkeys bypass the native secure store entirely.
  */
 const PASSKEY_AUTH_TYPE = {
     NAME: 'Passkey',
@@ -150,7 +149,6 @@ function decodeWebAuthnError(error: unknown): DecodedWebAuthnError {
 export {
     PASSKEY_AUTH_TYPE,
     arrayBufferToBase64URL,
-    base64URLToArrayBuffer,
     isWebAuthnSupported,
     buildPublicKeyCredentialCreationOptions,
     buildPublicKeyCredentialRequestOptions,
