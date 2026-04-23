@@ -33,7 +33,7 @@ If your company hasn’t yet connected a GBP or EUR business bank account, [foll
 
 The Expensify Card can be used **anywhere Visa is accepted**.
 
-Companies registered in the following 13 UK and EEA countries can enable the Expensify Card for their Workspaces:
+Companies registered in the following countries can enable the Expensify Card for their Workspaces:
 
 - Belgium
 - Denmark
