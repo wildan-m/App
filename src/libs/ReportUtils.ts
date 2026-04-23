@@ -6434,6 +6434,7 @@ function buildOptimisticAddCommentReportAction({
     // Falls back to module-level delegateEmail (from Onyx.connect) for callers not yet migrated; will be removed in https://github.com/Expensify/App/issues/66425
     const effectiveDelegateAccountID = delegateAccountIDParam ?? (delegateEmail ? getPersonalDetailByEmail(delegateEmail)?.accountID : undefined);
 
+    // Remove HTML from text when applying optimistic offline comment
     return {
         commentText,
         reportAction: {
