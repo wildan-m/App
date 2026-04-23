@@ -88,6 +88,7 @@ type UpdateSplitTransactionsParams = {
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     transactionReport: OnyxEntry<OnyxTypes.Report>;
     expenseReport: OnyxEntry<OnyxTypes.Report>;
+    isOffline: boolean;
 };
 
 function updateSplitTransactions({
@@ -114,6 +115,7 @@ function updateSplitTransactions({
     personalDetails,
     transactionReport,
     expenseReport,
+    isOffline,
 }: UpdateSplitTransactionsParams) {
     const chatReport = allReportsList?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport?.chatReportID}`];
     const expenseReportParentChat = getReportOrDraftReport(chatReport?.parentReportID);
@@ -517,6 +519,7 @@ function updateSplitTransactions({
                     isASAPSubmitBetaEnabled,
                     iouReportNextStep,
                     isSplitTransaction: true,
+                    isOffline,
                 });
                 if (currentSplit) {
                     currentSplit.modifiedExpenseReportActionID = params.reportActionID;
