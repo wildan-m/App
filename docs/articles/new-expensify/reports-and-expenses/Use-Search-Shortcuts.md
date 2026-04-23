@@ -1,13 +1,13 @@
 ---
-title: Use Search Shortcuts on the Spend Page
+title: Use Search Shortcuts
 description: Quickly find and take action on expense reports using role-based search shortcuts on the Spend page.
 keywords: [New Expensify, search, shortcut, Spend page, expense reports filters, submit, approve, pay, in bulk, multiple reports]
 internalScope: Audience is all members. Covers using search shortcuts on the Spend page. Does not cover advanced search operators or saved searches. 
 ---
 
-# Use Search Shortcuts on the Spend Page
+# Use Search Shortcuts
 
-Search shortcuts on the **Spend** page to apply pre-built filters that help you quickly find expense reports that need action. These shortcuts are automatically tailored to your role and show only the reports that require your attention.
+Search shortcuts on the **Spend** page apply pre-built filters that help you quickly find expense reports that need action. These shortcuts are automatically tailored to your role and show only the reports that require your attention.
 
 To create your own custom searches with advanced filtering, [learn how to use search operators](/articles/new-expensify/reports-and-expenses/Using-search-operators). 
 
