@@ -185,14 +185,14 @@ The skill provides guidance on:
 
 ### Code Quality
 - **TypeScript**: Strict mode enabled
-- **ESLint**: Linter
+- **ESLint**: Linter. Config lives in `config/eslint/`. Every rule is configured as `error`; pre-existing violations are grandfathered via [`eslint-seatbelt`](https://github.com/justjake/eslint-seatbelt) whose baseline is tracked in `config/eslint/eslint.seatbelt.tsv`. See `contributingGuides/LINTING.md`.
 - **Prettier**: Code formatting - run `npm run prettier` after making changes
 - **Patch Management**: patch-package for dependency fixes
 
 ### Post-Edit Checklist (IMPORTANT)
 **ALWAYS run these steps after making code changes, before committing:**
 1. **Prettier**: Run `npx prettier --write <changed files>` on every file you modified. This is mandatory - CI will reject unformatted code.
-2. **ESLint**: Run `npx eslint <changed files> --max-warnings=0` to catch lint errors early.
+2. **ESLint**: Run `npx eslint <changed files>` to catch lint errors early. A zero exit code means you're clean. If you fixed a baselined error, `config/eslint/eslint.seatbelt.tsv` will be rewritten with the lower count — **commit that diff alongside your code change** or CI will reject it. If you genuinely need to add a new baselined error, use `SEATBELT_INCREASE=<rule-id> npm run lint` and expect to justify it in review. Full rules: `contributingGuides/LINTING.md`.
 3. **TypeScript**: Run `npm run typecheck-tsgo` after changes that may affect typing (types, interfaces, or function signatures). It is ~10x faster and usually stricter than tsc. CI validates with `npm run typecheck` (tsc), which remains the required merge gate.
 4. **React Compiler**: If you added new React components/hooks or modified existing ones, run `npm run react-compiler-compliance-check check-changed` to verify they compile with React Compiler. This applies the same rules as CI: new components/hooks must compile, and existing compiled files must not regress. See `contributingGuides/REACT_COMPILER.md` for details and common fixes.
 
