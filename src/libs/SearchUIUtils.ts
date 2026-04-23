@@ -37,7 +37,6 @@ import type {
 import type {
     GroupedItem,
     QueryFilters,
-    SearchAction,
     SearchAmountFilterKeys,
     SearchColumnType,
     SearchCustomColumnIds,
@@ -1211,27 +1210,6 @@ function isTransactionGroupListItemType(item: ListItem): item is TransactionGrou
  */
 function isTransactionReportGroupListItemType(item: ListItem): item is TransactionReportGroupListItemType {
     return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
-}
-
-/**
- * Type guard that checks if something is a TransactionMemberGroupListItemType
- */
-function isTransactionMemberGroupListItemType(item: ListItem): item is TransactionMemberGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.FROM;
-}
-
-/**
- * Type guard that checks if something is a TransactionCardGroupListItemType
- */
-function isTransactionCardGroupListItemType(item: ListItem): item is TransactionCardGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.CARD;
-}
-
-/**
- * Type guard that checks if something is a TransactionWithdrawalIDGroupListItemType
- */
-function isTransactionWithdrawalIDGroupListItemType(item: ListItem): item is TransactionWithdrawalIDGroupListItemType {
-    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID;
 }
 
 /**
@@ -4484,10 +4462,6 @@ function getTypeOptions(translate: LocalizedTranslate, policies: OnyxCollection<
     return shouldHideInvoiceOption ? typeOptions.filter((typeOption) => typeOption.value !== CONST.SEARCH.DATA_TYPES.INVOICE) : typeOptions;
 }
 
-function getGroupByOptions(translate: LocalizedTranslate) {
-    return Object.values(CONST.SEARCH.GROUP_BY).map<SingleSelectItem<SearchGroupBy>>((value) => ({text: translate(`search.filters.groupBy.${value}`), value}));
-}
-
 function getSortByOptions(columns: SearchColumnType[], translate: LocalizedTranslate) {
     const sortableColumns: Array<SingleSelectItem<SearchColumnType>> = [];
     for (const column of columns) {
@@ -4745,7 +4719,6 @@ const FILTER_LABEL_MAP: Partial<Record<SearchAdvancedFiltersKey, TranslationPath
     [FILTER_KEYS.EXPORTED_TO]: 'search.exportedTo',
     [FILTER_KEYS.FEED]: 'search.filters.feed',
     [FILTER_KEYS.FROM]: 'common.from',
-    [FILTER_KEYS.GROUP_CURRENCY]: 'common.groupCurrency',
     [FILTER_KEYS.HAS]: 'search.has',
     [FILTER_KEYS.IN]: 'common.in',
     [FILTER_KEYS.IS]: 'search.filters.is',
@@ -5045,10 +5018,6 @@ function getMultiSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, type: 
 
 function getWithdrawalTypeOptions(translate: LocaleContextProps['translate']) {
     return Object.values(CONST.SEARCH.WITHDRAWAL_TYPE).map<SingleSelectItem<SearchWithdrawalType>>((value) => ({text: translate(`search.filters.withdrawalType.${value}`), value}));
-}
-
-function getActionOptions(translate: LocaleContextProps['translate']) {
-    return Object.values(CONST.SEARCH.ACTION_FILTERS).map<SingleSelectItem<SearchAction>>((value) => ({text: translate(`search.filters.action.${value}`), value}));
 }
 
 /**
@@ -5754,9 +5723,6 @@ export {
     getSortedSections,
     isTransactionGroupListItemType,
     isTransactionReportGroupListItemType,
-    isTransactionMemberGroupListItemType,
-    isTransactionCardGroupListItemType,
-    isTransactionWithdrawalIDGroupListItemType,
     isTransactionCategoryGroupListItemType,
     isTransactionMerchantGroupListItemType,
     isTransactionTagGroupListItemType,
@@ -5784,7 +5750,6 @@ export {
     getValidGroupBy,
     getStatusOptions,
     getTypeOptions,
-    getGroupByOptions,
     getSortByOptions,
     getSortOrderOptions,
     getGroupBySections,
@@ -5792,20 +5757,16 @@ export {
     getCurrencyOptions,
     getFeedOptions,
     getWideAmountIndicators,
-    hasDeletedTransactionInData,
     isTransactionAmountTooLong,
     isTransactionTaxAmountTooLong,
     getDatePresets,
     createAndOpenSearchTransactionThread,
     getWithdrawalTypeOptions,
-    getActionOptions,
     getColumnsToShow,
     getHasOptions,
     getSettlementStatus,
     getSettlementStatusBadgeProps,
-    getTransactionFromTransactionListItem,
     getSearchColumnTranslationKey,
-    isColumnSortable,
     getTableMinWidth,
     getCustomColumns,
     getCustomColumnDefault,
@@ -5821,7 +5782,6 @@ export {
     mapFiltersFormToLabelValueList,
     getSingleSelectFilterOptions,
     getMultiSelectFilterOptions,
-    isEligibleForApproveSuggestion,
     applySelectionToItem,
     GENERIC_SEARCH_KEYS,
     TODO_SEARCH_KEYS,

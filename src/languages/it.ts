@@ -2515,6 +2515,8 @@ ${amount} per ${merchant} - ${date}`,
         frozenByAdminNeedsUnfreezePrefix: 'Questa carta è stata bloccata da ',
         frozenByAdminNeedsUnfreezeSuffix: '. Contatta un amministratore per sbloccarla.',
         frozenByAdminNeedsUnfreeze: ({person}: {person: string}) => `Questa carta è stata bloccata da ${person}. Contatta un amministratore per sbloccarla.`,
+        spendRules: 'Regole di spesa',
+        editSpendRules: 'Modifica regole di spesa',
     },
     workflowsPage: {
         workflowTitle: 'Spesa',
@@ -6867,7 +6869,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                 currencyMismatchTitle: 'Valuta non corrispondente',
                 currencyMismatchPrompt: 'Per impostare un importo massimo, seleziona carte che si regolano nella stessa valuta.',
                 reviewSelectedCards: 'Controlla le carte selezionate',
-                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} altro`,
+                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => (count > 0 ? `${summary}, +${count} altri` : summary),
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Applica almeno una regola di spesa a una carta',
                 confirmErrorCardRequired: 'Il campo Carta è obbligatorio',
                 confirmErrorApplyAtLeastOneSpendRule: 'Applica almeno una regola di spesa',
@@ -6902,6 +6904,30 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                 editRuleTitle: 'Modifica regola',
                 deleteRule: 'Elimina regola',
                 deleteRuleConfirmation: 'Sei sicuro di voler eliminare questa regola?',
+                summaryMerchants: ({
+                    merchants,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    merchants: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Bloccato' : 'Consentito'} ${shownCount > 1 ? 'esercenti' : 'esercente'}: ${merchants}${hiddenCount > 0 ? `, +${hiddenCount} in più` : ''}`,
+                summaryCategories: ({
+                    categories,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    categories: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Bloccato' : 'Consentito'} ${shownCount > 1 ? 'categorie' : 'categoria'}: ${categories}${hiddenCount > 0 ? `, +${hiddenCount} in più` : ''}`,
             },
         },
         planTypePage: {
@@ -6946,7 +6972,13 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Modalità approvazione', finalApprover: 'Approvazione finale'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Modalità approvazione',
+                finalApprover: 'Approvazione finale',
+                connect: 'Collega',
+                connectionDescription: 'Collega Gusto per sincronizzare le approvazioni dei dipendenti con il tuo spazio di lavoro.',
+            },
         },
     },
     getAssistancePage: {
@@ -9103,8 +9135,12 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             forceTwoFactorAuthDescription: `<muted-text>Richiedi l’autenticazione a due fattori per tutti i membri di questo dominio. Ai membri del dominio verrà chiesto di configurare l’autenticazione a due fattori sul proprio account quando effettuano l’accesso.</muted-text>`,
             forceTwoFactorAuthError: 'Impossibile modificare l’impostazione “Forza l’autenticazione a due fattori”. Riprova più tardi.',
             resetTwoFactorAuth: 'Reimposta l’autenticazione a due fattori',
+            error: 'Impossibile salvare questa modifica. Riprova.',
         },
-        groups: {title: 'Gruppi', memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`})},
+        groups: {
+            title: 'Gruppi',
+            memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`}),
+        },
     },
     proactiveAppReview: {
         title: 'Ti piace il nuovo Expensify?',
