@@ -33,9 +33,9 @@ jobs:
         uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb
         with:
           path: node_modules/.cache/eslint
-          key: ${{ runner.os }}-eslint-${{ hashFiles('config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
+          key: ${{ runner.os }}-eslint-${{ hashFiles('eslint.config.mjs', 'config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-eslint-${{ hashFiles('config/eslint/**', 'normalized-package-lock.json') }}-
+            ${{ runner.os }}-eslint-${{ hashFiles('eslint.config.mjs', 'config/eslint/**', 'normalized-package-lock.json') }}-
             ${{ runner.os }}-eslint-
 
       # ESLint's cache doesn't track cross-file TypeScript dependencies, which can cause stale errors.
@@ -57,4 +57,4 @@ jobs:
         if: always()
         with:
           path: node_modules/.cache/eslint
-          key: ${{ runner.os }}-eslint-${{ hashFiles('config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
+          key: ${{ runner.os }}-eslint-${{ hashFiles('eslint.config.mjs', 'config/eslint/**', 'normalized-package-lock.json') }}-${{ github.sha }}
