@@ -242,7 +242,15 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
             prevNewestFetchedIDRef.current = currentCursor;
             loadNewerChats(false);
         }
-    }, [hasFinishedInitialLoad, reportActions.length, hasNewerActions, isOffline, reportLoadingState?.isLoadingNewerReportActions, reportPaginationState?.newestFetchedReportActionID, loadNewerChats]);
+    }, [
+        hasFinishedInitialLoad,
+        reportActions.length,
+        hasNewerActions,
+        isOffline,
+        reportLoadingState?.isLoadingNewerReportActions,
+        reportPaginationState?.newestFetchedReportActionID,
+        loadNewerChats,
+    ]);
 
     // Backfill loop: the backend prioritizes IOU actions in OpenReport/GetNewerActions for money
     // request reports, which can leave non-IOU chat messages in a gap between the IOU-biased cursor

@@ -114,7 +114,9 @@ function ReportAddAttachmentModalContent({route, navigation}: AttachmentModalScr
             return false;
         }
         const isEmptyReport = isEmptyObject(report);
-        return !!isLoadingApp || isEmptyReport || (reportLoadingState?.isLoadingInitialReportActions !== false && shouldFetchReport) || (Array.isArray(validFiles) && validFiles.length === 0);
+        return (
+            !!isLoadingApp || isEmptyReport || (reportLoadingState?.isLoadingInitialReportActions !== false && shouldFetchReport) || (Array.isArray(validFiles) && validFiles.length === 0)
+        );
     }, [isOffline, report, reportID, isLoadingApp, reportLoadingState?.isLoadingInitialReportActions, shouldFetchReport, validFiles]);
 
     const onConfirm = useCallback(
