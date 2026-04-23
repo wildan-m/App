@@ -8,12 +8,19 @@ The App is linted with [ESLint](https://eslint.org) and its configuration lives 
 # Lint the whole repo (same command CI runs):
 npm run lint
 
+# Lint only the files added/modified/renamed on this branch vs origin/main:
+npm run lint-changed
+
+# Lint specific files or directories:
+npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
+
 # Continuously re-lint changed files as you edit:
 npm run lint-watch
-
-# Lint just the files you're working on:
-npx eslint <files>
 ```
+
+All four entry points share the same config, the same on-disk cache at `node_modules/.cache/eslint`, and the same [seatbelt baseline](#mental-model) — they only differ in which paths ESLint is pointed at. That means an incremental `npm run lint-changed` during development will happily decrement the baseline in [`config/eslint/eslint.seatbelt.tsv`](../config/eslint/eslint.seatbelt.tsv) when you fix an error, exactly like a full `npm run lint` would.
+
+Prefer `npm run lint` (or `lint-changed` / `lint -- <files>`) over raw `npx eslint` invocations. Those wrappers set the repo's memory ceiling (`NODE_OPTIONS=--max_old_space_size=8192`), the shared content-addressed cache, and `--concurrency=auto`. Calling `npx eslint` directly silently drops all of those — you'll OOM on anything non-trivial and you won't share cache state with the rest of the repo. The single source of truth for the flags is [`scripts/lint.sh`](../scripts/lint.sh).
 
 Every rule is configured as `error`. If `npm run lint` exits non-zero locally, CI will fail too — fix the reported errors before opening a PR.
 
@@ -29,17 +36,25 @@ Every rule is configured as `error`. If `npm run lint` exits non-zero locally, C
 ### "I just wrote some code — is it clean?"
 
 ```bash
-npx eslint <changed files>
+npm run lint-changed
 ```
 
-If this exits 0, you're good. If it reports errors:
+This lints every file added, modified, or renamed on your branch relative to `origin/main`. It's the fastest "am I clean?" check during active development.
+
+If you're iterating specifically on a CI failure and you already know which files are flagged, lint just those:
+
+```bash
+npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
+```
+
+Either way, if the command exits 0, you're good. If it reports errors:
 
 - **Real error in code you just wrote** → fix it.
 - **Pre-existing error in a file you touched** → see the next section.
 
 ### "I fixed an existing baselined error"
 
-Just run `npm run lint` (or `npx eslint <file>`) locally. Seatbelt notices the count went down, rewrites `config/eslint/eslint.seatbelt.tsv` to reflect the lower count, and prints something like:
+Just run `npm run lint` (or `npm run lint-changed`) locally. Seatbelt notices the count went down, rewrites `config/eslint/eslint.seatbelt.tsv` to reflect the lower count, and prints something like:
 
 ```
 [eslint-seatbelt]: File src/foo.ts has 2 errors of rule @typescript-eslint/no-deprecated, but the seatbelt file allows 3. Decreasing the allowed error count to 2.
