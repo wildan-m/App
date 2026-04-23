@@ -30,9 +30,9 @@ import type AttachmentPickerProps from './types';
 const EXTENSION_TO_NATIVE_TYPE: Record<string, string> = {
     pdf: String(types.pdf),
     doc: String(types.doc),
-    msword: String(types.doc),
+    docx: String(types.docx),
     zip: String(types.zip),
-    text: String(types.plainText),
+    txt: String(types.plainText),
     json: String(types.json),
     xls: String(types.xls),
     xlsx: String(types.xlsx),
