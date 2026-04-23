@@ -792,7 +792,7 @@ function TransactionItemRow({
                             </View>
                         </View>
                         {!!shouldShowArrowRightOnNarrowLayout && !!onArrowRightPress && (
-                            <View style={[styles.justifyContentEnd, styles.alignItemsEnd, styles.mbHalf, styles.ml1]}>
+                            <View style={[styles.justifyContentEnd, styles.alignItemsEnd, styles.mbHalf, styles.ml3]}>
                                 <Icon
                                     src={expensicons.ArrowRight}
                                     fill={theme.icon}
