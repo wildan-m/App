@@ -8234,6 +8234,7 @@ const CONST = {
         },
     },
     DEFAULT_REPORT_METADATA: {isLoadingInitialReportActions: true},
+    DEFAULT_REPORT_LOADING_STATE: {isLoadingInitialReportActions: true},
     UPGRADE_PATHS: {
         CATEGORIES: 'categories',
         REPORTS: 'reports',

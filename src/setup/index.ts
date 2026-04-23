@@ -68,6 +68,7 @@ export default function () {
             ONYXKEYS.RAM_ONLY_UPDATE_REQUIRED,
             ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS,
             ONYXKEYS.RAM_ONLY_WALLET_ONFIDO,
+            ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE,
         ],
     });
 

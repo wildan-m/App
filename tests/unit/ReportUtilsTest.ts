@@ -4425,7 +4425,7 @@ describe('ReportUtils', () => {
                 lastReadTime: '2023-07-08 07:15:44.030',
                 participants: {[currentUserAccountID]: {notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS}},
             };
-            expect(getMostRecentlyVisitedReport(reports, undefined)).toEqual(latestReport);
+            expect(getMostRecentlyVisitedReport(reports, {})).toEqual(latestReport);
         });
     });
 

@@ -5324,14 +5324,14 @@ function updateLastVisitTime(reportID: string) {
     if (!isValidReportIDFromPath(reportID)) {
         return;
     }
-    Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {lastVisitTime: DateUtils.getDBTime()});
+    Onyx.merge(ONYXKEYS.REPORT_LAST_VISIT_TIMES, {[reportID]: DateUtils.getDBTime()});
 }
 
 function updateLoadingInitialReportAction(reportID: string | undefined) {
     if (!isValidReportIDFromPath(reportID)) {
         return;
     }
-    Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {isLoadingInitialReportActions: false});
+    Onyx.merge(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`, {isLoadingInitialReportActions: false});
 }
 
 function setNewRoomFormLoading(isLoading = true) {
