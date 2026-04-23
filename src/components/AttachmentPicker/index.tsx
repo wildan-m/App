@@ -1,10 +1,20 @@
 import React, {useRef} from 'react';
 import type {ValueOf} from 'type-fest';
-import {isMobileChrome} from '@libs/Browser';
+import {isMobileChrome, isMobileIOS} from '@libs/Browser';
 import Visibility from '@libs/Visibility';
 import CONST from '@src/CONST';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type AttachmentPickerProps from './types';
+
+// iOS WebKit may revoke gallery-backed File content after the tab is backgrounded,
+// leading to 0-byte uploads. Copy bytes into a JS-owned buffer up front on iOS.
+async function materializeIfIOS(file: File): Promise<File> {
+    if (!isMobileIOS()) {
+        return file;
+    }
+    const buffer = await file.arrayBuffer();
+    return new File([buffer], file.name, {type: file.type, lastModified: file.lastModified});
+}
 
 /**
  * Returns acceptable FileTypes based on ATTACHMENT_PICKER_TYPE
@@ -60,22 +70,31 @@ function AttachmentPicker({children, type = CONST.ATTACHMENT_PICKER_TYPE.FILE, a
                         return;
                     }
 
-                    if (allowMultiple && e.target.files.length > 1) {
-                        const files = Array.from(e.target.files).map((currentFile) => {
-                            // eslint-disable-next-line no-param-reassign
-                            currentFile.uri = URL.createObjectURL(currentFile);
-                            return currentFile as FileObject;
-                        });
-                        onPicked.current(files);
-                    } else if (e.target.files[0]) {
-                        const file = e.target.files[0];
-                        file.uri = URL.createObjectURL(file);
-                        onPicked.current([file]);
-                    }
+                    const picked = Array.from(e.target.files);
 
                     // Cleanup after selecting a file to start from a fresh state
                     if (fileInput.current) {
                         fileInput.current.value = '';
+                    }
+
+                    if (allowMultiple && picked.length > 1) {
+                        Promise.all(picked.map(materializeIfIOS)).then((stableFiles) => {
+                            const files = stableFiles.map((currentFile) => {
+                                const fileWithUri = currentFile as FileObject;
+                                fileWithUri.uri = URL.createObjectURL(currentFile);
+                                return fileWithUri;
+                            });
+                            onPicked.current(files);
+                        });
+                    } else {
+                        const first = picked.at(0);
+                        if (first) {
+                            materializeIfIOS(first).then((stableFile) => {
+                                const fileWithUri = stableFile as FileObject;
+                                fileWithUri.uri = URL.createObjectURL(stableFile);
+                                onPicked.current([fileWithUri]);
+                            });
+                        }
                     }
                 }}
                 // We are stopping the event propagation because triggering the `click()` on the hidden input
