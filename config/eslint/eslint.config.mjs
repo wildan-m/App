@@ -420,7 +420,7 @@ const config = defineConfig([
             'jsdoc/check-types': 'off',
             'jsdoc/no-types': 'error',
             '@dword-design/import-alias/prefer-alias': [
-                'warn',
+                'error',
                 {
                     alias: {
                         '@assets': './assets',
