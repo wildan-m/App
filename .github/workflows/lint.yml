@@ -81,36 +81,11 @@ jobs:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           SETUP_AS_APP: false
 
+      # If the push races with another commit to `main` (or fails for any other
+      # reason) we just give up: the next push to `main` will re-tighten.
       - name: Auto-commit tightened eslint-seatbelt baseline
         if: steps.seatbelt_diff.outputs.tightened == 'true'
         run: |
           git add config/eslint/eslint.seatbelt.tsv
           git commit -m "Auto-tighten eslint-seatbelt baseline"
-
-          MAX_RETRIES=5
-          RETRY_DELAY=2
-
-          for i in $(seq 1 $MAX_RETRIES); do
-            if git push origin main; then
-              echo "::notice::Successfully pushed tightened baseline on attempt $i"
-              exit 0
-            fi
-
-            echo "::warning::Push attempt $i failed, retrying in ${RETRY_DELAY}s..."
-            sleep $RETRY_DELAY
-            RETRY_DELAY=$((RETRY_DELAY * 2))
-
-            if ! git fetch origin main; then
-              echo "::error::Unable to fetch main on attempt $i"
-              continue
-            fi
-
-            if ! git rebase origin/main; then
-              echo "::warning::Rebase failed on attempt $i, aborting and retrying..."
-              git rebase --abort || true
-              continue
-            fi
-          done
-
-          echo "::error::Failed to push tightened baseline after $MAX_RETRIES attempts"
-          exit 1
+          git push origin main
