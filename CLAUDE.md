@@ -185,7 +185,7 @@ The skill provides guidance on:
 
 ### Code Quality
 - **TypeScript**: Strict mode enabled
-- **ESLint**: Linter. Config lives in `config/eslint/`. Every rule is configured as `error`; pre-existing violations are grandfathered via [`eslint-seatbelt`](https://github.com/justjake/eslint-seatbelt) whose baseline is tracked in `config/eslint/eslint.seatbelt.tsv`. See `contributingGuides/LINTING.md`.
+- **ESLint**: Linter. Pre-existing violations are grandfathered via [`eslint-seatbelt`](https://github.com/justjake/eslint-seatbelt).
 - **Prettier**: Code formatting - run `npm run prettier` after making changes
 - **Patch Management**: patch-package for dependency fixes
 
