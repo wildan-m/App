@@ -207,12 +207,14 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                                         descriptionTextStyle={approverDisplayName ? styles.textLabelSupportingNormal : undefined}
                                         titleComponent={
                                             currentApprover ? (
-                                                <UserPill
-                                                    avatar={currentApprover.avatar}
-                                                    displayName={currentApprover.displayName}
-                                                    email={currentApprover.email}
-                                                    style={styles.userPillStandalone}
-                                                />
+                                                <View style={styles.pr3}>
+                                                    <UserPill
+                                                        avatar={currentApprover.avatar}
+                                                        displayName={currentApprover.displayName}
+                                                        email={currentApprover.email}
+                                                        style={styles.userPillStandalone}
+                                                    />
+                                                </View>
                                             ) : undefined
                                         }
                                         onPress={navigateToApproverChange}
@@ -254,12 +256,14 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                                 descriptionTextStyle={selectedApproverDisplayName ? styles.textLabelSupportingNormal : undefined}
                                 titleComponent={
                                     selectedApproverEmail ? (
-                                        <UserPill
-                                            avatar={selectedApproverPersonalDetails?.avatar}
-                                            displayName={selectedApproverPersonalDetails?.displayName ?? selectedApproverEmail}
-                                            email={selectedApproverEmail}
-                                            style={styles.userPillStandalone}
-                                        />
+                                        <View style={styles.pr3}>
+                                            <UserPill
+                                                avatar={selectedApproverPersonalDetails?.avatar}
+                                                displayName={selectedApproverPersonalDetails?.displayName ?? selectedApproverEmail}
+                                                email={selectedApproverEmail}
+                                                style={styles.userPillStandalone}
+                                            />
+                                        </View>
                                     ) : undefined
                                 }
                                 onPress={navigateToApproverSelector}

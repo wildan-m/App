@@ -190,12 +190,14 @@ function ApprovalWorkflowEditor({approvalWorkflow, removeApprovalWorkflow, polic
                                 descriptionTextStyle={!!approver?.displayName && styles.textLabelSupportingNormal}
                                 titleComponent={
                                     approver ? (
-                                        <UserPill
-                                            avatar={approver.avatar}
-                                            displayName={approver.displayName}
-                                            email={approver.email}
-                                            style={styles.userPillStandalone}
-                                        />
+                                        <View style={styles.pr3}>
+                                            <UserPill
+                                                avatar={approver.avatar}
+                                                displayName={approver.displayName}
+                                                email={approver.email}
+                                                style={styles.userPillStandalone}
+                                            />
+                                        </View>
                                     ) : undefined
                                 }
                                 onPress={() => editApprover(approverIndex)}

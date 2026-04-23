@@ -121,7 +121,7 @@ function ApprovalWorkflowSection({approvalWorkflow, onPress, currency = CONST.CU
                             onPress={onPress}
                             shouldRemoveBackground
                             titleComponent={
-                                <View style={styles.ml3}>
+                                <View style={[styles.ml3, styles.pr3]}>
                                     <UserPill
                                         avatar={approver.avatar}
                                         displayName={approver.displayName}
