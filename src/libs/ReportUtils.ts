@@ -6236,11 +6236,23 @@ function navigateOnDeleteExpense(backToRoute: Route) {
         return;
     }
 
+    // Prefer the current route's backTo param so the user returns to the screen they came
+    // from (e.g. Search, a deep link) after the delete completes. However, if the backTo
+    // points to the SAME report as the caller's destination (typically because it encodes
+    // a linked action/comment of the now-deleted expense), using it would pop only to that
+    // action-scoped route and leave the parent report (e.g. the IOU report) in the stack.
+    // Pressing back would then bounce the user through the deleted screen. Fall back to
+    // backToRoute in that case so `goBack` pops all the way to the report itself.
     const rootState = navigationRef.getRootState();
     const focusedRoute = findFocusedRoute(rootState);
     if (focusedRoute?.params && 'backTo' in focusedRoute.params) {
-        Navigation.goBack(focusedRoute.params.backTo as Route);
-        return;
+        const focusedBackTo = focusedRoute.params.backTo as Route;
+        const focusedBackToReportID = parseReportRouteParams(focusedBackTo).reportID;
+        const backToRouteReportID = parseReportRouteParams(backToRoute).reportID;
+        if (!focusedBackToReportID || !backToRouteReportID || focusedBackToReportID !== backToRouteReportID) {
+            Navigation.goBack(focusedBackTo);
+            return;
+        }
     }
 
     Navigation.goBack(backToRoute);

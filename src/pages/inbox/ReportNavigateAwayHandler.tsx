@@ -119,7 +119,10 @@ function ReportNavigateAwayHandler() {
                 return;
             }
             Navigation.isNavigationReady().then(() => {
-                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(prevParentReportID));
+                // Use goBack (which pops to the parent if already in the stack, or replaces current)
+                // instead of navigate (which would push a new entry on top of the deleted report,
+                // leaving it behind to cause redirect loops when the user presses back).
+                Navigation.goBack(ROUTES.REPORT_WITH_ID.getRoute(prevParentReportID));
             });
             return;
         }
@@ -217,7 +220,11 @@ function ReportNavigateAwayHandler() {
         // Try to navigate to parent report if available
         if (deletedReportParentID && !isMoneyRequestReportPendingDeletion(deletedReportParentID)) {
             Navigation.isNavigationReady().then(() => {
-                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(deletedReportParentID));
+                // Use goBack instead of navigate to avoid pushing a duplicate entry.
+                // goBack pops to the parent if it already exists in the stack, or replaces
+                // the current (deleted) screen with the parent, which prevents the deleted
+                // screen from bouncing the user back when they press back.
+                Navigation.goBack(ROUTES.REPORT_WITH_ID.getRoute(deletedReportParentID));
             });
             return;
         }
