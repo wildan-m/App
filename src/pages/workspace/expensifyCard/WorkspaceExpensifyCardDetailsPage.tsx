@@ -26,6 +26,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import useEnvironment from '@hooks/useEnvironment';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -54,6 +55,7 @@ type WorkspaceExpensifyCardDetailsPageProps = PlatformStackScreenProps<
 >;
 
 function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetailsPageProps) {
+    const {isProduction} = useEnvironment();
     const navigation = useNavigation<NavigationProp<SettingsNavigatorParamList>>();
     const {policyID, cardID, backTo} = route.params;
     const {convertToDisplayString} = useCurrencyListActions();
@@ -332,7 +334,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                             }
                         />
                     </OfflineWithFeedback>
-                    {spendRulesSummary.length > 0 && (
+                    {!isProduction && spendRulesSummary.length > 0 && (
                         <MenuItemWithTopDescription
                             description={translate('cardPage.spendRules')}
                             descriptionTextStyle={[styles.fontSizeLabel]}
@@ -357,7 +359,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                             );
                         }}
                     />
-                    {isAdmin && (
+                    {!isProduction && isAdmin && (
                         <MenuItem
                             icon={expensifyIcons.CreditCardLock}
                             title={translate('cardPage.editSpendRules')}
