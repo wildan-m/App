@@ -157,8 +157,13 @@ function IOURequestStartPage({
         return tabs;
     }, [shouldUseTab, iouType, shouldShowPerDiemOption, shouldShowTimeOption]);
 
+    // A quick-action deeplink (e.g. iOS home-screen "Scan receipt") bypasses startMoneyRequest
+    // and leaves the previous flow's draft in place under OPTIMISTIC_TRANSACTION_ID. Detect it
+    // by comparing the draft's reportID to the URL's so we don't inherit its stale iouRequestType.
+    const isStaleTransactionDraft = !!transaction?.reportID && transaction.reportID !== reportID;
+
     const transactionRequestType = useMemo(() => {
-        if (transaction?.iouRequestType) {
+        if (transaction?.iouRequestType && !isStaleTransactionDraft) {
             return transaction.iouRequestType;
         }
         if (!shouldUseTab) {
@@ -170,7 +175,7 @@ function IOURequestStartPage({
             return selectedTab;
         }
         return undefined;
-    }, [transaction?.iouRequestType, shouldUseTab, selectedTab, availableTabs]);
+    }, [transaction?.iouRequestType, isStaleTransactionDraft, shouldUseTab, selectedTab, availableTabs]);
 
     const resetIOUTypeIfChanged = useResetIOUType({
         reportID,
