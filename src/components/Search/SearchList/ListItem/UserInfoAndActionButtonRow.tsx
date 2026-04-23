@@ -35,7 +35,7 @@ function UserInfoAndActionButtonRow({
     const styles = useThemeStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
     const transactionItem = item as unknown as TransactionListItemType;
-    const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${transactionItem.reportID}`, {selector: isActionLoadingSelector});
+    const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${transactionItem.reportID}`, {selector: isActionLoadingSelector});
     const hasFromSender = !!item?.from && !!item?.from?.accountID && !!item?.from?.displayName;
     const hasToRecipient = !!item?.to && !!item?.to?.accountID && !!item?.to?.displayName;
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';

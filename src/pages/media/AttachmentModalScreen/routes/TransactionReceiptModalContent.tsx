@@ -58,7 +58,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const allTransactions = useAllTransactions();
     const transactionMain = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`];
     const [transactionDraft] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${getNonEmptyStringOnyxID(transactionID)}`);
-    const [reportMetadata = CONST.DEFAULT_REPORT_METADATA] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`);
+    const [reportLoadingState = CONST.DEFAULT_REPORT_LOADING_STATE] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
@@ -629,7 +629,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             threeDotsMenuItems,
             isAuthTokenRequired,
             isTrackExpenseAction: isTrackExpenseActionValue,
-            isLoading: !transaction && reportMetadata?.isLoadingInitialReportActions,
+            isLoading: !transaction && reportLoadingState?.isLoadingInitialReportActions,
             shouldShowNotFoundPage,
             shouldShowCarousel: false,
             shouldShowRotateButton: false,
@@ -650,7 +650,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             isAuthTokenRequired,
             isTrackExpenseActionValue,
             transaction,
-            reportMetadata?.isLoadingInitialReportActions,
+            reportLoadingState?.isLoadingInitialReportActions,
             shouldShowNotFoundPage,
             allowDownload,
             onDownloadAttachment,
