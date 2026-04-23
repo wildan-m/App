@@ -62,8 +62,19 @@ jobs:
 
       # If lint tightened the seatbelt baseline (i.e. fewer baselined errors than last time),
       # commit the updated TSV back to `main` as OSBotify. Only runs on direct `push: main`.
-      - name: Setup git for OSBotify
+      - name: Check for tightened eslint-seatbelt baseline
+        id: seatbelt_diff
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet config/eslint/eslint.seatbelt.tsv; then
+            echo "tightened=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::eslint.seatbelt.tsv unchanged; skipping auto-commit."
+          else
+            echo "tightened=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup git for OSBotify
+        if: steps.seatbelt_diff.outputs.tightened == 'true'
         uses: Expensify/GitHub-Actions/setupGitForOSBotify@main
         with:
           OP_VAULT: ${{ vars.OP_VAULT }}
@@ -71,13 +82,8 @@ jobs:
           SETUP_AS_APP: false
 
       - name: Auto-commit tightened eslint-seatbelt baseline
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: steps.seatbelt_diff.outputs.tightened == 'true'
         run: |
-          if git diff --quiet config/eslint/eslint.seatbelt.tsv; then
-            echo "::notice::eslint.seatbelt.tsv unchanged; nothing to commit."
-            exit 0
-          fi
-
           git add config/eslint/eslint.seatbelt.tsv
           git commit -m "Auto-tighten eslint-seatbelt baseline"
 
