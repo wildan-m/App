@@ -1,40 +1,36 @@
 #!/bin/bash
 
-# Lints files that have been added, modified, or renamed on the current branch
-# relative to origin/main.
+# Lints .ts and .tsx files that have changed in this branch
 
-set -euo pipefail
+set -eu
 
 TOP="$(realpath "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)/..")"
 readonly TOP
-# shellcheck source=./shellUtils.sh
 source "${TOP}/scripts/shellUtils.sh"
 
+# Fetch the commit history to include the merge-base commit
 info "Fetching origin/main"
 git fetch origin main --no-tags
 
 MERGE_BASE_SHA_HASH="$(git merge-base origin/main HEAD)"
 readonly MERGE_BASE_SHA_HASH
 
-if [[ -z "${MERGE_BASE_SHA_HASH}" ]] || ! [[ "${MERGE_BASE_SHA_HASH}" =~ ^[a-fA-F0-9]{40}$ ]]; then
-    error "git merge-base returned unexpected output: ${MERGE_BASE_SHA_HASH}"
+# Check if output is empty or malformed
+if [[ -z "$MERGE_BASE_SHA_HASH" ]] || ! [[ "$MERGE_BASE_SHA_HASH" =~ ^[a-fA-F0-9]{40}$ ]]; then
+    error "git merge-base returned unexpected output: $MERGE_BASE_SHA_HASH"
     exit 1
 fi
 
-declare -a CHANGED_FILES=()
-while IFS= read -r CHANGED_FILE; do
-    CHANGED_FILES+=("${CHANGED_FILE}")
-done < <(
-    git diff --diff-filter=AMR --name-only "${MERGE_BASE_SHA_HASH}" HEAD \
-        -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.mjs' '*.cjs'
-)
-
-if [[ "${#CHANGED_FILES[@]}" -eq 0 ]]; then
-    info "No lintable files changed on this branch"
-    exit 0
+# Get the diff output and check status
+if ! GIT_DIFF_OUTPUT="$(git diff --diff-filter=AMR --name-only "$MERGE_BASE_SHA_HASH" HEAD -- '*.js' '*.jsx' '*.ts' '*.tsx' '*.mjs' '*.cjs')"; then
+    error "git diff failed - output: $GIT_DIFF_OUTPUT"
+    exit 1
 fi
 
-info "Linting ${#CHANGED_FILES[@]} changed file(s):"
-printf '    %s\n' "${CHANGED_FILES[@]}"
-
-exec "${TOP}/scripts/lint.sh" "${CHANGED_FILES[@]}"
+# Run eslint on the changed files
+if [[ -n "$GIT_DIFF_OUTPUT" ]] ; then
+    # shellcheck disable=SC2086 # For multiple files in variable
+    exec "${TOP}/scripts/lint.sh" $GIT_DIFF_OUTPUT
+else
+    info "No lintable files changed"
+fi
