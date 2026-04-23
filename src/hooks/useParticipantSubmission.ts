@@ -169,6 +169,7 @@ function useParticipantSubmission({
             policyForMovingExpenses: movingPolicy,
             currentUserPersonalDetails: userDetails,
             isActivePolicyRequest: isActiveRequest,
+            lastSelectedDistanceRates: distanceRates,
         } = dataRef.current;
 
         // If coming from the combined submit/track flow and the user proceeds to just track the expense,
@@ -183,6 +184,7 @@ function useParticipantSubmission({
                 isTrackDistanceExpense: isDistanceRequest(transaction),
                 policy: movingPolicy,
                 isPolicyExpenseChat: false,
+                lastSelectedDistanceRates: distanceRates,
             });
             setCustomUnitRateID(transaction.transactionID, rateID, transaction, movingPolicy);
             const shouldSetParticipantAutoAssignment = iouType === CONST.IOU.TYPE.CREATE;
