@@ -278,12 +278,10 @@ Onyx.connect({
     },
 });
 
-let deprecatedSessionEmail = '';
 let deprecatedSessionAccountID = 0;
 Onyx.connect({
     key: ONYXKEYS.SESSION,
     callback: (val) => {
-        deprecatedSessionEmail = val?.email ?? '';
         deprecatedSessionAccountID = val?.accountID ?? CONST.DEFAULT_NUMBER_ID;
     },
 });
