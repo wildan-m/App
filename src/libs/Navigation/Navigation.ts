@@ -27,6 +27,7 @@ import type {SidePanel} from '@src/types/onyx';
 import {clearPreInsertedOriginalTabRoute, getPreInsertedOriginalTabRoute} from './AppNavigator/createRootStackNavigator/GetStateForActionHandlers';
 import getInitialSplitNavigatorState from './AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
 import originalCloseRHPFlow from './helpers/closeRHPFlow';
+import getActiveTabName from './helpers/getActiveTabName';
 import getPathFromState from './helpers/getPathFromState';
 import getStateFromPath from './helpers/getStateFromPath';
 import getTopmostReportParams from './helpers/getTopmostReportParams';
@@ -832,11 +833,6 @@ const dismissModalWithReport = (
         }
         options?.onBeforeNavigate?.(true);
         const reportRoute = ROUTES.REPORT_WITH_ID.getRoute(reportID, reportActionID, referrer, backTo);
-        if (getIsNarrowLayout()) {
-            navigate(reportRoute, {forceReplace: true});
-            return;
-        }
-
         dismissModal({
             afterTransition: () => {
                 navigate(reportRoute);
@@ -1048,7 +1044,10 @@ function preInsertFullscreenUnderRHP(route: Route) {
     }
 
     const stateFromPath = getStateFromPath(route);
-    const targetRouteName = stateFromPath?.routes.findLast((r) => isFullScreenName(r.name))?.name;
+    const outermostFullScreen = stateFromPath?.routes.findLast((r) => isFullScreenName(r.name));
+    // Use the active inner tab name (e.g. REPORTS_SPLIT_NAVIGATOR) when the outermost
+    // fullscreen is a TAB_NAVIGATOR wrapper, so callers comparing against specific tab names match.
+    const targetRouteName = getActiveTabName(outermostFullScreen);
 
     const stateBefore = navigationRef.current.getRootState();
     const routeCountBefore = stateBefore.routes.length;

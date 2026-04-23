@@ -362,10 +362,22 @@ function handleReplaceFullscreenUnderRHP(
             if (i !== targetTabIndex) {
                 return r;
             }
+            // Prepend the existing sidebar/root route (e.g. Inbox) to the incoming state when
+            // it starts with a different screen, so back navigation from the new screen
+            // lands on the sidebar.
+            let mergedNestedState = focusedTargetTab.state;
+            const existingNestedRoutes = (r.state as PartialState<NavigationState> | undefined)?.routes;
+            const newNestedRoutes = focusedTargetTab.state?.routes;
+            const existingFirstRoute = existingNestedRoutes?.at(0);
+            const newFirstRoute = newNestedRoutes?.at(0);
+            if (existingFirstRoute && newFirstRoute && existingFirstRoute.name !== newFirstRoute.name) {
+                const prependedRoutes = [existingFirstRoute, ...(newNestedRoutes ?? [])];
+                mergedNestedState = {...focusedTargetTab.state, routes: prependedRoutes, index: prependedRoutes.length - 1};
+            }
             return {
                 ...r,
                 ...(focusedTargetTab.params !== undefined ? {params: focusedTargetTab.params} : {}),
-                ...(focusedTargetTab.state !== undefined ? {state: focusedTargetTab.state as typeof r.state} : {}),
+                ...(mergedNestedState !== undefined ? {state: mergedNestedState as typeof r.state} : {}),
             };
         });
         const updatedTabState = {...existingTabState, routes: updatedTabRoutes, index: targetTabIndex};
