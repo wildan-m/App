@@ -3,6 +3,8 @@ import {getErrorMessage} from '@libs/ErrorUtils';
 import Log from '@libs/Log';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
 import MARQETA_VALUES from '@libs/MultifactorAuthentication/shared/MarqetaValues';
+import {createLocalMFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import CONST from '@src/CONST';
@@ -143,22 +145,17 @@ const DOM_EXCEPTION_NAME_MAP: Record<string, MultifactorAuthenticationReason> = 
     UnknownError: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNKNOWN,
 };
 
-type DecodedWebAuthnError = {
-    reason: MultifactorAuthenticationReason;
-    message?: string;
-};
-
-/** Decodes WebAuthn DOMException errors and maps them to authentication error reasons. */
-function decodeWebAuthnError(error: unknown): DecodedWebAuthnError {
+/** Decodes WebAuthn DOMException errors and maps them to MFAError. */
+function decodeWebAuthnError(error: unknown): MFAError {
     Log.info('[Passkey] WebAuthn error', false, {error: getErrorMessage(error)});
     if (error instanceof DOMException) {
         const reason = DOM_EXCEPTION_NAME_MAP[error.name];
         if (reason) {
-            return {reason, message: error.message};
+            return createLocalMFAError(reason, error.message);
         }
     }
 
-    return {reason: VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNRECOGNIZED, message: getErrorMessage(error)};
+    return createLocalMFAError(VALUES.REASON.LOCAL_ERRORS.WEBAUTHN.UNRECOGNIZED, getErrorMessage(error));
 }
 
 export {

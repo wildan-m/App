@@ -106,10 +106,9 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 keyInfo,
             });
         } catch (error) {
-            const {reason, message} = decodeLibraryError(error);
             onResult({
                 success: false,
-                error: createLocalMFAError(reason, message),
+                error: decodeLibraryError(error),
             });
         }
     };
@@ -178,10 +177,9 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
                 authenticationMethod: authType,
             });
         } catch (error) {
-            const {reason, message} = decodeLibraryError(error);
             onResult({
                 success: false,
-                error: createLocalMFAError(reason, message),
+                error: decodeLibraryError(error),
             });
         }
     };

@@ -6,15 +6,12 @@ import type {AuthType} from '@sbaiahmed1/react-native-biometrics/types';
 import {Buffer} from 'buffer';
 import type {ValueOf} from 'type-fest';
 import {getErrorMessage} from '@libs/ErrorUtils';
+import {createLocalMFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import type {MFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {AuthTypeInfo, MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import VALUES from '@libs/MultifactorAuthentication/VALUES';
 import CONST from '@src/CONST';
 import NATIVE_BIOMETRICS_HSM_VALUES from './VALUES';
-
-type DecodedLibraryError = {
-    reason: MultifactorAuthenticationReason;
-    message: string | undefined;
-};
 
 type NativeBiometricsHSMTypeEntry = ValueOf<typeof NATIVE_BIOMETRICS_HSM_VALUES.AUTH_TYPE>;
 
@@ -92,18 +89,18 @@ const LIBRARY_ERROR_CODE_MAP: Record<string, MultifactorAuthenticationReason> = 
 };
 
 /**
- * Decodes caught exceptions from the library into a reason and message.
+ * Decodes caught exceptions from the library into an MFAError.
  * Falls back to UNRECOGNIZED for errors without a known code — mirrors decodeWebAuthnError.
  */
-function decodeLibraryError(error: unknown): DecodedLibraryError {
+function decodeLibraryError(error: unknown): MFAError {
     const message = getErrorMessage(error);
     if (error instanceof Error && 'code' in error && typeof error.code === 'string') {
         const reason = LIBRARY_ERROR_CODE_MAP[error.code];
         if (reason) {
-            return {reason, message};
+            return createLocalMFAError(reason, message);
         }
     }
-    return {reason: VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED, message};
+    return createLocalMFAError(VALUES.REASON.LOCAL_ERRORS.HSM.UNRECOGNIZED, message);
 }
 
 /**

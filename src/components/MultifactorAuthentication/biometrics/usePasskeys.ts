@@ -57,10 +57,9 @@ function usePasskeys(): UseBiometricsReturn {
         try {
             credential = await createPasskeyCredential(publicKeyOptions);
         } catch (error) {
-            const {reason, message} = decodeWebAuthnError(error);
             await onResult({
                 success: false,
-                error: createLocalMFAError(reason, message),
+                error: decodeWebAuthnError(error),
             });
             return;
         }
@@ -138,10 +137,9 @@ function usePasskeys(): UseBiometricsReturn {
         try {
             assertion = await authenticateWithPasskey(publicKeyOptions);
         } catch (error) {
-            const {reason, message} = decodeWebAuthnError(error);
             await onResult({
                 success: false,
-                error: createLocalMFAError(reason, message),
+                error: decodeWebAuthnError(error),
             });
             return;
         }
