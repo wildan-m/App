@@ -2538,13 +2538,13 @@ describe('actions/Report', () => {
 
         await new Promise<void>((resolve) => {
             const connection = Onyx.connect({
-                key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${parentReport?.reportID}`,
-                callback: (metadata) => {
-                    if (!metadata?.hasOnceLoadedReportActions) {
+                key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${parentReport?.reportID}`,
+                callback: (loadingState) => {
+                    if (!loadingState?.hasOnceLoadedReportActions) {
                         return;
                     }
                     Onyx.disconnect(connection);
-                    expect(metadata.hasOnceLoadedReportActions).toBe(true);
+                    expect(loadingState.hasOnceLoadedReportActions).toBe(true);
                     resolve();
                 },
             });
