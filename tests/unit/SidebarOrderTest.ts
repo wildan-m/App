@@ -150,7 +150,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -159,7 +159,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -168,7 +168,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {
@@ -222,7 +222,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -231,7 +231,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -240,7 +240,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const currentReportId = report1.reportID;
@@ -294,7 +294,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -303,7 +303,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -312,7 +312,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {
@@ -380,7 +380,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -389,7 +389,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -398,7 +398,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {
@@ -478,7 +478,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -487,7 +487,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -496,7 +496,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {
@@ -581,7 +581,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -590,7 +590,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -599,7 +599,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {
@@ -655,7 +655,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -664,7 +664,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -673,7 +673,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const currentReportId = report2.reportID;
@@ -828,7 +828,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const iouReport: OnyxTypes.Report = {
@@ -1044,7 +1044,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -1053,7 +1053,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -1062,7 +1062,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             // Given the user is in all betas
@@ -1122,7 +1122,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report2,
@@ -1131,7 +1131,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
             addComment({
                 report: report3,
@@ -1140,7 +1140,7 @@ describe('Sidebar', () => {
                 text: 'Hi, this is a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: 1,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             const reportCollectionDataSet: ReportCollectionDataSet = {

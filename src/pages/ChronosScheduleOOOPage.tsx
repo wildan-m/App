@@ -1,4 +1,3 @@
-import {delegateEmailSelector} from '@selectors/Account';
 import React, {useCallback, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import AmountForm from '@components/AmountForm';
@@ -14,6 +13,7 @@ import type {ValuePickerItem} from '@components/ValuePicker/types';
 import ValueSelectorModal from '@components/ValuePicker/ValueSelectorModal';
 import useAncestors from '@hooks/useAncestors';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -38,7 +38,7 @@ function ChronosScheduleOOOPage({route}: ChronosScheduleOOOPageProps) {
     const {translate} = useLocalize();
     const {accountID: currentUserAccountID, timezone: timezoneParam} = useCurrentUserPersonalDetails();
     const isInSidePanel = useIsInSidePanel();
-    const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
+    const delegateAccountID = useDelegateAccountID();
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isDurationUnitModalVisible, setIsDurationUnitModalVisible] = useState(false);
@@ -108,7 +108,7 @@ function ChronosScheduleOOOPage({route}: ChronosScheduleOOOPageProps) {
             currentUserAccountID,
             shouldPlaySound: false,
             isInSidePanel,
-            delegateEmail,
+            delegateAccountID,
         });
 
         Navigation.goBack();

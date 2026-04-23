@@ -491,7 +491,7 @@ describe('actions/Duplicate', () => {
                     text: message,
                     timezoneParam: CONST.DEFAULT_TIME_ZONE,
                     currentUserAccountID: RORY_ACCOUNT_ID,
-                    delegateEmail: undefined,
+                    delegateAccountID: undefined,
                 });
                 await waitForBatchedUpdates();
             };

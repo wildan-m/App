@@ -1537,7 +1537,7 @@ function respondToProactiveAppReview(
     currentProactiveAppReview: AppReview | null | undefined,
     userEmail: string | undefined,
     userAccountID: number,
-    delegateEmail: string | undefined,
+    delegateAccountID: number | undefined,
     message?: string,
     conciergeChatReportID?: string,
 ) {
@@ -1559,7 +1559,7 @@ function respondToProactiveAppReview(
             reportID: conciergeChatReportID,
             currentUserEmail: userEmail,
             currentUserAccountID: userAccountID,
-            delegateEmailParam: delegateEmail,
+            delegateAccountIDParam: delegateAccountID,
         });
         const optimisticReportActionID = optimisticReportAction.reportAction.reportActionID;
         const currentTime = DateUtils.getDBTime();

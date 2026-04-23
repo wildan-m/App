@@ -512,7 +512,7 @@ describe('Unread Indicators', () => {
                     text: 'Current User Comment 1',
                     timezoneParam: CONST.DEFAULT_TIME_ZONE,
                     currentUserAccountID: USER_A_ACCOUNT_ID,
-                    delegateEmail: undefined,
+                    delegateAccountID: undefined,
                 });
                 return waitForBatchedUpdates();
             })
@@ -593,7 +593,7 @@ describe('Unread Indicators', () => {
                         text: 'Current User Comment 1',
                         timezoneParam: CONST.DEFAULT_TIME_ZONE,
                         currentUserAccountID: USER_A_ACCOUNT_ID,
-                        delegateEmail: undefined,
+                        delegateAccountID: undefined,
                     });
                     return waitForBatchedUpdates();
                 })
@@ -648,7 +648,7 @@ describe('Unread Indicators', () => {
             text: 'Comment 1',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: USER_A_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
 
         await waitForBatchedUpdates();
@@ -667,7 +667,7 @@ describe('Unread Indicators', () => {
                 text: 'Comment 2',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: USER_A_ACCOUNT_ID,
-                delegateEmail: undefined,
+                delegateAccountID: undefined,
             });
 
             await waitForBatchedUpdates();
@@ -849,7 +849,7 @@ describe('Unread Indicators', () => {
             text: 'Current User Comment',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: USER_A_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
         await waitForBatchedUpdates();
 

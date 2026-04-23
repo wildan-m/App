@@ -1,4 +1,3 @@
-import {delegateEmailSelector} from '@selectors/Account';
 import {pendingChatMembersSelector} from '@selectors/ReportMetaData';
 import React, {useEffect, useState} from 'react';
 import type {SectionListData} from 'react-native';
@@ -15,6 +14,7 @@ import type {WithNavigationTransitionEndProps} from '@components/withNavigationT
 import useAncestors from '@hooks/useAncestors';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebouncedState from '@hooks/useDebouncedState';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePersonalDetailOptions from '@hooks/usePersonalDetailOptions';
@@ -77,7 +77,7 @@ function RoomInvitePage({
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${report?.reportID}`, {selector: pendingChatMembersSelector});
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
-    const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
+    const delegateAccountID = useDelegateAccountID();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState(userSearchPhrase ?? '');
@@ -207,7 +207,7 @@ function RoomInvitePage({
                     invitedEmailsToAccountIDs,
                     currentUserPersonalDetails.timezone ?? CONST.DEFAULT_TIME_ZONE,
                     currentUserPersonalDetails.accountID,
-                    delegateEmail,
+                    delegateAccountID,
                 );
             } else {
                 inviteToRoom(report, invitedEmailsToAccountIDs, formatPhoneNumber);

@@ -4152,7 +4152,7 @@ describe('updateSplitTransactions', () => {
             text: 'Testing a comment',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: CARLOS_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
         await waitForBatchedUpdates();
 
@@ -4214,7 +4214,7 @@ describe('updateSplitTransactions', () => {
             text: 'Testing a comment',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: CARLOS_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
         await waitForBatchedUpdates();
 
@@ -4259,7 +4259,7 @@ describe('updateSplitTransactions', () => {
             text: 'Testing a comment',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: CARLOS_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
         await waitForBatchedUpdates();
 
@@ -4345,7 +4345,7 @@ describe('updateSplitTransactions', () => {
             text: 'Testing a comment',
             timezoneParam: CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID: CARLOS_ACCOUNT_ID,
-            delegateEmail: undefined,
+            delegateAccountID: undefined,
         });
         await waitForBatchedUpdates();
 
