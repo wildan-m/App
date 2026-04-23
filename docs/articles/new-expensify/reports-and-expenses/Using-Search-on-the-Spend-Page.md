@@ -1,91 +1,63 @@
 ---
-title: Using Search on the Spend Page
-description: Learn how role-based search simplifies submitting, approving, or paying expense reports in New Expensify.
-keywords: [New Expensify, search, suggested searches, Submit, Approve, Pay, To-do, Explore, LHN, batch processing, filters, expense report actions, Awaiting export, Monthly accrual, Reconciliation]
+title: Use Search Shortcuts on the Spend Page
+description: Quickly find and take action on expense reports using role-based search shortcuts on the Spend page.
+keywords: [New Expensify, search, shortcut, Spend page, expense reports filters, submit, approve, pay, in bulk, multiple reports].
+internalScope: Audience is all members. Covers using search shortcuts on the Spend page. Does not cover advanced search operators or saved searches. 
 ---
 
+# Use Search Shortcuts on the Spend Page
 
-Using the search function on the Spend page helps you quickly take action on reports you need to submit, approve, or pay, all tailored to your role in a workspace.
+Search shortcuts on the **Spend** page to apply pre-built filters that help you quickly find expense reports that need action. These shortcuts are automatically tailored to your role and show only the reports that require your attention.
 
----
-
-# Search on the Spend Page
-
-**Navigation:** In the navigation tabs (on the left on web, and at the bottom on mobile), open **Spend**, then go to the **To-do** section and choose a shortcut such as **Submit**, **Approve**, **Pay**, or **Export**. (**To-do** is separate from **Explore**, where **Reports**, **Expenses**, and **Chats** live.)
-
-The **To-do** section surfaces key report actions so you can:
-- Submit expenses waiting on you
-- Approve reports that need your review
-- Pay approved reports ready for reimbursement
-- Export finalized reports to accounting platforms
-
-These shortcuts are personalized based on your role and workspace configuration, helping you process reports in batches without manually building advanced searches.
-
-![An image of the Search function on the Spend page on New Expensify]({{site.url}}/assets/images/export.png){:width="100%"}
+To create your own custom searches with advanced filtering, [learn how to use search operators](/articles/new-expensify/reports-and-expenses/Using-search-operators). 
 
 ---
 
-# How to Use Search Shortcuts
+## Who can use search shortcuts
 
-Search options appear under the **To-do** section in the navigation tabs (on the left on web, and at the bottom on mobile).
+All members can use search shortcuts, but what you see depends on your role:
 
-Depending on your role, you'll see shortcuts like:
-- **Submit** – Reports you've drafted and need to submit.
-- **Approve** – Reports awaiting your review.
-- **Pay** – Reports ready for reimbursement.
-- **Export** – Reports ready for accounting export (e.g., to QuickBooks).
-
-Admins may also see:
-- **Monthly accrual** -- Unapproved cash, Unapproved card.
-- **Reconciliation** -- Card statements, Expensify Card, Reimbursements.
+ - **Submitters:** See **Drafts** when reports are ready to submit
+ - **Approvers:** See **Needs approval** when reports require review
+ - **Workspace Admins:** See **Ready to pay** when reports are approved and reimbursements are enabled
 
 ---
 
-# Member Views and Access
+## How to use search shortcuts
 
-## All members
-- From **Spend** > **Explore**, can open **Reports**, **Expenses**, and **Chats** (the same **Chats** list is also available from **Inbox**).
-- If no reports exist, the To-do section will prompt you to create one.
+1. In the navigation tabs (on the left on web, on the bottom on mobile), select **Spend**.
+2. In the **Expense reports** section, choose a search shortcut. 
 
-## Employees (Submitters)
-- See **Submit** when they have unsubmitted reports.
-- See a confirmation message (e.g., "All caught up!") when nothing remains.
+Shortcuts include:
 
-## Approvers
-- See **Approve** for reports awaiting their review.
-- See a message like "Nothing left to review" when done.
+- **Drafts** – Reports you need to submit
+- **Needs approval** – Reports awaiting your review
+- **Ready to pay** – Reports ready for reimbursement
 
-## Admins (Payments)
-- See **Pay** for reports ready to reimburse.
-- See a celebratory message (e.g., "All reports paid!") when cleared.
-
-### Admins (Exports)
-- See **Export** for reports eligible for accounting export (e.g., to QuickBooks Online).
-- Filter uses `exported:never` to show only unexported reports.
+Workspace Admins will see additional search shortcuts for reconciliaton in the Accounting section. [Learn how to reconcile expenses with Accounting](articles/new-expensify/reports-and-expenses/Reconcile-Expenses-With-Accounting). 
 
 ---
 
-# Best Practices
+## What happens after you use search shortcuts
 
-- Start with the **To-do** section to prioritize daily report actions.
-- Save your favorite filters or searches for reuse.
-- Use advanced search only when needed for specific cases.
+ - The selected shortcut opens a filtered list of reports
+ - You can take action directly (submit, approve, or pay)
+ - Results update automatically as reports are processed
+
+These shortcuts help you process reports in bulk without manually creating filters.
 
 ---
 
 # FAQ
 
-## What if I don't see the Submit, Approve, Pay or Export options?
+## Can I use search shortcuts across multiple workspaces?
 
-These search shortcuts only appear when:
-- You have reports that require those actions.
-- You have the correct workspace permissions (e.g., Admin, Approver).
+Yes. Search shortcuts on the **Spend** page surface reports across multiple workspaces. Within the results, you can use **Filters** to refine the results. 
 
-## Can I use these searches across multiple workspaces?
+## Do search shortcuts update automatically?
 
-Not yet. The **Workspace filter** is currently single-select. Multi-workspace support is planned for a future update.
+Yes. Search shortcuts update in real time as reports are submitted, approved, paid, or exported.
 
-## What is the difference between Explore and To-do?
+## Can I customize the search shortcuts?
 
-- **Explore** = General browsing (e.g., Expenses, Chats)
-- **To-do** = Personalized actions based on your role (e.g., Submit, Approve, Pay, Export)
+No. Search shortcuts are automatically generated. To create custom searches, [learn how to use search operators](/articles/new-expensify/reports-and-expenses/Using-search-operators). 
