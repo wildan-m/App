@@ -849,11 +849,11 @@ function ReportActionsList({
             <>
                 {!shouldShowReportRecipientLocalTime && !hideComposer && <View style={[styles.stickToBottom, styles.appBG, styles.zIndex10, styles.height4]} />}
                 <StaticReportActionsPreview>
-                    {previewItems.map((action) => (
+                    {previewItems.map((action, index) => (
                         <View key={action.reportActionID}>
                             {renderItem({
                                 item: action,
-                                index: sortedVisibleReportActions.indexOf(action),
+                                index,
                             } as ListRenderItemInfo<OnyxTypes.ReportAction>)}
                         </View>
                     ))}
