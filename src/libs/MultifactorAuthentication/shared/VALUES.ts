@@ -44,6 +44,7 @@ const REASON = {
         /** The scenario does not allow this device's authentication type (e.g. biometrics-only scenario on web, or passkeys-only scenario on mobile). */
         AUTHENTICATION_TYPE_NOT_SUPPORTED: 'Local: Authentication type not supported',
         UNHANDLED_EXCEPTION: 'Local: An unhandled error occurred',
+        UNRECOGNIZED: 'Local: Unrecognized local error',
         CANCELED: 'Local: Flow canceled by user',
         /** No HTTP status code present — typically a network failure, JSON parse error, or unhandled exception in an action function. */
         UNHANDLED_API_RESPONSE: 'Local: Missing HTTP status in API response',
@@ -190,6 +191,7 @@ const ANOMALOUS_FAILURES = new Set<ReasonValue>([
     REASON.SERVER_ERRORS.UNRECOGNIZED,
     REASON.LOCAL_ERRORS.UNHANDLED_API_RESPONSE,
     REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
+    REASON.LOCAL_ERRORS.UNRECOGNIZED,
     REASON.LOCAL_ERRORS.SIGNATURE_MISSING,
     REASON.LOCAL_ERRORS.WEBAUTHN.INVALID_STATE,
     REASON.LOCAL_ERRORS.WEBAUTHN.SECURITY_ERROR,

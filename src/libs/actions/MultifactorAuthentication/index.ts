@@ -136,7 +136,7 @@ async function requestRegistrationChallenge(validateCode: string): Promise<Regis
             Log.hmmm('[MFA] Received non-registration challenge from registration endpoint');
             return {
                 ...parsedResponse,
-                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
+                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNRECOGNIZED,
                 message: 'Invalid registration challenge type: received non-registration challenge',
                 challenge: undefined,
                 publicKeys,
@@ -174,7 +174,7 @@ async function requestAuthorizationChallenge(): Promise<AuthenticationChallengeR
             Log.hmmm('[MFA] Received non-authentication challenge from authorization endpoint');
             return {
                 ...parsedResponse,
-                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNHANDLED_EXCEPTION,
+                reason: CONST.MULTIFACTOR_AUTHENTICATION.REASON.LOCAL_ERRORS.UNRECOGNIZED,
                 message: 'Invalid authorization challenge type: received non-authentication challenge',
                 challenge: undefined,
                 publicKeys,
