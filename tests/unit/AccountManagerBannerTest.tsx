@@ -41,17 +41,15 @@ describe('AccountManagerBanner', () => {
     beforeEach(async () => {
         jest.clearAllMocks();
         await Onyx.clear();
-        await Onyx.multiSet({
-            [ONYXKEYS.CONCIERGE_REPORT_ID]: CONCIERGE_REPORT_ID,
-            [`${ONYXKEYS.COLLECTION.REPORT}${CONCIERGE_REPORT_ID}`]: {
-                reportID: CONCIERGE_REPORT_ID,
-            },
-            [ONYXKEYS.PERSONAL_DETAILS_LIST]: {
-                [ACCOUNT_MANAGER_ACCOUNT_ID]: {
-                    accountID: ACCOUNT_MANAGER_ACCOUNT_ID,
-                    login: ACCOUNT_MANAGER_LOGIN,
-                    displayName: ACCOUNT_MANAGER_DISPLAY_NAME,
-                },
+        await Onyx.merge(ONYXKEYS.CONCIERGE_REPORT_ID, CONCIERGE_REPORT_ID);
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${CONCIERGE_REPORT_ID}`, {
+            reportID: CONCIERGE_REPORT_ID,
+        });
+        await Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+            [ACCOUNT_MANAGER_ACCOUNT_ID]: {
+                accountID: ACCOUNT_MANAGER_ACCOUNT_ID,
+                login: ACCOUNT_MANAGER_LOGIN,
+                displayName: ACCOUNT_MANAGER_DISPLAY_NAME,
             },
         });
     });

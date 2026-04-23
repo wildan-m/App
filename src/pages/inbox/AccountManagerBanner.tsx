@@ -22,9 +22,14 @@ function AccountManagerBanner({reportID}: AccountManagerBannerProps) {
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
-    const accountManagerReportID = account?.accountManagerReportID;
-    const accountManagerAccountID = Number(account?.accountManagerAccountID ?? CONST.DEFAULT_MISSING_ID);
+    const [accountManagerData] = useOnyx(ONYXKEYS.ACCOUNT, {
+        selector: (account) => ({
+            accountManagerReportID: account?.accountManagerReportID,
+            accountManagerAccountID: account?.accountManagerAccountID,
+        }),
+    });
+    const accountManagerReportID = accountManagerData?.accountManagerReportID;
+    const accountManagerAccountID = Number(accountManagerData?.accountManagerAccountID ?? CONST.DEFAULT_MISSING_ID);
     const [participantPersonalDetail] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         selector: personalDetailsSelector(accountManagerAccountID),
     });
