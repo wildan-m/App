@@ -168,11 +168,6 @@ const restrictedReportNameImportPatterns = [
     },
 ];
 
-// `eslint-plugin-you-dont-need-lodash-underscore` is valuable for TypeScript
-// code, but in plain JavaScript Lodash helpers are preferred because they defensively handle
-// nullish/non-array inputs that TypeScript would otherwise catch at compile time
-const disableYouDontNeedLodashUnderscoreRules = Object.fromEntries(Object.keys(youDontNeedLodashUnderscore.rules ?? {}).map((rule) => [`you-dont-need-lodash-underscore/${rule}`, 'off']));
-
 const config = defineConfig([
     expensifyConfig,
     typescriptEslint.configs.recommendedTypeChecked,
@@ -214,13 +209,11 @@ const config = defineConfig([
             'plugin:storybook/recommended',
             'plugin:react-native-a11y/basic',
             'plugin:@dword-design/import-alias/recommended',
-            'plugin:you-dont-need-lodash-underscore/all',
             'prettier',
         ),
 
         plugins: {
             jsdoc,
-            'you-dont-need-lodash-underscore': youDontNeedLodashUnderscore,
             'react-native-a11y': reactNativeA11Y,
             react,
             'testing-library': testingLibrary,
@@ -449,9 +442,6 @@ const config = defineConfig([
 
             // Other rules
             curly: 'error',
-            'you-dont-need-lodash-underscore/throttle': 'off',
-            // The suggested alternative (structuredClone) is not supported in Hermes:https://github.com/facebook/hermes/issues/684
-            'you-dont-need-lodash-underscore/clone-deep': 'off',
             'lodash/import-scope': ['error', 'method'],
             'prefer-regex-literals': 'off',
             'jsdoc/require-param': 'off',
@@ -558,9 +548,9 @@ const config = defineConfig([
             'prefer-arrow-callback': 'off',
 
             // Prefer Lodash helpers (and `import _ from 'lodash'`) in non-TS
-            // files — see `disableYouDontNeedLodashUnderscoreRules` above.
+            // files — they defensively handle nullish/non-array inputs that
+            // TypeScript would otherwise catch at compile time.
             'lodash/import-scope': 'off',
-            ...disableYouDontNeedLodashUnderscoreRules,
         },
     },
 
@@ -587,6 +577,23 @@ const config = defineConfig([
         rules: {
             'rulesdir/prefer-at': 'error',
             'rulesdir/boolean-conditional-rendering': 'error',
+        },
+    },
+
+    // `eslint-plugin-you-dont-need-lodash-underscore` steers code toward native
+    // JS equivalents of Lodash helpers. In TypeScript we want that guidance
+    // because TS catches the nullish/non-array edge cases Lodash papers over;
+    // in plain JS we prefer the Lodash helpers, so this plugin is TS/TSX-only.
+    {
+        files: ['**/*.ts', '**/*.tsx'],
+        extends: new FlatCompat({baseDirectory: projectRoot}).extends('plugin:you-dont-need-lodash-underscore/all'),
+        plugins: {
+            'you-dont-need-lodash-underscore': youDontNeedLodashUnderscore,
+        },
+        rules: {
+            'you-dont-need-lodash-underscore/throttle': 'off',
+            // The suggested alternative (structuredClone) is not supported in Hermes:https://github.com/facebook/hermes/issues/684
+            'you-dont-need-lodash-underscore/clone-deep': 'off',
         },
     },
 
