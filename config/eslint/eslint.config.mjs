@@ -171,9 +171,7 @@ const restrictedReportNameImportPatterns = [
 // `eslint-plugin-you-dont-need-lodash-underscore` is valuable for TypeScript
 // code, but in plain JavaScript Lodash helpers are preferred because they defensively handle
 // nullish/non-array inputs that TypeScript would otherwise catch at compile time
-const disableYouDontNeedLodashUnderscoreRules = Object.fromEntries(
-    Object.keys(youDontNeedLodashUnderscore.rules ?? {}).map((rule) => [`you-dont-need-lodash-underscore/${rule}`, 'off']),
-);
+const disableYouDontNeedLodashUnderscoreRules = Object.fromEntries(Object.keys(youDontNeedLodashUnderscore.rules ?? {}).map((rule) => [`you-dont-need-lodash-underscore/${rule}`, 'off']));
 
 const config = defineConfig([
     expensifyConfig,
