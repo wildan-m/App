@@ -9,7 +9,7 @@ internalScope: Audience is Workspace Admins. Covers using the Accounting section
 
 The **Accounting** search shortcuts on the **Spend** page bring together the expense views you need to reconcile your records and close your books. It helps you identify what’s ready to export, what still needs attention, and what should be matched against statements or bank data.
 
-Workspace Admins can use these shortcuts to validate totals, track liabilities, and ensure your expenses align withaccounting records before and after export.
+Workspace Admins can use these shortcuts to validate totals, track liabilities, and ensure your expenses align with accounting records before and after export.
 
 ---
 
