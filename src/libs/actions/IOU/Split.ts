@@ -99,6 +99,7 @@ import {
     getAllTransactions,
     getMoneyRequestInformation,
     getMoneyRequestParticipantsFromReport,
+    getMoneyRequestPolicyTags,
     getOrCreateOptimisticSplitChatReport,
     getReceiptError,
     getReportPreviewAction,
@@ -142,6 +143,7 @@ type UpdateSplitTransactionsParams = {
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     transactionReport: OnyxEntry<OnyxTypes.Report>;
     expenseReport: OnyxEntry<OnyxTypes.Report>;
+    isOffline: boolean;
 };
 
 type SplitBillActionsParams = {
@@ -1081,6 +1083,7 @@ function updateSplitTransactions({
     personalDetails,
     transactionReport,
     expenseReport,
+    isOffline,
 }: UpdateSplitTransactionsParams) {
     const chatReport = allReportsList?.[`${ONYXKEYS.COLLECTION.REPORT}${expenseReport?.chatReportID}`];
     const expenseReportParentChat = getReportOrDraftReport(chatReport?.parentReportID);
@@ -1155,7 +1158,7 @@ function updateSplitTransactions({
         const customUnitRate = getDistanceRateCustomUnitRate(policy, customUnitRateID);
 
         // If the rate doesn't exist or is disabled, show an error and return early
-        if (!customUnitRate || !customUnitRate.enabled) {
+        if (!customUnitRate?.enabled) {
             // Show error to user
             Onyx.merge(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${originalTransactionID}`, {
                 errors: getMicroSecondOnyxErrorWithTranslationKey('iou.error.invalidRate'),
@@ -1401,7 +1404,11 @@ function updateSplitTransactions({
         } = getMoneyRequestInformation({
             participantParams,
             parentChatReport,
-            policyParams,
+            policyParams: {
+                ...policyParams,
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                policyTagList: getMoneyRequestPolicyTags({moneyRequestReportID: splitExpense?.reportID, parentChatReport, participant: participantParams.participant}),
+            },
             transactionParams,
             moneyRequestReportID: splitExpense?.reportID,
             existingTransaction,
@@ -1484,6 +1491,7 @@ function updateSplitTransactions({
                     isASAPSubmitBetaEnabled,
                     iouReportNextStep,
                     isSplitTransaction: true,
+                    isOffline,
                 });
                 if (currentSplit) {
                     currentSplit.modifiedExpenseReportActionID = params.reportActionID;
@@ -1950,11 +1958,10 @@ function updateSplitTransactions({
             },
         });
 
-        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
         onyxData.failureData?.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`,
-            value: originalTransaction,
+            value: originalTransaction ?? null,
         });
 
         if (firstIOU) {
