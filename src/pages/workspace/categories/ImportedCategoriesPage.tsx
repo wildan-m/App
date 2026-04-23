@@ -105,7 +105,12 @@ function ImportedCategoriesPage({route}: ImportedCategoriesPageProps) {
             const existingGLCodeOrDefault = categoryAlreadyExists?.['GL Code'] ?? '';
             return {
                 name,
-                enabled: categoriesEnabledColumn !== -1 ? String(categoriesEnabled?.[containsHeader ? index + 1 : index]).toLowerCase() === 'true' : true,
+                enabled:
+                    categoriesEnabledColumn !== -1
+                        ? String(categoriesEnabled?.[containsHeader ? index + 1 : index])
+                              .trim()
+                              .toLowerCase() === 'true'
+                        : true,
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 'GL Code': categoriesGLCodeColumn !== -1 ? (categoriesGLCode?.[containsHeader ? index + 1 : index] ?? '') : existingGLCodeOrDefault,
             };
