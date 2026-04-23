@@ -1,6 +1,6 @@
 # Linting
 
-The App is linted with [ESLint](https://eslint.org) and its configuration lives in [`config/eslint/`](../config/eslint/). The single source of truth is [`config/eslint/eslint.config.mjs`](../config/eslint/eslint.config.mjs) — every other file in that directory (plugins, processors, the seatbelt baseline) is wired up from there. A one-line shim at the repo root ([`eslint.config.mjs`](../eslint.config.mjs)) re-exports it so ESLint's flat-config autodiscovery (used by `npx eslint`, the VS Code / Cursor ESLint extension, JetBrains, etc.) finds it without any configuration.
+The App is linted with [ESLint](https://eslint.org) and its configuration lives in [`config/eslint/`](../config/eslint/). The main source of truth is [`config/eslint/eslint.config.mjs`](../config/eslint/eslint.config.mjs) — every other file in that directory (plugins, processors, the seatbelt baseline) is wired up from there.
 
 ## TL;DR
 
@@ -18,15 +18,12 @@ npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
 npm run lint-watch
 ```
 
-All four entry points share the same config, the same on-disk cache at `node_modules/.cache/eslint`, and the same [seatbelt baseline](#mental-model) — they only differ in which paths ESLint is pointed at. That means an incremental `npm run lint-changed` during development will happily decrement the baseline in [`config/eslint/eslint.seatbelt.tsv`](../config/eslint/eslint.seatbelt.tsv) when you fix an error, exactly like a full `npm run lint` would.
+Prefer `npm run lint` (or `lint-changed` / `lint -- <files>`) over raw `npx eslint` invocations. Those wrappers increase the memory allocation to prevent OOM errors, and also include caching and concurrency flags for faster linting.
 
-Prefer `npm run lint` (or `lint-changed` / `lint -- <files>`) over raw `npx eslint` invocations. Those wrappers set the repo's memory ceiling (`NODE_OPTIONS=--max_old_space_size=8192`), the shared content-addressed cache, and `--concurrency=auto`. Calling `npx eslint` directly silently drops all of those — you'll OOM on anything non-trivial and you won't share cache state with the rest of the repo. The single source of truth for the flags is [`scripts/lint.sh`](../scripts/lint.sh).
+## eslint-seatbelt
+We use [eslint-seatbelt](https://github.com/justjake/eslint-seatbelt) to manage known lint errors.
 
-Every rule is configured as `error`. If `npm run lint` exits non-zero locally, CI will fail too — fix the reported errors before opening a PR.
-
-## Mental model
-
-1. **Every rule is an error.** There is no `warning` tier. If ESLint reports an issue, it's something we expect to be fixed.
+1. **Every rule is an error.** There are no warnings.
 2. **Pre-existing errors are grandfathered in via [`eslint-seatbelt`](https://github.com/justjake/eslint-seatbelt).** A per-file / per-rule baseline lives at [`config/eslint/eslint.seatbelt.tsv`](../config/eslint/eslint.seatbelt.tsv). As long as a file's error count for a given rule is **≤** its recorded baseline, seatbelt reclassifies those errors as warnings and the run still passes.
 3. **The baseline is a ratchet.** The count can only go down over time — never up — unless you (and a reviewer) explicitly allow an increase.
 4. **You never hand-edit `eslint.seatbelt.tsv`.** Seatbelt rewrites it deterministically based on what it sees during a lint run.
@@ -47,11 +44,6 @@ If you're iterating specifically on a CI failure and you already know which file
 npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
 ```
 
-Either way, if the command exits 0, you're good. If it reports errors:
-
-- **Real error in code you just wrote** → fix it.
-- **Pre-existing error in a file you touched** → see the next section.
-
 ### "I fixed an existing baselined error"
 
 Just run `npm run lint` (or `npm run lint-changed`) locally. Seatbelt notices the count went down, rewrites `config/eslint/eslint.seatbelt.tsv` to reflect the lower count, and prints something like:
@@ -60,7 +52,7 @@ Just run `npm run lint` (or `npm run lint-changed`) locally. Seatbelt notices th
 [eslint-seatbelt]: File src/foo.ts has 2 errors of rule @typescript-eslint/no-deprecated, but the seatbelt file allows 3. Decreasing the allowed error count to 2.
 ```
 
-Commit the updated `eslint.seatbelt.tsv` alongside your fix. CI will later verify the count really did drop (see [CI behavior](#ci-behavior)).
+Commit the updated `eslint.seatbelt.tsv` alongside your fix.
 
 ### "I added a new error and can't easily fix it right now"
 
@@ -72,17 +64,14 @@ The default assumption is that you fix it. If you genuinely need to land code th
     ```bash
     # Allow the new count for one rule:
     SEATBELT_INCREASE=@typescript-eslint/no-deprecated npm run lint
-
-    # Or for every rule (sledgehammer — use only for first-time rule rollouts):
-    SEATBELT_INCREASE=ALL npm run lint
     ```
 
-   Both variants rewrite `config/eslint/eslint.seatbelt.tsv`. **Always commit the diff alongside your code**, and expect a reviewer to ask you why a fix wasn't feasible.
+   That will modify `config/eslint/eslint.seatbelt.tsv`. **Always commit the diff alongside your code**, and expect a reviewer to ask you why a fix wasn't feasible.
 
 ### "I'm enabling a new rule repo-wide"
 
 1. Add the rule to `config/eslint/eslint.config.mjs` in `'error'` mode.
-2. Bake the initial baseline:
+2. Save the initial baseline:
 
     ```bash
     SEATBELT_INCREASE=<rule-id> npm run lint
@@ -112,18 +101,9 @@ Set any of these env vars for a one-off local run when you need to bypass seatbe
 
 Full reference: [eslint-seatbelt README](https://github.com/justjake/eslint-seatbelt#configuration).
 
-## How the config is wired
-
-[`config/eslint/eslint.config.mjs`](../config/eslint/eslint.config.mjs) is a standard ESLint v9 flat config. Notable local pieces:
-
-- **`config/eslint/plugins/eslint-plugin-report-name-utils.mjs`** — tiny in-house plugin that enforces the `computeReportName` import boundary.
-- **`config/eslint/processors/eslint-processor-react-compiler-compat.mjs`** — suppresses `react-hooks/*` / `react-you-might-not-need-an-effect/*` rules on files that compile cleanly with React Compiler (which already enforces a superset of those rules at build time). See [REACT_COMPILER.md](./REACT_COMPILER.md).
-- **`config/eslint/processors/eslint-processor-expensify.mjs`** — stitches the React Compiler compat processor and the `eslint-seatbelt` processor together so a single `processor:` entry in the config covers both.
-
-There is also a patch on top of `eslint-seatbelt` at `patches/eslint-seatbelt/` that makes its file writes thread-safe under ESLint's `--concurrency=auto`. See [`patches/eslint-seatbelt/details.md`](../patches/eslint-seatbelt/details.md). Nothing you need to think about day to day; it "just works".
-
 ## Related reading
 
+- [Racheting errors](https://www.notion.com/blog/how-we-evolved-our-code-notions-ratcheting-system-using-custom-eslint-rules).
 - [`CONSISTENCY-5`: Justify ESLint rule disables](../.claude/skills/coding-standards/rules/consistency-5-justify-eslint-disable.md) — when `eslint-disable` is acceptable, and how to document it.
 - [`CLEAN-REACT-PATTERNS-0`: React Compiler compliance](../.claude/skills/coding-standards/rules/clean-react-0-compiler.md) — why some hook-related rules are suppressed per-file.
 - [`STYLE.md`](./STYLE.md) — the coding style rules many of our ESLint rules enforce.
