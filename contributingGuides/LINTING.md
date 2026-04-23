@@ -114,7 +114,7 @@ Full reference: [eslint-seatbelt README](https://github.com/justjake/eslint-seat
 
 ## Related reading
 
-- [Racheting errors](https://www.notion.com/blog/how-we-evolved-our-code-notions-ratcheting-system-using-custom-eslint-rules).
+- [Ratcheting errors](https://www.notion.com/blog/how-we-evolved-our-code-notions-ratcheting-system-using-custom-eslint-rules).
 - [`CONSISTENCY-5`: Justify ESLint rule disables](../.claude/skills/coding-standards/rules/consistency-5-justify-eslint-disable.md) — when `eslint-disable` is acceptable, and how to document it.
 - [`CLEAN-REACT-PATTERNS-0`: React Compiler compliance](../.claude/skills/coding-standards/rules/clean-react-0-compiler.md) — why some hook-related rules are suppressed per-file.
 - [`STYLE.md`](./STYLE.md) — the coding style rules many of our ESLint rules enforce.
