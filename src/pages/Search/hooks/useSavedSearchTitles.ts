@@ -1,47 +1,21 @@
 import {useDeferredValue} from 'react';
 import {buildSearchQueryJSON, buildUserReadableQueryString} from '@libs/SearchQueryUtils';
+import type {BuildUserReadableQueryStringParams} from '@libs/SearchQueryUtils';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 
 type SavedSearchCollection = Record<string, SaveSearchItem>;
-type UserReadableQueryParams = Parameters<typeof buildUserReadableQueryString>[0];
 
-type SavedSearchTitlesHookParams = {
+type SavedSearchTitlesHookParams = Omit<BuildUserReadableQueryStringParams, 'queryJSON' | 'autoCompleteWithSpace'> & {
     savedSearches: SavedSearchCollection | undefined;
-    personalDetails: UserReadableQueryParams['PersonalDetails'];
-    reports: UserReadableQueryParams['reports'];
-    taxRates: UserReadableQueryParams['taxRates'];
-    cardsForSavedSearchDisplay: UserReadableQueryParams['cardList'];
-    allFeeds: UserReadableQueryParams['cardFeeds'];
-    allPolicies: UserReadableQueryParams['policies'];
-    currentUserAccountID: number;
-    translate: UserReadableQueryParams['translate'];
-    feedKeysWithCards: UserReadableQueryParams['feedKeysWithCards'];
-    reportAttributes: UserReadableQueryParams['reportAttributes'];
     enabled?: boolean;
 };
 
-function useSavedSearchTitles({
-    savedSearches,
-    personalDetails,
-    reports,
-    taxRates,
-    cardsForSavedSearchDisplay,
-    allFeeds,
-    allPolicies,
-    currentUserAccountID,
-    translate,
-    feedKeysWithCards,
-    reportAttributes,
-    enabled = true,
-}: SavedSearchTitlesHookParams): Map<string, string> {
-    const deferredReports = useDeferredValue(reports);
-    const deferredPolicies = useDeferredValue(allPolicies);
-    const deferredPersonalDetails = useDeferredValue(personalDetails);
-    const deferredReportAttributes = useDeferredValue(reportAttributes);
-    const deferredTaxRates = useDeferredValue(taxRates);
-    const deferredCardsForSavedSearchDisplay = useDeferredValue(cardsForSavedSearchDisplay);
-    const deferredAllFeeds = useDeferredValue(allFeeds);
-    const deferredFeedKeysWithCards = useDeferredValue(feedKeysWithCards);
+function useSavedSearchTitles({savedSearches, translate, enabled = true, ...rest}: SavedSearchTitlesHookParams): Map<string, string> {
+    // `savedSearches` and `translate` are intentionally excluded from the deferred object.
+    // `savedSearches` drives which items appear in the list — deferring it would cause a flash
+    // `translate` is a stable function reference that never triggers heavy re-computation on its own.
+    const deferredRest = useDeferredValue(rest);
+    const {PersonalDetails, reports, taxRates, cardList, cardFeeds, policies, currentUserAccountID, feedKeysWithCards, reportAttributes} = deferredRest;
 
     const titles = new Map<string, string>();
 
@@ -61,17 +35,17 @@ function useSavedSearchTitles({
 
         const title = buildUserReadableQueryString({
             queryJSON: itemJsonQuery,
-            PersonalDetails: deferredPersonalDetails,
-            reports: deferredReports,
-            taxRates: deferredTaxRates,
-            cardList: deferredCardsForSavedSearchDisplay,
-            cardFeeds: deferredAllFeeds,
-            policies: deferredPolicies,
+            PersonalDetails,
+            reports,
+            taxRates,
+            cardList,
+            cardFeeds,
+            policies,
             currentUserAccountID,
             autoCompleteWithSpace: false,
             translate,
-            feedKeysWithCards: deferredFeedKeysWithCards,
-            reportAttributes: deferredReportAttributes,
+            feedKeysWithCards,
+            reportAttributes,
         });
         titles.set(item.query, title);
     }

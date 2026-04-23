@@ -120,12 +120,12 @@ function SavedSearchList({hash}: SavedSearchListProps) {
 
     const savedSearchTitles = useSavedSearchTitles({
         savedSearches,
-        personalDetails,
+        PersonalDetails: personalDetails,
         reports,
         taxRates,
-        cardsForSavedSearchDisplay,
-        allFeeds,
-        allPolicies,
+        cardList: cardsForSavedSearchDisplay,
+        cardFeeds: allFeeds,
+        policies: allPolicies,
         currentUserAccountID,
         translate,
         feedKeysWithCards,

@@ -93,12 +93,12 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
     const cardsForSavedSearchDisplay = mergeCardListWithWorkspaceFeeds(workspaceCardList ?? CONST.EMPTY_OBJECT, cardList);
     const savedSearchTitles = useSavedSearchTitles({
         savedSearches,
-        personalDetails,
+        PersonalDetails: personalDetails,
         reports,
         taxRates,
-        cardsForSavedSearchDisplay,
-        allFeeds,
-        allPolicies,
+        cardList: cardsForSavedSearchDisplay,
+        cardFeeds: allFeeds,
+        policies: allPolicies,
         currentUserAccountID,
         translate,
         feedKeysWithCards,
