@@ -195,6 +195,11 @@ const config = defineConfig([
             seatbelt: {
                 seatbeltFile: new URL('./eslint.seatbelt.tsv', import.meta.url).pathname,
                 threadsafe: true,
+                // Never persist TSV updates unless we're in CI. In CI, the ephemeral
+                // write is harmless on PR runs and essential on `push: main`, where
+                // OSBotify commits the tightened baseline back to main
+                // (see .github/workflows/lint.yml). SEATBELT_INCREASE overrides this.
+                readOnly: !process.env.CI,
             },
         },
         plugins: {
