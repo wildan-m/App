@@ -28,20 +28,8 @@ function SearchPage({route}: SearchPageProps) {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
+    useDocumentTitle(translate('common.spend'));
     const {selectedTransactions, lastSearchType, areAllMatchingItemsSelected, currentSearchKey, currentSearchResults, currentSearchQueryJSON} = useSearchStateContext();
-
-    const searchType = currentSearchQueryJSON?.type;
-    let documentTitle = translate('common.spend');
-    if (searchType === CONST.SEARCH.DATA_TYPES.TASK) {
-        documentTitle = translate('common.tasks');
-    } else if (searchType === CONST.SEARCH.DATA_TYPES.TRIP) {
-        documentTitle = translate('travel.trips');
-    } else if (searchType === CONST.SEARCH.DATA_TYPES.INVOICE) {
-        documentTitle = translate('workspace.common.invoices');
-    } else if (searchType === CONST.SEARCH.DATA_TYPES.CHAT) {
-        documentTitle = translate('common.chats');
-    }
-    useDocumentTitle(documentTitle);
     const {clearSelectedTransactions, setLastSearchType} = useSearchActionsContext();
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
