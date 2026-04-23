@@ -25,7 +25,8 @@ import {
     getCustomTaxNameUpdateMessage,
     getForeignCurrencyDefaultTaxUpdateMessage,
     getHumanAgentAccountIDFromReportAction,
-    getHumanAgentDisplayName,
+    getHumanAgentFirstName,
+    getIntegrationSyncFailedMessage,
     getInvoiceCompanyNameUpdateMessage,
     getInvoiceCompanyWebsiteUpdateMessage,
     getOneTransactionThreadReportID,
@@ -5047,6 +5048,69 @@ describe('ReportActionsUtils', () => {
         });
     });
 
+    describe('getIntegrationSyncFailedMessage', () => {
+        const testPolicyID = 'test-policy-123';
+
+        it('should render message without recurrence text when recurrenceCount is absent', () => {
+            const action = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.INTEGRATION_SYNC_FAILED,
+                reportActionID: 'sync-fail-1',
+                actorAccountID: 1,
+                created: '2024-01-01',
+                message: [],
+                originalMessage: {
+                    label: 'QuickBooks Online',
+                    source: 'NEWEXPENSIFY',
+                    errorMessage: 'Auth token expired',
+                },
+            } as ReportAction;
+
+            const result = getIntegrationSyncFailedMessage(translateLocal, action, testPolicyID);
+            expect(result).toContain('Auth token expired');
+            expect(result).not.toContain('Repeated');
+        });
+
+        it('should append recurrence text when recurrenceCount > 1', () => {
+            const action = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.INTEGRATION_SYNC_FAILED,
+                reportActionID: 'sync-fail-2',
+                actorAccountID: 1,
+                created: '2024-01-01',
+                message: [],
+                originalMessage: {
+                    label: 'NetSuite',
+                    source: 'AUTOSYNC',
+                    errorMessage: 'Login Error',
+                    recurrenceCount: 3,
+                },
+            } as ReportAction;
+
+            const result = getIntegrationSyncFailedMessage(translateLocal, action, testPolicyID);
+            expect(result).toContain('Login Error');
+            expect(result).toContain('Repeated 3 times');
+        });
+
+        it('should not append recurrence text when recurrenceCount is 1', () => {
+            const action = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.INTEGRATION_SYNC_FAILED,
+                reportActionID: 'sync-fail-3',
+                actorAccountID: 1,
+                created: '2024-01-01',
+                message: [],
+                originalMessage: {
+                    label: 'Xero',
+                    source: 'NEWEXPENSIFY',
+                    errorMessage: 'Rate limit',
+                    recurrenceCount: 1,
+                },
+            } as ReportAction;
+
+            const result = getIntegrationSyncFailedMessage(translateLocal, action, testPolicyID);
+            expect(result).toContain('Rate limit');
+            expect(result).not.toContain('Repeated');
+        });
+    });
+
     describe('getHumanAgentAccountIDFromReportAction', () => {
         const HUMAN_AGENT_ACCOUNT_ID = 12345;
 
@@ -5105,7 +5169,7 @@ describe('ReportActionsUtils', () => {
         });
     });
 
-    describe('getHumanAgentDisplayName', () => {
+    describe('getHumanAgentFirstName', () => {
         const HUMAN_AGENT_ACCOUNT_ID = 54321;
 
         function makeConciergeAction(originalMessageOverrides: Record<string, unknown> = {}): ReportAction {
@@ -5122,10 +5186,11 @@ describe('ReportActionsUtils', () => {
             };
         }
 
-        function makePersonalDetails(displayName: string | undefined): PersonalDetailsList {
+        function makePersonalDetails(firstName: string | undefined, displayName = 'Pat Agent'): PersonalDetailsList {
             return {
                 [HUMAN_AGENT_ACCOUNT_ID]: {
                     accountID: HUMAN_AGENT_ACCOUNT_ID,
+                    firstName,
                     displayName,
                 },
             };
@@ -5133,32 +5198,32 @@ describe('ReportActionsUtils', () => {
 
         it('returns undefined when there is no human agent on the action', () => {
             const action = makeConciergeAction();
-            expect(getHumanAgentDisplayName(action, makePersonalDetails('Pat Agent'))).toBeUndefined();
+            expect(getHumanAgentFirstName(action, makePersonalDetails('Pat'))).toBeUndefined();
         });
 
-        it('returns the agent displayName when available', () => {
+        it('returns the agent firstName (not the full displayName) when available', () => {
             const action = makeConciergeAction({humanAgentAccountID: HUMAN_AGENT_ACCOUNT_ID});
-            expect(getHumanAgentDisplayName(action, makePersonalDetails('Pat Agent'))).toBe('Pat Agent');
+            expect(getHumanAgentFirstName(action, makePersonalDetails('Pat', 'Pat Agent'))).toBe('Pat');
         });
 
         it('returns undefined when personalDetails has no entry for the agent', () => {
             const action = makeConciergeAction({humanAgentAccountID: HUMAN_AGENT_ACCOUNT_ID});
-            expect(getHumanAgentDisplayName(action, {})).toBeUndefined();
+            expect(getHumanAgentFirstName(action, {})).toBeUndefined();
         });
 
         it('returns undefined when personalDetails are not loaded yet', () => {
             const action = makeConciergeAction({humanAgentAccountID: HUMAN_AGENT_ACCOUNT_ID});
-            expect(getHumanAgentDisplayName(action, undefined)).toBeUndefined();
+            expect(getHumanAgentFirstName(action, undefined)).toBeUndefined();
         });
 
-        it('returns undefined when the agent displayName is an empty string so the generic fallback can be used', () => {
+        it('returns undefined when the agent firstName is an empty string so the generic fallback can be used', () => {
             const action = makeConciergeAction({humanAgentAccountID: HUMAN_AGENT_ACCOUNT_ID});
-            expect(getHumanAgentDisplayName(action, makePersonalDetails(''))).toBeUndefined();
+            expect(getHumanAgentFirstName(action, makePersonalDetails(''))).toBeUndefined();
         });
 
-        it('returns undefined when the agent displayName is only whitespace so the generic fallback can be used', () => {
+        it('returns undefined when the agent firstName is only whitespace so the generic fallback can be used', () => {
             const action = makeConciergeAction({humanAgentAccountID: HUMAN_AGENT_ACCOUNT_ID});
-            expect(getHumanAgentDisplayName(action, makePersonalDetails('   '))).toBeUndefined();
+            expect(getHumanAgentFirstName(action, makePersonalDetails('   '))).toBeUndefined();
         });
     });
 });
