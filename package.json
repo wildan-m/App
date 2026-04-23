@@ -46,7 +46,6 @@
     "typecheck": "NODE_OPTIONS=--max_old_space_size=8192 tsc",
     "typecheck-tsgo": "tsgo --noEmit --incremental --tsBuildInfoFile tsconfig.tsgo.tsbuildinfo",
     "lint": "NODE_OPTIONS=--max_old_space_size=8192 eslint . --config ./config/eslint/eslint.config.mjs --cache --cache-location=node_modules/.cache/eslint --cache-strategy content --concurrency=auto",
-    "lint-changed": "NODE_OPTIONS=--max_old_space_size=8192 ./scripts/lintChanged.sh",
     "lint-watch": "npx eslint-watch --watch --changed --config ./config/eslint/eslint.config.mjs",
     "shellcheck": "./scripts/shellCheck.sh",
     "spell": "cspell --color **/*",

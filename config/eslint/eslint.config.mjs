@@ -160,6 +160,14 @@ const restrictedImportPatterns = [
     },
 ];
 
+const restrictedReportNameImportPatterns = [
+    {
+        group: ['**/ReportNameUtils', '**/libs/ReportNameUtils'],
+        importNames: ['computeReportName'],
+        message: 'Do not import computeReportName. Use getReportName instead, which properly uses derived report attributes.',
+    },
+];
+
 const config = defineConfig([
     expensifyConfig,
     typescriptEslint.configs.recommendedTypeChecked,
@@ -296,7 +304,7 @@ const config = defineConfig([
             // ESLint core rules
             'es/no-nullish-coalescing-operators': 'off',
             'es/no-optional-chaining': 'off',
-            '@typescript-eslint/no-deprecated': 'off',
+            '@typescript-eslint/no-deprecated': 'error',
             'arrow-body-style': 'off',
             'no-continue': 'off',
 
@@ -321,6 +329,8 @@ const config = defineConfig([
                     ],
                 },
             ],
+            'rulesdir/no-default-id-values': 'error',
+            'rulesdir/no-unstable-hook-defaults': 'error',
 
             // React and React Native specific rules
             'react-native-a11y/has-accessibility-hint': ['off'],
@@ -363,6 +373,27 @@ const config = defineConfig([
                     selector: 'CallExpression[callee.name="getUrlWithBackToParam"]',
                     message:
                         'Usage of getUrlWithBackToParam function is prohibited. This is legacy code and no new occurrences should be added. Please look into the `How to remove backTo from URL` section in contributingGuides/NAVIGATION.md. and use alternative routing methods instead.',
+                },
+                {
+                    selector: 'ImportNamespaceSpecifier[parent.source.value=/^@libs/]',
+                    message: 'Namespace imports from @libs are not allowed. Use named imports instead. Example: import { method } from "@libs/module"',
+                },
+                {
+                    selector: 'ImportNamespaceSpecifier[parent.source.value=/^@userActions/]',
+                    message: 'Namespace imports from @userActions are not allowed. Use named imports instead. Example: import { action } from "@userActions/module"',
+                },
+                {
+                    selector: 'ImportNamespaceSpecifier[parent.source.value=/^\\.\\./]',
+                    message: 'Namespace imports from parent directories are not allowed. Use named imports instead. Example: import { method } from "../libs/module"',
+                },
+                {
+                    selector: 'ImportNamespaceSpecifier[parent.source.value=/^\\./]',
+                    message: 'Namespace imports from sibling modules are not allowed. Use named imports instead. Example: import { method } from "./libs/module"',
+                },
+                {
+                    selector:
+                        'JSXElement[openingElement.name.name=/^Pressable(WithoutFeedback|WithFeedback|WithDelayToggle|WithoutFocus)$/]:not(:has(JSXAttribute[name.name="sentryLabel"]))',
+                    message: 'All Pressable components must include sentryLabel prop for Sentry tracking. Example: <PressableWithoutFeedback sentryLabel="MoreMenu-ExportFile" />',
                 },
 
                 // These are the original rules from AirBnB's style guide, modified to allow for...of loops and for...in loops
@@ -614,6 +645,24 @@ const config = defineConfig([
         files: ['src/libs/ReportNameUtils.ts'],
         plugins: {'report-name-utils': reportNameUtilsPlugin},
         rules: {'report-name-utils/no-function-call-in-get-report-name': 'error'},
+    },
+
+    // Restrict `computeReportName` imports everywhere except the one file that
+    // legitimately consumes it. This block overrides the main `no-restricted-imports`
+    // for ts/tsx files, so we re-apply the main `restrictedImportPaths`/`restrictedImportPatterns`
+    // here too (flat config is last-wins per rule, not additive).
+    {
+        files: ['**/*.ts', '**/*.tsx'],
+        ignores: ['src/libs/actions/OnyxDerived/configs/reportAttributes.ts'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: restrictedImportPaths,
+                    patterns: [...restrictedImportPatterns, ...restrictedReportNameImportPatterns],
+                },
+            ],
+        },
     },
 
     {
