@@ -1,7 +1,7 @@
 ---
 title: Use Search Shortcuts on the Spend Page
 description: Quickly find and take action on expense reports using role-based search shortcuts on the Spend page.
-keywords: [New Expensify, search, shortcut, Spend page, expense reports filters, submit, approve, pay, in bulk, multiple reports].
+keywords: [New Expensify, search, shortcut, Spend page, expense reports filters, submit, approve, pay, in bulk, multiple reports]
 internalScope: Audience is all members. Covers using search shortcuts on the Spend page. Does not cover advanced search operators or saved searches. 
 ---
 
@@ -34,7 +34,7 @@ Shortcuts include:
 - **Needs approval** – Reports awaiting your review
 - **Ready to pay** – Reports ready for reimbursement
 
-Workspace Admins will see additional search shortcuts for reconciliaton in the Accounting section. [Learn how to reconcile expenses with Accounting](articles/new-expensify/reports-and-expenses/Reconcile-Expenses-With-Accounting). 
+Workspace Admins will see additional search shortcuts for reconciliation in the Accounting section. [Learn how to reconcile expenses with Accounting](/articles/new-expensify/reports-and-expenses/Reconcile-Expenses-With-Accounting). 
 
 ---
 
