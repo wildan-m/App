@@ -2,15 +2,6 @@ name: ESLint check
 
 on:
   workflow_call:
-    secrets:
-      OS_BOTIFY_COMMIT_TOKEN:
-        required: false
-      OS_BOTIFY_APP_ID:
-        required: false
-      OS_BOTIFY_PRIVATE_KEY:
-        required: false
-      OP_SERVICE_ACCOUNT_TOKEN:
-        required: false
   pull_request:
     types: [opened, synchronize]
     branches-ignore: [staging, production]
@@ -31,7 +22,6 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           # OSBotify token lets the auto-commit step below push to the protected `main` branch.
-          # Safe to pass unconditionally; it's only used when the push-on-main auto-commit step runs.
           token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN }}
 
       - name: Setup Node
