@@ -177,7 +177,7 @@ const config = defineConfig([
     // Suppress lint rules that are unnecessary for files successfully compiled by React Compiler.
     // The processor runs React Compiler on each file and filters out redundant lint messages.
     {
-        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         processor: expensifyProcessor,
     },
 
@@ -234,7 +234,7 @@ const config = defineConfig([
             reportUnusedDisableDirectives: 'off',
         },
 
-        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         rules: {
             '@lwc/lwc/no-async-await': 'off',
 
@@ -475,7 +475,7 @@ const config = defineConfig([
 
     // Some rules became stricter or stopped working after upgrading to ESLint 9, so these configs adjust the rules to match the old behavior.
     {
-        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+        files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         rules: {
             // @typescript-eslint/lines-between-class-members was moved to @stylistic/eslint-plugin, so replaced with lines-between-class-members.
             'lines-between-class-members': 'error',
@@ -549,6 +549,17 @@ const config = defineConfig([
             'react/jsx-filename-extension': 'off',
             'rulesdir/no-default-props': 'off',
             'prefer-arrow-callback': 'off',
+        },
+    },
+
+    // Node.js ESM requires relative imports to include a file extension (unlike
+    // bundled `.js`/`.ts`, which are resolved by webpack/metro). Relax the
+    // airbnb-inherited `import/extensions` rule for `.mjs`/`.cjs` so it stops
+    // flagging legitimate ESM imports like `import x from './foo.mjs'`.
+    {
+        files: ['**/*.mjs', '**/*.cjs'],
+        rules: {
+            'import/extensions': 'off',
         },
     },
 
