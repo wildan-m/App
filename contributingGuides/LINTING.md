@@ -26,7 +26,21 @@ We use [eslint-seatbelt](https://github.com/justjake/eslint-seatbelt) to manage 
 1. **Every rule is an error.** There are no warnings.
 2. **Pre-existing errors are grandfathered in via [`eslint-seatbelt`](https://github.com/justjake/eslint-seatbelt).** A per-file / per-rule baseline lives at [`config/eslint/eslint.seatbelt.tsv`](../config/eslint/eslint.seatbelt.tsv). As long as a file's error count for a given rule is **≤** its recorded baseline, seatbelt reclassifies those errors as warnings and the run still passes.
 3. **The baseline is a ratchet.** The count can only go down over time — never up — unless you (and a reviewer) explicitly allow an increase.
-4. **You never hand-edit `eslint.seatbelt.tsv`.** Seatbelt rewrites it deterministically based on what it sees during a lint run.
+4. **The baseline auto-tightens on `main`.** When a PR merges, the lint job on `main` rewrites `eslint.seatbelt.tsv` to reflect the new (lower) counts and commits it back as OSBotify. You don't need to commit TSV updates yourself during normal development.
+5. **You never hand-edit `eslint.seatbelt.tsv`.** Seatbelt rewrites it deterministically based on what it sees during a lint run.
+
+### Mental model: what happens to `eslint.seatbelt.tsv`
+
+| Scenario                                                     | TSV rewritten locally? | Lint result                                                |
+| ------------------------------------------------------------ | ---------------------- | ---------------------------------------------------------- |
+| Counts go down (you fixed a baselined error)                 | No (read-only mode)    | Passes                                                     |
+| Counts go up without `SEATBELT_INCREASE`                     | No                     | Fails                                                      |
+| `SEATBELT_INCREASE=<rule>` locally (intentional loosening)   | Yes                    | Passes; commit the TSV diff alongside your change          |
+| PR CI, counts go down                                        | Yes (ephemeral)        | Passes; `main` will tighten the committed TSV after merge  |
+| PR CI, counts go up without `SEATBELT_INCREASE`              | No                     | Fails                                                      |
+| `push: main` lint job, counts go down                        | Yes                    | Passes; OSBotify commits the tightened TSV back to `main`  |
+
+In plain English: during normal development, fixing baselined errors does not dirty your worktree. `main`'s lint job takes care of tightening the committed baseline after your PR merges. The only case where you commit `eslint.seatbelt.tsv` by hand is the `SEATBELT_INCREASE` escape hatch.
 
 ## Day-to-day workflows
 
@@ -46,13 +60,9 @@ npm run lint -- src/components/Foo/index.tsx src/libs/bar.ts
 
 ### "I fixed an existing baselined error"
 
-Just run `npm run lint` (or `npm run lint-changed`) locally. Seatbelt notices the count went down, rewrites `config/eslint/eslint.seatbelt.tsv` to reflect the lower count, and prints something like:
+Just run `npm run lint` (or `npm run lint-changed`) locally. Seatbelt notices the count went down and passes. **It does not rewrite `config/eslint/eslint.seatbelt.tsv` locally** — the config sets `readOnly: !process.env.CI`, so the TSV is only rewritten in CI. After your PR merges, the lint job on `main` re-runs, writes the tightened TSV, and OSBotify commits it back to `main` for you.
 
-```
-[eslint-seatbelt]: File src/foo.ts has 2 errors of rule @typescript-eslint/no-deprecated, but the seatbelt file allows 3. Decreasing the allowed error count to 2.
-```
-
-Commit the updated `eslint.seatbelt.tsv` alongside your fix.
+No TSV commit required on your end.
 
 ### "I added a new error and can't easily fix it right now"
 
@@ -81,12 +91,12 @@ The default assumption is that you fix it. If you genuinely need to land code th
 
 ## CI behavior
 
-The [`ESLint check`](../.github/workflows/lint.yml) workflow runs `npm run lint` with `CI=1` set. Under `CI=1`, seatbelt switches to **frozen mode**:
+The [`ESLint check`](../.github/workflows/lint.yml) workflow runs `npm run lint`. In CI, `readOnly` is off (so seatbelt can write) and `SEATBELT_FROZEN=0` is exported from [`scripts/lint.sh`](../scripts/lint.sh) so GitHub Actions' auto-set `CI=true` doesn't flip seatbelt into frozen mode.
 
-- If your branch's counts are lower than what's committed in `eslint.seatbelt.tsv`, CI fails and asks you to commit the updated baseline.
-- If your branch's counts are higher, CI fails and reports the new errors.
+- **PR runs:** counts go down → passes (TSV rewrite is ephemeral and thrown away with the runner). Counts go up without `SEATBELT_INCREASE` → fails with seatbelt's "exceeds allowed count" error.
+- **`push: main` runs:** same behavior, plus an extra step — if `config/eslint/eslint.seatbelt.tsv` changed, OSBotify commits the tightened baseline straight back to `main`.
 
-In short: **commit whatever `eslint.seatbelt.tsv` diff your local `npm run lint` produced, or CI will complain.**
+You do **not** need to commit `eslint.seatbelt.tsv` diffs for ordinary fixes. The only case that requires a TSV commit from you is `SEATBELT_INCREASE` (see below).
 
 ## Escape hatches
 
@@ -94,8 +104,9 @@ Set any of these env vars for a one-off local run when you need to bypass seatbe
 
 | Variable                  | Effect                                                                                   |
 | ------------------------- | ---------------------------------------------------------------------------------------- |
-| `SEATBELT_INCREASE=<rule>`| Allow the baseline to grow for `<rule>` (or `ALL`). Writes the new count to disk.        |
-| `SEATBELT_FROZEN=1`       | Force frozen mode locally (what CI does). Useful for reproducing CI failures.            |
+| `SEATBELT_INCREASE=<rule>`| Allow the baseline to grow for `<rule>` (or `ALL`). Overrides `readOnly` and writes the new count to disk. Commit the diff. |
+| `SEATBELT_READ_ONLY=0`    | Force writes locally (e.g. you want to see what CI would rewrite). Opposite of the default local behavior. |
+| `SEATBELT_FROZEN=1`       | Force frozen mode locally (fail on any diff). Useful for reproducing a stale-baseline failure. |
 | `SEATBELT_DISABLE=1`      | Skip all seatbelt processing for this run — raw ESLint output, baseline file ignored.    |
 | `SEATBELT_VERBOSE=1`      | Log every decrement/increment seatbelt performs. Handy when debugging the baseline.      |
 
