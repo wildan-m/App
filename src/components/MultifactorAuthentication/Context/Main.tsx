@@ -14,7 +14,8 @@ import useNetwork from '@hooks/useNetwork';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import {getErrorMessage} from '@libs/ErrorUtils';
 import getPlatform from '@libs/getPlatform';
-import {createLocalMFAError} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
+import {createLocalMFAError, createMFAErrorFromApiResponse} from '@libs/MultifactorAuthentication/shared/MFAResult';
 import type {ChallengeType, MultifactorAuthenticationCallbackInput} from '@libs/MultifactorAuthentication/shared/types';
 import Navigation from '@navigation/Navigation';
 import {clearLocalMFAPublicKeyList, getDeviceBiometricsOnyxKey, requestAuthorizationChallenge, requestRegistrationChallenge} from '@userActions/MultifactorAuthentication';
@@ -243,13 +244,16 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
 
             // Request registration challenge after validateCode is set
             if (!registrationChallenge) {
-                const challengeResult = await requestRegistrationChallenge(validateCode);
-                addMFABreadcrumb('Registration challenge received', challengeResult.success ? {success: true} : challengeResult.error, challengeResult.success ? 'info' : 'error');
+                const {challenge, httpStatusCode, reason, message} = await requestRegistrationChallenge(validateCode);
 
-                if (!challengeResult.success) {
-                    dispatch({type: 'SET_ERROR', payload: challengeResult.error});
+                if (!isHttpSuccess(httpStatusCode) || !challenge) {
+                    const challengeError = createMFAErrorFromApiResponse(httpStatusCode, reason, message);
+                    addMFABreadcrumb('Registration challenge failed', challengeError, 'error');
+                    dispatch({type: 'SET_ERROR', payload: challengeError});
                     return;
                 }
+
+                addMFABreadcrumb('Registration challenge received', {success: true});
 
                 // IMPORTANT: Validate that we received a registration challenge.
                 // This check is safe here because the backend only issues registration challenges AFTER
@@ -257,7 +261,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                 // a challenge of type 'registration', it's genuinely from the registration path. This security guarantee
                 // does NOT apply to authorization challenges (which skip validateCode verification). If the WebAuthN spec
                 // ever changes the structure of these challenges, update getChallengeType() accordingly.
-                const challengeType = getChallengeType(challengeResult.challenge);
+                const challengeType = getChallengeType(challenge);
                 if (challengeType !== CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.REGISTRATION) {
                     addMFABreadcrumb('Invalid registration challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
                     dispatch({
@@ -270,7 +274,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     return;
                 }
 
-                dispatch({type: 'SET_REGISTRATION_CHALLENGE', payload: challengeResult.challenge});
+                dispatch({type: 'SET_REGISTRATION_CHALLENGE', payload: challenge});
                 return;
             }
 
@@ -327,16 +331,19 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
 
             // Request authorization challenge if not already fetched
             if (!authorizationChallenge) {
-                const challengeResult = await requestAuthorizationChallenge();
-                addMFABreadcrumb('Authorization challenge received', challengeResult.success ? {success: true} : challengeResult.error, challengeResult.success ? 'info' : 'error');
+                const {challenge, httpStatusCode, reason, message} = await requestAuthorizationChallenge();
 
-                if (!challengeResult.success) {
-                    dispatch({type: 'SET_ERROR', payload: challengeResult.error});
+                if (!isHttpSuccess(httpStatusCode) || !challenge) {
+                    const challengeError = createMFAErrorFromApiResponse(httpStatusCode, reason, message);
+                    addMFABreadcrumb('Authorization challenge failed', challengeError, 'error');
+                    dispatch({type: 'SET_ERROR', payload: challengeError});
                     return;
                 }
 
+                addMFABreadcrumb('Authorization challenge received', {success: true});
+
                 // Validate that we received an authentication challenge
-                const challengeType = getChallengeType(challengeResult.challenge);
+                const challengeType = getChallengeType(challenge);
                 if (challengeType !== CONST.MULTIFACTOR_AUTHENTICATION.CHALLENGE_TYPE.AUTHENTICATION) {
                     addMFABreadcrumb('Invalid authorization challenge type', {challengeType: challengeType ?? 'unknown'}, 'error');
                     dispatch({
@@ -349,7 +356,7 @@ function MultifactorAuthenticationContextProvider({children}: MultifactorAuthent
                     return;
                 }
 
-                dispatch({type: 'SET_AUTHORIZATION_CHALLENGE', payload: challengeResult.challenge});
+                dispatch({type: 'SET_AUTHORIZATION_CHALLENGE', payload: challenge});
                 return;
             }
 

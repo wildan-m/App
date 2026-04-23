@@ -9,9 +9,8 @@ import type {DenyTransactionParams, RevokeMultifactorAuthenticationCredentialsPa
 import {SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
 import Log from '@libs/Log';
 import type {AuthenticationChallenge, RegistrationChallenge} from '@libs/MultifactorAuthentication/shared/challengeTypes';
-import parseHttpResponse, {isHttpSuccess} from '@libs/MultifactorAuthentication/shared/helpers';
-import {createMFAErrorFromApiResponse} from '@libs/MultifactorAuthentication/shared/MFAResult';
-import type {MFAResult} from '@libs/MultifactorAuthentication/shared/MFAResult';
+import parseHttpResponse from '@libs/MultifactorAuthentication/shared/helpers';
+import type {MultifactorAuthenticationReason} from '@libs/MultifactorAuthentication/shared/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {LocallyProcessed3DSChallengeReviews} from '@src/types/onyx';
@@ -84,17 +83,23 @@ async function registerAuthenticationKey({keyInfo}: MultifactorAuthenticationSce
     }
 }
 
-type RegistrationChallengeData = {
-    challenge: RegistrationChallenge;
+type RegistrationChallengeResponse = {
+    httpStatusCode: number;
+    reason: MultifactorAuthenticationReason | undefined;
+    message: string | undefined;
+    challenge: RegistrationChallenge | undefined;
     publicKeys: string[] | undefined;
 };
 
-type AuthenticationChallengeData = {
-    challenge: AuthenticationChallenge;
+type AuthenticationChallengeResponse = {
+    httpStatusCode: number;
+    reason: MultifactorAuthenticationReason | undefined;
+    message: string | undefined;
+    challenge: AuthenticationChallenge | undefined;
     publicKeys: string[] | undefined;
 };
 
-async function requestRegistrationChallenge(validateCode: string): Promise<MFAResult<RegistrationChallengeData>> {
+async function requestRegistrationChallenge(validateCode: string): Promise<RegistrationChallengeResponse> {
     try {
         const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT>> = [
             {
@@ -125,25 +130,24 @@ async function requestRegistrationChallenge(validateCode: string): Promise<MFARe
             {optimisticData, finallyData},
         );
         const {jsonCode, challenge, publicKeys, message} = response ?? {};
-        const {httpStatusCode, reason} = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
-
-        if (!isHttpSuccess(httpStatusCode) || !challenge) {
-            return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
-        }
+        const parsedResponse = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
 
         return {
-            success: true,
-            challenge: challenge as RegistrationChallenge,
+            ...parsedResponse,
+            challenge: challenge as RegistrationChallenge | undefined,
             publicKeys,
         };
     } catch (error) {
         Log.hmmm('[MFA] Failed to request a registration challenge', {error});
-        const {httpStatusCode, reason, message} = parseHttpResponse(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, undefined);
-        return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
+        return {
+            ...parseHttpResponse(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, undefined),
+            challenge: undefined,
+            publicKeys: undefined,
+        };
     }
 }
 
-async function requestAuthorizationChallenge(): Promise<MFAResult<AuthenticationChallengeData>> {
+async function requestAuthorizationChallenge(): Promise<AuthenticationChallengeResponse> {
     try {
         const response = await makeRequestWithSideEffects(
             SIDE_EFFECT_REQUEST_COMMANDS.REQUEST_AUTHENTICATION_CHALLENGE,
@@ -153,21 +157,20 @@ async function requestAuthorizationChallenge(): Promise<MFAResult<Authentication
             {},
         );
         const {jsonCode, challenge, publicKeys, message} = response ?? {};
-        const {httpStatusCode, reason} = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
-
-        if (!isHttpSuccess(httpStatusCode) || !challenge) {
-            return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
-        }
+        const parsedResponse = parseHttpResponse(jsonCode, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, message);
 
         return {
-            success: true,
-            challenge: challenge as AuthenticationChallenge,
+            ...parsedResponse,
+            challenge: challenge as AuthenticationChallenge | undefined,
             publicKeys,
         };
     } catch (error) {
         Log.hmmm('[MFA] Failed to request an authorization challenge', {error});
-        const {httpStatusCode, reason, message} = parseHttpResponse(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, undefined);
-        return {success: false, error: createMFAErrorFromApiResponse(httpStatusCode, reason, message)};
+        return {
+            ...parseHttpResponse(undefined, CONST.MULTIFACTOR_AUTHENTICATION.API_RESPONSE_MAP.REQUEST_AUTHENTICATION_CHALLENGE, undefined),
+            challenge: undefined,
+            publicKeys: undefined,
+        };
     }
 }
 
