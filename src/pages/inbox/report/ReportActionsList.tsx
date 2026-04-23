@@ -700,6 +700,12 @@ function ReportActionsList({
             const originalReportID = getOriginalReportID(report.reportID, reportAction, reportActionsFromOnyx);
             const showPreviousMessagesButton = reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && !!isConciergeSidePanel && !!showHiddenHistory && !!hasPreviousMessages;
 
+            // Use the action's actual index in sortedVisibleReportActions rather than the FlashList-provided index,
+            // because useFlashListScrollKey may slice the data for deep-link scroll positioning, making the
+            // FlashList index offset from the full array and causing wrong displayAsGroup computation.
+            const actionIndex = sortedVisibleReportActions.indexOf(reportAction);
+            const safeIndex = actionIndex >= 0 ? actionIndex : index;
+
             return (
                 <>
                     <ReportActionsListItemRenderer
@@ -711,8 +717,8 @@ function ReportActionsList({
                         transactionThreadReport={transactionThreadReport}
                         linkedReportActionID={linkedReportActionID}
                         displayAsGroup={
-                            !isConsecutiveChronosAutomaticTimerAction(sortedVisibleReportActions, index, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
-                            isConsecutiveActionMadeByPreviousActor(sortedVisibleReportActions, index, isOffline)
+                            !isConsecutiveChronosAutomaticTimerAction(sortedVisibleReportActions, safeIndex, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
+                            isConsecutiveActionMadeByPreviousActor(sortedVisibleReportActions, safeIndex, isOffline)
                         }
                         shouldHideThreadDividerLine={shouldHideThreadDividerLine}
                         shouldDisplayNewMarker={reportAction.reportActionID === unreadMarkerReportActionID}
