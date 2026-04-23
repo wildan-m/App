@@ -53,8 +53,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             }
             return Base64URL.base64ToBase64url(entry.publicKey);
         } catch (error) {
-            const {reason, message} = decodeLibraryError(error);
-            addMFABreadcrumb('Failed to get local credential ID', {reason, message}, 'error');
+            addMFABreadcrumb('Failed to get local credential ID', decodeLibraryError(error), 'error');
             return undefined;
         }
     };
@@ -69,8 +68,7 @@ function useNativeBiometricsHSM(): UseBiometricsReturn {
             const keyAlias = getKeyAlias(accountID);
             await deleteKeys(keyAlias);
         } catch (error) {
-            const {reason, message} = decodeLibraryError(error);
-            addMFABreadcrumb('Failed to delete local keys', {reason, message}, 'error');
+            addMFABreadcrumb('Failed to delete local keys', decodeLibraryError(error), 'error');
         }
     };
 
