@@ -9643,7 +9643,7 @@ const CONST = {
                 publishedDate: '2026-04-15',
             },
             {
-                title: 'Expensify Partners With IOCP to Expand Access to Modern Spend Management',
+                title: 'Expensify partners with IOCP to expand access to modern spend management',
                 subtitle: 'Press release',
                 url: 'https://www.businesswire.com/news/home/20260421550894/en/Expensify-Partners-With-IOCP-to-Expand-Access-to-Modern-Spend-Management',
                 publishedDate: '2026-04-21',
