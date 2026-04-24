@@ -34,7 +34,7 @@ import {
 } from '@userActions/IOU';
 import {navigateToStartStepIfScanFileCannotBeRead} from '@userActions/IOU/Receipt';
 import {setSplitShares} from '@userActions/IOU/Split';
-import {createDraftWorkspace, newGenerateDefaultWorkspaceName} from '@userActions/Policy/Policy';
+import {createDraftWorkspace, generateDefaultWorkspaceName} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -118,6 +118,7 @@ function IOURequestStepParticipants({
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
+    const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
@@ -125,7 +126,7 @@ function IOURequestStepParticipants({
         iouType === CONST.IOU.TYPE.CREATE &&
         isPaidGroupPolicy(activePolicy) &&
         activePolicy?.isPolicyExpenseChatEnabled &&
-        !shouldRestrictUserBillableActions(activePolicy.id, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds);
+        !shouldRestrictUserBillableActions(activePolicy.id, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed);
 
     const isAndroidNative = getPlatform() === CONST.PLATFORM.ANDROID;
     const isMobileSafari = isMobileSafariBrowser();
@@ -200,6 +201,7 @@ function IOURequestStepParticipants({
                 isTrackDistanceExpense: isDistanceRequest(transaction),
                 policy: policyForMovingExpenses,
                 isPolicyExpenseChat: false,
+                lastSelectedDistanceRates,
             });
             setCustomUnitRateID(transaction.transactionID, rateID, transaction, policyForMovingExpenses);
             const shouldSetParticipantAutoAssignment = iouType === CONST.IOU.TYPE.CREATE;
@@ -237,6 +239,7 @@ function IOURequestStepParticipants({
         isActivePolicyRequest,
         backTo,
         policyForMovingExpenses,
+        lastSelectedDistanceRates,
     ]);
 
     const addParticipant = useCallback(
@@ -268,8 +271,8 @@ function IOURequestStepParticipants({
             }
 
             if (!isMovingTransactionFromTrackExpense || !isPolicyExpenseChat) {
-                // If not moving the transaction from track expense, select the default rate automatically.
-                // Otherwise, keep the original p2p rate and let the user manually change it to the one they want from the workspace.
+                // If not moving the transaction from track expense to a workspace, select the default rate automatically.
+                // Otherwise, keep the original rate and let the user manually change it to the one they want from the workspace.
                 const rateID = DistanceRequestUtils.getCustomUnitRateID({reportID: firstParticipantReportID, isPolicyExpenseChat, policy, lastSelectedDistanceRates});
 
                 if (draftTransactions.length > 0) {
@@ -336,7 +339,12 @@ function IOURequestStepParticipants({
             if ((isCategorizing || isShareAction) && numberOfParticipants.current === 0) {
                 const email = currentUserPersonalDetails.email ?? '';
                 const lastWorkspaceNumber = lastWorkspaceNumberSelector(allPolicies, email);
-                const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(introSelected, newGenerateDefaultWorkspaceName(email, lastWorkspaceNumber, translate));
+                const {expenseChatReportID, policyID, policyName} = createDraftWorkspace(
+                    introSelected,
+                    generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
+                    currentUserPersonalDetails.accountID,
+                    email,
+                );
                 for (const transaction of draftTransactions) {
                     setMoneyRequestParticipants(transaction.transactionID, [
                         {
@@ -392,6 +400,7 @@ function IOURequestStepParticipants({
             participants,
             iouType,
             initialTransaction,
+            selfDMReportID,
             initialTransactionID,
             reportID,
             waitForKeyboardDismiss,
@@ -399,10 +408,11 @@ function IOURequestStepParticipants({
             isMovingTransactionFromTrackExpense,
             allPolicies,
             policyForMovingExpenses,
+            currentUserPersonalDetails.email,
+            currentUserPersonalDetails.accountID,
             introSelected,
-            backTo,
-            selfDMReportID,
             translate,
+            backTo,
         ],
     );
 
