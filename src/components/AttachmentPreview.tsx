@@ -8,6 +8,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {cleanFileName, getFileName} from '@libs/fileDownload/FileUtils';
 import variables from '@styles/variables';
+import CONST from '@src/CONST';
 import {checkIsFileImage} from './Attachments/AttachmentView';
 import DefaultAttachmentView from './Attachments/AttachmentView/DefaultAttachmentView';
 import Icon from './Icon';
@@ -63,6 +64,7 @@ function AttachmentPreview({source, aspectRatio = 1, onPress, onLoadError}: Atta
                 onPress={onPress}
                 accessible
                 accessibilityLabel="Attachment Thumbnail"
+                sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_PREVIEW.VIDEO_THUMBNAIL}
             >
                 {!!thumbnail && (
                     /* eslint-disable-next-line react-native-a11y/has-valid-accessibility-ignores-invert-colors -- Custom Image wrapper does not support this prop. */
@@ -94,6 +96,7 @@ function AttachmentPreview({source, aspectRatio = 1, onPress, onLoadError}: Atta
                 onPress={onPress}
                 accessible
                 accessibilityLabel="Image Thumbnail"
+                sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_PREVIEW.IMAGE_THUMBNAIL}
             >
                 <View style={[fillStyle, styles.br4, styles.overflowHidden, {aspectRatio}]}>
                     {/* eslint-disable-next-line react-native-a11y/has-valid-accessibility-ignores-invert-colors -- Custom Image wrapper does not support this prop. */}
@@ -114,6 +117,7 @@ function AttachmentPreview({source, aspectRatio = 1, onPress, onLoadError}: Atta
                 onPress={onPress}
                 accessible
                 accessibilityLabel="PDF Thumbnail"
+                sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_PREVIEW.PDF_THUMBNAIL}
             >
                 <PDFThumbnail
                     fitPolicy={1}

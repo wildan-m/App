@@ -8831,6 +8831,11 @@ const CONST = {
             SEND_BUTTON: 'AttachmentModal-SendButton',
             IMAGE_ZOOM: 'AttachmentModal-ImageZoom',
         },
+        ATTACHMENT_PREVIEW: {
+            VIDEO_THUMBNAIL: 'AttachmentPreview-VideoThumbnail',
+            IMAGE_THUMBNAIL: 'AttachmentPreview-ImageThumbnail',
+            PDF_THUMBNAIL: 'AttachmentPreview-PDFThumbnail',
+        },
         HEADER: {
             BACK_BUTTON: 'Header-BackButton',
             DOWNLOAD_BUTTON: 'Header-DownloadButton',

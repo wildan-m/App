@@ -110,7 +110,6 @@ function HeaderWithBackButton({
     const middleContent = useMemo(() => {
         if (progressBarPercentage) {
             const progressBarLabel = stepCounter ? `${translate('common.progressBarLabel')}, ${translate('stepCounter', stepCounter)}` : undefined;
-            const progressBarHint = stepCounter ? translate('stepCounter', stepCounter) : progressBarLabel;
             return (
                 <>
                     {/* Reserves as much space for the middleContent as possible */}
