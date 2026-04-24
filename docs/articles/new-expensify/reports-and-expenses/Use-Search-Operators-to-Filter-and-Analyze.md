@@ -118,30 +118,50 @@ You can use the following operators to filter Tasks:
 
 ## How to group and visualize results using search operators
 
-Use `group-by:` to analyze results by dimension, `view:` to control how grouped results are displayed, and `group-currency:` to normalize totals.
+Use these operators to analyze and visualize your results:
 
-Supported groupings include:
+- `group-by:` groups results by a specific dimension  
+- `view:` controls how grouped results are displayed  
+- `group-currency:` converts totals into a single currency  
 
-- `group-by:report` - Group by report
-- `group-by:from` - Group by expense submitter (employee)
-- `group-by:card` - Group by payment card
-- `group-by:withdrawal-id` - Group by withdrawal ID
-- `group-by:merchant` - Group by merchant or vendor
-- `group-by:category` - Group by expense category
-- `group-by:tag` - Group by expense tag
-- `group-by:month` - Group by calendar month
-- `group-by:week` - Group by calendar week
-- `group-by:quarter` - Group by fiscal quarter
-- `group-by:year` - Group by calendar year
+**Normalize totals using `group-currency:`**
 
-**Example query:**  
-`group-by:category view:bar group-currency:USD`
+Use `group-currency:` to convert all grouped amounts into a single currency for easier comparison. This is helpful when your data includes multiple currencies.
 
+Supported values include standard ISO currency codes such as:
+- `USD`
+- `EUR`
+- `GBP`
+- `CAD`
+- `AUD`
+
+**Example search:**  
+`type:expense group-by:category group-currency:USD`
+
+---
+
+**Group results by dimension**
+
+Supported grouping options include:
+
+- `group-by:report` – Group by report  
+- `group-by:from` – Group by submitter  
+- `group-by:card` – Group by card  
+- `group-by:withdrawal-id` – Group by withdrawal ID  
+- `group-by:merchant` – Group by merchant  
+- `group-by:category` – Group by category  
+- `group-by:tag` – Group by tag  
+- `group-by:month` – Group by month  
+- `group-by:week` – Group by week  
+- `group-by:quarter` – Group by quarter  
+- `group-by:year` – Group by year
+  
 ---
 
 ## How to choose a chart view for grouped results
 
 When using `group-by:`, you can add `view:` to control the visualization type. 
+
 Supported views:
 
 - `view:table` - table (default)
@@ -151,10 +171,33 @@ Supported views:
 
 > **Note:** The `view:` operator only applies when `group-by:` is also used. Without `group-by:`, the `view:` value is ignored.
 
+---
+## How to build reports using search operators
+
+You can create report-style views similar to Insights by combining filters, grouping, date ranges, and chart views.
+
+Here are some common examples:
+
+- **Top categories (bar chart)**  
+  `type:expense group-by:category date:last-month view:bar`
+
+- **Top spenders (table)**  
+  `type:expense group-by:from date:last-month view:table`
+
+- **Spend over time (line chart)**  
+  `type:expense group-by:month date:year-to-date view:line`
+
+- **Last month category breakdown (pie chart)**  
+  `type:expense group-by:category date:last-month view:pie`
+
+- **Custom date range (table)**  
+  `type:expense date>=2026-01-01 date<=2026-01-31 group-by:category view:table`
+
+These searches update in real time and can be refined further using additional filters. You can save frequently used searches to reuse them later by clicking **Save search** in the search bar.
+
 For more advanced dashboards and exports, learn how to use [Insights in Expensify](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify).
 
 ---
-
 # FAQ
 
 ## Can I combine filters from different types?
