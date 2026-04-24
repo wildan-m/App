@@ -19,25 +19,41 @@ type MoneyRequestReportNavigationProps = {
     shouldDisplayNarrowVersion: boolean;
 };
 
-const EMPTY_REPORT_IDS: string[] = [];
+type SnapshotGuard = {
+    hasMultiple: boolean;
+    includesReport: boolean;
+};
+
+const EMPTY_GUARD: SnapshotGuard = {hasMultiple: false, includesReport: false};
 
 const selectIsExpenseReportSearch = (lastSearchQuery: OnyxEntry<LastSearchParams>): boolean => lastSearchQuery?.queryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
 
 const selectQueryHash = (lastSearchQuery: OnyxEntry<LastSearchParams>): number | undefined => lastSearchQuery?.queryJSON?.hash;
 
-const selectSnapshotReportIDs = (snapshot: OnyxEntry<SearchResults>): string[] => {
-    const data = snapshot?.data;
-    if (!data) {
-        return EMPTY_REPORT_IDS;
-    }
-    const ids: string[] = [];
-    for (const key of Object.keys(data)) {
-        if (key.startsWith(ONYXKEYS.COLLECTION.REPORT) && !key.startsWith(ONYXKEYS.COLLECTION.REPORT_ACTIONS) && !key.startsWith(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS)) {
-            ids.push(key.slice(ONYXKEYS.COLLECTION.REPORT.length));
+const buildSnapshotGuardSelector =
+    (reportID: string | undefined) =>
+    (snapshot: OnyxEntry<SearchResults>): SnapshotGuard => {
+        const data = snapshot?.data;
+        if (!data || !reportID) {
+            return EMPTY_GUARD;
         }
-    }
-    return ids;
-};
+        const prefix = ONYXKEYS.COLLECTION.REPORT;
+        let count = 0;
+        let includesReport = false;
+        for (const key of Object.keys(data)) {
+            if (!key.startsWith(prefix)) {
+                continue;
+            }
+            count++;
+            if (!includesReport && key.slice(prefix.length) === reportID) {
+                includesReport = true;
+            }
+            if (count > 1 && includesReport) {
+                break;
+            }
+        }
+        return {hasMultiple: count > 1, includesReport};
+    };
 
 function MoneyRequestReportNavigationInner({reportID, shouldDisplayNarrowVersion}: MoneyRequestReportNavigationProps) {
     const {allReports, isSearchLoading, lastSearchQuery} = useSearchSections();
@@ -142,9 +158,10 @@ function MoneyRequestReportNavigationInner({reportID, shouldDisplayNarrowVersion
 function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: MoneyRequestReportNavigationProps) {
     const [isExpenseReportSearch] = useOnyx(ONYXKEYS.REPORT_NAVIGATION_LAST_SEARCH_QUERY, {selector: selectIsExpenseReportSearch});
     const [hash] = useOnyx(ONYXKEYS.REPORT_NAVIGATION_LAST_SEARCH_QUERY, {selector: selectQueryHash});
-    const [snapshotReportIDs = EMPTY_REPORT_IDS] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`, {selector: selectSnapshotReportIDs});
+    const snapshotGuardSelector = buildSnapshotGuardSelector(reportID);
+    const [snapshotGuard = EMPTY_GUARD] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`, {selector: snapshotGuardSelector});
 
-    const shouldMount = isExpenseReportSearch && !!reportID && snapshotReportIDs.length > 1 && snapshotReportIDs.includes(reportID);
+    const shouldMount = isExpenseReportSearch && snapshotGuard.hasMultiple && snapshotGuard.includesReport;
 
     if (!shouldMount) {
         return null;
