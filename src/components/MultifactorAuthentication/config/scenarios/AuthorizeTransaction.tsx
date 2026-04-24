@@ -77,19 +77,6 @@ const DeniedTransactionSuccessScreen = createScreenWithDefaults(
     'DeniedTransactionSuccessScreen',
 );
 
-const DeniedTransactionClientFailureScreen = createScreenWithDefaults(
-    DefaultClientFailureScreen,
-    {
-        headerTitle: 'multifactorAuthentication.reviewTransaction.transactionFailed',
-        illustration: 'DeniedTransactionHand',
-        iconWidth: variables.transactionHandWidth,
-        iconHeight: variables.transactionHandHeight,
-        title: 'multifactorAuthentication.reviewTransaction.transactionFailed',
-        subtitle: 'multifactorAuthentication.reviewTransaction.transactionCouldNotBeCompletedReachOut',
-    },
-    'DeniedTransactionClientFailureScreen',
-);
-
 const DeniedTransactionServerFailureScreen = createScreenWithDefaults(
     DefaultServerFailureScreen,
     {
@@ -113,15 +100,7 @@ const AlreadyReviewedFailureScreen = createScreenWithDefaults(
     'AlreadyReviewedFailureScreen',
 );
 
-export {
-    ApprovedTransactionSuccessScreen,
-    ApproveTransactionClientFailureScreen,
-    ApproveTransactionServerFailureScreen,
-    DeniedTransactionSuccessScreen,
-    DeniedTransactionClientFailureScreen,
-    DeniedTransactionServerFailureScreen,
-    AlreadyReviewedFailureScreen,
-};
+export {DeniedTransactionSuccessScreen, DeniedTransactionServerFailureScreen, AlreadyReviewedFailureScreen};
 
 export default {
     // Allowed methods are hardcoded here; keep in sync with allowedAuthenticationMethods in useNavigateTo3DSAuthorizationChallenge.
