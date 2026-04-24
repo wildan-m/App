@@ -15,13 +15,28 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 
 type ChatTransactionPreviewProps = {
+    /** All the data of the action, used for showing context menu and deriving the IOU report */
     action: OnyxTypes.ReportAction;
+
+    /** The ID of the current report where the preview is rendered */
     reportID: string | undefined;
+
+    /** ID of the original report from which the given report action was first created */
     originalReportID: string;
+
+    /** The ID of the associated chat report, used when navigating to split bill details */
     chatReportID: string | undefined;
+
+    /** The IOU report linked to this transaction, used when creating a transaction thread on demand */
     iouReport: OnyxEntry<OnyxTypes.Report>;
+
+    /** Whether the preview should navigate to the split bill details screen on press */
     shouldShowSplitPreview: boolean;
+
+    /** Whether the context menu should be shown on press */
     shouldDisplayContextMenu: boolean;
+
+    /** The ID of the transaction to preview */
     transactionID: string | undefined;
 };
 
