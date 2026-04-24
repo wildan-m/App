@@ -16,7 +16,7 @@ function useShouldAddOrReplaceReceipt(reportID: string) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const isReportArchived = useReportIsArchived(report?.reportID);
     const allReportTransactions = useReportTransactionsCollection(reportID);
-    const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`, {canEvict: false});
+    const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`);
 
     const isTransactionThreadView = isReportTransactionThread(report);
 
