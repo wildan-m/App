@@ -22,7 +22,8 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           # OSBotify token lets the auto-commit step below push to the protected `main` branch.
-          token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN }}
+          # Falls back to the default GITHUB_TOKEN for fork PRs, which can't access repo secrets.
+          token: ${{ secrets.OS_BOTIFY_COMMIT_TOKEN || github.token }}
 
       - name: Setup Node
         uses: ./.github/actions/composite/setupNode
