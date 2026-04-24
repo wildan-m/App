@@ -7534,6 +7534,7 @@ ${reportName}
         withdrawalType: '提款类型',
         recentSearches: '最近搜索',
         recentChats: '最近聊天',
+        inviteUserToExpensify: '邀请加入 Expensify',
         searchIn: '搜索范围',
         searchPlaceholder: '搜索内容...',
         suggestions: '建议',

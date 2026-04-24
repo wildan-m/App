@@ -7778,6 +7778,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         withdrawalType: 'Auszahlungsart',
         recentSearches: 'Letzte Suchen',
         recentChats: 'Neueste Chats',
+        inviteUserToExpensify: 'Zu Expensify einladen',
         searchIn: 'Suchen in',
         searchPlaceholder: 'Nach etwas suchen...',
         suggestions: 'Vorschläge',

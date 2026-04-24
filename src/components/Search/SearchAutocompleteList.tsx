@@ -4,6 +4,7 @@ import type {OnyxCollection} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
+import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
 import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
@@ -110,6 +111,15 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
     if (isSearchQueryListItem(props)) {
         return (
             <SearchQueryListItem
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...props}
+            />
+        );
+    }
+
+    if (props.item?.isOptimisticAccount) {
+        return (
+            <InviteMemberListItem
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...props}
             />
@@ -370,12 +380,23 @@ function SearchAutocompleteList({
         });
 
         const reportOptions: OptionData[] = [...orderedOptions.recentReports, ...orderedOptions.personalDetails];
-        if (searchOptions.userToInvite) {
-            reportOptions.push(searchOptions.userToInvite);
-        }
 
         return reportOptions.slice(0, 20);
     }, [autocompleteQueryValue, searchOptions]);
+
+    const userToInviteOption = useMemo(() => {
+        if (autocompleteQueryValue.trim() === '' || !searchOptions.userToInvite) {
+            return null;
+        }
+        const option = searchOptions.userToInvite;
+        const keyForList = option.keyForList ?? option.reportID ?? (option.accountID ? String(option.accountID) : undefined);
+        return {
+            ...option,
+            keyForList,
+            pressableStyle: styles.br2,
+            wrapperStyle: [styles.pr3, styles.pl3],
+        } as AutocompleteListItem;
+    }, [autocompleteQueryValue, searchOptions.userToInvite, styles.br2, styles.pr3, styles.pl3]);
 
     const debounceHandleSearch = useDebounce(() => {
         if (!handleSearch || !autocompleteQueryWithoutFilters) {
@@ -445,6 +466,14 @@ function SearchAutocompleteList({
                 data: nextStyledRecentReports,
                 sectionIndex: sectionIndex++,
             });
+
+            if (userToInviteOption) {
+                pushSection({
+                    title: translate('search.inviteUserToExpensify'),
+                    data: [userToInviteOption],
+                    sectionIndex: sectionIndex++,
+                });
+            }
         } else if (autocompleteQueryValue.trim() !== '' && nextStyledRecentReports.length > 0) {
             // When options aren't fully initialized but we have a search query with available results,
             // render them immediately so they're selectable instead of hiding the section entirely.
@@ -502,6 +531,7 @@ function SearchAutocompleteList({
         translate,
         isLoadingOptions,
         isRecentSearchesDataLoaded,
+        userToInviteOption,
     ]);
 
     const sectionItemText = sections?.at(1)?.data?.[0]?.text ?? '';
@@ -515,7 +545,7 @@ function SearchAutocompleteList({
     const shouldAnnounceNoResults = !isLoading && suggestionsCount === 0 && !!trimmedAutocompleteQueryValue;
     useDebouncedAccessibilityAnnouncement(noResultsFoundText, shouldAnnounceNoResults, autocompleteQueryValue);
 
-    const firstRecentReportKey = styledRecentReports.at(0)?.keyForList;
+    const firstRecentReportKey = styledRecentReports.at(0)?.keyForList ?? userToInviteOption?.keyForList;
     let firstRecentReportFlatIndex = -1;
     if (firstRecentReportKey) {
         let flatIndex = 0;

@@ -7800,6 +7800,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         withdrawalType: 'Type de retrait',
         recentSearches: 'Recherches récentes',
         recentChats: 'Discussions récentes',
+        inviteUserToExpensify: 'Inviter sur Expensify',
         searchIn: 'Rechercher dans',
         searchPlaceholder: 'Rechercher quelque chose...',
         suggestions: 'Suggestions',
