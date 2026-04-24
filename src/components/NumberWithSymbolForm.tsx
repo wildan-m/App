@@ -427,7 +427,6 @@ function NumberWithSymbolForm({
                         onMouseDown={(e) => e.preventDefault()}
                         isContentCentered
                         accessibilityLabel={translate('iou.flip')}
-                        accessibilityHint={translate('iou.flip')}
                         isDisabled={disabled}
                     />
                 )}
@@ -440,7 +439,6 @@ function NumberWithSymbolForm({
                         isContentCentered
                         text={currency}
                         accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
-                        accessibilityHint={`${translate('common.selectCurrency')}, ${currency}`}
                         isDisabled={disabled}
                     />
                 )}
@@ -453,7 +451,6 @@ function NumberWithSymbolForm({
             <TextInput
                 label={label}
                 accessibilityLabel={label}
-                accessibilityHint={label}
                 value={formattedNumber}
                 onChangeText={setFormattedNumber}
                 ref={(newRef: BaseTextInputRef | null) => {
@@ -548,7 +545,6 @@ function NumberWithSymbolForm({
             toggleNegative={toggleNegative}
             onFocus={props.onFocus}
             accessibilityLabel={props.accessibilityLabel}
-            accessibilityHint={props.accessibilityLabel}
             keyboardType={props.keyboardType}
         />
     );
@@ -576,7 +572,6 @@ function NumberWithSymbolForm({
                                 isContentCentered
                                 text={currency}
                                 accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
-                                accessibilityHint={`${translate('common.selectCurrency')}, ${currency}`}
                             />
                         )}
                         {!!errorText && (
@@ -603,7 +598,6 @@ function NumberWithSymbolForm({
                         isContentCentered
                         text={currency}
                         accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
-                        accessibilityHint={`${translate('common.selectCurrency')}, ${currency}`}
                     />
                 )}
                 {allowFlippingAmount && canUseTouchScreen && (
@@ -616,7 +610,6 @@ function NumberWithSymbolForm({
                         isContentCentered
                         text={translate('iou.flip')}
                         accessibilityLabel={translate('iou.flip')}
-                        accessibilityHint={translate('iou.flip')}
                     />
                 )}
             </View>

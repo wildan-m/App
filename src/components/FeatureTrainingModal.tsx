@@ -477,7 +477,6 @@ function FeatureTrainingModal({
                         <CheckboxWithLabel
                             label={translate('featureTraining.doNotShowAgain')}
                             accessibilityLabel={translate('featureTraining.doNotShowAgain')}
-                            accessibilityHint={translate('featureTraining.doNotShowAgain')}
                             style={[styles.mb5]}
                             isChecked={!willShowAgain}
                             onInputChange={toggleWillShowAgain}

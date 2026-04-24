@@ -65,7 +65,6 @@ function Socials() {
                     accessible
                     accessibilityRole={CONST.ROLE.LINK}
                     accessibilityLabel={translate(social.label)}
-                    accessibilityHint={translate(social.label)}
                     style={[styles.mr1, styles.mt1]}
                     shouldUseAutoHitSlop={false}
                     sentryLabel={`${CONST.SENTRY_LABEL.SOCIALS.LINK}-${social.iconURL}`}

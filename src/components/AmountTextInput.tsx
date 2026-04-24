@@ -97,7 +97,6 @@ function AmountTextInput({
             selection={selection}
             onSelectionChange={onSelectionChange}
             accessibilityLabel={accessibilityLabel ?? translate('iou.amount')}
-            accessibilityHint={accessibilityLabel ?? translate('iou.amount')}
             onKeyPress={onKeyPress as (event: TextInputKeyPressEvent) => void}
             touchableInputWrapperStyle={touchableInputWrapperStyle}
             // On iPad, even if the soft keyboard is hidden, the keyboard suggestion is still shown.

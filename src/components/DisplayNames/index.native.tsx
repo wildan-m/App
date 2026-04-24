@@ -8,17 +8,7 @@ import TextWithEmojiFragment from '@pages/inbox/report/comment/TextWithEmojiFrag
 import type DisplayNamesProps from './types';
 
 // As we don't have to show tooltips of the Native platform so we simply render the full display names list.
-function DisplayNames({
-    accessibilityLabel,
-    accessibilityHint,
-    fullTitle,
-    textStyles = [],
-    numberOfLines = 1,
-    renderAdditionalText,
-    forwardedFSClass,
-    testID,
-    shouldParseFullTitle = true,
-}: DisplayNamesProps) {
+function DisplayNames({accessibilityLabel, fullTitle, textStyles = [], numberOfLines = 1, renderAdditionalText, forwardedFSClass, testID, shouldParseFullTitle = true}: DisplayNamesProps) {
     const {translate} = useLocalize();
     const titleContainsTextAndCustomEmoji = useMemo(() => containsCustomEmoji(fullTitle) && !containsOnlyCustomEmoji(fullTitle), [fullTitle]);
     const title = useMemo(() => {
@@ -29,7 +19,6 @@ function DisplayNames({
     return (
         <Text
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint ?? accessibilityLabel}
             style={textStyles}
             numberOfLines={numberOfLines}
             testID={`DisplayNames${testID !== undefined ? `-${testID}` : ''}`}

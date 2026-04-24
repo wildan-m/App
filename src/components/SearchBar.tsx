@@ -37,7 +37,6 @@ function SearchBar({label, style, icon, inputValue, onChangeText, onSubmitEditin
                 <TextInput
                     label={label}
                     accessibilityLabel={label}
-                    accessibilityHint={label}
                     role={CONST.ROLE.PRESENTATION}
                     value={inputValue}
                     onChangeText={onChangeText}

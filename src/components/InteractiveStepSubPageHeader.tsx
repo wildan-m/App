@@ -66,7 +66,6 @@ function InteractiveStepSubPageHeader({stepNames, currentStepIndex, onStepSelect
                             onPress={() => handleStepPress(isLockedStep, index)}
                             accessible
                             accessibilityLabel={stepName}
-                            accessibilityHint={stepName}
                             role={CONST.ROLE.BUTTON}
                         >
                             {isCompletedStep ? (

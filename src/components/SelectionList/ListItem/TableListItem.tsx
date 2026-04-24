@@ -87,7 +87,6 @@ function TableListItem<TItem extends ListItem>({
                     {!!canSelectMultiple && (
                         <Checkbox
                             accessibilityLabel={item.text ?? ''}
-                            accessibilityHint={item.text ?? ''}
                             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                             disabled={isDisabled || item.isDisabledCheckbox}
                             isChecked={!!item.isSelected}

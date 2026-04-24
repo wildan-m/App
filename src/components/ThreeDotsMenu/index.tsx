@@ -154,7 +154,6 @@ function ThreeDotsMenu({
                         role={getButtonRole(isNested)}
                         isNested={isNested}
                         accessibilityLabel={translate(iconTooltip)}
-                        accessibilityHint={translate(iconTooltip)}
                         sentryLabel={sentryLabel}
                     >
                         <Icon

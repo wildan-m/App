@@ -171,7 +171,6 @@ function DebugDetails({formType, data, policyHasEnabledTags, policyID, children,
                                 InputComponent={TextInput}
                                 inputID={key}
                                 accessibilityLabel={key}
-                                accessibilityHint={key}
                                 shouldSaveDraft
                                 forceActiveLabel
                                 label={key}
@@ -193,7 +192,6 @@ function DebugDetails({formType, data, policyHasEnabledTags, policyID, children,
                             InputComponent={TextInput}
                             inputID={key}
                             accessibilityLabel={key}
-                            accessibilityHint={key}
                             shouldSaveDraft
                             forceActiveLabel
                             label={key}
@@ -244,7 +242,6 @@ function DebugDetails({formType, data, policyHasEnabledTags, policyID, children,
                             inputID={key}
                             shouldSaveDraft
                             accessibilityLabel={key}
-                            accessibilityHint={key}
                             defaultValue={value}
                         />
                     ))}

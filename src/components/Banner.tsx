@@ -132,7 +132,6 @@ function Banner({
                                     onPress={onClose}
                                     role={CONST.ROLE.BUTTON}
                                     accessibilityLabel={text ? `${translate('common.close')}, ${text}` : translate('common.close')}
-                                    accessibilityHint={text ? `${translate('common.close')}, ${text}` : translate('common.close')}
                                     sentryLabel="Banner-Close"
                                 >
                                     <Icon

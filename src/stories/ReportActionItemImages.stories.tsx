@@ -20,7 +20,6 @@ function Template(props: ReportActionItemImagesProps) {
     return (
         <PressableWithoutFeedback
             accessibilityLabel="ReportActionItemImages Story"
-            accessibilityHint="Shows the report action item images"
             style={{flex: 1}}
         >
             {({hovered}) => (

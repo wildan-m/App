@@ -206,7 +206,6 @@ function BaseTwoFactorAuthForm({
                     errorText={formError.recoveryCode ?? errorMessage}
                     onSubmitEditing={validateAndSubmitForm}
                     accessibilityLabel={translate('recoveryCodeForm.recoveryCode')}
-                    accessibilityHint={translate('recoveryCodeForm.recoveryCode')}
                     role={CONST.ROLE.PRESENTATION}
                     testID="recoveryCodeInput"
                 />
@@ -222,7 +221,6 @@ function BaseTwoFactorAuthForm({
                     ref={inputRef}
                     autoFocus={false}
                     accessibilityLabel={translate('common.twoFactorCode')}
-                    accessibilityHint={translate('common.twoFactorCode')}
                     testID="twoFactorAuthCodeInput"
                 />
             )}
@@ -232,7 +230,6 @@ function BaseTwoFactorAuthForm({
                     onPress={handleToggleInputType}
                     hoverDimmingValue={1}
                     accessibilityLabel={translate(toggleLabelKey)}
-                    accessibilityHint={translate(toggleLabelKey)}
                     sentryLabel={CONST.SENTRY_LABEL.VALIDATE_CODE.RESEND_CODE}
                 >
                     <Text style={[styles.link]}>{translate(toggleLabelKey)}</Text>

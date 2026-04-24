@@ -336,7 +336,6 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                         handleFeatureSelect(item.id);
                     }}
                     accessibilityLabel={item.title}
-                    accessibilityHint={item.title}
                     accessible={false}
                     hoverStyle={!isSelected ? styles.hoveredComponentBG : undefined}
                     style={[styles.onboardingInterestedFeaturesItem, isSmallScreenWidth ? styles.flexBasis100 : {maxWidth: (width - gap) / 2}, isSelected && styles.activeComponentBG]}
@@ -352,7 +351,6 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                     </View>
                     <Checkbox
                         accessibilityLabel={item.title}
-                        accessibilityHint={item.title}
                         isChecked={isSelected}
                         onPress={() => {
                             handleFeatureSelect(item.id);

@@ -58,9 +58,6 @@ type BaseBlockingViewProps = {
     /** Accessibility label for the view */
     accessibilityLabel?: string;
 
-    /** Accessibility hint for the view */
-    accessibilityHint?: string;
-
     /** Whether to add bottom safe area padding to the content. */
     addOfflineIndicatorBottomSafeAreaPadding?: boolean;
 
@@ -113,7 +110,6 @@ function BlockingView({
     titleStyles = [],
     animationWebStyle = {},
     accessibilityLabel = '',
-    accessibilityHint,
     CustomSubtitle,
     contentFitImage,
     containerStyle: containerStyleProp,
@@ -135,7 +131,6 @@ function BlockingView({
         <View
             style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph10, containerStyle]}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint ?? accessibilityLabel}
             testID={testID}
         >
             {!!animation && (

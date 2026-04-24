@@ -101,7 +101,6 @@ function KnowATeacherPage() {
                         name="fname"
                         label={translate('common.firstName')}
                         accessibilityLabel={translate('common.firstName')}
-                        accessibilityHint={translate('common.firstName')}
                         role={CONST.ROLE.PRESENTATION}
                         autoCapitalize="words"
                         autoComplete="given-name"
@@ -114,7 +113,6 @@ function KnowATeacherPage() {
                         name="lname"
                         label={translate('common.lastName')}
                         accessibilityLabel={translate('common.lastName')}
-                        accessibilityHint={translate('common.lastName')}
                         role={CONST.ROLE.PRESENTATION}
                         autoCapitalize="words"
                         autoComplete="family-name"
@@ -127,7 +125,6 @@ function KnowATeacherPage() {
                         name="partnerUserID"
                         label={`${translate('common.email')}/${translate('common.phoneNumber')}`}
                         accessibilityLabel={`${translate('common.email')}/${translate('common.phoneNumber')}`}
-                        accessibilityHint={`${translate('common.email')}/${translate('common.phoneNumber')}`}
                         role={CONST.ROLE.PRESENTATION}
                         inputMode={CONST.INPUT_MODE.EMAIL}
                         autoCapitalize="none"

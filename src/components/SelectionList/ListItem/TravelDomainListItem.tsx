@@ -43,7 +43,6 @@ function TravelDomainListItem<TItem extends ListItem>({item, isFocused, showTool
                         disabled={isDisabled}
                         role={CONST.ROLE.BUTTON}
                         accessibilityLabel={item.text ?? ''}
-                        accessibilityHint={item.text ?? ''}
                         style={[styles.mr2, styles.optionSelectCircle]}
                     >
                         <SelectCircle

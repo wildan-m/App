@@ -137,7 +137,6 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                         isOn={tag.enabled}
                         disabled={tag.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}
                         accessibilityLabel={translate('workspace.tags.enableTag')}
-                        accessibilityHint={translate('workspace.tags.enableTag')}
                         onToggle={(newValue: boolean) => {
                             if (isDisablingOrDeletingLastEnabledTag(currentPolicyTag, [tag])) {
                                 showConfirmModal({

@@ -48,7 +48,6 @@ function SingleOptionSelector<TKey extends string>({options = [], selectedOption
                         accessibilityState={{checked: selectedOptionKey === option.key}}
                         aria-checked={selectedOptionKey === option.key}
                         accessibilityLabel={option.label}
-                        accessibilityHint={option.label}
                     >
                         <SelectCircle
                             isChecked={selectedOptionKey ? selectedOptionKey === option.key : false}

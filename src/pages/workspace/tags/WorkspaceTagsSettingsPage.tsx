@@ -107,7 +107,6 @@ function WorkspaceTagsSettingsPage({route}: WorkspaceTagsSettingsPageProps) {
                     <Switch
                         isOn={policy?.requiresTag ?? false}
                         accessibilityLabel={translate('workspace.tags.requiresTag')}
-                        accessibilityHint={translate('workspace.tags.requiresTag')}
                         onToggle={updateWorkspaceRequiresTag}
                         disabled={!policy?.areTagsEnabled || !hasEnabledOptions}
                     />
@@ -125,7 +124,6 @@ function WorkspaceTagsSettingsPage({route}: WorkspaceTagsSettingsPageProps) {
                     <Switch
                         isOn={!(policy?.disabledFields?.defaultBillable ?? false)}
                         accessibilityLabel={translate('workspace.tags.trackBillable')}
-                        accessibilityHint={translate('workspace.tags.trackBillable')}
                         onToggle={() => toggleBillableExpenses(policy)}
                         disabled={!policy?.areTagsEnabled}
                     />

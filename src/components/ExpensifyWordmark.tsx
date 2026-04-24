@@ -41,7 +41,6 @@ function ExpensifyWordmark({style}: ExpensifyWordmarkProps) {
             accessible
             role={CONST.ROLE.IMG}
             accessibilityLabel={translate('common.expensifyLogo')}
-            accessibilityHint={translate('common.expensifyLogo')}
             style={[
                 StyleUtils.getSignInWordmarkWidthStyle(shouldUseNarrowLayout, environment),
                 StyleUtils.getHeight(shouldUseNarrowLayout ? variables.signInLogoHeightSmallScreen : variables.signInLogoHeight),

@@ -284,7 +284,6 @@ function MapViewImpl({
                         <PressableWithoutFeedback
                             sentryLabel="MapView-ToggleDistanceUnit"
                             accessibilityLabel={CONST.ROLE.BUTTON}
-                            accessibilityHint={CONST.ROLE.BUTTON}
                             role={CONST.ROLE.BUTTON}
                             onPress={toggleDistanceUnit}
                         >
@@ -318,7 +317,6 @@ function MapViewImpl({
                         iconFill={theme.icon}
                         icon={expensifyIcons.Crosshair}
                         accessibilityLabel={translate('common.center')}
-                        accessibilityHint={translate('common.center')}
                     />
                 </View>
             )}

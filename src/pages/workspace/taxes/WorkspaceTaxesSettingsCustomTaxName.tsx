@@ -90,7 +90,6 @@ function WorkspaceTaxesSettingsCustomTaxName({
                             inputID={INPUT_IDS.NAME}
                             label={translate('workspace.editor.nameInputLabel')}
                             accessibilityLabel={translate('workspace.editor.nameInputLabel')}
-                            accessibilityHint={translate('workspace.editor.nameInputLabel')}
                             defaultValue={policy?.taxRates?.name}
                             multiline={false}
                             ref={inputCallbackRef}

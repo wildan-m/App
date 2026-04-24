@@ -266,7 +266,6 @@ function WorkspacesListRow({
                 <PressableWithoutFeedback
                     accessible
                     accessibilityLabel={accessibilityLabel}
-                    accessibilityHint={accessibilityLabel}
                     role={CONST.ROLE.LINK}
                     onPress={onPress}
                     disabled={disabled}

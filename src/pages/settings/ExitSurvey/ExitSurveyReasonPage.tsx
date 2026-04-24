@@ -101,7 +101,6 @@ function ExitSurveyReasonPage() {
                             inputID={INPUT_IDS.RESPONSE}
                             label={translate(`exitSurvey.responsePlaceholder`)}
                             accessibilityLabel={translate(`exitSurvey.responsePlaceholder`)}
-                            accessibilityHint={translate(`exitSurvey.responsePlaceholder`)}
                             role={CONST.ROLE.PRESENTATION}
                             autoGrowHeight
                             maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}

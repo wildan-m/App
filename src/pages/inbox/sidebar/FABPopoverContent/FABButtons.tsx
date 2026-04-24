@@ -23,7 +23,6 @@ function FABButtons({isActive, fabRef, onPress}: FABButtonsProps) {
             {!shouldUseNarrowLayout && (
                 <FloatingReceiptButton
                     accessibilityLabel={translate('sidebarScreen.fabScanReceiptExplained')}
-                    accessibilityHint={translate('sidebarScreen.fabScanReceiptExplained')}
                     role={CONST.ROLE.BUTTON}
                     onPress={startQuickScan}
                     sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.FLOATING_RECEIPT_BUTTON}
@@ -31,7 +30,6 @@ function FABButtons({isActive, fabRef, onPress}: FABButtonsProps) {
             )}
             <FloatingActionButton
                 accessibilityLabel={translate('sidebarScreen.fabNewChatExplained')}
-                accessibilityHint={translate('sidebarScreen.fabNewChatExplained')}
                 role={CONST.ROLE.BUTTON}
                 isActive={isActive}
                 ref={fabRef}

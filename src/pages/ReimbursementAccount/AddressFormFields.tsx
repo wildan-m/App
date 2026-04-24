@@ -153,7 +153,6 @@ function AddressFormFields({
                 shouldSaveDraft={shouldSaveDraft}
                 label={translate('common.city')}
                 accessibilityLabel={translate('common.city')}
-                accessibilityHint={translate('common.city')}
                 role={CONST.ROLE.PRESENTATION}
                 value={values?.city}
                 defaultValue={defaultValues?.city}
@@ -186,7 +185,6 @@ function AddressFormFields({
                 shouldSaveDraft={shouldSaveDraft}
                 label={translate('common.zip')}
                 accessibilityLabel={translate('common.zip')}
-                accessibilityHint={translate('common.zip')}
                 role={CONST.ROLE.PRESENTATION}
                 inputMode={shouldValidateZipCodeFormat ? CONST.INPUT_MODE.NUMERIC : undefined}
                 value={values?.zipCode}

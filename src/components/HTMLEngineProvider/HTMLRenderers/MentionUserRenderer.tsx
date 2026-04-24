@@ -96,7 +96,6 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
             }}
             role={CONST.ROLE.LINK}
             accessibilityLabel={`/${navigationRoute}`}
-            accessibilityHint={`/${navigationRoute}`}
         >
             <UserDetailsTooltip
                 accountID={accountID}

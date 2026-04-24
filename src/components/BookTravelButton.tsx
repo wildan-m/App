@@ -212,7 +212,6 @@ function BookTravelButton({
                 text={text}
                 onPress={bookATrip}
                 accessibilityLabel={translate('travel.bookTravel')}
-                accessibilityHint={translate('travel.bookTravel')}
                 style={large ? styles.w100 : undefined}
                 isDisabled={!activePolicyID}
                 success

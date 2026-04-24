@@ -291,7 +291,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                 shouldShowTextInput={shouldShowTextInput}
                 onKeyPress={textInputKeyPress}
                 accessibilityLabel={textInputOptions?.label}
-                accessibilityHint={textInputOptions?.label}
                 options={textInputOptions}
                 onSubmit={selectFocusedItem}
                 dataLength={itemsCount}

@@ -84,7 +84,6 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                 onPress={() => navigateToAvatarPage(icon)}
                 accessibilityRole={CONST.ROLE.BUTTON}
                 accessibilityLabel={icon.name ?? ''}
-                accessibilityHint={icon.name ?? ''}
                 disabled={icon.source === expensifyIcons.FallbackAvatar}
             >
                 <Avatar
@@ -122,7 +121,6 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                             onPress={() => navigateToAvatarPage(icon)}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={icon.name ?? ''}
-                            accessibilityHint={icon.name ?? ''}
                             disabled={icon.source === expensifyIcons.FallbackAvatar}
                         >
                             <Avatar

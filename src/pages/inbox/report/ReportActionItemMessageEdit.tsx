@@ -506,7 +506,6 @@ function ReportActionItemMessageEdit({
                                 style={closeButtonStyles}
                                 role={CONST.ROLE.BUTTON}
                                 accessibilityLabel={translate('common.close')}
-                                accessibilityHint={translate('common.close')}
                                 // disable dimming
                                 hoverDimmingValue={1}
                                 pressDimmingValue={1}
@@ -626,7 +625,6 @@ function ReportActionItemMessageEdit({
                                 disabled={hasExceededMaxCommentLength}
                                 role={CONST.ROLE.BUTTON}
                                 accessibilityLabel={translate('common.saveChanges')}
-                                accessibilityHint={translate('common.saveChanges')}
                                 hoverDimmingValue={1}
                                 pressDimmingValue={0.2}
                                 // Keep focus on the composer when send button is clicked.

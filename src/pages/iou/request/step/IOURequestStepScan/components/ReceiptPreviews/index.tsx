@@ -91,7 +91,6 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false}:
             <PressableWithFeedback
                 accessible
                 accessibilityLabel={translate('common.receipt')}
-                accessibilityHint={translate('common.receipt')}
                 accessibilityRole={CONST.ROLE.BUTTON}
                 onPress={() => Navigation.navigate(ROUTES.MONEY_REQUEST_RECEIPT_VIEW.getRoute(item.transactionID, Navigation.getActiveRoute()))}
                 sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.RECEIPT_PREVIEW_ITEM}

@@ -329,7 +329,6 @@ function BaseValidateCodeForm({
                             pressDimmingValue={0.2}
                             role={CONST.ROLE.BUTTON}
                             accessibilityLabel={translate('validateCodeForm.magicCodeNotReceived')}
-                            accessibilityHint={translate('validateCodeForm.magicCodeNotReceived')}
                             sentryLabel={CONST.SENTRY_LABEL.VALIDATE_CODE.RESEND_CODE}
                         >
                             <Text style={[StyleUtils.getDisabledLinkStyles(shouldDisableResendValidateCode)]}>{translate('validateCodeForm.magicCodeNotReceived')}</Text>

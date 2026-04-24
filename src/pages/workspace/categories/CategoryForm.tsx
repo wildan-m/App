@@ -84,7 +84,6 @@ function CategoryForm({onSubmit, policyCategories, categoryName, validateEdit}: 
                 defaultValue={decodedCategoryName}
                 label={translate('common.name')}
                 accessibilityLabel={translate('common.name')}
-                accessibilityHint={translate('common.name')}
                 inputID={INPUT_IDS.CATEGORY_NAME}
                 role={CONST.ROLE.PRESENTATION}
             />

@@ -609,7 +609,6 @@ function MoneyRequestReportTransactionList({
                             }
                         }}
                         accessibilityLabel={translate('accessibilityHints.selectAllTransactions')}
-                        accessibilityHint={translate('accessibilityHints.selectAllTransactions')}
                         isIndeterminate={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length !== transactionsWithoutPendingDelete.length}
                         isChecked={selectedTransactionIDs.length > 0 && selectedTransactionIDs.length === transactionsWithoutPendingDelete.length}
                     />

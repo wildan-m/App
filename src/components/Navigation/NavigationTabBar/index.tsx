@@ -151,7 +151,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                         <PressableWithFeedback
                             role={CONST.ROLE.LINK}
                             accessibilityLabel={translate('common.home')}
-                            accessibilityHint={translate('common.home')}
                             accessible
                             testID="ExpensifyLogoButton"
                             onPress={navigateToNewDotHome}
@@ -168,7 +167,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                             onPress={navigateToNewDotHome}
                             role={CONST.ROLE.TAB}
                             accessibilityLabel={translate('common.home')}
-                            accessibilityHint={translate('common.home')}
                             style={({hovered}) => [styles.leftNavigationTabBarItem, hovered && styles.navigationTabBarItemHovered]}
                             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.HOME}
                         >
@@ -185,7 +183,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                             onPress={navigateToChats}
                             role={CONST.ROLE.TAB}
                             accessibilityLabel={chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox')}
-                            accessibilityHint={chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox')}
                             accessibilityState={inboxAccessibilityState}
                             style={({hovered}) => [styles.leftNavigationTabBarItem, hovered && styles.navigationTabBarItemHovered]}
                             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.INBOX}
@@ -238,7 +235,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                     onPress={navigateToNewDotHome}
                     role={CONST.ROLE.TAB}
                     accessibilityLabel={translate('common.home')}
-                    accessibilityHint={translate('common.home')}
                     wrapperStyle={styles.flex1}
                     style={styles.navigationTabBarItem}
                     sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.HOME}
@@ -253,7 +249,6 @@ function NavigationTabBar({selectedTab, isTopLevelBar = false, shouldShowFloatin
                     onPress={navigateToChats}
                     role={CONST.ROLE.TAB}
                     accessibilityLabel={chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox')}
-                    accessibilityHint={chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox')}
                     accessibilityState={inboxAccessibilityState}
                     wrapperStyle={styles.flex1}
                     style={styles.navigationTabBarItem}

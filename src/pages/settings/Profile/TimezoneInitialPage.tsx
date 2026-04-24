@@ -45,7 +45,6 @@ function TimezoneInitialPage({currentUserPersonalDetails}: TimezoneInitialPagePr
                         </Text>
                         <Switch
                             accessibilityLabel={translate('timezonePage.getLocationAutomatically')}
-                            accessibilityHint={translate('timezonePage.getLocationAutomatically')}
                             isOn={!!timezone.automatic}
                             onToggle={(isAutomatic: boolean) => {
                                 // Updates setting for automatic timezone selection.

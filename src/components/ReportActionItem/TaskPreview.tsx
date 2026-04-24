@@ -153,7 +153,6 @@ function TaskPreview({
                 style={[styles.flexRow, styles.justifyContentBetween, style]}
                 role={CONST.ROLE.BUTTON}
                 accessibilityLabel={translate('task.task')}
-                accessibilityHint={translate('task.task')}
                 sentryLabel={CONST.SENTRY_LABEL.TASK.PREVIEW_CARD}
             >
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsStart, styles.mr2]}>
@@ -170,7 +169,6 @@ function TaskPreview({
                                 }
                             })}
                             accessibilityLabel={translate('task.task')}
-                            accessibilityHint={translate('task.task')}
                             sentryLabel={CONST.SENTRY_LABEL.TASK.PREVIEW_CHECKBOX}
                         />
                     </View>

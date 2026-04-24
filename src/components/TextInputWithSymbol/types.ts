@@ -110,7 +110,7 @@ type BaseTextInputWithSymbolProps = {
     | 'disabled'
     | 'ref'
     | 'accessibilityLabel'
-    | 'accessibilityHint'
+    | 'shouldAllowFocusInLandscapeMode'
 >;
 
 type TextInputWithSymbolProps = Omit<BaseTextInputWithSymbolProps, 'onSelectionChange'> & {

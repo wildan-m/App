@@ -135,7 +135,6 @@ function ReportFieldsValueSettingsPage({
                             <Switch
                                 isOn={!currentValueDisabled}
                                 accessibilityLabel={translate('workspace.reportFields.enableValue')}
-                                accessibilityHint={translate('workspace.reportFields.enableValue')}
                                 onToggle={updateListValueEnabled}
                             />
                         </View>

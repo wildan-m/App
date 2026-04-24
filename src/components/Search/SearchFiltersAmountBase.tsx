@@ -219,7 +219,6 @@ function SearchFiltersAmountBase({title, filterKey, testID}: {title: Translation
                         defaultValue={getCurrentValue()}
                         label={fieldTitle}
                         accessibilityLabel={fieldTitle}
-                        accessibilityHint={fieldTitle}
                         role={CONST.ROLE.PRESENTATION}
                         ref={inputCallbackRef}
                         inputMode={CONST.INPUT_MODE.DECIMAL}

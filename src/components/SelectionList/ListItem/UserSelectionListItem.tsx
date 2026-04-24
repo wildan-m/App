@@ -117,7 +117,6 @@ function UserSelectionListItem<TItem extends ListItem>({
 
                 <PressableWithFeedback
                     accessibilityLabel={item.text ?? ''}
-                    accessibilityHint={item.text ?? ''}
                     role={CONST.ROLE.BUTTON}
                     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                     disabled={isDisabled || item.isDisabledCheckbox}

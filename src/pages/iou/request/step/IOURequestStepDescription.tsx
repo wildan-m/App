@@ -230,7 +230,6 @@ function IOURequestStepDescription({
                         onValueChange={updateDescriptionRef}
                         label={translate('moneyRequestConfirmationList.whatsItFor')}
                         accessibilityLabel={translate('moneyRequestConfirmationList.whatsItFor')}
-                        accessibilityHint={translate('moneyRequestConfirmationList.whatsItFor')}
                         role={CONST.ROLE.PRESENTATION}
                         editable={!isDiscardModalVisible}
                         autoGrowHeight

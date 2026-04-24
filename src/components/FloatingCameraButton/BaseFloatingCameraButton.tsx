@@ -84,7 +84,6 @@ function BaseFloatingCameraButton({icon}: BaseFloatingCameraButtonProps) {
                 styles.floatingCameraButton,
             ]}
             accessibilityLabel={translate('sidebarScreen.fabScanReceiptExplained')}
-            accessibilityHint={translate('sidebarScreen.fabScanReceiptExplained')}
             onPress={onPress}
             role={CONST.ROLE.BUTTON}
             testID="floating-camera-button"

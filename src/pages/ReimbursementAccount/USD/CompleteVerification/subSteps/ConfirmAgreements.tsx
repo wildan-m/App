@@ -86,7 +86,6 @@ function ConfirmAgreements({onNext}: ConfirmAgreementsProps) {
             <InputWrapper
                 InputComponent={CheckboxWithLabel}
                 accessibilityLabel={translate('completeVerificationStep.isAuthorizedToUseBankAccount')}
-                accessibilityHint={translate('completeVerificationStep.isAuthorizedToUseBankAccount')}
                 inputID={COMPLETE_VERIFICATION_KEYS.IS_AUTHORIZED_TO_USE_BANK_ACCOUNT}
                 style={styles.mt6}
                 LabelComponent={IsAuthorizedToUseBankAccountLabel}
@@ -96,7 +95,6 @@ function ConfirmAgreements({onNext}: ConfirmAgreementsProps) {
             <InputWrapper
                 InputComponent={CheckboxWithLabel}
                 accessibilityLabel={translate('completeVerificationStep.certifyTrueAndAccurate')}
-                accessibilityHint={translate('completeVerificationStep.certifyTrueAndAccurate')}
                 inputID={COMPLETE_VERIFICATION_KEYS.CERTIFY_TRUE_INFORMATION}
                 style={styles.mt6}
                 LabelComponent={CertifyTrueAndAccurateLabel}
@@ -106,7 +104,6 @@ function ConfirmAgreements({onNext}: ConfirmAgreementsProps) {
             <InputWrapper
                 InputComponent={CheckboxWithLabel}
                 accessibilityLabel={`${translate('common.iAcceptThe')} ${translate('completeVerificationStep.termsAndConditions')}`}
-                accessibilityHint={`${translate('common.iAcceptThe')} ${translate('completeVerificationStep.termsAndConditions')}`}
                 inputID={COMPLETE_VERIFICATION_KEYS.ACCEPT_TERMS_AND_CONDITIONS}
                 style={styles.mt6}
                 LabelComponent={TermsAndConditionsLabel}

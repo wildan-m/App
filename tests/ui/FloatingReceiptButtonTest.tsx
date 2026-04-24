@@ -14,7 +14,6 @@ describe('FloatingReceiptButton hover', () => {
                 <FloatingReceiptButton
                     onPress={onPress}
                     accessibilityLabel="fab"
-                    accessibilityHint="Activates the floating receipt button"
                     role={CONST.ROLE.BUTTON}
                 />
             </NavigationContainer>,

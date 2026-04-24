@@ -161,7 +161,6 @@ function PrivateNotesEditPageInternal({route, report, accountID, privateNoteDraf
                         inputID={INPUT_IDS.PRIVATE_NOTES}
                         label={translate('privateNotes.composerLabel')}
                         accessibilityLabel={translate('privateNotes.title')}
-                        accessibilityHint={translate('privateNotes.title')}
                         autoCompleteType="off"
                         autoCorrect={false}
                         autoGrowHeight

@@ -432,7 +432,6 @@ function MerchantRulePageBase({policyID, ruleID, titleKey, testID}: MerchantRule
                                 </Text>
                                 <Switch
                                     accessibilityLabel={translate('workspace.rules.merchantRules.applyToExistingUnsubmittedExpenses')}
-                                    accessibilityHint={translate('workspace.rules.merchantRules.applyToExistingUnsubmittedExpenses')}
                                     isOn={shouldUpdateMatchingTransactions}
                                     onToggle={setShouldUpdateMatchingTransactions}
                                 />

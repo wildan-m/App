@@ -330,7 +330,6 @@ function MapView({
                             <ToggleDistanceUnitButton
                                 accessibilityRole={CONST.ROLE.BUTTON}
                                 accessibilityLabel="distance-label"
-                                accessibilityHint="distance-label"
                                 onPress={toggleDistanceUnit}
                             >
                                 <View style={[styles.distanceLabelWrapper]}>
@@ -348,7 +347,6 @@ function MapView({
                         iconFill={theme.icon}
                         icon={expensifyIcons.Crosshair}
                         accessibilityLabel={translate('common.center')}
-                        accessibilityHint={translate('common.center')}
                     />
                 </View>
             )}

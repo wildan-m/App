@@ -89,7 +89,6 @@ function WorkspaceNamePage({policy}: Props) {
                             inputID={INPUT_IDS.NAME}
                             label={translate('workspace.common.workspaceName')}
                             accessibilityLabel={translate('workspace.common.workspaceName')}
-                            accessibilityHint={translate('workspace.common.workspaceName')}
                             defaultValue={policy?.name}
                             spellCheck={false}
                             autoFocus

@@ -67,7 +67,6 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
                         }}
                         role={CONST.ROLE.BUTTON}
                         accessibilityLabel={translate('common.close')}
-                        accessibilityHint={translate('common.close')}
                         sentryLabel={CONST.SENTRY_LABEL.EARLY_DISCOUNT_BANNER.DISMISS_BUTTON}
                     >
                         <Icon

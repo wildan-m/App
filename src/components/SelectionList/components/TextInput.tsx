@@ -23,9 +23,6 @@ type TextInputProps = {
     /**  */
     accessibilityLabel?: string;
 
-    /** Accessibility hint for the text input */
-    accessibilityHint?: string;
-
     /** Whether the text input is loading */
     isLoading?: boolean;
 
@@ -58,7 +55,6 @@ function TextInput({
     ref,
     options,
     accessibilityLabel,
-    accessibilityHint,
     isLoading = false,
     dataLength,
     onSubmit,
@@ -152,7 +148,6 @@ function TextInput({
                     onBlur={handleBlur}
                     label={label}
                     accessibilityLabel={accessibilityLabel}
-                    accessibilityHint={accessibilityHint ?? accessibilityLabel}
                     hint={hint}
                     role={CONST.ROLE.PRESENTATION}
                     value={value}

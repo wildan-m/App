@@ -75,7 +75,6 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
                 onPress={navigateToSearch}
                 role={CONST.ROLE.TAB}
                 accessibilityLabel={translate('common.reports')}
-                accessibilityHint={translate('common.reports')}
                 accessibilityState={searchAccessibilityState}
                 style={({hovered}) => [styles.leftNavigationTabBarItem, hovered && styles.navigationTabBarItemHovered]}
                 sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.REPORTS}
@@ -97,7 +96,6 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
             onPress={navigateToSearch}
             role={CONST.ROLE.TAB}
             accessibilityLabel={translate('common.reports')}
-            accessibilityHint={translate('common.reports')}
             accessibilityState={searchAccessibilityState}
             wrapperStyle={styles.flex1}
             style={styles.navigationTabBarItem}

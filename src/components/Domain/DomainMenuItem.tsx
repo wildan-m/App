@@ -92,7 +92,6 @@ function DomainMenuItem({item, index}: DomainMenuItemProps) {
             <PressableWithoutFeedback
                 role={CONST.ROLE.BUTTON}
                 accessibilityLabel="row"
-                accessibilityHint="row"
                 onPress={action}
                 sentryLabel={item.sentryLabel}
             >

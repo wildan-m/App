@@ -307,7 +307,6 @@ function IOURequestStepOdometerImage({
                             success
                             text={translate('common.continue')}
                             accessibilityLabel={translate('common.continue')}
-                            accessibilityHint={translate('common.continue')}
                             style={[styles.p9, styles.pt5]}
                             onPress={capturePhoto}
                             sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.CONTINUE_BUTTON}
@@ -342,7 +341,6 @@ function IOURequestStepOdometerImage({
                                     <PressableWithFeedback
                                         role={CONST.ROLE.BUTTON}
                                         accessibilityLabel={translate('receipt.flash')}
-                                        accessibilityHint={translate('receipt.flash')}
                                         disabled={cameraPermissionStatus !== RESULTS.GRANTED || !hasFlash}
                                         onPress={() => setFlash((prevFlash) => !prevFlash)}
                                         sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.FLASH}
@@ -388,7 +386,6 @@ function IOURequestStepOdometerImage({
                             <PressableWithFeedback
                                 role={CONST.ROLE.BUTTON}
                                 accessibilityLabel={translate('receipt.gallery')}
-                                accessibilityHint={translate('receipt.gallery')}
                                 style={[styles.alignItemsStart]}
                                 sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.GALLERY}
                                 onPress={() => {
@@ -415,7 +412,6 @@ function IOURequestStepOdometerImage({
                     <PressableWithFeedback
                         role={CONST.ROLE.BUTTON}
                         accessibilityLabel={translate('receipt.shutter')}
-                        accessibilityHint={translate('receipt.shutter')}
                         style={[styles.alignItemsCenter]}
                         onPress={capturePhoto}
                         sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.ODOMETER_IMAGE.SHUTTER}

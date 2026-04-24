@@ -30,7 +30,6 @@ function BasePicker<TPickerValue>({
     icon,
     label = '',
     accessibilityLabel,
-    accessibilityHint,
     isDisabled = false,
     errorText = '',
     hintText = '',
@@ -58,7 +57,7 @@ function BasePicker<TPickerValue>({
     const picker = useRef<RNPickerSelect>(null);
 
     useEffect(() => {
-        if (!!value || !items || items.length !== 1 || !onInputChange) {
+        if (!!value || items?.length !== 1 || !onInputChange) {
             return;
         }
 
@@ -230,7 +229,6 @@ function BasePicker<TPickerValue>({
                         allowFontScaling: false,
                         accessibilityRole: CONST.ROLE.COMBOBOX,
                         accessibilityLabel: actualAccessibilityLabel,
-                        accessibilityHint,
                         importantForAccessibility: 'no-hide-descendants',
                     }}
                     touchableDoneProps={{
@@ -241,7 +239,6 @@ function BasePicker<TPickerValue>({
                         accessible: true,
                         accessibilityRole: CONST.ROLE.COMBOBOX,
                         accessibilityLabel: actualAccessibilityLabel,
-                        accessibilityHint,
                     }}
                     doneText={translate('common.done')}
                     pickerProps={{
@@ -253,7 +250,6 @@ function BasePicker<TPickerValue>({
                             onBlur();
                         },
                         accessibilityLabel: actualAccessibilityLabel,
-                        accessibilityHint,
                         accessibilityRole: CONST.ROLE.COMBOBOX,
                         ...additionalPickerEvents(enableHighlight, (inputValue, index) => {
                             onValueChange(inputValue, index);

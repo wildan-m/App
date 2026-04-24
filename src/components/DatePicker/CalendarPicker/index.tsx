@@ -205,7 +205,6 @@ function CalendarPicker({
                     disabled={years.length <= 1}
                     testID="currentYearButton"
                     accessibilityLabel={`${currentYearView}, ${translate('common.currentYear')}`}
-                    accessibilityHint={`${currentYearView}, ${translate('common.currentYear')}`}
                     role={CONST.ROLE.BUTTON}
                     sentryLabel={CONST.SENTRY_LABEL.CALENDAR_PICKER.YEAR_PICKER}
                 >
@@ -222,7 +221,6 @@ function CalendarPicker({
                         style={themeStyles.sidebarLinkTextBold}
                         testID="currentMonthText"
                         accessibilityLabel={`${monthNames.at(currentMonthView)}, ${translate('common.currentMonth')}`}
-                        accessibilityHint={`${monthNames.at(currentMonthView)}, ${translate('common.currentMonth')}`}
                     >
                         {monthNames.at(currentMonthView)}
                     </Text>
@@ -233,7 +231,6 @@ function CalendarPicker({
                         onPress={moveToPrevMonth}
                         hoverDimmingValue={1}
                         accessibilityLabel={translate('common.previous')}
-                        accessibilityHint={translate('common.previous')}
                         role={CONST.ROLE.BUTTON}
                         sentryLabel={CONST.SENTRY_LABEL.CALENDAR_PICKER.PREV_MONTH}
                     >
@@ -249,7 +246,6 @@ function CalendarPicker({
                         onPress={moveToNextMonth}
                         hoverDimmingValue={1}
                         accessibilityLabel={translate('common.next')}
-                        accessibilityHint={translate('common.next')}
                         role={CONST.ROLE.BUTTON}
                         sentryLabel={CONST.SENTRY_LABEL.CALENDAR_PICKER.NEXT_MONTH}
                     >

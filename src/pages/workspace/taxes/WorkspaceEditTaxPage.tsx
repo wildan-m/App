@@ -100,7 +100,6 @@ function WorkspaceEditTaxPage({
                                 <Switch
                                     isOn={!currentTaxRate?.isDisabled}
                                     accessibilityLabel={translate('workspace.taxes.actions.enable')}
-                                    accessibilityHint={translate('workspace.taxes.actions.enable')}
                                     onToggle={toggleTaxRate}
                                     disabled={!canEditTaxRate}
                                 />

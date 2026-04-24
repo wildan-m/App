@@ -51,7 +51,6 @@ function ThreadDivider({ancestor, isLinkDisabled = false}: ThreadDividerProps) {
                 <PressableWithoutFeedback
                     onPress={() => navigateToLinkedReportAction(ancestor, isInNarrowPaneModal, canUserPerformWriteAction(ancestor.report, isReportArchived), isOffline)}
                     accessibilityLabel={translate('threads.thread')}
-                    accessibilityHint={translate('threads.thread')}
                     role={CONST.ROLE.BUTTON}
                     style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}
                     sentryLabel={CONST.SENTRY_LABEL.REPORT.THREAD_DIVIDER}

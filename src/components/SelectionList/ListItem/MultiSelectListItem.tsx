@@ -36,7 +36,6 @@ function MultiSelectListItem<TItem extends ListItem>({
                 shouldSelectOnPressEnter
                 isChecked={item.isSelected}
                 accessibilityLabel={item.text ?? ''}
-                accessibilityHint={item.text ?? ''}
                 onPress={() => onSelectRow(item)}
             />
         );

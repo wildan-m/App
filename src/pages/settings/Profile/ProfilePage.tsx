@@ -249,7 +249,6 @@ function ProfilePage() {
                             ))}
                             <Button
                                 accessibilityLabel={translate('common.shareCode')}
-                                accessibilityHint={translate('common.shareCode')}
                                 text={translate('common.share')}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_SHARE_CODE)}
                                 icon={icons.QrCode}

@@ -30,7 +30,6 @@ function SidePanelOverlay({shouldBeVisible, onBackdropPress}: SidePanelOverlayPr
             <PressableWithoutFeedback
                 accessible
                 accessibilityLabel={translate('modal.backdropLabel')}
-                accessibilityHint={translate('modal.backdropLabel')}
                 onPress={onBackdropPress}
                 style={styles.flex1}
             />

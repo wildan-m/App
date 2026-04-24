@@ -132,7 +132,6 @@ function GrowlNotification({ref}: GrowlNotificationProps) {
             <GrowlNotificationContainer translateY={translateY}>
                 <PressableWithoutFeedback
                     accessibilityLabel={bodyText}
-                    accessibilityHint={bodyText}
                     onPress={() => fling()}
                 >
                     <GestureDetector gesture={flingGesture}>

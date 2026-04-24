@@ -22,7 +22,6 @@ function CurrentLocationButton({onPress, isDisabled = false}: CurrentLocationBut
             hoverStyle={StyleUtils.getButtonBackgroundColorStyle(getButtonState(true), true)}
             onPress={() => onPress?.()}
             accessibilityLabel={translate('location.useCurrent')}
-            accessibilityHint={translate('location.useCurrent')}
             disabled={isDisabled}
             onMouseDown={(e) => e.preventDefault()}
         >

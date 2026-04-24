@@ -134,7 +134,6 @@ function ReportFieldsListValuesPage({
                     <Switch
                         isOn={!disabledListValues.at(index)}
                         accessibilityLabel={translate('workspace.distanceRates.trackTax')}
-                        accessibilityHint={translate('workspace.distanceRates.trackTax')}
                         onToggle={(newValue: boolean) => updateReportFieldListValueEnabled(newValue, index)}
                     />
                 ),

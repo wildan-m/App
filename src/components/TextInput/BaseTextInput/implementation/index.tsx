@@ -497,7 +497,6 @@ function BaseTextInput({
                                 defaultValue={defaultValue}
                                 markdownStyle={markdownStyle}
                                 accessibilityLabel={inputProps.accessibilityLabel ?? accessibilityLabel}
-                                accessibilityHint={inputProps.accessibilityLabel ?? accessibilityLabel}
                                 accessibilityValue={accessibilityValue}
                                 keyboardType={inputProps.keyboardType}
                                 aria-describedby={inputHelpText ? helpMessageTextID : undefined}
@@ -554,7 +553,6 @@ function BaseTextInput({
                                         e.preventDefault();
                                     }}
                                     accessibilityLabel={translate('common.visible')}
-                                    accessibilityHint={translate('common.visible')}
                                 >
                                     <Icon
                                         src={passwordHidden ? expensifyIcons.Eye : expensifyIcons.EyeDisabled}

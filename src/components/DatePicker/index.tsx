@@ -134,7 +134,6 @@ function DatePicker({
                     iconContainerStyle={styles.pr0}
                     label={label}
                     accessibilityLabel={label}
-                    accessibilityHint={label}
                     role={CONST.ROLE.PRESENTATION}
                     value={selectedDate}
                     placeholder={placeholder ?? translate('common.dateFormat')}

@@ -50,7 +50,6 @@ function SearchButton({style, shouldUseAutoHitSlop = false}: SearchButtonProps) 
                 ref={pressableRef}
                 testID="searchButton"
                 accessibilityLabel={translate('common.search')}
-                accessibilityHint={translate('common.search')}
                 role={CONST.ROLE.BUTTON}
                 style={[styles.flexRow, styles.touchableButtonImage, style]}
                 shouldUseAutoHitSlop={shouldUseAutoHitSlop}

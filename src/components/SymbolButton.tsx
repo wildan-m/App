@@ -35,7 +35,6 @@ function SymbolButton({onSymbolButtonPress, symbol, isSymbolPressable = true, te
             <PressableWithoutFeedback
                 onPress={onSymbolButtonPress}
                 accessibilityLabel={translate('common.selectSymbolOrCurrency')}
-                accessibilityHint={translate('common.selectSymbolOrCurrency')}
                 role={CONST.ROLE.BUTTON}
                 style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}
             >

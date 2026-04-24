@@ -162,7 +162,6 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                         style={[styles.visuallyHidden]}
                         accessibilityRole={CONST.ROLE.HEADER}
                         accessibilityLabel={translate('workspace.common.distanceRates')}
-                        accessibilityHint={translate('workspace.common.distanceRates')}
                     >
                         {translate('workspace.common.distanceRates')}
                     </Text>
@@ -183,7 +182,6 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                                 isOn={rate?.enabled ?? false}
                                 onToggle={toggleRate}
                                 accessibilityLabel={translate('workspace.distanceRates.enableRate')}
-                                accessibilityHint={translate('workspace.distanceRates.enableRate')}
                                 showLockIcon={!canDisableOrDeleteRate}
                             />
                         </View>

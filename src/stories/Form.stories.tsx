@@ -84,7 +84,6 @@ function Template(props: FormProviderProps & FormProviderOnyxProps) {
                     InputComponent={TextInput}
                     role={CONST.ROLE.PRESENTATION}
                     accessibilityLabel="Routing number"
-                    accessibilityHint="Enter the routing number"
                     label="Routing number"
                     inputID="routingNumber"
                     shouldSaveDraft
@@ -95,7 +94,6 @@ function Template(props: FormProviderProps & FormProviderOnyxProps) {
                 role={CONST.ROLE.PRESENTATION}
                 label="Account number"
                 accessibilityLabel="Account number"
-                accessibilityHint="Enter the account number"
                 inputID="accountNumber"
                 containerStyles={defaultStyles.mt4}
             />
@@ -199,7 +197,6 @@ function WithNativeEventHandler(props: FormProviderProps & FormProviderOnyxProps
                 InputComponent={TextInput}
                 role={CONST.ROLE.PRESENTATION}
                 accessibilityLabel="Routing number"
-                accessibilityHint="Enter the routing number"
                 label="Routing number"
                 inputID="routingNumber"
                 onChangeText={setLog}

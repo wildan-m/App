@@ -165,7 +165,6 @@ function ReportActionItemSingle({
                 onPress={showActorDetails}
                 disabled={shouldDisableDetailPage}
                 accessibilityLabel={details.actorHint}
-                accessibilityHint={details.actorHint}
                 role={CONST.ROLE.BUTTON}
                 sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_SINGLE_AVATAR_BUTTON}
             >
@@ -196,7 +195,6 @@ function ReportActionItemSingle({
                             onPress={showActorDetails}
                             disabled={shouldDisableDetailPage}
                             accessibilityLabel={details.actorHint}
-                            accessibilityHint={details.actorHint}
                             role={CONST.ROLE.BUTTON}
                             sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_SINGLE_ACTOR_BUTTON}
                         >

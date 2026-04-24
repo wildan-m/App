@@ -208,7 +208,6 @@ function SearchAutocompleteInput({
                         spellCheck={false}
                         enterKeyHint="search"
                         accessibilityLabel={translate('search.searchPlaceholder')}
-                        accessibilityHint={translate('search.searchPlaceholder')}
                         disabled={disabled}
                         maxLength={CONST.SEARCH_QUERY_LIMIT}
                         onSubmitEditing={onSubmit}

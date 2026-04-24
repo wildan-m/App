@@ -233,7 +233,6 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
                                 maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}
                                 onChangeText={setMessage}
                                 accessibilityLabel={translate('share.messageInputLabel')}
-                                accessibilityHint={translate('share.messageInputLabel')}
                                 label={translate('share.messageInputLabel')}
                             />
                         </ScrollView>

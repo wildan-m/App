@@ -75,7 +75,6 @@ function CategoryRequiredFieldsPage({
                                 <Switch
                                     isOn={areCommentsRequired}
                                     accessibilityLabel={translate('workspace.rules.categoryRules.requireDescription')}
-                                    accessibilityHint={translate('workspace.rules.categoryRules.requireDescription')}
                                     onToggle={() => {
                                         setPolicyCategoryDescriptionRequired(policyID, categoryName, !areCommentsRequired, policyCategories);
                                     }}
@@ -97,7 +96,6 @@ function CategoryRequiredFieldsPage({
                                     <Switch
                                         isOn={areAttendeesRequired}
                                         accessibilityLabel={translate('workspace.rules.categoryRules.requireAttendees')}
-                                        accessibilityHint={translate('workspace.rules.categoryRules.requireAttendees')}
                                         onToggle={() => {
                                             setPolicyCategoryAttendeesRequired(policyID, categoryName, !areAttendeesRequired, policyCategories);
                                         }}

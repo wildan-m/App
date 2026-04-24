@@ -57,7 +57,6 @@ function TransparentOverlay({onPress: onPressProp}: TransparentOverlayProps) {
                 onPress={onPress}
                 style={[styles.flex1, styles.cursorDefault, overlay]}
                 accessibilityLabel={translate('common.close')}
-                accessibilityHint={translate('common.close')}
                 role={CONST.ROLE.BUTTON}
             />
         </View>

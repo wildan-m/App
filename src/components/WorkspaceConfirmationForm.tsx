@@ -232,7 +232,6 @@ function WorkspaceConfirmationForm({onSubmit, policyOwnerEmail = '', onBackButto
                                 inputID={INPUT_IDS.NAME}
                                 label={translate('workspace.common.workspaceName')}
                                 accessibilityLabel={translate('workspace.common.workspaceName')}
-                                accessibilityHint={translate('workspace.common.workspaceName')}
                                 spellCheck={false}
                                 defaultValue={defaultWorkspaceName}
                                 onChangeText={(str) => {
@@ -289,7 +288,6 @@ function WorkspaceConfirmationForm({onSubmit, policyOwnerEmail = '', onBackButto
                                             </View>
                                             <Switch
                                                 accessibilityLabel={translate('workspace.common.keepMeAsAdmin')}
-                                                accessibilityHint={translate('workspace.common.keepMeAsAdmin')}
                                                 isOn={makeMeAdmin}
                                                 onToggle={setMakeMeAdmin}
                                             />

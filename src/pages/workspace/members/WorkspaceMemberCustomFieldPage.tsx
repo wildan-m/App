@@ -79,7 +79,6 @@ function WorkspaceMemberCustomFieldPage({policy, route, personalDetails}: Worksp
                         InputComponent={TextInput}
                         label={customFieldText}
                         accessibilityLabel={customFieldText}
-                        accessibilityHint={customFieldText}
                         role={CONST.ROLE.PRESENTATION}
                         inputID="customField"
                         value={customField}

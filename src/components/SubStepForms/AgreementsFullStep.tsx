@@ -139,7 +139,6 @@ function AgreementsFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                 <InputWrapper
                     InputComponent={CheckboxWithLabel}
                     accessibilityLabel={translate('agreementsStep.iAmAuthorized')}
-                    accessibilityHint={translate('agreementsStep.iAmAuthorized')}
                     inputID={inputIDs.authorizedToBindClientToAgreement as string}
                     style={styles.mt6}
                     LabelComponent={IsAuthorizedToUseBankAccountLabel}
@@ -149,7 +148,6 @@ function AgreementsFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                 <InputWrapper
                     InputComponent={CheckboxWithLabel}
                     accessibilityLabel={translate('agreementsStep.iCertify')}
-                    accessibilityHint={translate('agreementsStep.iCertify')}
                     inputID={inputIDs.provideTruthfulInformation as string}
                     style={styles.mt6}
                     LabelComponent={CertifyTrueAndAccurateLabel}
@@ -159,7 +157,6 @@ function AgreementsFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                 <InputWrapper
                     InputComponent={CheckboxWithLabel}
                     accessibilityLabel={translate('agreementsStep.iAcceptTheTermsAndConditionsAccessibility')}
-                    accessibilityHint={translate('agreementsStep.iAcceptTheTermsAndConditionsAccessibility')}
                     inputID={inputIDs.agreeToTermsAndConditions as string}
                     style={styles.mt6}
                     LabelComponent={TermsAndConditionsLabel}
@@ -169,7 +166,6 @@ function AgreementsFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                 <InputWrapper
                     InputComponent={CheckboxWithLabel}
                     accessibilityLabel={translate('agreementsStep.iConsentToThePrivacyNoticeAccessibility')}
-                    accessibilityHint={translate('agreementsStep.iConsentToThePrivacyNoticeAccessibility')}
                     inputID={inputIDs.consentToPrivacyNotice as string}
                     style={styles.mt6}
                     LabelComponent={ConsentToPrivacyNoticeLabel}

@@ -100,7 +100,6 @@ function MoneyRequestReportGroupHeader({
                             disabled={isDisabled}
                             onPress={handleToggleSelection}
                             accessibilityLabel={translate('reportLayout.selectGroup', {groupName: displayName})}
-                            accessibilityHint={translate('reportLayout.selectGroup', {groupName: displayName})}
                             style={styles.mr2}
                         />
                     )}

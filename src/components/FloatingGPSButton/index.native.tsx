@@ -36,7 +36,6 @@ function FloatingGpsButton() {
             style={[styles.floatingGpsButton]}
             testID="floating-gps-button"
             accessibilityLabel={translate('gps.gpsFloatingPillText')}
-            accessibilityHint={translate('gps.gpsFloatingPillText')}
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.FLOATING_GPS_BUTTON}
         />
     );

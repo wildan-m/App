@@ -45,7 +45,6 @@ function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTool
                 }}
                 disabled={isDisabled && !item.isSelected}
                 accessibilityLabel={item.text ?? ''}
-                accessibilityHint={item.text ?? ''}
                 role={getButtonRole(true)}
                 isNested
                 onMouseDown={(e) => e.preventDefault()}

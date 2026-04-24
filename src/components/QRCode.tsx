@@ -59,9 +59,6 @@ type QRCodeProps = {
 
     /** Accessibility label for the QR code image */
     accessibilityLabel?: string;
-
-    /** Accessibility hint for the QR code image */
-    accessibilityHint?: string;
 };
 
 function QRCode({
@@ -77,7 +74,6 @@ function QRCode({
     logoRatio = CONST.QR.DEFAULT_LOGO_SIZE_RATIO,
     logoMarginRatio = CONST.QR.DEFAULT_LOGO_MARGIN_RATIO,
     accessibilityLabel,
-    accessibilityHint,
 }: QRCodeProps) {
     const theme = useTheme();
 
@@ -86,7 +82,6 @@ function QRCode({
             accessible
             role={CONST.ROLE.IMG}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint ?? accessibilityLabel}
             tabIndex={0}
         >
             <QRCodeLibrary

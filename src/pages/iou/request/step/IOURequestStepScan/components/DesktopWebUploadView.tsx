@@ -112,7 +112,6 @@ function DesktopWebUploadView({
                                             success
                                             text={translate(shouldAcceptMultipleFiles ? 'common.chooseFiles' : 'common.chooseFile')}
                                             accessibilityLabel={translate(shouldAcceptMultipleFiles ? 'common.chooseFiles' : 'common.chooseFile')}
-                                            accessibilityHint={translate(shouldAcceptMultipleFiles ? 'common.chooseFiles' : 'common.chooseFile')}
                                             style={[styles.p5]}
                                             onPress={() => {
                                                 openPicker({

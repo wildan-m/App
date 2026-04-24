@@ -102,7 +102,6 @@ function Badge({
             onPress={onPress}
             role={pressable ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
             accessibilityLabel={pressable ? text : undefined}
-            accessibilityHint={pressable ? text : undefined}
             aria-label={!pressable ? text : undefined}
             accessible={false}
         >

@@ -138,7 +138,6 @@ function HeaderFirstRow<TItem extends ListItem>({
                         containerStyle={[StyleUtils.getCheckboxContainerStyle(20), StyleUtils.getMultiselectListStyles(!!reportItem.isSelected, !!reportItem.isDisabled)]}
                         disabled={!!isDisabled || reportItem.isDisabledCheckbox}
                         accessibilityLabel={reportItem.text ?? ''}
-                        accessibilityHint={reportItem.text ?? ''}
                         shouldStopMouseDownPropagation
                         style={[styles.cursorUnset, StyleUtils.getCheckboxPressableStyle(), reportItem.isDisabledCheckbox && styles.cursorDisabled]}
                     />
@@ -164,7 +163,6 @@ function HeaderFirstRow<TItem extends ListItem>({
                             style={[styles.pl3, styles.justifyContentCenter, styles.alignItemsEnd]}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={isExpanded ? CONST.ACCESSIBILITY_LABELS.COLLAPSE : CONST.ACCESSIBILITY_LABELS.EXPAND}
-                            accessibilityHint={isExpanded ? CONST.ACCESSIBILITY_LABELS.COLLAPSE : CONST.ACCESSIBILITY_LABELS.EXPAND}
                             sentryLabel={CONST.SENTRY_LABEL.SEARCH.REPORT_EXPAND_COLLAPSE}
                         >
                             {({hovered}) => (

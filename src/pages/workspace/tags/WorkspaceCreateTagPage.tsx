@@ -130,7 +130,6 @@ function WorkspaceCreateTagPage({route}: WorkspaceCreateTagPageProps) {
                         InputComponent={TextInput}
                         label={translate('common.name')}
                         accessibilityLabel={translate('common.name')}
-                        accessibilityHint={translate('common.name')}
                         inputID={INPUT_IDS.TAG_NAME}
                         role={CONST.ROLE.PRESENTATION}
                         ref={inputCallbackRef}

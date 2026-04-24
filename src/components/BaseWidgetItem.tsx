@@ -48,7 +48,6 @@ function BaseWidgetItem({icon, iconBackgroundColor, title, subtitle, ctaText, on
     return (
         <PressableWithoutFeedback
             accessibilityLabel={title}
-            accessibilityHint={title}
             onPress={onCtaPress}
             role={CONST.ROLE.BUTTON}
             sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.WIDGET_ITEM}

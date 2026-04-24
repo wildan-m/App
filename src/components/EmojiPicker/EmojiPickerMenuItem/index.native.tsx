@@ -47,7 +47,6 @@ function EmojiPickerMenuItem({
                 themeStyles.emojiItem,
             ]}
             accessibilityLabel={emoji}
-            accessibilityHint={emoji}
             role={CONST.ROLE.BUTTON}
             sentryLabel={CONST.SENTRY_LABEL.EMOJI_PICKER.MENU_ITEM}
         >

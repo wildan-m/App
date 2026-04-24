@@ -309,7 +309,7 @@ const config = defineConfig([
             ],
 
             // React and React Native specific rules
-            'react-native-a11y/has-accessibility-hint': 'error',
+            'react-native-a11y/has-accessibility-hint': 'off',
             'react-native-a11y/has-valid-accessibility-ignores-invert-colors': 'error',
             'react/require-default-props': 'off',
             'react/prop-types': 'off',

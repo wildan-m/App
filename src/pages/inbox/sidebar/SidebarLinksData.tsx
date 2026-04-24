@@ -71,7 +71,6 @@ function SidebarLinksData({insets}: SidebarLinksDataProps) {
             accessibilityElementsHidden={!isFocused}
             collapsable={false}
             accessibilityLabel={translate('sidebarScreen.listOfChats')}
-            accessibilityHint={translate('sidebarScreen.listOfChats')}
             style={[styles.flex1, styles.h100]}
             onLayout={onLayout}
         >

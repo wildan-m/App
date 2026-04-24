@@ -21,7 +21,6 @@ type EmojiPickerButtonDropdownProps = {
     /** Flag to disable the emoji picker button */
     isDisabled?: boolean;
     accessibilityLabel?: string;
-    accessibilityHint?: string;
     role?: string;
     onModalHide: EmojiPickerOnModalHide;
     onInputChange: (emoji: string) => void;
@@ -34,7 +33,7 @@ type EmojiPickerButtonDropdownProps = {
 
 function EmojiPickerButtonDropdown(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    {isDisabled = false, withoutOverlay = false, onModalHide, onInputChange, value, disabled, style, ref, accessibilityHint, ...otherProps}: EmojiPickerButtonDropdownProps,
+    {isDisabled = false, withoutOverlay = false, onModalHide, onInputChange, value, disabled, style, ref, ...otherProps}: EmojiPickerButtonDropdownProps,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 ) {
     const styles = useThemeStyles();
@@ -74,7 +73,6 @@ function EmojiPickerButtonDropdown(
                 onPress={onPress}
                 id="emojiDropdownButton"
                 accessibilityLabel={value ? `${value}, ${translate('statusPage.status')}` : translate('statusPage.status')}
-                accessibilityHint={accessibilityHint ?? (value ? `${value}, ${translate('statusPage.status')}` : translate('statusPage.status'))}
                 role={CONST.ROLE.BUTTON}
                 sentryLabel={CONST.SENTRY_LABEL.EMOJI_PICKER.BUTTON_DROPDOWN}
             >

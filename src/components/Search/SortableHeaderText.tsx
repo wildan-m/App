@@ -65,7 +65,6 @@ export default function SortableHeaderText({text, icon, sortOrder, isActive, tex
                 onPress={() => onPress(nextSortOrder)}
                 role={CONST.ROLE.BUTTON}
                 accessibilityLabel={CONST.ROLE.BUTTON}
-                accessibilityHint={CONST.ROLE.BUTTON}
                 accessible
                 disabled={!isSortable}
                 sentryLabel={sentryLabel}

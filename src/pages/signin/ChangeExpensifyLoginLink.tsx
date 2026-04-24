@@ -25,7 +25,6 @@ function ChangeExpensifyLoginLink({onPress}: ChangeExpensifyLoginLinkProps) {
                 onPress={onPress}
                 role={CONST.ROLE.LINK}
                 accessibilityLabel={translate('common.goBack')}
-                accessibilityHint={translate('common.goBack')}
                 sentryLabel={CONST.SENTRY_LABEL.SIGN_IN.GO_BACK}
             >
                 <Text style={[styles.link]}>{translate('common.goBack')}.</Text>

@@ -111,7 +111,6 @@ function DebugTransactionViolationCreatePage({
                             <TextInput
                                 errorText={error}
                                 accessibilityLabel={translate('debug.editJson')}
-                                accessibilityHint={translate('debug.editJson')}
                                 forceActiveLabel
                                 numberOfLines={18}
                                 multiline

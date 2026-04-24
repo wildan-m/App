@@ -58,7 +58,6 @@ function AvatarSelector({selectedID, onSelect, label, name, size = CONST.AVATAR_
                             accessible
                             accessibilityRole="button"
                             accessibilityLabel={translate('avatarPage.selectAvatar')}
-                            accessibilityHint={translate('avatarPage.selectAvatar')}
                             onPress={() => onSelect(id)}
                             style={[styles.avatarSelectorWrapper, isSelected && {borderColor: theme.success, borderWidth: 2}]}
                         >
@@ -81,7 +80,6 @@ function AvatarSelector({selectedID, onSelect, label, name, size = CONST.AVATAR_
                             accessible
                             accessibilityRole="button"
                             accessibilityLabel={translate('avatarPage.selectAvatar')}
-                            accessibilityHint={translate('avatarPage.selectAvatar')}
                             onPress={() => onSelect(id)}
                             style={[styles.avatarSelectorWrapper, isSelected && styles.avatarSelected]}
                         >

@@ -561,7 +561,6 @@ function MoneyRequestReceiptView({
                                                     style={styles.receiptActionButton}
                                                     hoverStyle={styles.buttonDefaultHovered}
                                                     accessibilityLabel={translate('receipt.addAdditionalReceipt')}
-                                                    accessibilityHint={translate('receipt.addAdditionalReceipt')}
                                                     role={CONST.ROLE.BUTTON}
                                                     sentryLabel={CONST.SENTRY_LABEL.RECEIPT.ADD_ATTACHMENT_BUTTON}
                                                 >
@@ -585,7 +584,6 @@ function MoneyRequestReceiptView({
                                             style={styles.receiptActionButton}
                                             hoverStyle={styles.buttonDefaultHovered}
                                             accessibilityLabel={translate('accessibilityHints.viewAttachment')}
-                                            accessibilityHint={translate('accessibilityHints.viewAttachment')}
                                             role={CONST.ROLE.BUTTON}
                                             sentryLabel={CONST.SENTRY_LABEL.RECEIPT.ENLARGE_BUTTON}
                                         >

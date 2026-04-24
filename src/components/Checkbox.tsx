@@ -51,9 +51,6 @@ type CheckboxProps = Partial<ChildrenProps> &
         /** An accessibility label for the checkbox */
         accessibilityLabel: string;
 
-        /** An accessibility hint for the checkbox */
-        accessibilityHint?: string;
-
         /** stop propagation of the mouse down event */
         shouldStopMouseDownPropagation?: boolean;
 
@@ -87,7 +84,6 @@ function Checkbox({
     caretSize = 14,
     onPress,
     accessibilityLabel,
-    accessibilityHint,
     shouldStopMouseDownPropagation,
     shouldSelectOnPressEnter,
     wrapperStyle,
@@ -149,7 +145,6 @@ function Checkbox({
                 mixed → indeterminate  */
             aria-checked={isIndeterminate ? 'mixed' : isChecked}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint ?? accessibilityLabel}
             pressDimmingValue={1}
             wrapperStyle={wrapperStyle}
             sentryLabel={sentryLabel}

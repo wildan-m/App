@@ -59,9 +59,6 @@ type CheckboxWithLabelProps = RequiredLabelProps & {
     /** An accessibility label for the checkbox */
     accessibilityLabel?: string;
 
-    /** An accessibility hint for the checkbox */
-    accessibilityHint?: string;
-
     /** Reference to the outer element */
     ref?: ForwardedRef<View>;
 };
@@ -74,7 +71,6 @@ function CheckboxWithLabel({
     LabelComponent,
     label,
     accessibilityLabel,
-    accessibilityHint,
     style,
     value,
     ref,
@@ -105,7 +101,6 @@ function CheckboxWithLabel({
                     hasError={!!errorText}
                     ref={ref}
                     accessibilityLabel={accessibilityLabel ?? label ?? ''}
-                    accessibilityHint={accessibilityHint ?? accessibilityLabel ?? label ?? ''}
                 />
                 <PressableWithFeedback
                     tabIndex={-1}

@@ -130,7 +130,6 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
                     thumbnailUrl={thumbnailUrl}
                     onPress={handleOnPress}
                     accessibilityLabel={fileName}
-                    accessibilityHint={fileName}
                     isDeleted={isDeleted}
                 />
             ) : (

@@ -222,7 +222,6 @@ function ImageView({isAuthTokenRequired = false, url, fileName, onError}: ImageV
                 onPress={onContainerPress}
                 role={CONST.ROLE.IMG}
                 accessibilityLabel={fileName}
-                accessibilityHint={fileName}
                 sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_MODAL.IMAGE_ZOOM}
             >
                 {/* eslint-disable-next-line react-native-a11y/has-valid-accessibility-ignores-invert-colors -- Custom Image wrapper does not support this prop. */}

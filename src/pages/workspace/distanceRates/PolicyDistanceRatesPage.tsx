@@ -245,7 +245,6 @@ function PolicyDistanceRatesPage({
                         <Switch
                             isOn={!!value?.enabled}
                             accessibilityLabel={value?.name ?? ''}
-                            accessibilityHint={value?.name ?? ''}
                             onToggle={(newValue: boolean) => updateDistanceRateEnabled(newValue, value.customUnitRateID)}
                             showLockIcon={!canDisableOrDeleteRate(value.customUnitRateID)}
                             disabled={value.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}

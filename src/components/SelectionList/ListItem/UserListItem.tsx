@@ -112,14 +112,12 @@ function UserListItem<TItem extends ListItem>({
                     <View
                         accessible={shouldDisableAccessibleGrouping || undefined}
                         accessibilityLabel={shouldDisableAccessibleGrouping ? contactAccessibilityLabel : undefined}
-                        accessibilityHint={shouldDisableAccessibleGrouping ? translate('common.select') : undefined}
                         role={shouldDisableAccessibleGrouping ? CONST.ROLE.BUTTON : undefined}
                         style={[styles.flex1, styles.flexRow, styles.alignItemsCenter]}
                     >
                         {!shouldUseDefaultRightHandSideCheckmark && !!canSelectMultiple && (
                             <PressableWithFeedback
                                 accessibilityLabel={item.text ?? ''}
-                                accessibilityHint={item.isSelected ? translate('common.deselect') : translate('common.select')}
                                 role={CONST.ROLE.BUTTON}
                                 sentryLabel={CONST.SENTRY_LABEL.USER_LIST_ITEM.CHECKBOX}
                                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -189,7 +187,6 @@ function UserListItem<TItem extends ListItem>({
                         {!!shouldUseDefaultRightHandSideCheckmark && !!canSelectMultiple && (
                             <PressableWithFeedback
                                 accessibilityLabel={item.text ?? ''}
-                                accessibilityHint={item.text ?? ''}
                                 role={CONST.ROLE.BUTTON}
                                 sentryLabel={CONST.SENTRY_LABEL.USER_LIST_ITEM.CHECKBOX_RIGHT}
                                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing

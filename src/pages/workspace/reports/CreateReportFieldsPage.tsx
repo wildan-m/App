@@ -194,7 +194,6 @@ function WorkspaceCreateReportFieldsPage({
                                 description={translate('common.name')}
                                 rightLabel={translate('common.required')}
                                 accessibilityLabel={translate('workspace.editor.nameInputLabel')}
-                                accessibilityHint={translate('workspace.editor.nameInputLabel')}
                                 maxLength={CONST.WORKSPACE_REPORT_FIELD_POLICY_MAX_LENGTH}
                                 multiline={false}
                                 role={CONST.ROLE.PRESENTATION}
@@ -244,7 +243,6 @@ function WorkspaceCreateReportFieldsPage({
                                     subtitle={translate('workspace.reportFields.initialValueInputSubtitle')}
                                     description={translate('common.initialValue')}
                                     accessibilityLabel={translate('workspace.editor.initialValueInputLabel')}
-                                    accessibilityHint={translate('workspace.editor.initialValueInputLabel')}
                                     maxLength={CONST.WORKSPACE_REPORT_FIELD_POLICY_MAX_LENGTH}
                                     multiline={false}
                                     role={CONST.ROLE.PRESENTATION}

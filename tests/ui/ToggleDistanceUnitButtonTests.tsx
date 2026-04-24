@@ -12,7 +12,6 @@ describe('ToggleDistanceUnitButton', () => {
             <ToggleDistanceUnitButton
                 testID="pressable"
                 accessibilityLabel="fake-button"
-                accessibilityHint="Activates the button"
                 accessibilityRole={CONST.ROLE.BUTTON}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 {...props}

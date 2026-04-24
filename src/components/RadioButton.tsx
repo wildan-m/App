@@ -16,9 +16,6 @@ type RadioButtonProps = {
     /** Specifies the accessibility label for the radio button */
     accessibilityLabel: string;
 
-    /** Specifies the accessibility hint for the radio button */
-    accessibilityHint?: string;
-
     /** Should the input be styled for errors  */
     hasError?: boolean;
 
@@ -30,7 +27,7 @@ type RadioButtonProps = {
     shouldUseNewStyle?: boolean;
 };
 
-function RadioButton({isChecked, onPress, accessibilityLabel, accessibilityHint, hasError = false, disabled = false, shouldUseNewStyle = false}: RadioButtonProps) {
+function RadioButton({isChecked, onPress, accessibilityLabel, hasError = false, disabled = false, shouldUseNewStyle = false}: RadioButtonProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
@@ -43,7 +40,6 @@ function RadioButton({isChecked, onPress, accessibilityLabel, accessibilityHint,
                 hoverDimmingValue={1}
                 pressDimmingValue={1}
                 accessibilityLabel={accessibilityLabel}
-                accessibilityHint={accessibilityHint ?? accessibilityLabel}
                 role={CONST.ROLE.RADIO}
                 sentryLabel={CONST.SENTRY_LABEL.RADIO_BUTTON.BUTTON}
                 style={[
@@ -73,7 +69,6 @@ function RadioButton({isChecked, onPress, accessibilityLabel, accessibilityHint,
             hoverDimmingValue={1}
             pressDimmingValue={1}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityHint ?? accessibilityLabel}
             role={CONST.ROLE.RADIO}
             sentryLabel={CONST.SENTRY_LABEL.RADIO_BUTTON.BUTTON}
             style={[styles.radioButtonContainer, hasError && styles.borderColorDanger, disabled && styles.cursorDisabled]}

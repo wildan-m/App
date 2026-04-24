@@ -62,7 +62,6 @@ function UnreportedExpenseListItem<TItem extends ListItem>({
                 }}
                 disabled={isItemDisabled}
                 accessibilityLabel={item.text ?? ''}
-                accessibilityHint={item.text ?? ''}
                 role={getButtonRole(true)}
                 isNested
                 onMouseDown={(e) => e.preventDefault()}

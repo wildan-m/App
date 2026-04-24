@@ -116,7 +116,6 @@ function TaskTitlePage({report, currentUserPersonalDetails}: TaskTitlePageProps)
                                 name={INPUT_IDS.TITLE}
                                 label={translate('task.title')}
                                 accessibilityLabel={translate('task.title')}
-                                accessibilityHint={translate('task.title')}
                                 defaultValue={Parser.htmlToMarkdown(report?.reportName ?? '', {})}
                                 ref={(element: AnimatedTextInputRef | null) => {
                                     if (!element) {

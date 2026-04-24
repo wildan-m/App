@@ -145,7 +145,6 @@ function PressableWithDelayToggle({
             ref={ref as any}
             onPress={updatePressState}
             accessibilityLabel={accessibilityLabel}
-            accessibilityHint={accessibilityLabel}
             suppressHighlighting={inline ? true : undefined}
             accessibilityRole={accessibilityRole}
         >
