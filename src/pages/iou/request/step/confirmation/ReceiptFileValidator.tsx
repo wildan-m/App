@@ -4,6 +4,7 @@ import {isLocalFile as isLocalFileFileUtils} from '@libs/fileDownload/FileUtils'
 import validateReceiptFile from '@libs/fileDownload/validateReceiptFile';
 import {navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {isOdometerDistanceRequest as isOdometerDistanceRequestTransactionUtils} from '@libs/TransactionUtils';
 import {setMoneyRequestReceipt} from '@userActions/IOU/Receipt';
 import {removeDraftTransactionsByIDs} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
@@ -56,6 +57,16 @@ function ReceiptFileValidator({
 
         Promise.all(
             transactions.map((item) => {
+                // Odometer-distance transactions store a stitched blob as their receipt source.
+                // Blob-URL expiry and recovery for those are owned by useRestartOnOdometerImagesFailure,
+                // so skip them here to avoid a duplicate clear-and-navigate path that races with the hook.
+                if (isOdometerDistanceRequestTransactionUtils(item)) {
+                    if (item.receipt) {
+                        newReceiptFiles = {...newReceiptFiles, [item.transactionID]: item.receipt};
+                    }
+                    return Promise.resolve();
+                }
+
                 const itemReceiptFilename = item.receipt?.filename;
                 const itemReceiptPath = item.receipt?.source;
                 const itemReceiptType = item.receipt?.type;

@@ -553,9 +553,6 @@ function IOURequestStepConfirmation({
                 odometerStartImage={odometerStartImage}
                 odometerEndImage={odometerEndImage}
                 transaction={transaction}
-                reportID={reportID}
-                backToReport={backToReport}
-                iouType={iouType}
                 onStitchingChange={setIsStitchingReceipt}
                 onStitchError={setStitchError}
             />
