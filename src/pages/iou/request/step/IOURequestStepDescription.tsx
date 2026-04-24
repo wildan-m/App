@@ -112,13 +112,14 @@ function IOURequestStepDescription({
                 addErrorMessage(errors, 'moneyRequestComment', translate('common.error.characterLimitExceedCounter', values.moneyRequestComment.length, CONST.DESCRIPTION_LIMIT));
             }
 
-            if (isDescriptionRequired && !values.moneyRequestComment) {
+            const trimmedComment = values.moneyRequestComment.trim();
+            if (isDescriptionRequired && !trimmedComment && trimmedComment !== currentDescriptionInMarkdown) {
                 addErrorMessage(errors, INPUT_IDS.MONEY_REQUEST_COMMENT, translate('common.error.fieldRequired'));
             }
 
             return errors;
         },
-        [isDescriptionRequired, translate],
+        [isDescriptionRequired, translate, currentDescriptionInMarkdown],
     );
 
     const navigateBack = useCallback(() => {
