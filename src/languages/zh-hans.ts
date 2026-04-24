@@ -1373,7 +1373,7 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidTagLength: '标签名称超过了 255 个字符。请缩短它或选择其他标签。',
             invalidAmount: '请在继续之前输入有效金额',
             invalidDistance: '请在继续之前输入有效的距离',
-            invalidReadings: '请输入起始读数和结束读数',
+            invalidReadings: '请在继续之前输入起始读数和结束读数',
             negativeDistanceNotAllowed: '结束读数必须大于开始读数',
             distanceAmountTooLarge: '总金额过大。请减少距离或降低费率。',
             distanceAmountTooLargeReduceDistance: '总金额过大。请减少距离。',

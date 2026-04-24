@@ -1416,7 +1416,7 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidTagLength: 'De tagnaam is langer dan 255 tekens. Maak deze korter of kies een andere tag.',
             invalidAmount: 'Voer een geldig bedrag in voordat je doorgaat',
             invalidDistance: 'Voer een geldige afstand in voordat je verdergaat',
-            invalidReadings: 'Voer zowel de begin- als eindstanden in',
+            invalidReadings: 'Voer zowel de begin- als eindstanden in voordat je doorgaat',
             negativeDistanceNotAllowed: 'Eindstand moet hoger zijn dan beginstand',
             distanceAmountTooLarge: 'Het totale bedrag is te hoog. Verlaag de afstand of verlaag het tarief.',
             distanceAmountTooLargeReduceDistance: 'Het totale bedrag is te hoog. Verlaag de afstand.',

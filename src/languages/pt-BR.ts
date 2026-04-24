@@ -1413,7 +1413,7 @@ const translations: TranslationDeepObject<typeof en> = {
             invalidTagLength: 'O nome da tag excede 255 caracteres. Reduza-o ou escolha uma tag diferente.',
             invalidAmount: 'Insira um valor válido antes de continuar',
             invalidDistance: 'Insira uma distância válida antes de continuar',
-            invalidReadings: 'Insira as leituras de início e fim',
+            invalidReadings: 'Insira as leituras de início e fim antes de continuar',
             negativeDistanceNotAllowed: 'A leitura final deve ser maior que a leitura inicial',
             distanceAmountTooLarge: 'O valor total é muito alto. Diminua a distância ou reduza a tarifa.',
             distanceAmountTooLargeReduceDistance: 'O valor total é muito alto. Diminua a distância.',
