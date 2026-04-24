@@ -82,6 +82,9 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [cardsList] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${defaultFundID}_${CONST.EXPENSIFY_CARD.BANK}`, {selector: filterInactiveCards});
+    const {cardList, ...cards} = cardsList ?? {};
+    const hasAnyCards = Object.keys(cards).length > 0;
+
     const [expensifyCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${defaultFundID}`);
     const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
     const illustrations = useMemoizedLazyIllustrations(['HandCard']);
@@ -186,7 +189,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
 
     const hasCards = listData.length > 0;
     const hasEligibleCards = eligibleCards.length > 0;
-    const headerMessage = hasEligibleCards ? getHeaderMessage(listData.length > 0, false, inputValue, countryCode, false) : '';
+    const headerMessage = hasEligibleCards ? getHeaderMessage(hasEligibleCards, false, inputValue, countryCode, false) : '';
 
     return (
         <AccessOrNotFoundWrapper
@@ -246,13 +249,9 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                                         icon={illustrations.HandCard}
                                         iconWidth={variables.iconSection}
                                         iconHeight={variables.iconSection}
-                                        title={
-                                            inputValue.trim()
-                                                ? translate('common.noResultsFound')
-                                                : translate(hasEligibleCards ? 'workspace.rules.spendRules.noAvailableCards' : 'workspace.rules.spendRules.noCardsIssuedTitle')
-                                        }
+                                        title={translate(hasAnyCards ? 'workspace.rules.spendRules.noAvailableCards' : 'workspace.rules.spendRules.noCardsIssuedTitle')}
                                         titleStyles={styles.mb2}
-                                        subtitle={translate(hasEligibleCards ? 'workspace.rules.spendRules.noAvailableCardsSubtitle' : 'workspace.rules.spendRules.noCardsIssuedSubtitle')}
+                                        subtitle={translate(hasAnyCards ? 'workspace.rules.spendRules.noAvailableCardsSubtitle' : 'workspace.rules.spendRules.noCardsIssuedSubtitle')}
                                         subtitleStyle={styles.textSupporting}
                                     />
                                 </ScrollView>
