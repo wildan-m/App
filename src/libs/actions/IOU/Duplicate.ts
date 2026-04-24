@@ -76,15 +76,14 @@ function getIOUActionForTransactions(transactionIDList: Array<string | undefined
     );
 }
 
+type MergeDuplicatesFuncParams = MergeDuplicatesParams & {currentUserLogin: string; currentUserAccountID: number};
+
 /** Merge several transactions into one by updating the fields of the one we want to keep and deleting the rest */
-function mergeDuplicates({transactionThreadReportID: optimisticTransactionThreadReportID, ...params}: MergeDuplicatesParams) {
+function mergeDuplicates({transactionThreadReportID: optimisticTransactionThreadReportID, currentUserLogin, currentUserAccountID, ...params}: MergeDuplicatesFuncParams) {
     const allParams: MergeDuplicatesParams = {...params};
     const allTransactions = getAllTransactions();
     const allTransactionViolations = getAllTransactionViolations();
     const allReports = getAllReports();
-    const currentUserEmail = getCurrentUserEmail();
-    const currentUserAccountID = getUserAccountID();
-
     const originalSelectedTransaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${params.transactionID}`];
 
     const optimisticTransactionData: OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION> = {
@@ -283,7 +282,7 @@ function mergeDuplicates({transactionThreadReportID: optimisticTransactionThread
 
     if (optimisticTransactionThreadReportID) {
         const iouAction = getIOUActionForReportID(params.reportID, params.transactionID);
-        const optimisticCreatedAction = buildOptimisticCreatedReportAction(currentUserEmail);
+        const optimisticCreatedAction = buildOptimisticCreatedReportAction(currentUserLogin);
         const optimisticTransactionThreadReport = buildTransactionThread(iouAction, expenseReport, undefined, optimisticTransactionThreadReportID);
 
         allParams.transactionThreadReportID = optimisticTransactionThreadReportID;
