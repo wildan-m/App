@@ -728,7 +728,7 @@ function handleMoneyRequestStepDistanceNavigation({
             createDistanceRequest({
                 report,
                 participants,
-                currentUserLogin,
+                currentUserLogin: currentUserLogin ?? '',
                 currentUserAccountID,
                 iouType,
                 existingTransaction: transaction,
