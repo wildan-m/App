@@ -81,7 +81,7 @@ function parseHttpResponse(
 }
 
 function isHttpSuccess(httpStatusCode: number | undefined): boolean {
-    return httpStatusCode !== undefined && httpStatusCode >= 200 && httpStatusCode < 300;
+    return httpStatusCode !== undefined && categorizeHttpStatus(httpStatusCode) === VALUES.HTTP_STATUS.SUCCESS;
 }
 
 function isRegistrationChallenge(challenge: unknown): challenge is RegistrationChallenge {
