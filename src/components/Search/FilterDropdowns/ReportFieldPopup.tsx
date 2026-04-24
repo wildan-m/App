@@ -22,11 +22,13 @@ import type {Policy, PolicyReportField} from '@src/types/onyx';
 import type {PolicyReportFieldType} from '@src/types/onyx/Policy';
 import BasePopup from './BasePopup';
 import DateSelectPopup from './DateSelectPopup';
+import type {PopoverComponentProps} from './DropdownButton';
 import SingleSelectPopup from './SingleSelectPopup';
 import TextInputPopup from './TextInputPopup';
 
 type ReportFieldPopupProps = {
     closeOverlay: () => void;
+    setPopoverWidth: PopoverComponentProps['setPopoverWidth'];
     updateFilterForm: (value: Partial<SearchAdvancedFiltersForm>) => void;
 };
 
@@ -40,6 +42,7 @@ type ReportFieldSubPopupProps = {
 type ReportFieldDatePopupProps = {
     field: PolicyReportField;
     value: SearchDateValues;
+    setPopoverWidth: PopoverComponentProps['setPopoverWidth'];
     onBackButtonPress: () => void;
     onChange: (newValue: SearchDateValues) => void;
 };
@@ -67,7 +70,7 @@ function ReportFieldListPopup({value, field, onBackButtonPress, onChange}: Repor
     );
 }
 
-function ReportFieldDatePopup({value, field, onBackButtonPress, onChange}: ReportFieldDatePopupProps) {
+function ReportFieldDatePopup({value, field, setPopoverWidth, onBackButtonPress, onChange}: ReportFieldDatePopupProps) {
     const styles = useThemeStyles();
     const filterKey = `${CONST.SEARCH.REPORT_FIELD.DEFAULT_PREFIX}${getFieldNameAsKey(field.name)}` as const;
 
@@ -84,6 +87,7 @@ function ReportFieldDatePopup({value, field, onBackButtonPress, onChange}: Repor
                 value={value}
                 onChange={onChange}
                 closeOverlay={onBackButtonPress}
+                setPopoverWidth={setPopoverWidth}
                 presets={getDatePresets(filterKey, true)}
             />
         </View>
@@ -103,7 +107,7 @@ function ReportFieldTextPopup({field, value, onBackButtonPress, onChange}: Repor
     );
 }
 
-function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProps) {
+function ReportFieldPopup({closeOverlay, setPopoverWidth, updateFilterForm}: ReportFieldPopupProps) {
     const {translate, localeCompare} = useLocalize();
     const {windowHeight} = useWindowDimensions();
     const isInLandscapeMode = useIsInLandscapeMode();
@@ -137,6 +141,7 @@ function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProp
     if (selectedField) {
         const goBack = () => {
             setSelectedField(null);
+            setPopoverWidth?.(undefined);
         };
 
         // We only support list, date, & text for report fields, no other types
@@ -154,6 +159,7 @@ function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProp
                     field={selectedField}
                     value={filterValue as SearchDateValues}
                     onBackButtonPress={goBack}
+                    setPopoverWidth={setPopoverWidth}
                     onChange={(newValue) =>
                         setValues((prevValues) => ({
                             ...prevValues,
