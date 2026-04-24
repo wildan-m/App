@@ -6952,7 +6952,13 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Goedkeuringsmodus', finalApprover: 'Laatste fiatteur'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Goedkeuringsmodus',
+                finalApprover: 'Laatste fiatteur',
+                connect: 'Verbinden',
+                connectionDescription: 'Verbind Gusto om goedkeuringen van werknemers gesynchroniseerd te houden met je workspace.',
+            },
         },
     },
     getAssistancePage: {
@@ -9102,8 +9108,12 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             forceTwoFactorAuthDescription: `<muted-text>Tweeledige verificatie vereisen voor alle leden van dit domein. Domeinleden worden gevraagd om tweefactorauthenticatie voor hun account in te stellen wanneer ze zich aanmelden.</muted-text>`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
             resetTwoFactorAuth: 'Tweeledige verificatie opnieuw instellen',
+            error: 'Kon deze wijziging niet opslaan. Probeer het opnieuw.',
         },
-        groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
+        groups: {
+            title: 'Groepen',
+            memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`}),
+        },
     },
     proactiveAppReview: {
         title: 'Geniet je van de nieuwe Expensify?',

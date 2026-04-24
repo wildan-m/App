@@ -6987,7 +6987,13 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Genehmigungsmodus', finalApprover: 'Endgültige:r Genehmiger:in'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Genehmigungsmodus',
+                finalApprover: 'Endgültige:r Genehmiger:in',
+                connect: 'Verbinden',
+                connectionDescription: 'Verbinde Gusto, um Mitarbeitergenehmigungen mit deinem Workspace zu synchronisieren.',
+            },
         },
     },
     getAssistancePage: {
@@ -9139,8 +9145,12 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             forceTwoFactorAuthDescription: `<muted-text>Zwei-Faktor-Authentifizierung für alle Mitglieder dieser Domain verlangen. Domänenmitglieder werden beim Anmelden aufgefordert, die Zwei-Faktor-Authentifizierung für ihr Konto einzurichten.</muted-text>`,
             forceTwoFactorAuthError: 'Die Erzwingung der Zwei-Faktor-Authentifizierung konnte nicht geändert werden. Bitte versuche es später erneut.',
             resetTwoFactorAuth: 'Zwei-Faktor-Authentifizierung zurücksetzen',
+            error: 'Diese Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.',
         },
-        groups: {title: 'Gruppen', memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`})},
+        groups: {
+            title: 'Gruppen',
+            memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`}),
+        },
     },
     proactiveAppReview: {
         title: 'Gefällt dir das neue Expensify?',
