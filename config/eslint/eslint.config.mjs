@@ -186,7 +186,7 @@ const config = defineConfig([
     {
         settings: {
             seatbelt: {
-                seatbeltFile: new URL('./eslint.seatbelt.tsv', import.meta.url).pathname,
+                seatbeltFile: path.join(dirname, 'eslint.seatbelt.tsv'),
                 threadsafe: true,
                 // Never persist TSV updates unless we're in CI. In CI, the ephemeral
                 // write is harmless on PR runs and essential on `push: main`, where
