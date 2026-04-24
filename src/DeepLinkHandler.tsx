@@ -30,13 +30,13 @@ function DeepLinkHandler({onInitialUrl}: DeepLinkHandlerProps) {
     const [allReports, allReportsMetadata] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
     const [, sessionMetadata] = useOnyx(ONYXKEYS.SESSION);
     const [conciergeReportID, conciergeReportIDMetadata] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [introSelected, introSelectedMeatadata] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [introSelected, introSelectedMetadata] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed, isSelfTourViewedMetadata] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas, betasMetadata] = useOnyx(ONYXKEYS.BETAS);
     const isAuthenticated = useIsAuthenticated();
 
     useEffect(() => {
-        if (isLoadingOnyxValue(allReportsMetadata, sessionMetadata, conciergeReportIDMetadata, introSelectedMeatadata, isSelfTourViewedMetadata, betasMetadata)) {
+        if (isLoadingOnyxValue(allReportsMetadata, sessionMetadata, conciergeReportIDMetadata, introSelectedMetadata, isSelfTourViewedMetadata, betasMetadata)) {
             return;
         }
         // If the app is opened from a deep link, get the reportID (if exists) from the deep link and navigate to the chat report
@@ -81,7 +81,7 @@ function DeepLinkHandler({onInitialUrl}: DeepLinkHandlerProps) {
         allReportsMetadata.status,
         sessionMetadata.status,
         conciergeReportIDMetadata.status,
-        introSelectedMeatadata.status,
+        introSelectedMetadata.status,
         isSelfTourViewedMetadata.status,
         betasMetadata.status,
     ]);
