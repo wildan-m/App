@@ -11,6 +11,10 @@ import * as ReportActionContextMenu from './pages/inbox/report/ContextMenu/Repor
 
 const LazyPopoverReportActionContextMenu = React.lazy(() => import('./pages/inbox/report/ContextMenu/PopoverReportActionContextMenu'));
 
+// Maximum time (ms) the context menu mount can stay deferred before requestIdleCallback forces it to run,
+// guaranteeing mount even if the main thread never becomes idle.
+const IDLE_CALLBACK_TIMEOUT_MS = 2000;
+
 /**
  * Renders global modals and overlays that are mounted once at the top level.
  */
@@ -20,14 +24,20 @@ function GlobalModals() {
     useEffect(() => {
         // Defer loading the context menu until after startup to avoid pulling in heavy
         // dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage, etc.)
-        // during the ManualAppStartup span. The ref-based API in ReportActionContextMenu
-        // already handles null refs gracefully.
+        // during the ManualAppStartup span.
         // Fallback to setTimeout on environments without requestIdleCallback (e.g. Safari < 16.4).
         const schedule: (cb: () => void) => number =
-            typeof requestIdleCallback === 'function' ? (cb) => requestIdleCallback(cb, {timeout: 2000}) : (cb) => setTimeout(cb, 1) as unknown as number;
+            typeof requestIdleCallback === 'function' ? (cb) => requestIdleCallback(cb, {timeout: IDLE_CALLBACK_TIMEOUT_MS}) : (cb) => setTimeout(cb, 1) as unknown as number;
         const cancel: (id: number) => void = typeof cancelIdleCallback === 'function' ? cancelIdleCallback : (id) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>);
         const id = schedule(() => setShouldRenderContextMenu(true));
-        return () => cancel(id);
+
+        // Allow showContextMenu() to force eager mount if the user interacts before the idle callback fires.
+        ReportActionContextMenu.registerEnsureContextMenuMounted(() => setShouldRenderContextMenu(true));
+
+        return () => {
+            cancel(id);
+            ReportActionContextMenu.registerEnsureContextMenuMounted(null);
+        };
     }, []);
 
     return (
