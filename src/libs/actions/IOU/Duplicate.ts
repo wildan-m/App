@@ -1050,6 +1050,9 @@ function bulkDuplicateExpenses({
             currentOptimisticIOUReportID = generateReportID();
             currentReportPreviewActionID = NumberUtils.rand64();
             reportWasSplit = true;
+            if (currentTargetReport) {
+                currentTargetReport = {...currentTargetReport, iouReportID: currentOptimisticIOUReportID};
+            }
         }
 
         // Defer auto-submit only when this isn't the last expense AND the
