@@ -69,12 +69,10 @@ function ReportFieldListPopup({value, field, onBackButtonPress, onChange}: Repor
 
 function ReportFieldDatePopup({value, field, onBackButtonPress, onChange}: ReportFieldDatePopupProps) {
     const styles = useThemeStyles();
-    const {windowHeight} = useWindowDimensions();
-    const isInLandscapeMode = useIsInLandscapeMode();
     const filterKey = `${CONST.SEARCH.REPORT_FIELD.DEFAULT_PREFIX}${getFieldNameAsKey(field.name)}` as const;
 
     return (
-        <View style={[styles.pv4, styles.gap2, styles.getPopoverMaxHeight(windowHeight, isInLandscapeMode)]}>
+        <View style={[styles.pv4, styles.gap2]}>
             <HeaderWithBackButton
                 shouldDisplayHelpButton={false}
                 style={[styles.h10]}
