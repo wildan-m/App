@@ -22,15 +22,24 @@ const ROUTE_TO_NAVIGATION_TAB: Record<string, ValueOf<typeof NAVIGATION_TABS>> =
     [NAVIGATORS.WORKSPACE_NAVIGATOR]: NAVIGATION_TABS.WORKSPACES,
 };
 
-// Tab wrapper navigators — when `getFocusedLeafScreenName` bottoms out on one of these
-// (because the nested stack state hasn't hydrated yet), the user is landing on the tab root,
-// so treat it as "at root" to keep the tab bar visible during the transition.
+// Count as tab-root when they surface as the resolved leaf.
 const TAB_WRAPPER_NAVIGATORS = new Set<string>([
     NAVIGATORS.REPORTS_SPLIT_NAVIGATOR,
     NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR,
     NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR,
     NAVIGATORS.WORKSPACE_NAVIGATOR,
 ]);
+
+const isAtTabRootLevel = (name: string | undefined): boolean => !name || ROOT_TAB_SCREENS.has(name) || TAB_WRAPPER_NAVIGATORS.has(name);
+
+// Deepest `screen` in a `{screen, params}` chain (e.g. WORKSPACE_NAV → WORKSPACE_SPLIT_NAV → WORKSPACE.INITIAL).
+const getPushTargetLeaf = (params: unknown): string | undefined => {
+    const p = params as {screen?: unknown; params?: unknown} | undefined;
+    if (typeof p?.screen !== 'string') {
+        return undefined;
+    }
+    return getPushTargetLeaf(p.params) ?? p.screen;
+};
 
 /**
  * Custom tab bar rendered by the BottomTabNavigator. Only receives `state` (not the
@@ -44,8 +53,8 @@ function TabNavigatorBar({state}: Pick<BottomTabBarProps, 'state'>) {
     const StyleUtils = useStyleUtils();
     const activeRoute = state.routes[state.index];
     const selectedTab = ROUTE_TO_NAVIGATION_TAB[activeRoute?.name ?? SCREENS.HOME] ?? NAVIGATION_TABS.HOME;
-    const focusedScreen = getFocusedLeafScreenName(activeRoute?.state);
-    const isAtRoot = !focusedScreen || ROOT_TAB_SCREENS.has(focusedScreen) || TAB_WRAPPER_NAVIGATORS.has(focusedScreen);
+    // Check both leaves so wrapper hydration doesn't flash the tab bar on the push target (Android).
+    const isAtRoot = isAtTabRootLevel(getFocusedLeafScreenName(activeRoute?.state)) && isAtTabRootLevel(getPushTargetLeaf(activeRoute?.params));
     // --- Narrow-only animation logic (hooks must run unconditionally per Rules of Hooks) ---
     // On native, screens also render the tab bar via bottomContent for swipe-back animations.
     // Delay showing this navigator's tab bar only when navigating back from a deeper screen
