@@ -1666,6 +1666,32 @@ function createOptionFromReport(
     };
 }
 
+function createOptionFromPersonalDetail(
+    personalDetail: PersonalDetails,
+    personalDetails: OnyxEntry<PersonalDetailsList>,
+    report: OnyxEntry<Report>,
+    privateIsArchived: boolean | undefined,
+    policy: OnyxEntry<Policy>,
+    reportAttributesDerived?: ReportAttributesDerivedValue['reports'],
+    policyTags?: OnyxEntry<PolicyTagLists>,
+    visibleReportActionsData: VisibleReportActionsDerivedValue = {},
+): SearchOption<PersonalDetails> {
+    return {
+        item: personalDetail,
+        ...createOption({
+            accountIDs: [personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID],
+            personalDetails,
+            report,
+            policy,
+            privateIsArchived,
+            config: {showPersonalDetails: true},
+            reportAttributesDerived,
+            policyTags,
+            visibleReportActionsData,
+        }),
+    };
+}
+
 function orderPersonalDetailsOptions(options: SearchOptionData[]) {
     // PersonalDetails should be ordered Alphabetically by default - https://github.com/Expensify/App/issues/8220#issuecomment-1104009435
     return lodashOrderBy(options, [(personalDetail) => personalDetail.text?.toLowerCase()], 'asc');
@@ -3419,6 +3445,7 @@ function processSearchString(searchString: string | undefined): string[] {
 export {
     canCreateOptimisticPersonalDetailOption,
     combineOrderingOfReportsAndPersonalDetails,
+    createOptionFromPersonalDetail,
     createOptionFromReport,
     createOptionList,
     createFilteredOptionList,

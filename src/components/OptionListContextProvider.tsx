@@ -3,13 +3,13 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
-import {createOptionFromReport, createOptionList, processReport, shallowOptionsListCompare} from '@libs/OptionsListUtils';
+import {createOptionFromPersonalDetail, createOptionFromReport, createOptionList, processReport, shallowOptionsListCompare} from '@libs/OptionsListUtils';
 import type {OptionList, SearchOption} from '@libs/OptionsListUtils';
-import {isSelfDM} from '@libs/ReportUtils';
+import {getParticipantsAccountIDsForDisplay, isOneOnOneChat, isSelfDM} from '@libs/ReportUtils';
 import {endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {PersonalDetails, Report} from '@src/types/onyx';
+import type {PersonalDetails, Policy, Report} from '@src/types/onyx';
 import {usePersonalDetails} from './OnyxListItemProvider';
 
 type OptionsListStateContextProps = {
@@ -284,6 +284,15 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
             newReportOption: SearchOption<Report>;
         }> = [];
 
+        // Mutate only the entries whose personal detail actually changed, avoiding a full rebuild
+        // of the personalDetails option array on every change (which caused OOM on low-RAM devices).
+        const updatedPersonalDetailsMap = new Map<string, SearchOption<PersonalDetails>>();
+        for (const option of options.personalDetails) {
+            if (option.item?.accountID != null) {
+                updatedPersonalDetailsMap.set(String(option.item.accountID), option);
+            }
+        }
+
         for (const accountID of Object.keys(personalDetails)) {
             const prevPersonalDetail = prevPersonalDetails?.[accountID];
             const personalDetail = personalDetails[accountID];
@@ -291,6 +300,10 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
             if (prevPersonalDetail && personalDetail && isEqualPersonalDetail(prevPersonalDetail, personalDetail)) {
                 continue;
             }
+
+            let reportForPersonalDetail: OnyxEntry<Report>;
+            let privateIsArchivedForPersonalDetail: boolean | undefined;
+            let policyForPersonalDetail: OnyxEntry<Policy>;
 
             for (const report of Object.values(reports ?? {})) {
                 if (!report) {
@@ -313,11 +326,43 @@ function OptionsListContextProvider({children}: OptionsListProviderProps) {
                     newReportOption,
                     replaceIndex,
                 });
+
+                // Mirror createOptionList's reportMapForAccountIDs lookup so the delta-built option
+                // carries the same 1:1 DM metadata a full rebuild would attach.
+                if (!reportForPersonalDetail && isOneOnOneChat(report)) {
+                    const participantAccountIDs = getParticipantsAccountIDsForDisplay(report);
+                    if (participantAccountIDs.length <= 1 && participantAccountIDs.at(0) === Number(accountID)) {
+                        reportForPersonalDetail = report;
+                        privateIsArchivedForPersonalDetail = privateIsArchived;
+                        policyForPersonalDetail = policy;
+                    }
+                }
+            }
+
+            if (personalDetail) {
+                updatedPersonalDetailsMap.set(
+                    accountID,
+                    createOptionFromPersonalDetail(
+                        personalDetail,
+                        personalDetails,
+                        reportForPersonalDetail,
+                        privateIsArchivedForPersonalDetail,
+                        policyForPersonalDetail,
+                        reportAttributes?.reports,
+                    ),
+                );
+            } else {
+                updatedPersonalDetailsMap.delete(accountID);
             }
         }
 
-        // since personal details are not a collection, we need to recreate the whole list from scratch
-        const newPersonalDetailsOptions = createOptionList(personalDetails, privateIsArchivedMap, reports, allPolicies, reportAttributes?.reports).personalDetails;
+        for (const existingAccountID of Array.from(updatedPersonalDetailsMap.keys())) {
+            if (!(existingAccountID in personalDetails)) {
+                updatedPersonalDetailsMap.delete(existingAccountID);
+            }
+        }
+
+        const newPersonalDetailsOptions = Array.from(updatedPersonalDetailsMap.values());
 
         setOptions((prevOptions) => {
             const newOptions = {...prevOptions};
