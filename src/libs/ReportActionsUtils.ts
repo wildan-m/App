@@ -1990,9 +1990,13 @@ function getOneTransactionThreadReportAction(
 
     const originalMessage = getOriginalMessage(iouRequestAction);
 
+    // Mirror the loop above: an IOU action that is optimistically deleted while the user is offline is intentionally kept alive
+    // so callers (e.g. receipt-error RBR) can still inspect the underlying transaction until the deletion is committed on the server.
+    const isPendingOfflineDelete = iouRequestAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && (isOffline ?? deprecatedIsNetworkOffline);
+
     // If there's only one IOU request action associated with the report but it's been deleted, then we don't consider this a oneTransaction report
     // and want to display it using the standard view
-    if (((originalMessage?.deleted ?? '') !== '' || isDeletedAction(iouRequestAction)) && isMoneyRequestAction(iouRequestAction)) {
+    if (((originalMessage?.deleted ?? '') !== '' || isDeletedAction(iouRequestAction)) && isMoneyRequestAction(iouRequestAction) && !isPendingOfflineDelete) {
         return;
     }
 
