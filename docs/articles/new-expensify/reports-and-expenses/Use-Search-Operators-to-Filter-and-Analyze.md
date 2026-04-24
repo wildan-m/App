@@ -1,11 +1,11 @@
 ---
-title: Use Search Operators to Filter and Analyze 
+title: Use Search Operators to Filter and Analyze
 description: Learn how to use search operators, filters, and grouping to find, organize, and analyze expenses, chats, reports, and tasks in Expensify.
 keywords: [New Expensify, search operators, advanced filters, search rules, expense search, report search, chat filters, advanced search, group-by, view, chart, search syntax]
 internalScope: Audience is all Expensify members. Covers search operator syntax for filtering, grouping, and chart views. Does not cover saved search management or Search page UI navigation.
 ---
 
-# Use Search Operators to Filter and Analyze 
+# Use Search Operators to Filter and Analyze
 
 Search operators let you quickly filter, sort, and group results across expenses, chats, reports, and tasks using powerful text-based queries. These operators work like advanced filters, helping you narrow results, combine conditions, and analyze data directly from the search bar.
 
@@ -39,7 +39,7 @@ Use these operators to refine results across different types:
 
 | **Syntax**       | **Description**                                                               | **Example**                  |
 |------------------|-------------------------------------------------------------------------------|------------------------------|
-| `type:`          | Filter by object type (`expense`, `chat`, `trip`,`task`)       | `type:expense`               |
+| `type:`          | Filter by object type (`expense`, `chat`, `trip`, `task`)       | `type:expense`               |
 | `workspace:`     | Filter by workspace name (wrap in quotes if the name has spaces)             | `workspace:"Acme Inc."`      |
 | `from:`          | Filter by sender (email, phone, display name, or `me`)          | `from:alice@acme.com`        |
 | `to:`            | Filter by recipient (email, phone, display name, or `me`)       | `to:me`                      |
@@ -50,7 +50,7 @@ Use these operators to refine results across different types:
 
 ## How to filter expenses using search operators
 
-You can use the following operators to filter expenses: 
+You can use the following operators to filter expenses:
 
 - `merchant:` – expense merchant name
 - `category:` – expense category label
@@ -71,7 +71,7 @@ You can use the following operators to filter expenses:
 
 ## How to filter reports using search operators
 
-You can use the following operators to filter reports: 
+You can use the following operators to filter reports:
 
 - `report-id:` – unique report reference
 - `status:` – draft, outstanding, approved, paid, done
@@ -103,7 +103,7 @@ You can use the following operators to filter chats:
 
 ## How to filter tasks using search operators
 
-You can use the following operators to filter Tasks:
+You can use the following operators to filter tasks:
 
 - `assignee:` – assigned member
 - `status:` – outstanding, completed
@@ -111,7 +111,7 @@ You can use the following operators to filter Tasks:
 - `title:` – task title
 - `in:` – channel name or DM for tasks
 
-**Example query**
+**Example query:**
 `type:task assignee:"Charlie Brown" status:outstanding`
 
 ---
@@ -160,7 +160,7 @@ Supported grouping options include:
 
 ## How to choose a chart view for grouped results
 
-When using `group-by:`, you can add `view:` to control the visualization type. 
+When using `group-by:`, you can add `view:` to control the visualization type.
 
 Supported views:
 
