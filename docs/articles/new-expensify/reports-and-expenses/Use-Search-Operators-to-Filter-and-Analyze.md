@@ -15,9 +15,7 @@ This guide walks you through the supported syntax, available filters, and usage 
 
 ## Who can use search operators in Expensify
 
-Anyone can use search operators when filtering results in Expenses, Reports, Chats, and Tasks. 
-
-This is especially useful for Workspace Admins, accountants, and finance teams who need to review, audit, or export specific datasets.
+Anyone can use search operators when filtering data in features like expenses, reports, chats, and tasks. This is especially helpful for Workspace Admins, accountants, and finance teams looking to analyze or export targeted data.
 
 ---
 
