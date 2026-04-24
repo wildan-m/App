@@ -113,7 +113,14 @@ const DYNAMIC_ROUTES = {
     },
     CHANGE_POLICY_EDUCATIONAL: {
         path: 'change-workspace-educational',
-        entryScreens: [SCREENS.REPORT, SCREENS.RIGHT_MODAL.EXPENSE_REPORT, SCREENS.REPORT_DETAILS.ROOT, SCREENS.REPORT_CHANGE_WORKSPACE.ROOT],
+        entryScreens: [
+            SCREENS.REPORT,
+            SCREENS.RIGHT_MODAL.SEARCH_REPORT,
+            SCREENS.RIGHT_MODAL.EXPENSE_REPORT,
+            SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT,
+            SCREENS.REPORT_DETAILS.ROOT,
+            SCREENS.REPORT_CHANGE_WORKSPACE.ROOT,
+        ],
     },
     NETSUITE_AUTO_SYNC: {
         path: 'netsuite-autosync',
