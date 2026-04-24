@@ -119,7 +119,8 @@ function WorkspaceExpensifyCardFeedSelectorPage({route}: WorkspaceExpensifyCardF
         text: getExpensifyCardFeedDescription(entry.settings, policies),
         keyForList: entry.fundID.toString(),
         isSelected: entry.fundID === lastSelectedExpensifyCardFeedID,
-        isDisabled: isOtherWorkspaceSection && isOffline,
+        isDisabled: entry.settings.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || (isOtherWorkspaceSection && isOffline),
+        pendingAction: entry.settings.pendingAction,
         errors: feedWithError?.fundID === entry.fundID ? feedWithError.error : undefined,
         leftElement: (
             <Icon
