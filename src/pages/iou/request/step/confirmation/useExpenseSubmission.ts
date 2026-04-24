@@ -535,7 +535,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
         createDistanceRequestIOUActions({
             report,
             participants: selectedParticipantsArg,
-            currentUserLogin: currentUserPersonalDetails.login,
+            currentUserLogin: currentUserPersonalDetails.login ?? '',
             currentUserAccountID: currentUserPersonalDetails.accountID,
             iouType,
             existingTransaction: transaction,
