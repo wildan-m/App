@@ -2,13 +2,16 @@
 title: Connect a Personal Bank Account
 description: Learn how to connect your personal bank account to receive reimbursements in Expensify, including support for both US and international accounts.
 keywords: [New Expensify, bank account, personal bank account, reimbursements, wallet, US bank account, global reimbursements, manual bank connection, add bank account for reimbursement, reimbursement account setup, wallet, deposit account, direct deposit, update bank account, action required, missing info]
+internalScope: Audience is members receiving reimbursements. Covers connecting and updating personal bank accounts, does not cover business bank accounts or workspace-level payment settings.
 ---
+
+# Connect a Personal Bank Account
 
 You can add a personal bank account to receive reimbursements in over **190 countries**. All personal accounts are managed under **Account > Wallet > Bank Accounts**. The steps differ depending on whether you're connecting a **US** or **non-US** account.
 
 ---
 
-# Add a U.S. Bank Account
+## How to add personal bank account 
 
 For U.S. accounts, Expensify offers two ways to connect your bank account:
 
@@ -38,7 +41,7 @@ To connect a U.S. bank account:
 
 ---
 
-# Update a bank account with missing information
+## How to update a bank account with missing information
 
 If a bank account is missing required information (such as your legal name, address, or phone number), an **Action required** badge will appear on the bank account row in your Wallet. This information is needed for reimbursement payments to process successfully.
 
