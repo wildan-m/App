@@ -9625,12 +9625,6 @@ const CONST = {
     HOME: {
         ANNOUNCEMENTS: [
             {
-                title: 'More power, right where you need it',
-                subtitle: 'Product update',
-                url: 'https://use.expensify.com/blog/expensify-march-2026-product-update',
-                publishedDate: '2026-03-23',
-            },
-            {
                 title: 'New global partnerships: banking, travel, accounting, & more',
                 subtitle: 'Newsletter',
                 url: 'https://use.expensify.com/blog/expensify-new-integrations-march-2026',
