@@ -294,7 +294,7 @@ function AvatarWithDisplayName({
         <View style={[styles.appContentHeaderTitle, styles.flex1]}>
             {!!report && !!title && (
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]}>
-                    <View>
+                    <View accessibilityLabel={title}>
                         {shouldEnableAvatarNavigation ? (
                             <PressableWithoutFeedback
                                 sentryLabel={CONST.SENTRY_LABEL.AVATAR_WITH_DISPLAY_NAME.SHOW_ACTOR_DETAILS}
