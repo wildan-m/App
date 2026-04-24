@@ -72,5 +72,5 @@ function useMultifactorAuthenticationActions(): MultifactorAuthenticationActions
 MultifactorAuthenticationStateProvider.displayName = 'MultifactorAuthenticationStateProvider';
 
 export default MultifactorAuthenticationStateProvider;
-export {useMultifactorAuthenticationState, useMultifactorAuthenticationActions};
+export {DEFAULT_STATE, useMultifactorAuthenticationState, useMultifactorAuthenticationActions};
 export type {MultifactorAuthenticationState, MultifactorAuthenticationStateContextType, MultifactorAuthenticationActionsContextType, Action} from './types';
