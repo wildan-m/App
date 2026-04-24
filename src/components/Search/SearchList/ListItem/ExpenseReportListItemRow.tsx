@@ -236,7 +236,7 @@ function ExpenseReportListItemRow({
         theme.highlightBG;
 
     if (!isLargeScreenWidth) {
-        const expenseCount = item.transactions?.length ?? 0;
+        const expenseCount = item.transactionCount ?? item.transactions?.length ?? 0;
         const expenseCountText = translate('iou.expenseCount', {count: expenseCount});
         const formattedDate = DateUtils.formatWithUTCTimeZone(
             item.created ?? '',
