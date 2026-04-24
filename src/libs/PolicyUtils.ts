@@ -1251,7 +1251,8 @@ function getSubmitReportManagerAccountID(policy: OnyxEntry<Policy>, expenseRepor
         return existingManagerID;
     }
 
-    return getSubmitToAccountID(policy, expenseReport);
+    const submitToAccountID = getSubmitToAccountID(policy, expenseReport);
+    return submitToAccountID > CONST.DEFAULT_NUMBER_ID ? submitToAccountID : existingManagerID;
 }
 
 function getManagerAccountEmail(policy: OnyxEntry<Policy>, expenseReport: OnyxEntry<Report>): string {
