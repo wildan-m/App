@@ -646,7 +646,7 @@ function IOURequestStepConfirmation({
                                 isPolicyExpenseChat={isPolicyExpenseChat}
                                 policyID={policyID}
                                 isOdometerDistanceRequest={isOdometerDistanceRequest}
-                                isLoadingReceipt={isStitchingReceipt}
+                                isLoadingReceipt={isStitchingReceipt || (isOdometerDistanceRequest && !hasVerifiedBlobs)}
                                 isPerDiemRequest={isPerDiemRequest}
                                 shouldShowSmartScanFields={shouldShowSmartScanFields}
                                 action={action}
