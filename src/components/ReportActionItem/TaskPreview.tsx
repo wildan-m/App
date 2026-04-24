@@ -28,6 +28,7 @@ import {canActionTask, completeTask, getTaskAssigneeAccountID, reopenTask} from 
 import ControlSelection from '@libs/ControlSelection';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getButtonState from '@libs/getButtonState';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import Parser from '@libs/Parser';
 import {getOriginalMessage} from '@libs/ReportActionsUtils';
@@ -88,7 +89,7 @@ function TaskPreview({
     const {originalReportID} = useShowContextMenuState();
     const originalMessage = getOriginalMessage(action);
     const taskReportIDFromOriginalMessage = originalMessage && 'taskReportID' in originalMessage ? originalMessage.taskReportID : undefined;
-    const [taskReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${taskReportIDFromOriginalMessage}`);
+    const [taskReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(taskReportIDFromOriginalMessage)}`);
     const taskReportID = taskReport?.reportID ?? action?.childReportID;
     // Prefer the live task report name so offline title edits are reflected immediately.
     const taskTitle = taskReport?.reportName ?? action?.childReportName ?? '';
