@@ -2,10 +2,11 @@
 title: Avoiding common scams
 description: Learn how to recognize and avoid common phishing scams that pretend to be from Expensify, including fake phone calls and emails asking for your Magic Code.
 keywords: [Expensify scam, phishing, Magic Code, security, login code, avoid fraud, suspicious email, fake call, fraud prevention]
+internalScope: Audience is all Expensify members. Covers identifying and responding to scams involving Magic Codes. Does not cover account recovery or dispute workflows.
 ---
 
 
-# How to avoid scams pretending to be from Expensify
+# Avoiding common scams
 
 Some scammers try to impersonate Expensify by sending fake emails or calling you directly, often asking for your **Magic Code** (your login code). These scams are designed to trick you into giving up access to your Expensify account.
 
@@ -72,9 +73,9 @@ Here's what to do:
 
 If you accidentally gave someone your Magic Code, act fast to: 
 
-1. **[Lock your Expensify account](https://help.expensify.com/articles/expensify-classic/settings/Report-Suspicious-Activity)** immediately to block unauthorized access.
+1. **[Lock your Expensify account](/articles/expensify-classic/settings/Report-Suspicious-Activity)** immediately to block unauthorized access.
 2. **Contact Concierge** from a safe device and explain the situation.
-3. **[Enable two-factor authentication](https://help.expensify.com/articles/new-expensify/settings/Two-Factor-Authentication)** to protect your account going forward.
+3. **[Enable two-factor authentication](/articles/new-expensify/settings/Two-Factor-Authentication)** to protect your account going forward.
 
 ---
 
@@ -82,7 +83,7 @@ If you accidentally gave someone your Magic Code, act fast to:
 
 If you believe your account has been targeted or compromised:
 
-1. **[Lock your Expensify account](https://help.expensify.com/articles/expensify-classic/settings/Report-Suspicious-Activity)** immediately to block unauthorized access.
+1. **[Lock your Expensify account](/articles/expensify-classic/settings/Report-Suspicious-Activity)** immediately to block unauthorized access.
 2. **Message Concierge immediately** via [email](mailto:concierge@expensify.com), or from within the Expensify app (web or mobile).
 3. Let us know if you’ve received a suspicious message or phone call.
 4. Our team will work to secure your account.
@@ -104,7 +105,7 @@ Legitimate Expensify emails always come from an address ending in **@expensify.c
 
 ## I received a Magic Code I didn't request. Is my account compromised?
 
-No. Receiving an unrequested Magic Code does not mean your account is compromised. It most likely means someone entered your email address by mistake when trying to log in. As long as you don't share the code with anyone, your account is safe. You can simply ignore or delete the email. If you want extra protection, enable [two-factor authentication](https://help.expensify.com/articles/new-expensify/settings/Two-Factor-Authentication).
+No. Receiving an unrequested Magic Code does not mean your account is compromised. It most likely means someone entered your email address by mistake when trying to log in. As long as you don't share the code with anyone, your account is safe. You can simply ignore or delete the email. If you want extra protection, enable [two-factor authentication](/articles/new-expensify/settings/Two-Factor-Authentication).
 
 ## Can Expensify call me?
 
