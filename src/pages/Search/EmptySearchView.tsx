@@ -342,7 +342,10 @@ function EmptySearchViewContent({
                                                       return;
                                                   }
 
-                                                  if (!defaultChatEnabledPolicy || !shouldRestrictUserBillableActions(defaultChatEnabledPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
+                                                  if (
+                                                      !defaultChatEnabledPolicy ||
+                                                      !shouldRestrictUserBillableActions(defaultChatEnabledPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)
+                                                  ) {
                                                       handleCreateReportClick();
                                                   } else {
                                                       Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(workspaceIDForReportCreation));
