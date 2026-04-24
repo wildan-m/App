@@ -2508,6 +2508,8 @@ ${amount} dla ${merchant} - ${date}`,
         frozenByAdminNeedsUnfreezePrefix: 'Ta karta została zamrożona przez ',
         frozenByAdminNeedsUnfreezeSuffix: '. Skontaktuj się z administratorem, aby ją odmrozić.',
         frozenByAdminNeedsUnfreeze: ({person}: {person: string}) => `Ta karta została zamrożona przez ${person}. Skontaktuj się z administratorem, aby ją odmrozić.`,
+        spendRules: 'Zasady wydatków',
+        editSpendRules: 'Edytuj zasady wydatków',
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',
@@ -6839,7 +6841,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 currencyMismatchTitle: 'Niezgodność waluty',
                 currencyMismatchPrompt: 'Aby ustawić maksymalną kwotę, wybierz karty rozliczane w tej samej walucie.',
                 reviewSelectedCards: 'Przejrzyj wybrane karty',
-                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} więcej`,
+                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => (count > 0 ? `${summary}, +${count} więcej` : summary),
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Zastosuj co najmniej jedną regułę wydatków do jednej karty',
                 confirmErrorCardRequired: 'Pole „Karta” jest wymagane',
                 confirmErrorApplyAtLeastOneSpendRule: 'Zastosuj co najmniej jedną regułę wydatków',
@@ -6874,6 +6876,30 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 editRuleTitle: 'Edytuj regułę',
                 deleteRule: 'Usuń regułę',
                 deleteRuleConfirmation: 'Na pewno chcesz usunąć tę regułę?',
+                summaryMerchants: ({
+                    merchants,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    merchants: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Zablokowane' : 'Dozwolone'} ${shownCount > 1 ? 'sprzedawcy' : 'sprzedawca'}: ${merchants}${hiddenCount > 0 ? `, +${hiddenCount} więcej` : ''}`,
+                summaryCategories: ({
+                    categories,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    categories: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Zablokowane' : 'Dozwolone'} ${shownCount > 1 ? 'kategorie' : 'kategoria'}: ${categories}${hiddenCount > 0 ? `, +${hiddenCount} więcej` : ''}`,
             },
         },
         planTypePage: {
@@ -6918,7 +6944,13 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Tryb zatwierdzania', finalApprover: 'Ostateczny zatwierdzający'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Tryb zatwierdzania',
+                finalApprover: 'Ostateczny zatwierdzający',
+                connect: 'Połącz',
+                connectionDescription: 'Połącz Gusto, aby synchronizować akceptacje pracowników z Twoim miejscem pracy.',
+            },
         },
     },
     getAssistancePage: {
@@ -9057,8 +9089,12 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             forceTwoFactorAuthDescription: `<muted-text>Wymagaj uwierzytelniania dwuskładnikowego od wszystkich członków tej domeny. Członkowie domeny zostaną poproszeni o skonfigurowanie uwierzytelniania dwuskładnikowego na swoim koncie po zalogowaniu.</muted-text>`,
             forceTwoFactorAuthError: 'Nie udało się zmienić wymuszania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później.',
             resetTwoFactorAuth: 'Zresetuj uwierzytelnianie dwuskładnikowe',
+            error: 'Nie udało się zapisać tej zmiany. Spróbuj ponownie.',
         },
-        groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
+        groups: {
+            title: 'Grupy',
+            memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`}),
+        },
     },
     proactiveAppReview: {
         title: 'Podoba Ci się nowy Expensify?',
