@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
 import {checkIfLocalFileIsAccessible} from '@libs/actions/IOU/Receipt';
@@ -31,13 +31,13 @@ const useRestartOnOdometerImagesFailure = (
     const hasCheckedRef = useRef(false);
     const [asyncVerificationPassed, setAsyncVerificationPassed] = useState(false);
 
-    const hasBlobUrls = useMemo(() => {
+    const hasBlobUrls = (() => {
         if (!transaction) {
             return false;
         }
         const paths = [getOdometerImageUri(transaction.comment?.odometerStartImage), getOdometerImageUri(transaction.comment?.odometerEndImage), transaction.receipt?.source?.toString()];
         return paths.some((path) => !!path && path.startsWith('blob:'));
-    }, [transaction]);
+    })();
 
     useEffect(() => {
         if (!transaction || isLoadingOnyxValue(draftTransactionsMetadata)) {
