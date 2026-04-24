@@ -260,6 +260,17 @@ function ReportActionsList({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [report.reportID]);
 
+    // When lastReadTime transitions from empty to a real value (e.g., data hasn't
+    // loaded yet after sign-in), update the marker so it uses the fresh value
+    // instead of the empty string from initial mount.
+    useEffect(() => {
+        if (reportLastReadTime === '' || unreadMarkerTime !== '') {
+            return;
+        }
+        setUnreadMarkerTime(reportLastReadTime);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportLastReadTime]);
+
     const prevUnreadMarkerReportActionID = useRef<string | null>(null);
 
     /**
@@ -541,7 +552,10 @@ function ReportActionsList({
                     }
                 } else {
                     setIsFloatingMessageCounterVisible(false);
-                    reportScrollManager.scrollToBottom();
+                    // Wait for the next frame so the list has laid out new items before scrolling
+                    requestAnimationFrame(() => {
+                        reportScrollManager.scrollToBottom();
+                    });
                 }
 
                 setIsScrollToBottomEnabled(true);
@@ -681,28 +695,28 @@ function ReportActionsList({
         return isExpenseReport(report) || isIOUReport(report) || isInvoiceReport(report);
     }, [parentReportAction, report, sortedVisibleReportActions]);
 
+    // Precompute a reportActionID → index map so renderItem can resolve the real index in O(1)
+    // instead of scanning sortedVisibleReportActions with indexOf on every render.
+    const actionIndexMap = useMemo(() => {
+        const map = new Map<string, number>();
+        for (const [i, action] of sortedVisibleReportActions.entries()) {
+            map.set(action.reportActionID, i);
+        }
+        return map;
+    }, [sortedVisibleReportActions]);
+
     const renderItem = useCallback(
         ({item: reportAction, index}: ListRenderItemInfo<OnyxTypes.ReportAction>) => {
             const originalReportID = getOriginalReportID(report.reportID, reportAction, reportActionsFromOnyx);
             const showPreviousMessagesButton = reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED && !!isConciergeSidePanel && !!showHiddenHistory && !!hasPreviousMessages;
 
+            // Use the action's actual index in sortedVisibleReportActions rather than the FlashList-provided index,
+            // because useFlashListScrollKey may slice the data for deep-link scroll positioning, making the
+            // FlashList index offset from the full array and causing wrong displayAsGroup computation.
+            const safeIndex = actionIndexMap.get(reportAction.reportActionID) ?? index;
+
             return (
                 <>
-                    {showPreviousMessagesButton && (
-                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.pv3, styles.mh5]}>
-                            <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
-                            <View>
-                                <Button
-                                    small
-                                    shouldShowRightIcon
-                                    iconRight={expensifyIcons.UpArrow}
-                                    text={translate('common.concierge.showHistory')}
-                                    onPress={onShowPreviousMessages}
-                                />
-                            </View>
-                            <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
-                        </View>
-                    )}
                     <ReportActionsListItemRenderer
                         reportAction={reportAction}
                         parentReportAction={parentReportAction}
@@ -712,8 +726,8 @@ function ReportActionsList({
                         transactionThreadReport={transactionThreadReport}
                         linkedReportActionID={linkedReportActionID}
                         displayAsGroup={
-                            !isConsecutiveChronosAutomaticTimerAction(sortedVisibleReportActions, index, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
-                            isConsecutiveActionMadeByPreviousActor(sortedVisibleReportActions, index, isOffline)
+                            !isConsecutiveChronosAutomaticTimerAction(sortedVisibleReportActions, safeIndex, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
+                            isConsecutiveActionMadeByPreviousActor(sortedVisibleReportActions, safeIndex, isOffline)
                         }
                         shouldHideThreadDividerLine={shouldHideThreadDividerLine}
                         shouldDisplayNewMarker={reportAction.reportActionID === unreadMarkerReportActionID}
@@ -730,6 +744,21 @@ function ReportActionsList({
                         reportNameValuePairsOrigin={reportNameValuePairs?.origin}
                         reportNameValuePairsOriginalID={reportNameValuePairs?.originalID}
                     />
+                    {showPreviousMessagesButton && (
+                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.pv3, styles.mh5]}>
+                            <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
+                            <View>
+                                <Button
+                                    small
+                                    shouldShowRightIcon
+                                    iconRight={expensifyIcons.UpArrow}
+                                    text={translate('common.concierge.showHistory')}
+                                    onPress={onShowPreviousMessages}
+                                />
+                            </View>
+                            <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
+                        </View>
+                    )}
                 </>
             );
         },
@@ -740,6 +769,7 @@ function ReportActionsList({
             isOffline,
             transactionThreadReport,
             linkedReportActionID,
+            actionIndexMap,
             sortedVisibleReportActions,
             shouldHideThreadDividerLine,
             unreadMarkerReportActionID,
@@ -833,14 +863,14 @@ function ReportActionsList({
                         <View key={action.reportActionID}>
                             {renderItem({
                                 item: action,
-                                index: sortedVisibleReportActions.indexOf(action),
+                                index: actionIndexMap.get(action.reportActionID) ?? 0,
                             } as ListRenderItemInfo<OnyxTypes.ReportAction>)}
                         </View>
                     ))}
                 </StaticReportActionsPreview>
             </>
         );
-    }, [hideComposer, initialNumToRender, renderItem, shouldShowReportRecipientLocalTime, sortedVisibleReportActions, styles]);
+    }, [actionIndexMap, hideComposer, initialNumToRender, renderItem, shouldShowReportRecipientLocalTime, sortedVisibleReportActions, styles]);
 
     const onStartReached = useCallback(() => {
         if (!isSearchTopmostFullScreenRoute()) {
