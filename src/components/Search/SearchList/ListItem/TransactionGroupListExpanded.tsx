@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
@@ -7,6 +7,7 @@ import {PressableWithFeedback} from '@components/Pressable';
 import ScrollView from '@components/ScrollView';
 import SearchTableHeader from '@components/Search/SearchTableHeader';
 import type {ListItem} from '@components/SelectionList/types';
+import {useEditingCellState} from '@components/Table/EditableCell';
 import Text from '@components/Text';
 import TransactionItemRow from '@components/TransactionItemRow';
 import {useWideRHPActions} from '@components/WideRHPContextProvider';
@@ -92,6 +93,8 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
     const shouldShowLoadingOnSearch = !!(!transactions?.length && transactionsSnapshotMetadata?.isLoading) || currentOffset > 0;
     const shouldDisplayLoadingIndicator = !isExpenseReportType && !!transactionsSnapshotMetadata?.isLoading && shouldShowLoadingOnSearch;
     const {isLargeScreenWidth} = useResponsiveLayout();
+    const {isEditingCell} = useEditingCellState();
+    const wasEditingOnMouseDownRef = useRef(false);
 
     const isAmountColumnWide = transactions.some((transaction) => transaction.isAmountColumnWide);
     const isTaxAmountColumnWide = transactions.some((transaction) => transaction.isTaxAmountColumnWide);
@@ -184,6 +187,10 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
     }
 
     const handleOnPress = (transaction: TransactionListItemType) => {
+        if (wasEditingOnMouseDownRef.current) {
+            wasEditingOnMouseDownRef.current = false;
+            return;
+        }
         if (isMobileSelectionModeEnabled) {
             onCheckboxPress?.(transaction as unknown as TItem);
             return;
@@ -265,24 +272,23 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                         pendingAction={transaction.pendingAction}
                         key={transaction.transactionID}
                     >
-                        {!isLargeScreenWidth ? (
-                            <PressableWithFeedback
-                                onPress={() => handleOnPress(transaction)}
-                                onLongPress={() => onLongPress?.(transaction)}
-                                accessibilityRole={CONST.ROLE.BUTTON}
-                                accessibilityLabel={transaction.text ?? ''}
-                                isNested
-                                onMouseDown={(e) => e.preventDefault()}
-                                hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG]}
-                                dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
-                                id={transaction.transactionID}
-                                sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
-                            >
-                                {transactionRow}
-                            </PressableWithFeedback>
-                        ) : (
-                            transactionRow
-                        )}
+                        <PressableWithFeedback
+                            onPress={() => handleOnPress(transaction)}
+                            onPressIn={() => {
+                                wasEditingOnMouseDownRef.current = isEditingCell;
+                            }}
+                            onLongPress={() => onLongPress?.(transaction)}
+                            accessibilityRole={CONST.ROLE.BUTTON}
+                            accessibilityLabel={transaction.text ?? ''}
+                            isNested
+                            onMouseDown={(e) => e.preventDefault()}
+                            hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG]}
+                            dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
+                            id={transaction.transactionID}
+                            sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
+                        >
+                            {transactionRow}
+                        </PressableWithFeedback>
                     </OfflineWithFeedback>
                 );
             })}
