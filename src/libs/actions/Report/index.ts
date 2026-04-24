@@ -5429,6 +5429,36 @@ function resolveActionableMentionWhisper(
         },
     ];
 
+    if (resolution === CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE && ReportActionsUtils.isActionableMentionWhisper(reportAction)) {
+        const inviteeAccountIDs = ReportActionsUtils.getOriginalMessage(reportAction)?.inviteeAccountIDs ?? [];
+        if (inviteeAccountIDs.length > 0) {
+            const defaultNotificationPreference = getDefaultNotificationPreferenceForReport(report);
+            const optimisticParticipants = inviteeAccountIDs.reduce<Participants>((accumulator, accountID) => {
+                // eslint-disable-next-line no-param-reassign
+                accumulator[accountID] = {
+                    notificationPreference: defaultNotificationPreference,
+                    role: CONST.REPORT.ROLE.MEMBER,
+                };
+                return accumulator;
+            }, {});
+            const failureParticipants = inviteeAccountIDs.reduce<Record<number, null>>((accumulator, accountID) => {
+                // eslint-disable-next-line no-param-reassign
+                accumulator[accountID] = null;
+                return accumulator;
+            }, {});
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {participants: optimisticParticipants},
+            });
+            failureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {participants: failureParticipants},
+            });
+        }
+    }
+
     const parameters: ResolveActionableMentionWhisperParams = {
         reportActionID: reportAction.reportActionID,
         resolution,
