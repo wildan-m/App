@@ -362,4 +362,21 @@ function SelectionToolbar({reportID, transactions, reportActions}: SelectionTool
     );
 }
 
-export default SelectionToolbar;
+function SelectionToolbarGate({reportID, transactions, reportActions}: SelectionToolbarProps) {
+    const {selectedTransactionIDs} = useSearchStateContext();
+    const isMobileSelectionModeEnabled = useMobileSelectionMode();
+
+    if (selectedTransactionIDs.length === 0 && !isMobileSelectionModeEnabled) {
+        return null;
+    }
+
+    return (
+        <SelectionToolbar
+            reportID={reportID}
+            transactions={transactions}
+            reportActions={reportActions}
+        />
+    );
+}
+
+export default SelectionToolbarGate;
