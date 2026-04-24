@@ -37,8 +37,7 @@ import {
     navigateBackOnDeleteTransaction,
     updateOptimisticParentReportAction,
 } from '@libs/ReportUtils';
-import {getSpan} from '@libs/telemetry/activeSpans';
-import {setPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
+import {isTracking, setPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import {getChildTransactions, isDistanceRequest as isDistanceRequestTransactionUtils, isOnHold, isPerDiemRequest as isPerDiemRequestTransactionUtils} from '@libs/TransactionUtils';
 import {setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import {removeDraftSplitTransaction} from '@userActions/TransactionEdit';
@@ -53,7 +52,8 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
 import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
-import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getReportPreviewAction} from './index';
+// eslint-disable-next-line @typescript-eslint/no-deprecated
+import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getMoneyRequestPolicyTags, getReportPreviewAction} from './index';
 import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams} from './index';
 import {getDeleteTrackExpenseInformation} from './TrackExpense';
 import {getUpdateMoneyRequestParams} from './UpdateMoneyRequest';
@@ -190,7 +190,7 @@ function updateSplitTransactions({
         const customUnitRate = getDistanceRateCustomUnitRate(policy, customUnitRateID);
 
         // If the rate doesn't exist or is disabled, show an error and return early
-        if (!customUnitRate || !customUnitRate.enabled) {
+        if (!customUnitRate?.enabled) {
             // Show error to user
             Onyx.merge(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${originalTransactionID}`, {
                 errors: getMicroSecondOnyxErrorWithTranslationKey('iou.error.invalidRate'),
@@ -436,7 +436,11 @@ function updateSplitTransactions({
         } = getMoneyRequestInformation({
             participantParams,
             parentChatReport,
-            policyParams,
+            policyParams: {
+                ...policyParams,
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                policyTagList: getMoneyRequestPolicyTags({moneyRequestReportID: splitExpense?.reportID, parentChatReport, participant: participantParams.participant}),
+            },
             transactionParams,
             moneyRequestReportID: splitExpense?.reportID,
             existingTransaction,
@@ -986,11 +990,10 @@ function updateSplitTransactions({
             },
         });
 
-        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
         onyxData.failureData?.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`,
-            value: originalTransaction,
+            value: originalTransaction ?? null,
         });
 
         if (firstIOU) {
@@ -1326,7 +1329,7 @@ function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransac
 
     const targetReportID = params.expenseReport?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
 
-    if (getSpan(CONST.TELEMETRY.SPAN_SUBMIT_TO_DESTINATION_VISIBLE)) {
+    if (isTracking()) {
         setPendingSubmitFollowUpAction(CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, targetReportID);
     }
     Navigation.dismissModalWithReport({reportID: targetReportID});
