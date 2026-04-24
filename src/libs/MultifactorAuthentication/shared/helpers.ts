@@ -37,8 +37,13 @@ const getFallbackReason = (category: HttpStatusCategory | undefined): Multifacto
 
 const hasHttpStatusCategory = (responseMap: ResponseToReasonMap, category: HttpStatusCategory): category is keyof ResponseToReasonMap => category in responseMap;
 
+/**
+ * Matches a backend API error message against a map of known messages and returns the corresponding reason.
+ * This is used to translate raw backend error strings into typed internal reason codes for error handling in the MFA flow.
+ */
 const findReasonByBackendMessage = (messageMap: Record<string, MultifactorAuthenticationReason>, message: string): MultifactorAuthenticationReason | undefined => {
     const lowerMessage = message.toLowerCase();
+    // Backend prepends the HTTP status code to the message (e.g. "400 Registration required"), so we use endsWith to match the known suffix.
     const entry = Object.entries(messageMap).find(([backendMessage]) => lowerMessage.endsWith(backendMessage.toLowerCase()));
     return entry?.[1];
 };
