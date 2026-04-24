@@ -81,11 +81,12 @@ function BaseRequestStepWorkspace({transaction, getPolicies, onSelectWorkspace}:
 
     const selectWorkspace = (item: WorkspaceListItem) => {
         const policyID = item.policyID;
-        if (shouldRestrictUserBillableActions(policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
+        const selectedPolicy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
+        if (selectedPolicy && shouldRestrictUserBillableActions(selectedPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyID));
             return;
         }
-        onSelectWorkspace(allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`]);
+        onSelectWorkspace(selectedPolicy);
     };
 
     return (
