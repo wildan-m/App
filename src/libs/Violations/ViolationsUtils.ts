@@ -681,6 +681,45 @@ const ViolationsUtils = {
         if (hasTaxOutOfPolicyViolation && !shouldAddTaxOutOfPolicy) {
             newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.TAX_OUT_OF_POLICY});
         }
+
+        // Optimistically add the SmartScan-variant 'modifiedAmount' violation when the user
+        // has overridden the SmartScanned amount to a higher value. This mirrors the violation
+        // the backend produces so the LHN RBR appears immediately offline. Distance and Expensify
+        // Card transactions emit their own variants of this violation through different paths
+        // and are excluded here to avoid double-producing.
+        const isSmartScanModifiedAmountViolation = (violation: TransactionViolation) =>
+            violation.name === CONST.VIOLATIONS.MODIFIED_AMOUNT &&
+            violation.data?.type !== CONST.MODIFIED_AMOUNT_VIOLATION_DATA.DISTANCE &&
+            violation.data?.type !== CONST.MODIFIED_AMOUNT_VIOLATION_DATA.CARD;
+        const hasModifiedAmountSmartScanViolation = transactionViolations.some(isSmartScanModifiedAmountViolation);
+        const isExpensifyCardExpense = TransactionUtils.isExpensifyCardTransaction(updatedTransaction);
+        const isReceiptScanInProgress = TransactionUtils.isReceiptBeingScanned(updatedTransaction);
+        const scannedExpenseAmount = -(updatedTransaction.amount ?? 0);
+        const modifiedExpenseAmount = -Number(updatedTransaction.modifiedAmount);
+        const shouldShowModifiedAmountSmartScanViolation =
+            hasValidModifiedAmount(updatedTransaction) &&
+            TransactionUtils.hasReceipt(updatedTransaction) &&
+            !isDistanceRequest &&
+            !isExpensifyCardExpense &&
+            !isReceiptScanInProgress &&
+            scannedExpenseAmount > 0 &&
+            modifiedExpenseAmount > scannedExpenseAmount;
+
+        if (!hasModifiedAmountSmartScanViolation && shouldShowModifiedAmountSmartScanViolation) {
+            newTransactionViolations.push({
+                name: CONST.VIOLATIONS.MODIFIED_AMOUNT,
+                type: CONST.VIOLATION_TYPES.NOTICE,
+                showInReview: true,
+                data: {
+                    displayPercentVariance: Math.round(((modifiedExpenseAmount - scannedExpenseAmount) / scannedExpenseAmount) * 100),
+                },
+            });
+        }
+
+        if (hasModifiedAmountSmartScanViolation && !shouldShowModifiedAmountSmartScanViolation) {
+            newTransactionViolations = newTransactionViolations.filter((violation) => !isSmartScanModifiedAmountViolation(violation));
+        }
+
         return {
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${updatedTransaction.transactionID}`,
