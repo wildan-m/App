@@ -10,6 +10,7 @@ type SavedSearchTitlesHookParams = Omit<BuildUserReadableQueryStringParams, 'que
     enabled?: boolean;
 };
 
+/** Returns a map of raw query string → human-readable title for saved searches that have no custom name. Heavy resolution is deferred to avoid blocking the UI. */
 function useSavedSearchTitles({savedSearches, translate, enabled = true, ...rest}: SavedSearchTitlesHookParams): Map<string, string> {
     // `savedSearches` and `translate` are intentionally excluded from the deferred object.
     // `savedSearches` drives which items appear in the list — deferring it would cause a flash
@@ -54,4 +55,3 @@ function useSavedSearchTitles({savedSearches, translate, enabled = true, ...rest
 }
 
 export default useSavedSearchTitles;
-export type {SavedSearchCollection};
