@@ -92,5 +92,4 @@ function isAuthenticationChallenge(challenge: unknown): challenge is Authenticat
     return typeof challenge === 'object' && challenge !== null && 'allowCredentials' in challenge && 'rpId' in challenge;
 }
 
-export default parseHttpResponse;
-export {isHttpSuccess, isRegistrationChallenge, isAuthenticationChallenge};
+export {parseHttpResponse, isHttpSuccess, isRegistrationChallenge, isAuthenticationChallenge};
