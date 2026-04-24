@@ -11,17 +11,18 @@ type NavigationDeferredMountProps = {
 };
 
 /**
- * Navigation-aware variant of `DeferredMount`. Gates the swap on navigation transition completion via
- * `TransitionTracker`, so the heavy tree hydrates only after the nav animation has finished. The swap
- * is wrapped in `startTransition` so React still treats the hydrate as non-urgent and can yield to user input.
+ * Gates a heavy subtree behind navigation transition completion via `TransitionTracker`, so the tree
+ * hydrates only after the nav animation has finished. The swap is wrapped in `startTransition` so React
+ * treats the hydrate as non-urgent and can yield to user input.
  *
- * Use it for: heavy subtrees mounted during navigation transitions (report headers, page-level actions)
- * where `DeferredMount`'s post-first-commit timing is too loose and the hydrate risks competing with
- * the nav animation frame budget.
+ * Use it for: heavy subtrees that mount as part of a navigation transition (report headers, page-level
+ * actions, dropdowns rendered on a freshly navigated screen) where the hydrate risks competing with the
+ * nav animation frame budget.
  *
- * Do NOT use it for: modals, accordions, dropdowns, or other non-nav surfaces — use `DeferredMount` instead.
- * If no transition is in flight or upcoming, this component waits for the `MAX_TRANSITION_START_WAIT_MS`
- * safety timeout before hydrating, which adds latency with no benefit outside navigation contexts.
+ * Do NOT use it for: subtrees that mount in response to user interaction after navigation has settled
+ * (modals, accordions, popovers opened on tap). If no transition is in flight or upcoming, this component
+ * waits for the `MAX_TRANSITION_START_WAIT_MS` safety timeout before hydrating, which adds latency with
+ * no benefit outside navigation contexts.
  */
 function NavigationDeferredMount({placeholder = null, children}: NavigationDeferredMountProps): ReactNode {
     const [isReady, setIsReady] = useState(false);
