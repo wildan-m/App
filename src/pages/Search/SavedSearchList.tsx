@@ -134,6 +134,9 @@ function SavedSearchList({hash}: SavedSearchListProps) {
 
     const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal);
 
+    const itemStyle = [styles.alignItemsCenter];
+    const tooltipWrapperStyle = [styles.mh4, styles.pv2, styles.productTrainingTooltipWrapper];
+
     const savedSearchesMenuItems = savedSearches
         ? Object.entries(savedSearches).map(([key, item], index) =>
               buildSavedSearchMenuItem({
@@ -146,8 +149,8 @@ function SavedSearchList({hash}: SavedSearchListProps) {
                   shouldShowSavedSearchTooltip,
                   hideSavedSearchTooltip,
                   renderSavedSearchTooltip,
-                  itemStyle: [styles.alignItemsCenter],
-                  tooltipWrapperStyle: [styles.mh4, styles.pv2, styles.productTrainingTooltipWrapper],
+                  itemStyle,
+                  tooltipWrapperStyle,
               }),
           )
         : [];
