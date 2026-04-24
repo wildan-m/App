@@ -670,35 +670,29 @@ function submitMoneyRequestOnSearch(hash: number, reportList: Report[], policy: 
 }
 
 function approveMoneyRequestOnSearch(hash: number, reportIDList: string[], currentSearchKey?: SearchKey) {
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE>> = [
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
             key: ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE,
-            value: Object.fromEntries(
-                reportIDList.map((reportID) => [
-                    `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
-                    {
-                        isActionLoading: true,
-                        pendingExpenseAction: CONST.EXPENSE_PENDING_ACTION.APPROVE,
-                    },
-                ]),
-            ),
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`, {isActionLoading: true}])),
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
+            key: ONYXKEYS.COLLECTION.REPORT_METADATA,
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {pendingExpenseAction: CONST.EXPENSE_PENDING_ACTION.APPROVE}])),
         },
     ];
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
             key: ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE,
-            value: Object.fromEntries(
-                reportIDList.map((reportID) => [
-                    `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
-                    {
-                        isActionLoading: false,
-                        pendingExpenseAction: null,
-                    },
-                ]),
-            ),
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`, {isActionLoading: false}])),
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
+            key: ONYXKEYS.COLLECTION.REPORT_METADATA,
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {pendingExpenseAction: null}])),
         },
     ];
 
@@ -714,19 +708,16 @@ function approveMoneyRequestOnSearch(hash: number, reportIDList: string[], curre
         });
     }
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE | typeof ONYXKEYS.COLLECTION.REPORT_METADATA | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
             key: ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE,
-            value: Object.fromEntries(
-                reportIDList.map((reportID) => [
-                    `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`,
-                    {
-                        isActionLoading: false,
-                        pendingExpenseAction: null,
-                    },
-                ]),
-            ),
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`, {isActionLoading: false}])),
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
+            key: ONYXKEYS.COLLECTION.REPORT_METADATA,
+            value: Object.fromEntries(reportIDList.map((reportID) => [`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {pendingExpenseAction: null}])),
         },
         {
             onyxMethod: Onyx.METHOD.MERGE_COLLECTION,
