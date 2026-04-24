@@ -1,13 +1,13 @@
 ---
 title: Use Search Operators to Filter and Analyze 
-description: Learn how to use advanced search filters, comparisons, and groupings to filter, group, and analyze expenses, chats, reports, and more in Expensify.
+description: Learn how to use search operators, filters, and grouping to find, organize, and analyze expenses, chats, reports, and tasks in Expensify.
 keywords: [New Expensify, search operators, advanced filters, search rules, expense search, report search, chat filters, advanced search, group-by, view, chart, search syntax]
 internalScope: Audience is all Expensify members. Covers search operator syntax for filtering, grouping, and chart views. Does not cover saved search management or Search page UI navigation.
 ---
 
-# Use search operators to filter and analyze
+# Use Search Operators to Filter and Analyze 
 
-Search operators let you quickly filter, sort, and group results across expenses, chats, reports, and tasks using powerful text-based queries.These operators work like advanced filters, helping you narrow results, combine conditions, and analyze data directly from the search bar.
+Search operators let you quickly filter, sort, and group results across expenses, chats, reports, and tasks using powerful text-based queries. These operators work like advanced filters, helping you narrow results, combine conditions, and analyze data directly from the search bar.
 
 This guide walks you through the supported syntax, available filters, and usage tips.
 
@@ -21,11 +21,11 @@ This is especially useful for Workspace Admins, accountants, and finance teams w
 
 ---
 
-## How use search operators to build a search query
+## How to build a search query with search operators
 
 Use these core rules to create your searches:
 
-- Use `field:value` is the basic format.
+- Use `field:value` as the basic format.
 - Use commas for **OR** conditions: `status:drafts,outstanding`.
 - Combine fields for **AND** conditions: `amount>50 status:approved`.
 - Use `-` to exclude results: `-has:receipt`.
@@ -50,7 +50,7 @@ Use these operators to refine results across different types:
 
 ---
 
-## What search operator filters are available for expenses 
+## How to filter expenses using search operators
 
 You can use the following operators to filter expenses: 
 
@@ -71,7 +71,7 @@ You can use the following operators to filter expenses:
 
 ---
 
-## What search operator filters are available for reports
+## How to filter reports using search operators
 
 You can use the following operators to filter reports: 
 
@@ -87,7 +87,9 @@ You can use the following operators to filter reports:
 **Example query:**
 `status:paid exported<=2026-01-01`
 
-## Available filters for Chat
+---
+
+## How to filter chats using search operators
 
 You can use the following operators to filter chats:
 
@@ -101,7 +103,7 @@ You can use the following operators to filter chats:
 
 ---
 
-## Available filters for Tasks
+## How to filter tasks using search operators
 
 You can use the following operators to filter Tasks:
 
@@ -116,17 +118,13 @@ You can use the following operators to filter Tasks:
 
 ---
 
-## How to use grouping, chart views, and currency conversion filters
+## How to group and visualize results using search operators
 
-Use `group-by:` to analyze data by dimension, `view:` to choose how grouped results are displayed, and `group-currency:` to normalize totals.
-
-```
-group-by:category view:bar group-currency:USD
-```
+Use `group-by:` to analyze results by dimension, `view:` to control how grouped results are displayed, and `group-currency:` to normalize totals.
 
 Supported groupings include:
 
-- `group-by:report` - Group by expense report
+- `group-by:report` - Group by report
 - `group-by:from` - Group by expense submitter (employee)
 - `group-by:card` - Group by payment card
 - `group-by:withdrawal-id` - Group by withdrawal ID
@@ -138,18 +136,24 @@ Supported groupings include:
 - `group-by:quarter` - Group by fiscal quarter
 - `group-by:year` - Group by calendar year
 
+**Example query:**  
+`group-by:category view:bar group-currency:USD`
+
+---
+
 ## How to choose a chart view for grouped results
 
-When using `group-by:`, you can add `view:` to control the visualization type. If you save a grouped search with a specific `view:`, that choice is preserved in the saved search label.
-
+When using `group-by:`, you can add `view:` to control the visualization type. 
 Supported views:
 
-- `view:table` - Display grouped results as a table (default)
-- `view:bar` - Display grouped results as a bar chart
-- `view:pie` - Display grouped results as a pie chart
-- `view:line` - Display grouped results as a line chart
+- `view:table` - table (default)
+- `view:bar` - bar chart
+- `view:pie` - pie chart
+- `view:line` - line chart
 
 > **Note:** The `view:` operator only applies when `group-by:` is also used. Without `group-by:`, the `view:` value is ignored.
+
+For more advanced dashboards and exports, learn how to use [Insights in Expensify](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify).
 
 ---
 
