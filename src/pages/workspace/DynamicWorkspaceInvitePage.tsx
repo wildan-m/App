@@ -66,7 +66,7 @@ function DynamicWorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
     useNetwork({onReconnect: openWorkspaceInvitePage});
 
     const excludedUsers = useMemo(() => {
-        const ineligibleInvites = getIneligibleInvitees(policy?.employeeList);
+        const ineligibleInvites = getIneligibleInvitees(policy?.employeeList, policy?.primaryLoginsInvited);
         return ineligibleInvites.reduce(
             (acc, login) => {
                 acc[login] = true;
@@ -74,7 +74,7 @@ function DynamicWorkspaceInvitePage({route, policy}: WorkspaceInvitePageProps) {
             },
             {} as Record<string, boolean>,
         );
-    }, [policy?.employeeList]);
+    }, [policy?.employeeList, policy?.primaryLoginsInvited]);
 
     const softExclusions = useMemo(
         () => getSoftExclusionsForGuideAndAccountManager(policy, account?.accountManagerAccountID, personalDetails),

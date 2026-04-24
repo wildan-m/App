@@ -540,7 +540,7 @@ function getMemberAccountIDsForWorkspace(employeeList: PolicyEmployeeList | unde
 /**
  * Get login list that we should not show in the workspace invite options
  */
-function getIneligibleInvitees(employeeList?: PolicyEmployeeList): string[] {
+function getIneligibleInvitees(employeeList?: PolicyEmployeeList, primaryLoginsInvited?: Record<string, string>): string[] {
     const policyEmployeeList = employeeList ?? {};
     const memberEmailsToExclude: string[] = [...CONST.EXPENSIFY_EMAILS];
     for (const email of Object.keys(policyEmployeeList)) {
@@ -553,6 +553,15 @@ function getIneligibleInvitees(employeeList?: PolicyEmployeeList): string[] {
             continue;
         }
         memberEmailsToExclude.push(email);
+    }
+
+    // Secondary logins that the server has already resolved to existing members must also be ineligible,
+    // otherwise re-searching by the same alias produces a duplicate optimistic invite for an existing member.
+    for (const secondaryEmail of Object.keys(primaryLoginsInvited ?? {})) {
+        if (!secondaryEmail) {
+            continue;
+        }
+        memberEmailsToExclude.push(secondaryEmail);
     }
 
     return memberEmailsToExclude;
