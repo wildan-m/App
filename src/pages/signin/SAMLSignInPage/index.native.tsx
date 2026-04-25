@@ -80,14 +80,20 @@ function SAMLSignInPage() {
         openAuthSessionAsync(SAMLUrl, CONST.SAML_REDIRECT_URL)
             .then((response: WebBrowserAuthSessionResult) => {
                 if (response.type !== 'success') {
-                    Navigation.goBack();
+                    clearSignInData();
+                    Navigation.isNavigationReady().then(() => {
+                        Navigation.goBack();
+                    });
                     return;
                 }
                 handleNavigationStateChange(response.url);
             })
             .catch((error) => {
                 Log.hmmm('SAML sign in failed', {error});
-                Navigation.goBack();
+                clearSignInData();
+                Navigation.isNavigationReady().then(() => {
+                    Navigation.goBack();
+                });
             });
     }, [SAMLUrl, handleNavigationStateChange]);
 
