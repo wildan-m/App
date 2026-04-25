@@ -25,8 +25,7 @@ import {
     shouldOptimisticallyUpdateSearch,
 } from '@libs/actions/IOU';
 import {putOnHold} from '@libs/actions/IOU/Hold';
-import {completeSplitBill, splitBill, startSplitBill} from '@libs/actions/IOU/Split';
-import {updateSplitTransactionsFromSplitExpensesFlow} from '@libs/actions/IOU/SplitTransactionUpdate';
+import {completeSplitBill, splitBill, startSplitBill, updateSplitTransactionsFromSplitExpensesFlow} from '@libs/actions/IOU/Split';
 import {requestMoney, trackExpense} from '@libs/actions/IOU/TrackExpense';
 import {removeMoneyRequestOdometerImage, setMoneyRequestOdometerImage} from '@libs/actions/OdometerTransactionUtils';
 import initOnyxDerivedValues from '@libs/actions/OnyxDerived';

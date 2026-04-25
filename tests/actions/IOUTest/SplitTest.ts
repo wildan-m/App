@@ -5,7 +5,6 @@ import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry, OnyxMergeCollectionInput} from 'react-native-onyx';
 import {getReportPreviewAction} from '@libs/actions/IOU';
 import {putOnHold} from '@libs/actions/IOU/Hold';
-import {createDistanceRequest} from '@libs/actions/IOU/Split';
 import {requestMoney} from '@libs/actions/IOU/TrackExpense';
 import initOnyxDerivedValues from '@libs/actions/OnyxDerived';
 import {createWorkspace, generatePolicyID, setWorkspaceApprovalMode} from '@libs/actions/Policy/Policy';
@@ -15,18 +14,23 @@ import {WRITE_COMMANDS} from '@libs/API/types';
 import {rand64} from '@libs/NumberUtils';
 import {getIOUActionForReportID, getOriginalMessage, isActionOfType, isAddCommentAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {buildOptimisticIOUReportAction, getAncestors, getReportOrDraftReport} from '@libs/ReportUtils';
-import {completeSplitBill, setDraftSplitTransaction, splitBill, startSplitBill} from '@userActions/IOU/Split';
 import {
     addSplitExpenseField,
+    completeSplitBill,
+    createDistanceRequest,
     evenlyDistributeSplitExpenseAmounts,
     initDraftSplitExpenseDataForEdit,
     initSplitExpenseItemData,
     removeSplitExpenseField,
     resetSplitExpensesByDateRange,
+    setDraftSplitTransaction,
+    splitBill,
+    startSplitBill,
     updateSplitExpenseAmountField,
     updateSplitExpenseField,
-} from '@userActions/IOU/SplitExpenseItems';
-import {updateSplitTransactions, updateSplitTransactionsFromSplitExpensesFlow} from '@userActions/IOU/SplitTransactionUpdate';
+    updateSplitTransactions,
+    updateSplitTransactionsFromSplitExpensesFlow,
+} from '@userActions/IOU/Split';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import DateUtils from '@src/libs/DateUtils';
