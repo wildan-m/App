@@ -311,9 +311,12 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
 
 function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, newDefaultRateID?: string): CustomUnit {
     if (newDefaultRateID) {
-        // For distance units: use the provided rate ID for the default rate,
-        // matching the customUnitRateID sent to the DUPLICATE_POLICY API
-        const defaultRate = Object.values(unit.rates).find((rate) => rate.enabled) ?? Object.values(unit.rates).at(0);
+        // The server-side DUPLICATE_POLICY assigns newDefaultRateID to the source's default rate
+        // (lowest index, matching getDefaultMileageRate). Mirror that here so the optimistic data
+        // doesn't get overwritten when the server response merges. Other source rates get fresh
+        // server IDs, so we drop them from the optimistic state to avoid stale duplicates.
+        const sortedRates = Object.values(unit.rates).sort((a, b) => (a.index ?? Number.MAX_SAFE_INTEGER) - (b.index ?? Number.MAX_SAFE_INTEGER));
+        const defaultRate = sortedRates.find((rate) => rate.enabled !== false) ?? sortedRates.at(0);
         return {
             ...unit,
             customUnitID: newCustomUnitID,
@@ -321,7 +324,6 @@ function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, ne
         };
     }
 
-    // For other units (per diem): only update the customUnitID
     return {
         ...unit,
         customUnitID: newCustomUnitID,
