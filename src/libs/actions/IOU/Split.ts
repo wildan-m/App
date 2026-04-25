@@ -30,6 +30,7 @@ import Log from '@libs/Log';
 import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopmostSplitNavigator';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
+import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
 import {addSMSDomainIfPhoneNumber} from '@libs/PhoneNumber';
@@ -85,6 +86,7 @@ import {
     getChildTransactions,
     getCurrency,
     getUpdatedTransaction,
+    isDistanceExpenseType,
     isDistanceRequest as isDistanceRequestTransactionUtils,
     isOnHold,
     isPerDiemRequest as isPerDiemRequestTransactionUtils,
@@ -118,12 +120,12 @@ import {
     getAllReports,
     getAllTransactionDrafts,
     getAllTransactions,
-    getCurrentUserEmail,
     getMoneyRequestInformation,
     getMoneyRequestParticipantsFromReport,
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     getMoneyRequestPolicyTags,
-    getPolicyTags,
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    getPolicyTagsData,
     getReceiptError,
     getReportPreviewAction,
     getUserAccountID,
@@ -170,8 +172,8 @@ type DistanceRequestTransactionParams = BaseTransactionParams & {
 type CreateDistanceRequestInformation = {
     report: OnyxEntry<OnyxTypes.Report>;
     participants: Participant[];
-    currentUserLogin?: string;
-    currentUserAccountID?: number;
+    currentUserLogin: string;
+    currentUserAccountID: number;
     iouType?: ValueOf<typeof CONST.IOU.TYPE>;
     existingIOUReport?: OnyxEntry<OnyxTypes.Report>;
     existingTransaction?: OnyxEntry<OnyxTypes.Transaction>;
@@ -3226,7 +3228,7 @@ function createSplitsAndOnyxData({
 
     const allTransactionDrafts = getAllTransactionDrafts();
     const existingTransaction = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_TRANSACTION_ID}`];
-    const isDistanceRequest = existingTransaction && existingTransaction.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE;
+    const isDistanceRequest = existingTransaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE;
     let splitTransaction = buildOptimisticTransaction({
         existingTransaction,
         transactionParams: {
@@ -3610,8 +3612,9 @@ function createSplitsAndOnyxData({
         // Add tag to optimistic policy recently used tags when a participant is a workspace
         const optimisticPolicyRecentlyUsedTags = isPolicyExpenseChat
             ? buildOptimisticPolicyRecentlyUsedTags({
-                  // TODO: Replace getPolicyTags (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
-                  policyTags: getPolicyTags()?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`] ?? {},
+                  // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+                  // eslint-disable-next-line @typescript-eslint/no-deprecated
+                  policyTags: getPolicyTagsData(participant.policyID),
                   policyRecentlyUsedTags,
                   transactionTags: tag,
               })
@@ -3652,7 +3655,7 @@ function createSplitsAndOnyxData({
                 personalDetailListAction: oneOnOnePersonalDetailListAction,
             },
             currentUserAccountIDParam: currentUserAccountID,
-            currentUserEmailParam: getCurrentUserEmail(),
+            currentUserEmailParam: currentUserLogin,
             hasViolations,
             quickAction,
             personalDetails,
@@ -3710,12 +3713,13 @@ function createSplitsAndOnyxData({
     };
 }
 
+/** Requests money based on a distance (e.g. mileage from a map) */
 function createDistanceRequest(distanceRequestInformation: CreateDistanceRequestInformation) {
     const {
         report,
         participants,
-        currentUserLogin = '',
-        currentUserAccountID = -1,
+        currentUserLogin,
+        currentUserAccountID,
         iouType = CONST.IOU.TYPE.SUBMIT,
         existingIOUReport,
         existingTransaction,
@@ -3757,7 +3761,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         customUnitRateID = '',
         splitShares = {},
         attendees,
-        receipt: receiptParam,
+        receipt,
         odometerStart,
         odometerEnd,
         isFromGlobalCreate,
@@ -3775,7 +3779,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
               source: ReceiptGeneric as ReceiptSource,
               state: CONST.IOU.RECEIPT_STATE.OPEN,
           }
-        : receiptParam;
+        : receipt;
 
     let parameters: CreateDistanceRequestParams;
     let onyxData: OnyxData<BuildOnyxDataForMoneyRequestKeys | typeof ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE | typeof ONYXKEYS.NVP_RECENT_WAYPOINTS | typeof ONYXKEYS.GPS_DRAFT_DETAILS>;
@@ -3865,8 +3869,8 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             moneyRequestReportID,
             participantParams: {
                 participant,
-                payeeAccountID: getUserAccountID(),
-                payeeEmail: getCurrentUserEmail(),
+                payeeAccountID: currentUserAccountID,
+                payeeEmail: currentUserLogin,
             },
             policyParams: {
                 policy,
@@ -3912,16 +3916,10 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
 
         const isGPSDistanceRequest = transaction.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_GPS;
 
-        if (
-            transaction.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_MAP ||
-            isGPSDistanceRequest ||
-            isManualDistanceRequest ||
-            transaction.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER
-        ) {
+        if (isDistanceExpenseType(transaction.iouRequestType)) {
             onyxData?.optimisticData?.push({
                 onyxMethod: Onyx.METHOD.SET,
                 key: ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE,
-                // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                 value: transaction.iouRequestType,
             });
         }
@@ -3945,8 +3943,8 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             createdIOUReportActionID,
             reportPreviewReportActionID: reportPreviewAction.reportActionID,
             waypoints: JSON.stringify(sanitizedWaypoints),
-            distance: distance !== undefined ? NumberUtils.roundToTwoDecimalPlaces(distance) : undefined,
-            receipt: receiptParam,
+            distance: distance !== undefined ? roundToTwoDecimalPlaces(distance) : undefined,
+            receipt,
             odometerStart,
             odometerEnd,
             created,
