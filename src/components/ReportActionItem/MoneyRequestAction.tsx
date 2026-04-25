@@ -10,6 +10,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {createTransactionThreadReport} from '@libs/actions/Report';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {TransactionDuplicateNavigatorParamList} from '@libs/Navigation/types';
@@ -21,6 +22,7 @@ import {
     isSplitBillAction as isSplitBillActionReportActionsUtils,
     isTrackExpenseAction as isTrackExpenseActionReportActionsUtils,
 } from '@libs/ReportActionsUtils';
+import {isReceiptBeingScanned} from '@libs/TransactionUtils';
 import type {ContextMenuAnchor} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import {contextMenuRef} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import {useReportActionItemActions, useReportActionItemState} from '@pages/inbox/report/ReportActionItemContext';
@@ -85,6 +87,8 @@ function MoneyRequestAction({
     const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${requestReportID}`);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const linkedTransactionID = isMoneyRequestAction(action) ? getOriginalMessage(action)?.IOUTransactionID : undefined;
+    const [linkedTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(linkedTransactionID)}`);
     const StyleUtils = useStyleUtils();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -119,6 +123,15 @@ function MoneyRequestAction({
         const transactionID = isMoneyRequestAction(action) ? getOriginalMessage(action)?.IOUTransactionID : CONST.DEFAULT_NUMBER_ID;
 
         if (!action?.childReportID && transactionID && action.reportActionID) {
+            // Optimistic transaction thread's parent-action link is fragile across SmartScan completion; route to the stable IOU report instead.
+            if (isReceiptBeingScanned(linkedTransaction) && requestReportID) {
+                if (shouldOpenReportInRHP) {
+                    Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: requestReportID, backTo: Navigation.getActiveRoute()}));
+                    return;
+                }
+                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(requestReportID, undefined, undefined, Navigation.getActiveRoute()));
+                return;
+            }
             const transactionThreadReport = createTransactionThreadReport(introSelected, currentUserEmail ?? '', currentUserAccountID, betas, iouReport, action);
             if (shouldOpenReportInRHP) {
                 Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: transactionThreadReport?.reportID, backTo: Navigation.getActiveRoute()}));
