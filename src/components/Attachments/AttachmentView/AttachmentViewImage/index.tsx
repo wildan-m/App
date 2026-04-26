@@ -38,7 +38,6 @@ function AttachmentViewImage({attachmentID, url, file, isAuthTokenRequired, load
             accessibilityRole={CONST.ROLE.BUTTON}
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             accessibilityLabel={file?.name || translate('attachmentView.unknownFilename')}
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_CAROUSEL.ITEM}
         >
             {children}

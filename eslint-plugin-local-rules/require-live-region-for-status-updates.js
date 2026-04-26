@@ -156,7 +156,7 @@ function create(context) {
                 return;
             }
 
-            if (hasKnownStatusRole && liveRegionValue === 'none') {
+            if ((hasKnownStatusRole || hasAnyResolvedStatusRole) && liveRegionValue === 'none') {
                 context.report({
                     node,
                     messageId: 'invalidLiveRegion',

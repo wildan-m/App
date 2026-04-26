@@ -132,4 +132,11 @@ describe('require-live-region-for-status-updates', () => {
         expect(reports).toHaveLength(1);
         expect(reports.at(0)?.messageId).toBe('invalidLiveRegion');
     });
+
+    it('fails when a conditional status role uses accessibilityLiveRegion="none"', () => {
+        const reports = runRule([createConditionalRoleAttribute('accessibilityRole', 'ALERT'), createLiteralAttribute('accessibilityLiveRegion', 'none')]);
+
+        expect(reports).toHaveLength(1);
+        expect(reports.at(0)?.messageId).toBe('invalidLiveRegion');
+    });
 });

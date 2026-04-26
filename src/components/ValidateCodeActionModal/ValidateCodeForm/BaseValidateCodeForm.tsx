@@ -337,7 +337,7 @@ function BaseValidateCodeForm({
                 )}
             </OfflineWithFeedback>
             <View
-                role="status"
+                role={CONST.ROLE.STATUS}
                 accessibilityLiveRegion="polite"
             >
                 {!!validateCodeSent && (

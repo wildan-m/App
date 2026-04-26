@@ -2,7 +2,8 @@ const name = 'require-a11y-disable-justification';
 
 const ISSUE_URL_REGEX = /https?:\/\/github\.com\/(?:Expensify\/App|FormidableLabs\/eslint-plugin-react-native-a11y)\/(?:issues|pull)\/\d+/i;
 const ISSUE_URL_GLOBAL_REGEX = /https?:\/\/github\.com\/(?:Expensify\/App|FormidableLabs\/eslint-plugin-react-native-a11y)\/(?:issues|pull)\/\d+/gi;
-const DISABLE_A11Y_REGEX = /eslint-disable(?:-next-line|-line)?\s+[^]*?react-native-a11y\//i;
+const DISABLE_A11Y_REGEX = /eslint-disable(?:-next-line|-line)?\s+[\s\S]*?react-native-a11y\//i;
+const MIN_RATIONALE_LENGTH = 12;
 
 const meta = {
     type: 'problem',
@@ -35,7 +36,7 @@ function hasRationale(commentText) {
         .replaceAll(/\s+/g, ' ')
         .trim();
 
-    return strippedComment.length >= 12;
+    return strippedComment.length >= MIN_RATIONALE_LENGTH;
 }
 
 function create(context) {

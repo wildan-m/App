@@ -119,7 +119,7 @@ function ReceiptPreview({source, hovered, isEReceipt = false, transactionItem}: 
             {shouldShowImage ? (
                 <View style={[styles.w100]}>
                     {isLoading && (
-                        <View style={[StyleSheet.absoluteFill, styles.justifyContentCenter, styles.alignItemsCenter]}>
+                        <View style={[StyleSheet.absoluteFillObject, styles.justifyContentCenter, styles.alignItemsCenter]}>
                             <ActivityIndicator
                                 size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                                 reasonAttributes={reasonAttributes}

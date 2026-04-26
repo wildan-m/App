@@ -6144,6 +6144,8 @@ const CONST = {
     ROLE: {
         /** Use for elements with important, time-sensitive information. */
         ALERT: 'alert',
+        /** Use for elements with advisory information that should be announced without interrupting the user. */
+        STATUS: 'status',
         /** Use for elements that act as buttons. */
         BUTTON: 'button',
         /** Use for elements representing checkboxes. */
