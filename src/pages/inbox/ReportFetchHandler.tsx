@@ -1,5 +1,5 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
-import {useEffect, useEffectEvent, useRef} from 'react';
+import {useEffect, useEffectEvent, useMemo, useRef} from 'react';
 import {InteractionManager} from 'react-native';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useIsAnonymousUser from '@hooks/useIsAnonymousUser';
@@ -12,6 +12,7 @@ import useReportTransactionsCollection from '@hooks/useReportTransactionsCollect
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
+import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {getFilteredReportActionsForReportView, getIOUActionForReportID, getOneTransactionThreadReportID, isCreatedAction} from '@libs/ReportActionsUtils';
 import {
@@ -29,6 +30,7 @@ import {setShouldShowComposeInput} from '@userActions/Composer';
 import {createTransactionThreadReport, openReport, readNewestAction, subscribeToReportLeavingEvents, unsubscribeFromLeavingRoomReportChannel, updateLastVisitTime} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
 type ReportScreenRoute =
@@ -98,6 +100,24 @@ function ReportFetchHandler() {
 
     const isTransactionThreadView = isReportTransactionThread(report);
 
+    // When deeplinked into a one-transaction child thread (CHAT type), redirect to the parent IOU report URL
+    // so the linked message is shown in the parent's combined view (which includes parent system messages like "Submitted").
+    // Without this redirect, the same expense would be viewable from two different URLs.
+    const parentReportIDForRedirect = isTransactionThreadView ? report?.parentReportID : undefined;
+    const [parentReportForRedirect] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportIDForRedirect}`);
+    const [parentChatReportForRedirect] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportForRedirect?.chatReportID}`);
+    const [parentReportActionsForRedirect] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportIDForRedirect}`);
+    const parentOneTransactionThreadIDForRedirect = useMemo(() => {
+        if (!reportActionIDFromRoute || !parentReportIDForRedirect || !parentReportForRedirect || !parentReportActionsForRedirect) {
+            return undefined;
+        }
+        const parentActionsArray = getFilteredReportActionsForReportView(Object.values(parentReportActionsForRedirect));
+        if (!parentActionsArray.length) {
+            return undefined;
+        }
+        return getOneTransactionThreadReportID(parentReportForRedirect, parentChatReportForRedirect, parentActionsArray, isOffline);
+    }, [reportActionIDFromRoute, parentReportIDForRedirect, parentReportForRedirect, parentChatReportForRedirect, parentReportActionsForRedirect, isOffline]);
+
     const indexOfLinkedMessage = reportActionIDFromRoute ? reportActions.findIndex((obj) => String(obj.reportActionID) === String(reportActionIDFromRoute)) : -1;
     const doesCreatedActionExists = !!reportActions?.findLast((action) => isCreatedAction(action));
     const isLinkedMessageAvailable = indexOfLinkedMessage > -1;
@@ -162,6 +182,13 @@ function ReportFetchHandler() {
         }
         navigation.setParams({reportActionID: ''});
     }, [transactionThreadReportID, route?.params?.reportActionID, linkedAction, reportID, navigation, report, childReport]);
+
+    useEffect(() => {
+        if (!reportActionIDFromRoute || !parentReportIDForRedirect || parentOneTransactionThreadIDForRedirect !== reportID) {
+            return;
+        }
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(parentReportIDForRedirect, reportActionIDFromRoute), {forceReplace: true});
+    }, [reportActionIDFromRoute, parentReportIDForRedirect, parentOneTransactionThreadIDForRedirect, reportID]);
 
     useEffect(() => {
         if (!isAnonymousUser) {
