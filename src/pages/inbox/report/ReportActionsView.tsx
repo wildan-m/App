@@ -137,6 +137,29 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         [getTransactionThreadReportActions],
     );
     const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
+
+    // When viewing a transaction thread directly (e.g. via a copied message link), the parent IOU report's
+    // actions (including system messages like "Submitted") need to be merged into the displayed list so this
+    // view matches the combined one-transaction view rendered when navigating from the parent.
+    const parentReportIDForCombine = isReportTransactionThread ? report?.parentReportID : undefined;
+    const [parentChatReportForCombine] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${chatReport?.chatReportID}`);
+    const getParentReportActionsSelector = useCallback(
+        (actions: OnyxTypes.ReportActions | undefined): OnyxTypes.ReportAction[] => {
+            return getSortedReportActionsForDisplay(actions, canPerformWriteAction, true, undefined, parentReportIDForCombine);
+        },
+        [canPerformWriteAction, parentReportIDForCombine],
+    );
+    const [parentReportActionsForCombine] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportIDForCombine}`, {selector: getParentReportActionsSelector}, [
+        getParentReportActionsSelector,
+    ]);
+    const parentOneTransactionThreadID = useMemo(() => {
+        if (!isReportTransactionThread || !chatReport || !parentReportActionsForCombine?.length) {
+            return undefined;
+        }
+        return getOneTransactionThreadReportID(chatReport, parentChatReportForCombine, parentReportActionsForCombine, isOffline);
+    }, [isReportTransactionThread, chatReport, parentChatReportForCombine, parentReportActionsForCombine, isOffline]);
+    const isOneTransactionFromParentView = parentOneTransactionThreadID === reportID;
+
     const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS);
     const prevReportActionID = usePrevious(reportActionID);
@@ -235,16 +258,40 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     }, [allReportActions, shouldAddCreatedAction, report, reportPreviewAction?.childMoneyRequestCount, transactionThreadReport, lastAction?.created]);
 
     // Get a sorted array of reportActions for both the current report and the transaction thread report associated with this report (if there is one)
-    // so that we display transaction-level and report-level report actions in order in the one-transaction view
-    const reportActions = useMemo(
-        () => (reportActionsToDisplay ? getCombinedReportActions(reportActionsToDisplay, transactionThreadReportID ?? null, transactionThreadReportActions ?? []) : []),
-        [reportActionsToDisplay, transactionThreadReportActions, transactionThreadReportID],
-    );
+    // so that we display transaction-level and report-level report actions in order in the one-transaction view.
+    // When viewing a one-transaction child thread directly (e.g. via a message link), merge the parent IOU report's
+    // actions so system messages like "Submitted" are visible — matching the combined view rendered from the parent.
+    const reportActions = useMemo(() => {
+        if (!reportActionsToDisplay) {
+            return [];
+        }
+        if (isOneTransactionFromParentView && parentReportActionsForCombine?.length) {
+            return getCombinedReportActions(parentReportActionsForCombine, reportID ?? null, reportActionsToDisplay, parentReportIDForCombine);
+        }
+        return getCombinedReportActions(reportActionsToDisplay, transactionThreadReportID ?? null, transactionThreadReportActions ?? []);
+    }, [
+        reportActionsToDisplay,
+        transactionThreadReportActions,
+        transactionThreadReportID,
+        isOneTransactionFromParentView,
+        parentReportActionsForCombine,
+        reportID,
+        parentReportIDForCombine,
+    ]);
 
-    const parentReportActionForTransactionThread = useMemo(
-        () => (isEmptyObject(transactionThreadReportActions) ? undefined : allReportActions?.find((action) => action.reportActionID === transactionThreadReport?.parentReportActionID)),
-        [allReportActions, transactionThreadReportActions, transactionThreadReport?.parentReportActionID],
-    );
+    const parentReportActionForTransactionThread = useMemo(() => {
+        if (isOneTransactionFromParentView) {
+            return parentReportActionsForCombine?.find((action) => action.reportActionID === report?.parentReportActionID);
+        }
+        return isEmptyObject(transactionThreadReportActions) ? undefined : allReportActions?.find((action) => action.reportActionID === transactionThreadReport?.parentReportActionID);
+    }, [
+        isOneTransactionFromParentView,
+        parentReportActionsForCombine,
+        report?.parentReportActionID,
+        allReportActions,
+        transactionThreadReportActions,
+        transactionThreadReport?.parentReportActionID,
+    ]);
 
     const visibleReportActions = useMemo(
         () =>
