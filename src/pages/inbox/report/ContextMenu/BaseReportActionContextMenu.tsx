@@ -164,11 +164,9 @@ function BaseReportActionContextMenu({
     const threeDotRef = useRef<View>(null);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
-        canEvict: false,
         selector: withDEWRoutedActionsObject,
     });
     const [originalReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${originalReportID}`, {
-        canEvict: false,
         selector: withDEWRoutedActionsObject,
     });
 
@@ -243,6 +241,7 @@ function BaseReportActionContextMenu({
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     const isTryNewDotNVPDismissed = !!tryNewDot?.classicRedirect?.dismissed;
     const session = useSession();
@@ -287,6 +286,7 @@ function BaseReportActionContextMenu({
                 iouTransaction,
                 transactions,
                 isHarvestReport,
+                currentUserAccountID: currentUserPersonalDetails?.accountID,
             }),
     );
 
@@ -414,6 +414,7 @@ function BaseReportActionContextMenu({
                             iouTransaction,
                             bankAccountList,
                             isOffline,
+                            conciergeReportID,
                         };
 
                         if ('renderContent' in contextAction) {
