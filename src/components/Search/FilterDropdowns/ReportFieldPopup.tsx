@@ -72,10 +72,12 @@ function ReportFieldListPopup({value, field, onBackButtonPress, onChange}: Repor
 
 function ReportFieldDatePopup({value, field, setPopoverWidth, onBackButtonPress, onChange}: ReportFieldDatePopupProps) {
     const styles = useThemeStyles();
+    const {windowHeight} = useWindowDimensions();
     const filterKey = `${CONST.SEARCH.REPORT_FIELD.DEFAULT_PREFIX}${getFieldNameAsKey(field.name)}` as const;
+    const maxPopupHeight = Math.round(windowHeight * 0.875);
 
     return (
-        <View style={[styles.pv4, styles.gap2]}>
+        <View style={[styles.pv4, styles.gap2, styles.flexShrink1, {maxHeight: maxPopupHeight}]}>
             <HeaderWithBackButton
                 shouldDisplayHelpButton={false}
                 style={[styles.h10]}
