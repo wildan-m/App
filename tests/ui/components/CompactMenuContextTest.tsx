@@ -35,6 +35,7 @@ const defaultResponsiveLayout = {
     isExtraSmallScreenHeight: false,
     isMediumScreenWidth: false,
     isLargeScreenWidth: true,
+    isExtraLargeScreenWidth: false,
     isSmallScreen: false,
     isInLandscapeMode: false,
     lockWindowDimensionsToLast: () => {},
