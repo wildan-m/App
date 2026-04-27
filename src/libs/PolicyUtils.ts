@@ -1859,31 +1859,6 @@ function isPolicyAccessible(policy: OnyxEntry<Policy>, currentUserLogin: string)
     );
 }
 
-function areAllGroupPoliciesExpenseChatDisabled(policies: OnyxCollection<Policy> | null) {
-    let foundGroupPolicy = false;
-    for (const policy of Object.values(policies ?? {})) {
-        if (!policy || !isPaidGroupPolicy(policy)) {
-            continue;
-        }
-
-        if (policy.isJoinRequestPending || !shouldShowPolicy(policy, false, undefined)) {
-            continue;
-        }
-
-        foundGroupPolicy = true;
-
-        if (policy.isPolicyExpenseChatEnabled) {
-            return false;
-        }
-    }
-
-    if (!foundGroupPolicy) {
-        return false;
-    }
-
-    return true;
-}
-
 function getGroupPaidPoliciesWithExpenseChatEnabled(policies: OnyxCollection<Policy> | null) {
     if (isEmptyObject(policies)) {
         return CONST.EMPTY_ARRAY;
@@ -2279,7 +2254,6 @@ export {
     getManagerAccountID,
     isPreferredExporter,
     getCustomUnitsForDuplication,
-    areAllGroupPoliciesExpenseChatDisabled,
     getCountOfRequiredTagLists,
     getActiveEmployeeWorkspaces,
     isCurrentUserMemberOfAnyPolicy,

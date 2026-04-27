@@ -2,7 +2,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {hasSynchronizationErrorMessage, isConnectionUnverified} from '@libs/actions/connections';
 import {getDisplayNameForWorkspace} from '@libs/actions/Policy/Policy';
-import {areAllGroupPoliciesExpenseChatDisabled, getActiveAdminWorkspaces, getOwnedPaidPolicies, isPaidGroupPolicy, shouldShowPolicy} from '@libs/PolicyUtils';
+import {getActiveAdminWorkspaces, getOwnedPaidPolicies, isPaidGroupPolicy, shouldShowPolicy} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import type {Policy, PolicyReportField} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
@@ -89,8 +89,6 @@ const groupPaidPoliciesWithExpenseChatEnabledSelector = (policies: OnyxCollectio
         (policy): policy is Policy => !!policy?.isPolicyExpenseChatEnabled && !policy?.isJoinRequestPending && isPaidGroupPolicy(policy) && shouldShowPolicy(policy, false, currentUserLogin),
     );
 };
-
-const shouldRedirectToExpensifyClassicSelector = (policies: OnyxCollection<Policy>) => areAllGroupPoliciesExpenseChatDisabled(policies);
 
 // deepEqual on ~15 fields is cheaper than re-rendering IOURequestStartPage's full hook/memo tree.
 const iouRequestPolicyCollectionSelector = (policies: OnyxCollection<Policy>): OnyxCollection<Policy> => {
@@ -199,7 +197,6 @@ export {
     hasMultipleOutputCurrenciesSelector,
     groupPaidPoliciesWithExpenseChatEnabledSelector,
     iouRequestPolicyCollectionSelector,
-    shouldRedirectToExpensifyClassicSelector,
     adminPoliciesConnectedToSageIntacctSelector,
     adminPoliciesConnectedToNetSuiteSelector,
     adminPoliciesConnectedToQBDSelector,

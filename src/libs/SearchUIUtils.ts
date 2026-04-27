@@ -91,7 +91,6 @@ import arraysEqual from '@src/utils/arraysEqual';
 import {hasSynchronizationErrorMessage} from './actions/connections';
 import {startMoneyRequest} from './actions/IOU';
 import {canApproveIOU, canIOUBePaid, canSubmitReport} from './actions/IOU/ReportWorkflow';
-import {setIsOpenConfirmNavigateExpensifyClassicModalOpen} from './actions/isOpenConfirmNavigateExpensifyClassicModal';
 import {createTransactionThreadReport} from './actions/Report';
 import type {TransactionPreviewData} from './actions/Search';
 import {setOptimisticDataForTransactionThreadPreview} from './actions/Search';
@@ -4167,25 +4166,13 @@ type TypeMenuSectionsParams = {
     savedSearches: OnyxEntry<OnyxTypes.SaveSearch>;
     isOffline: boolean;
     defaultExpensifyCard: CardFeedForDisplay | undefined;
-    shouldRedirectToExpensifyClassic: boolean;
     draftTransactionIDs: string[] | undefined;
     isTrackIntentUser: boolean;
 };
 
 function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuSection[] {
-    const {
-        currentUserEmail,
-        currentUserAccountID,
-        cardFeedsByPolicy,
-        defaultCardFeed,
-        policies,
-        savedSearches,
-        isOffline,
-        defaultExpensifyCard,
-        shouldRedirectToExpensifyClassic,
-        draftTransactionIDs,
-        isTrackIntentUser,
-    } = params;
+    const {currentUserEmail, currentUserAccountID, cardFeedsByPolicy, defaultCardFeed, policies, savedSearches, isOffline, defaultExpensifyCard, draftTransactionIDs, isTrackIntentUser} =
+        params;
     const typeMenuSections: SearchTypeMenuSection[] = [];
 
     const {
@@ -4223,11 +4210,6 @@ function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuS
                                       buttonText: 'report.newReport.createExpense',
                                       buttonAction: () => {
                                           interceptAnonymousUser(() => {
-                                              if (shouldRedirectToExpensifyClassic) {
-                                                  setIsOpenConfirmNavigateExpensifyClassicModalOpen(true);
-                                                  return;
-                                              }
-
                                               startMoneyRequest(CONST.IOU.TYPE.CREATE, generateReportID(), draftTransactionIDs, CONST.IOU.REQUEST_TYPE.SCAN);
                                           });
                                       },

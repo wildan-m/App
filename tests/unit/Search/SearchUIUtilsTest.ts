@@ -6252,7 +6252,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             })
@@ -6337,7 +6336,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6398,7 +6396,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6443,7 +6440,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6464,7 +6460,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6492,7 +6487,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6520,7 +6514,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: mockSavedSearches,
                 isOffline: true,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6552,7 +6545,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6584,7 +6576,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6628,7 +6619,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6665,7 +6655,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6722,7 +6711,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6766,7 +6754,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6836,7 +6823,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6910,7 +6896,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
@@ -6985,7 +6970,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: true,
             });
@@ -7009,7 +6993,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             })
@@ -7083,7 +7066,6 @@ describe('SearchUIUtils', () => {
                 savedSearches: {},
                 isOffline: false,
                 defaultExpensifyCard: undefined,
-                shouldRedirectToExpensifyClassic: false,
                 draftTransactionIDs: [],
                 isTrackIntentUser: false,
             });
