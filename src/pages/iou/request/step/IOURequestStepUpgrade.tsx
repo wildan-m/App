@@ -83,6 +83,7 @@ function IOURequestStepUpgrade({
     const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
     const [allReportNextSteps] = useOnyx(ONYXKEYS.COLLECTION.NEXT_STEP);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
     const [session] = useOnyx(ONYXKEYS.SESSION);
 
     // Build transactions map from selectedTransactions (search results) instead of Onyx TRANSACTION collection
@@ -143,6 +144,7 @@ function IOURequestStepUpgrade({
                 policy: newPolicy,
                 reportNextStep,
                 policyCategories: allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`],
+                policyTagList: allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`],
                 allTransactions,
             });
 
