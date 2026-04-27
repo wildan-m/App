@@ -134,7 +134,11 @@ function DateSelectPopup({label, value, presets, style, closeOverlay, onChange, 
     if (!isSmallScreenWidth) {
         return (
             <View style={[styles.pv4, styles.gap2, style]}>
-                <View>
+                <ScrollView
+                    ref={scrollViewRef}
+                    keyboardShouldPersistTaps="handled"
+                    style={styles.flexShrink1}
+                >
                     {!!selectedDateModifier && (
                         <SelectedDateModifierHeader
                             isCompact={false}
@@ -151,14 +155,14 @@ function DateSelectPopup({label, value, presets, style, closeOverlay, onChange, 
                         onDateValuesChange={updateRangeText}
                         onRangeValidationErrorChange={setShouldShowRangeError}
                     />
-                    {shouldShowRangeError && (
-                        <FormHelpMessage
-                            isError
-                            message={translate('search.errors.pleaseSelectDatesForBothFromAndTo')}
-                            style={[styles.mh5, styles.mt2]}
-                        />
-                    )}
-                </View>
+                </ScrollView>
+                {shouldShowRangeError && (
+                    <FormHelpMessage
+                        isError
+                        message={translate('search.errors.pleaseSelectDatesForBothFromAndTo')}
+                        style={[styles.mh5, styles.mt2]}
+                    />
+                )}
                 <View style={[styles.flexRow, styles.gap2, useRangeLayout ? styles.mh5 : styles.ph5, useRangeLayout && styles.alignItemsCenter, useRangeLayout && styles.pt1]}>
                     {useRangeLayout && (
                         <View style={[styles.flex1, styles.mr2]}>
