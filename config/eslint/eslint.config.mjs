@@ -6,11 +6,13 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import lodash from 'eslint-plugin-lodash';
 import react from 'eslint-plugin-react';
 import reactNativeA11Y from 'eslint-plugin-react-native-a11y';
+import rulesdir from 'eslint-plugin-rulesdir';
 import testingLibrary from 'eslint-plugin-testing-library';
 import youDontNeedLodashUnderscore from 'eslint-plugin-you-dont-need-lodash-underscore';
 import seatbelt from 'eslint-seatbelt';
 import {defineConfig, globalIgnores} from 'eslint/config';
 import globals from 'globals';
+import {createRequire} from 'node:module';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import typescriptEslint from 'typescript-eslint';
@@ -25,6 +27,17 @@ const dirname = path.dirname(filename);
 // continue to resolve relative to the App root (their original location),
 // rather than relative to this config file's directory (which is the default).
 const projectRoot = path.resolve(dirname, '../..');
+
+// `eslint-plugin-rulesdir` lets us load rules from arbitrary local directories.
+// We point it at `eslint-config-expensify`'s shipped rules (so configs that
+// rely on `rulesdir/<rule>` resolve them) and at our own `eslint-plugin-local-rules/`
+// at the repo root.
+const require = createRequire(import.meta.url);
+const expensifyConfigDirectory = path.dirname(require.resolve('eslint-config-expensify/package.json'));
+const expensifyRulesDir = path.resolve(expensifyConfigDirectory, 'eslint-plugin-expensify');
+const localRulesDir = path.resolve(projectRoot, 'eslint-plugin-local-rules');
+
+rulesdir.RULES_DIR = [expensifyRulesDir, localRulesDir];
 
 const restrictedImportPaths = [
     {
@@ -207,7 +220,7 @@ const config = defineConfig([
         extends: new FlatCompat({baseDirectory: projectRoot}).extends(
             'airbnb-typescript',
             'plugin:storybook/recommended',
-            'plugin:react-native-a11y/basic',
+            'plugin:react-native-a11y/all',
             'plugin:@dword-design/import-alias/recommended',
             'prettier',
         ),
@@ -321,6 +334,8 @@ const config = defineConfig([
             'rulesdir/prefer-underscore-method': 'off',
             'rulesdir/prefer-import-module-contents': 'off',
             'rulesdir/no-beta-handler': 'error',
+            'rulesdir/require-live-region-for-status-updates': 'error',
+            'rulesdir/require-a11y-disable-justification': 'error',
             'rulesdir/prefer-narrow-hook-dependencies': [
                 'error',
                 {
@@ -336,7 +351,8 @@ const config = defineConfig([
             'rulesdir/no-unstable-hook-defaults': 'error',
 
             // React and React Native specific rules
-            'react-native-a11y/has-accessibility-hint': ['off'],
+            'react-native-a11y/has-accessibility-hint': 'off',
+            'react-native-a11y/has-valid-accessibility-ignores-invert-colors': 'error',
             'react/require-default-props': 'off',
             'react/prop-types': 'off',
             'react/jsx-key': 'error',
