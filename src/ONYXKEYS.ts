@@ -272,6 +272,9 @@ const ONYXKEYS = {
     /** ID associated with the payment card added by the user. */
     NVP_BILLING_FUND_ID: 'nvp_expensify_billingFundID',
 
+    /** The user's freebie credits balance (in cents). */
+    NVP_PRIVATE_FREEBIE_CREDITS: 'nvp_private_freebieCredits',
+
     /** The amount owed by the workspace’s owner. */
     NVP_PRIVATE_AMOUNT_OWED: 'nvp_private_amountOwed',
 
@@ -966,8 +969,8 @@ const ONYXKEYS = {
         PERSONAL_BANK_ACCOUNT_FORM_DRAFT: 'personalBankAccountDraft',
         DISABLE_AUTO_RENEW_SURVEY_FORM: 'disableAutoRenewSurveyForm',
         DISABLE_AUTO_RENEW_SURVEY_FORM_DRAFT: 'disableAutoRenewSurveyFormDraft',
-        REQUEST_EARLY_CANCELLATION_FORM: 'requestEarlyCancellationForm',
-        REQUEST_EARLY_CANCELLATION_FORM_DRAFT: 'requestEarlyCancellationFormDraft',
+        CANCEL_SUBSCRIPTION_FORM: 'cancelSubscriptionForm',
+        CANCEL_SUBSCRIPTION_FORM_DRAFT: 'cancelSubscriptionFormDraft',
         EXIT_SURVEY_RESPONSE_FORM: 'exitSurveyResponseForm',
         EXIT_SURVEY_RESPONSE_FORM_DRAFT: 'exitSurveyResponseFormDraft',
         WALLET_ADDITIONAL_DETAILS: 'walletAdditionalDetails',
@@ -1082,6 +1085,8 @@ const ONYXKEYS = {
         ADD_DOMAIN_MEMBER_FORM_DRAFT: 'addDomainMemberFormDraft',
         ADD_WORK_EMAIL_FORM: 'addWorkEmailForm',
         ADD_WORK_EMAIL_FORM_DRAFT: 'addWorkEmailFormDraft',
+        EDIT_DOMAIN_GROUP_NAME_FORM: 'editDomainGroupNameForm',
+        EDIT_DOMAIN_GROUP_NAME_FORM_DRAFT: 'editDomainGroupNameFormDraft',
     },
     DERIVED: {
         REPORT_ATTRIBUTES: 'reportAttributes',
@@ -1135,7 +1140,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.NEW_TASK_FORM]: FormTypes.NewTaskForm;
     [ONYXKEYS.FORMS.EDIT_TASK_FORM]: FormTypes.EditTaskForm;
     [ONYXKEYS.FORMS.DISABLE_AUTO_RENEW_SURVEY_FORM]: FormTypes.FeedbackSurveyForm;
-    [ONYXKEYS.FORMS.REQUEST_EARLY_CANCELLATION_FORM]: FormTypes.FeedbackSurveyForm;
+    [ONYXKEYS.FORMS.CANCEL_SUBSCRIPTION_FORM]: FormTypes.FeedbackSurveyForm;
     [ONYXKEYS.FORMS.EXIT_SURVEY_RESPONSE_FORM]: FormTypes.ExitSurveyResponseForm;
     [ONYXKEYS.FORMS.MONEY_REQUEST_DESCRIPTION_FORM]: FormTypes.MoneyRequestDescriptionForm;
     [ONYXKEYS.FORMS.MONEY_REQUEST_MERCHANT_FORM]: FormTypes.MoneyRequestMerchantForm;
@@ -1226,6 +1231,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.SPEND_RULE_FORM]: FormTypes.SpendRuleForm;
     [ONYXKEYS.FORMS.ADD_DOMAIN_MEMBER_FORM]: FormTypes.AddDomainMemberForm;
     [ONYXKEYS.FORMS.ADD_WORK_EMAIL_FORM]: FormTypes.AddWorkEmailForm;
+    [ONYXKEYS.FORMS.EDIT_DOMAIN_GROUP_NAME_FORM]: FormTypes.DomainGroupEditNameForm;
 };
 
 type OnyxFormDraftValuesMapping = {
@@ -1475,6 +1481,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_BILLING_FUND_ID]: number;
+    [ONYXKEYS.NVP_PRIVATE_FREEBIE_CREDITS]: number;
     [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: number;
     [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: number;
     [ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL]: string | undefined;

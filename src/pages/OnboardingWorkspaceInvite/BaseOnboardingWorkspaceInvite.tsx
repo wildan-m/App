@@ -182,7 +182,6 @@ function BaseOnboardingWorkspaceInvite({shouldUseNativeStyles}: BaseOnboardingWo
             CONST.POLICY.ROLE.USER,
             formatPhoneNumber,
             currentUserPersonalDetails.accountID,
-            undefined,
         );
         completeOnboarding(true);
     };
