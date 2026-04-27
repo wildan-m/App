@@ -469,6 +469,7 @@ function IOURequestStepAmount({
             shouldShowWrapper={!!backTo || isEditing}
             includeSafeAreaPaddingBottom
             shouldShowNotFoundPage={shouldShowNotFoundPage}
+            shouldEnableKeyboardAvoidingView={!isCurrencyPickerVisible}
         >
             <IOURequestStepCurrencyModal
                 isPickerVisible={isCurrencyPickerVisible}
