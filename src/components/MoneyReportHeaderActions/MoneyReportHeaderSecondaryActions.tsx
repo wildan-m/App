@@ -396,13 +396,13 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
 
 function MoneyReportHeaderSecondaryActions({reportID, primaryAction, isReportInSearch, backTo, dropdownMenuRef}: MoneyReportHeaderSecondaryActionsProps) {
     return (
-            <MoneyReportHeaderSecondaryActionsInner
-                reportID={reportID}
-                primaryAction={primaryAction}
-                isReportInSearch={isReportInSearch}
-                backTo={backTo}
-                dropdownMenuRef={dropdownMenuRef}
-            />
+        <MoneyReportHeaderSecondaryActionsInner
+            reportID={reportID}
+            primaryAction={primaryAction}
+            isReportInSearch={isReportInSearch}
+            backTo={backTo}
+            dropdownMenuRef={dropdownMenuRef}
+        />
     );
 }
 
