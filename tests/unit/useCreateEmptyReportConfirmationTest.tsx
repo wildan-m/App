@@ -1,6 +1,8 @@
 import {act, renderHook} from '@testing-library/react-native';
 import type {ReactElement, ReactNode} from 'react';
 import useCreateEmptyReportConfirmation from '@hooks/useCreateEmptyReportConfirmation';
+import {getSuggestedSearches} from '@libs/SearchUIUtils';
+import CONST from '@src/CONST';
 
 type ShowConfirmModalOptions = {
     prompt?: ReactNode;
@@ -166,5 +168,22 @@ describe('useCreateEmptyReportConfirmation', () => {
         });
 
         expect(onConfirm).not.toHaveBeenCalled();
+    });
+
+    it('uses the same translation key for the link text as the Reports search suggestion', () => {
+        const suggestedSearches = getSuggestedSearches();
+        const reportsTranslationPath = suggestedSearches[CONST.SEARCH.SEARCH_KEYS.REPORTS].translationPath;
+
+        const onConfirm = jest.fn();
+        renderHook(() =>
+            useCreateEmptyReportConfirmation({
+                policyID,
+                policyName,
+                onConfirm,
+            }),
+        );
+
+        // The modal link text must use the same translation key as the Reports search tab
+        expect(mockTranslate).toHaveBeenCalledWith(reportsTranslationPath);
     });
 });
