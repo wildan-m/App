@@ -2,7 +2,7 @@ diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js 
 index ee42f63..4e8d8c0 100644
 --- a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
 +++ b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
-@@ -380,16 +380,14 @@ const RecyclerViewComponent = (props, ref) => {
+@@ -380,16 +380,15 @@ const RecyclerViewComponent = (props, ref) => {
          }
          return onScrollHandler;
      }, [onScrollHandler, scrollY, stickyHeaders, stickyHeaderUseNativeDriver]);
@@ -11,7 +11,7 @@ index ee42f63..4e8d8c0 100644
 -        if (shouldMaintainVisibleContentPosition) {
 +        if (maintainVisibleContentPosition != null) {
              return {
--                ...maintainVisibleContentPosition,
+                 ...maintainVisibleContentPosition,
                  minIndexForVisible: 0,
              };
          }
@@ -39,7 +39,7 @@ diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx 
 index b2bd67a..d4bf02d 100644
 --- a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
 +++ b/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
-@@ -572,18 +572,14 @@ const RecyclerViewComponent = <T,>(
+@@ -572,18 +572,15 @@ const RecyclerViewComponent = <T,>(
      return onScrollHandler;
    }, [onScrollHandler, scrollY, stickyHeaders, stickyHeaderUseNativeDriver]);
  
@@ -50,7 +50,7 @@ index b2bd67a..d4bf02d 100644
 -    if (shouldMaintainVisibleContentPosition) {
 +    if (maintainVisibleContentPosition != null) {
        return {
--        ...maintainVisibleContentPosition,
+         ...maintainVisibleContentPosition,
          minIndexForVisible: 0,
        };
      }
