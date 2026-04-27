@@ -84,6 +84,7 @@ function IOURequestStepUpgrade({
     const [allReportNextSteps] = useOnyx(ONYXKEYS.COLLECTION.NEXT_STEP);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
 
     // Build transactions map from selectedTransactions (search results) instead of Onyx TRANSACTION collection
     // This ensures that transactions selected from search are properly included in the map passed to changeTransactionsReport
@@ -132,6 +133,7 @@ function IOURequestStepUpgrade({
             const optimisticReport = createNewReport(ownerPersonalDetails, hasViolations, isASAPSubmitBetaEnabled, newPolicy, betas);
 
             const reportNextStep = allReportNextSteps?.[`${ONYXKEYS.COLLECTION.NEXT_STEP}${optimisticReport.reportID}`];
+            const policyTagList = policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`] : {};
 
             // Move ALL selected transactions to the new report
             changeTransactionsReport({
@@ -144,6 +146,7 @@ function IOURequestStepUpgrade({
                 reportNextStep,
                 policyCategories: allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`],
                 allTransactions,
+                policyTagList,
             });
 
             clearSelectedTransactions();
@@ -229,6 +232,7 @@ function IOURequestStepUpgrade({
         betas,
         iouType,
         isTrack,
+        allPolicyTags,
     ]);
 
     const participant = transaction?.participants?.[0];
