@@ -4708,7 +4708,7 @@ function canEditMoneyRequest(
         return !isForwarded;
     }
 
-    return !isReportApproved({report: moneyRequestReport}) && !isSettled(moneyRequestReport) && !isClosedReport(moneyRequestReport) && isRequestor;
+    return !isReportApproved({report: moneyRequestReport}) && !isSettled(moneyRequestReport?.reportID) && !isClosedReport(moneyRequestReport) && isRequestor;
 }
 
 function getNextApproverAccountID(report: OnyxEntry<Report>, isUnapproved = false) {
@@ -4902,7 +4902,7 @@ function canEditFieldOfMoneyRequest({
         return false;
     }
 
-    if (isSettled(moneyRequestReport) || isReportApproved({report: moneyRequestReport})) {
+    if (isSettled(String(moneyRequestReport.reportID)) || isReportIDApproved(String(moneyRequestReport.reportID))) {
         return false;
     }
 
@@ -8578,17 +8578,24 @@ function shouldPinAdminRoomByDefault() {
     return !isExpensifyTeam(deprecatedCurrentUserEmail);
 }
 
-function buildOptimisticWorkspaceChats(policyID: string, policyName: string, expenseReportId?: string): OptimisticWorkspaceChats {
-    const pendingChatMembers = getPendingChatMembers(deprecatedCurrentUserAccountID ? [deprecatedCurrentUserAccountID] : [], [], CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
+function buildOptimisticWorkspaceChats(
+    policyID: string,
+    policyName: string,
+    currentUserAccountID: number | undefined,
+    currentUserEmail: string | undefined,
+    expenseReportId?: string,
+): OptimisticWorkspaceChats {
+    const pendingChatMembers = getPendingChatMembers(currentUserAccountID ? [currentUserAccountID] : [], [], CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
     const adminsChatData = {
         ...buildOptimisticChatReport({
-            participantList: deprecatedCurrentUserAccountID ? [deprecatedCurrentUserAccountID] : [],
+            participantList: currentUserAccountID ? [currentUserAccountID] : [],
             reportName: CONST.REPORT.WORKSPACE_CHAT_ROOMS.ADMINS,
             chatType: CONST.REPORT.CHAT_TYPE.POLICY_ADMINS,
             policyID,
             ownerAccountID: CONST.POLICY.OWNER_ACCOUNT_ID_FAKE,
             oldPolicyName: policyName,
             isPinned: shouldPinAdminRoomByDefault(),
+            currentUserAccountID,
         }),
     };
     const adminsChatReportID = adminsChatData.reportID;
@@ -8598,18 +8605,19 @@ function buildOptimisticWorkspaceChats(policyID: string, policyName: string, exp
     };
 
     const expenseChatData = buildOptimisticChatReport({
-        participantList: deprecatedCurrentUserAccountID ? [deprecatedCurrentUserAccountID] : [],
+        participantList: currentUserAccountID ? [currentUserAccountID] : [],
         reportName: '',
         chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
         policyID,
-        ownerAccountID: deprecatedCurrentUserAccountID,
+        ownerAccountID: currentUserAccountID,
         isOwnPolicyExpenseChat: true,
         oldPolicyName: policyName,
         optimisticReportID: expenseReportId,
+        currentUserAccountID,
     });
 
     const expenseChatReportID = expenseChatData.reportID;
-    const expenseReportCreatedAction = buildOptimisticCreatedReportAction(deprecatedCurrentUserEmail ?? '');
+    const expenseReportCreatedAction = buildOptimisticCreatedReportAction(currentUserEmail ?? '');
     const expenseReportActionData = {
         [expenseReportCreatedAction.reportActionID]: expenseReportCreatedAction,
     };
@@ -9132,6 +9140,8 @@ function getViolatingReportIDForRBRInLHN(report: OnyxEntry<Report>, transactionV
                 return false;
             }
 
+            const excludedNoticeNamesForLHN = isProcessingReport(potentialReport) ? [CONST.VIOLATIONS.MODIFIED_AMOUNT] : [];
+
             return (
                 !isInvoiceReport(potentialReport) &&
                 ViolationsUtils.hasVisibleViolationsForUser(
@@ -9162,19 +9172,37 @@ function getViolatingReportIDForRBRInLHN(report: OnyxEntry<Report>, transactionV
                         potentialReport,
                         policy,
                     ) ||
-                    hasNoticeTypeViolations(
-                        potentialReport.reportID,
+                    hasNoticeTypeViolationsForRBRInLHN(
                         transactionViolations,
                         deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
                         deprecatedCurrentUserEmail ?? '',
-                        true,
                         transactions,
                         potentialReport,
                         policy,
+                        excludedNoticeNamesForLHN,
                     ))
             );
         });
     return violatingReport ? violatingReport.reportID : null;
+}
+
+function hasNoticeTypeViolationsForRBRInLHN(
+    transactionViolations: OnyxCollection<TransactionViolation[]>,
+    currentUserAccountIDParam: number,
+    currentUserEmailParam: string,
+    reportTransactions: Transaction[],
+    report: OnyxEntry<Report>,
+    policy: OnyxEntry<Policy>,
+    excludedViolationNames: string[],
+): boolean {
+    return reportTransactions.some((transaction) => {
+        const rawViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction?.transactionID}`];
+        if (!rawViolations?.length) {
+            return false;
+        }
+        const filteredViolations = excludedViolationNames.length > 0 ? rawViolations.filter((violation) => !excludedViolationNames.includes(violation.name)) : rawViolations;
+        return hasNoticeTypeViolation(transaction, filteredViolations, currentUserEmailParam, currentUserAccountIDParam, report, policy, true);
+    });
 }
 
 /**
@@ -9398,9 +9426,16 @@ function getAllReportErrors(
     return allReportErrors;
 }
 
-function getReceiptUploadErrorReason(report: Report, chatReport: OnyxEntry<Report>, reportActions: OnyxEntry<ReportActions>, transactions: OnyxCollection<Transaction>) {
+function getReceiptUploadErrorReason(
+    report: Report,
+    chatReport: OnyxEntry<Report>,
+    reportActions: OnyxEntry<ReportActions>,
+    transactions: OnyxCollection<Transaction>,
+    // We'll make it required eventually. Refactor issue: https://github.com/Expensify/App/issues/66407
+    isOffline?: boolean,
+) {
     const parentReportAction = getReportAction(report?.parentReportID, report?.parentReportActionID);
-    const transactionThreadReportAction = getOneTransactionThreadReportAction(report, chatReport, reportActions ?? []);
+    const transactionThreadReportAction = getOneTransactionThreadReportAction(report, chatReport, reportActions ?? [], isOffline);
     if (transactionThreadReportAction) {
         const transactionID = isMoneyRequestAction(transactionThreadReportAction) ? getOriginalMessage(transactionThreadReportAction)?.IOUTransactionID : undefined;
         const transaction = transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
