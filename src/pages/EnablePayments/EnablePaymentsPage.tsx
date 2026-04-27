@@ -40,7 +40,7 @@ function EnablePaymentsPage() {
     // Only redirect after the fresh data loading cycle (isLoading: true → false) completes,
     // to avoid acting on stale cached values from a previous session.
     useEffect(() => {
-        if (isOffline) {
+        if (isOffline || !hasFreshData) {
             return;
         }
 
@@ -48,7 +48,7 @@ function EnablePaymentsPage() {
         if (isPendingOnfidoResult || hasFailedOnfido) {
             Navigation.navigate(ROUTES.SETTINGS_WALLET, {forceReplace: true});
         }
-    }, [isOffline, isPendingOnfidoResult, hasFailedOnfido]);
+    }, [isOffline, isPendingOnfidoResult, hasFailedOnfido, hasFreshData]);
 
     const isUserWalletEmpty = isEmptyObject(userWallet);
     if (isUserWalletEmpty || userWallet?.isLoading || (!hasFreshData && !isOffline)) {
