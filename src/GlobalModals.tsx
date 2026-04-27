@@ -25,17 +25,13 @@ function GlobalModals() {
         // Defer loading the context menu until after startup to avoid pulling in heavy
         // dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage, etc.)
         // during the ManualAppStartup span.
-        // Fallback to setTimeout on environments without requestIdleCallback (e.g. Safari < 16.4).
-        const schedule: (cb: () => void) => number =
-            typeof requestIdleCallback === 'function' ? (cb) => requestIdleCallback(cb, {timeout: IDLE_CALLBACK_TIMEOUT_MS}) : (cb) => setTimeout(cb, 1) as unknown as number;
-        const cancel: (id: number) => void = typeof cancelIdleCallback === 'function' ? cancelIdleCallback : (id) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>);
-        const id = schedule(() => setShouldRenderContextMenu(true));
+        const id = requestIdleCallback(() => setShouldRenderContextMenu(true), {timeout: IDLE_CALLBACK_TIMEOUT_MS});
 
         // Allow showContextMenu() to force eager mount if the user interacts before the idle callback fires.
         ReportActionContextMenu.registerEnsureContextMenuMounted(() => setShouldRenderContextMenu(true));
 
         return () => {
-            cancel(id);
+            cancelIdleCallback(id);
             ReportActionContextMenu.registerEnsureContextMenuMounted(null);
         };
     }, []);
