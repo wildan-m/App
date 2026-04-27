@@ -1,5 +1,5 @@
 diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
-index ee42f63c6f38..4e8d8c057f71 100644
+index ee42f63..4e8d8c0 100644
 --- a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
 +++ b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
 @@ -380,16 +380,14 @@ const RecyclerViewComponent = (props, ref) => {
@@ -36,13 +36,13 @@ index ee42f63c6f38..4e8d8c057f71 100644
      // Render the main RecyclerView structure
      return (React.createElement(RecyclerViewContextProvider, { value: recyclerViewContext },
 diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx b/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
-index b2bd67a4152b..d4bf02d12103 100644
+index b2bd67a..d4bf02d 100644
 --- a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
 +++ b/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
 @@ -572,18 +572,14 @@ const RecyclerViewComponent = <T,>(
      return onScrollHandler;
    }, [onScrollHandler, scrollY, stickyHeaders, stickyHeaderUseNativeDriver]);
-
+ 
 -  const shouldMaintainVisibleContentPosition =
 -    recyclerViewManager.shouldMaintainVisibleContentPosition();
 -
@@ -57,12 +57,12 @@ index b2bd67a4152b..d4bf02d12103 100644
      return undefined;
 -  }, [maintainVisibleContentPosition, shouldMaintainVisibleContentPosition]);
 +  }, [maintainVisibleContentPosition]);
-
+ 
    const shouldRenderFromBottom =
      recyclerViewManager.getDataLength() > 0 &&
 @@ -604,7 +600,7 @@ const RecyclerViewComponent = <T,>(
    }, [horizontal, stickyHeaderOffset]);
-
+ 
    const scrollAnchor = useMemo(() => {
 -    if (shouldMaintainVisibleContentPosition) {
 +    if (maintainVisibleContentPosition != null) {
@@ -75,5 +75,6 @@ index b2bd67a4152b..d4bf02d12103 100644
      return null;
 -  }, [horizontal, shouldMaintainVisibleContentPosition]);
 +  }, [horizontal, maintainVisibleContentPosition]);
-
+ 
    // console.log("render", recyclerViewManager.getRenderStack());
+ 
