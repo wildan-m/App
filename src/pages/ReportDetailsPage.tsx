@@ -38,7 +38,6 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePaginatedReportActions from '@hooks/usePaginatedReportActions';
 import useParentReportAction from '@hooks/useParentReportAction';
-import usePermissions from '@hooks/usePermissions';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -163,7 +162,6 @@ type CaseID = ValueOf<typeof CASES>;
 function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetailsPageProps) {
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const {isOffline} = useNetwork();
-    const {isBetaEnabled} = usePermissions();
     const {isRestrictedToPreferredPolicy, preferredPolicyID} = usePreferredPolicy();
     const activePolicy = useActivePolicy();
     const styles = useThemeStyles();
@@ -325,16 +323,14 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
     const reportAttributes = useReportAttributes();
     const isWorkspaceChat = useMemo(() => isWorkspaceChatUtil(report?.chatType ?? ''), [report?.chatType]);
 
-    const isPrivateNotesEnabled = isBetaEnabled(CONST.BETAS.PRIVATE_NOTES);
-
     useEffect(() => {
-        // Do not fetch private notes if the beta is disabled, isLoadingPrivateNotes is already defined, the network is offline, or if the report is a self DM.
-        if (!isPrivateNotesEnabled || isPrivateNotesFetchTriggered || isOffline || isSelfDM) {
+        // Do not fetch private notes if the feature is disabled, isLoadingPrivateNotes is already defined, the network is offline, or if the report is a self DM.
+        if (!Permissions.canUsePrivateNotes() || isPrivateNotesFetchTriggered || isOffline || isSelfDM) {
             return;
         }
 
         getReportPrivateNote(report?.reportID);
-    }, [report?.reportID, isOffline, isPrivateNotesFetchTriggered, isSelfDM, isPrivateNotesEnabled]);
+    }, [report?.reportID, isOffline, isPrivateNotesFetchTriggered, isSelfDM]);
 
     const leaveChat = useCallback(() => {
         if (isRootGroupChat) {
@@ -530,8 +526,8 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
             }
         }
 
-        // Prevent displaying private notes option for threads and task reports, or when the beta is disabled
-        if (isBetaEnabled(CONST.BETAS.PRIVATE_NOTES) && !isChatThread && !isMoneyRequestReport && !isInvoiceReport && !isTaskReport) {
+        // Prevent displaying private notes option for threads and task reports, or when the feature is disabled
+        if (Permissions.canUsePrivateNotes() && !isChatThread && !isMoneyRequestReport && !isInvoiceReport && !isTaskReport) {
             items.push({
                 key: CONST.REPORT_DETAILS_MENU_ITEM.PRIVATE_NOTES,
                 translationKey: 'privateNotes.title',
@@ -655,7 +651,6 @@ function ReportDetailsPage({policy, report, route, reportMetadata}: ReportDetail
         ownerBillingGracePeriodEnd,
         iouTransaction,
         delegateEmail,
-        isBetaEnabled,
     ]);
 
     const displayNamesWithTooltips = useMemo(() => {
