@@ -663,7 +663,7 @@ function getSuggestedSearches(
     return {
         [CONST.SEARCH.SEARCH_KEYS.EXPENSES]: {
             key: CONST.SEARCH.SEARCH_KEYS.EXPENSES,
-            translationPath: 'search.tabs.expenses',
+            translationPath: 'common.expenses',
             type: CONST.SEARCH.DATA_TYPES.EXPENSE,
             icon: 'Receipt',
             searchQuery: buildCannedSearchQuery(),
@@ -682,7 +682,7 @@ function getSuggestedSearches(
         },
         [CONST.SEARCH.SEARCH_KEYS.REPORTS]: {
             key: CONST.SEARCH.SEARCH_KEYS.REPORTS,
-            translationPath: 'search.tabs.reports',
+            translationPath: 'common.reports',
             type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
             icon: 'Document',
             searchQuery: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT}),

@@ -7763,8 +7763,6 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         spendOverTime: 'Gastos ao longo do tempo',
         tabs: {
             expenseReports: 'Relatórios de despesas',
-            reports: 'Todos os relatórios',
-            expenses: 'Todas as despesas',
             submit: 'Rascunhos',
             approve: 'Precisa de aprovação',
             pay: 'Pronto para pagar',

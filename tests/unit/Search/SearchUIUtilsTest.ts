@@ -6263,12 +6263,12 @@ describe('SearchUIUtils', () => {
             expect(menuItems).toStrictEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
-                        translationPath: 'search.tabs.expenses',
+                        translationPath: 'common.expenses',
                         type: CONST.SEARCH.DATA_TYPES.EXPENSE,
                         icon: 'Receipt',
                     }),
                     expect.objectContaining({
-                        translationPath: 'search.tabs.reports',
+                        translationPath: 'common.reports',
                         type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
                         icon: 'Document',
                     }),

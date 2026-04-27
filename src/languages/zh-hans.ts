@@ -7563,8 +7563,6 @@ ${reportName}
         spendOverTime: '随时间支出',
         tabs: {
             expenseReports: '报销报告',
-            reports: '所有报表',
-            expenses: '所有报销',
             submit: '草稿',
             approve: '待审批',
             pay: '准备付款',
