@@ -35,8 +35,9 @@ The grey **More** button is always visible in the report header. Tap it to acces
 - Unapprove
 - Duplicate report
 - Download as CSV
-- **Print**
+- Print
 - Change Workspace
+- Change Approver
 - View Details
 - Delete
 - Reject
