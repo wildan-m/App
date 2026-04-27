@@ -75,7 +75,7 @@ Workspace admins can bypass the approval workflow on a report to final approve i
 4. Select **Add approver** or **Bypass approvers**.
 5. If you selected **Add approver**, choose the approver and click **Save**.
 
-**Note:** When selecting reports across multiple workspaces, only members who belong to all selected workspaces will appear in the approver list. Bulk change approver is only available for reports submitted on Control plan workspaces with approval workflows enabled. Non-Control workspaces will prompt you to upgrade.
+**Note:** When selecting reports across multiple workspaces, only members who belong to all selected workspaces will appear in the approver list.
 
 ---
 
