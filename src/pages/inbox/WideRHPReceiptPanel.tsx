@@ -22,9 +22,18 @@ import SCREENS from '@src/SCREENS';
 
 /**
  * Conditionally renders the receipt view in wide RHP layout.
- * Self-subscribes to determine whether to show and what to display.
+ * Outer guard short-circuits on routes other than SEARCH_REPORT so the heavy
+ * subscriptions inside the gate don't fire on every Inbox ReportScreen mount.
  */
 function WideRHPReceiptPanel() {
+    const route = useRoute();
+    if (route.name !== SCREENS.RIGHT_MODAL.SEARCH_REPORT) {
+        return null;
+    }
+    return <WideRHPReceiptPanelGate />;
+}
+
+function WideRHPReceiptPanelGate() {
     const styles = useThemeStyles();
     const route = useRoute();
     const routeParams = route.params as {reportID?: string; reportActionID?: string} | undefined;
@@ -52,7 +61,6 @@ function WideRHPReceiptPanel() {
     const shouldDisplayMoneyRequestActionsList = isMoneyRequestOrInvoiceReport && shouldDisplayReportTableView(report, visibleTransactions ?? []);
 
     const shouldShowWideRHP =
-        route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT &&
         !isSmallScreenWidth &&
         !shouldDisplayMoneyRequestActionsList &&
         (isTransactionThread(parentReportAction) ||
