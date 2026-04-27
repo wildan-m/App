@@ -122,7 +122,7 @@ ${errorMessage}
 1. **Why the PR caused the job to fail?**
 2. **Address any underlying issues.**
 
-**For detailed instructions, check [this SO](https://stackoverflowteams.com/c/expensify/questions/21936)**
+**For detailed instructions, check [this SO](https://stackoverflowteams.com/c/expensify/questions/21936).**
 
 **🐛 We appreciate your help in squashing this bug!**`;
 
