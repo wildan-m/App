@@ -66,7 +66,7 @@ function TabNavigatorBar({state}: Pick<BottomTabBarProps, 'state'>) {
     const shouldHide = shouldUseNarrowLayout && (!isAtRoot || isBlockingViewVisible);
     const prevTabIndex = usePrevious(state.index);
     const prevShouldHide = usePrevious(shouldHide);
-    const stateKey = `${state.index}-${isAtRoot}`;
+    const stateKey = `${state.index}-${isAtRoot}-${isBlockingViewVisible}`;
     const [animationDoneKey, setAnimationDoneKey] = useState(stateKey);
 
     const tabChanged = prevTabIndex !== state.index;
