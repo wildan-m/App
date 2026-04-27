@@ -102,8 +102,6 @@ describe('ClearReportActionErrors UI', () => {
                                 index={0}
                                 isFirstVisibleReportAction={false}
                                 taskReport={undefined}
-                                linkedReport={undefined}
-                                iouReportOfLinkedReport={undefined}
                                 clearAllRelatedReportActionErrors={clearErrorFn}
                                 originalReportID={originalReportID}
                             />

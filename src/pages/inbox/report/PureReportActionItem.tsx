@@ -222,12 +222,6 @@ type PureReportActionItemProps = {
     /** The task report associated with this action, if any */
     taskReport: OnyxEntry<OnyxTypes.Report>;
 
-    /** The linked report associated with this action, if any */
-    linkedReport: OnyxEntry<OnyxTypes.Report>;
-
-    /** The iou report associated with the linked report, if any */
-    iouReportOfLinkedReport: OnyxEntry<OnyxTypes.Report>;
-
     /** Linked transaction route error */
     linkedTransactionRouteError?: Errors;
 
@@ -347,8 +341,6 @@ function PureReportActionItem({
     draftMessage,
     iouReport,
     taskReport,
-    linkedReport,
-    iouReportOfLinkedReport,
     linkedTransactionRouteError,
     isUserValidated,
     parentReport,
@@ -729,8 +721,6 @@ function PureReportActionItem({
             children = (
                 <TripRoomPreview
                     action={action}
-                    chatReport={linkedReport}
-                    iouReport={iouReportOfLinkedReport}
                     isHovered={hovered}
                     contextMenuAnchor={popoverAnchorRef.current}
                     containerStyles={displayAsGroup ? [] : [styles.mt2]}
