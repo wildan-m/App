@@ -38,7 +38,7 @@ The grey **More** button is always visible in the report header. Tap it to acces
 - Print
 - Change Workspace
 - Change approver
-- View setails
+- View details
 - Delete
 - Reject
 
