@@ -1,28 +1,27 @@
-import {useEffect, useRef, useState} from 'react';
+import {useState} from 'react';
+
+type WalletDataState = 'idle' | 'loading' | 'fresh';
+
+function computeNextState(current: WalletDataState, isOffline: boolean, isLoading: boolean | undefined): WalletDataState {
+    if (isOffline) {
+        return current;
+    }
+    if (current === 'idle' && isLoading) {
+        return 'loading';
+    }
+    if (current === 'loading' && !isLoading) {
+        return 'fresh';
+    }
+    return current;
+}
 
 function useHasFreshWalletData(isOffline: boolean, isLoading: boolean | undefined): boolean {
-    const wasLoadingRef = useRef(false);
-    const [hasFreshData, setHasFreshData] = useState(false);
-
-    useEffect(() => {
-        if (isOffline) {
-            return;
-        }
-
-        if (isLoading) {
-            wasLoadingRef.current = true;
-            return;
-        }
-
-        if (!wasLoadingRef.current) {
-            return;
-        }
-
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- we need to trigger a re-render when fresh data arrives to stop showing the loading indicator
-        setHasFreshData(true);
-    }, [isOffline, isLoading]);
-
-    return hasFreshData;
+    const [state, setState] = useState<WalletDataState>('idle');
+    const next = computeNextState(state, isOffline, isLoading);
+    if (next !== state) {
+        setState(next);
+    }
+    return next === 'fresh';
 }
 
 export default useHasFreshWalletData;
