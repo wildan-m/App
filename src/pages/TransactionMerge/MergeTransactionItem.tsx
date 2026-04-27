@@ -16,7 +16,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
-function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTooltip, isDisabled, onFocus, shouldSyncFocus, onSelectRow}: ListItemProps<TItem>) {
+function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTooltip, isDisabled, onFocus, shouldSyncFocus, onSelectRow, isLastItem}: ListItemProps<TItem>) {
     const styles = useThemeStyles();
     const transactionItem = item as unknown as TransactionListItemType;
     const theme = useTheme();
@@ -56,7 +56,7 @@ function MergeTransactionItem<TItem extends ListItem>({item, isFocused, showTool
                     isFocused && StyleUtils.getItemBackgroundColorStyle(false, !!isFocused, !!item.isDisabled, theme.activeComponentBG, theme.hoverComponentBG),
                 ]}
                 onFocus={onFocus}
-                wrapperStyle={[styles.flex1, animatedHighlightStyle, styles.userSelectNone, styles.borderBottom]}
+                wrapperStyle={[styles.flex1, animatedHighlightStyle, styles.userSelectNone, !isLastItem && styles.borderBottom]}
             >
                 <TransactionItemRow
                     transactionItem={transactionItem}
