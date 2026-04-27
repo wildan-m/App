@@ -47,7 +47,7 @@
     "typecheck-tsgo": "tsgo --noEmit --incremental --tsBuildInfoFile tsconfig.tsgo.tsbuildinfo",
     "lint": "./scripts/lint.sh",
     "lint-changed": "./scripts/lintChanged.sh",
-    "lint-watch": "npx eslint-watch --watch --changed",
+    "lint-watch": "onchange '**/*.{js,jsx,ts,tsx,mjs,cjs}' -- ./scripts/lint.sh {{changed}}",
     "shellcheck": "./scripts/shellCheck.sh",
     "spell": "cspell --color **/*",
     "spell-changed": "cspell --color --no-must-find-files",
