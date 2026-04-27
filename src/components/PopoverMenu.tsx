@@ -556,7 +556,7 @@ function BasePopoverMenu({
         const stylesArray: ViewStyle[] = [StyleSheet.flatten(styles.createMenuContainer), {width: variables.compactPopoverMenuWidth}, styles.pv2];
 
         if (shouldUseScrollView && shouldEnableMaxHeight && !isInLandscapeMode) {
-            stylesArray.push({maxHeight: windowHeight - variables.compactPopoverMenuVerticalMargin});
+            stylesArray.push({maxHeight: Math.max(windowHeight - variables.compactPopoverMenuVerticalMargin, CONST.POPOVER_MENU_MAX_HEIGHT)});
         }
 
         return stylesArray;
