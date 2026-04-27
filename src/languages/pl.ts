@@ -7761,6 +7761,8 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         spendOverTime: 'Wydatki w czasie',
         tabs: {
             expenseReports: 'Raporty wydatków',
+            reports: 'Raporty',
+            expenses: 'Wydatki',
             submit: 'Szkice',
             approve: 'Wymaga zatwierdzenia',
             pay: 'Gotowe do zapłaty',

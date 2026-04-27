@@ -7424,6 +7424,8 @@ ${amount} para ${merchant} - ${date}`,
     search: {
         tabs: {
             expenseReports: 'Informes de gastos',
+            reports: 'Informes',
+            expenses: 'Gastos',
             submit: 'Borradores',
             approve: 'Necesita aprobación',
             pay: 'Listo para pagar',

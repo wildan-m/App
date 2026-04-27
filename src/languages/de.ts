@@ -7807,6 +7807,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         spendOverTime: 'Ausgaben im Zeitverlauf',
         tabs: {
             expenseReports: 'Spesenabrechnungen',
+            reports: 'Berichte',
+            expenses: 'Ausgaben',
             submit: 'Entwürfe',
             approve: 'Genehmigung erforderlich',
             pay: 'Zahlungsbereit',

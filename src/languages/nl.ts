@@ -7771,6 +7771,8 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         spendOverTime: 'Uitgaven in de tijd',
         tabs: {
             expenseReports: 'Declaraties',
+            reports: 'Rapporten',
+            expenses: 'Declaraties',
             submit: 'Concepten',
             approve: 'Moet worden goedgekeurd',
             pay: 'Klaar om te betalen',

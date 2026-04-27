@@ -7568,6 +7568,8 @@ const translations = {
     search: {
         tabs: {
             expenseReports: 'Expense reports',
+            reports: 'Reports',
+            expenses: 'Expenses',
             submit: 'Drafts',
             approve: 'Needs approval',
             pay: 'Ready to pay',
