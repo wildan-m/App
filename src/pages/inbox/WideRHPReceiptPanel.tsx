@@ -22,12 +22,15 @@ import SCREENS from '@src/SCREENS';
 
 /**
  * Conditionally renders the receipt view in wide RHP layout.
- * Outer guard short-circuits on routes other than SEARCH_REPORT so the heavy
- * subscriptions inside the gate don't fire on every Inbox ReportScreen mount.
+ * Outer guard short-circuits on non-SEARCH_REPORT routes and on small screens so the heavy
+ * subscriptions inside the gate don't fire on every Inbox ReportScreen mount or on mobile,
+ * where the wide RHP layout doesn't exist.
  */
 function WideRHPReceiptPanel() {
     const route = useRoute();
-    if (route.name !== SCREENS.RIGHT_MODAL.SEARCH_REPORT) {
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth} = useResponsiveLayout();
+    if (route.name !== SCREENS.RIGHT_MODAL.SEARCH_REPORT || isSmallScreenWidth) {
         return null;
     }
     return <WideRHPReceiptPanelGate />;
@@ -39,9 +42,6 @@ function WideRHPReceiptPanelGate() {
     const routeParams = route.params as {reportID?: string; reportActionID?: string} | undefined;
     const reportIDFromRoute = getNonEmptyStringOnyxID(routeParams?.reportID);
     const {isOffline} = useNetwork();
-
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth} = useResponsiveLayout();
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`);
@@ -61,7 +61,6 @@ function WideRHPReceiptPanelGate() {
     const shouldDisplayMoneyRequestActionsList = isMoneyRequestOrInvoiceReport && shouldDisplayReportTableView(report, visibleTransactions ?? []);
 
     const shouldShowWideRHP =
-        !isSmallScreenWidth &&
         !shouldDisplayMoneyRequestActionsList &&
         (isTransactionThread(parentReportAction) ||
             parentReportAction?.childType === CONST.REPORT.TYPE.EXPENSE ||
