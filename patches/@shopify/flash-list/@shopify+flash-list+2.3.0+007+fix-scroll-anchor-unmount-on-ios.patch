@@ -1,7 +1,8 @@
 diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
+index ee42f63..4e8d8c0 100644
 --- a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
 +++ b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
-@@ -308,16 +308,15 @@
+@@ -380,16 +380,14 @@ const RecyclerViewComponent = (props, ref) => {
          }
          return onScrollHandler;
      }, [onScrollHandler, scrollY, stickyHeaders, stickyHeaderUseNativeDriver]);
@@ -10,7 +11,7 @@ diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js 
 -        if (shouldMaintainVisibleContentPosition) {
 +        if (maintainVisibleContentPosition != null) {
              return {
-                 ...maintainVisibleContentPosition,
+-                ...maintainVisibleContentPosition,
                  minIndexForVisible: 0,
              };
          }
@@ -20,7 +21,7 @@ diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js 
      const shouldRenderFromBottom = recyclerViewManager.getDataLength() > 0 &&
          ((_d = maintainVisibleContentPosition === null || maintainVisibleContentPosition === void 0 ? void 0 : maintainVisibleContentPosition.startRenderingFromBottom) !== null && _d !== void 0 ? _d : false);
      // Create view for measuring bounded size
-@@ -329,11 +328,11 @@
+@@ -401,11 +399,11 @@ const RecyclerViewComponent = (props, ref) => {
              }, ref: firstChildViewRef }));
      }, [horizontal, stickyHeaderOffset]);
      const scrollAnchor = useMemo(() => {
@@ -35,9 +36,10 @@ diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js 
      // Render the main RecyclerView structure
      return (React.createElement(RecyclerViewContextProvider, { value: recyclerViewContext },
 diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx b/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
+index b2bd67a..d4bf02d 100644
 --- a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
 +++ b/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx
-@@ -480,18 +480,15 @@
+@@ -572,18 +572,14 @@ const RecyclerViewComponent = <T,>(
      return onScrollHandler;
    }, [onScrollHandler, scrollY, stickyHeaders, stickyHeaderUseNativeDriver]);
  
@@ -48,7 +50,7 @@ diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx 
 -    if (shouldMaintainVisibleContentPosition) {
 +    if (maintainVisibleContentPosition != null) {
        return {
-         ...maintainVisibleContentPosition,
+-        ...maintainVisibleContentPosition,
          minIndexForVisible: 0,
        };
      }
@@ -58,7 +60,7 @@ diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx 
  
    const shouldRenderFromBottom =
      recyclerViewManager.getDataLength() > 0 &&
-@@ -512,7 +509,7 @@
+@@ -604,7 +600,7 @@ const RecyclerViewComponent = <T,>(
    }, [horizontal, stickyHeaderOffset]);
  
    const scrollAnchor = useMemo(() => {
@@ -67,7 +69,7 @@ diff --git a/node_modules/@shopify/flash-list/src/recyclerview/RecyclerView.tsx 
        return (
          <ScrollAnchor
            horizontal={Boolean(horizontal)}
-@@ -521,7 +518,7 @@
+@@ -613,7 +609,7 @@ const RecyclerViewComponent = <T,>(
        );
      }
      return null;
