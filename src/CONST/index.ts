@@ -880,7 +880,6 @@ const CONST = {
         TRAVEL_INVOICING: 'travelInvoicing',
         EXPENSIFY_CARD_EU_UK: 'expensifyCardEuUk',
         EUR_BILLING: 'eurBilling',
-        UBER_FOR_BUSINESS: 'uberForBusiness',
         PAY_INVOICE_VIA_EXPENSIFY: 'payInvoiceViaExpensify',
         SUGGESTED_FOLLOWUPS: 'suggestedFollowups',
         GUSTO: 'gustoNewDot',
@@ -2590,7 +2589,6 @@ const CONST = {
     LHN_SKELETON_VIEW_ITEM_HEIGHT: 64,
     LHN_VIEWPORT_ITEM_COUNT: 20,
     SEARCH_SKELETON_VIEW_ITEM_HEIGHT: 108,
-    SEARCH_SKELETON_VIEW_ITEM_HEIGHT_SMALL: 96,
     EXPENSIFY_PARTNER_NAME: 'expensify.com',
     EXPENSIFY_MERCHANT: 'Expensify, Inc.',
     EMAIL,
@@ -6142,6 +6140,8 @@ const CONST = {
     ROLE: {
         /** Use for elements with important, time-sensitive information. */
         ALERT: 'alert',
+        /** Use for elements with advisory information that should be announced without interrupting the user. */
+        STATUS: 'status',
         /** Use for elements that act as buttons. */
         BUTTON: 'button',
         /** Use for elements representing checkboxes. */
@@ -8829,6 +8829,11 @@ const CONST = {
             SEND_BUTTON: 'AttachmentModal-SendButton',
             IMAGE_ZOOM: 'AttachmentModal-ImageZoom',
         },
+        ATTACHMENT_PREVIEW: {
+            VIDEO_THUMBNAIL: 'AttachmentPreview-VideoThumbnail',
+            IMAGE_THUMBNAIL: 'AttachmentPreview-ImageThumbnail',
+            PDF_THUMBNAIL: 'AttachmentPreview-PDFThumbnail',
+        },
         HEADER: {
             BACK_BUTTON: 'Header-BackButton',
             DOWNLOAD_BUTTON: 'Header-DownloadButton',
@@ -9585,6 +9590,9 @@ const CONST = {
         PROFILE_PAGE: {
             AVATAR: 'ProfilePage-Avatar',
         },
+        BASE_AUTO_COMPLETE_SUGGESTIONS: {
+            MENU_ITEM: 'BaseAutoCompleteSuggestions-MenuItem',
+        },
         SAFE_AREA: {
             DISMISS_KEYBOARD_LANDSCAPE_MODE: 'SafeArea-DismissKeyboardLandscapeMode',
         },
@@ -9621,12 +9629,6 @@ const CONST = {
     HOME: {
         ANNOUNCEMENTS: [
             {
-                title: 'More power, right where you need it',
-                subtitle: 'Product update',
-                url: 'https://use.expensify.com/blog/expensify-march-2026-product-update',
-                publishedDate: '2026-03-23',
-            },
-            {
                 title: 'New global partnerships: banking, travel, accounting, & more',
                 subtitle: 'Newsletter',
                 url: 'https://use.expensify.com/blog/expensify-new-integrations-march-2026',
@@ -9637,6 +9639,12 @@ const CONST = {
                 subtitle: 'Product update',
                 url: 'https://use.expensify.com/blog/expensify-april-2026-product-update',
                 publishedDate: '2026-04-15',
+            },
+            {
+                title: 'New BYOC partnership: Institute of Commercial Payments',
+                subtitle: 'Press release',
+                url: 'https://www.businesswire.com/news/home/20260421550894/en/Expensify-Partners-With-IOCP-to-Expand-Access-to-Modern-Spend-Management',
+                publishedDate: '2026-04-21',
             },
         ],
     },
