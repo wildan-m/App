@@ -93,9 +93,11 @@ function TransactionListItem<TItem extends ListItem>({
     // Fetch policy categories directly from Onyx since they are not included in the search snapshot
     const [policyCategories] = originalUseOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(policyID)}`);
 
-    const [parentReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transactionItem.reportID)}`);
-    const [transactionThreadReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionItem?.reportAction?.childReportID}`);
     const [transaction] = originalUseOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionItem.transactionID)}`);
+    // Key parentReport off the live transaction.reportID so that after an offline move-to-create-report,
+    // we resolve the new optimistic Expense report instead of the stale Self DM still referenced by the snapshot.
+    const [parentReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID ?? transactionItem.reportID)}`);
+    const [transactionThreadReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionItem?.reportAction?.childReportID}`);
     const parentReportActionSelector = (reportActions: OnyxEntry<ReportActions>): OnyxEntry<ReportAction> => reportActions?.[`${transactionItem?.reportAction?.reportActionID}`];
     const [parentReportAction] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(transactionItem.reportID)}`, {selector: parentReportActionSelector}, [
         transactionItem,
@@ -232,13 +234,13 @@ function TransactionListItem<TItem extends ListItem>({
                             <UserInfoAndActionButtonRow
                                 item={transactionItem}
                                 shouldShowUserInfo={!isDeletedTransaction && !!transactionItem?.from}
-                                stateNum={transactionItem.report?.stateNum}
-                                statusNum={transactionItem.report?.statusNum}
+                                stateNum={reportForViolations?.stateNum}
+                                statusNum={reportForViolations?.statusNum}
                             />
                         )}
                         <TransactionItemRow
                             transactionItem={transactionItem}
-                            report={transactionItem.report}
+                            report={reportForViolations}
                             policy={transactionItem.policy}
                             shouldShowTooltip={showTooltip}
                             onButtonPress={handleActionButtonPress}
