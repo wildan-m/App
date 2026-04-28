@@ -40,7 +40,6 @@ import {
     getOriginalAmountForDisplay,
     getOriginalCurrencyForDisplay,
     getReimbursable,
-    getTagForDisplay,
     getTaxName,
     getCreated as getTransactionCreated,
     hasMissingSmartscanFields,
@@ -680,8 +679,6 @@ function TransactionItemRow({
     }, [columns]);
 
     const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
-    const tagForDisplay = getTagForDisplay(transactionItem);
-    const categoryAndTagSuffix = [categoryForDisplay, tagForDisplay].filter(Boolean).join(' • ');
 
     if (shouldUseNarrowLayout) {
         return (
@@ -740,7 +737,7 @@ function TransactionItemRow({
                                     date={createdAt}
                                     showTooltip={shouldShowTooltip}
                                     isLargeScreenWidth={false}
-                                    suffixText={categoryAndTagSuffix}
+                                    suffixText={categoryForDisplay}
                                 />
                                 <TypeCell
                                     transactionItem={transactionItem}
