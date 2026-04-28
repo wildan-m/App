@@ -191,6 +191,14 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
         });
     };
 
+    console.log('[fix-first-filter-pill] useSearchFiltersBar render', {
+        formKeys: Object.keys(searchAdvancedFiltersForm ?? {}),
+        formDateAfter: searchAdvancedFiltersForm?.dateAfter,
+        formDateOn: searchAdvancedFiltersForm?.dateOn,
+        formDateBefore: searchAdvancedFiltersForm?.dateBefore,
+        formDateRange: searchAdvancedFiltersForm?.dateRange,
+        inputQuery: queryJSON?.inputQuery,
+    });
     const filters = mapFiltersFormToLabelValueList<FilterItem>(searchAdvancedFiltersForm, queryJSON.policyID, SKIPPED_FILTERS, translate, localeCompare, (filterKey) => {
         const groupConfig = FILTER_GROUP_MAP[filterKey];
         if (groupConfig) {
