@@ -14,6 +14,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import {getParticipantsOption} from '@libs/OptionsListUtils';
+import {doesPersonalDetailMatchSearchTerm} from '@libs/OptionsListUtils/searchMatchUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -103,9 +104,11 @@ function UserSelectPopup({value, label, closeOverlay, onChange, isSearchable}: U
             if (currentUserPersonalDetail) {
                 currentUserOption = currentUserPersonalDetail;
             } else if (personalDetails?.[currentUserAccountID]) {
-                currentUserOption = {
-                    ...getParticipantsOption(personalDetails[currentUserAccountID], personalDetails),
-                } as OptionData;
+                const candidateOption = getParticipantsOption(personalDetails[currentUserAccountID], personalDetails) as OptionData;
+                const trimmedSearchTerm = debouncedSearchTerm.trim().toLowerCase();
+                if (!trimmedSearchTerm || doesPersonalDetailMatchSearchTerm(candidateOption, currentUserAccountID, trimmedSearchTerm)) {
+                    currentUserOption = candidateOption;
+                }
             }
         }
 
@@ -141,7 +144,7 @@ function UserSelectPopup({value, label, closeOverlay, onChange, isSearchable}: U
             keyForList: option.keyForList ?? option.login ?? '',
         }));
         return combinedOptionsWithKeyForList;
-    }, [availableOptions.personalDetails, availableOptions.recentReports, selectedOptionsForDisplay, currentUserAccountID, personalDetails]);
+    }, [availableOptions.personalDetails, availableOptions.recentReports, selectedOptionsForDisplay, currentUserAccountID, personalDetails, debouncedSearchTerm]);
 
     const headerMessage = useMemo(() => {
         const noResultsFound = isEmpty(listData);
