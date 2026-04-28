@@ -121,6 +121,9 @@ function TransactionListItem<TItem extends ListItem>({
                   ...StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected),
               }
             : {...styles.flexColumn, ...styles.alignItemsStretch},
+        isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+        !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
+        !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
     ];
 
     const animatedHighlightStyle = useAnimatedHighlightStyle({
@@ -220,9 +223,9 @@ function TransactionListItem<TItem extends ListItem>({
                     styles.flex1,
                     animatedHighlightStyle,
                     styles.userSelectNone,
-                    isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+                    isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
+                    !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
+                    !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
                     !isLargeScreenWidth && !isLastItem && styles.borderBottom,
                 ]}
             >
