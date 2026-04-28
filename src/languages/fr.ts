@@ -5163,6 +5163,11 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             fromOtherWorkspaces: "D'autres espaces de travail",
             addWorkEmail: 'Ajoutez votre adresse e-mail professionnelle',
             addWorkEmailDescription: "Veuillez ajouter votre e-mail professionnel pour utiliser les flux existants d'autres espaces de travail.",
+            confirmWorkEmailMagicCode: {
+                title: "Confirmer l'e-mail professionnel",
+                description: ({primaryLogin}: {primaryLogin: string}) =>
+                    `Saisissez le code magique envoyé à ${primaryLogin} pour changer votre méthode de contact principale par votre e-mail professionnel.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'Impossible de charger les flux de cartes',
                 workspaceFeedsCouldNotBeLoadedMessage:

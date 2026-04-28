@@ -2699,6 +2699,11 @@ const ROUTES = {
         route: 'workspaces/:policyID/company-cards/:feed/verify-work-email',
         getRoute: (policyID: string, feed: CompanyCardFeedWithDomainID) => `workspaces/${policyID}/company-cards/${encodeURIComponent(feed)}/verify-work-email` as const,
     },
+    WORKSPACE_COMPANY_CARD_CONFIRM_MAGIC_CODE: {
+        route: 'workspaces/:policyID/company-cards/:feed/work-email/:targetEmail/confirm-magic-code',
+        getRoute: (policyID: string, feed: CompanyCardFeedWithDomainID, targetEmail: string) =>
+            `workspaces/${policyID}/company-cards/${encodeURIComponent(feed)}/work-email/${encodeURIComponent(targetEmail)}/confirm-magic-code` as const,
+    },
     WORKSPACE_COMPANY_CARD_EDIT_TRANSACTION_START_DATE: {
         route: 'workspaces/:policyID/company-cards/:feed/:cardID/edit/transaction-start-date',
         getRoute: (policyID: string, cardID: string, feed: CompanyCardFeedWithDomainID) =>

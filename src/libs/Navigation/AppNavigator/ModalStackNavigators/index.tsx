@@ -821,6 +821,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.COMPANY_CARDS_VERIFY_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/WorkspaceCompanyCardsVerifyAccountPage').default,
     [SCREENS.WORKSPACE.COMPANY_CARD_ADD_WORK_EMAIL]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/WorkspaceCompanyCardAddWorkEmailPage').default,
     [SCREENS.WORKSPACE.COMPANY_CARD_VERIFY_WORK_EMAIL]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/WorkspaceVerifyWorkAccountPage').default,
+    [SCREENS.WORKSPACE.COMPANY_CARD_CONFIRM_MAGIC_CODE]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/WorkspaceCompanyCardConfirmMagicCodePage').default,
     [SCREENS.WORKSPACE.COMPANY_CARDS_ASSIGN_CARD_ASSIGNEE]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/assignCard/AssigneeStep').default,
     [SCREENS.WORKSPACE.COMPANY_CARDS_ASSIGN_CARD_CARD_SELECTION]: () => require<ReactComponentModule>('../../../../pages/workspace/companyCards/assignCard/CardSelectionStep').default,
     [SCREENS.WORKSPACE.COMPANY_CARDS_ASSIGN_CARD_TRANSACTION_START_DATE]: () =>

@@ -1062,6 +1062,7 @@ function setContactMethodAsDefault(
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
     backTo?: string,
     skipNavigation?: boolean,
+    validateCode?: string,
 ) {
     const oldDefaultContactMethod = currentEmail;
     const optimisticData: Array<
@@ -1209,6 +1210,7 @@ function setContactMethodAsDefault(
     }
     const parameters: SetContactMethodAsDefaultParams = {
         partnerUserID: newDefaultContactMethod,
+        validateCode,
     };
 
     API.write(WRITE_COMMANDS.SET_CONTACT_METHOD_AS_DEFAULT, parameters, {

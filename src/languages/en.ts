@@ -5177,6 +5177,10 @@ const translations = {
             fromOtherWorkspaces: 'From other workspaces',
             addWorkEmail: 'Add your work email',
             addWorkEmailDescription: 'Please add your work email in order to use existing feeds from other workspaces.',
+            confirmWorkEmailMagicCode: {
+                title: 'Confirm work email',
+                description: ({primaryLogin}: {primaryLogin: string}) => `Enter the magic code sent to ${primaryLogin} to switch your primary contact method to your work email.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: "Couldn't load card feeds",
                 workspaceFeedsCouldNotBeLoadedMessage: 'An error occurred while loading workspace card feeds. Please try again or contact your administrator.',

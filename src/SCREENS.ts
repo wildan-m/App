@@ -692,6 +692,7 @@ const SCREENS = {
         COMPANY_CARD_EDIT_CARD_NAME: 'Workspace_CompanyCard_Edit_Card_Name',
         COMPANY_CARD_ADD_WORK_EMAIL: 'Workspace_CompanyCard_Add_Work_Email',
         COMPANY_CARD_VERIFY_WORK_EMAIL: 'Workspace_CompanyCard_Verify_Work_Email',
+        COMPANY_CARD_CONFIRM_MAGIC_CODE: 'Workspace_CompanyCard_Confirm_Magic_Code',
         COMPANY_CARD_EDIT_TRANSACTION_START_DATE: 'Workspace_CompanyCard_Edit_Transaction_Start_Date',
         COMPANY_CARD_EXPORT: 'Workspace_CompanyCard_Export',
         EXPENSIFY_CARD: 'Workspace_ExpensifyCard',

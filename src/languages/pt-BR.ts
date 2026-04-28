@@ -5123,6 +5123,11 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             fromOtherWorkspaces: 'De outros workspaces',
             addWorkEmail: 'Adicione seu e-mail de trabalho',
             addWorkEmailDescription: 'Adicione seu e-mail de trabalho para usar os feeds existentes de outros workspaces.',
+            confirmWorkEmailMagicCode: {
+                title: 'Confirmar e-mail de trabalho',
+                description: ({primaryLogin}: {primaryLogin: string}) =>
+                    `Digite o código mágico enviado para ${primaryLogin} para alterar seu método de contato principal para seu e-mail de trabalho.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'Não foi possível carregar os feeds do cartão',
                 workspaceFeedsCouldNotBeLoadedMessage: 'Ocorreu um erro ao carregar os feeds de cartões do workspace. Tente novamente ou contate o seu administrador.',

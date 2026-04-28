@@ -5029,6 +5029,11 @@ ${amount} para ${merchant} - ${date}`,
             fromOtherWorkspaces: 'De otros espacios de trabajo',
             addWorkEmail: 'Añade tu correo electrónico de trabajo',
             addWorkEmailDescription: 'Por favor, añade tu correo de trabajo para poder usar los feeds existentes de otros espacios de trabajo.',
+            confirmWorkEmailMagicCode: {
+                title: 'Confirma tu correo de trabajo',
+                description: ({primaryLogin}: {primaryLogin: string}) =>
+                    `Introduce el código mágico enviado a ${primaryLogin} para cambiar tu método de contacto principal a tu correo de trabajo.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'Error al cargar las fuentes de tarjetas del espacio de trabajo',
                 workspaceFeedsCouldNotBeLoadedMessage:

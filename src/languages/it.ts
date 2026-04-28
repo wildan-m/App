@@ -5137,6 +5137,11 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             fromOtherWorkspaces: 'Da altri spazi di lavoro',
             addWorkEmail: 'Aggiungi la tua email di lavoro',
             addWorkEmailDescription: 'Aggiungi la tua email di lavoro per utilizzare i feed esistenti di altri spazi di lavoro.',
+            confirmWorkEmailMagicCode: {
+                title: 'Conferma email di lavoro',
+                description: ({primaryLogin}: {primaryLogin: string}) =>
+                    `Inserisci il codice magico inviato a ${primaryLogin} per cambiare il tuo metodo di contatto principale con la tua email di lavoro.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'Impossibile caricare i feed della carta',
                 workspaceFeedsCouldNotBeLoadedMessage:

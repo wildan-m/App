@@ -5091,6 +5091,10 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             fromOtherWorkspaces: '他のワークスペースから',
             addWorkEmail: 'あなたの勤務用メールアドレスを追加',
             addWorkEmailDescription: '他のワークスペースの既存フィードを使用するには、勤務用メールアドレスを追加してください。',
+            confirmWorkEmailMagicCode: {
+                title: '勤務用メールアドレスを確認',
+                description: ({primaryLogin}: {primaryLogin: string}) => `${primaryLogin} に送信されたマジックコードを入力して、主要な連絡先を勤務用メールアドレスに切り替えてください。`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'カードフィードを読み込めませんでした',
                 workspaceFeedsCouldNotBeLoadedMessage: 'ワークスペースカードフィードの読み込み中にエラーが発生しました。もう一度お試しいただくか、管理者にお問い合わせください。',

@@ -5153,6 +5153,11 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             fromOtherWorkspaces: 'Aus anderen Workspaces',
             addWorkEmail: 'Fügen Sie Ihre Arbeits-E-Mail hinzu',
             addWorkEmailDescription: 'Bitte fügen Sie Ihre Arbeits-E-Mail hinzu, um vorhandene Feeds aus anderen Workspaces zu nutzen.',
+            confirmWorkEmailMagicCode: {
+                title: 'Arbeits-E-Mail bestätigen',
+                description: ({primaryLogin}: {primaryLogin: string}) =>
+                    `Geben Sie den an ${primaryLogin} gesendeten magischen Code ein, um Ihre primäre Kontaktmethode auf Ihre Arbeits-E-Mail umzustellen.`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: 'Kartendaten konnten nicht geladen werden',
                 workspaceFeedsCouldNotBeLoadedMessage:

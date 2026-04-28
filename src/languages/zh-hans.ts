@@ -5007,6 +5007,10 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             fromOtherWorkspaces: '来自其他工作区',
             addWorkEmail: '添加您的工作邮箱',
             addWorkEmailDescription: '请添加您的工作邮箱以使用其他工作区的现有流水。',
+            confirmWorkEmailMagicCode: {
+                title: '确认工作邮箱',
+                description: ({primaryLogin}: {primaryLogin: string}) => `请输入发送至 ${primaryLogin} 的魔法验证码,以将您的主要联系方式切换为工作邮箱。`,
+            },
             error: {
                 workspaceFeedsCouldNotBeLoadedTitle: '无法加载卡片流水',
                 workspaceFeedsCouldNotBeLoadedMessage: '加载工作区卡片动态时发生错误。请重试或联系管理员。',

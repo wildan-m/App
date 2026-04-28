@@ -1315,6 +1315,11 @@ type SettingsNavigatorParamList = {
         policyID: string;
         feed: CompanyCardFeedWithDomainID;
     };
+    [SCREENS.WORKSPACE.COMPANY_CARD_CONFIRM_MAGIC_CODE]: {
+        policyID: string;
+        feed: CompanyCardFeedWithDomainID;
+        targetEmail: string;
+    };
     [SCREENS.WORKSPACE.COMPANY_CARDS_ASSIGN_CARD_ASSIGNEE]: {
         policyID: string;
         feed: CompanyCardFeedWithDomainID;
