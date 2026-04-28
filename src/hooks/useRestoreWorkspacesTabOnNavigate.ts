@@ -1,3 +1,4 @@
+import {StackActions} from '@react-navigation/native';
 import {useCallback} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import {getPreservedNavigatorState} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
@@ -5,6 +6,7 @@ import {isFullScreenName, isWorkspaceNavigatorRouteName} from '@libs/Navigation/
 import {getWorkspacesTabStateFromSessionStorage} from '@libs/Navigation/helpers/lastVisitedTabPathUtils';
 import navigateToWorkspacesPage from '@libs/Navigation/helpers/navigateToWorkspacesPage';
 import {getTabState} from '@libs/Navigation/helpers/tabNavigatorUtils';
+import navigationRef from '@libs/Navigation/navigationRef';
 import type {DomainSplitNavigatorParamList, WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -35,6 +37,34 @@ function useRestoreWorkspacesTabOnNavigate() {
             return {};
         }
 
+        // Detect the duplicate-TAB_NAVIGATOR situation: when the user follows a cross-tab link
+        // from inside an RHP (e.g. "View transactions" inside the workspace card details RHP →
+        // Search), linkTo PUSHes a fresh TAB_NAVIGATOR onto the root stack above the RHP, while
+        // the original TAB_NAVIGATOR — still holding the user's deep workspace state — stays
+        // mounted underneath. Tapping the Workspaces tab on the bottom bar should reveal that
+        // original state. Look for an older root-level TAB_NAVIGATOR that already contains
+        // workspace state and signal the callback to pop the root stack down to it instead of
+        // routing through the standard navigate flow (which would push yet another stack).
+        const rootRoutes = rootState?.routes ?? [];
+        const topRootIndex = rootState?.index ?? rootRoutes.length - 1;
+        for (let i = 0; i < topRootIndex; i++) {
+            const candidate = rootRoutes.at(i);
+            if (candidate?.name !== NAVIGATORS.TAB_NAVIGATOR) {
+                continue;
+            }
+            const candidateTabState = getTabState(candidate);
+            const candidateWorkspaceNavigator = candidateTabState?.routes?.find((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR);
+            if (!candidateWorkspaceNavigator) {
+                continue;
+            }
+            const candidateWorkspaceNavigatorState =
+                candidateWorkspaceNavigator.state ?? (candidateWorkspaceNavigator.key ? getPreservedNavigatorState(candidateWorkspaceNavigator.key) : undefined);
+            const hasWorkspaceState = candidateWorkspaceNavigatorState?.routes?.some((route) => isWorkspaceNavigatorRouteName(route.name)) ?? false;
+            if (hasWorkspaceState) {
+                return {duplicateStackPopCount: topRootIndex - i, topmostFullScreenRoute};
+            }
+        }
+
         // Look inside TabNavigator for WORKSPACE_NAVIGATOR
         const rootTabRoute = rootState?.routes.findLast((route) => route.name === NAVIGATORS.TAB_NAVIGATOR);
         const rootTabState = getTabState(rootTabRoute);
@@ -61,7 +91,7 @@ function useRestoreWorkspacesTabOnNavigate() {
         return {topmostFullScreenRoute};
     });
 
-    const {lastWorkspacesTabNavigatorRoute, workspacesTabState, topmostFullScreenRoute} = routeState;
+    const {lastWorkspacesTabNavigatorRoute, workspacesTabState, topmostFullScreenRoute, duplicateStackPopCount} = routeState;
 
     // If the last route was a specific workspace or domain, extract its ID from params
     const params = workspacesTabState?.routes?.at(0)?.params as
@@ -94,6 +124,10 @@ function useRestoreWorkspacesTabOnNavigate() {
     const [lastViewedDomain] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN, {selector: lastViewedDomainSelector});
 
     return useCallback(() => {
+        if (duplicateStackPopCount && duplicateStackPopCount > 0) {
+            navigationRef.dispatch(StackActions.pop(duplicateStackPopCount));
+            return;
+        }
         navigateToWorkspacesPage({
             shouldUseNarrowLayout,
             currentUserLogin,
@@ -102,7 +136,7 @@ function useRestoreWorkspacesTabOnNavigate() {
             lastWorkspacesTabNavigatorRoute,
             topmostFullScreenRoute,
         });
-    }, [shouldUseNarrowLayout, currentUserLogin, lastViewedPolicy, lastViewedDomain, lastWorkspacesTabNavigatorRoute, topmostFullScreenRoute]);
+    }, [duplicateStackPopCount, shouldUseNarrowLayout, currentUserLogin, lastViewedPolicy, lastViewedDomain, lastWorkspacesTabNavigatorRoute, topmostFullScreenRoute]);
 }
 
 export default useRestoreWorkspacesTabOnNavigate;
