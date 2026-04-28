@@ -1,4 +1,4 @@
-import {startTransition, useEffect, useState} from 'react';
+import {startTransition, useEffect, useRef, useState} from 'react';
 import type {ReactNode} from 'react';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 
@@ -33,15 +33,15 @@ type NavigationDeferredMountProps = {
  */
 function NavigationDeferredMount({placeholder = null, children, waitForUpcomingTransition = true}: NavigationDeferredMountProps): ReactNode {
     const [isReady, setIsReady] = useState(false);
+    // One-shot mount-time config — flipping the prop after mount shouldn't retrigger the wait.
+    const waitForUpcomingTransitionRef = useRef(waitForUpcomingTransition);
 
     useEffect(() => {
         const handle = TransitionTracker.runAfterTransitions({
-            waitForUpcomingTransition,
+            waitForUpcomingTransition: waitForUpcomingTransitionRef.current,
             callback: () => startTransition(() => setIsReady(true)),
         });
         return () => handle.cancel();
-        // `waitForUpcomingTransition` is a one-shot mount-time config — flipping it post-mount shouldn't retrigger the wait.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return isReady ? children : placeholder;
