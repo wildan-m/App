@@ -1205,7 +1205,7 @@ Onyx.connect({
 });
 
 let allReportLastVisitTimes: Record<string, string> = {};
-Onyx.connect({
+Onyx.connectWithoutView({
     key: ONYXKEYS.REPORT_LAST_VISIT_TIMES,
     callback: (value) => {
         allReportLastVisitTimes = value ?? {};
