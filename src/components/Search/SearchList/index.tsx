@@ -422,6 +422,9 @@ function SearchList({
 
     useImperativeHandle(ref, () => ({scrollToIndex}), [scrollToIndex]);
 
+    const firstVisibleIndex = useMemo(() => data.findIndex((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE), [data]);
+    const lastVisibleIndex = useMemo(() => data.findLastIndex((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE), [data]);
+
     const renderItem = useCallback(
         (item: SearchListItem, index: number, isItemFocused: boolean, onFocus?: (event: NativeSyntheticEvent<ExtendedTargetedEvent>) => void) => {
             const isDisabled = item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
@@ -469,8 +472,8 @@ function SearchList({
                         newTransactionID={newTransactionID}
                         onUndelete={handleUndelete}
                         keyForList={item.keyForList}
-                        isFirstItem={index === 0}
-                        isLastItem={index === data.length - 1 && !ListFooterComponent}
+                        isFirstItem={index === firstVisibleIndex}
+                        isLastItem={index === lastVisibleIndex && !ListFooterComponent}
                     />
                 </Animated.View>
             );
@@ -507,6 +510,8 @@ function SearchList({
             ListFooterComponent,
             policyForMovingExpenses,
             handleUndelete,
+            firstVisibleIndex,
+            lastVisibleIndex,
         ],
     );
 

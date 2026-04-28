@@ -63,7 +63,7 @@ function SearchRowSkeleton({
 
     if (shouldUseNarrowLayout) {
         return (
-            <View style={[styles.flex1, containerStyle]}>
+            <View style={containerStyle}>
                 <ItemListSkeletonView
                     itemViewHeight={CONST.SEARCH_SKELETON_VIEW_ITEM_HEIGHT_SMALL}
                     itemViewStyle={[styles.highlightBG, styles.mb2, styles.br3, styles.ml5]}
