@@ -29,17 +29,13 @@ function useSearchFilterSync(queryJSON: SearchQueryJSON | undefined, formValues:
     const isFocused = useIsFocused();
 
     useEffect(() => {
-        const querySig = queryJSON ? buildSearchQueryString(queryJSON) : null;
-        console.log('[fix-first-filter-pill] sync useEffect run', {isFocused, querySig, lastSyncedQuerySig, formValues});
         if (!isFocused) {
-            console.log('[fix-first-filter-pill] sync SKIP not focused');
             return;
         }
+        const querySig = queryJSON ? buildSearchQueryString(queryJSON) : null;
         if (lastSyncedQuerySig === querySig) {
-            console.log('[fix-first-filter-pill] sync SKIP same querySig');
             return;
         }
-        console.log('[fix-first-filter-pill] sync FIRE Onyx.set', {lastSyncedQuerySig, newQuerySig: querySig, formValues});
         lastSyncedQuerySig = querySig;
         updateAdvancedFilters(formValues, true);
     }, [queryJSON, formValues, isFocused]);
