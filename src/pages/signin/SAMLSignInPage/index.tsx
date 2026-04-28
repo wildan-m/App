@@ -27,6 +27,9 @@ function SAMLSignInPage() {
                     handleSAMLLoginError(translate('common.error.login'), false);
                     return;
                 }
+                // Mark that SAML login was initiated so SignInPage can detect a browser-back
+                // from the IdP and clear sign-in data instead of re-initiating SAML
+                sessionStorage.setItem('EXPENSIFY_SAML_INITIATED', 'true');
                 window.location.replace(response.url);
             })
             .catch((error: Error) => {

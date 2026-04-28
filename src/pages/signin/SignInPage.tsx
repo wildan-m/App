@@ -67,6 +67,7 @@ type GetRenderOptionsParams = {
     isPrimaryLogin: boolean;
     isUsingMagicCode: boolean;
     hasInitiatedSAMLLogin: boolean;
+    isReturningFromSAMLOnWeb: boolean;
     shouldShowAnotherLoginPageOpenedMessage: boolean;
     credentials: OnyxEntry<Credentials>;
     isAccountValidated?: boolean;
@@ -89,6 +90,7 @@ function getRenderOptions({
     isPrimaryLogin,
     isUsingMagicCode,
     hasInitiatedSAMLLogin,
+    isReturningFromSAMLOnWeb,
     shouldShowAnotherLoginPageOpenedMessage,
     credentials,
     isAccountValidated,
@@ -100,13 +102,14 @@ function getRenderOptions({
     const hasSMSDeliveryFailure = !!account?.smsDeliveryFailureStatus?.hasSMSDeliveryFailure;
 
     // True, if the user has SAML required, and we haven't yet initiated SAML for their account
-    const shouldInitiateSAMLLogin = hasAccount && hasLogin && isSAMLRequired && !hasInitiatedSAMLLogin && !!account.isLoading;
+    const shouldInitiateSAMLLogin = hasAccount && hasLogin && isSAMLRequired && !hasInitiatedSAMLLogin && !isReturningFromSAMLOnWeb && !!account.isLoading;
     const shouldShowChooseSSOOrMagicCode = hasAccount && hasLogin && isSAMLEnabled && !isSAMLRequired && !isUsingMagicCode;
 
     // SAML required users may reload the login page after having already entered their login details, in which
     // case we want to clear their sign in data so they don't end up in an infinite loop redirecting back to their
-    // SSO provider's login page
-    const isClearingSAMLSignInData = hasLogin && isSAMLRequired && !shouldInitiateSAMLLogin && !hasInitiatedSAMLLogin && !account.isLoading;
+    // SSO provider's login page. On web, also trigger when returning from an IdP redirect (browser-back) since
+    // account.isLoading may still be true during Onyx hydration.
+    const isClearingSAMLSignInData = hasLogin && isSAMLRequired && !shouldInitiateSAMLLogin && ((!hasInitiatedSAMLLogin && !account.isLoading) || isReturningFromSAMLOnWeb);
     if (isClearingSAMLSignInData) {
         clearSignInData();
     }
@@ -177,6 +180,20 @@ function SignInPage({ref}: SignInPageProps) {
      *  if we need to clear their sign in details so they can enter a login */
     const [hasInitiatedSAMLLogin, setHasInitiatedSAMLLogin] = useState(false);
 
+    // On web, detect if the user is returning from a SAML IdP redirect (e.g. browser-back).
+    // sessionStorage survives page reloads within the same tab, unlike React state.
+    const [isReturningFromSAMLOnWeb] = useState(() => {
+        if (typeof sessionStorage === 'undefined') {
+            return false;
+        }
+        const flag = sessionStorage.getItem('EXPENSIFY_SAML_INITIATED');
+        if (flag === 'true') {
+            sessionStorage.removeItem('EXPENSIFY_SAML_INITIATED');
+            return true;
+        }
+        return false;
+    });
+
     const isClientTheLeader = !!activeClients && isClientTheLeaderActiveClientManager();
     // We need to show "Another login page is opened" message if the page isn't active and visible
     // eslint-disable-next-line rulesdir/no-negated-variables
@@ -214,6 +231,7 @@ function SignInPage({ref}: SignInPageProps) {
         isPrimaryLogin: !account?.primaryLogin || account.primaryLogin === credentials?.login,
         isUsingMagicCode,
         hasInitiatedSAMLLogin,
+        isReturningFromSAMLOnWeb,
         shouldShowAnotherLoginPageOpenedMessage,
         credentials,
         isAccountValidated,
