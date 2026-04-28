@@ -19,7 +19,7 @@ const createNewAccountCountSignal: FraudSignalFactory = (_, responseData) => {
     if (!responseData?.newAccountCount) {
         return undefined;
     }
-    return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: {key: 'new_account_count', value: responseData.newAccountCount as string}};
+    return {event: FRAUD_PROTECTION_EVENT.NEW_EMAILS_INVITED, attribute: {key: 'new_account_count', value: String(responseData.newAccountCount)}};
 };
 
 const fraudSignalFactoryByApiCommand: Record<string, FraudSignalFactory> = {
