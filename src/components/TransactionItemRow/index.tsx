@@ -708,26 +708,26 @@ function TransactionItemRow({
                             shouldUseNarrowLayout={shouldUseNarrowLayout}
                         />
                         <View style={[styles.flex2, styles.flexColumn, styles.justifyContentEvenly]}>
-                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.minHeight5, styles.maxHeight5]}>
-                                <DateCell
-                                    date={createdAt}
-                                    showTooltip={shouldShowTooltip}
-                                    isLargeScreenWidth={!shouldUseNarrowLayout}
-                                />
-                                <Text style={[styles.textMicroSupporting]}> • </Text>
-                                <TypeCell
-                                    transactionItem={transactionItem}
-                                    shouldShowTooltip={shouldShowTooltip}
-                                    shouldUseNarrowLayout={shouldUseNarrowLayout}
-                                />
+                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.gap2]}>
+                                <View style={[styles.flexRow, styles.alignItemsCenter, styles.minHeight5, styles.maxHeight5, styles.flexShrink1]}>
+                                    <DateCell
+                                        date={createdAt}
+                                        showTooltip={shouldShowTooltip}
+                                        isLargeScreenWidth={!shouldUseNarrowLayout}
+                                    />
+                                    <Text style={[styles.textMicroSupporting]}> • </Text>
+                                    <TypeCell
+                                        transactionItem={transactionItem}
+                                        shouldShowTooltip={shouldShowTooltip}
+                                        shouldUseNarrowLayout={shouldUseNarrowLayout}
+                                    />
+                                </View>
                                 {!merchantOrDescription && (
-                                    <View style={[styles.mlAuto]}>
-                                        <TotalCell
-                                            transactionItem={transactionItem}
-                                            shouldShowTooltip={shouldShowTooltip}
-                                            shouldUseNarrowLayout={shouldUseNarrowLayout}
-                                        />
-                                    </View>
+                                    <TotalCell
+                                        transactionItem={transactionItem}
+                                        shouldShowTooltip={shouldShowTooltip}
+                                        shouldUseNarrowLayout={shouldUseNarrowLayout}
+                                    />
                                 )}
                             </View>
                             {!!merchantOrDescription && (
