@@ -1204,6 +1204,7 @@ Onyx.connect({
     },
 });
 
+// See findLastAccessedReport — non-UI, module-scoped intentionally.
 let allReportLastVisitTimes: Record<string, string> = {};
 Onyx.connectWithoutView({
     key: ONYXKEYS.REPORT_LAST_VISIT_TIMES,
