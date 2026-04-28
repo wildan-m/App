@@ -684,7 +684,7 @@ function TransactionItemRow({
         return (
             <>
                 <View
-                    style={[bgActiveStyles, styles.justifyContentEvenly, style]}
+                    style={[styles.expenseWidgetRadius, styles.overflowHidden, bgActiveStyles, styles.justifyContentEvenly, style]}
                     testID="transaction-item-row"
                 >
                     <View style={[styles.flexRow]}>
