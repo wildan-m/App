@@ -54,11 +54,8 @@ function DescriptionField({
 
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
 
-    // `getDescription` returns the raw `transaction.comment.comment`, which is stored as HTML for saved
-    // transactions (e.g. viewing a completed split on `SplitBillDetailsPage`). Normalize to markdown so
-    // both downstream consumers below — the `shouldParseTitle` `MenuItemWithTopDescription` (which runs
-    // markdown→HTML on the value) and the editable `TextInput type="markdown"` — receive a consistent
-    // markdown string regardless of whether the transaction is a draft (plain text) or a saved one (HTML).
+    // `getDescription` returns raw `transaction.comment.comment`, which can be HTML for saved transactions.
+    // We normalize to markdown so both the read-only and editable inputs receive a consistent format.
     const iouComment = Parser.htmlToMarkdown(getDescription(transaction));
 
     const contextMenuStateValue = {
