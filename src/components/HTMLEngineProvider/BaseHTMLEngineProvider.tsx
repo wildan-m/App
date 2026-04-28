@@ -1,3 +1,4 @@
+import {Element} from 'domhandler';
 import React, {useMemo} from 'react';
 import type {TextProps} from 'react-native';
 import {HTMLContentModel, HTMLElementModel, RenderHTMLConfigProvider, TRenderEngineProvider} from 'react-native-render-html';
@@ -245,6 +246,23 @@ function BaseHTMLEngineProvider({textSelectable = false, children, enableExperim
                     }
                     // eslint-disable-next-line no-param-reassign
                     text.data = convertToLTR(text.data);
+                },
+                onElement: (element) => {
+                    // Strip <br> element nodes that appear as direct children of a bullet-list
+                    // container (or its raw <ul> counterpart). Senders such as Concierge can emit
+                    // `<ul>...<li>X</li><br/></ul>`; the orphan <br> survives parsing as an element
+                    // sibling of the list items and the transient render engine then lays it out as
+                    // an extra empty bullet row. <br> nested inside an <li>/<bullet-item> is left
+                    // untouched because we only inspect direct children of the list container.
+                    if (element.name !== 'bullet-list' && element.name !== 'ul') {
+                        return;
+                    }
+                    const filtered = element.children.filter((child) => !(child instanceof Element && child.name === 'br'));
+                    if (filtered.length === element.children.length) {
+                        return;
+                    }
+                    // eslint-disable-next-line no-param-reassign
+                    element.children = filtered;
                 },
             }}
         >
