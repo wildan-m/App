@@ -32,6 +32,15 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
 
+const ADVANCED_CSV_COLUMNS = new Set<string>([
+    CONST.CSV_IMPORT_COLUMNS.ORIGINAL_TRANSACTION_DATE,
+    CONST.CSV_IMPORT_COLUMNS.ORIGINAL_AMOUNT,
+    CONST.CSV_IMPORT_COLUMNS.ORIGINAL_CURRENCY,
+    CONST.CSV_IMPORT_COLUMNS.COMMENT,
+    CONST.CSV_IMPORT_COLUMNS.CATEGORY,
+    CONST.CSV_IMPORT_COLUMNS.TAG,
+]);
+
 type WorkspaceCompanyCardsSettingsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.COMPANY_CARDS_SETTINGS>;
 
 function WorkspaceCompanyCardsSettingsPage({
@@ -65,6 +74,9 @@ function WorkspaceCompanyCardsSettingsPage({
     const isPending = !!selectedFeedData?.pending;
     const isDirectFeedType = isDirectFeed(feed);
     const isCsvFeed = !!feed?.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV);
+    const storedMappings = selectedFeedData?.uploadLayoutSettings?.columnMappings;
+    const hadAdvancedFields = !!storedMappings && Object.keys(storedMappings).some((col) => ADVANCED_CSV_COLUMNS.has(col));
+
     const statementCloseDate = useMemo(() => {
         if (!selectedFeedData?.statementPeriodEndDay) {
             return undefined;
@@ -183,7 +195,7 @@ function WorkspaceCompanyCardsSettingsPage({
                                         data: {
                                             layoutType: feed,
                                             companyCardLayoutName: selectedFeedData?.customFeedName ?? feedName ?? '',
-                                            useAdvancedFields: false,
+                                            useAdvancedFields: hadAdvancedFields,
                                             existingInstanceID: selectedFeedData?.uploadLayoutSettings?.instanceID ?? null,
                                         },
                                     });

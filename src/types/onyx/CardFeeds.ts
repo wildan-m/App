@@ -127,6 +127,9 @@ type CustomCardFeedData = OnyxCommon.OnyxValueWithOfflineFeedback<{
         /** Unique identifier for this CSV layout instance */
         instanceID?: string;
 
+        /** Stored column mappings from the most recent CSV import (column name → column index) */
+        columnMappings?: Record<string, string>;
+
         [key: string]: unknown;
     };
 
