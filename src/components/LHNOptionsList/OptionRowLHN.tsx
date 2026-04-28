@@ -1,13 +1,11 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef} from 'react';
 import type {GestureResponderEvent, ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
 import Badge from '@components/Badge';
 import DisplayNames from '@components/DisplayNames';
-import Hoverable from '@components/Hoverable';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails, useSession} from '@components/OnyxListItemProvider';
-import PressableWithSecondaryInteraction from '@components/PressableWithSecondaryInteraction';
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
@@ -16,12 +14,10 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
-import DomUtils from '@libs/DomUtils';
 import {containsCustomEmoji as containsCustomEmojiUtils, containsOnlyCustomEmoji} from '@libs/EmojiUtils';
 import FS from '@libs/Fullstory';
 import {shouldOptionShowTooltip, shouldUseBoldText} from '@libs/OptionsListUtils';
@@ -30,13 +26,13 @@ import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import TextWithEmojiFragment from '@pages/inbox/report/comment/TextWithEmojiFragment';
-import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import LHNAvatar from './LHNAvatar';
 import {useLHNTooltipContext} from './LHNTooltipContext';
+import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 import type {OptionRowLHNProps} from './types';
 
@@ -58,7 +54,6 @@ function OptionRowLHN({
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'DotIndicator', 'Pin']);
 
     const {onboardingPurpose, onboarding, firstReportIDWithGBRorRBR, isScreenFocused} = useLHNTooltipContext();
@@ -75,7 +70,6 @@ function OptionRowLHN({
     const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
 
     const {translate} = useLocalize();
-    const [isContextMenuActive, setIsContextMenuActive] = useState(false);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
     const sidebarInnerRowStyle = StyleSheet.flatten<ViewStyle>(
@@ -167,37 +161,6 @@ function OptionRowLHN({
     const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
 
-    /**
-     * Show the ReportActionContextMenu modal popover.
-     *
-     * @param [event] - A press event.
-     */
-    const showPopover = (event: MouseEvent | GestureResponderEvent) => {
-        if (!isScreenFocused && shouldUseNarrowLayout) {
-            return;
-        }
-        setIsContextMenuActive(true);
-        showContextMenu({
-            type: CONST.CONTEXT_MENU_TYPES.REPORT,
-            event,
-            selection: '',
-            contextMenuAnchor: popoverAnchor.current,
-            report: {
-                reportID,
-                originalReportID: reportID,
-                isPinnedChat: optionItem.isPinned,
-                isUnreadChat: !!optionItem.isUnread,
-            },
-            reportAction: {
-                reportActionID: '-1',
-            },
-            callbacks: {
-                onHide: () => setIsContextMenuActive(false),
-            },
-            withoutOverlay: false,
-        });
-    };
-
     const emojiCode = optionItem.status?.emojiCode ?? '';
     const statusText = optionItem.status?.text ?? '';
     const statusClearAfterDate = optionItem.status?.clearAfter ?? '';
@@ -240,202 +203,173 @@ function OptionRowLHN({
     });
 
     const renderRow = (onPress: typeof onOptionPress) => (
-        <View>
-            <Hoverable>
-                {(hovered) => {
-                    let secondaryAvatarBgColor = theme.sidebar;
-                    if (isOptionFocused) {
-                        secondaryAvatarBgColor = focusedBackgroundColor;
-                    } else if (hovered) {
-                        secondaryAvatarBgColor = hoveredBackgroundColor;
-                    }
-                    return (
-                        <PressableWithSecondaryInteraction
-                            ref={popoverAnchor}
-                            onPress={onPress}
-                            onMouseDown={(event) => {
-                                // Allow composer blur on right click
-                                if (!event) {
-                                    return;
-                                }
-                                // Prevent composer blur on left click
-                                event.preventDefault();
-                            }}
-                            // reportID may be a number contrary to the type definition
-                            testID={typeof optionItem.reportID === 'number' ? String(optionItem.reportID) : optionItem.reportID}
-                            onSecondaryInteraction={(event) => {
-                                showPopover(event);
-                                // Ensure that we blur the composer when opening context menu, so that only one component is focused at a time
-                                if (DomUtils.getActiveElement()) {
-                                    (DomUtils.getActiveElement() as HTMLElement | null)?.blur();
-                                }
-                            }}
-                            withoutFocusOnSecondaryInteraction
-                            activeOpacity={variables.pressDimValue}
-                            opacityAnimationDuration={0}
-                            style={[
-                                styles.flexRow,
-                                styles.alignItemsCenter,
-                                styles.justifyContentBetween,
-                                styles.sidebarLink,
-                                styles.sidebarLinkInnerLHN,
-                                StyleUtils.getBackgroundColorStyle(theme.sidebar),
-                                isOptionFocused ? styles.sidebarLinkActive : null,
-                                (hovered || isContextMenuActive) && !isOptionFocused ? styles.sidebarLinkHover : null,
-                            ]}
-                            role={CONST.ROLE.BUTTON}
-                            accessibilityLabel={accessibilityLabelWithContextMenuHint}
-                            accessibilityHint={accessibilityHint}
-                            onLayout={onLayout}
-                            needsOffscreenAlphaCompositing={(optionItem?.icons?.length ?? 0) >= 2}
-                            sentryLabel={CONST.SENTRY_LABEL.LHN.OPTION_ROW}
-                        >
-                            <View style={sidebarInnerRowStyle}>
-                                <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                                    {!!optionItem.icons?.length && !!firstIcon && (
-                                        <LHNAvatar
-                                            icons={icons}
-                                            shouldShowSubscript={!!optionItem.shouldShowSubscript}
-                                            size={isInFocusMode ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
-                                            subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
-                                            useMidSubscriptSize={isInFocusMode}
-                                            secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
-                                            singleAvatarContainerStyle={singleAvatarContainerStyle}
-                                            shouldShowTooltip={shouldOptionShowTooltip(optionItem)}
-                                            delegateAccountID={skipDelegate ? undefined : delegateAccountID}
-                                            delegateTooltipAccountID={delegateTooltipAccountID}
+        <OptionRowPressable
+            reportID={reportID}
+            optionItem={optionItem}
+            isOptionFocused={isOptionFocused}
+            isScreenFocused={isScreenFocused}
+            popoverAnchor={popoverAnchor}
+            onPress={onPress}
+            onLayout={onLayout}
+            accessibilityLabel={accessibilityLabelWithContextMenuHint}
+            accessibilityHint={accessibilityHint}
+            // reportID may be a number contrary to the type definition
+            testID={typeof optionItem.reportID === 'number' ? String(optionItem.reportID) : optionItem.reportID}
+        >
+            {(hovered) => {
+                let secondaryAvatarBgColor = theme.sidebar;
+                if (isOptionFocused) {
+                    secondaryAvatarBgColor = focusedBackgroundColor;
+                } else if (hovered) {
+                    secondaryAvatarBgColor = hoveredBackgroundColor;
+                }
+                return (
+                    <>
+                        <View style={sidebarInnerRowStyle}>
+                            <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                                {!!optionItem.icons?.length && !!firstIcon && (
+                                    <LHNAvatar
+                                        icons={icons}
+                                        shouldShowSubscript={!!optionItem.shouldShowSubscript}
+                                        size={isInFocusMode ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
+                                        subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
+                                        useMidSubscriptSize={isInFocusMode}
+                                        secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
+                                        singleAvatarContainerStyle={singleAvatarContainerStyle}
+                                        shouldShowTooltip={shouldOptionShowTooltip(optionItem)}
+                                        delegateAccountID={skipDelegate ? undefined : delegateAccountID}
+                                        delegateTooltipAccountID={delegateTooltipAccountID}
+                                    />
+                                )}
+                                <View style={contentContainerStyles}>
+                                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
+                                        <DisplayNames
+                                            accessibilityLabel={translate('accessibilityHints.chatUserDisplayNames')}
+                                            fullTitle={optionItem.text ?? ''}
+                                            shouldParseFullTitle={shouldParseFullTitle}
+                                            displayNamesWithTooltips={optionItem.displayNamesWithTooltips ?? []}
+                                            tooltipEnabled
+                                            numberOfLines={1}
+                                            textStyles={displayNameStyle}
+                                            shouldUseFullTitle={
+                                                !!optionItem.isChatRoom ||
+                                                !!optionItem.isPolicyExpenseChat ||
+                                                !!optionItem.isTaskReport ||
+                                                !!optionItem.isThread ||
+                                                !!optionItem.isMoneyRequestReport ||
+                                                !!optionItem.isInvoiceReport ||
+                                                !!optionItem.private_isArchived ||
+                                                isGroupChat(report) ||
+                                                isSystemChat(report)
+                                            }
+                                            testID={testID}
                                         />
-                                    )}
-                                    <View style={contentContainerStyles}>
-                                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
-                                            <DisplayNames
-                                                accessibilityLabel={translate('accessibilityHints.chatUserDisplayNames')}
-                                                fullTitle={optionItem.text ?? ''}
-                                                shouldParseFullTitle={shouldParseFullTitle}
-                                                displayNamesWithTooltips={optionItem.displayNamesWithTooltips ?? []}
-                                                tooltipEnabled
-                                                numberOfLines={1}
-                                                textStyles={displayNameStyle}
-                                                shouldUseFullTitle={
-                                                    !!optionItem.isChatRoom ||
-                                                    !!optionItem.isPolicyExpenseChat ||
-                                                    !!optionItem.isTaskReport ||
-                                                    !!optionItem.isThread ||
-                                                    !!optionItem.isMoneyRequestReport ||
-                                                    !!optionItem.isInvoiceReport ||
-                                                    !!optionItem.private_isArchived ||
-                                                    isGroupChat(report) ||
-                                                    isSystemChat(report)
-                                                }
-                                                testID={testID}
-                                            />
-                                            {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
-                                            {isStatusVisible && (
-                                                <Tooltip
-                                                    text={statusContent}
-                                                    shiftVertical={-4}
-                                                >
-                                                    <Text style={styles.ml1}>{emojiCode}</Text>
-                                                </Tooltip>
-                                            )}
-                                        </View>
-                                        {!!optionItem.alternateText && (
-                                            <Text
-                                                style={alternateTextStyle}
-                                                numberOfLines={1}
-                                                accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
-                                                fsClass={alternateTextFSClass}
+                                        {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
+                                        {isStatusVisible && (
+                                            <Tooltip
+                                                text={statusContent}
+                                                shiftVertical={-4}
                                             >
-                                                {alternateTextContainsCustomEmojiWithText ? (
-                                                    <TextWithEmojiFragment
-                                                        message={optionItem.alternateText}
-                                                        style={[alternateTextStyle, styles.mh0]}
-                                                        alignCustomEmoji
-                                                    />
-                                                ) : (
-                                                    optionItem.alternateText
-                                                )}
-                                            </Text>
+                                                <Text style={styles.ml1}>{emojiCode}</Text>
+                                            </Tooltip>
                                         )}
                                     </View>
-                                    {optionItem?.descriptiveText ? (
-                                        <View
-                                            style={[styles.flexWrap]}
+                                    {!!optionItem.alternateText && (
+                                        <Text
+                                            style={alternateTextStyle}
+                                            numberOfLines={1}
+                                            accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
                                             fsClass={alternateTextFSClass}
                                         >
-                                            <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
-                                        </View>
-                                    ) : null}
-                                    {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
-                                        <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
-                                            {actionBadgeText ? (
-                                                <Badge
-                                                    text={actionBadgeText}
-                                                    error
-                                                    isStrong
+                                            {alternateTextContainsCustomEmojiWithText ? (
+                                                <TextWithEmojiFragment
+                                                    message={optionItem.alternateText}
+                                                    style={[alternateTextStyle, styles.mh0]}
+                                                    alignCustomEmoji
                                                 />
                                             ) : (
-                                                <Icon
-                                                    testID="RBR Icon"
-                                                    src={expensifyIcons.DotIndicator}
-                                                    fill={theme.danger}
-                                                />
+                                                optionItem.alternateText
                                             )}
-                                        </View>
+                                        </Text>
                                     )}
                                 </View>
-                            </View>
-                            <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                                {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO &&
-                                    (actionBadgeText ? (
-                                        <Badge
-                                            text={actionBadgeText}
-                                            success
-                                            isStrong
-                                        />
-                                    ) : (
-                                        <View style={styles.ml2}>
-                                            <Icon
-                                                testID="GBR Icon"
-                                                src={expensifyIcons.DotIndicator}
-                                                fill={theme.success}
+                                {optionItem?.descriptiveText ? (
+                                    <View
+                                        style={[styles.flexWrap]}
+                                        fsClass={alternateTextFSClass}
+                                    >
+                                        <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
+                                    </View>
+                                ) : null}
+                                {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
+                                    <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
+                                        {actionBadgeText ? (
+                                            <Badge
+                                                text={actionBadgeText}
+                                                error
+                                                isStrong
                                             />
-                                        </View>
-                                    ))}
-                                {hasDraftComment && !!optionItem.isAllowedToComment && (
-                                    <View
-                                        style={styles.ml2}
-                                        accessibilityLabel={translate('sidebarScreen.draftedMessage')}
-                                    >
-                                        <Icon
-                                            testID="Pencil Icon"
-                                            fill={theme.icon}
-                                            src={expensifyIcons.Pencil}
-                                            width={variables.iconSizeSmall}
-                                            height={variables.iconSizeSmall}
-                                        />
-                                    </View>
-                                )}
-                                {!brickRoadIndicator && !!optionItem.isPinned && (
-                                    <View
-                                        style={styles.ml2}
-                                        accessibilityLabel={translate('sidebarScreen.chatPinned')}
-                                    >
-                                        <Icon
-                                            testID="Pin Icon"
-                                            fill={theme.icon}
-                                            src={expensifyIcons.Pin}
-                                            width={variables.iconSizeSmall}
-                                            height={variables.iconSizeSmall}
-                                        />
+                                        ) : (
+                                            <Icon
+                                                testID="RBR Icon"
+                                                src={expensifyIcons.DotIndicator}
+                                                fill={theme.danger}
+                                            />
+                                        )}
                                     </View>
                                 )}
                             </View>
-                        </PressableWithSecondaryInteraction>
-                    );
-                }}
-            </Hoverable>
-        </View>
+                        </View>
+                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                            {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO &&
+                                (actionBadgeText ? (
+                                    <Badge
+                                        text={actionBadgeText}
+                                        success
+                                        isStrong
+                                    />
+                                ) : (
+                                    <View style={styles.ml2}>
+                                        <Icon
+                                            testID="GBR Icon"
+                                            src={expensifyIcons.DotIndicator}
+                                            fill={theme.success}
+                                        />
+                                    </View>
+                                ))}
+                            {hasDraftComment && !!optionItem.isAllowedToComment && (
+                                <View
+                                    style={styles.ml2}
+                                    accessibilityLabel={translate('sidebarScreen.draftedMessage')}
+                                >
+                                    <Icon
+                                        testID="Pencil Icon"
+                                        fill={theme.icon}
+                                        src={expensifyIcons.Pencil}
+                                        width={variables.iconSizeSmall}
+                                        height={variables.iconSizeSmall}
+                                    />
+                                </View>
+                            )}
+                            {!brickRoadIndicator && !!optionItem.isPinned && (
+                                <View
+                                    style={styles.ml2}
+                                    accessibilityLabel={translate('sidebarScreen.chatPinned')}
+                                >
+                                    <Icon
+                                        testID="Pin Icon"
+                                        fill={theme.icon}
+                                        src={expensifyIcons.Pin}
+                                        width={variables.iconSizeSmall}
+                                        height={variables.iconSizeSmall}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                    </>
+                );
+            }}
+        </OptionRowPressable>
     );
 
     return (
