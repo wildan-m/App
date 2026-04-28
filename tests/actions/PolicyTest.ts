@@ -1491,6 +1491,46 @@ describe('actions/Policy', () => {
             apiWriteSpy.mockRestore();
         });
 
+        it('should bail out of onboarding-tasks block if prepareOnboardingOnyxData returns undefined', async () => {
+            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
+            await waitForBatchedUpdates();
+
+            const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
+            // Force prepareOnboardingOnyxData to return undefined so the early-return path inside the guarded block runs.
+            // This mirrors the real-world case where the target chat (Concierge for non-MANAGE_TEAM flows) cannot be resolved.
+            const prepareSpy = jest.spyOn(ReportUtils, 'prepareOnboardingOnyxData').mockReturnValue(undefined);
+            const policyID = Policy.generatePolicyID();
+
+            // introSelected.choice is undefined so the block enters; engagementChoice is non-MANAGE_TEAM
+            // so prepareOnboardingOnyxData would normally route to Concierge — and since the mock returns undefined,
+            // buildPolicyData should return early without setting guidedSetupData.
+            Policy.createWorkspace({
+                policyOwnerEmail: ESH_EMAIL,
+                makeMeAdmin: true,
+                policyName: WORKSPACE_NAME,
+                policyID,
+                engagementChoice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
+                introSelected: {},
+                currentUserAccountIDParam: ESH_ACCOUNT_ID,
+                currentUserEmailParam: ESH_EMAIL,
+                isSelfTourViewed: false,
+                betas: undefined,
+                hasActiveAdminPolicies: false,
+            });
+            await waitForBatchedUpdates();
+
+            expect(prepareSpy).toHaveBeenCalled();
+            const apiCallArgs = apiWriteSpy.mock.calls.find((call) => call.at(0) === WRITE_COMMANDS.CREATE_WORKSPACE);
+            expect(apiCallArgs).toBeDefined();
+            const params = apiCallArgs?.[1] as {guidedSetupData?: string; bespokeWelcomeMessage?: string};
+            // Early-return path should not populate the onboarding fields.
+            expect(params.guidedSetupData).toBeUndefined();
+            expect(params.bespokeWelcomeMessage).toBeUndefined();
+
+            prepareSpy.mockRestore();
+            apiWriteSpy.mockRestore();
+        });
+
         it('should publish a workspace created event if this is their first policy', () => {
             Policy.createWorkspace({
                 policyOwnerEmail: ESH_EMAIL,
