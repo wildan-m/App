@@ -422,8 +422,9 @@ function SearchList({
 
     useImperativeHandle(ref, () => ({scrollToIndex}), [scrollToIndex]);
 
-    const firstVisibleIndex = useMemo(() => data.findIndex((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE), [data]);
-    const lastVisibleIndex = useMemo(() => data.findLastIndex((item) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE), [data]);
+    const isItemVisible = useCallback((item: SearchListItem) => item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isOffline, [isOffline]);
+    const firstVisibleIndex = useMemo(() => data.findIndex(isItemVisible), [data, isItemVisible]);
+    const lastVisibleIndex = useMemo(() => data.findLastIndex(isItemVisible), [data, isItemVisible]);
 
     const renderItem = useCallback(
         (item: SearchListItem, index: number, isItemFocused: boolean, onFocus?: (event: NativeSyntheticEvent<ExtendedTargetedEvent>) => void) => {
