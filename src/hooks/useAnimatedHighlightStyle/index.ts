@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {Easing, interpolate, interpolateColor, useAnimatedStyle, useSharedValue, withDelay, withSequence, withTiming} from 'react-native-reanimated';
 import {scheduleOnRN} from 'react-native-worklets';
 import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
@@ -100,12 +100,11 @@ export default function useAnimatedHighlightStyle({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [shouldHighlight]);
 
-    const didRunAnimationRef = useRef(false);
-    const runAnimation = React.useCallback(() => {
-        if (didRunAnimationRef.current) {
+    React.useEffect(() => {
+        if (!startHighlight || !didScreenTransitionEnd) {
             return;
         }
-        didRunAnimationRef.current = true;
+        setStartHighlight(false);
         scheduleOnRN(() => {
             nonRepeatableProgress.set(
                 withDelay(
@@ -125,23 +124,18 @@ export default function useAnimatedHighlightStyle({
                 ),
             );
         });
-    }, [itemEnterDelay, itemEnterDuration, highlightStartDelay, highlightStartDuration, highlightEndDelay, highlightEndDuration, repeatableProgress, nonRepeatableProgress]);
-
-    React.useEffect(() => {
-        if (!startHighlight) {
-            return;
-        }
-
-        if (didScreenTransitionEnd) {
-            setStartHighlight(false);
-            runAnimation();
-            return;
-        }
-
-        const fallbackTimer = setTimeout(runAnimation, CONST.ANIMATED_HIGHLIGHT_FALLBACK_DELAY);
-
-        return () => clearTimeout(fallbackTimer);
-    }, [didScreenTransitionEnd, startHighlight, runAnimation]);
+    }, [
+        didScreenTransitionEnd,
+        startHighlight,
+        itemEnterDelay,
+        itemEnterDuration,
+        highlightStartDelay,
+        highlightStartDuration,
+        highlightEndDelay,
+        highlightEndDuration,
+        repeatableProgress,
+        nonRepeatableProgress,
+    ]);
 
     return highlightBackgroundStyle;
 }
