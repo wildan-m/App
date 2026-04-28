@@ -272,6 +272,9 @@ const ONYXKEYS = {
     /** ID associated with the payment card added by the user. */
     NVP_BILLING_FUND_ID: 'nvp_expensify_billingFundID',
 
+    /** The user's freebie credits balance (in cents). */
+    NVP_PRIVATE_FREEBIE_CREDITS: 'nvp_private_freebieCredits',
+
     /** The amount owed by the workspace’s owner. */
     NVP_PRIVATE_AMOUNT_OWED: 'nvp_private_amountOwed',
 
@@ -315,7 +318,7 @@ const ONYXKEYS = {
     IS_PLAID_DISABLED: 'isPlaidDisabled',
 
     /** Token needed to initialize Plaid link */
-    PLAID_LINK_TOKEN: 'plaidLinkToken',
+    RAM_ONLY_PLAID_LINK_TOKEN: 'plaidLinkToken',
 
     /** Capture Plaid event  */
     PLAID_CURRENT_EVENT: 'plaidCurrentEvent',
@@ -421,10 +424,13 @@ const ONYXKEYS = {
     IS_BETA: 'isBeta',
 
     /** Whether we're checking if the room is public or not */
-    IS_CHECKING_PUBLIC_ROOM: 'isCheckingPublicRoom',
+    RAM_ONLY_IS_CHECKING_PUBLIC_ROOM: 'isCheckingPublicRoom',
 
     /** A map of the user's security group IDs they belong to in specific domains */
     MY_DOMAIN_SECURITY_GROUPS: 'myDomainSecurityGroups',
+
+    /** Selected domain member account IDs for the move-to-group operation */
+    DOMAIN_MEMBERS_SELECTED_FOR_MOVE: 'domainMembersSelectedForMove',
 
     // The theme setting set by the user in preferences.
     // This can be either "light", "dark", "system", "light-contrast", "dark-contrast" or "system-contrast"
@@ -790,6 +796,9 @@ const ONYXKEYS = {
         /** The value that indicates whether Continuous Reconciliation should be used on the domain */
         EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION: 'expensifyCard_useContinuousReconciliation_',
 
+        /** The selected accounting integration bank account ID for card reconciliation */
+        EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID: 'expensifyCard_bankAccount_',
+
         /** Currently displaying feed */
         LAST_SELECTED_FEED: 'lastSelectedFeed_',
 
@@ -803,9 +812,6 @@ const ONYXKEYS = {
 
         /** Stores the information about the state of issuing a new card */
         RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD: 'issueNewExpensifyCard_',
-
-        /** Used for identifying user as admin of a domain */
-        SHARED_NVP_PRIVATE_ADMIN_ACCESS: 'sharedNVP_private_admin_access_',
 
         /** Stored the user information with whom bank account is being shared */
         BANK_ACCOUNT_SHARE_DETAILS: 'expensify_bankAccountShare_',
@@ -966,8 +972,8 @@ const ONYXKEYS = {
         PERSONAL_BANK_ACCOUNT_FORM_DRAFT: 'personalBankAccountDraft',
         DISABLE_AUTO_RENEW_SURVEY_FORM: 'disableAutoRenewSurveyForm',
         DISABLE_AUTO_RENEW_SURVEY_FORM_DRAFT: 'disableAutoRenewSurveyFormDraft',
-        REQUEST_EARLY_CANCELLATION_FORM: 'requestEarlyCancellationForm',
-        REQUEST_EARLY_CANCELLATION_FORM_DRAFT: 'requestEarlyCancellationFormDraft',
+        CANCEL_SUBSCRIPTION_FORM: 'cancelSubscriptionForm',
+        CANCEL_SUBSCRIPTION_FORM_DRAFT: 'cancelSubscriptionFormDraft',
         EXIT_SURVEY_RESPONSE_FORM: 'exitSurveyResponseForm',
         EXIT_SURVEY_RESPONSE_FORM_DRAFT: 'exitSurveyResponseFormDraft',
         WALLET_ADDITIONAL_DETAILS: 'walletAdditionalDetails',
@@ -1006,6 +1012,8 @@ const ONYXKEYS = {
         EDIT_EXPENSIFY_CARD_NAME_DRAFT_FORM: 'editExpensifyCardNameDraft',
         EDIT_EXPENSIFY_CARD_LIMIT_FORM: 'editExpensifyCardLimit',
         EDIT_EXPENSIFY_CARD_LIMIT_DRAFT_FORM: 'editExpensifyCardLimitDraft',
+        EDIT_TRAVEL_INVOICING_MONTHLY_LIMIT_FORM: 'editTravelInvoicingMonthlyLimit',
+        EDIT_TRAVEL_INVOICING_MONTHLY_LIMIT_DRAFT_FORM: 'editTravelInvoicingMonthlyLimitDraft',
         EDIT_EXPENSIFY_CARD_LIMIT_TYPE_FORM: 'editExpensifyCardLimitType',
         EDIT_EXPENSIFY_CARD_LIMIT_TYPE_DRAFT_FORM: 'editExpensifyCardLimitTypeDraft',
         SAGE_INTACCT_CREDENTIALS_FORM: 'sageIntacctCredentialsForm',
@@ -1080,6 +1088,8 @@ const ONYXKEYS = {
         ADD_DOMAIN_MEMBER_FORM_DRAFT: 'addDomainMemberFormDraft',
         ADD_WORK_EMAIL_FORM: 'addWorkEmailForm',
         ADD_WORK_EMAIL_FORM_DRAFT: 'addWorkEmailFormDraft',
+        EDIT_DOMAIN_GROUP_NAME_FORM: 'editDomainGroupNameForm',
+        EDIT_DOMAIN_GROUP_NAME_FORM_DRAFT: 'editDomainGroupNameFormDraft',
     },
     DERIVED: {
         REPORT_ATTRIBUTES: 'reportAttributes',
@@ -1133,7 +1143,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.NEW_TASK_FORM]: FormTypes.NewTaskForm;
     [ONYXKEYS.FORMS.EDIT_TASK_FORM]: FormTypes.EditTaskForm;
     [ONYXKEYS.FORMS.DISABLE_AUTO_RENEW_SURVEY_FORM]: FormTypes.FeedbackSurveyForm;
-    [ONYXKEYS.FORMS.REQUEST_EARLY_CANCELLATION_FORM]: FormTypes.FeedbackSurveyForm;
+    [ONYXKEYS.FORMS.CANCEL_SUBSCRIPTION_FORM]: FormTypes.FeedbackSurveyForm;
     [ONYXKEYS.FORMS.EXIT_SURVEY_RESPONSE_FORM]: FormTypes.ExitSurveyResponseForm;
     [ONYXKEYS.FORMS.MONEY_REQUEST_DESCRIPTION_FORM]: FormTypes.MoneyRequestDescriptionForm;
     [ONYXKEYS.FORMS.MONEY_REQUEST_MERCHANT_FORM]: FormTypes.MoneyRequestMerchantForm;
@@ -1186,6 +1196,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.ASSIGN_CARD_FORM]: FormTypes.AssignCardForm;
     [ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_NAME_FORM]: FormTypes.EditExpensifyCardNameForm;
     [ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_LIMIT_FORM]: FormTypes.EditExpensifyCardLimitForm;
+    [ONYXKEYS.FORMS.EDIT_TRAVEL_INVOICING_MONTHLY_LIMIT_FORM]: FormTypes.EditTravelInvoicingMonthlyLimitForm;
     [ONYXKEYS.FORMS.EDIT_EXPENSIFY_CARD_LIMIT_TYPE_FORM]: FormTypes.EditExpensifyCardLimitTypeForm;
     [ONYXKEYS.FORMS.SAGE_INTACCT_CREDENTIALS_FORM]: FormTypes.SageIntactCredentialsForm;
     [ONYXKEYS.FORMS.NETSUITE_CUSTOM_FIELD_FORM]: FormTypes.NetSuiteCustomFieldForm;
@@ -1223,6 +1234,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.SPEND_RULE_FORM]: FormTypes.SpendRuleForm;
     [ONYXKEYS.FORMS.ADD_DOMAIN_MEMBER_FORM]: FormTypes.AddDomainMemberForm;
     [ONYXKEYS.FORMS.ADD_WORK_EMAIL_FORM]: FormTypes.AddWorkEmailForm;
+    [ONYXKEYS.FORMS.EDIT_DOMAIN_GROUP_NAME_FORM]: FormTypes.DomainGroupEditNameForm;
 };
 
 type OnyxFormDraftValuesMapping = {
@@ -1285,11 +1297,11 @@ type OnyxCollectionValuesMapping = {
     [ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST]: OnyxTypes.WorkspaceCardsList;
     [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_CONTINUOUS_RECONCILIATION_CONNECTION]: OnyxTypes.PolicyConnectionName;
     [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION]: OnyxTypes.CardContinuousReconciliation;
+    [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID]: string;
     [ONYXKEYS.COLLECTION.LAST_SELECTED_FEED]: OnyxTypes.CompanyCardFeedWithDomainID;
     [ONYXKEYS.COLLECTION.LAST_SELECTED_EXPENSIFY_CARD_FEED]: OnyxTypes.FundID;
     [ONYXKEYS.COLLECTION.NVP_EXPENSIFY_ON_CARD_WAITLIST]: OnyxTypes.CardOnWaitlist;
     [ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD]: OnyxTypes.IssueNewCard;
-    [ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_ADMIN_ACCESS]: boolean;
     [ONYXKEYS.COLLECTION.SAML_METADATA]: OnyxTypes.SamlMetadata;
     [ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS]: OnyxTypes.DomainPendingActions;
     [ONYXKEYS.COLLECTION.DOMAIN_ERRORS]: OnyxTypes.DomainErrors;
@@ -1375,7 +1387,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_SEEN_NEW_USER_MODAL]: boolean;
     [ONYXKEYS.PLAID_DATA]: OnyxTypes.PlaidData;
     [ONYXKEYS.IS_PLAID_DISABLED]: boolean;
-    [ONYXKEYS.PLAID_LINK_TOKEN]: string;
+    [ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN]: string;
     [ONYXKEYS.ONFIDO_TOKEN]: string;
     [ONYXKEYS.ONFIDO_APPLICANT_ID]: string;
     [ONYXKEYS.NVP_PREFERRED_LOCALE]: OnyxTypes.Locale;
@@ -1425,8 +1437,9 @@ type OnyxValuesMapping = {
     [ONYXKEYS.LAST_ACCESSED_WORKSPACE_POLICY_ID]: string;
     [ONYXKEYS.SHOULD_SHOW_COMPOSE_INPUT]: boolean;
     [ONYXKEYS.IS_BETA]: boolean;
-    [ONYXKEYS.IS_CHECKING_PUBLIC_ROOM]: boolean;
+    [ONYXKEYS.RAM_ONLY_IS_CHECKING_PUBLIC_ROOM]: boolean;
     [ONYXKEYS.MY_DOMAIN_SECURITY_GROUPS]: Record<string, string>;
+    [ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE]: string[];
     [ONYXKEYS.VERIFY_3DS_SUBSCRIPTION]: string;
     [ONYXKEYS.PREFERRED_THEME]: ValueOf<typeof CONST.THEME>;
     [ONYXKEYS.MAPBOX_ACCESS_TOKEN]: OnyxTypes.MapboxAccessToken;
@@ -1472,6 +1485,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_BILLING_FUND_ID]: number;
+    [ONYXKEYS.NVP_PRIVATE_FREEBIE_CREDITS]: number;
     [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: number;
     [ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END]: number;
     [ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL]: string | undefined;

@@ -203,6 +203,8 @@ export default {
     modalContentMaxWidth: 360,
     listItemHeightNormal: 64,
     popoverWidth: 375,
+    compactPopoverMenuWidth: 300,
+    compactPopoverMenuVerticalMargin: 100,
     searchRouterPopoverWidth: 512,
     bankAccountActionPopoverRightSpacing: 32,
     bankAccountActionPopoverTopSpacing: 14,
@@ -338,12 +340,12 @@ export default {
     inlineImagePreviewMinSize: 64,
     inlineImagePreviewMaxSize: 148,
 
-    minimalTopBarOffset: -176,
+    minimalTopBarOffset: -126,
+    minimalTopBarWithFiltersOffset: -170,
     searchHeaderDefaultOffset: 0,
-    searchListContentMarginTop: 176,
+    searchListContentMarginTop: 126,
+    searchListContentWithFiltersMarginTop: 170,
     searchTopBarZIndex: 9,
-    searchTopBarHeight: 52,
-    searchRouterInputMargin: 52,
 
     scrollToNewTransactionOffset: 300,
 
