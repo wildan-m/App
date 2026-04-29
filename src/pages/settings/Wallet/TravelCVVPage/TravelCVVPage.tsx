@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
@@ -19,6 +19,7 @@ import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider';
 
 /**
@@ -32,7 +33,7 @@ function TravelCVVPage() {
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['TravelCVV']);
 
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
@@ -58,6 +59,25 @@ function TravelCVVPage() {
         // Navigate to the verify account page
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
     }, [isAccountLocked, showLockedAccountModal]);
+
+    // Auto-navigate to the magic code screen on first mount so the user does not need
+    // to click "Reveal Details" — the Travel CVV RHP exists solely to reveal the CVV,
+    // which always requires a magic code.
+    const hasAutoNavigatedRef = useRef(false);
+    useEffect(() => {
+        if (hasAutoNavigatedRef.current) {
+            return;
+        }
+        if (isLoadingOnyxValue(accountMetadata)) {
+            return;
+        }
+        if (cvv || isSignedInAsDelegate || isOffline || isAccountLocked) {
+            return;
+        }
+        hasAutoNavigatedRef.current = true;
+        resetValidateActionCodeSent();
+        Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
+    }, [accountMetadata, cvv, isSignedInAsDelegate, isOffline, isAccountLocked]);
 
     return (
         <ScreenWrapper
