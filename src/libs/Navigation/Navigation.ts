@@ -601,24 +601,35 @@ function resetToHome() {
 }
 
 /**
- * The goBack function doesn't support recursive pop e.g. pop route from root and then from nested navigator.
- * There is only one case where recursive pop is needed which is going back to home.
- * This function will cover this case.
- * We will implement recursive pop if more use cases will appear.
+ * Pops any screens stacked above the top-level TAB_NAVIGATOR and switches the active tab to Home.
+ *
+ * POP_TO targeting TAB_NAVIGATOR only updates that route's params — the nested tab state is preserved
+ * by the StackRouter, so a plain goBack(ROUTES.HOME) leaves the previously-active tab selected (e.g.
+ * the chat the user came from). Dispatching TabActions.jumpTo on the TAB_NAVIGATOR's nested state
+ * after popping reliably switches to Home.
  */
 function goBackToHome() {
-    const isNarrowLayout = getIsNarrowLayout();
-
-    // This set the right split navigator.
-    goBack(ROUTES.HOME);
-
-    // We want to keep the report screen in the split navigator on wide layout.
-    if (!isNarrowLayout) {
+    const rootState = navigationRef.current?.getRootState();
+    if (!rootState) {
         return;
     }
 
-    // This set the right route in this split navigator.
-    goBack(ROUTES.HOME);
+    const tabNavIndex = rootState.routes.findIndex((route) => route.name === NAVIGATORS.TAB_NAVIGATOR);
+    if (tabNavIndex === -1) {
+        return;
+    }
+
+    const topRootIndex = rootState.index ?? rootState.routes.length - 1;
+    const popCount = topRootIndex - tabNavIndex;
+    if (popCount > 0) {
+        navigationRef.current?.dispatch({...StackActions.pop(popCount), target: rootState.key});
+    }
+
+    const tabNavRoute = rootState.routes.at(tabNavIndex);
+    const tabNavStateKey = tabNavRoute?.state?.key;
+    if (tabNavStateKey) {
+        navigationRef.current?.dispatch({...TabActions.jumpTo(SCREENS.HOME), target: tabNavStateKey});
+    }
 }
 
 /**
