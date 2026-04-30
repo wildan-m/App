@@ -76,9 +76,6 @@ function getSearchParamFromPath(path: string, param: string) {
         return null;
     }
 
-    const [pathWithoutHash] = path.split('#', 2);
-    const queryIndex = pathWithoutHash.indexOf('?');
-
     const safeDecode = (value: string) => {
         try {
             return decodeURIComponent(value);
@@ -103,29 +100,50 @@ function getSearchParamFromPath(path: string, param: string) {
         return safeDecode(safeDecode(rawValue));
     };
 
-    if (queryIndex !== -1) {
-        const queryString = pathWithoutHash.slice(queryIndex + 1);
-        const directParam = getParamFromQueryString(queryString);
-        if (directParam !== null) {
-            return directParam;
+    const getNestedBackToFromQueryString = (queryString: string) => {
+        const match = queryString.match(/(?:^|&)backTo=([^&]*)/);
+        const raw = match?.[1];
+        if (!raw) {
+            return null;
         }
+        return safeDecode(safeDecode(raw));
+    };
+
+    // Walk the URL through any number of nested backTo layers (path-segment OR query-string),
+    // bailing out when the param is found, the chain dead-ends, or we revisit the same value.
+    let current: string | null = path;
+    const visited = new Set<string>();
+
+    while (current && !visited.has(current)) {
+        visited.add(current);
+
+        const [pathWithoutHash] = current.split('#', 2);
+        const queryIndex = pathWithoutHash.indexOf('?');
+
+        if (queryIndex !== -1) {
+            const queryString = pathWithoutHash.slice(queryIndex + 1);
+            const directParam = getParamFromQueryString(queryString);
+            if (directParam !== null) {
+                return directParam;
+            }
+
+            const nestedBackTo = getNestedBackToFromQueryString(queryString);
+            if (nestedBackTo) {
+                current = nestedBackTo;
+                continue;
+            }
+        }
+
+        // Fallback: drill into a path-segment backTo such as ".../search/<encoded>/amount"
+        const encodedBackToMatch = pathWithoutHash.match(/\/search\/([^/]+)/);
+        const encodedBackTo = encodedBackToMatch?.[1];
+        if (!encodedBackTo) {
+            return null;
+        }
+        current = safeDecode(encodedBackTo);
     }
 
-    // Fallback: extract params from encoded backTo segment (e.g., ".../search/<encoded>/amount")
-    const encodedBackToMatch = pathWithoutHash.match(/\/search\/([^/]+)/);
-    const encodedBackTo = encodedBackToMatch?.[1];
-    if (!encodedBackTo) {
-        return null;
-    }
-
-    const decodedBackTo = safeDecode(encodedBackTo);
-    const backToQueryIndex = decodedBackTo.indexOf('?');
-    if (backToQueryIndex === -1) {
-        return null;
-    }
-
-    const backToQueryString = decodedBackTo.slice(backToQueryIndex + 1);
-    return getParamFromQueryString(backToQueryString);
+    return null;
 }
 
 type UrlWithParams<TBase extends string> = `${TBase}${'' | `?${string}` | `&${string}`}`;

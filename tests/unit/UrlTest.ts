@@ -130,6 +130,25 @@ describe('Url', () => {
                 'q',
                 'type:expense-report sortBy:date sortOrder:desc action:submit from:21227763',
             ],
+            [
+                // The split RHP refresh URL nests the search query two levels deep:
+                // outer path-segment backTo decodes to a SEARCH_REPORT URL whose own
+                // backTo query param holds the original `?q=...` search.
+                'reads query from doubly-nested backTo (split RHP refresh)',
+                // cspell:disable-next-line
+                'create/split-expense/overview/12345/67890/0/search/%2Fsearch%2Fview%2F12345%3FbackTo%3D%252Fsearch%253Fq%253Dtype%253Aexpense%2520action%253Asubmit/amount',
+                'q',
+                'type:expense action:submit',
+            ],
+            [
+                // Same as above but with the outermost backTo expressed as a query parameter
+                // rather than a path segment, to cover both URL flavors.
+                'reads query from doubly-nested backTo carried via query string',
+                // cspell:disable-next-line
+                'r/12345/split/0?backTo=%2Fsearch%2Fview%2F12345%3FbackTo%3D%252Fsearch%253Fq%253Dtype%253Aexpense%2520action%253Asubmit',
+                'q',
+                'type:expense action:submit',
+            ],
         ])('%s', (_, path, param, expected) => {
             expect(Url.getSearchParamFromPath(path, param)).toBe(expected);
         });
