@@ -114,12 +114,14 @@ describe('useGettingStartedItems', () => {
         });
 
         it('should fall back to ONBOARDING_PURPOSE_SELECTED when NVP_INTRO_SELECTED is not available', async () => {
+            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+            const twentyThreeDaysFromNow = new Date(Date.now() + 23 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
             await Onyx.merge(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, CONST.ONBOARDING_CHOICES.MANAGE_TEAM);
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, sevenDaysAgo);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, twentyThreeDaysFromNow);
             await Onyx.merge(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION, CONST.POLICY.CONNECTIONS.NAME.QBO as never);
             await waitForBatchedUpdates();
 
@@ -753,13 +755,15 @@ describe('useGettingStartedItems', () => {
         });
 
         it('should prefer NVP_INTRO_SELECTED over ONBOARDING_PURPOSE_SELECTED when both are set', async () => {
+            const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+            const twentyThreeDaysFromNow = new Date(Date.now() + 23 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
             await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM});
             await Onyx.merge(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, CONST.ONBOARDING_CHOICES.PERSONAL_SPEND);
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             const policy = buildPolicy();
             await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
-            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, '2026-03-01');
-            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, '2026-04-01');
+            await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, sevenDaysAgo);
+            await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, twentyThreeDaysFromNow);
             await Onyx.merge(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION, CONST.POLICY.CONNECTIONS.NAME.QBO as never);
             await waitForBatchedUpdates();
 
