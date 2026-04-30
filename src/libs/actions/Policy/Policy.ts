@@ -2002,7 +2002,7 @@ function updateGeneralSettings(policy: OnyxEntry<Policy>, name: string, currency
         }
     }
 
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             // We use SET because it's faster than merge and avoids a race condition when setting the currency and navigating the user to the Bank account page in confirmCurrencyChangeAndHideModal
             onyxMethod: Onyx.METHOD.SET,
@@ -2035,6 +2035,49 @@ function updateGeneralSettings(policy: OnyxEntry<Policy>, name: string, currency
             },
         },
     ];
+
+    // When the workspace currency changes, propagate it to existing open expense reports under this
+    // policy so their stored `currency` and computed `reportName` reflect the new workspace currency.
+    // Without this, only newly created reports pick up the change; existing reports keep stale titles.
+    const reportCurrencyFailureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT>> = [];
+    if (currencyPendingAction) {
+        const updatedPolicyForName: Policy = {...policy, outputCurrency: currency};
+        const affectedReports = ReportUtils.getAllPolicyReports(policy.id).filter((report): report is Report => !!report && ReportUtils.isOpenExpenseReport(report));
+
+        for (const report of affectedReports) {
+            const reportID = report.reportID;
+            if (!reportID) {
+                continue;
+            }
+
+            const updatedReportForName: Report = {...report, currency};
+            const transactionsRecord: Record<string, Transaction> = {};
+            for (const transaction of ReportUtils.getReportTransactions(reportID)) {
+                if (transaction?.transactionID) {
+                    transactionsRecord[transaction.transactionID] = transaction;
+                }
+            }
+            const computedName = ReportUtils.computeOptimisticReportName(updatedReportForName, updatedPolicyForName, policy.id, transactionsRecord);
+
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {
+                    currency,
+                    ...(computedName !== null && {reportName: computedName}),
+                },
+            });
+            reportCurrencyFailureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
+                value: {
+                    currency: report.currency,
+                    reportName: report.reportName,
+                },
+            });
+        }
+    }
+
     const finallyData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -2064,7 +2107,7 @@ function updateGeneralSettings(policy: OnyxEntry<Policy>, name: string, currency
         errorFields.outputCurrency = ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.editor.genericFailureMessage');
     }
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policy.id}`,
@@ -2082,6 +2125,7 @@ function updateGeneralSettings(policy: OnyxEntry<Policy>, name: string, currency
                 }),
             },
         },
+        ...reportCurrencyFailureData,
     ];
 
     const params: UpdateWorkspaceGeneralSettingsParams = {
