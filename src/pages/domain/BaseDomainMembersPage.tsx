@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -14,6 +14,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {openPublicProfilePage} from '@libs/actions/PersonalDetails';
 import {getLatestError} from '@libs/ErrorUtils';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
@@ -125,8 +126,30 @@ function BaseDomainMembersPage({
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
+    const [personalDetailsMetadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_METADATA);
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+
+    // Hydrate personal details for member account IDs that aren't already in Onyx. This covers
+    // copilot/delegate sessions where OpenDomainInitialPage returns the security-group account IDs
+    // but the delegate's own OpenApp didn't preload personal details for those users.
+    const requestedAccountIDsRef = useRef<Set<number>>(new Set());
+    useEffect(() => {
+        for (const accountID of accountIDs) {
+            if (!accountID || requestedAccountIDsRef.current.has(accountID)) {
+                continue;
+            }
+            const details = personalDetails?.[accountID];
+            if (details?.login || details?.displayName) {
+                continue;
+            }
+            if (personalDetailsMetadata?.[accountID]?.isLoading) {
+                continue;
+            }
+            requestedAccountIDsRef.current.add(accountID);
+            openPublicProfilePage(accountID);
+        }
+    }, [accountIDs, personalDetails, personalDetailsMetadata]);
 
     const data: MemberOption[] = accountIDs
         .filter((accountID) => {
