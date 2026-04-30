@@ -159,6 +159,8 @@ function vacationDelegateSelector(accountID: number): (domain: OnyxEntry<Domain>
 
 const adminPendingActionSelector = (pendingAction: OnyxEntry<DomainPendingActions>) => pendingAction?.admin ?? {};
 
+const isDomainPendingDeleteSelector = (pendingActions: OnyxEntry<DomainPendingActions>) => pendingActions?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+
 const defaultSecurityGroupIDSelector = (domain: OnyxEntry<Domain>) => domain?.domain_defaultSecurityGroupID;
 
 /**
@@ -225,6 +227,7 @@ export {
     memberAccountIDsSelector,
     domainEmailSelector,
     adminPendingActionSelector,
+    isDomainPendingDeleteSelector,
     technicalContactSettingsSelector,
     defaultSecurityGroupIDSelector,
     selectSecurityGroupForAccount,

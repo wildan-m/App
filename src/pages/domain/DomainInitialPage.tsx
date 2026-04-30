@@ -32,7 +32,7 @@ import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
-import {isAdminSelector} from '@src/selectors/Domain';
+import {isAdminSelector, isDomainPendingDeleteSelector} from '@src/selectors/Domain';
 import type IconAsset from '@src/types/utils/IconAsset';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
@@ -65,6 +65,7 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
     useDocumentTitle(domainName ?? '');
     const isAdmin = isAdminSelector(currentUserAccountID)(domain);
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
+    const [isPendingDelete] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: isDomainPendingDeleteSelector});
 
     const domainMenuItems: DomainMenuItem[] = [
         {
@@ -107,12 +108,12 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
     const shouldShowFullScreenLoadingIndicator = isLoadingOnyxValue(domainMetadata);
 
     useEffect(() => {
-        if (shouldShowFullScreenLoadingIndicator || (domain && isAdmin)) {
+        if (shouldShowFullScreenLoadingIndicator || (domain && isAdmin) || isPendingDelete) {
             return;
         }
 
         Navigation.goBack(ROUTES.WORKSPACES_LIST.route);
-    }, [domain, isAdmin, shouldShowFullScreenLoadingIndicator]);
+    }, [domain, isAdmin, shouldShowFullScreenLoadingIndicator, isPendingDelete]);
 
     return (
         <ScreenWrapper
@@ -124,7 +125,7 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
             <FullPageNotFoundView
                 onBackButtonPress={() => Navigation.dismissModal()}
                 onLinkPress={Navigation.goBackToHome}
-                shouldShow={!domain || !isAdmin}
+                shouldShow={(!domain || !isAdmin) && !isPendingDelete}
                 addBottomSafeAreaPadding
                 shouldForceFullScreen
                 shouldDisplaySearchRouter

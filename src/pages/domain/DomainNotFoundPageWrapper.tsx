@@ -1,4 +1,4 @@
-import {adminAccountIDsSelector} from '@selectors/Domain';
+import {adminAccountIDsSelector, isDomainPendingDeleteSelector} from '@selectors/Domain';
 import React, {useEffect} from 'react';
 import type {FullPageNotFoundViewProps} from '@components/BlockingViews/FullPageNotFoundView';
 import FullscreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
@@ -30,19 +30,20 @@ function DomainNotFoundPageWrapper({domainAccountID, shouldBeBlocked, fullPageNo
     const [adminAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: adminAccountIDsSelector,
     });
+    const [isPendingDelete] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: isDomainPendingDeleteSelector});
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const isAdmin = adminAccountIDs?.includes(currentUserAccountID);
 
     const shouldShowFullScreenLoadingIndicator = isLoadingOnyxValue(domainMetadata);
-    const shouldShowNotFoundPage = !domain || !isAdmin || shouldBeBlocked;
+    const shouldShowNotFoundPage = (!domain || !isAdmin || shouldBeBlocked) && !isPendingDelete;
 
     useEffect(() => {
-        if (shouldShowFullScreenLoadingIndicator || (domain && isAdmin)) {
+        if (shouldShowFullScreenLoadingIndicator || (domain && isAdmin) || isPendingDelete) {
             return;
         }
 
         Navigation.dismissModal();
-    }, [domain, isAdmin, shouldShowFullScreenLoadingIndicator]);
+    }, [domain, isAdmin, shouldShowFullScreenLoadingIndicator, isPendingDelete]);
 
     if (shouldShowFullScreenLoadingIndicator) {
         const reasonAttributes: SkeletonSpanReasonAttributes = {
