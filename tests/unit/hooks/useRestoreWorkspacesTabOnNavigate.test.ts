@@ -278,19 +278,29 @@ describe('useRestoreWorkspacesTabOnNavigate', () => {
                 },
             ],
         });
+        // Mirror the real getStateFromPath output: WORKSPACE_NAVIGATOR is nested inside TAB_NAVIGATOR
+        // (per the linking config), not at the top level. The earlier shape masked the
+        // sessionStorage-fallback bug because it skipped this wrapper.
         lastVisitedTabPathUtils.getWorkspacesTabStateFromSessionStorage.mockReturnValue({
             routes: [
                 {
-                    name: NAVIGATORS.WORKSPACE_NAVIGATOR,
+                    name: NAVIGATORS.TAB_NAVIGATOR,
                     state: {
                         routes: [
                             {
-                                name: NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR,
+                                name: NAVIGATORS.WORKSPACE_NAVIGATOR,
                                 state: {
-                                    index: 1,
                                     routes: [
-                                        {name: SCREENS.WORKSPACE.INITIAL, params: {policyID: fakePolicyID}},
-                                        {name: SCREENS.WORKSPACE.WORKFLOWS, params: {policyID: fakePolicyID}},
+                                        {
+                                            name: NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR,
+                                            state: {
+                                                index: 1,
+                                                routes: [
+                                                    {name: SCREENS.WORKSPACE.INITIAL, params: {policyID: fakePolicyID}},
+                                                    {name: SCREENS.WORKSPACE.WORKFLOWS, params: {policyID: fakePolicyID}},
+                                                ],
+                                            },
+                                        },
                                     ],
                                 },
                             },
