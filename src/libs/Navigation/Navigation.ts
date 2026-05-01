@@ -974,12 +974,9 @@ function navigateBackToLastSuperWideRHPScreen(options: {afterTransition?: () => 
 }
 
 function dismissToSuperWideRHP(options: {afterTransition?: () => void} = {}) {
-    // On narrow layouts (mobile), Super Wide RHP doesn't exist, so just dismiss the modal completely
-    if (getIsNarrowLayout()) {
-        dismissModal(options);
-        return;
-    }
-    // On wide layouts, dismiss back to the Super Wide RHP modal stack
+    // The Super Wide RHP route is rendered full-screen on narrow layouts but is still a real entry in the
+    // right-modal navigator's child stack, so we need to navigate back to it on narrow as well.
+    // navigateBackToLastSuperWideRHPScreen falls back to dismissModal when no Super Wide RHP route exists below.
     navigateBackToLastSuperWideRHPScreen(options);
 }
 
