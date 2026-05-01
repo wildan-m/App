@@ -333,12 +333,11 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
             } else {
                 backHistory(() => {
                     if (item?.reportID) {
-                        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(item.reportID));
+                        Navigation.dismissModalWithReport({reportID: item.reportID});
                     } else if ('login' in item) {
-                        navigateToAndOpenReport(item.login ? [item.login] : [], personalDetails, currentUserAccountID, introSelected, isSelfTourViewed, betas, false);
+                        navigateToAndOpenReport(item.login ? [item.login] : [], personalDetails, currentUserAccountID, introSelected, isSelfTourViewed, betas, true);
                     }
                 });
-                onRouterClose();
             }
         },
         [
