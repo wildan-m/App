@@ -372,8 +372,13 @@ function IOURequestStepConfirmation({
         }
 
         if (transaction?.isFromGlobalCreate && !transaction.receipt?.isTestReceipt) {
+            // The upgrade flow auto-injects a policy-expense-chat participant with accountID 0 whose reportID
+            // points at a still-being-created optimistic policy expense report. Pushing the participants route
+            // for that target would land on a screen whose underlying report is not yet ready and freeze the JS
+            // thread, so treat it as auto-assigned and fall through to the plain goBack branch below.
+            const hasAutoInjectedPolicyParticipant = transaction.participants?.some((participant) => participant.isPolicyExpenseChat && participant.accountID === 0);
             // If the participants weren't automatically added to the transaction, then we should go back to the IOURequestStepParticipants.
-            if (!transaction?.participantsAutoAssigned && participantsAutoAssignedFromRoute !== 'true') {
+            if (!transaction?.participantsAutoAssigned && participantsAutoAssignedFromRoute !== 'true' && !hasAutoInjectedPolicyParticipant) {
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(iouType, initialTransactionID, transaction?.reportID || reportID, undefined, action), {
                     compareParams: false,

@@ -156,16 +156,21 @@ function IOURequestStepUpgrade({
         }
 
         if (shouldSubmitExpense) {
-            setMoneyRequestParticipants(transactionID, [
-                {
-                    selected: true,
-                    accountID: 0,
-                    isPolicyExpenseChat: true,
-                    reportID: expenseReportID,
-                    policyID: policyDataRef.current?.policyID,
-                    searchText: policyDataRef.current?.policyName,
-                },
-            ]);
+            setMoneyRequestParticipants(
+                transactionID,
+                [
+                    {
+                        selected: true,
+                        accountID: 0,
+                        isPolicyExpenseChat: true,
+                        reportID: expenseReportID,
+                        policyID: policyDataRef.current?.policyID,
+                        searchText: policyDataRef.current?.policyName,
+                    },
+                ],
+                false,
+                true,
+            );
         }
 
         switch (upgradePath) {
