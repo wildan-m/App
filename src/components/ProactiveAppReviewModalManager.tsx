@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useOnyx from '@hooks/useOnyx';
@@ -15,10 +15,19 @@ const CONCIERGE_NEGATIVE_MESSAGE = "Hi there! I'm sorry to hear you aren't fully
 function ProactiveAppReviewModalManager() {
     const {shouldShowModal, proactiveAppReview} = useProactiveAppReview();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [modal] = useOnyx(ONYXKEYS.MODAL);
     const delegateAccountID = useDelegateAccountID();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails?.email;
     const currentUserAccountID = currentUserPersonalDetails?.accountID;
+
+    // Latch the open state so that once the AppReview modal opens, the global modal
+    // tracker flipping to "visible" (because BaseModal inside the AppReview modal
+    // signals its own visibility) does not immediately tear it back down.
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    if (!isModalOpen && shouldShowModal && !modal?.isVisible && !modal?.willAlertModalBecomeVisible) {
+        setIsModalOpen(true);
+    }
 
     const handleResponse = useCallback(
         (response: AppReviewResponse, message?: string) => {
@@ -29,6 +38,7 @@ function ProactiveAppReviewModalManager() {
     );
 
     const handlePositive = useCallback(() => {
+        setIsModalOpen(false);
         handleResponse('positive', CONCIERGE_POSITIVE_MESSAGE);
 
         // Trigger native app store review prompt
@@ -36,16 +46,18 @@ function ProactiveAppReviewModalManager() {
     }, [handleResponse]);
 
     const handleNegative = useCallback(() => {
+        setIsModalOpen(false);
         handleResponse('negative', CONCIERGE_NEGATIVE_MESSAGE);
     }, [handleResponse]);
 
     const handleSkip = useCallback(() => {
+        setIsModalOpen(false);
         handleResponse('skip');
     }, [handleResponse]);
 
     return (
         <ProactiveAppReviewModal
-            isVisible={shouldShowModal}
+            isVisible={isModalOpen}
             onPositive={handlePositive}
             onNegative={handleNegative}
             onSkip={handleSkip}
