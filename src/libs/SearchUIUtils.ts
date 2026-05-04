@@ -5321,8 +5321,10 @@ function getColumnsToShow({
             }
 
             // If the transaction has any tax info (code, value, or amount),
-            // show both TAX_RATE and TAX_AMOUNT columns. Zero is valid tax data.
-            const hasTaxInfo = !!transaction.taxCode || transaction.taxAmount != null || (transaction.taxValue !== undefined && transaction.taxValue !== '');
+            // show both TAX_RATE and TAX_AMOUNT columns. A taxAmount of 0 is the
+            // default for optimistic transactions with no tax applied, so it must
+            // not count as a tax signal on its own.
+            const hasTaxInfo = !!transaction.taxCode || !!transaction.taxAmount || (transaction.taxValue !== undefined && transaction.taxValue !== '');
             if (hasTaxInfo) {
                 columns[CONST.SEARCH.TABLE_COLUMNS.TAX_RATE] = true;
                 columns[CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT] = true;
