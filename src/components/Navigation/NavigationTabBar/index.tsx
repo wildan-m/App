@@ -136,10 +136,12 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
         return (
             <>
                 {shouldRenderDebugTabViewOnWideLayout && (
-                    <DebugTabView
-                        selectedTab={selectedTab}
-                        chatTabBrickRoad={chatTabBrickRoad}
-                    />
+                    <View style={styles.leftNavigationTabBarDebugTabViewWrapper}>
+                        <DebugTabView
+                            selectedTab={selectedTab}
+                            chatTabBrickRoad={chatTabBrickRoad}
+                        />
+                    </View>
                 )}
                 <View
                     style={styles.leftNavigationTabBarContainer}

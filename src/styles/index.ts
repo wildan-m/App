@@ -725,6 +725,11 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.appBG,
         },
 
+        leftNavigationTabBarDebugTabViewWrapper: {
+            width: variables.navigationTabBarSize,
+            overflow: 'hidden',
+        },
+
         leftNavigationTabBarItem: {
             height: variables.navigationTabBarSize,
             display: 'flex',
