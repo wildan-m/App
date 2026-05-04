@@ -64,7 +64,6 @@ function SignInModal() {
     return (
         <ScreenWrapper
             style={[StyleUtils.getBackgroundColorStyle(theme.PAGE_THEMES[SCREENS.RIGHT_MODAL.SIGN_IN].backgroundColor)]}
-            includeSafeAreaPaddingBottom={false}
             shouldShowOfflineIndicator={false}
             testID="SignInModal"
         >
