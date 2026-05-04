@@ -86,6 +86,7 @@ import type {
 } from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import SafeString from '@src/utils/SafeString';
+import getDistanceFromWaypoints from './getDistanceFromWaypoints';
 import getDistanceInMeters from './getDistanceInMeters';
 
 type TransactionParams = {
@@ -720,11 +721,38 @@ function getUpdatedTransaction({
         shouldStopSmartscan = true;
 
         if (!transactionChanges.routes?.route0?.geometry?.coordinates) {
-            // The waypoints were changed, but there is no route – it is pending from the BE and we should mark the fields as pending
-            updatedTransaction.amount = CONST.IOU.DEFAULT_AMOUNT;
-            updatedTransaction.modifiedAmount = CONST.IOU.DEFAULT_AMOUNT;
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            updatedTransaction.modifiedMerchant = translateLocal('iou.fieldPending');
+            // The waypoints were changed, but there is no route – it is pending from the BE.
+            // When the new waypoints carry valid lat/lng (e.g. user picked them from the location
+            // suggestions), derive a great-circle distance locally so that successive offline edits
+            // produce visibly different amount/merchant values in the title header.
+            const offlineDistanceInMeters = getDistanceFromWaypoints(transactionChanges.waypoints);
+            if (offlineDistanceInMeters > 0) {
+                const mileageRate = DistanceRequestUtils.getRate({transaction: updatedTransaction, policy});
+                const {unit, rate} = mileageRate;
+                const amount = DistanceRequestUtils.getDistanceRequestAmount(offlineDistanceInMeters, unit, rate ?? 0);
+                const updatedAmount = isFromExpenseReport || isUnReportedExpense ? -amount : amount;
+                const updatedMerchant = DistanceRequestUtils.getDistanceMerchant(
+                    true,
+                    offlineDistanceInMeters,
+                    unit,
+                    rate,
+                    transaction.currency,
+                    // eslint-disable-next-line @typescript-eslint/no-deprecated
+                    translateLocal,
+                    (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
+                    getCurrencySymbol,
+                    isManualDistanceRequest(transaction),
+                );
+
+                updatedTransaction.amount = updatedAmount;
+                updatedTransaction.modifiedAmount = updatedAmount;
+                updatedTransaction.modifiedMerchant = updatedMerchant;
+            } else {
+                updatedTransaction.amount = CONST.IOU.DEFAULT_AMOUNT;
+                updatedTransaction.modifiedAmount = CONST.IOU.DEFAULT_AMOUNT;
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                updatedTransaction.modifiedMerchant = translateLocal('iou.fieldPending');
+            }
         } else {
             const mileageRate = DistanceRequestUtils.getRate({transaction: updatedTransaction, policy});
             const {unit, rate} = mileageRate;
