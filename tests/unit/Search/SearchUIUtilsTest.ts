@@ -8195,6 +8195,28 @@ describe('SearchUIUtils', () => {
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
         });
 
+        test('Should hide TAX columns when taxAmount is the optimistic default 0 with no taxCode', () => {
+            // Regression: buildOptimisticTransaction defaults taxAmount to 0, so split
+            // transactions on a tax-disabled workspace flicker the TAX columns into view
+            // until the server response arrives. With no taxCode and no non-empty taxValue,
+            // a 0 taxAmount must not count as a tax signal.
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const optimisticSplit = {
+                ...baseTransaction,
+                transactionID: 'optimisticSplit',
+                merchant: 'Test Merchant',
+                taxCode: undefined,
+                taxAmount: 0,
+                taxValue: undefined,
+            };
+
+            const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
+            const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data: [optimisticSplit], visibleColumns, isExpenseReportView: true});
+
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
+        });
+
         test('Should hide empty AMOUNT column in expense report view when no conversion', () => {
             const baseTransaction = searchResults.data[`transactions_${transactionID}`];
             const testTransaction = {
