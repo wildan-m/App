@@ -20,6 +20,8 @@ import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {PressableWithoutFeedback} from '@components/Pressable';
 import ScreenWrapper from '@components/ScreenWrapper';
+import SortableHeaderText from '@components/Search/SortableHeaderText';
+import type {SortOrder} from '@components/Search/types';
 import SearchBar from '@components/SearchBar';
 import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
@@ -52,6 +54,7 @@ import {getLatestErrorMessage} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceNavigatorParamList} from '@libs/Navigation/types';
+import {getDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
 import {
     getConnectionExporters,
     getPolicyBrickRoadIndicatorStatus,
@@ -97,7 +100,10 @@ type WorkspaceItem = {listItemType: 'workspace'} & ListItem &
         iconType?: ValueOf<typeof CONST.ICON_TYPE_AVATAR | typeof CONST.ICON_TYPE_ICON>;
         policyID?: string;
         isJoinRequestPending?: boolean;
+        ownerName: string;
     };
+
+type WorkspaceSortColumn = 'name' | 'owner';
 
 type WorkspaceOrDomainListItem = WorkspaceItem | DomainItem | {listItemType: 'domains-header' | 'workspaces-empty-state' | 'domains-empty-state'};
 
@@ -205,6 +211,8 @@ function WorkspacesListPage() {
             policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDToDelete}`]?.workspaceAccountID);
     const hasExpensifyCard = !!policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyIDToDelete}`]?.areExpensifyCardsEnabled && !isEmptyObject(cardsList);
     const personalDetails = usePersonalDetails();
+    const [sortColumn, setSortColumn] = useState<WorkspaceSortColumn>('name');
+    const [sortOrder, setSortOrder] = useState<SortOrder>(CONST.SEARCH.SORT_ORDER.ASC);
     const [accountIDToLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: accountIDToLoginSelector(reportsToArchive)});
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [isCannotLeaveWorkspaceModalOpen, setIsCannotLeaveWorkspaceModalOpen] = useState(false);
@@ -576,6 +584,7 @@ function WorkspacesListPage() {
                     dismissError: () => null,
                     isJoinRequestPending: true,
                     keyForList: policyInfo.name,
+                    ownerName: '',
                 });
             } else {
                 workspaces.push({
@@ -597,13 +606,26 @@ function WorkspacesListPage() {
                     type: policy.type,
                     employeeList: policy.employeeList,
                     keyForList: policy.name,
+                    ownerName: getDisplayNameOrDefault(personalDetails?.[policy.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID]),
                 });
             }
         }
     }
 
     const filterWorkspace = (workspace: WorkspaceItem, inputValue: string) => workspace.title.toLowerCase().includes(inputValue);
-    const sortWorkspace = (workspaceItems: WorkspaceItem[]) => workspaceItems.sort((a, b) => localeCompare(a.title, b.title));
+    const sortWorkspace = (workspaceItems: WorkspaceItem[]) => {
+        const direction = sortOrder === CONST.SEARCH.SORT_ORDER.DESC ? -1 : 1;
+        return workspaceItems.sort((a, b) => {
+            if (sortColumn === 'owner') {
+                const ownerCompare = localeCompare(a.ownerName, b.ownerName);
+                if (ownerCompare !== 0) {
+                    return ownerCompare * direction;
+                }
+                return localeCompare(a.title, b.title) * direction;
+            }
+            return localeCompare(a.title, b.title) * direction;
+        });
+    };
     const [inputValue, setInputValue, filteredWorkspaces] = useSearchResults(workspaces, filterWorkspace, sortWorkspace);
 
     const domains = allDomains
@@ -657,30 +679,39 @@ function WorkspacesListPage() {
             )}
             {!isLessThanMediumScreen && filteredWorkspaces.length > 0 && (
                 <View style={[styles.flexRow, styles.gap5, styles.pt2, styles.pb3, styles.pr5, styles.pl10, styles.appBG]}>
-                    <View style={[styles.flexRow, styles.flex2]}>
-                        <Text
-                            numberOfLines={1}
-                            style={[styles.flexGrow1, styles.textLabelSupporting]}
-                        >
-                            {translate('workspace.common.workspaceName')}
-                        </Text>
-                    </View>
-                    <View style={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}>
-                        <Text
-                            numberOfLines={1}
-                            style={[styles.flexGrow1, styles.textLabelSupporting]}
-                        >
-                            {translate('workspace.common.workspaceOwner')}
-                        </Text>
-                    </View>
-                    <View style={[styles.flexRow, styles.flex1, styles.workspaceTypeSectionTitle]}>
-                        <Text
-                            numberOfLines={1}
-                            style={[styles.flexGrow1, styles.textLabelSupporting]}
-                        >
-                            {translate('workspace.common.workspaceType')}
-                        </Text>
-                    </View>
+                    <SortableHeaderText
+                        text={translate('workspace.common.workspaceName')}
+                        sortOrder={sortOrder}
+                        isActive={sortColumn === 'name'}
+                        containerStyle={[styles.flexRow, styles.flex2]}
+                        textStyle={[styles.flexGrow1, styles.textLabelSupporting]}
+                        onPress={(order) => {
+                            setSortColumn('name');
+                            setSortOrder(order);
+                        }}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_SORTABLE_HEADER}
+                    />
+                    <SortableHeaderText
+                        text={translate('workspace.common.workspaceOwner')}
+                        sortOrder={sortOrder}
+                        isActive={sortColumn === 'owner'}
+                        containerStyle={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}
+                        textStyle={[styles.flexGrow1, styles.textLabelSupporting]}
+                        onPress={(order) => {
+                            setSortColumn('owner');
+                            setSortOrder(order);
+                        }}
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_SORTABLE_HEADER}
+                    />
+                    <SortableHeaderText
+                        text={translate('workspace.common.workspaceType')}
+                        sortOrder={sortOrder}
+                        isActive={false}
+                        isSortable={false}
+                        containerStyle={[styles.flexRow, styles.flex1, styles.workspaceTypeSectionTitle]}
+                        textStyle={[styles.flexGrow1, styles.textLabelSupporting]}
+                        onPress={() => {}}
+                    />
                     <View style={[styles.workspaceRightColumn, styles.mr7]} />
                 </View>
             )}
