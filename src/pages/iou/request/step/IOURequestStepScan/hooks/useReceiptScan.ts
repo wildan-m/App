@@ -195,7 +195,7 @@ function useReceiptScan({
 
         if (shouldSkipConfirmation) {
             setReceiptFiles(newReceiptFiles);
-            const gpsRequired = initialTransaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && files.length;
+            const gpsRequired = (initialTransaction?.amount ?? 0) === 0 && iouType !== CONST.IOU.TYPE.SPLIT && files.length;
             if (gpsRequired) {
                 if (shouldStartLocationPermissionFlow) {
                     setStartLocationPermissionFlow(true);
