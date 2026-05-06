@@ -135,7 +135,7 @@ function TravelCVVPage() {
                         title={cvv ?? '•••'}
                         interactive={false}
                         wrapperStyle={[styles.pt0, styles.ph0]}
-                        titleStyle={styles.walletCardNumber}
+                        titleStyle={styles.moneyRequestConfirmationAmount}
                         copyable={!!cvv}
                         shouldShowRightComponent
                         rightComponent={
