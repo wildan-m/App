@@ -686,8 +686,12 @@ function WorkspacesListPage() {
                         containerStyle={[styles.flexRow, styles.flex2]}
                         textStyle={[styles.flexGrow1, styles.textLabelSupporting]}
                         onPress={(order) => {
+                            if (sortColumn === 'name') {
+                                setSortOrder(order);
+                                return;
+                            }
                             setSortColumn('name');
-                            setSortOrder(order);
+                            setSortOrder(CONST.SEARCH.SORT_ORDER.ASC);
                         }}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_SORTABLE_HEADER}
                     />
@@ -698,8 +702,12 @@ function WorkspacesListPage() {
                         containerStyle={[styles.flexRow, styles.flex1, styles.workspaceOwnerSectionTitle, styles.workspaceOwnerSectionMinWidth]}
                         textStyle={[styles.flexGrow1, styles.textLabelSupporting]}
                         onPress={(order) => {
+                            if (sortColumn === 'owner') {
+                                setSortOrder(order);
+                                return;
+                            }
                             setSortColumn('owner');
-                            setSortOrder(order);
+                            setSortOrder(CONST.SEARCH.SORT_ORDER.ASC);
                         }}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKSPACE_LIST_SORTABLE_HEADER}
                     />
