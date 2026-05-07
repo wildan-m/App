@@ -12,7 +12,7 @@ import {useSearchActionsContext, useSearchStateContext} from '@components/Search
 import type {BulkPaySelectionData, PaymentData, SearchQueryJSON} from '@components/Search/types';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
-import {deleteAppReport, markAsManuallyExported, moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter} from '@libs/actions/Report';
+import {deleteAppReport, exportReportToPDF, markAsManuallyExported, moveIOUReportToPolicy, moveIOUReportToPolicyAndInviteSubmitter} from '@libs/actions/Report';
 import {
     approveMoneyRequestOnSearch,
     bulkDeleteReports,
@@ -246,6 +246,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
+    const [isPDFModalVisible, setIsPDFModalVisible] = useState(false);
+    const [pdfReportID, setPdfReportID] = useState<string | undefined>(undefined);
     const {showConfirmModal} = useConfirmModal();
     const [isHoldEducationalModalVisible, setIsHoldEducationalModalVisible] = useState(false);
     const [rejectModalAction, setRejectModalAction] = useState<ValueOf<
@@ -285,6 +287,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         'GustoSquare',
         'Pencil',
         'Workflows',
+        'Download',
     ]);
 
     const {getCurrencyDecimals, convertToDisplayString} = useCurrencyListActions();
@@ -1145,6 +1148,32 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             });
         }
 
+        let singleTargetReportID: string | undefined;
+        if (selectedReports.length === 1) {
+            singleTargetReportID = selectedReports.at(0)?.reportID;
+        } else if (selectedReports.length === 0 && selectedTransactionReportIDs.length === 1) {
+            singleTargetReportID = selectedTransactionReportIDs.at(0);
+        }
+        if (isExpenseReportSearch && singleTargetReportID) {
+            const downloadPDFTargetReportID = singleTargetReportID;
+            options.push({
+                icon: expensifyIcons.Download,
+                text: translate('common.downloadAsPDF'),
+                value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_PDF,
+                shouldCloseModalOnSelect: true,
+                sentryLabel: CONST.SENTRY_LABEL.SEARCH.BULK_DOWNLOAD_PDF,
+                onSelected: () => {
+                    if (isOffline) {
+                        setIsOfflineModalVisible(true);
+                        return;
+                    }
+                    setPdfReportID(downloadPDFTargetReportID);
+                    setIsPDFModalVisible(true);
+                    exportReportToPDF({reportID: downloadPDFTargetReportID});
+                },
+            });
+        }
+
         const areSelectedTransactionsIncludedInReports = selectedTransactionsKeys.every((id) =>
             selectedTransactions[id].reportID ? selectedReportIDs.includes(selectedTransactions[id].reportID) : true,
         );
@@ -1556,6 +1585,11 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         setIsDownloadErrorModalVisible(false);
     }, [setIsDownloadErrorModalVisible]);
 
+    const handlePDFModalClose = useCallback(() => {
+        setIsPDFModalVisible(false);
+        setPdfReportID(undefined);
+    }, []);
+
     const dismissModalAndUpdateUseHold = useCallback(() => {
         setIsHoldEducationalModalVisible(false);
         setNameValuePair(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, true, false, !isOffline);
@@ -1586,11 +1620,14 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         confirmPayment: stableOnBulkPaySelected,
         isOfflineModalVisible,
         isDownloadErrorModalVisible,
+        isPDFModalVisible,
+        pdfReportID,
         isHoldEducationalModalVisible,
         rejectModalAction,
         emptyReportsCount,
         handleOfflineModalClose,
         handleDownloadErrorModalClose,
+        handlePDFModalClose,
         dismissModalAndUpdateUseHold,
         dismissRejectModalBasedOnAction,
         isDuplicateOptionVisible,

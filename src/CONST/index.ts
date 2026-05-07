@@ -7634,6 +7634,7 @@ const CONST = {
             DUPLICATE: 'duplicate',
             DUPLICATE_REPORT: 'duplicateReport',
             UNDELETE: 'undelete',
+            DOWNLOAD_PDF: 'downloadPDF',
         },
         BULK_DUPLICATE_LIMIT: 50,
         TRANSACTION_TYPE: {
@@ -8979,6 +8980,7 @@ const CONST = {
             COLUMNS_BUTTON: 'Search-ColumnsButton',
             SELECT_ALL_MATCHING_BUTTON: 'Search-SelectAllMatchingButton',
             BULK_ACTIONS_DROPDOWN: 'Search-BulkActionsDropdown',
+            BULK_DOWNLOAD_PDF: 'Search-BulkDownloadPDF',
             SELECT_ALL_CHECKBOX: 'Search-SelectAllCheckbox',
             SELECTION_MODE_MENU_ITEM: 'Search-SelectionModeMenuItem',
             FILTER_RESET_BUTTON: 'Search-FilterResetButton',
