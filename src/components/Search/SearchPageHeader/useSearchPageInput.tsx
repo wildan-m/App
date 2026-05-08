@@ -118,7 +118,12 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
     }
 
     function submitSearch(queryString: SearchQueryString, shouldSkipAmountConversion = false) {
-        const queryWithSubstitutions = getQueryWithSubstitutions(queryString, autocompleteSubstitutions);
+        // If the user did not explicitly type a `type:` filter, inherit the current page's data type
+        // so a free-text keyword search stays scoped to the active page (Reports, Invoices, etc.)
+        // instead of falling back to the parser's hard-coded `expense` default.
+        const hasExplicitType = /(^|\s)type:/.test(queryString);
+        const queryStringWithType = hasExplicitType ? queryString : `type:${queryJSON.type} ${queryString}`;
+        const queryWithSubstitutions = getQueryWithSubstitutions(queryStringWithType, autocompleteSubstitutions);
         const updatedQuery = getQueryWithUpdatedValues(queryWithSubstitutions, shouldSkipAmountConversion);
 
         if (!updatedQuery) {
