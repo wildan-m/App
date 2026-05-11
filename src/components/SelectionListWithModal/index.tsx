@@ -58,7 +58,18 @@ function SelectionListWithModal<TItem extends ListItem>({
     const [, debouncedData, setDataState] = useDebouncedState<TItem[]>(filteredData, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
 
     // Determine if this is changed by filtering (to limit multiple rerenders)
-    const isFiltering = filteredData.length < debouncedData.length;
+    // Only treat the state as "in the middle of filtering" when debouncedData is a less-restrictive
+    // view of the same query (i.e. every keyForList in filteredData is also in debouncedData).
+    // A bare length comparison incorrectly returns true when the user clears the search and types a
+    // different query within the debounce window, handing FlashList items from a different query
+    // and causing recycled cells to be rendered with undefined items.
+    const isFiltering = useMemo(() => {
+        if (filteredData.length >= debouncedData.length) {
+            return false;
+        }
+        const debouncedKeys = new Set(debouncedData.map((item) => item.keyForList));
+        return filteredData.every((item) => debouncedKeys.has(item.keyForList));
+    }, [filteredData, debouncedData]);
 
     useEffect(() => {
         setDataState(filteredData);

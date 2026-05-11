@@ -116,7 +116,9 @@ function BaseSelectionList<TItem extends ListItem>({
     const [itemsToHighlight, setItemsToHighlight] = useState<Set<string> | null>(null);
 
     const isItemSelected = useCallback(
-        (item: TItem) => item.isSelected ?? ((isSelected?.(item) ?? selectedItems.includes(item.keyForList)) && canSelectMultiple),
+        // FlashList v2 can hand a recycled cell back with an undefined item during rapid data changes,
+        // so we must optional-chain into the accessor to avoid a render-time crash.
+        (item: TItem) => item?.isSelected ?? ((isSelected?.(item) ?? selectedItems.includes(item?.keyForList)) && canSelectMultiple),
         [isSelected, selectedItems, canSelectMultiple],
     );
 
@@ -347,6 +349,11 @@ function BaseSelectionList<TItem extends ListItem>({
     };
 
     const renderItem: ListRenderItem<TItem> = ({item, index}: ListRenderItemInfo<TItem>) => {
+        // FlashList v2's recycler may briefly hand back an undefined item when data shrinks rapidly
+        // between renders. Return null in that case so the next debounced render replaces the cell.
+        if (!item) {
+            return null;
+        }
         const selected = isItemSelected(item);
         const isItemDisabled = isDisabled || (!!item.isDisabled && !selected);
         const isItemFocused = (!isDisabled || selected) && focusedIndex === index;
