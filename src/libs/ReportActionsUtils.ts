@@ -2733,10 +2733,16 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
                 case CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.xero:
                     url = XERO_NON_REIMBURSABLE_EXPENSES_URL;
                     break;
-                case CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite:
-                    url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
-                    url += wasExportedAfterBase62 ? base62ReportID : reportID;
+                case CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite: {
+                    const firstNonReimbursableUrl = nonReimbursableUrls.at(0) ?? '';
+                    if (firstNonReimbursableUrl.startsWith('https://')) {
+                        url = firstNonReimbursableUrl;
+                    } else {
+                        url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
+                        url += wasExportedAfterBase62 ? base62ReportID : reportID;
+                    }
                     break;
+                }
                 case CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.financialForce:
                     // The first three characters in a Salesforce ID is the expense type
                     url = nonReimbursableUrls.at(0)?.substring(0, SALESFORCE_EXPENSES_URL_PREFIX.length + 3) ?? '';
@@ -2763,8 +2769,13 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
             const travelInvoicingUrl = travelInvoicingUrls.at(0) ?? '';
             url = travelInvoicingUrl.startsWith('https://') ? travelInvoicingUrl : '';
         } else if (label === CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite) {
-            url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
-            url += wasExportedAfterBase62 ? base62ReportID : reportID;
+            const firstTravelInvoicingUrl = travelInvoicingUrls.at(0) ?? '';
+            if (firstTravelInvoicingUrl.startsWith('https://')) {
+                url = firstTravelInvoicingUrl;
+            } else {
+                url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
+                url += wasExportedAfterBase62 ? base62ReportID : reportID;
+            }
         }
 
         result.push({text, url});
