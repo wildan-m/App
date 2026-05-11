@@ -447,6 +447,10 @@ const translations: TranslationDeepObject<typeof en> = {
         collapseReasoning: 'Contraer razonamiento',
         expandReasoning: 'Expandir razonamiento',
     },
+    enableNotificationsBanner: {
+        text: 'No te pierdas la respuesta de Concierge: activa las notificaciones para que podamos avisarte cuando responda.',
+        notifyMe: 'Notifícame',
+    },
     supportalNoAccess: {
         title: 'No tan rápido',
         descriptionWithCommand: (command) =>

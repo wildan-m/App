@@ -526,6 +526,10 @@ const translations = {
         collapseReasoning: 'Collapse reasoning',
         expandReasoning: 'Expand reasoning',
     },
+    enableNotificationsBanner: {
+        text: "Don't miss Concierge's reply — turn on notifications so we can ping you when it responds.",
+        notifyMe: 'Notify me',
+    },
     supportalNoAccess: {
         title: 'Not so fast',
         descriptionWithCommand: (command?: string) =>

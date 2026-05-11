@@ -53,6 +53,9 @@ type BannerProps = {
 
     /** Callback called when pressing the button */
     onButtonPress?: () => void;
+
+    /** Optional text for the action button. Falls back to common.chatNow when omitted to preserve existing call sites. */
+    buttonText?: string;
 };
 
 function Banner({
@@ -68,6 +71,7 @@ function Banner({
     shouldShowIcon = false,
     shouldShowCloseButton = false,
     shouldShowButton = false,
+    buttonText,
 }: BannerProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -122,7 +126,7 @@ function Banner({
                             <Button
                                 success
                                 style={[styles.ph3]}
-                                text={translate('common.chatNow')}
+                                text={buttonText ?? translate('common.chatNow')}
                                 onPress={onButtonPress}
                             />
                         )}

@@ -25,6 +25,7 @@ import AccountManagerBanner from './AccountManagerBanner';
 import {AgentZeroStatusProvider} from './AgentZeroStatusContext';
 import {ConciergeDraftProvider} from './ConciergeDraftContext';
 import DeleteTransactionNavigateBackHandler from './DeleteTransactionNavigateBackHandler';
+import EnableNotificationsBanner from './EnableNotificationsBanner';
 import useDeferNonEssentials from './hooks/useDeferNonEssentials';
 import useFlushDeferredWriteOnFocus from './hooks/useFlushDeferredWriteOnFocus';
 import LinkedActionNotFoundGuard from './LinkedActionNotFoundGuard';
@@ -108,6 +109,7 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                                     <CollapsibleHeaderOnKeyboard>
                                         <ReportHeader />
                                         {!shouldDeferNonEssentials && <AccountManagerBanner reportID={reportIDFromRoute} />}
+                                        {!shouldDeferNonEssentials && <EnableNotificationsBanner reportID={reportIDFromRoute} />}
                                     </CollapsibleHeaderOnKeyboard>
                                     <OfflineWithFeedback
                                         pendingAction={reportPendingAction}
