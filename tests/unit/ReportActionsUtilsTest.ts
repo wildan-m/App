@@ -1838,6 +1838,24 @@ describe('ReportActionsUtils', () => {
 
             expect(ReportActionsUtils.isDeletedAction(reportAction)).toBe(false);
         });
+
+        it('should not throw and should return false when originalMessage resolves to a plain string (legacy expense-update notification)', () => {
+            const reportAction = {
+                created: '2026-05-11 00:00:00.000',
+                reportActionID: 'legacy-string-message-1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                message: [
+                    {
+                        html: 'The expense has been updated with official data from an imported card.',
+                        text: 'The expense has been updated with official data from an imported card.',
+                        type: 'COMMENT',
+                    },
+                ],
+                originalMessage: 'The expense has been updated with official data from an imported card.',
+            } as unknown as ReportAction;
+            expect(() => ReportActionsUtils.isDeletedAction(reportAction)).not.toThrow();
+            expect(ReportActionsUtils.isDeletedAction(reportAction)).toBe(false);
+        });
     });
 
     describe('getRenamedAction', () => {
