@@ -53,29 +53,33 @@ function SelectionListWithModal<TItem extends ListItem>({
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
 
-    // Debounce the data prop to prevent rapid updates that cause FlashList layout errors
-    // This gives FlashList time to properly update its layout cache when searching/filtering
+    // Debounce the data prop to give FlashList time to update its internal layout cache
+    // between data changes. FlashList v2's RecyclerViewManager throws "index out of bounds,
+    // not enough layouts" when a ViewHolder's measurement callback fires for an index past
+    // the new layouts.length, which happens whenever the data prop shrinks faster than
+    // FlashList can sync its layouts.
     const [, debouncedData, setDataState] = useDebouncedState<TItem[]>(filteredData, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
-
-    // Determine if this is changed by filtering (to limit multiple rerenders)
-    // Only treat the state as "in the middle of filtering" when debouncedData is a less-restrictive
-    // view of the same query (i.e. every keyForList in filteredData is also in debouncedData).
-    // A bare length comparison incorrectly returns true when the user clears the search and types a
-    // different query within the debounce window, handing FlashList items from a different query
-    // and causing recycled cells to be rendered with undefined items.
-    const isFiltering = useMemo(() => {
-        if (filteredData.length >= debouncedData.length) {
-            return false;
-        }
-        const debouncedKeys = new Set(debouncedData.map((item) => item.keyForList));
-        return filteredData.every((item) => debouncedKeys.has(item.keyForList));
-    }, [filteredData, debouncedData]);
 
     useEffect(() => {
         setDataState(filteredData);
     }, [filteredData, setDataState]);
 
-    const displayData = isFiltering ? debouncedData : filteredData;
+    // Hand FlashList a stable list identity. Item-level updates and growth (selection toggles,
+    // clearing the search) apply immediately so the user sees instant feedback. Shrinks are
+    // gated to the debounced state, so FlashList sees at most one settled shrink per debounce
+    // window — eliminating both the cross-query mismatch (stale debouncedData from a different
+    // query bleeding into the render) and the rapid-shrink race in FlashList's layout cache.
+    const [displayData, setDisplayData] = useState(filteredData);
+
+    useEffect(() => {
+        if (filteredData.length >= displayData.length) {
+            setDisplayData(filteredData);
+            return;
+        }
+        if (filteredData === debouncedData) {
+            setDisplayData(filteredData);
+        }
+    }, [filteredData, debouncedData, displayData]);
 
     const selectedItems = useMemo(
         () =>
