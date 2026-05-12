@@ -80,6 +80,7 @@ import {
     isTrackExpenseReportNew,
     shouldEnableNegative,
 } from '@libs/ReportUtils';
+import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import {hasEnabledTags, shouldShowDependentTagList} from '@libs/TagsOptionsListUtils';
 import {
     getAttendeesListDisplayString,
@@ -1060,7 +1061,7 @@ function MoneyRequestView({
                                                 iouType,
                                                 transaction.transactionID,
                                                 transactionThreadReport?.reportID,
-                                                Navigation.getActiveRoute(),
+                                                ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE})}),
                                             ),
                                         }),
                                     );
