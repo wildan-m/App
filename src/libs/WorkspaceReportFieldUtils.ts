@@ -105,9 +105,15 @@ function hasFormulaPartsInInitialValue(initialValue?: string): boolean {
 
 /**
  * Checks if a report field name already exists in the policy's field list (case-insensitive).
+ *
+ * Excludes the default report-title field (fieldID `text_title`, name `title`) — it is hidden from
+ * the Workspace → Reports list, so users see no field named "title" and should be allowed to create
+ * one. See WorkspaceReportsPage's `filterReportFields` filter for the matching display-side rule.
  */
 function isReportFieldNameExisting(fieldList: Record<string, PolicyReportField> | undefined, fieldName: string): boolean {
-    return Object.values(fieldList ?? {}).some((reportField) => reportField.name.toLowerCase() === fieldName.toLowerCase());
+    return Object.values(fieldList ?? {}).some(
+        (reportField) => reportField.fieldID !== CONST.POLICY.FIELDS.FIELD_LIST_TITLE && reportField.name.toLowerCase() === fieldName.toLowerCase(),
+    );
 }
 
 /**
