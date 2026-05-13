@@ -100,4 +100,21 @@ describe('WorkspaceReportFieldUtils.isReportFieldNameExisting', () => {
         expect(isReportFieldNameExisting(fieldList, 'FIELD1')).toBe(true);
         expect(isReportFieldNameExisting(fieldList, 'field1')).toBe(true);
     });
+
+    it('should ignore the default text_title field so users can create a custom field named "title"', () => {
+        const fieldListWithDefaultTitle: Record<string, PolicyReportField> = {
+            text_title: {fieldID: 'text_title', name: 'title', type: 'formula'} as PolicyReportField,
+        };
+        expect(isReportFieldNameExisting(fieldListWithDefaultTitle, 'title')).toBe(false);
+        expect(isReportFieldNameExisting(fieldListWithDefaultTitle, 'Title')).toBe(false);
+        expect(isReportFieldNameExisting(fieldListWithDefaultTitle, 'TITLE')).toBe(false);
+    });
+
+    it('should still flag a real duplicate even when the default text_title entry is also present', () => {
+        const fieldListWithBoth: Record<string, PolicyReportField> = {
+            text_title: {fieldID: 'text_title', name: 'title', type: 'formula'} as PolicyReportField,
+            field_custom: {fieldID: 'field_custom', name: 'Project', type: 'text'} as PolicyReportField,
+        };
+        expect(isReportFieldNameExisting(fieldListWithBoth, 'project')).toBe(true);
+    });
 });
