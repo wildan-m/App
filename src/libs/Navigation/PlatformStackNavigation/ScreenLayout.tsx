@@ -26,6 +26,14 @@ function ScreenLayout({
 
     useLayoutEffect(() => {
         const transitionStartListener = navigation.addListener('transitionStart', () => {
+            // If a previous transitionStart never received its transitionEnd (can happen on iOS when
+            // back-to-back transition events fire on the same screen during the public → protected
+            // stack swap on fresh login), release the stale handle before opening a new one. Otherwise
+            // it would leak until the 1000 ms safety timeout, leaving activeTransitions inflated and
+            // pendingCallbacks stranded.
+            if (transitionHandleRef.current) {
+                TransitionTracker.endTransition(transitionHandleRef.current);
+            }
             transitionHandleRef.current = TransitionTracker.startTransition();
         });
         const transitionEndListener = navigation.addListener('transitionEnd', () => {
@@ -39,6 +47,13 @@ function ScreenLayout({
         return () => {
             transitionStartListener();
             transitionEndListener();
+            // If the screen unmounts mid-transition (e.g. sign-in being torn down during the
+            // post-login navigation reset), release the in-flight handle here — the transitionEnd
+            // listener has just been unsubscribed and would otherwise never run.
+            if (transitionHandleRef.current) {
+                TransitionTracker.endTransition(transitionHandleRef.current);
+                transitionHandleRef.current = null;
+            }
         };
     }, [navigation]);
 
