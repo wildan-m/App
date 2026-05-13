@@ -6,40 +6,45 @@ import CONST from '@src/CONST';
 import type AsyncOpenURL from './types';
 
 /**
- * Prevents Safari from blocking pop-up window when opened within async call.
- * @param shouldSkipCustomSafariLogic When true, we will use `Linking.openURL` even if the browser is Safari.
+ * Opens a URL after `promise` resolves, while keeping the popup tied to the
+ * original user gesture so browsers don't block it.
  */
-const asyncOpenURL: AsyncOpenURL = (promise, url, shouldSkipCustomSafariLogic, shouldOpenInSameTab) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const asyncOpenURL: AsyncOpenURL = (promise, url, _shouldSkipCustomSafariLogic, shouldOpenInSameTab) => {
     if (!url) {
         return;
     }
 
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     const canOpenURLInSameTab = getPlatform() === CONST.PLATFORM.WEB;
 
-    if (!isSafari || !!shouldSkipCustomSafariLogic || !!shouldOpenInSameTab) {
+    if (shouldOpenInSameTab && canOpenURLInSameTab) {
         promise
             .then((params) => {
-                (Linking.openURL as LinkingWeb['openURL'])(typeof url === 'string' ? url : url(params), shouldOpenInSameTab && canOpenURLInSameTab ? '_self' : undefined);
+                (Linking.openURL as LinkingWeb['openURL'])(typeof url === 'string' ? url : url(params), '_self');
             })
             .catch(() => {
                 Log.warn('[asyncOpenURL] error occurred while opening URL', {url});
             });
-    } else {
-        const windowRef = window.open();
-        promise
-            .then((params) => {
-                if (!windowRef) {
-                    (Linking.openURL as LinkingWeb['openURL'])(typeof url === 'string' ? url : url(params), '_self');
-                    return;
-                }
-                windowRef.location = typeof url === 'string' ? url : url(params);
-            })
-            .catch(() => {
-                windowRef?.close();
-                Log.warn('[asyncOpenURL] error occurred while opening URL', {url});
-            });
+        return;
     }
+
+    // Open the popup synchronously so the user-gesture is preserved on every browser.
+    // Waiting for `promise` to resolve before calling `window.open` lets the gesture lapse,
+    // which Chrome silently blocks and Safari used to fall back to `_self` (hijacking the main tab).
+    const windowRef = window.open();
+    promise
+        .then((params) => {
+            const finalURL = typeof url === 'string' ? url : url(params);
+            if (!windowRef) {
+                Log.warn('[asyncOpenURL] popup was blocked — leaving the main tab in place', {url});
+                return;
+            }
+            windowRef.location = finalURL;
+        })
+        .catch(() => {
+            windowRef?.close();
+            Log.warn('[asyncOpenURL] error occurred while opening URL', {url});
+        });
 };
 
 export default asyncOpenURL;
