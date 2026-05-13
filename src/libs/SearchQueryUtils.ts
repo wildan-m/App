@@ -600,6 +600,19 @@ function getCachedSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQue
 
     try {
         const result = parseSearchQuery(query) as SearchQueryJSON;
+
+        // Drop unrecognized groupBy values so downstream consumers (Save search page, Display popup, etc.)
+        // never try to look up a missing `search.filters.groupBy.<value>` translation key.
+        if (result.groupBy && !Object.values(CONST.SEARCH.GROUP_BY).includes(result.groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>)) {
+            result.groupBy = undefined;
+            result.view = undefined;
+            if (result.rawFilterList) {
+                result.rawFilterList = result.rawFilterList.filter(
+                    (filter) => filter.key !== CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY && filter.key !== CONST.SEARCH.SYNTAX_ROOT_KEYS.VIEW,
+                );
+            }
+        }
+
         const flatFilters = getFilters(result);
         const rawFilterList = rawQuery ? getRawFilterListFromQuery(rawQuery) : result.rawFilterList;
 
