@@ -15,7 +15,7 @@ import {getCommaSeparatedTagNameWithSanitizedColons} from './PolicyUtils';
 import {constructReceiptSourceFromFilename} from './ReceiptUtils';
 import {getIOUActionForReportID} from './ReportActionsUtils';
 import {getReportName} from './ReportNameUtils';
-import {findSelfDMReportID, getReportOrDraftReport, getTransactionDetails, isIOUReport} from './ReportUtils';
+import {findSelfDMReportID, getReportOrDraftReport, getTransactionDetails, isInvoiceReport, isIOUReport} from './ReportUtils';
 import type {TransactionDetails} from './ReportUtils';
 import StringUtils from './StringUtils';
 import {
@@ -441,6 +441,10 @@ function areTransactionsEligibleForMerge(transaction1: OnyxEntry<Transaction>, t
     }
 
     if (isIOUReport(transaction1?.reportID) || isIOUReport(transaction2?.reportID)) {
+        return false;
+    }
+
+    if (isInvoiceReport(transaction1?.reportID) || isInvoiceReport(transaction2?.reportID)) {
         return false;
     }
 

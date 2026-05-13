@@ -17,7 +17,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getTransactionsForMerging, setupMergeTransactionData, setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {fillMissingReceiptSource} from '@libs/MergeTransactionUtils';
-import {getTransactionReportName, isIOUReport} from '@libs/ReportUtils';
+import {getTransactionReportName, isInvoiceReport, isIOUReport} from '@libs/ReportUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import tokenizedSearch from '@libs/tokenizedSearch';
 import {getAmount, getCreated, getCurrency, getDescription, getMerchant, isExpenseUnreported} from '@libs/TransactionUtils';
@@ -76,7 +76,7 @@ function MergeTransactionsListContent({transactionID, mergeTransaction}: MergeTr
                       return true;
                   }
 
-                  return !isIOUReport(transaction?.reportID);
+                  return !isIOUReport(transaction?.reportID) && !isInvoiceReport(transaction?.reportID);
               })
               .map((eligibleTransaction) => ({
                   ...fillMissingReceiptSource(eligibleTransaction),
@@ -172,7 +172,7 @@ function MergeTransactionsListContent({transactionID, mergeTransaction}: MergeTr
     };
 
     const filteredTransactions = eligibleTransactions?.filter((transaction) => {
-        return !isIOUReport(transaction?.reportID);
+        return !isIOUReport(transaction?.reportID) && !isInvoiceReport(transaction?.reportID);
     });
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
