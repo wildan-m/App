@@ -42,7 +42,8 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
     const hasVacationDelegate = !!vacationDelegate?.delegate;
     const vacationDelegatePersonalDetails = personalDetailsByLogin[vacationDelegate?.delegate?.toLowerCase() ?? ''];
     const formattedDelegateLogin = formatPhoneNumber(vacationDelegatePersonalDetails?.login ?? '');
-    const fallbackVacationDelegateLogin = formattedDelegateLogin === '' ? vacationDelegate?.delegate : formattedDelegateLogin;
+    const formattedRawDelegate = formatPhoneNumber(vacationDelegate?.delegate ?? '');
+    const fallbackVacationDelegateLogin = formattedDelegateLogin || formattedRawDelegate || vacationDelegate?.delegate;
 
     return hasVacationDelegate ? (
         <>

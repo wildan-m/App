@@ -85,26 +85,27 @@ function BaseVacationDelegateSelectionComponent({
 
     const sectionsList = [];
 
-    if (currentVacationDelegate && delegatePersonalDetails) {
+    if (currentVacationDelegate) {
+        const formattedRawDelegate = formatPhoneNumber(currentVacationDelegate);
         sectionsList.push({
             title: undefined,
             sectionIndex: 0,
             data: [
                 {
-                    ...delegatePersonalDetails,
-                    text: delegatePersonalDetails?.displayName ?? currentVacationDelegate,
-                    alternateText: delegatePersonalDetails?.login ?? currentVacationDelegate,
-                    login: delegatePersonalDetails.login ?? currentVacationDelegate,
-                    keyForList: `vacationDelegate-${delegatePersonalDetails.login}`,
+                    ...(delegatePersonalDetails ?? {}),
+                    text: delegatePersonalDetails?.displayName ?? formattedRawDelegate,
+                    alternateText: delegatePersonalDetails?.login ? formatPhoneNumber(delegatePersonalDetails.login) : formattedRawDelegate,
+                    login: delegatePersonalDetails?.login ?? currentVacationDelegate,
+                    keyForList: `vacationDelegate-${delegatePersonalDetails?.login ?? currentVacationDelegate}`,
                     isDisabled: false,
                     isSelected: true,
                     shouldShowSubscript: undefined,
                     icons: [
                         {
                             source: delegatePersonalDetails?.avatar ?? icons.FallbackAvatar,
-                            name: formatPhoneNumber(delegatePersonalDetails?.login ?? ''),
+                            name: delegatePersonalDetails?.login ? formatPhoneNumber(delegatePersonalDetails.login) : formattedRawDelegate,
                             type: CONST.ICON_TYPE_AVATAR,
-                            id: delegatePersonalDetails?.accountID,
+                            id: delegatePersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                         },
                     ],
                 },
