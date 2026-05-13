@@ -2672,6 +2672,10 @@ const ROUTES = {
         route: 'workspaces/:policyID/reports/newReportField',
         getRoute: (policyID: string) => `workspaces/${policyID}/reports/newReportField` as const,
     },
+    WORKSPACE_REPORT_FIELDS_TYPE_SELECTOR: {
+        route: 'workspaces/:policyID/reports/newReportField/typeSelector',
+        getRoute: (policyID: string) => `workspaces/${policyID}/reports/newReportField/typeSelector` as const,
+    },
     WORKSPACE_REPORT_FIELDS_SETTINGS: {
         route: 'workspaces/:policyID/reports/:reportFieldID/edit',
         getRoute: (policyID: string, reportFieldID: string) => `workspaces/${policyID}/reports/${encodeURIComponent(reportFieldID)}/edit` as const,

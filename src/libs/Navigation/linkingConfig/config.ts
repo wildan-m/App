@@ -1147,6 +1147,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.REPORT_FIELDS_CREATE]: {
                             path: ROUTES.WORKSPACE_CREATE_REPORT_FIELD.route,
                         },
+                        [SCREENS.WORKSPACE.REPORT_FIELDS_TYPE_SELECTOR]: {
+                            path: ROUTES.WORKSPACE_REPORT_FIELDS_TYPE_SELECTOR.route,
+                        },
                         [SCREENS.WORKSPACE.REPORT_FIELDS_LIST_VALUES]: {
                             path: ROUTES.WORKSPACE_REPORT_FIELDS_LIST_VALUES.route,
                         },

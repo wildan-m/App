@@ -755,6 +755,7 @@ const SCREENS = {
         REPORTS: 'Workspace_Reports',
         REPORT_FIELDS_SETTINGS: 'Workspace_ReportFields_Settings',
         REPORT_FIELDS_CREATE: 'Workspace_ReportFields_Create',
+        REPORT_FIELDS_TYPE_SELECTOR: 'Workspace_ReportFields_TypeSelector',
         REPORT_FIELDS_LIST_VALUES: 'Workspace_ReportFields_ListValues',
         REPORT_FIELDS_ADD_VALUE: 'Workspace_ReportFields_AddValue',
         REPORT_FIELDS_VALUE_SETTINGS: 'Workspace_ReportFields_ValueSettings',

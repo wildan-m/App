@@ -11,7 +11,6 @@ import TextPicker from '@components/TextPicker';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import DateUtils from '@libs/DateUtils';
 import {addErrorMessage} from '@libs/ErrorUtils';
 import {hasCircularReferences} from '@libs/Formula';
 import Navigation from '@libs/Navigation/Navigation';
@@ -34,8 +33,6 @@ import InitialListValueSelector from './InitialListValueSelector';
 import TypeSelector from './TypeSelector';
 
 type CreateReportFieldsPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.REPORT_FIELDS_CREATE>;
-
-const defaultDate = DateUtils.extractDate(new Date().toString());
 
 function WorkspaceCreateReportFieldsPage({
     policy,
@@ -162,6 +159,18 @@ function WorkspaceCreateReportFieldsPage({
         setInitialCreateReportFieldsForm();
     }, []);
 
+    const draftType = formDraft?.[INPUT_IDS.TYPE];
+    const previousDraftTypeRef = useRef(draftType);
+
+    useEffect(() => {
+        if (previousDraftTypeRef.current !== undefined && draftType !== previousDraftTypeRef.current) {
+            // Clear any stale validation errors (e.g. on initialValue) that no longer apply
+            // after the user changed the report field type via the type selector screen.
+            formRef.current?.resetErrors();
+        }
+        previousDraftTypeRef.current = draftType;
+    }, [draftType]);
+
     const listValues = [...(formDraft?.[INPUT_IDS.LIST_VALUES] ?? [])].sort(localeCompare).join(', ');
 
     return (
@@ -214,24 +223,8 @@ function WorkspaceCreateReportFieldsPage({
                                 InputComponent={TypeSelector}
                                 inputID={INPUT_IDS.TYPE}
                                 label={translate('common.type')}
-                                subtitle={translate('workspace.reportFields.typeInputSubtitle')}
                                 rightLabel={translate('common.required')}
-                                onTypeSelected={(type) => {
-                                    let initialValue;
-                                    if (type === CONST.REPORT_FIELD_TYPES.DATE) {
-                                        initialValue = defaultDate;
-                                    } else if (type === CONST.REPORT_FIELD_TYPES.FORMULA) {
-                                        initialValue = '{report:id}';
-                                    } else {
-                                        initialValue = '';
-                                    }
-
-                                    formRef.current?.resetForm({
-                                        ...inputValues,
-                                        type,
-                                        initialValue,
-                                    });
-                                }}
+                                policyID={policyID}
                             />
 
                             {inputValues[INPUT_IDS.TYPE] === CONST.REPORT_FIELD_TYPES.LIST && (

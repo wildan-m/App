@@ -1,50 +1,39 @@
 import {Str} from 'expensify-common';
 import type {ForwardedRef} from 'react';
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import type {MenuItemBaseProps} from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import useLocalize from '@hooks/useLocalize';
+import Navigation from '@libs/Navigation/Navigation';
 import {getReportFieldTypeTranslationKey} from '@libs/WorkspaceReportFieldUtils';
-import type {ReportFieldItemType} from '@pages/workspace/reports/ReportFieldTypePicker';
 import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
 import type {PolicyReportFieldType} from '@src/types/onyx/Policy';
-import TypeSelectorModal from './TypeSelectorModal';
 
 type TypeSelectorProps = Pick<MenuItemBaseProps, 'label' | 'rightLabel' | 'errorText'> & {
     /** Currently selected type */
     value?: string;
 
-    /** Subtitle to display on field */
-    subtitle?: string;
+    /** The policy ID this report field belongs to */
+    policyID: string;
 
-    /** Function to call when the user selects a type */
+    /**
+     * InputWrapper injects this for FormProvider integration. The new flow writes the selected type
+     * directly to the WORKSPACE_REPORT_FIELDS_FORM draft from the type selector screen, so this is
+     * unused — but accepting it keeps the component compatible with InputWrapper's expected shape.
+     */
     onInputChange?: (value: string) => void;
-
-    /** Function to call when the user selects a type */
-    onTypeSelected?: (reportFieldType: PolicyReportFieldType) => void;
 
     /** Reference to the outer element */
     ref?: ForwardedRef<View>;
 };
 
-function TypeSelector({value, label = '', rightLabel, subtitle = '', errorText = '', onInputChange, onTypeSelected, ref}: TypeSelectorProps) {
+function TypeSelector({value, policyID, label = '', rightLabel, errorText = '', ref}: TypeSelectorProps) {
     const {translate} = useLocalize();
 
-    const [isPickerVisible, setIsPickerVisible] = useState(false);
-
-    const showPickerModal = () => {
-        setIsPickerVisible(true);
-    };
-
-    const hidePickerModal = () => {
-        setIsPickerVisible(false);
-    };
-
-    const updateTypeInput = (reportField: ReportFieldItemType) => {
-        onInputChange?.(reportField.value);
-        onTypeSelected?.(reportField.value);
-        hidePickerModal();
+    const openTypeSelector = () => {
+        Navigation.navigate(ROUTES.WORKSPACE_REPORT_FIELDS_TYPE_SELECTOR.getRoute(policyID));
     };
 
     return (
@@ -57,15 +46,7 @@ function TypeSelector({value, label = '', rightLabel, subtitle = '', errorText =
                 rightLabel={rightLabel}
                 brickRoadIndicator={errorText ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                 errorText={errorText}
-                onPress={showPickerModal}
-            />
-            <TypeSelectorModal
-                isVisible={isPickerVisible}
-                currentType={value as PolicyReportFieldType}
-                onClose={hidePickerModal}
-                onTypeSelected={updateTypeInput}
-                label={label}
-                subtitle={subtitle}
+                onPress={openTypeSelector}
             />
         </View>
     );
