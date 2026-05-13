@@ -24,7 +24,7 @@ import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import SCREENS, {PROTECTED_SCREENS} from '@src/SCREENS';
 import type {SidePanel} from '@src/types/onyx';
-import {clearPreInsertedOriginalTabRoute, getPreInsertedOriginalTabRoute} from './AppNavigator/createRootStackNavigator/GetStateForActionHandlers';
+import {clearPreInsertedOriginalTabRoute, getPreInsertedOriginalTabRoute, MODAL_ROUTES_TO_DISMISS} from './AppNavigator/createRootStackNavigator/GetStateForActionHandlers';
 import getInitialSplitNavigatorState from './AppNavigator/createSplitNavigator/getInitialSplitNavigatorState';
 import originalCloseRHPFlow from './helpers/closeRHPFlow';
 import getActiveTabName from './helpers/getActiveTabName';
@@ -793,7 +793,13 @@ function dismissModal({ref = navigationRef, afterTransition, waitForTransition}:
     const performDismiss = () => {
         TransitionTracker.runAfterTransitions({
             callback: () => {
-                ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
+                const rootState = ref.getRootState();
+                const topRouteName = rootState?.routes?.at(-1)?.name;
+                const canDismiss = !!topRouteName && MODAL_ROUTES_TO_DISMISS.has(topRouteName);
+
+                if (canDismiss) {
+                    ref.dispatch({type: CONST.NAVIGATION.ACTION_TYPE.DISMISS_MODAL});
+                }
 
                 if (afterTransition) {
                     TransitionTracker.runAfterTransitions({callback: afterTransition, waitForUpcomingTransition: true});

@@ -542,4 +542,5 @@ export {
     handleToggleSidePanelWithHistoryAction,
     getPreInsertedOriginalTabRoute,
     clearPreInsertedOriginalTabRoute,
+    MODAL_ROUTES_TO_DISMISS,
 };
