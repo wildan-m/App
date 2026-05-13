@@ -1,16 +1,7 @@
-type GustoSyncResultUser = {
-    email: string;
-    displayName?: string;
-};
-
-type GustoSyncSkippedResultUser = GustoSyncResultUser & {
-    reason: string;
-};
-
 type GustoSyncResult = {
-    added?: GustoSyncResultUser[];
-    removed?: GustoSyncResultUser[];
-    skipped?: GustoSyncSkippedResultUser[];
+    addedEmployeesCount?: number;
+    removedEmployeesCount?: number;
+    skippedEmployees?: Array<{name: string; id: string; reason: string}>;
 };
 
-export type {GustoSyncResult, GustoSyncResultUser};
+export type {GustoSyncResult};
