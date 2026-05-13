@@ -1085,6 +1085,14 @@ function unapproveExpenseReport(
         return;
     }
 
+    // When the report was paid and then the payment was cancelled, isCancelledIOU is true.
+    // Capture this state before the optimistic merge below clears it so we can keep the
+    // historical "payment was cancelled" indicator and detach the chat from this report,
+    // so the next expense starts a fresh report instead of being appended to the cancelled one.
+    const wasCancelledIOU = !!expenseReport.isCancelledIOU;
+    const chatReport = getReportOrDraftReport(expenseReport.parentReportID);
+    const previousChatIouReportID = chatReport?.iouReportID;
+
     const optimisticUnapprovedReportAction = buildOptimisticUnapprovedReportAction(expenseReport.total ?? 0, expenseReport.currency ?? '', expenseReport.reportID, delegateEmail);
 
     // buildOptimisticNextStep is used in parallel
@@ -1135,7 +1143,7 @@ function unapproveExpenseReport(
                 partial: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
             },
-            isCancelledIOU: false,
+            isCancelledIOU: wasCancelledIOU,
         },
     };
 
@@ -1222,6 +1230,26 @@ function unapproveExpenseReport(
                     childStateNum: expenseReport.stateNum,
                     childStatusNum: expenseReport.statusNum,
                 },
+            },
+        });
+    }
+
+    // Detach the workspace chat from a paid-then-cancelled expense report so a
+    // subsequent FAB → New expense starts a fresh report instead of re-using this one.
+    if (wasCancelledIOU && expenseReport.parentReportID && previousChatIouReportID === expenseReport.reportID) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.parentReportID}`,
+            value: {
+                iouReportID: null,
+            },
+        });
+
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.parentReportID}`,
+            value: {
+                iouReportID: previousChatIouReportID,
             },
         });
     }
