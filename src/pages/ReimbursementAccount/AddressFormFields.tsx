@@ -32,6 +32,11 @@ type AddressInputKeys = {
 
 type AddressErrors = Record<keyof Address, boolean>;
 
+type CountryZipRegex = {
+    regex?: RegExp;
+    samples?: string;
+};
+
 type AddressFormProps = ForwardedFSClassProps & {
     /** Translate key for Street name */
     streetTranslationKey: TranslationPaths;
@@ -120,6 +125,12 @@ function AddressFormFields({
     // When draft values are not being saved we need to relay on local state to determine the currently selected country
     const currentlySelectedCountry = shouldSaveDraft ? defaultValues?.country : countryInEditMode;
 
+    const countryZipData = currentlySelectedCountry
+        ? (CONST.COUNTRY_ZIP_REGEX_DATA[currentlySelectedCountry as keyof typeof CONST.COUNTRY_ZIP_REGEX_DATA] as CountryZipRegex | undefined)
+        : undefined;
+    const zipSampleFormat = countryZipData?.samples ?? CONST.COUNTRY_ZIP_REGEX_DATA.US.samples;
+    const shouldForceNumericKeyboard = shouldValidateZipCodeFormat && (currentlySelectedCountry === CONST.COUNTRY.US || !countryZipData);
+
     const handleCountryChange = (country: unknown) => {
         if (typeof country === 'string' && country !== '') {
             setCountryInEditMode(country);
@@ -186,11 +197,11 @@ function AddressFormFields({
                 label={translate('common.zip')}
                 accessibilityLabel={translate('common.zip')}
                 role={CONST.ROLE.PRESENTATION}
-                inputMode={shouldValidateZipCodeFormat ? CONST.INPUT_MODE.NUMERIC : undefined}
+                inputMode={shouldForceNumericKeyboard ? CONST.INPUT_MODE.NUMERIC : undefined}
                 value={values?.zipCode}
                 defaultValue={defaultValues?.zipCode}
                 errorText={errors?.zipCode ? translate('bankAccount.error.zipCode') : ''}
-                hint={translate('common.zipCodeExampleFormat', CONST.COUNTRY_ZIP_REGEX_DATA.US.samples)}
+                hint={translate('common.zipCodeExampleFormat', zipSampleFormat)}
                 containerStyles={styles.mt3}
                 forwardedFSClass={forwardedFSClass}
                 autoComplete="postal-code"
