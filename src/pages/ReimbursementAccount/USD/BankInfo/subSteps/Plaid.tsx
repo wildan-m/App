@@ -3,14 +3,16 @@ import React, {useCallback, useEffect} from 'react';
 import AddPlaidBankAccount from '@components/AddPlaidBankAccount';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import type {SubStepProps} from '@hooks/useSubStep/types';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getLatestErrorMessage} from '@libs/ErrorUtils';
 import {getBankAccountIDAsNumber} from '@libs/ReimbursementAccountUtils';
 import {setBankAccountSubStep, validatePlaidSelection} from '@userActions/BankAccounts';
-import {updateReimbursementAccountDraft} from '@userActions/ReimbursementAccount';
+import {hideBankAccountErrors, updateReimbursementAccountDraft} from '@userActions/ReimbursementAccount';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/ReimbursementAccountForm';
 
@@ -49,6 +51,7 @@ function Plaid({onNext, setUSDBankAccountStep}: PlaidProps) {
     }, [plaidData, reimbursementAccountDraft, onNext]);
 
     const bankAccountID = getBankAccountIDAsNumber(reimbursementAccount?.achData);
+    const latestErrorMessage = getLatestErrorMessage(reimbursementAccount);
 
     useEffect(() => {
         const plaidBankAccounts = plaidData?.bankAccounts ?? [];
@@ -94,6 +97,12 @@ function Plaid({onNext, setUSDBankAccountStep}: PlaidProps) {
                 selectedPlaidAccountID={selectedPlaidAccountID}
                 inputID={BANK_INFO_STEP_KEYS.SELECTED_PLAID_ACCOUNT_ID}
                 defaultValue={selectedPlaidAccountID}
+            />
+            <OfflineWithFeedback
+                errors={reimbursementAccount?.errors}
+                errorRowStyles={[styles.mh5, styles.mt3]}
+                shouldShowErrorMessages={!!latestErrorMessage}
+                onClose={hideBankAccountErrors}
             />
         </FormProvider>
     );
