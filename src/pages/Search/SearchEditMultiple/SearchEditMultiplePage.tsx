@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {InteractionManager, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -118,14 +118,16 @@ function SearchEditMultiplePage() {
     const areCategoriesEnabled = areSelectedTransactionsExpenses && !!policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {});
     const areTagsEnabled = areSelectedTransactionsExpenses && !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
 
+    const [isSaving, setIsSaving] = useState(false);
+
     useEffect(() => {
         return () => {
             clearBulkEditDraftTransaction();
         };
     }, []);
 
-    const save = () => {
-        if (!draftTransaction) {
+    const save = useCallback(() => {
+        if (!draftTransaction || isSaving) {
             return;
         }
 
@@ -163,29 +165,54 @@ function SearchEditMultiplePage() {
             return;
         }
 
-        updateMultipleMoneyRequests({
-            transactionIDs: selectedTransactionIDs,
-            changes,
-            policy,
-            reports: mergedReports,
-            transactions: mergedTransactions,
-            reportActions: mergedReportActions,
-            policyCategories: allPolicyCategories,
-            policyTags: allPolicyTags,
-            hash: currentSearchHash,
-            allPolicies: policies,
-            introSelected,
-            betas,
-            currentUserAccountID,
-            currentUserLogin: currentUserLogin ?? '',
-        });
-        // Bulk edit can start from report (ID-based selection) or search (map-based selection),
-        // so clear both stores to keep deselection behavior consistent.
-        clearSelectedTransactions(true);
-        clearSelectedTransactions();
+        // Show the spinner immediately, then defer the synchronous edit loop so the spinner
+        // has a chance to paint before the JS thread blocks. On large selections (40-50+ items)
+        // the loop and its Onyx merges can stall the main thread for noticeable time; without
+        // this defer the user sees an idle Save button and tends to keep clicking.
+        setIsSaving(true);
+        InteractionManager.runAfterInteractions(() => {
+            updateMultipleMoneyRequests({
+                transactionIDs: selectedTransactionIDs,
+                changes,
+                policy,
+                reports: mergedReports,
+                transactions: mergedTransactions,
+                reportActions: mergedReportActions,
+                policyCategories: allPolicyCategories,
+                policyTags: allPolicyTags,
+                hash: currentSearchHash,
+                allPolicies: policies,
+                introSelected,
+                betas,
+                currentUserAccountID,
+                currentUserLogin: currentUserLogin ?? '',
+            });
+            // Bulk edit can start from report (ID-based selection) or search (map-based selection),
+            // so clear both stores to keep deselection behavior consistent.
+            clearSelectedTransactions(true);
+            clearSelectedTransactions();
 
-        Navigation.dismissToPreviousRHP();
-    };
+            setIsSaving(false);
+            Navigation.dismissToPreviousRHP();
+        });
+    }, [
+        draftTransaction,
+        isSaving,
+        selectedTransactionIDs,
+        policy,
+        mergedReports,
+        mergedTransactions,
+        mergedReportActions,
+        allPolicyCategories,
+        allPolicyTags,
+        currentSearchHash,
+        policies,
+        introSelected,
+        betas,
+        currentUserAccountID,
+        currentUserLogin,
+        clearSelectedTransactions,
+    ]);
 
     const currency = policy?.outputCurrency ?? CONST.CURRENCY.USD;
 
@@ -320,6 +347,8 @@ function SearchEditMultiplePage() {
                     large
                     text={translate('common.save')}
                     onPress={save}
+                    isLoading={isSaving}
+                    isDisabled={isSaving}
                     style={[styles.m5]}
                 />
             </View>

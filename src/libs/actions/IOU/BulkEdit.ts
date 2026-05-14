@@ -12,8 +12,10 @@ import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticCreatedReportAction,
     buildOptimisticModifiedExpenseReportAction,
+    buildTransactionThread,
     canEditFieldOfMoneyRequest,
     findSelfDMReportID,
+    generateReportID,
     getOutstandingChildRequest,
     getParsedComment,
     getTransactionDetails,
@@ -24,7 +26,6 @@ import {
 } from '@libs/ReportUtils';
 import {calculateTaxAmount, getAmount, getClearedPendingFields, getCurrency, getTaxValue, getUpdatedTransaction, isOnHold, isSplitChildTransaction} from '@libs/TransactionUtils';
 import ViolationsUtils from '@libs/Violations/ViolationsUtils';
-import {createTransactionThreadReport} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
@@ -134,24 +135,24 @@ function updateMultipleMoneyRequests({
         let transactionThread = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`] ?? null;
 
         // Offline-created expenses can be missing a transaction thread until it's opened once.
-        // Ensure the thread exists before adding optimistic MODIFIED_EXPENSE actions so
-        // bulk-edit comments are visible immediately while still offline.
+        // Seed the thread locally so the optimistic MODIFIED_EXPENSE action has a place to land
+        // and bulk-edit comments are visible immediately while still offline.
+        //
+        // We intentionally do NOT call createTransactionThreadReport / openReport here: on a
+        // 40-50 expense bulk edit that would queue up to N additional OPEN_REPORT writes (one
+        // per uncached thread) on top of the N UPDATE_MONEY_REQUEST writes we actually need,
+        // floods the persistent queue and the Onyx merges those trigger fan out to many
+        // subscribers — hanging the JS thread. The backend already creates the transaction
+        // thread when it processes UPDATE_MONEY_REQUEST against an unknown thread, and if the
+        // user later opens the thread normally a real openReport will run from ReportScreen,
+        // so no functional regression.
         let didCreateThreadInThisIteration = false;
         if (!transactionThreadReportID && iouReport?.reportID) {
-            const optimisticTransactionThread = createTransactionThreadReport({
-                introSelected,
-                currentUserLogin,
-                currentUserAccountID,
-                betas,
-                iouReport,
-                iouReportAction: reportAction,
-                transaction,
-            });
-            if (optimisticTransactionThread?.reportID) {
-                transactionThreadReportID = optimisticTransactionThread.reportID;
-                transactionThread = optimisticTransactionThread;
-                didCreateThreadInThisIteration = true;
-            }
+            const optimisticTransactionThreadReportID = generateReportID();
+            const optimisticTransactionThread = buildTransactionThread(reportAction, iouReport, currentUserAccountID, undefined, optimisticTransactionThreadReportID);
+            transactionThreadReportID = optimisticTransactionThreadReportID;
+            transactionThread = optimisticTransactionThread;
+            didCreateThreadInThisIteration = true;
         }
 
         const isUnreportedExpense = !transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
@@ -457,9 +458,11 @@ function updateMultipleMoneyRequests({
         if (transactionThreadReportID) {
             // Backfill a CREATED action for threads never opened locally so
             // MoneyRequestView renders and the skeleton doesn't loop offline.
-            // Skip when the thread was just created above (openReport handles it).
+            // For threads we built locally above, threadReportActions is empty so the
+            // backfill correctly fires (previously openReport supplied this CREATED action,
+            // but bulk-edit no longer calls openReport).
             const threadReportActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`] ?? {};
-            const hasCreatedAction = didCreateThreadInThisIteration || Object.values(threadReportActions).some((action) => action?.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED);
+            const hasCreatedAction = Object.values(threadReportActions).some((action) => action?.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED);
             const optimisticCreatedValue: Record<string, Partial<OnyxTypes.ReportAction>> = {};
             if (!hasCreatedAction) {
                 const optimisticCreatedAction = buildOptimisticCreatedReportAction({emailCreatingAction: CONST.REPORT.OWNER_EMAIL_FAKE});
@@ -482,10 +485,14 @@ function updateMultipleMoneyRequests({
             optimisticData.push({
                 onyxMethod: Onyx.METHOD.MERGE,
                 key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`,
-                value: {
-                    lastReadTime: optimisticReportAction.created,
-                    reportID: transactionThreadReportID,
-                },
+                // For newly-built threads, seed the full optimistic report so the thread
+                // is renderable offline; otherwise just bump lastReadTime as before.
+                value: didCreateThreadInThisIteration
+                    ? {...transactionThread, lastReadTime: optimisticReportAction.created, reportID: transactionThreadReportID}
+                    : {
+                          lastReadTime: optimisticReportAction.created,
+                          reportID: transactionThreadReportID,
+                      },
             });
             failureData.push({
                 onyxMethod: Onyx.METHOD.MERGE,
