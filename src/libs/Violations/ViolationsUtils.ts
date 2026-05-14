@@ -401,7 +401,7 @@ const ViolationsUtils = {
             const isCategoryInPolicy = categoryKey ? !!(categoryData?.enabled || categoryData?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) : false;
 
             // Add 'categoryOutOfPolicy' violation if category is not in policy
-            if (!hasCategoryOutOfPolicyViolation && !isCategoryMissing(categoryKey) && !isCategoryInPolicy) {
+            if (!hasCategoryOutOfPolicyViolation && !isCategoryMissing(categoryKey, policyCategories) && !isCategoryInPolicy) {
                 newTransactionViolations.push({name: 'categoryOutOfPolicy', type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true});
             }
 

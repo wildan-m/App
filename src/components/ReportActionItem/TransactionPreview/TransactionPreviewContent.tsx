@@ -75,6 +75,7 @@ function TransactionPreviewContent({
     const {convertToDisplayString} = useCurrencyListActions();
     const {environmentURL} = useEnvironment();
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
+    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
     const isParentPolicyExpenseChat = isPolicyExpenseChat(chatReport);
     const transactionDetails = useMemo<Partial<TransactionDetails>>(
         () => getTransactionDetails(transaction, undefined, policy, isParentPolicyExpenseChat) ?? {},
@@ -97,13 +98,14 @@ function TransactionPreviewContent({
         () => ({
             iouReport: report,
             policy,
+            policyCategories,
             transaction,
             action,
             isBillSplit,
             violations,
             transactionDetails,
         }),
-        [action, report, policy, isBillSplit, transaction, transactionDetails, violations],
+        [action, report, policy, policyCategories, isBillSplit, transaction, transactionDetails, violations],
     );
 
     const conditionals = useMemo(

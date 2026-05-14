@@ -24,6 +24,24 @@ describe(`isMissingCategory`, () => {
         expect(isCategoryMissing('Travel')).toBe(false);
         expect(isCategoryMissing('Meals')).toBe(false);
     });
+
+    it('returns false when "Uncategorized" exists as a real policy category', () => {
+        const policyCategories = {
+            Uncategorized: {name: 'Uncategorized', enabled: true},
+        } as PolicyCategories;
+        expect(isCategoryMissing('Uncategorized', policyCategories)).toBe(false);
+    });
+
+    it('still treats "Uncategorized" as missing when no policy categories are passed (sentinel behavior)', () => {
+        expect(isCategoryMissing('Uncategorized', undefined)).toBe(true);
+    });
+
+    it('still treats "Uncategorized" as missing when policy does not contain it', () => {
+        const policyCategories = {
+            Travel: {name: 'Travel', enabled: true},
+        } as PolicyCategories;
+        expect(isCategoryMissing('Uncategorized', policyCategories)).toBe(true);
+    });
 });
 
 describe('formatRequireItemizedReceiptsOverText', () => {

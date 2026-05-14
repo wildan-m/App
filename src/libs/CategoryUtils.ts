@@ -128,9 +128,15 @@ function getEnabledCategoriesCount(policyCategories: PolicyCategories | undefine
     return Object.values(policyCategories).filter((policyCategory) => policyCategory.enabled).length;
 }
 
-function isCategoryMissing(category: string | undefined): boolean {
+function isCategoryMissing(category: string | undefined, policyCategories?: PolicyCategories): boolean {
     if (!category) {
         return true;
+    }
+
+    // A real policy category entry always wins over the sentinel comparison so a workspace category
+    // whose name collides with CATEGORY_DEFAULT_VALUE ("Uncategorized") still renders as a real category.
+    if (policyCategories?.[category]) {
+        return false;
     }
 
     return category === CONST.SEARCH.CATEGORY_EMPTY_VALUE || category === CONST.SEARCH.CATEGORY_DEFAULT_VALUE;

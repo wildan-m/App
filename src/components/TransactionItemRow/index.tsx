@@ -2,6 +2,7 @@ import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getCompanyCardDescription} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
@@ -22,6 +23,7 @@ import {
     shouldShowAttendees as shouldShowAttendeesUtils,
 } from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {TranslationPaths} from '@src/languages/types';
 import TransactionItemRowNarrow from './TransactionItemRowNarrow';
 import TransactionItemRowWide from './TransactionItemRowWide';
@@ -86,6 +88,7 @@ function TransactionItemRow({
     const createdAt = getTransactionCreated(transactionItem);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const transactionThreadReportID = reportActions ? getIOUActionForTransactionID(reportActions, transactionItem.transactionID)?.childReportID : undefined;
+    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
 
     const bgActiveStyles = isSelected && shouldHighlightItemWhenSelected ? styles.activeComponentBG : EMPTY_ACTIVE_STYLE;
     const merchant = getMerchantName(transactionItem, translate);
@@ -118,7 +121,7 @@ function TransactionItemRow({
     if (shouldUseNarrowLayout) {
         const description = getDescription(transactionItem);
         const merchantOrDescription = merchant || description;
-        const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
+        const categoryForDisplay = isCategoryMissing(transactionItem?.category, policyCategories) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
         const shouldRenderChatBubbleCell = columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
 
         // TransactionItemRowNarrow intentionally omits column sizing, hover, action button, and related table-only props that only the wide layout consumes

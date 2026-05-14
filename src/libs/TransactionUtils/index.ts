@@ -1492,7 +1492,7 @@ function isReceiptBeingScanned(transaction: OnyxInputOrEntry<Transaction>): bool
 /**
  * Check if category is being analyzed (manual request creation or auto-categorization grace period)
  */
-function isCategoryBeingAnalyzed(transaction: OnyxEntry<Transaction>): boolean {
+function isCategoryBeingAnalyzed(transaction: OnyxEntry<Transaction>, policyCategories?: OnyxEntry<PolicyCategories>): boolean {
     if (!transaction) {
         return false;
     }
@@ -1503,7 +1503,7 @@ function isCategoryBeingAnalyzed(transaction: OnyxEntry<Transaction>): boolean {
 
     // Only consider analyzing if category is actually missing
     const category = getCategory(transaction);
-    if (!isCategoryMissing(category)) {
+    if (!isCategoryMissing(category, policyCategories ?? undefined)) {
         return false;
     }
 
