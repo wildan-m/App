@@ -145,12 +145,21 @@ function openTravelDotLink(policyID: OnyxEntry<string>, postLoginPath?: string) 
     });
 }
 
+const CANONICAL_NEW_EXPENSIFY_URL = 'https://new.expensify.com';
+
+function isCanonicalNewExpensifyHref(href: string) {
+    return Url.hasSameExpensifyOrigin(href, CANONICAL_NEW_EXPENSIFY_URL);
+}
+
 function getInternalNewExpensifyPath(href: string) {
     if (!href) {
         return '';
     }
     const attrPath = Url.getPathFromURL(href);
-    return (Url.hasSameExpensifyOrigin(href, CONST.NEW_EXPENSIFY_URL) || Url.hasSameExpensifyOrigin(href, CONST.STAGING_NEW_EXPENSIFY_URL) || href.startsWith(CONST.DEV_NEW_EXPENSIFY_URL)) &&
+    return (Url.hasSameExpensifyOrigin(href, CONST.NEW_EXPENSIFY_URL) ||
+        Url.hasSameExpensifyOrigin(href, CONST.STAGING_NEW_EXPENSIFY_URL) ||
+        href.startsWith(CONST.DEV_NEW_EXPENSIFY_URL) ||
+        isCanonicalNewExpensifyHref(href)) &&
         !CONST.PATHS_TO_TREAT_AS_EXTERNAL.find((path) => attrPath.startsWith(path))
         ? attrPath
         : '';
@@ -171,7 +180,7 @@ function getInternalExpensifyPath(href: string) {
 }
 
 function openLink(href: string, environmentURL: string, isAttachment = false) {
-    const hasSameOrigin = Url.hasSameExpensifyOrigin(href, environmentURL);
+    const hasSameOrigin = Url.hasSameExpensifyOrigin(href, environmentURL) || isCanonicalNewExpensifyHref(href);
     const hasExpensifyOrigin = Url.hasSameExpensifyOrigin(href, CONFIG.EXPENSIFY.EXPENSIFY_URL) || Url.hasSameExpensifyOrigin(href, CONFIG.EXPENSIFY.STAGING_API_ROOT);
     const internalNewExpensifyPath = getInternalNewExpensifyPath(href);
     const internalExpensifyPath = getInternalExpensifyPath(href);
