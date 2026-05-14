@@ -409,7 +409,7 @@ function MoneyRequestView({
     const policyTagLists = getTagLists(policyTagList);
 
     const category = transactionCategory ?? '';
-    const categoryForDisplay = isCategoryMissing(category) ? '' : category;
+    const categoryForDisplay = isCategoryMissing(category, policyCategories) ? '' : category;
 
     // Flags for showing categories and tags
     // transactionCategory can be an empty string
@@ -882,7 +882,7 @@ function MoneyRequestView({
         : getReportName(parentReport, reportAttributes) || parentReport?.reportName;
     const shouldShowReport = !!parentReportID || (isFromMergeTransaction && !!reportNameToDisplay);
     const reportCopyValue = !canEditReport && reportNameToDisplay !== translate('common.none') ? reportNameToDisplay : undefined;
-    const shouldShowCategoryAnalyzing = isCategoryBeingAnalyzed(updatedTransaction ?? transaction);
+    const shouldShowCategoryAnalyzing = isCategoryBeingAnalyzed(updatedTransaction ?? transaction, policyCategories);
 
     // In this case we want to use this value. The shouldUseNarrowLayout will always be true as this case is handled when we display ReportScreen in RHP.
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth

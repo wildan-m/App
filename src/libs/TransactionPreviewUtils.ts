@@ -370,6 +370,7 @@ function getTransactionPreviewTextAndTranslationPaths({
 function createTransactionPreviewConditionals({
     iouReport,
     policy,
+    policyCategories,
     transaction,
     action,
     violations,
@@ -383,6 +384,7 @@ function createTransactionPreviewConditionals({
 }: {
     iouReport: OnyxEntry<OnyxTypes.Report>;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    policyCategories?: OnyxTypes.PolicyCategories;
     transaction: OnyxEntry<OnyxTypes.Transaction> | undefined;
     action: OnyxEntry<OnyxTypes.ReportAction>;
     violations: OnyxTypes.TransactionViolations;
@@ -416,7 +418,7 @@ function createTransactionPreviewConditionals({
     const shouldShowSkeleton = isEmptyObject(transaction) && !isMessageDeleted(action) && action?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     const shouldShowTag = !!tag && isReportAPolicyExpenseChat;
 
-    const categoryForDisplay = isCategoryMissing(category) ? '' : category;
+    const categoryForDisplay = isCategoryMissing(category, policyCategories) ? '' : category;
 
     const shouldShowCategory = !!categoryForDisplay && isReportAPolicyExpenseChat;
 

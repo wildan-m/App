@@ -91,7 +91,7 @@ function IOURequestStepCategory({
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
 
-    const categoryForDisplay = isCategoryMissing(transactionCategory) ? '' : transactionCategory;
+    const categoryForDisplay = isCategoryMissing(transactionCategory, policyCategories) ? '' : transactionCategory;
 
     const canCreateCategoryInSitu = isPolicyAdmin(policy) && !hasAccountingConnections(policy) && !!policy?.areCategoriesEnabled;
 

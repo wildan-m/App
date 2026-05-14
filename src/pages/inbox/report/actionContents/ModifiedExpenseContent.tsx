@@ -22,6 +22,7 @@ function ModifiedExpenseContent({action, report, originalReport}: ModifiedExpens
     const {email: currentUserEmail} = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
+    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`, {canBeMissing: true});
     const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
 
     // When expense is moved from self-DM to workspace, policyID is temporarily OWNER_EMAIL_FAKE.
@@ -35,6 +36,7 @@ function ModifiedExpenseContent({action, report, originalReport}: ModifiedExpens
         translate,
         reportAction: action,
         policy,
+        policyCategories,
         movedFromReport,
         movedToReport,
         policyTags: policyTags ?? CONST.POLICY.DEFAULT_TAG_LIST,

@@ -4,7 +4,7 @@ import type {Entries, ValueOf} from 'type-fest';
 import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
-import type {Policy, PolicyTagLists, Report, ReportAction, ReportAttributesDerivedValue} from '@src/types/onyx';
+import type {Policy, PolicyCategories, PolicyTagLists, Report, ReportAction, ReportAttributesDerivedValue} from '@src/types/onyx';
 import type {PersonalRulesModifiedFields, PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
 import ObjectUtils from '@src/types/utils/ObjectUtils';
 import {getDecodedCategoryName, isCategoryMissing} from './CategoryUtils';
@@ -43,6 +43,7 @@ function buildMessageFragmentForValue(
     removalFragments: string[],
     changeFragments: string[],
     shouldConvertToLowercase = true,
+    policyCategories?: OnyxEntry<PolicyCategories>,
 ) {
     const newValueToDisplay = valueInQuotes ? `"${newValue}"` : newValue;
     const oldValueToDisplay = valueInQuotes ? `"${oldValue}"` : oldValue;
@@ -51,8 +52,8 @@ function buildMessageFragmentForValue(
 
     const displayValueName = shouldConvertToLowercase ? valueName.toLowerCase() : valueName;
     const isOldMerchantInvalid = valueName === translate('common.merchant') && isInvalidMerchantValue(oldValue);
-    const isOldCategoryMissing = isCategoryField && isCategoryMissing(oldValue);
-    const isNewCategoryMissing = isCategoryField && isCategoryMissing(newValue);
+    const isOldCategoryMissing = isCategoryField && isCategoryMissing(oldValue, policyCategories ?? undefined);
+    const isNewCategoryMissing = isCategoryField && isCategoryMissing(newValue, policyCategories ?? undefined);
 
     if (!oldValue || isOldMerchantInvalid || isOldCategoryMissing) {
         if (!(isOldCategoryMissing && isNewCategoryMissing)) {
@@ -242,6 +243,7 @@ function getForReportAction({
     translate,
     reportAction,
     policy,
+    policyCategories,
     movedFromReport,
     movedToReport,
     policyTags,
@@ -251,6 +253,7 @@ function getForReportAction({
     translate: LocalizedTranslate;
     reportAction: OnyxEntry<ReportAction>;
     policy: OnyxEntry<Policy>;
+    policyCategories?: OnyxEntry<PolicyCategories>;
     movedFromReport?: OnyxEntry<Report>;
     movedToReport?: OnyxEntry<Report>;
     // Optional because the deprecated getReportName in ReportUtils.ts calls this without policyTags.
@@ -370,6 +373,7 @@ function getForReportAction({
             changeFragments,
             // Don't convert to lowercase when we have source attribution (to preserve any HTML links)
             false,
+            policyCategories,
         );
     }
 
