@@ -45,9 +45,10 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
 
     const getOtherFeeds = () => {
         const otherPolicyFeeds: CardFeedListItem[] = [];
+        const upperPolicyID = policyID.toUpperCase();
         for (const [feedPolicyID, cardFeeds] of Object.entries(cardFeedsByPolicy ?? {})) {
             for (const feed of cardFeeds) {
-                if (feed?.linkedPolicyIDs?.includes(policyID)) {
+                if (feed?.linkedPolicyIDs?.some((id) => id?.toUpperCase() === upperPolicyID)) {
                     continue;
                 }
                 const feedName = feed.feed;

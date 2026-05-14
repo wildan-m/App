@@ -33,6 +33,7 @@ const useCardFeeds = (policyID: string | undefined): [CombinedCardFeeds | undefi
     // This handles domain-based card accounts where no workspace account exists yet.
     let effectiveWorkspaceAccountID = workspaceAccountID;
     if (workspaceAccountID === CONST.DEFAULT_NUMBER_ID && policyID && allFeeds) {
+        const upperPolicyID = policyID.toUpperCase();
         const linkedDomainEntry = Object.entries(allFeeds).find(([onyxKey, feeds]) => {
             const domainID = Number(onyxKey.split('_').at(-1));
             if (!domainID) {
@@ -42,7 +43,11 @@ const useCardFeeds = (policyID: string | undefined): [CombinedCardFeeds | undefi
             if (!companyCards) {
                 return false;
             }
-            return Object.values(companyCards).some((feedSettings) => feedSettings?.preferredPolicy === policyID || (feedSettings?.linkedPolicyIDs ?? []).includes(policyID));
+            return Object.values(companyCards).some(
+                (feedSettings) =>
+                    feedSettings?.preferredPolicy?.toUpperCase() === upperPolicyID ||
+                    (feedSettings?.linkedPolicyIDs ?? []).some((id) => id?.toUpperCase() === upperPolicyID),
+            );
         });
         if (linkedDomainEntry) {
             effectiveWorkspaceAccountID = Number(linkedDomainEntry[0].split('_').at(-1));
@@ -51,12 +56,13 @@ const useCardFeeds = (policyID: string | undefined): [CombinedCardFeeds | undefi
 
     let workspaceFeeds: CombinedCardFeeds | undefined;
     if (policyID && allFeeds) {
+        const upperPolicyID = policyID.toUpperCase();
         const shouldIncludeFeedPredicate = (combinedCardFeed: CombinedCardFeed) => {
             const validLinkedPolicyIDs = combinedCardFeed?.linkedPolicyIDs?.filter(Boolean);
             if (validLinkedPolicyIDs?.length) {
-                return validLinkedPolicyIDs.includes(policyID);
+                return validLinkedPolicyIDs.some((id) => id.toUpperCase() === upperPolicyID);
             }
-            return combinedCardFeed.preferredPolicy ? combinedCardFeed.preferredPolicy === policyID : combinedCardFeed.domainID === effectiveWorkspaceAccountID;
+            return combinedCardFeed.preferredPolicy ? combinedCardFeed.preferredPolicy.toUpperCase() === upperPolicyID : combinedCardFeed.domainID === effectiveWorkspaceAccountID;
         };
         workspaceFeeds = getCombinedCardFeedsFromAllFeeds(allFeeds, shouldIncludeFeedPredicate, feedKeysWithCards);
     }
