@@ -11711,6 +11711,11 @@ function prepareOnboardingOnyxData({
         });
     }
     const actorAccountID = shouldPostTasksInAdminsRoom ? assignedGuideAccountID : CONST.ACCOUNT_ID.CONCIERGE;
+    // The setup-specialist personal detail above is written via async Onyx.merge, but buildOptimisticAddCommentReportAction reads
+    // the module-level allPersonalDetails cache that the Onyx.connect callback has not refreshed yet. Compute the locally-known
+    // display values so we can overwrite the optimistic action's person/avatar after construction.
+    const assignedGuideDisplayName = assignedGuidePersonalDetail?.displayName ?? assignedGuidePersonalDetail?.login ?? assignedGuideEmail;
+    const assignedGuideAvatar = assignedGuidePersonalDetail?.avatar ?? getDefaultAvatarURL({accountID: assignedGuideAccountID});
     const firstAdminPolicy = getActivePolicies(allPolicies, deprecatedCurrentUserEmail).find(
         (policy) => policy.type !== CONST.POLICY.TYPE.PERSONAL && getPolicyRole(policy, deprecatedCurrentUserEmail) === CONST.POLICY.ROLE.ADMIN,
     );
@@ -11736,6 +11741,10 @@ function prepareOnboardingOnyxData({
     // delegateAccountIDParam: will be threaded in PR 14; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value (https://github.com/Expensify/App/issues/66425)
     const textComment = buildOptimisticAddCommentReportAction({text: message, actorAccountID, createdOffset: 1, delegateAccountIDParam: undefined});
     const textCommentAction: OptimisticAddCommentReportAction = textComment.reportAction;
+    if (shouldPostTasksInAdminsRoom) {
+        textCommentAction.person = [{style: 'strong', text: assignedGuideDisplayName, type: 'TEXT'}];
+        textCommentAction.avatar = assignedGuideAvatar;
+    }
     const textMessage: AddCommentOrAttachmentParams = {
         reportID: targetChatReportID,
         reportActionID: textCommentAction.reportActionID,
@@ -11885,6 +11894,10 @@ function prepareOnboardingOnyxData({
     // delegateAccountIDParam: will be threaded in PR 14; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value (https://github.com/Expensify/App/issues/66425)
     const welcomeSignOffComment = buildOptimisticAddCommentReportAction({text: welcomeSignOffText, actorAccountID, createdOffset: tasksData.length + 3, delegateAccountIDParam: undefined});
     const welcomeSignOffCommentAction: OptimisticAddCommentReportAction = welcomeSignOffComment.reportAction;
+    if (shouldPostTasksInAdminsRoom) {
+        welcomeSignOffCommentAction.person = [{style: 'strong', text: assignedGuideDisplayName, type: 'TEXT'}];
+        welcomeSignOffCommentAction.avatar = assignedGuideAvatar;
+    }
     const welcomeSignOffMessage = {
         reportID: targetChatReportID,
         reportActionID: welcomeSignOffCommentAction.reportActionID,
