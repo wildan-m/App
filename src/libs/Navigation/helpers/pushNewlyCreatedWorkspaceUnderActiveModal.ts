@@ -1,4 +1,6 @@
 import {CommonActions} from '@react-navigation/native';
+import getIsNarrowLayout from '@libs/getIsNarrowLayout';
+import {markFullscreenPreInsertedUnderRHP} from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
 import NAVIGATORS from '@src/NAVIGATORS';
 import type SCREENS from '@src/SCREENS';
@@ -37,6 +39,16 @@ function pushNewlyCreatedWorkspaceUnderActiveModal(targetScreen: WorkspaceTarget
         }),
         target: tabStateKey,
     });
+
+    // On narrow layout the caller (`createWorkspaceWithPolicyDraftAndNavigateToIt`) will
+    // otherwise also call `revealRouteBeforeDismissingModal`, which dispatches
+    // REPLACE_FULLSCREEN_UNDER_RHP and prepends WORKSPACES_LIST under the freshly
+    // pushed WORKSPACE_SPLIT_NAVIGATOR — leaving the user with two Workspaces entries
+    // in browser history. Setting the existing pre-insert flag lets the caller detect
+    // the pre-mount and skip the duplicating reveal.
+    if (getIsNarrowLayout()) {
+        markFullscreenPreInsertedUnderRHP();
+    }
 }
 
 export default pushNewlyCreatedWorkspaceUnderActiveModal;

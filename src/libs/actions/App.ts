@@ -644,6 +644,17 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
                 return;
             }
 
+            // The caller may have already pre-mounted the destination under the RHP via
+            // `pushNewlyCreatedWorkspaceUnderActiveModal` (narrow-layout workspace creation).
+            // Running `revealRouteBeforeDismissingModal` on top of that pre-mount duplicates
+            // routes inside the tab navigator and leaves the user with two Workspaces entries
+            // in browser history. Detect the pre-mount and dismiss instead.
+            if (Navigation.getIsFullscreenPreInsertedUnderRHP()) {
+                Navigation.clearFullscreenPreInsertedFlag();
+                Navigation.dismissModal();
+                return;
+            }
+
             Navigation.revealRouteBeforeDismissingModal(routeToNavigate);
         } else {
             Navigation.navigate(routeToNavigate, {forceReplace: true});

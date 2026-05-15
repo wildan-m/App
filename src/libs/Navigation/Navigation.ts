@@ -1081,6 +1081,15 @@ function getIsFullscreenPreInsertedUnderRHP() {
     return isFullscreenPreInsertedUnderRHP;
 }
 
+// Mark the flag without going through the dispatch in preInsertFullscreenUnderRHP.
+// Callers that have already inserted a fullscreen route under the RHP through a
+// different code path (e.g. pushNewlyCreatedWorkspaceUnderActiveModal) use this so
+// downstream "reveal then dismiss" logic can detect the pre-mount and skip a
+// duplicating second insert.
+function markFullscreenPreInsertedUnderRHP() {
+    isFullscreenPreInsertedUnderRHP = true;
+}
+
 function getPreInsertedFullscreenRouteName() {
     return preInsertedFullscreenRouteName;
 }
@@ -1226,6 +1235,7 @@ export default {
     revealRouteBeforeDismissingModal,
     preInsertFullscreenUnderRHP,
     getIsFullscreenPreInsertedUnderRHP,
+    markFullscreenPreInsertedUnderRHP,
     getPreInsertedFullscreenRouteName,
     clearFullscreenPreInsertedFlag,
     removePreInsertedFullscreenIfNeeded,
