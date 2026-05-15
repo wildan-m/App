@@ -442,25 +442,34 @@ function deletePolicyDistanceRates(
     ];
 
     const optimisticTransactionsViolations: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS>> = [];
+    const successTransactionsViolations: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS>> = [];
     const failureTransactionsViolations: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS>> = [];
 
     for (const transactionID of transactionIDsAffected) {
         const currentTransactionViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] ?? [];
         if (currentTransactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY)) {
-            return;
+            continue;
         }
+
+        const updatedViolations = [
+            ...currentTransactionViolations,
+            {
+                type: CONST.VIOLATION_TYPES.VIOLATION,
+                name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY,
+                showInReview: true,
+            },
+        ];
 
         optimisticTransactionsViolations.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`,
-            value: [
-                ...currentTransactionViolations,
-                {
-                    type: CONST.VIOLATION_TYPES.VIOLATION,
-                    name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY,
-                    showInReview: true,
-                },
-            ],
+            value: updatedViolations,
+        });
+
+        successTransactionsViolations.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`,
+            value: updatedViolations,
         });
 
         failureTransactionsViolations.push({
@@ -471,6 +480,7 @@ function deletePolicyDistanceRates(
     }
 
     optimisticData.push(...optimisticTransactionsViolations);
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS>> = [...successTransactionsViolations];
     failureData.push(...failureTransactionsViolations);
 
     const params: DeletePolicyDistanceRatesParams = {
@@ -479,7 +489,7 @@ function deletePolicyDistanceRates(
         customUnitRateID: rateIDsToDelete,
     };
 
-    API.write(WRITE_COMMANDS.DELETE_POLICY_DISTANCE_RATES, params, {optimisticData, failureData});
+    API.write(WRITE_COMMANDS.DELETE_POLICY_DISTANCE_RATES, params, {optimisticData, successData, failureData});
 }
 
 function updateDistanceTaxClaimableValue(policyID: string, customUnit: CustomUnit, customUnitRates: Rate[]) {
