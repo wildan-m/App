@@ -1678,6 +1678,81 @@ function verifyAddSecondaryLoginCode(validateCode: string) {
     API.write(WRITE_COMMANDS.VERIFY_ADD_SECONDARY_LOGIN_CODE, parameters, {optimisticData, successData, failureData});
 }
 
+/**
+ * Verify the validation code before applying a "Set as default" change for an existing contact method.
+ *
+ * Mirrors the verify-then-act flow used by {@link verifyAddSecondaryLoginCode}: the magic code is
+ * validated in isolation so an invalid code surfaces a deterministic rejection without mutating the
+ * user's primary login. On success the page's effect calls {@link setContactMethodAsDefault} with the
+ * already-verified code; on failure an error is written to the contact method's `defaultLogin` field
+ * so the form's existing `validateError` displays "Incorrect or invalid magic code".
+ */
+function verifySetContactMethodAsDefaultCode(newDefaultContactMethod: string, validateCode: string) {
+    resetValidateActionCodeSent();
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.PENDING_CONTACT_ACTION | typeof ONYXKEYS.LOGIN_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.PENDING_CONTACT_ACTION,
+            value: {
+                validateActionCode: validateCode,
+                isLoading: true,
+                isVerifiedValidateActionCode: false,
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.LOGIN_LIST,
+            value: {
+                [newDefaultContactMethod]: {
+                    errorFields: {
+                        defaultLogin: null,
+                    },
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.PENDING_CONTACT_ACTION>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.PENDING_CONTACT_ACTION,
+            value: {
+                isVerifiedValidateActionCode: true,
+                isLoading: false,
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.PENDING_CONTACT_ACTION | typeof ONYXKEYS.LOGIN_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.PENDING_CONTACT_ACTION,
+            value: {
+                isVerifiedValidateActionCode: false,
+                isLoading: false,
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.LOGIN_LIST,
+            value: {
+                [newDefaultContactMethod]: {
+                    errorFields: {
+                        defaultLogin: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('contacts.genericFailureMessages.validateSecondaryLogin'),
+                    },
+                },
+            },
+        },
+    ];
+
+    // Reuses the existing generic VerifyAddSecondaryLoginCode endpoint which only validates the magic
+    // code against the user's account — no state change is made on the backend until the subsequent
+    // SetContactMethodAsDefault call fires after success.
+    const parameters: VerifyAddSecondaryLoginCodeParams = {validateCode};
+
+    API.write(WRITE_COMMANDS.VERIFY_ADD_SECONDARY_LOGIN_CODE, parameters, {optimisticData, successData, failureData});
+}
+
 function setServerErrorsOnForm(errors: Errors) {
     Onyx.set(ONYXKEYS.FORMS.NEW_CONTACT_METHOD_FORM, {
         errors,
@@ -1941,6 +2016,7 @@ export {
     requestUnlockAccount,
     respondToProactiveAppReview,
     verifyAddSecondaryLoginCode,
+    verifySetContactMethodAsDefaultCode,
     updateIsVerifiedValidateActionCode,
     setDraftRule,
     updateDraftRule,

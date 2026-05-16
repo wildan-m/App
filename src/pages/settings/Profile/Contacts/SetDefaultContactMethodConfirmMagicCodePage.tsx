@@ -5,7 +5,14 @@ import ValidateCodeActionContent from '@components/ValidateCodeActionModal/Valid
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import {clearContactMethodErrors, requestValidateCodeAction, resetValidateActionCodeSent, setContactMethodAsDefault} from '@libs/actions/User';
+import {
+    clearContactMethodErrors,
+    requestValidateCodeAction,
+    resetValidateActionCodeSent,
+    setContactMethodAsDefault,
+    updateIsVerifiedValidateActionCode,
+    verifySetContactMethodAsDefaultCode,
+} from '@libs/actions/User';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -25,11 +32,28 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
+    const [pendingContactAction] = useOnyx(ONYXKEYS.PENDING_CONTACT_ACTION);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const primaryContactMethod = getContactMethod(account?.primaryLogin, session?.email);
 
     const loginData = loginList?.[contactMethod];
     const defaultLoginError = getLatestErrorField(loginData, 'defaultLogin');
+
+    // Reset verification state on mount so a previous successful set-as-default flow does not leak in
+    // and short-circuit verification for this attempt.
+    useEffect(() => {
+        updateIsVerifiedValidateActionCode(false);
+    }, []);
+
+    // Once verification succeeds, fire the actual set-as-default mutation with the validated code. The
+    // existing session.email effect below handles the post-success navigation.
+    useEffect(() => {
+        if (!pendingContactAction?.isVerifiedValidateActionCode || !pendingContactAction?.validateActionCode) {
+            return;
+        }
+        setContactMethodAsDefault(currentUserPersonalDetails, contactMethod, formatPhoneNumber, backTo, true, pendingContactAction.validateActionCode);
+        updateIsVerifiedValidateActionCode(false);
+    }, [pendingContactAction?.isVerifiedValidateActionCode, pendingContactAction?.validateActionCode, currentUserPersonalDetails, contactMethod, formatPhoneNumber, backTo]);
 
     // Navigate back to contact methods list when the default login is successfully updated
     useEffect(() => {
@@ -45,6 +69,7 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
     useEffect(() => {
         return () => {
             clearContactMethodErrors(contactMethod, 'defaultLogin');
+            updateIsVerifiedValidateActionCode(false);
         };
     }, [contactMethod]);
 
@@ -68,13 +93,14 @@ function SetDefaultContactMethodConfirmMagicCodePage({route}: SetDefaultContactM
             descriptionPrimary={translate('contacts.enterMagicCode', primaryContactMethod)}
             validateCodeActionErrorField="defaultLogin"
             validateError={defaultLoginError}
-            handleSubmitForm={(validateCode) => setContactMethodAsDefault(currentUserPersonalDetails, contactMethod, formatPhoneNumber, backTo, true, validateCode)}
-            isLoading={!!loginData?.pendingFields?.defaultLogin}
+            handleSubmitForm={(validateCode) => verifySetContactMethodAsDefaultCode(contactMethod, validateCode)}
+            isLoading={!!pendingContactAction?.isLoading || !!loginData?.pendingFields?.defaultLogin}
             clearError={() => {
                 clearContactMethodErrors(contactMethod, 'defaultLogin');
             }}
             onClose={() => {
                 resetValidateActionCodeSent();
+                updateIsVerifiedValidateActionCode(false);
                 Navigation.goBack(ROUTES.SETTINGS_CONTACT_METHOD_DETAILS.getRoute(contactMethod, backTo));
             }}
         />
