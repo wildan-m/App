@@ -5777,7 +5777,14 @@ function getReportName(reportNameInformation: GetReportNameParams): string {
 
     if (isTaskReport(report)) {
         const taskName = report?.reportName ?? '';
-        return Parser.isHTML(taskName) ? Parser.htmlToText(taskName).trim() : taskName.trim();
+        if (Parser.isHTML(taskName)) {
+            return Parser.htmlToText(taskName).trim();
+        }
+        // Task names are stored as parsed HTML at create time, but the value the recipient ends up reading from Onyx can be the raw Markdown source
+        // (e.g. the onboarding "Take a [test drive](<url>)" admin task). Render Markdown to HTML first, then strip to plain text so callers always see
+        // user-visible text rather than raw Markdown brackets.
+        const html = Parser.replace(taskName, {disabledRules: [...CONST.TASK_TITLE_DISABLED_RULES]});
+        return Parser.htmlToText(html).trim();
     }
 
     if (isChatThread(report)) {
