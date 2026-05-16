@@ -1634,6 +1634,8 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
         rate,
         unit,
         isFromGlobalCreate = false,
+        odometerStart,
+        odometerEnd,
     } = transactionParams;
 
     const testDriveCommentReportActionID = isTestDrive ? NumberUtils.rand64() : undefined;
@@ -1843,6 +1845,8 @@ function requestMoney(requestMoneyInformation: RequestMoneyInformation): {iouRep
                           unit,
                       }
                     : {}),
+                odometerStart,
+                odometerEnd,
                 shouldDeferAutoSubmit,
             };
 
