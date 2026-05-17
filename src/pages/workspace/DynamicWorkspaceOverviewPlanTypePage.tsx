@@ -162,6 +162,7 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
                             data={workspacePlanTypes}
                             isDisabled={isPlanTypeLocked}
                             ListItem={SingleSelectListItem}
+                            alternateNumberOfSupportedLines={2}
                             onSelectRow={(option) => {
                                 setCurrentPlan(option.value);
                             }}
