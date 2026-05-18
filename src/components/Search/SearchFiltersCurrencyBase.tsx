@@ -40,16 +40,18 @@ function SearchFiltersCurrencyBase({title, filterKey, multiselect = false}: Sear
             continue;
         }
 
+        const searchableText = currencyList[currencyCode]?.name;
+
         if (Array.isArray(selectedCurrencyData) && selectedCurrencyData?.includes(currencyCode) && !selectedCurrencies.some((currencyItem) => currencyItem.value === currencyCode)) {
-            selectedCurrencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode});
+            selectedCurrencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode, searchableText});
         }
 
         if (!Array.isArray(selectedCurrencyData) && selectedCurrencyData === currencyCode) {
-            selectedCurrencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode});
+            selectedCurrencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode, searchableText});
         }
 
         if (!currencies.some((item) => item.value === currencyCode)) {
-            currencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode});
+            currencies.push({name: `${currencyCode} - ${getCurrencySymbol(currencyCode)}`, value: currencyCode, searchableText});
         }
     }
 

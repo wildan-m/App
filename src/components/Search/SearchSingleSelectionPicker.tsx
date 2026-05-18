@@ -13,6 +13,7 @@ import SearchFilterPageFooterButtons from './SearchFilterPageFooterButtons';
 type SearchSingleSelectionPickerItem = {
     name: string;
     value: string;
+    searchableText?: string;
 };
 
 type SearchSingleSelectionPickerProps = {
@@ -43,7 +44,11 @@ function SearchSingleSelectionPicker({
         setSelectedItem(initiallySelectedItem);
     }, [initiallySelectedItem]);
 
-    const initiallySelectedItemSection = initiallySelectedItem?.name.toLowerCase().includes(debouncedSearchTerm?.toLowerCase())
+    const searchLower = debouncedSearchTerm?.toLowerCase();
+    const itemMatchesSearch = (item: SearchSingleSelectionPickerItem) =>
+        item.name.toLowerCase().includes(searchLower) || (!!item.searchableText && item.searchableText.toLowerCase().includes(searchLower));
+
+    const initiallySelectedItemSection = initiallySelectedItem && itemMatchesSearch(initiallySelectedItem)
         ? [
               {
                   text: initiallySelectedItem.name,
@@ -55,7 +60,7 @@ function SearchSingleSelectionPicker({
         : [];
 
     const remainingItemsSection = items
-        .filter((item) => item.value !== initiallySelectedItem?.value && item.name.toLowerCase().includes(debouncedSearchTerm?.toLowerCase()))
+        .filter((item) => item.value !== initiallySelectedItem?.value && itemMatchesSearch(item))
         .sort((a, b) => sortOptionsWithEmptyValue(a.name.toString(), b.name.toString(), localeCompare))
         .map((item) => ({
             text: item.name,
