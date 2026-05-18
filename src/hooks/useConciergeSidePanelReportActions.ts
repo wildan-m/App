@@ -3,6 +3,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import DateUtils from '@libs/DateUtils';
 import {isCreatedAction} from '@libs/ReportActionsUtils';
 import {buildConciergeGreetingReportAction} from '@libs/ReportUtils';
+import CONST from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 
 type UseConciergeSidePanelReportActionsParams = {
@@ -58,7 +59,11 @@ function useConciergeSidePanelReportActions({
             return false;
         }
         const hasUserMessageInLoadedSet = visibleReportActions.some(
-            (action) => !isCreatedAction(action) && action.actorAccountID === currentUserAccountID && action.created < sessionStartTime,
+            (action) =>
+                !isCreatedAction(action) &&
+                action.actorAccountID === currentUserAccountID &&
+                action.created < sessionStartTime &&
+                action.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
         );
         return hasUserMessageInLoadedSet || hasOlderActions;
     }, [isConciergeSidePanel, visibleReportActions, currentUserAccountID, sessionStartTime, hasOlderActions]);

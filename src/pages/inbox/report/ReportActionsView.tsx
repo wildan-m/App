@@ -81,7 +81,12 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         if (!isConciergeSidePanel || !sessionStartTime) {
             return false;
         }
-        return allReportActions.some((action) => !isCreatedAction(action) && action.actorAccountID === currentUserAccountID && action.created >= sessionStartTime);
+        return allReportActions.some(
+            (action) =>
+                !isCreatedAction(action) &&
+                action.actorAccountID === currentUserAccountID &&
+                (action.created >= sessionStartTime || action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD),
+        );
     }, [isConciergeSidePanel, allReportActions, currentUserAccountID, sessionStartTime]);
 
     const isReportTransactionThread = isReportTransactionThreadUtil(report);

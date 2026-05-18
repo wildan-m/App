@@ -1,5 +1,6 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import {isCreatedAction} from '@libs/ReportActionsUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportActions} from '@src/types/onyx/ReportAction';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
@@ -23,7 +24,12 @@ function useShouldSuppressConciergeIndicators(reportID: string | undefined): boo
         if (!actions || !sessionStartTime) {
             return false;
         }
-        return Object.values(actions).some((action) => !isCreatedAction(action) && action.actorAccountID === currentUserAccountID && action.created >= sessionStartTime);
+        return Object.values(actions).some(
+            (action) =>
+                !isCreatedAction(action) &&
+                action.actorAccountID === currentUserAccountID &&
+                (action.created >= sessionStartTime || action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD),
+        );
     };
     const [hasUserSentMessage] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
         selector: hasUserSentMessageSelector,
