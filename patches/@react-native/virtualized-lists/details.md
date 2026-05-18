@@ -12,3 +12,11 @@
 - Upstream PR/issue: https://github.com/facebook/react-native/pull/46250
 - E/App issue: https://github.com/Expensify/App/issues/46217
 - PR introducing patch: https://github.com/Expensify/App/pull/46315
+
+- Additional change:
+  
+    ```
+    Clamp `last` to satisfy `_createRenderMask`'s `last >= first - 1` invariant inside `_constrainToItemCount`. Without the lower bound, an artificially negative inbound `cells.last` (produced by `maintainVisibleContentPosition` adjustments across an empty/non-empty data transition) propagates back into state and crashes on the next render with `Invalid cells around viewport "[0, -N]"`.
+    ```
+
+- E/App issue: https://github.com/Expensify/App/issues/90957

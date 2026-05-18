@@ -1,5 +1,5 @@
 diff --git a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
-index 5b8aaa5..45ea377 100644
+index 66e6fd5..ac124fa 100644
 --- a/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
 +++ b/node_modules/@react-native/virtualized-lists/Lists/VirtualizedList.js
 @@ -90,6 +90,7 @@ type State = {
@@ -33,7 +33,7 @@ index 5b8aaa5..45ea377 100644
      };
    }
  
-@@ -706,7 +709,7 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -708,7 +711,7 @@ class VirtualizedList extends StateSafePureComponent<
      // first and last could be stale (e.g. if a new, shorter items props is passed in), so we make
      // sure we're rendering a reasonable range here.
      const itemCount = newProps.getItemCount(newProps.data);
@@ -42,7 +42,7 @@ index 5b8aaa5..45ea377 100644
        return prevState;
      }
  
-@@ -715,7 +718,7 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -717,7 +720,7 @@ class VirtualizedList extends StateSafePureComponent<
      const minIndexForVisible =
        newProps.maintainVisibleContentPosition?.minIndexForVisible ?? 0;
      const newFirstVisibleItemKey =
@@ -51,7 +51,7 @@ index 5b8aaa5..45ea377 100644
          ? VirtualizedList._getItemKey(newProps, minIndexForVisible)
          : null;
      if (
-@@ -763,6 +766,7 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -765,6 +768,7 @@ class VirtualizedList extends StateSafePureComponent<
          maintainVisibleContentPositionAdjustment != null
            ? prevState.pendingScrollUpdateCount + 1
            : prevState.pendingScrollUpdateCount,
@@ -59,7 +59,25 @@ index 5b8aaa5..45ea377 100644
      };
    }
  
-@@ -1183,7 +1187,7 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -849,9 +853,15 @@ class VirtualizedList extends StateSafePureComponent<
+     );
+     const maxFirst = Math.max(0, lastPossibleCellIndex - maxToRenderPerBatch);
+ 
++    const constrainedFirst = clamp(0, cells.first, maxFirst);
+     return {
+-      first: clamp(0, cells.first, maxFirst),
+-      last: Math.min(lastPossibleCellIndex, cells.last),
++      first: constrainedFirst,
++      // Clamp `last` to satisfy `_createRenderMask`'s `last >= first - 1` invariant.
++      // Without the lower bound, an artificially negative inbound `cells.last`
++      // (produced by `maintainVisibleContentPosition` adjustments across an
++      // empty/non-empty data transition) would propagate back into state and
++      // crash on the next render with `Invalid cells around viewport "[0, -N]"`.
++      last: Math.max(constrainedFirst - 1, Math.min(lastPossibleCellIndex, cells.last)),
+     };
+   }
+ 
+@@ -1185,7 +1195,7 @@ class VirtualizedList extends StateSafePureComponent<
      }
    }
  
@@ -68,7 +86,7 @@ index 5b8aaa5..45ea377 100644
      const {data, extraData, getItemLayout} = this.props;
      if (data !== prevProps.data || extraData !== prevProps.extraData) {
        // clear the viewableIndices cache to also trigger
-@@ -1205,7 +1209,10 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -1207,7 +1217,10 @@ class VirtualizedList extends StateSafePureComponent<
      if (hiPriInProgress) {
        this._hiPriInProgress = false;
      }
@@ -80,7 +98,7 @@ index 5b8aaa5..45ea377 100644
      // We only call `onEndReached` after we render the last cell, but when
      // getItemLayout is present, we can scroll past the last rendered cell, and
      // never trigger a new layout or bounds change, so we need to check again
-@@ -1251,7 +1258,7 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -1253,7 +1266,7 @@ class VirtualizedList extends StateSafePureComponent<
      zoomScale: 1,
    };
    _scrollRef: ?React.ElementRef<typeof ScrollView> = null;
@@ -89,7 +107,7 @@ index 5b8aaa5..45ea377 100644
    _sentEndForContentLength = 0;
    _updateCellsToRenderTimeoutID: ?TimeoutID = null;
    _viewabilityTuples: Array<ViewabilityHelperCallbackTuple> = [];
-@@ -1595,16 +1602,16 @@ class VirtualizedList extends StateSafePureComponent<
+@@ -1597,16 +1610,16 @@ class VirtualizedList extends StateSafePureComponent<
        onStartReached != null &&
        this.state.cellsAroundViewport.first === 0 &&
        isWithinStartThreshold &&

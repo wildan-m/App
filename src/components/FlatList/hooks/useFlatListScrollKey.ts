@@ -120,9 +120,17 @@ export default function useFlatListScrollKey<T>({
             return undefined;
         }
 
+        // Only enable maintainVisibleContentPosition when we have at least two
+        // stable anchor items. Falling back to `minIndexForVisible: 0` across
+        // small/empty data transitions causes VirtualizedList to drift its
+        // `cellsAroundViewport.last` below -1 and crash in _createRenderMask.
+        if (data.length < 2) {
+            return undefined;
+        }
+
         const config: ScrollViewProps['maintainVisibleContentPosition'] = {
             // This needs to be 1 to avoid using loading views as anchors.
-            minIndexForVisible: data.length ? Math.min(1, data.length - 1) : 0,
+            minIndexForVisible: 1,
         };
 
         if (shouldEnableAutoScrollToTopThreshold && !isLoadingData && !wasLoadingData) {
