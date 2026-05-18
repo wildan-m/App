@@ -643,6 +643,16 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
                 return;
             }
 
+            // If the caller (narrow-layout workspace confirmation) already mounted the destination
+            // under the RHP via pushNewlyCreatedWorkspaceUnderActiveModal, running the reveal a
+            // second time would prepend WORKSPACES_LIST under the new workspace and flash it during
+            // the dismiss animation. In that case just dismiss the RHP and let the pre-mount show.
+            if (Navigation.getIsFullscreenPreInsertedUnderRHP()) {
+                Navigation.clearFullscreenPreInsertedFlag();
+                Navigation.dismissModal();
+                return;
+            }
+
             Navigation.revealRouteBeforeDismissingModal(routeToNavigate);
         } else {
             Navigation.navigate(routeToNavigate, {forceReplace: true});

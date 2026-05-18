@@ -1081,6 +1081,17 @@ function getIsFullscreenPreInsertedUnderRHP() {
     return isFullscreenPreInsertedUnderRHP;
 }
 
+// Marks the flag without doing the REPLACE_FULLSCREEN_UNDER_RHP dispatch. Used by flows that
+// have already pre-mounted a fullscreen under the RHP via their own targeted dispatch (e.g.
+// pushNewlyCreatedWorkspaceUnderActiveModal), so a later revealRouteBeforeDismissingModal
+// can detect the pre-mount and skip the duplicating reveal.
+function markFullscreenPreInsertedUnderRHP() {
+    if (!getIsNarrowLayout()) {
+        return;
+    }
+    isFullscreenPreInsertedUnderRHP = true;
+}
+
 function getPreInsertedFullscreenRouteName() {
     return preInsertedFullscreenRouteName;
 }
@@ -1225,6 +1236,7 @@ export default {
     dismissToSuperWideRHP,
     revealRouteBeforeDismissingModal,
     preInsertFullscreenUnderRHP,
+    markFullscreenPreInsertedUnderRHP,
     getIsFullscreenPreInsertedUnderRHP,
     getPreInsertedFullscreenRouteName,
     clearFullscreenPreInsertedFlag,

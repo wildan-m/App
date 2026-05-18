@@ -1,4 +1,5 @@
 import {CommonActions} from '@react-navigation/native';
+import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
 import NAVIGATORS from '@src/NAVIGATORS';
 import type SCREENS from '@src/SCREENS';
@@ -37,6 +38,11 @@ function pushNewlyCreatedWorkspaceUnderActiveModal(targetScreen: WorkspaceTarget
         }),
         target: tabStateKey,
     });
+
+    // Signal to the post-create reveal path that the destination is already mounted under the
+    // RHP, so revealRouteBeforeDismissingModal can skip the duplicating REPLACE_FULLSCREEN_UNDER_RHP
+    // that would otherwise prepend WORKSPACES_LIST and flash it during the dismiss animation.
+    Navigation.markFullscreenPreInsertedUnderRHP();
 }
 
 export default pushNewlyCreatedWorkspaceUnderActiveModal;
