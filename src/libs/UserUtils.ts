@@ -69,6 +69,33 @@ function hasDeviceManagementError(logins: OnyxEntry<Logins>) {
 }
 
 /**
+ * Onyx selector for the new LOGINS key that returns a LoginList-shaped object
+ * containing only Expensify-partner logins (partnerID === 1), rekeyed by
+ * partnerUserID (the email) so consumers reading the legacy `loginList`
+ * structure work unchanged.
+ */
+function expensifyLoginsSelector(logins: OnyxEntry<Logins>): LoginList {
+    const result: LoginList = {};
+    if (!logins) {
+        return result;
+    }
+    for (const login of Object.values(logins)) {
+        if (login.partnerID !== CONST.PARTNER_ID.EXPENSIFY || !login.partnerUserID) {
+            continue;
+        }
+        result[login.partnerUserID] = {
+            partnerUserID: login.partnerUserID,
+            partnerName: 'expensify.com',
+            validatedDate: login.validatedDate ?? undefined,
+            errorFields: login.errorFields as LoginList[string]['errorFields'],
+            pendingFields: login.pendingFields as LoginList[string]['pendingFields'],
+            pendingAction: login.pendingAction,
+        };
+    }
+    return result;
+}
+
+/**
  * Checks if the current user has a validated the primary contact method
  */
 function isCurrentUserValidated(loginList: OnyxEntry<LoginList>, email: string | undefined): boolean {
@@ -202,5 +229,6 @@ export {
     getLastLogin,
     getDeviceLogins,
     hasDeviceManagementError,
+    expensifyLoginsSelector,
 };
 export type {AvatarSource};
