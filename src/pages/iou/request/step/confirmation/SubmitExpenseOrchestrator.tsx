@@ -170,17 +170,21 @@ function SubmitExpenseOrchestrator({
     // details - this is safe because snapshot + handler run in the same synchronous block.
     const buildNavigationSnapshot = (rootState: ReturnType<typeof navigationRef.getRootState>): SubmitNavigationSnapshot => {
         const isPreInserted = Navigation.getIsFullscreenPreInsertedUnderRHP();
+        const isDestinationReportLoaded = !!destinationReportID && !!getReportOrDraftReport(destinationReportID)?.reportID;
         return {
             isPreInserted,
             isReportPreInserted: isPreInserted && Navigation.getPreInsertedFullscreenRouteName() === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR,
             isFromGlobalCreate,
             canDismissFromSearch,
-            navigatesToDestinationReport: iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.TRACK,
+            // SPLIT/TRACK always target a destination report, and so does any flow that has an already-loaded
+            // destination report (e.g. a QAB submit/request to an existing chat). The latter lets such flows reach
+            // the dismiss-to-report handler from any tab instead of falling through to the legacy Spend navigation.
+            navigatesToDestinationReport: iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.TRACK || isDestinationReportLoaded,
             destinationReportID,
             isReportInRHP: isReportOpenInRHP(rootState),
             isReportTopmostSplit: isReportTopmostSplitNavigator(),
             isSearchTopmostFullScreen: isSearchTopmostFullScreenRoute(),
-            isDestinationReportLoaded: !!destinationReportID && !!getReportOrDraftReport(destinationReportID)?.reportID,
+            isDestinationReportLoaded,
         };
     };
 
