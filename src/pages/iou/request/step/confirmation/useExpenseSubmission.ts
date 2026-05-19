@@ -472,9 +472,10 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
                 conciergeReportID,
                 shouldHandleNavigation: shouldHandleNav,
             });
-            if (shouldHandleNav && result && activeReportID) {
+            const resolvedActiveReportID = backToReport ?? activeReportID;
+            if (shouldHandleNav && result && resolvedActiveReportID) {
                 navigateAfterExpenseCreate({
-                    activeReportID,
+                    activeReportID: resolvedActiveReportID,
                     transactionID: transaction.transactionID,
                     isFromGlobalCreate: transaction.isFromFloatingActionButton ?? transaction.isFromGlobalCreate,
                     hasMultipleTransactions: reportTransactions.length > 0,
