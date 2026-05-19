@@ -169,7 +169,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
     const {showConfirmModal} = useConfirmModal();
 
     // Split indicator
-    const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
+    const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction, allTransactions, allReports);
     const hasMultipleSplits = !!transaction?.comment?.originalTransactionID && getChildTransactions(allTransactions, allReports, transaction.comment.originalTransactionID).length > 1;
     const isReportOpen = isOpenReport(moneyRequestReport);
     const hasSplitIndicator = isExpenseSplit && (hasMultipleSplits || isReportOpen);

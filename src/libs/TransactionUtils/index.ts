@@ -2722,7 +2722,12 @@ function hasSplitExpenseInSelection(transactions: Transaction[]): boolean {
     return transactions.some(isSplitChildTransaction);
 }
 
-const getOriginalTransactionWithSplitInfo = (transaction: OnyxEntry<Transaction>, originalTransaction: OnyxEntry<Transaction>) => {
+const getOriginalTransactionWithSplitInfo = (
+    transaction: OnyxEntry<Transaction>,
+    originalTransaction: OnyxEntry<Transaction>,
+    transactions?: OnyxCollection<Transaction>,
+    reports?: OnyxCollection<Report>,
+) => {
     const {originalTransactionID, source, splits} = transaction?.comment ?? {};
 
     if (splits && splits.length > 0) {
@@ -2735,7 +2740,20 @@ const getOriginalTransactionWithSplitInfo = (transaction: OnyxEntry<Transaction>
 
     // To determine if it’s a split bill or a split expense, we check for the presence of `comment.splits` on the original transaction.
     // Since both splits use `comment.originalTransaction`, but split expenses won’t have `comment.splits`.
-    return {isBillSplit: !!originalTransaction?.comment?.splits, isExpenseSplit: isExpenseSplit(transaction, originalTransaction), originalTransaction: originalTransaction ?? transaction};
+    let isExpenseSplitValue = isExpenseSplit(transaction, originalTransaction);
+
+    // Once every sibling of a split child has been deleted or orphaned in the self-DM, the remaining
+    // transaction is no longer part of a live split. Treat it as a standalone expense so the user can
+    // start a fresh split instead of being stuck in the single-row "edit splits" UI.
+    if (isExpenseSplitValue && transactions) {
+        const survivingSiblings = getChildTransactions(transactions, reports, originalTransactionID);
+        const hasOtherSurvivingSibling = survivingSiblings.some((sibling) => sibling?.transactionID !== transaction?.transactionID);
+        if (!hasOtherSurvivingSibling) {
+            isExpenseSplitValue = false;
+        }
+    }
+
+    return {isBillSplit: !!originalTransaction?.comment?.splits, isExpenseSplit: isExpenseSplitValue, originalTransaction: originalTransaction ?? transaction};
 };
 
 function shouldRedirectDeleteToSplitExpenseEdit(transaction: OnyxEntry<Transaction>, originalTransaction: OnyxEntry<Transaction>): boolean {

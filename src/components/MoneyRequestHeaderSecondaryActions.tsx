@@ -14,6 +14,7 @@ import useDeleteTransactions from '@hooks/useDeleteTransactions';
 import useDuplicateTransactionsAndViolations from '@hooks/useDuplicateTransactionsAndViolations';
 import useGetIOUReportFromReportAction from '@hooks/useGetIOUReportFromReportAction';
 import useHasMultipleSplitChildren from '@hooks/useHasMultipleSplitChildren';
+import useHasOtherSurvivingSplitSibling from '@hooks/useHasOtherSurvivingSplitSibling';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -190,7 +191,9 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         (isParentReportArchived || (activePolicyExpenseChat && (isSelfDM(parentReport) || isParentChatReportDM)))
     );
     const shouldDuplicateCloseModalOnSelect = isDistanceExpenseUnsupportedForDuplicating || hasCustomUnitOutOfPolicyViolation || isPerDiemRequestOnNonDefaultWorkspace;
-    const {isExpenseSplit} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
+    const {isExpenseSplit: isExpenseSplitRaw} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
+    const hasOtherSurvivingSplitSibling = useHasOtherSurvivingSplitSibling(transaction?.comment?.originalTransactionID, transaction?.transactionID);
+    const isExpenseSplit = isExpenseSplitRaw && hasOtherSurvivingSplitSibling;
     const hasMultipleSplits = useHasMultipleSplitChildren(transaction?.comment?.originalTransactionID);
     const isReportOpen = isOpenReport(parentReport);
     const shouldShowSplitIndicator = isExpenseSplit && (hasMultipleSplits || isReportOpen);
