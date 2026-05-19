@@ -468,13 +468,13 @@ function computeReportNameBasedOnReportAction(
             personalDetails: personalDetailsList,
         });
     }
-    if (parentReportAction?.actionName === CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED) {
+    if (isActionOfType(parentReportAction, CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED)) {
         // RECEIPT_SCAN_FAILED is submitted by Concierge, so use the IOU action to determine edit permission
         let iouAction = getReportAction(report?.parentReportID, report?.parentReportActionID);
         if (!isActionOfType(iouAction, CONST.REPORT.ACTIONS.TYPE.IOU)) {
             iouAction = getReportAction(parentReport?.parentReportID, parentReport?.parentReportActionID);
         }
-        return translate('violations.smartscanFailed', {canEdit: wasActionTakenByCurrentUser(iouAction)});
+        return translate('violations.smartscanFailed', {canEdit: wasActionTakenByCurrentUser(iouAction), missingFields: getOriginalMessage(parentReportAction)?.missingFields ?? []});
     }
 
     if (isReimbursementDeQueuedOrCanceledAction(parentReportAction)) {

@@ -7,7 +7,6 @@ import {
     getActionableCard3DSTransactionApprovalMessage,
     getDemotedFromWorkspaceMessage,
     getDismissedViolationMessageText,
-    getLinkedTransactionID,
     getMarkedReimbursedMessage,
     getMessageOfOldDotReportAction,
     getOriginalMessage,
@@ -54,7 +53,7 @@ function isSimpleMessageAction(action: OnyxTypes.ReportAction): boolean {
     return SIMPLE_MESSAGE_ACTION_TYPES.has(action.actionName) || isUnapprovedAction(action) || isRejectedAction(action);
 }
 
-function ReceiptScanFailedContent({action, report}: {action: OnyxTypes.ReportAction; report: OnyxEntry<OnyxTypes.Report>}) {
+function ReceiptScanFailedContent({action, report}: {action: OnyxTypes.ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED>; report: OnyxEntry<OnyxTypes.Report>}) {
     const {translate} = useLocalize();
     // IOU action lives in the IOU report's actions — `report` itself if it's IOU/Expense/Invoice, else its parent.
     const isIouReport = report?.type === CONST.REPORT.TYPE.IOU || report?.type === CONST.REPORT.TYPE.EXPENSE || report?.type === CONST.REPORT.TYPE.INVOICE;
@@ -82,10 +81,9 @@ function ReceiptScanFailedContent({action, report}: {action: OnyxTypes.ReportAct
         return iouActions.length === 1 ? iouActions.at(0) : undefined;
     };
     const [iouAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(iouReportID)}`, {selector: getIouActionSelector});
-    const transactionID = getLinkedTransactionID(iouAction);
-    const [transactionViolations] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${getNonEmptyStringOnyxID(transactionID)}`);
-    const smartscanFailedViolation = transactionViolations?.find((violation) => violation.name === CONST.VIOLATIONS.SMARTSCAN_FAILED);
-    const missingFields = smartscanFailedViolation?.data?.missingFields ?? [];
+    // `missingFields` now ships on the action's originalMessage from the backend, so read it directly
+    // instead of resolving the transaction's SMARTSCAN_FAILED violation through a multi-hop Onyx lookup.
+    const missingFields = getOriginalMessage(action)?.missingFields ?? [];
 
     return <ReportActionItemBasicMessage message={translate('violations.smartscanFailed', {canEdit: wasActionTakenByCurrentUser(iouAction), missingFields})} />;
 }

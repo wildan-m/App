@@ -1344,6 +1344,21 @@ type OriginalMessageDEWFailed = {
     harvesting?: boolean;
 };
 
+/** Model of RECEIPTSCANFAILED action */
+type OriginalMessageReceiptScanFailed = {
+    /** The HTML message rendered for the action */
+    html?: string;
+
+    /** Account IDs the action is actionable for */
+    actionableForAccountIDs?: number[];
+
+    /** Receipt fields SmartScan could not extract (e.g. merchant, date, amount) */
+    missingFields?: string[];
+
+    /** When the action was last modified */
+    lastModified?: string;
+};
+
 /**
  * Model of CARD_ISSUED, CARD_MISSING_ADDRESS, CARD_ISSUED_VIRTUAL, and CARD_REPLACED_VIRTUAL actions
  */
@@ -1565,7 +1580,7 @@ type OriginalMessageMap = {
     [CONST.REPORT.ACTIONS.TYPE.PLAID_BALANCE_FAILURE]: OriginalMessagePlaidBalanceFailure;
     [CONST.REPORT.ACTIONS.TYPE.RETRACTED]: never;
     [CONST.REPORT.ACTIONS.TYPE.REOPENED]: never;
-    [CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED]: never;
+    [CONST.REPORT.ACTIONS.TYPE.RECEIPT_SCAN_FAILED]: OriginalMessageReceiptScanFailed;
     [CONST.REPORT.ACTIONS.TYPE.REASSIGN_APPROVER]: OriginalMessageReassignApprover;
     [CONST.REPORT.ACTIONS.TYPE.REROUTE]: OriginalMessageTakeControl;
     [CONST.REPORT.ACTIONS.TYPE.REIMBURSEMENT_DIRECTOR_INFORMATION_REQUIRED]: OriginalMessageReimbursementDirectorInformationRequired;
