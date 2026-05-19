@@ -47,7 +47,7 @@ function ReimbursementQueuedContent({action, report, iouReport, personalDetails}
     const targetReport = isChatThread(report) ? parentReport : report;
     const submitterDisplayName = formatPhoneNumber(getDisplayNameOrDefault(personalDetails?.[targetReport?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID]));
     const paymentType = getOriginalMessage(action)?.paymentType ?? '';
-    const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, targetReport?.reportID, action, bankAccountList);
+    const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, iouReport?.reportID, action, bankAccountList);
 
     return (
         <ReportActionItemBasicMessage message={translate(paymentType === CONST.IOU.PAYMENT_TYPE.EXPENSIFY ? 'iou.waitingOnEnabledWallet' : 'iou.waitingOnBankAccount', submitterDisplayName)}>
