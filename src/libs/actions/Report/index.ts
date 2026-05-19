@@ -235,6 +235,7 @@ import type {Decision} from '@src/types/onyx/OriginalMessage';
 import type {CurrentUserPersonalDetails, Timezone} from '@src/types/onyx/PersonalDetails';
 import type {ConnectionName} from '@src/types/onyx/Policy';
 import type {NotificationPreference, Participants, Participant as ReportParticipant, RoomVisibility, WriteCapability} from '@src/types/onyx/Report';
+import type {UsersReactions} from '@src/types/onyx/ReportActionReactions';
 import type {Message, ReportActions} from '@src/types/onyx/ReportAction';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type {FileObject} from '@src/types/utils/Attachment';
@@ -4672,8 +4673,24 @@ function addEmojiReaction(reportID: string, reportActionID: string, emoji: Emoji
 /**
  * Removes a reaction to the report action.
  * Uses the NEW FORMAT for "emojiReactions"
+ *
+ * When `skinTone` is provided and the current user still has other skin-tone variations of the
+ * same emoji after removing it, only that specific skin-tone entry is cleared so the other
+ * variations remain visible in the reaction bubble. Otherwise the entire user entry is nulled.
  */
-function removeEmojiReaction(reportID: string, reportActionID: string, emoji: Emoji, currentUserAccountID: number) {
+function removeEmojiReaction(
+    reportID: string,
+    reportActionID: string,
+    emoji: Emoji,
+    currentUserAccountID: number,
+    skinTone?: number,
+    existingUsers?: UsersReactions,
+) {
+    const currentSkinTones = existingUsers?.[currentUserAccountID]?.skinTones ?? {};
+    const otherSkinTonesRemain = skinTone !== undefined && Object.keys(currentSkinTones).some((key) => Number(key) !== skinTone);
+
+    const userUpdate = skinTone !== undefined && otherSkinTonesRemain ? {skinTones: {[skinTone]: null}} : null;
+
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -4681,7 +4698,7 @@ function removeEmojiReaction(reportID: string, reportActionID: string, emoji: Em
             value: {
                 [emoji.name]: {
                     users: {
-                        [currentUserAccountID]: null,
+                        [currentUserAccountID]: userUpdate,
                     },
                 },
             },
@@ -4731,7 +4748,7 @@ function toggleEmojiReaction(
     const skinTone = emoji.types === undefined ? CONST.EMOJI_DEFAULT_SKIN_TONE : paramSkinTone;
 
     if (existingReactionObject && EmojiUtils.hasAccountIDEmojiReacted(currentUserAccountID, existingReactionObject.users, ignoreSkinToneOnCompare ? undefined : skinTone)) {
-        removeEmojiReaction(originalReportID, reportAction.reportActionID, emoji, currentUserAccountID);
+        removeEmojiReaction(originalReportID, reportAction.reportActionID, emoji, currentUserAccountID, ignoreSkinToneOnCompare ? undefined : skinTone, existingReactionObject.users);
         return;
     }
 
