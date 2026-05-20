@@ -164,7 +164,19 @@ function getContactOption({searchValue, firstName, lastName, email, phone, avata
         validated: true,
     };
 
-    return createOption(userDetails, undefined, formatPhoneNumber);
+    const option = createOption(userDetails, undefined, formatPhoneNumber);
+
+    // `createOption` derives the row text from the global personal-details store, which
+    // doesn't contain this optimistically-created device contact, so it falls back to the
+    // phone number. When the device contact has a name, use the display name we built above.
+    if (firstName || lastName) {
+        option.text = displayName;
+        if (option.icons?.[0]) {
+            option.icons[0].name = displayName;
+        }
+    }
+
+    return option;
 }
 
 /**
