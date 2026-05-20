@@ -24,6 +24,8 @@ const isMobile = !canFocusInputOnScreenFocus();
 function BaseTwoFactorAuthForm({
     autoComplete = CONST.AUTO_COMPLETE_VARIANTS.ONE_TIME_CODE,
     shouldAllowRecoveryCode = false,
+    authAppExplanation,
+    recoveryCodeExplanation,
     onSubmit,
     onInputChange,
     errorMessage,
@@ -189,7 +191,11 @@ function BaseTwoFactorAuthForm({
     return (
         <>
             {shouldAllowRecoveryCode && (
-                <Text style={[styles.mb3]}>{translate(isUsingRecoveryCode ? 'twoFactorAuth.explainProcessToRemoveWithRecovery' : 'twoFactorAuth.explainProcessToRemove')}</Text>
+                <Text style={[styles.mb3]}>
+                    {isUsingRecoveryCode
+                        ? (recoveryCodeExplanation ?? translate('twoFactorAuth.explainProcessToRemoveWithRecovery'))
+                        : (authAppExplanation ?? translate('twoFactorAuth.explainProcessToRemove'))}
+                </Text>
             )}
             {shouldAllowRecoveryCode && isUsingRecoveryCode ? (
                 <TextInput

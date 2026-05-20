@@ -2325,6 +2325,7 @@ const translations = {
         replaceDeviceTitle: 'Replace two-factor device',
         verifyOldDeviceTitle: 'Verify old device',
         verifyOldDeviceDescription: 'Enter the six-digit code from your current authenticator app to confirm you have access to it.',
+        verifyOldDeviceWithRecoveryDescription: "If you've lost access to your authenticator app, enter one of your recovery codes to confirm your identity.",
         verifyNewDeviceTitle: 'Set up new device',
         verifyNewDeviceDescription: 'Scan the QR code with your new device, then enter the code to complete setup.',
     },

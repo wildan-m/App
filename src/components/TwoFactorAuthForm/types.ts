@@ -10,6 +10,12 @@ type TwoFactorAuthFormProps = {
     /** Whether to allow using a recovery code */
     shouldAllowRecoveryCode?: boolean;
 
+    /** Explanation shown above the authenticator-code input when recovery codes are allowed. Defaults to the disable-2FA copy. */
+    authAppExplanation?: string;
+
+    /** Explanation shown above the recovery-code input when recovery codes are allowed. Defaults to the disable-2FA copy. */
+    recoveryCodeExplanation?: string;
+
     /** Callback to call when the form is submitted with a valid code */
     onSubmit: (code: string) => void;
 
