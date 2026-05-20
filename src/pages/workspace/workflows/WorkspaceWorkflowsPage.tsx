@@ -4,6 +4,7 @@ import React, {useCallback, useEffect, useMemo} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {InteractionManager, View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
+import AgentPromotionBanner from '@components/AgentPromotionBanner';
 import ApprovalWorkflowSection from '@components/ApprovalWorkflowSection';
 import Icon from '@components/Icon';
 import getBankIcon from '@components/Icon/BankIcons';
@@ -126,6 +127,9 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const {isBetaEnabled} = usePermissions();
     const isSubmit2026BetaEnabled = isBetaEnabled(CONST.BETAS.SUBMIT_2026);
+    const isCustomAgentEnabled = isBetaEnabled(CONST.BETAS.CUSTOM_AGENT);
+    const [dismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
+    const shouldShowAgentsWorkflowsBanner = isCustomAgentEnabled && !dismissedProductTraining?.[CONST.AGENTS_WORKFLOWS_BANNER];
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
     const workspaceCards = getAllCardsForWorkspace(workspaceAccountID, cardList, cardFeeds);
     const {showConfirmModal} = useConfirmModal();
@@ -431,6 +435,12 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 </View>
                             </View>
                         )}
+                        {shouldShowAgentsWorkflowsBanner && (
+                            <AgentPromotionBanner
+                                title={translate('agentsPage.workflowsBanner')}
+                                productTrainingElementName={CONST.AGENTS_WORKFLOWS_BANNER}
+                            />
+                        )}
                         {filteredApprovalWorkflows.length > CONST.SEARCH_BAR_THRESHOLD && (
                             <SearchBar
                                 label={translate('workflowsPage.findWorkflow')}
@@ -696,6 +706,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         confirmCurrencyChangeAndHideModal,
         delegateAccountID,
         canAccessSubmit2026Features,
+        shouldShowAgentsWorkflowsBanner,
     ]);
 
     const renderOptionItem = (item: ToggleSettingOptionRowProps, index: number) => (

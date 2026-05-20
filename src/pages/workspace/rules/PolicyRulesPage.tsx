@@ -1,17 +1,23 @@
 import React, {useCallback, useEffect} from 'react';
 import {View} from 'react-native';
+import AgentPromotionBanner from '@components/AgentPromotionBanner';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 import {openPolicyRulesPage} from '@libs/actions/Policy/Rules';
+import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import WorkspacePageWithSections from '@pages/workspace/WorkspacePageWithSections';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import IndividualExpenseRulesSection from './IndividualExpenseRulesSection';
 import MerchantRulesSection from './MerchantRulesSection';
@@ -27,6 +33,9 @@ function PolicyRulesPage({route}: PolicyRulesPageProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['Rules']);
+    const {isBetaEnabled} = usePermissions();
+    const [dismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
+    const shouldShowAgentsRulesBanner = isBetaEnabled(CONST.BETAS.CUSTOM_AGENT) && !dismissedProductTraining?.[CONST.AGENTS_RULES_BANNER];
 
     const fetchRules = useCallback(() => {
         openPolicyRulesPage(policyID);
@@ -54,6 +63,14 @@ function PolicyRulesPage({route}: PolicyRulesPageProps) {
                 addBottomSafeAreaPadding
             >
                 <View style={[styles.mt3, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
+                    {shouldShowAgentsRulesBanner && (
+                        <AgentPromotionBanner
+                            title={translate('agentsPage.rulesBanner')}
+                            productTrainingElementName={CONST.AGENTS_RULES_BANNER}
+                            ctaText={translate('agentsPage.rulesBannerCTA')}
+                            onCTAPress={() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS.getRoute(policyID))}
+                        />
+                    )}
                     <IndividualExpenseRulesSection policyID={policyID} />
                     <MerchantRulesSection policyID={policyID} />
                     {!!policy?.areExpensifyCardsEnabled && <SpendRulesSection policyID={policyID} />}

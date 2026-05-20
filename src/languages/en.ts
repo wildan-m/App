@@ -2818,6 +2818,9 @@ const translations = {
             updatePrompt: "There was a problem updating this agent's instructions",
             updateAvatar: "There was a problem updating this agent's avatar",
         },
+        workflowsBanner: 'Automate approvals with agents',
+        rulesBanner: "Don't see the rule you need?",
+        rulesBannerCTA: 'Set up an agent',
     },
     addAgentPage: {
         title: 'New agent',
