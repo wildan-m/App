@@ -3,6 +3,7 @@ import {useEffect} from 'react';
 import CONST from './CONST';
 import useOnyx from './hooks/useOnyx';
 import FS from './libs/Fullstory';
+import Log from './libs/Log';
 import ONYXKEYS from './ONYXKEYS';
 
 /**
@@ -15,12 +16,19 @@ function FullstoryInitHandler() {
 
     useEffect(() => {
         FS.init(userMetadata);
-        FS.getSessionURL().then((url) => {
-            if (!url) {
-                return;
-            }
-            Sentry.setContext(CONST.TELEMETRY.CONTEXT_FULLSTORY, {url});
-        });
+        FS.getSessionURL()
+            .then((url) => {
+                if (!url) {
+                    return;
+                }
+                Sentry.setContext(CONST.TELEMETRY.CONTEXT_FULLSTORY, {url});
+            })
+            .catch((error) => {
+                // When the Fullstory session is shut down (ad-blocker, opt-out, prior FS('shutdown')),
+                // getSessionURL rejects with "Shutdown called". There is no session URL to record in that
+                // case, so swallow the rejection and log it instead of letting it crash the app.
+                Log.warn('Failed to get Fullstory session URL', {error});
+            });
     }, [userMetadata]);
 
     return null;
