@@ -9,6 +9,7 @@ import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
 import Text from '@components/Text';
 import useGustoSyncResultsModal from '@hooks/useGustoSyncResultsModal';
+import useHRFirstSyncModal from '@hooks/useHRFirstSyncModal';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -59,6 +60,7 @@ function WorkspaceHRPage({
     }, [policyID]);
 
     useGustoSyncResultsModal(policyID, connectionSyncProgress, isFocused);
+    useHRFirstSyncModal(policyID, connectionSyncProgress, policy, isFocused);
 
     const cards = getHRCards({
         policy,

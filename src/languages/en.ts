@@ -6452,6 +6452,11 @@ const translations = {
             disconnectTitle: (providerName: string) => `Disconnect ${providerName}`,
             disconnectPrompt: (providerName: string) => `Are you sure you want to disconnect ${providerName}?`,
             lastSync: (relativeDate: string) => `Last synced ${relativeDate}`,
+            syncingEmployees: 'Syncing employees',
+            firstSync: {
+                title: 'Your connection is syncing',
+                prompt: "The first connection can take some time. You'll be notified of any errors.",
+            },
             syncError: (providerName: string) => `Can't connect to ${providerName}`,
             connectionDescription: (providerName: string) => `Connect ${providerName} to keep employee approvals in sync with your workspace.`,
             approvalMode: 'Approval mode',

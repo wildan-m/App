@@ -43,8 +43,8 @@ function HRProviderCard({card, policy, handleConnect}: HRProviderCardProps) {
     const cardIcon = typeof card.icon === 'string' && card.icon.startsWith('http') ? card.icon : (card.icon as IconAsset) || fallbackIcon;
 
     let connectionDescription: string | undefined;
-    if (card.isSyncInProgress && card.syncStageInProgress) {
-        connectionDescription = translate('workspace.hr.syncStageName', {stage: card.syncStageInProgress});
+    if (card.isSyncInProgress) {
+        connectionDescription = translate('workspace.hr.syncingEmployees');
     } else if (card.successfulDate && !card.hasError) {
         connectionDescription = translate('workspace.hr.lastSync', datetimeToRelative(card.successfulDate));
     }
