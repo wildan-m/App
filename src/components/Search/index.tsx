@@ -90,7 +90,14 @@ import SearchChartView from './SearchChartView';
 import SearchChartWrapper from './SearchChartWrapper';
 import {useSearchActionsContext, useSearchStateContext, useSyncSelectedReports} from './SearchContext';
 import SearchList from './SearchList';
-import type {ReportActionListItemType, SearchListItem, TransactionGroupListItemType, TransactionListItemType, TransactionReportGroupListItemType} from './SearchList/ListItem/types';
+import type {
+    ReportActionListItemType,
+    SearchListItem,
+    TransactionGroupListItemType,
+    TransactionListItemType,
+    TransactionMemberGroupListItemType,
+    TransactionReportGroupListItemType,
+} from './SearchList/ListItem/types';
 import {SearchScopeProvider} from './SearchScopeProvider';
 import SearchTableHeader from './SearchTableHeader';
 import type {SearchColumnType, SearchParams, SearchQueryJSON, SelectedTransactionInfo, SelectedTransactions, SortOrder} from './types';
@@ -591,15 +598,36 @@ function Search({
             return baseFilteredData;
         }
 
+        // An expense created offline is an optimistic transaction held only in local Onyx. The per-group snapshots fetched
+        // above come from the server snapshot and never contain it, so for "From" group-by views we inject it into the
+        // matching group's snapshot and pass optimisticTransactionID (mirroring the non-grouped path) so status filtering
+        // keeps it visible until the server snapshot arrives. An offline-created expense is always created by the current
+        // user, so under "From" grouping it belongs to the current user's group.
+        const isFromGrouping = validGroupBy === CONST.SEARCH.GROUP_BY.FROM;
+        const optimisticTransactionKey = optimisticTrackingState.optimisticWatchKey;
+        const optimisticTransactionID = optimisticTransactionKey?.toString().replace(ONYXKEYS.COLLECTION.TRANSACTION, '');
+        const optimisticTransaction =
+            isFromGrouping && optimisticTransactionKey && optimisticTransactionKey.startsWith(ONYXKEYS.COLLECTION.TRANSACTION)
+                ? transactions?.[optimisticTransactionKey as `${typeof ONYXKEYS.COLLECTION.TRANSACTION}${string}`]
+                : undefined;
+
         const enriched = (baseFilteredData as TransactionGroupListItemType[]).map((item) => {
             const snapshot = groupByTransactionSnapshots[hashToString(item.transactionsQueryJSON?.hash) ?? ''];
             if (!snapshot?.data) {
                 return item;
             }
 
+            const belongsToCurrentUserGroup =
+                !!optimisticTransaction &&
+                !!optimisticTransactionKey &&
+                (item as TransactionMemberGroupListItemType).accountID === accountID &&
+                !snapshot.data[optimisticTransactionKey as keyof typeof snapshot.data];
+
+            const groupData = belongsToCurrentUserGroup ? ({...snapshot.data, [optimisticTransactionKey]: optimisticTransaction} as typeof snapshot.data) : snapshot.data;
+
             const [transactions1] = getSections({
                 type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-                data: snapshot.data,
+                data: groupData,
                 currentAccountID: accountID,
                 currentUserEmail: email ?? '',
                 bankAccountList,
@@ -610,6 +638,7 @@ function Search({
                 allReportMetadata,
                 conciergeReportID,
                 convertToDisplayString,
+                optimisticTransactionID: belongsToCurrentUserGroup ? optimisticTransactionID : undefined,
             });
             return {
                 ...item,
@@ -634,6 +663,8 @@ function Search({
         allReportMetadata,
         conciergeReportID,
         convertToDisplayString,
+        optimisticTrackingState.optimisticWatchKey,
+        transactions,
     ]);
 
     const hasLoadedAllTransactions = useMemo(() => {
