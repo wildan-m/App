@@ -50,15 +50,18 @@ function tryMatchParametric(candidate: string, candidateSegmentCount: number, pa
 /**
  * Finds a registered dynamic route suffix that matches the end of the given path.
  *
- * Uses three-phase matching with decreasing specificity. Each phase iterates
- * all sub-suffixes from longest to shortest before the next phase begins:
+ * Iterates path sub-suffixes from longest to shortest and, at each candidate length,
+ * checks with decreasing specificity:
  *   1. Static matches (`dynamicRoutePaths` Set lookup).
  *   2. Strict parametric patterns (no optional params).
  *   3. Optional parametric patterns (has at least one `:param?`).
  *
- * This guarantees that any static match, even a short one, always beats
- * a parametric match, and any strict-parametric match always beats an
- * optional-parametric match.
+ * Trying longer candidates first guarantees the longest (most specific) suffix wins, so a
+ * parametric route whose final value happens to equal a shorter static route's path — e.g. a
+ * tag named `tag-edit` reached via `tag/:orderWeight/:tagName` — still resolves to the parametric
+ * route instead of being hijacked by the static `tag-edit` suffix. Within a single candidate
+ * length, static beats strict-parametric beats optional-parametric, keeping the tie-break
+ * deterministic.
  *
  * @param path - The path to find the matching dynamic suffix for
  * @returns The matching dynamic suffix, or undefined if no matching suffix is found
@@ -71,27 +74,26 @@ function findMatchingDynamicSuffix(path = ''): DynamicSuffixMatch | undefined {
 
     const segments = normalizedPath.split('/').filter(Boolean);
 
-    // Phase 1: Static matches (longest to shortest)
+    // Iterate sub-suffixes from longest to shortest so the most specific suffix wins.
     for (let i = 0; i < segments.length; i++) {
         const candidate = segments.slice(i).join('/');
+        const candidateSegmentCount = segments.length - i;
+
+        // Static match (e.g. 'country', 'verify-account')
         if (dynamicRoutePaths.has(candidate)) {
             return {pattern: candidate, actualSuffix: candidate, pathParams: {}};
         }
-    }
 
-    // Phase 2: Strict parametric patterns - no optional params (longest to shortest)
-    for (let i = 0; i < segments.length; i++) {
-        const result = tryMatchParametric(segments.slice(i).join('/'), segments.length - i, compiledStrictParametricDynamicRoutes);
-        if (result) {
-            return result;
+        // Strict parametric patterns (no optional params)
+        const strictMatch = tryMatchParametric(candidate, candidateSegmentCount, compiledStrictParametricDynamicRoutes);
+        if (strictMatch) {
+            return strictMatch;
         }
-    }
 
-    // Phase 3: Optional parametric patterns - has at least one :param? (longest to shortest)
-    for (let i = 0; i < segments.length; i++) {
-        const result = tryMatchParametric(segments.slice(i).join('/'), segments.length - i, compiledOptionalParametricDynamicRoutes);
-        if (result) {
-            return result;
+        // Optional parametric patterns (has at least one :param?)
+        const optionalMatch = tryMatchParametric(candidate, candidateSegmentCount, compiledOptionalParametricDynamicRoutes);
+        if (optionalMatch) {
+            return optionalMatch;
         }
     }
 

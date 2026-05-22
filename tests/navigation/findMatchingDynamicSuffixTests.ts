@@ -10,6 +10,12 @@ jest.mock('@src/ROUTES', () => ({
         KEYBOARD_SHORTCUTS: {path: 'keyboard-shortcuts'},
         OPT_TRAILING: {path: 'opt-page/:id?'},
         OPT_MIDDLE: {path: 'wrap/:p?/end'},
+        // Workspace tag routes: the parametric settings route shares a prefix with the static
+        // sub-routes whose paths can collide with a user-chosen tag name.
+        WORKSPACE_TAG_SETTINGS: {path: 'tag/:orderWeight/:tagName'},
+        WORKSPACE_TAG_EDIT: {path: 'tag-edit'},
+        WORKSPACE_TAG_GL_CODE: {path: 'tag-gl-code'},
+        WORKSPACE_TAG_APPROVER: {path: 'workspace-tag-approver'},
     },
 }));
 
@@ -115,6 +121,40 @@ describe('findMatchingDynamicSuffix', () => {
             pattern: 'keyboard-shortcuts',
             actualSuffix: 'keyboard-shortcuts',
             pathParams: {},
+        });
+    });
+
+    describe('parametric value colliding with a static route path', () => {
+        it('should prefer the longer parametric suffix when a tag is named like the static tag-edit route', () => {
+            expect(findMatchingDynamicSuffix('/settings/workspaces/123/tags/tag/0/tag-edit')).toEqual({
+                pattern: 'tag/:orderWeight/:tagName',
+                actualSuffix: 'tag/0/tag-edit',
+                pathParams: {orderWeight: '0', tagName: 'tag-edit'},
+            });
+        });
+
+        it('should prefer the longer parametric suffix when a tag is named like the static tag-gl-code route', () => {
+            expect(findMatchingDynamicSuffix('/settings/workspaces/123/tags/tag/0/tag-gl-code')).toEqual({
+                pattern: 'tag/:orderWeight/:tagName',
+                actualSuffix: 'tag/0/tag-gl-code',
+                pathParams: {orderWeight: '0', tagName: 'tag-gl-code'},
+            });
+        });
+
+        it('should prefer the longer parametric suffix when a tag is named like the static workspace-tag-approver route', () => {
+            expect(findMatchingDynamicSuffix('/settings/workspaces/123/tags/tag/0/workspace-tag-approver')).toEqual({
+                pattern: 'tag/:orderWeight/:tagName',
+                actualSuffix: 'tag/0/workspace-tag-approver',
+                pathParams: {orderWeight: '0', tagName: 'workspace-tag-approver'},
+            });
+        });
+
+        it('should still match the static tag-edit route when it is the genuine trailing sub-route of a tag settings page', () => {
+            expect(findMatchingDynamicSuffix('/settings/workspaces/123/tags/tag/0/MyTag/tag-edit')).toEqual({
+                pattern: 'tag-edit',
+                actualSuffix: 'tag-edit',
+                pathParams: {},
+            });
         });
     });
 
