@@ -157,7 +157,15 @@ function useComposerSubmit(reportID: string) {
     };
 
     const submitDraftAndClearComposer = () => {
-        if (isSendDisabled || !debouncedCommentMaxLengthValidation?.flush()) {
+        // Validate the current text and flush any pending debounced validation so the length check
+        // reflects the latest text before sending. A draft restored after navigating away and back
+        // is seeded directly into the composer state without going through onValueChange, so the
+        // validator may never have run for it. In that case `flush()` alone returns `undefined`,
+        // which the previous `!flush()` guard treated as "invalid" and silently blocked sending the
+        // restored draft. Invoking the validator here guarantees a real boolean result instead.
+        debouncedCommentMaxLengthValidation?.(textRef.current ?? '');
+        const isCommentWithinMaxLength = debouncedCommentMaxLengthValidation?.flush() ?? true;
+        if (isSendDisabled || !isCommentWithinMaxLength) {
             return;
         }
 
