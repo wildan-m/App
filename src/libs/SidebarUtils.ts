@@ -867,7 +867,15 @@ function getOptionData({
     result.statusNum = report.statusNum;
     // When the only message of a report is deleted lastVisibleActionCreated is not reset leading to wrongly
     // setting it Unread so we add additional condition here to avoid empty chat LHN from being bold.
-    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived) && !!report.lastActorAccountID;
+    // A report must also never appear unread in the LHN when its own author posted the most recent visible
+    // action. This mirrors the in-report "New message" marker, which already skips self-authored actions
+    // (see shouldDisplayNewMarkerOnReportAction). The relevant actor is taken from whichever of the report or
+    // its one-transaction thread holds the more recent lastVisibleActionCreated (mirrors getReportLastVisibleActionCreated).
+    const lastVisibleActionActorAccountID =
+        (oneTransactionThreadReport?.lastVisibleActionCreated ?? '') > (report.lastVisibleActionCreated ?? '')
+            ? oneTransactionThreadReport?.lastActorAccountID
+            : report.lastActorAccountID;
+    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived) && !!report.lastActorAccountID && lastVisibleActionActorAccountID !== currentUserAccountID;
     result.isUnreadWithMention = isUnreadWithMention(report);
     result.isPinned = report.isPinned;
     result.iouReportID = report.iouReportID;
