@@ -582,6 +582,19 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     }, [isLoading, policy?.employeeList, translate, isOfflineAndNoMemberDataAvailable]);
 
     const memberCount = data.filter((member) => member.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length;
+    const prevMemberCount = usePrevious(memberCount);
+
+    // When the effective member count (excluding offline pending-delete members) drops below the
+    // search-bar threshold, clear the search query. useSearchResults' built-in auto-clear keys off
+    // the raw data length, which doesn't change when a member is deleted offline, so we clear the
+    // query here based on the effective count instead to match the online behavior.
+    useEffect(() => {
+        if (prevMemberCount < CONST.STANDARD_LIST_ITEM_LIMIT || memberCount >= CONST.STANDARD_LIST_ITEM_LIMIT) {
+            return;
+        }
+        setInputValue('');
+    }, [memberCount, prevMemberCount, setInputValue]);
+
     const connectedHRProvider = getConnectedHRProvider(policy);
     const shouldShowHRSyncLink = isPolicyAdmin && !!connectedHRProvider;
     const isMergeHRSyncInProgress =
@@ -592,7 +605,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         (isMergeHRSyncInProgress || (connectionSyncProgress?.connectionName === connectedHRProvider?.connectionName && isConnectionInProgress(connectionSyncProgress, policy)));
     const isPendingAddOrDelete =
         isOffline && data?.some((member) => member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || member.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
-    const shouldShowSearchBar = data.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
+    const shouldShowSearchBar = memberCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
     const debouncedFilteredData = useDebouncedValue(filteredData, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
     const isFilteringMembers = filteredData?.length < debouncedFilteredData?.length;
     const displayedFilteredData = isFilteringMembers ? debouncedFilteredData : filteredData;
