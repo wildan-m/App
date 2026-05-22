@@ -76,12 +76,16 @@ function navigateAfterOnboarding(
     // (Side Panel doesn't exist on native), but we still need to navigate to Concierge on mobile.
     const variant = variantOverride ?? onboardingRHPVariant;
     if (isSmallScreenWidth && variant === CONST.ONBOARDING_RHP_VARIANT.TRACK_EXPENSES_WITH_CONCIERGE) {
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeReportID));
+        // Dismiss the onboarding modal and open the Concierge DM atomically so the report-less
+        // HOME screen is never revealed in between (which briefly shows the "Not here" page).
+        Navigation.dismissModalWithReport({reportID: conciergeReportID});
         return;
     }
 
     if (shouldOpenRHPVariant(variantOverride)) {
-        handleRHPVariantNavigation(onboardingPolicyID, variantOverride);
+        // Run the RHP-variant navigation as part of the dismiss transition rather than in a
+        // detached step, so there is no intermediate report-less frame.
+        Navigation.dismissModal({afterTransition: () => handleRHPVariantNavigation(onboardingPolicyID, variantOverride)});
         return;
     }
 
@@ -95,10 +99,12 @@ function navigateAfterOnboarding(
         shouldPreventOpenAdminRoom,
     );
     if (reportID) {
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
+        // Dismiss the onboarding modal and open the destination report atomically so the
+        // "Not here" page can't flash on the report-less HOME screen in between.
+        Navigation.dismissModalWithReport({reportID});
     } else {
-        // Navigate to home to trigger guard evaluation
-        Navigation.navigate(ROUTES.HOME);
+        // Navigate to home to trigger guard evaluation, as part of the dismiss transition.
+        Navigation.dismissModal({afterTransition: () => Navigation.navigate(ROUTES.HOME)});
     }
 }
 
@@ -112,7 +118,10 @@ function navigateAfterOnboardingWithMicrotaskQueue(
     shouldPreventOpenAdminRoom = false,
     variantOverride?: OnboardingRHPVariant | null,
 ) {
-    Navigation.dismissModal();
+    // Defer to a microtask so the Onyx update from CompleteGuidedSetup is applied before we
+    // navigate (see https://github.com/Expensify/App/issues/37785#issuecomment-1989056726).
+    // navigateAfterOnboarding now performs the dismissal and the destination navigation atomically,
+    // so the modal is no longer torn down in a separate, earlier step that briefly reveals HOME.
     Navigation.setNavigationActionToMicrotaskQueue(() => {
         navigateAfterOnboarding(
             isSmallScreenWidth,
