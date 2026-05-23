@@ -1075,6 +1075,7 @@ function buildFilterFormValuesFromQuery(
     reports: OnyxCollection<OnyxTypes.Report>,
     taxRates: Record<string, string[]>,
     exportedToFilterOptions?: string[],
+    currentUserAccountID?: number,
 ) {
     const filters = queryJSON.flatFilters;
     const filtersForm = {} as Partial<SearchAdvancedFiltersForm>;
@@ -1141,7 +1142,8 @@ function buildFilterFormValuesFromQuery(
             filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE ||
             filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTER
         ) {
-            filtersForm[key as typeof filterKey] = filterValues.filter((id) => personalDetails?.[id]);
+            const resolvedValues = filterValues.map((id) => (id === CONST.SEARCH.ME && currentUserAccountID ? currentUserAccountID.toString() : id));
+            filtersForm[key as typeof filterKey] = resolvedValues.filter((id) => personalDetails?.[id]);
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE) {
             // Don't filter attendee values by personalDetails - they can be accountIDs OR display names for name-only attendees
@@ -1450,6 +1452,9 @@ function getFilterDisplayValue({
         filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTER ||
         filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE
     ) {
+        if (filterValue === CONST.SEARCH.ME) {
+            return CONST.SEARCH.ME;
+        }
         return filterValue === currentUserAccountID.toString() ? CONST.SEARCH.ME : getDisplayNameOrDefault(personalDetails?.[filterValue], filterValue, false);
     }
     if (filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID) {
@@ -1882,6 +1887,14 @@ function getQueryWithUpdatedValues(query: string, shouldSkipAmountConversion = f
 
     const computeNodeValue = (left: SyntaxFilterKey, right: string | string[]) => getUpdatedFilterValue(left, right, shouldSkipAmountConversion);
     const standardizedQuery = traverseAndUpdatedQuery(queryJSON, computeNodeValue);
+    const rawFilterList = getRawFilterListFromQuery(query);
+    const hasInFilter = rawFilterList?.some((filter) => !filter.isDefault && filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.IN) ?? false;
+    const hasExplicitType = rawFilterList?.some((filter) => filter.key === CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE) ?? false;
+
+    if (hasInFilter && !hasExplicitType) {
+        standardizedQuery.type = CONST.SEARCH.DATA_TYPES.CHAT;
+    }
+
     return buildSearchQueryString(standardizedQuery);
 }
 
