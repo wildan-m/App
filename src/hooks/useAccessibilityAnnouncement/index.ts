@@ -73,6 +73,8 @@ function useAccessibilityAnnouncement(message: string | ReactNode, shouldAnnounc
 
         prevShouldAnnounceRef.current = true;
 
+        let rafId: number | null = null;
+
         const timer = setTimeout(() => {
             const container = getWrapper();
 
@@ -80,14 +82,24 @@ function useAccessibilityAnnouncement(message: string | ReactNode, shouldAnnounc
                 container.removeChild(container.firstChild);
             }
 
-            const node = document.createElement('div');
-            node.setAttribute('role', 'alert');
-            node.textContent = message;
-            container.appendChild(node);
+            // Defer writing the message by one frame so the aria-live region is already registered in the
+            // accessibility tree before its content changes. VoiceOver on macOS only announces a live region
+            // whose content mutates *after* the region existed; creating the wrapper and populating it in the
+            // same tick is silently ignored, so the message is never spoken. TalkBack/NVDA announce regardless
+            // of ordering, so they are unaffected by this extra frame.
+            rafId = requestAnimationFrame(() => {
+                const node = document.createElement('div');
+                node.setAttribute('role', 'alert');
+                node.textContent = message;
+                container.appendChild(node);
+            });
         }, ANNOUNCEMENT_DELAY_MS);
 
         return () => {
             clearTimeout(timer);
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
             prevShouldAnnounceRef.current = false;
         };
     }, [message, shouldAnnounceMessage, shouldAnnounceOnWeb]);
