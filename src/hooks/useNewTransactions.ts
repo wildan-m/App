@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {deletePendingNewTransactionIDs} from '@libs/actions/IOU/PendingNewTransactions';
 import CONST from '@src/CONST';
 import type {Transaction} from '@src/types/onyx';
@@ -26,6 +26,23 @@ function useNewTransactions(
     // We need to skip the first transactions change, to avoid highlighting transactions on the first load.
     const skipFirstTransactionsChange = useRef(!hasOnceLoadedReportActions);
 
+    // pendingNewTransactionIDs is written to Onyx asynchronously and can arrive after this hook's first
+    // render (e.g. creating the first expense in a freshly opened workspace chat via FAB). We latch a boolean
+    // that flips to true once the pending IDs become available for the current transactions, and never flips
+    // back. It is used as a memo dependency below so newTransactions recomputes when the pending IDs *arrive*
+    // without recomputing when they are later deleted - which would clear the highlight mid-animation on
+    // slower devices.
+    const [pendingHighlightReady, setPendingHighlightReady] = useState(false);
+    useEffect(() => {
+        if (pendingHighlightReady) {
+            return;
+        }
+        const hasPendingHighlight = !!isFocused && !isEmptyObject(pendingNewTransactionIDs) && !!transactions?.length && transactions.some(({transactionID}) => pendingNewTransactionIDs?.[transactionID]);
+        if (hasPendingHighlight) {
+            setPendingHighlightReady(true);
+        }
+    }, [isFocused, pendingNewTransactionIDs, transactions, pendingHighlightReady]);
+
     const newTransactions = useMemo(() => {
         // If isFocused is not passed (=undefined) we will not return empty.
         if (isFocused === false) {
@@ -49,10 +66,12 @@ function useNewTransactions(
         }
         return transactions.filter((transaction) => !prevTransactions?.some((prevTransaction) => prevTransaction.transactionID === transaction.transactionID));
 
-        // We don't need to recalculate on change of prevTransactions or pendingNewTransactionIDs as it will make the value
-        // disappear quickly which will break the scroll and highlight on slower devices like mobile app.
+        // We don't depend on prevTransactions or pendingNewTransactionIDs directly as recomputing on their every
+        // change would make the value disappear quickly which will break the scroll and highlight on slower devices
+        // like mobile app. Instead we depend on pendingHighlightReady, which only flips false -> true once, so the
+        // memo recomputes when the pending IDs first arrive but not when they are later deleted.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transactions, reportID, isFocused]);
+    }, [transactions, reportID, isFocused, pendingHighlightReady]);
 
     useEffect(() => {
         if (!pendingNewTransactionIDs) {

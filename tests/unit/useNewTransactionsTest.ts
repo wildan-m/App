@@ -338,6 +338,39 @@ describe('useNewTransactions with pendingNewTransactionIDs (cross-navigation)', 
         expect(result.current).toEqual([]);
     });
 
+    it('highlights the first expense when pendingNewTransactionIDs arrive after the transaction is already present (issue #91543)', () => {
+        // Simulates creating the FIRST expense via FAB in a freshly opened workspace chat:
+        // the optimistic transaction is already in the list when the preview mounts, but the
+        // pendingNewTransactionIDs Onyx write lands in a LATER render without the transactions
+        // list changing. We keep the same transactions reference across rerenders so the only
+        // thing that changes is the arrival of pendingNewTransactionIDs.
+        const sameTransactions = [newTransaction];
+        const {rerender, result} = renderHook<
+            Transaction[],
+            {transactions: Transaction[]; hasOnceLoadedReportActions: boolean; pendingNewTransactionIDs: Record<string, true | null> | undefined; isFocused?: boolean}
+        >((props) => useNewTransactions(props.hasOnceLoadedReportActions, props.transactions, props.pendingNewTransactionIDs, '1', props.isFocused), {
+            initialProps: {
+                hasOnceLoadedReportActions: false,
+                transactions: sameTransactions,
+                pendingNewTransactionIDs: undefined,
+                isFocused: true,
+            },
+        });
+        // pendingNewTransactionIDs hasn't arrived yet -> nothing highlighted
+        expect(result.current).toEqual([]);
+
+        // pendingNewTransactionIDs arrive via the async Onyx write; the transactions list is unchanged.
+        // On main this never highlights because the memo deps omit pendingNewTransactionIDs and the
+        // transactions reference did not change, so the memo is not recomputed.
+        rerender({
+            hasOnceLoadedReportActions: false,
+            transactions: sameTransactions,
+            pendingNewTransactionIDs: {[newTransaction.transactionID]: true},
+            isFocused: true,
+        });
+        expect(result.current).toEqual([newTransaction]);
+    });
+
     it('does not highlight transactions without pendingNewTransactionIDs', () => {
         // Normal navigation to a report (no cross-navigation pending IDs)
         const {rerender, result} = renderHook<
