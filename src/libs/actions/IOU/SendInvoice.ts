@@ -129,6 +129,7 @@ function buildOnyxDataForInvoice(
     | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
     | typeof ONYXKEYS.COLLECTION.POLICY
     | typeof ONYXKEYS.COLLECTION.SNAPSHOT
+    | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
 > {
     const {chat, iou, transactionParams, policyParams, optimisticData: optimisticDataParams, companyName, companyWebsite, participant} = invoiceParams;
     const transaction = transactionParams.transaction;
@@ -146,6 +147,7 @@ function buildOnyxDataForInvoice(
             | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.COLLECTION.SNAPSHOT
+            | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
         >
     > = [
         {
@@ -229,6 +231,7 @@ function buildOnyxDataForInvoice(
             | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
             | typeof ONYXKEYS.COLLECTION.POLICY
             | typeof ONYXKEYS.COLLECTION.SNAPSHOT
+            | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
         >
     > = [];
 
@@ -251,6 +254,24 @@ function buildOnyxDataForInvoice(
                 key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${chat.report?.reportID}`,
                 value: {
                     isOptimisticReport: true,
+                },
+            });
+
+            // A new invoice room is created optimistically and never goes through OpenReport (ReportFetchHandler
+            // skips OpenReport for optimistic chat reports), so its report loading state would otherwise stay at the
+            // default `isLoadingInitialReportActions: true` and the room would show the skeleton forever until a manual
+            // refresh. The room's actions (CREATED and report preview) are already written optimistically above, so the
+            // room is fully loaded locally — mark it as loaded so the skeleton clears immediately.
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.report?.reportID}`,
+                value: {
+                    isLoadingInitialReportActions: false,
+                    hasOnceLoadedReportActions: true,
+                    isLoadingOlderReportActions: false,
+                    hasLoadingOlderReportActionsError: false,
+                    isLoadingNewerReportActions: false,
+                    hasLoadingNewerReportActionsError: false,
                 },
             });
         }
@@ -407,6 +428,15 @@ function buildOnyxDataForInvoice(
                 key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${chat.report?.reportID}`,
                 value: {
                     isOptimisticReport: false,
+                },
+            },
+            {
+                // Keep the invoice room marked as loaded once the server confirms creation, so the skeleton stays cleared.
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.report?.reportID}`,
+                value: {
+                    isLoadingInitialReportActions: false,
+                    hasOnceLoadedReportActions: true,
                 },
             },
         );
