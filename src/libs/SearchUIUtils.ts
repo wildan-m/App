@@ -402,6 +402,28 @@ function isValidExpenseStatus(status: unknown): status is ValueOf<typeof CONST.S
     return typeof status === 'string' && status in expenseStatusActionMapping;
 }
 
+// Statuses a freshly created expense can never be in. The tracked optimistic
+// item is kept visible before its server snapshot arrives, but it must not be
+// force-shown under these terminal status filters (e.g. a brand-new "Draft"
+// expense leaking into the "Deleted" tab).
+const OPTIMISTIC_INCOMPATIBLE_EXPENSE_STATUSES = new Set<string>([
+    CONST.SEARCH.STATUS.EXPENSE.DELETED,
+    CONST.SEARCH.STATUS.EXPENSE.APPROVED,
+    CONST.SEARCH.STATUS.EXPENSE.PAID,
+    CONST.SEARCH.STATUS.EXPENSE.DONE,
+]);
+
+/**
+ * Whether the tracked optimistic item may be kept visible under the active
+ * status filter. A newly created expense can plausibly belong to "all",
+ * "unreported", "draft" or "outstanding", but never to a terminal status.
+ * Returns true if at least one active status is compatible.
+ */
+function canOptimisticExpenseMatchStatusFilter(status: SearchStatus): boolean {
+    const statuses = Array.isArray(status) ? status : [status];
+    return statuses.some((singleStatus) => !OPTIMISTIC_INCOMPATIBLE_EXPENSE_STATUSES.has(singleStatus));
+}
+
 function formatBadgeText(count: number): string {
     if (count === 0) {
         return '';
@@ -2080,15 +2102,22 @@ function getTransactionsSections({
         // transaction ID to avoid leaking unrelated pending items into wrong
         // status tabs (e.g. offline-queued expenses appearing in "approved").
         const isTrackedOptimisticItem = !!optimisticTransactionID && transactionItem.transactionID === optimisticTransactionID;
-        if (currentQueryJSON && !isActionLoading && !isTrackedOptimisticItem) {
+        if (currentQueryJSON && !isActionLoading) {
             if (currentQueryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE) {
                 const status = currentQueryJSON.status;
-                if (Array.isArray(status)) {
-                    shouldShow = status.some((expenseStatus) => {
-                        return isValidExpenseStatus(expenseStatus) ? expenseStatusActionMapping[expenseStatus](report, transactionItem.reportID) : false;
-                    });
-                } else {
-                    shouldShow = isValidExpenseStatus(status) ? expenseStatusActionMapping[status](report, transactionItem.reportID) : false;
+                // The optimistic item bypasses status filtering only for statuses a
+                // brand-new expense can actually be in. Under a terminal status filter
+                // (e.g. "deleted") it must still be excluded, since a just-created
+                // expense is never deleted/approved/paid/done.
+                const skipStatusFilterForOptimisticItem = isTrackedOptimisticItem && canOptimisticExpenseMatchStatusFilter(status);
+                if (!skipStatusFilterForOptimisticItem) {
+                    if (Array.isArray(status)) {
+                        shouldShow = status.some((expenseStatus) => {
+                            return isValidExpenseStatus(expenseStatus) ? expenseStatusActionMapping[expenseStatus](report, transactionItem.reportID) : false;
+                        });
+                    } else {
+                        shouldShow = isValidExpenseStatus(status) ? expenseStatusActionMapping[status](report, transactionItem.reportID) : false;
+                    }
                 }
             }
         }
