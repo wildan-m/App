@@ -23,6 +23,7 @@ import localFileDownload from '@libs/localFileDownload';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import {isCurrentUserValidated} from '@libs/UserUtils';
 import {toggleTwoFactorAuth} from '@userActions/Session';
 import {quitAndNavigateBack, setCodesAreCopied} from '@userActions/TwoFactorAuthActions';
 import CONST from '@src/CONST';
@@ -56,8 +57,9 @@ function DynamicTwoFactorAuthPage() {
     };
 
     const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
 
-    const isUserValidated = account?.validated ?? false;
+    const isUserValidated = isCurrentUserValidated(loginList, account?.primaryLogin);
     const is2FAEnabled = !!account?.requiresTwoFactorAuth;
     const {asset: ShieldYellow} = useMemoizedLazyAsset(() => loadIllustration('ShieldYellow' as IllustrationName));
     const accountLoadingReasonAttributes: SkeletonSpanReasonAttributes = {context: 'DynamicTwoFactorAuthPage', isLoading: !!account?.isLoading};
