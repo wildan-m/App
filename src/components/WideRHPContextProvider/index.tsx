@@ -156,11 +156,14 @@ function WideRHPContextProvider({children}: React.PropsWithChildren) {
         expandedRHPProgress.setValue(0);
     };
 
-    // Once we have updated the array of all Super Wide RHP keys, we should sync it with the array of RHP keys visible on the screen
+    // Once we have updated the array of all Super Wide RHP keys, we should sync it with the array of RHP keys visible on the screen.
+    // We also re-sync whenever the focused route changes. Rapidly opening a new single RHP on top of a wide/super wide RHP does not
+    // change the all-keys arrays, so without depending on the focused route the visible-key classification (and therefore the RHP
+    // width and the narrow-card interpolator offset) would keep the stale wide value and the new RHP would be misaligned.
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         syncRHPKeys();
-    }, [allSuperWideRHPRouteKeys, allWideRHPRouteKeys, syncRHPKeys]);
+    }, [allSuperWideRHPRouteKeys, allWideRHPRouteKeys, syncRHPKeys, focusedRoute?.key]);
 
     /**
      * Effect that manages the secondary overlay animation for single RHP displayed on Super Wide RHP and rendering state.
