@@ -1,4 +1,5 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import {isPreferredExporter} from '@libs/PolicyUtils';
 import {isApproveAction, isExportAction, isPrimaryPayAction, isSubmitAction} from '@libs/ReportPrimaryActionUtils';
 import {hasOnlyNonReimbursableTransactions} from '@libs/ReportUtils';
 import createOnyxDerivedValueConfig from '@userActions/OnyxDerived/createOnyxDerivedValueConfig';
@@ -78,7 +79,7 @@ const createTodosReportsAndTransactions = ({
         ) {
             reportsToPay.push(report);
         }
-        if (isExportAction(report, login, policy, reportActions) && policy?.exporter === login) {
+        if (isExportAction(report, login, policy, reportActions) && (policy?.exporter === login || (!!policy && isPreferredExporter(policy, login)))) {
             reportsToExport.push(report);
         }
     }
