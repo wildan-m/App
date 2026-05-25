@@ -364,11 +364,13 @@ function getReportNextStep(
     currentUserEmail: string,
     currentUserAccountID: number,
 ) {
-    const {reimbursableSpend} = getMoneyRequestSpendBreakdown(moneyRequestReport);
-    const shouldShowNoFurtherAction =
-        reimbursableSpend === 0 &&
-        (moneyRequestReport?.statusNum === CONST.REPORT.STATUS_NUM.APPROVED ||
-            (moneyRequestReport?.statusNum === CONST.REPORT.STATUS_NUM.SUBMITTED && policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL));
+    // The next step for an approved report (or a submitted report under an optional-approval policy) is fully
+    // determined by the report's current status, so it must be recomputed from that status rather than trusting
+    // the cached value. This keeps "What's next" in sync when the status changes via Pusher (e.g. someone else
+    // approves the report while the submitter is only viewing it) and no approval action runs on this client.
+    const shouldRecomputeNextStep =
+        moneyRequestReport?.statusNum === CONST.REPORT.STATUS_NUM.APPROVED ||
+        (moneyRequestReport?.statusNum === CONST.REPORT.STATUS_NUM.SUBMITTED && policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL);
 
     if (
         isOpenExpenseReport(moneyRequestReport) &&
@@ -388,7 +390,7 @@ function getReportNextStep(
         return buildOptimisticNextStepForPreventSelfApprovalsEnabled();
     }
 
-    if (shouldShowNoFurtherAction) {
+    if (shouldRecomputeNextStep) {
         return buildNextStepNew({
             report: moneyRequestReport,
             policy,
