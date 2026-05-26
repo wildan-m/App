@@ -353,7 +353,13 @@ function MoneyRequestView({
     const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`);
     const hasMultipleSplits = useHasMultipleSplitChildren(transaction?.comment?.originalTransactionID);
     const isReportOpen = isOpenReport(moneyRequestReport);
+    // Gates the amount-edit affordance (editability + opening the split-edit flow). The open-report
+    // fallback is required here so that editing the amount of a reverted split keeps routing through
+    // initSplitExpense instead of the plain amount editor (removing it regressed #91481).
     const shouldShowSplitIndicator = isExpenseSplit && (hasMultipleSplits || isReportOpen);
+    // Gates only the visible " · Split" label. Once the split has been removed and a single child
+    // remains, hasMultipleSplits is false, so the label is hidden even while the report is Open (#91749).
+    const shouldShowSplitLabel = isExpenseSplit && hasMultipleSplits;
     const isSplitAvailable =
         moneyRequestReport &&
         transaction &&
@@ -571,7 +577,7 @@ function MoneyRequestView({
     } else if (shouldShowPaid) {
         amountDescription += ` ${CONST.DOT_SEPARATOR} ${translate('iou.settledExpensify')}`;
     }
-    if (shouldShowSplitIndicator) {
+    if (shouldShowSplitLabel) {
         amountDescription += ` ${CONST.DOT_SEPARATOR} ${translate('iou.split')}`;
     }
     if (shouldShowConvertedAmount) {
