@@ -1,3 +1,4 @@
+import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -58,20 +59,25 @@ function VerifyAccountPageBase({navigateBackTo, navigateForwardTo, handleClose, 
         Navigation.goBack(navigateBackTo);
     }, [handleClose, navigateBackTo]);
 
-    // Handle navigation once the user is validated
-    useEffect(() => {
-        if (!isUserValidated) {
-            return;
-        }
+    // Navigate away whenever the page is focused while the user is already validated.
+    // Using useFocusEffect (instead of a plain effect keyed on the validation transition) ensures
+    // the page also dismisses when the user returns to a still-mounted, already-validated instance
+    // of it via the back button - otherwise the validated branch below renders a spinner forever.
+    useFocusEffect(
+        useCallback(() => {
+            if (!isUserValidated) {
+                return;
+            }
 
-        onValidationSuccess?.();
+            onValidationSuccess?.();
 
-        if (navigateForwardTo) {
-            Navigation.navigate(navigateForwardTo, {forceReplace: true});
-        } else {
-            handleCloseWithFallback();
-        }
-    }, [isUserValidated, navigateForwardTo, handleCloseWithFallback, handleClose, onValidationSuccess]);
+            if (navigateForwardTo) {
+                Navigation.navigate(navigateForwardTo, {forceReplace: true});
+            } else {
+                handleCloseWithFallback();
+            }
+        }, [isUserValidated, navigateForwardTo, handleCloseWithFallback, onValidationSuccess]),
+    );
 
     // Once user is validated or the modal is dismissed, we don't want to show empty content.
     if (isUserValidated) {
