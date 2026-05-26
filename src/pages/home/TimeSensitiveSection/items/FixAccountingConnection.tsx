@@ -3,6 +3,7 @@ import BaseWidgetItem from '@components/BaseWidgetItem';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import Navigation from '@libs/Navigation/Navigation';
+import {isAccountingConnectionName} from '@libs/PolicyUtils';
 import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -28,6 +29,10 @@ function FixAccountingConnection({connectionName, policyID, policyName}: FixAcco
         ? translate('homePage.timeSensitiveSection.fixAccountingConnection.subtitle', {policyName})
         : translate('homePage.timeSensitiveSection.fixAccountingConnection.defaultSubtitle');
 
+    // Accounting connections (QBO, Xero, NetSuite, etc.) are fixed on the workspace Accounting page,
+    // while HRIS connections (Gusto, TriNet/Zenefits, Merge HR) are fixed on the workspace HR page.
+    const fixConnectionRoute = isAccountingConnectionName(connectionName) ? ROUTES.WORKSPACE_ACCOUNTING.getRoute(policyID) : ROUTES.WORKSPACE_HR.getRoute(policyID);
+
     return (
         <BaseWidgetItem
             icon={icons.Connect}
@@ -36,7 +41,7 @@ function FixAccountingConnection({connectionName, policyID, policyName}: FixAcco
             title={translate('homePage.timeSensitiveSection.fixAccountingConnection.title', {integrationName})}
             subtitle={subtitle}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}
-            onCtaPress={() => Navigation.navigate(ROUTES.WORKSPACE_ACCOUNTING.getRoute(policyID))}
+            onCtaPress={() => Navigation.navigate(fixConnectionRoute)}
             buttonProps={{danger: true}}
         />
     );
