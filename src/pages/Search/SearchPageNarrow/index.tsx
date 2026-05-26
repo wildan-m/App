@@ -8,6 +8,7 @@ import {useFullScreenBlockingViewActions} from '@components/FullScreenBlockingVi
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import NAVIGATION_TABS from '@components/Navigation/NavigationTabBar/NAVIGATION_TABS';
 import TabBarBottomContent from '@components/Navigation/TabBarBottomContent';
+import NavigationDeferredMount from '@components/NavigationDeferredMount';
 import PulsingView from '@components/PulsingView';
 import ReceiptScanDropZone from '@components/ReceiptScanDropZone';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -254,6 +255,22 @@ function SearchPageNarrow({
     const shouldShowLoadingState = !isOffline && (!isDataLoaded || !!metadata?.isLoading);
     const contentContainerStyle = !isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles(hasFilterBars) : undefined;
 
+    const loadingSkeleton = (
+        <SearchLoadingSkeleton
+            containerStyle={styles.searchListContentContainerStyles(hasFilterBars)}
+            reasonAttributes={{
+                context: 'SearchPage',
+                isOffline,
+                isDataLoaded,
+                isSearchLoading: !!searchResults?.search?.isLoading,
+                hasEmptyData: Array.isArray(searchResults?.data) && searchResults?.data.length === 0,
+                hasErrors: Object.keys(searchResults?.errors ?? {}).length > 0 && !isOffline,
+                hasPendingResponse: searchRequestResponseStatusCode === null,
+                shouldUseLiveData,
+            }}
+        />
+    );
+
     return (
         <View
             ref={receiptDropTargetRef}
@@ -384,33 +401,23 @@ function SearchPageNarrow({
                             {!useStaticRendering && (
                                 <>
                                     {shouldShowLoadingSkeleton ? (
-                                        <SearchLoadingSkeleton
-                                            containerStyle={styles.searchListContentContainerStyles(hasFilterBars)}
-                                            reasonAttributes={{
-                                                context: 'SearchPage',
-                                                isOffline,
-                                                isDataLoaded,
-                                                isSearchLoading: !!searchResults?.search?.isLoading,
-                                                hasEmptyData: Array.isArray(searchResults?.data) && searchResults?.data.length === 0,
-                                                hasErrors: Object.keys(searchResults?.errors ?? {}).length > 0 && !isOffline,
-                                                hasPendingResponse: searchRequestResponseStatusCode === null,
-                                                shouldUseLiveData,
-                                            }}
-                                        />
+                                        loadingSkeleton
                                     ) : (
-                                        <Search
-                                            searchResults={searchResults}
-                                            queryJSON={queryJSON}
-                                            key={queryJSON.hash}
-                                            onSearchListScroll={scrollHandler}
-                                            contentContainerStyle={contentContainerStyle}
-                                            handleSearch={handleSearchAction}
-                                            isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
-                                            searchRequestResponseStatusCode={searchRequestResponseStatusCode}
-                                            onDestinationVisible={endSubmitNavigationSpans}
-                                            onContentReady={onSearchContentReady}
-                                            hasFilterBars={hasFilterBars}
-                                        />
+                                        <NavigationDeferredMount placeholder={loadingSkeleton}>
+                                            <Search
+                                                searchResults={searchResults}
+                                                queryJSON={queryJSON}
+                                                key={queryJSON.hash}
+                                                onSearchListScroll={scrollHandler}
+                                                contentContainerStyle={contentContainerStyle}
+                                                handleSearch={handleSearchAction}
+                                                isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
+                                                searchRequestResponseStatusCode={searchRequestResponseStatusCode}
+                                                onDestinationVisible={endSubmitNavigationSpans}
+                                                onContentReady={onSearchContentReady}
+                                                hasFilterBars={hasFilterBars}
+                                            />
+                                        </NavigationDeferredMount>
                                     )}
                                     {isOverlayActive && !searchOverlayContent && <View onLayout={onSearchLayout} />}
                                     {!!searchOverlayContent && (
