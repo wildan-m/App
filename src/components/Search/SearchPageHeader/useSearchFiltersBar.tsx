@@ -12,6 +12,7 @@ import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import {updateAdvancedFilters} from '@libs/actions/Search';
 import {FILTER_LABEL_MAP, isAmountFilterKey, isDateFilterKey, mapFiltersFormToLabelValueList, SKIPPED_SEARCH_FILTERS} from '@libs/SearchUIUtils';
 import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
@@ -19,6 +20,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
+import type Nullable from '@src/types/utils/Nullable';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
 import DatePickerFilterPopup from './DatePickerFilterPopup';
 
@@ -142,6 +144,7 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                     const greaterThanKey = `${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`;
                     const lessThanKey = `${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`;
                     updateFilterForm({[equalToKey]: undefined, [greaterThanKey]: undefined, [lessThanKey]: undefined});
+                    updateAdvancedFilters({[equalToKey]: null, [greaterThanKey]: null, [lessThanKey]: null});
                     return;
                 }
 
@@ -151,6 +154,7 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                     const afterKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`;
                     const rangeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`;
                     updateFilterForm({[onKey]: undefined, [beforeKey]: undefined, [afterKey]: undefined, [rangeKey]: undefined});
+                    updateAdvancedFilters({[onKey]: null, [beforeKey]: null, [afterKey]: null, [rangeKey]: null});
                     return;
                 }
 
@@ -161,11 +165,17 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
                         }
                         return acc;
                     }, {} as Partial<SearchAdvancedFiltersForm>);
+                    const clearedFormValues = Object.keys(formValues).reduce((acc, curr) => {
+                        acc[curr as SearchAdvancedFiltersKey] = null;
+                        return acc;
+                    }, {} as Nullable<Partial<SearchAdvancedFiltersForm>>);
                     updateFilterForm(formValues);
+                    updateAdvancedFilters(clearedFormValues);
                     return;
                 }
 
                 updateFilterForm({[filterKey]: undefined});
+                updateAdvancedFilters({[filterKey]: null});
             },
         }),
     );
