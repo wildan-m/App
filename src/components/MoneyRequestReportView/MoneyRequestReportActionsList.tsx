@@ -340,7 +340,11 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
             return;
         }
 
-        if (isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction, visibleReportActions))) {
+        // Only the current user's own newest action (e.g. an "exported to CSV" system message) should not auto-clear an
+        // unread state the user explicitly set via "Mark as unread", so we ignore it when deciding to mark the report read.
+        const isLastActionFromOtherUser = !!lastAction && lastAction.actorAccountID !== currentUserAccountID;
+
+        if (isUnread(report, transactionThreadReport, isReportArchived) || (isLastActionFromOtherUser && isCurrentActionUnread(report, lastAction, visibleReportActions))) {
             // On desktop, when the notification center is displayed, isVisible will return false.
             // Currently, there's no programmatic way to dismiss the notification center panel.
             // To handle this, we use the 'referrer' parameter to check if the current navigation is triggered from a notification.
