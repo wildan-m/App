@@ -65,7 +65,12 @@ function ReanimatedModal({
     const styles = useThemeStyles();
 
     const onBackButtonPressHandler = useCallback(() => {
-        if (shouldIgnoreBackHandlerDuringTransition && isTransitioning) {
+        // Ignore the back/escape handler until the modal has fully opened. `isTransitioning` covers the
+        // open/close animation, but on a fresh on-demand mount (e.g. modals shown via showConfirmModal)
+        // `isVisibleState` initializes to `true` while `isTransitioning` is still `false`, leaving a brief
+        // window where the same key press that opened the modal would immediately close it. Guarding on
+        // `!isContainerOpen` closes that window since it is `false` until the open animation completes.
+        if (shouldIgnoreBackHandlerDuringTransition && (isTransitioning || !isContainerOpen)) {
             return false;
         }
         if (isVisibleState) {
@@ -73,7 +78,7 @@ function ReanimatedModal({
             return true;
         }
         return false;
-    }, [isVisibleState, onBackButtonPress, isTransitioning, shouldIgnoreBackHandlerDuringTransition]);
+    }, [isVisibleState, onBackButtonPress, isTransitioning, isContainerOpen, shouldIgnoreBackHandlerDuringTransition]);
 
     const handleEscape = useCallback(
         (e: KeyboardEvent) => {
