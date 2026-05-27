@@ -1339,7 +1339,13 @@ function submitReport({
               isUnapprove: true,
           });
     const optimisticData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.NEXT_STEP | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.NEXT_STEP
+            | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+        >
     > = [];
 
     if (shouldAddOptimisticSubmitAction) {
@@ -1469,7 +1475,13 @@ function submitReport({
     }
 
     const failureData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.NEXT_STEP | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT_METADATA>
+        OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.NEXT_STEP
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT_METADATA
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+        >
     > = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1539,6 +1551,34 @@ function submitReport({
                 iouReportID: expenseReport.reportID,
             },
         });
+    }
+
+    // A submit-and-close report reaches the same terminal CLOSED state as a full approval, so clear the hold of
+    // every held transaction (mirroring approveMoneyRequest). Otherwise the expense header keeps showing the
+    // "on hold" message after the report is marked as done. On a normal submit (to an approver) holds are
+    // preserved so the approver can still act on them, hence this only runs on the submit-and-close path.
+    if (isSubmitAndClosePolicy && !isDEWPolicy) {
+        const heldTransactions = getAllHeldTransactionsReportUtils(expenseReport.reportID);
+        for (const heldTransaction of heldTransactions) {
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${heldTransaction.transactionID}`,
+                value: {
+                    comment: {
+                        hold: '',
+                    },
+                },
+            });
+            failureData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${heldTransaction.transactionID}`,
+                value: {
+                    comment: {
+                        hold: heldTransaction.comment?.hold,
+                    },
+                },
+            });
+        }
     }
 
     const parameters: SubmitReportParams = {
