@@ -61,6 +61,14 @@ function ReanimatedModal({
     const backHandlerListener = useRef<NativeEventSubscription | null>(null);
     const handleRef = useRef<number | undefined>(undefined);
     const transitionHandleRef = useRef<TransitionHandle | null>(null);
+    // Tracks whether this modal observed an Escape keydown while it was mounted. On web the back handler
+    // runs on keyup, but the Escape that opens a modal (e.g. the discard-changes confirmation) is handled
+    // on keydown by the global keyboard-shortcut manager, before this modal mounts and attaches its
+    // listeners. The trailing keyup of that same press then reaches handleEscape, and because the open
+    // transition is already finished (modal animation timing is ~1ms) it would immediately close the
+    // just-opened modal. Requiring a matching keydown ensures we only close on an Escape press that
+    // happened while the modal was already open.
+    const hasReceivedEscapeKeyDownRef = useRef(false);
 
     const styles = useThemeStyles();
 
@@ -75,18 +83,36 @@ function ReanimatedModal({
         return false;
     }, [isVisibleState, onBackButtonPress, isTransitioning, shouldIgnoreBackHandlerDuringTransition]);
 
+    const handleEscapeKeyDown = useCallback((e: KeyboardEvent) => {
+        if (e.key !== 'Escape') {
+            return;
+        }
+        hasReceivedEscapeKeyDownRef.current = true;
+    }, []);
+
     const handleEscape = useCallback(
         (e: KeyboardEvent) => {
-            if (e.key !== 'Escape' || onBackButtonPressHandler() !== true) {
+            if (e.key !== 'Escape') {
+                return;
+            }
+            const hasMatchingKeyDown = hasReceivedEscapeKeyDownRef.current;
+            hasReceivedEscapeKeyDownRef.current = false;
+            // Ignore a keyup whose keydown was never observed by this modal: it is the tail of the
+            // press that opened the modal, not a deliberate press to dismiss it.
+            if (shouldIgnoreBackHandlerDuringTransition && !hasMatchingKeyDown) {
+                return;
+            }
+            if (onBackButtonPressHandler() !== true) {
                 return;
             }
             e.stopImmediatePropagation();
         },
-        [onBackButtonPressHandler],
+        [onBackButtonPressHandler, shouldIgnoreBackHandlerDuringTransition],
     );
 
     useEffect(() => {
         if (getPlatform() === CONST.PLATFORM.WEB) {
+            document.body.addEventListener('keydown', handleEscapeKeyDown, {capture: true});
             document.body.addEventListener('keyup', handleEscape, {capture: true});
         } else {
             backHandlerListener.current = BackHandler.addEventListener('hardwareBackPress', onBackButtonPressHandler);
@@ -94,12 +120,13 @@ function ReanimatedModal({
 
         return () => {
             if (getPlatform() === CONST.PLATFORM.WEB) {
+                document.body.removeEventListener('keydown', handleEscapeKeyDown, {capture: true});
                 document.body.removeEventListener('keyup', handleEscape, {capture: true});
             } else {
                 backHandlerListener.current?.remove();
             }
         };
-    }, [handleEscape, onBackButtonPressHandler]);
+    }, [handleEscape, handleEscapeKeyDown, onBackButtonPressHandler]);
 
     useEffect(
         () => () => {
