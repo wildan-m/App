@@ -15,7 +15,10 @@ import type SCREENS from '@src/SCREENS';
 import useDownloadAttachment from './hooks/useDownloadAttachment';
 
 function ProfileAvatarModalContent({navigation, route}: AttachmentModalScreenProps<typeof SCREENS.DYNAMIC_PROFILE_AVATAR>) {
-    const {accountID = CONST.DEFAULT_NUMBER_ID, source: tempSource, originalFileName: tempOriginalFileName} = route.params;
+    // The dynamic route delivers `accountID` as a string. Coerce it to a number because avatar helpers such as
+    // getDefaultAvatar compare it strictly (===) against numeric account IDs (e.g. Concierge), which fails for a string.
+    const {accountID: accountIDParam = CONST.DEFAULT_NUMBER_ID, source: tempSource, originalFileName: tempOriginalFileName} = route.params;
+    const accountID = Number(accountIDParam);
 
     const defaultAvatars = useDefaultAvatars();
     const {formatPhoneNumber} = useLocalize();
