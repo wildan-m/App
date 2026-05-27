@@ -107,11 +107,16 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
 
     const [hasErrorIconVisible, setHasErrorIconVisible] = useState(false);
 
+    // Tracks whether the source was emptied by the offline effect below, so it can be restored on reconnect
+    // even when the video had already started playing (currentTime > 0) and is therefore no longer in an error state.
+    const wasSourceClearedWhileOfflineRef = useRef(false);
+
     useNetwork({
         onReconnect: () => {
-            if (!(currentTime <= 0 && hasError)) {
+            if (!((currentTime <= 0 && hasError) || wasSourceClearedWhileOfflineRef.current)) {
                 return;
             }
+            wasSourceClearedWhileOfflineRef.current = false;
             videoPlayerRef.current.replaceAsync(sourceURL);
         },
     });
@@ -133,6 +138,7 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
         if (!(isVideoOffline && isLoading && isOffline)) {
             return;
         }
+        wasSourceClearedWhileOfflineRef.current = true;
         videoPlayerRef.current.replaceAsync('');
     }, [isLoading, isVideoOffline, isOffline]);
 
