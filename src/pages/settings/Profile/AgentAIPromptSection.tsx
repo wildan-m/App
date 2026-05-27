@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import type {RefObject} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type {ScrollView as RNScrollView, TextInputKeyPressEvent} from 'react-native';
-import {Keyboard} from 'react-native';
+import {Keyboard, View} from 'react-native';
 import Button from '@components/Button';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Section from '@components/Section';
@@ -70,6 +70,12 @@ function AgentAIPromptSection({accountID, parentScrollViewRef}: AgentAIPromptSec
         errorText = translate('common.error.invalidCharacter');
     }
     const storedPrompt = Str.htmlDecode(agentPrompt?.prompt ?? '');
+
+    // The user has unsaved changes when the draft diverges from what is stored. The Save/Cancel
+    // controls are only shown when there is something to act on (dirty), while a save is in
+    // flight, or during the brief "Saved" confirmation window.
+    const isDirty = draftPrompt !== storedPrompt;
+    const shouldShowButtons = isDirty || isSaving || showSavedConfirmation;
 
     // Delegate.connect seeds IS_LOADING_APP=true via clearOnyxForDelegateTransition and OpenApp's optimisticData,
     // then flips it back to false in OpenApp's finallyData. By that point NetworkStore.authToken is the delegate.
@@ -149,6 +155,12 @@ function AgentAIPromptSection({accountID, parentScrollViewRef}: AgentAIPromptSec
         updateAgentPrompt(accountID, trimmed, agentPrompt?.prompt ?? '');
     };
 
+    const handleCancel = () => {
+        setDraftPrompt(storedPrompt);
+        setShowEmptyError(false);
+        dismissInput();
+    };
+
     const handleChangeText = (text: string) => {
         setDraftPrompt(text);
         if (showEmptyError && text.trim()) {
@@ -193,16 +205,26 @@ function AgentAIPromptSection({accountID, parentScrollViewRef}: AgentAIPromptSec
                     onFocus={handleInputFocus}
                 />
             </OfflineWithFeedback>
-            <Button
-                success
-                text={showSavedConfirmation ? translate('profilePage.aiPromptSection.saved') : translate('common.save')}
-                icon={showSavedConfirmation ? icons.Checkmark : undefined}
-                onPress={handleSave}
-                isLoading={isSaving}
-                isDisabled={hasHtmlTag || isSaving}
-                style={[styles.alignSelfStart]}
-                testID="save-prompt-button"
-            />
+            {shouldShowButtons && (
+                <View style={[styles.flexRow, styles.gap2, styles.alignSelfStart]}>
+                    <Button
+                        success
+                        text={showSavedConfirmation ? translate('profilePage.aiPromptSection.saved') : translate('common.save')}
+                        icon={showSavedConfirmation ? icons.Checkmark : undefined}
+                        onPress={handleSave}
+                        isLoading={isSaving}
+                        isDisabled={hasHtmlTag || isSaving}
+                        testID="save-prompt-button"
+                    />
+                    {isDirty && !isSaving && (
+                        <Button
+                            text={translate('common.cancel')}
+                            onPress={handleCancel}
+                            testID="cancel-prompt-button"
+                        />
+                    )}
+                </View>
+            )}
         </Section>
     );
 }

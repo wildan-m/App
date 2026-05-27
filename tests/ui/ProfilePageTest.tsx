@@ -267,7 +267,15 @@ describe('ProfilePage - agent account', () => {
 
         expect(screen.getByTestId('ai-prompt-input')).toBeDefined();
         expect(screen.getByTestId('ai-prompt-input').props.value).toBe('Reject gambling expenses.');
+        // Save/Cancel are hidden until the user changes the prompt.
+        expect(screen.queryByTestId('save-prompt-button')).toBeNull();
+        expect(screen.queryByTestId('cancel-prompt-button')).toBeNull();
+
+        // Once the prompt is edited, both Save and Cancel appear.
+        fireEvent.changeText(screen.getByTestId('ai-prompt-input'), 'Reject gambling expenses. Updated.');
+        await waitForBatchedUpdatesWithAct();
         expect(screen.getByTestId('save-prompt-button')).toBeDefined();
+        expect(screen.getByTestId('cancel-prompt-button')).toBeDefined();
     });
 
     it('hides AI prompt section for non-agent account', async () => {
