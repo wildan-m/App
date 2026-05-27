@@ -8,9 +8,9 @@ import {generateHexadecimalValue} from '@libs/NumberUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CopyPolicySettings as CopyPolicySettingsState, Policy, PolicyCategories, PolicyTagLists} from '@src/types/onyx';
-import type {CustomUnit} from '@src/types/onyx/Policy';
+import type {CodingRule, CustomUnit} from '@src/types/onyx/Policy';
 
-type Part = 'overview' | 'members' | 'reports' | 'accounting' | 'categories' | 'tags' | 'taxes' | 'workflows' | 'rules' | 'distanceRates' | 'perDiem' | 'invoices' | 'travel';
+type Part = 'overview' | 'members' | 'reports' | 'accounting' | 'categories' | 'tags' | 'taxes' | 'workflows' | 'rules' | 'codingRules' | 'distanceRates' | 'perDiem' | 'invoices' | 'travel';
 
 const PARTS_TO_POLICY_FIELDS = {
     overview: ['outputCurrency', 'address', 'description'],
@@ -37,6 +37,10 @@ const PARTS_TO_POLICY_FIELDS = {
         'shouldShowAutoApprovalOptions',
         'shouldShowAutoReimbursementLimitOption',
     ],
+    // Merchant rules live in the nested `policy.rules.codingRules` object. The `rules` field is
+    // patched separately in buildCopyPolicySettingsData (and skipped in buildPolicyFieldPatch) so
+    // copying merchant rules never clobbers the target's other `rules` sub-objects.
+    codingRules: ['rules'],
     distanceRates: ['areDistanceRatesEnabled', 'customUnits'],
     perDiem: ['arePerDiemRatesEnabled', 'customUnits'],
     invoices: ['areInvoicesEnabled', 'invoice'],
@@ -62,6 +66,19 @@ function findCustomUnitByName(policy: Policy | undefined, unitName: string): Cus
         return undefined;
     }
     return Object.values(policy.customUnits).find((unit) => unit.name === unitName);
+}
+
+/**
+ * Returns the source policy's merchant (coding) rules with pending-delete entries removed, so a
+ * rule the admin already deleted on the source isn't recreated on the target. Returns undefined
+ * when the source has no merchant rules.
+ */
+function getCopyableCodingRules(sourcePolicy: Policy): Record<string, CodingRule> | undefined {
+    const codingRules = sourcePolicy.rules?.codingRules;
+    if (!codingRules) {
+        return undefined;
+    }
+    return Object.fromEntries(Object.entries(codingRules).filter(([, rule]) => rule?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE));
 }
 
 /**
@@ -108,7 +125,9 @@ function buildPolicyFieldPatch(sourcePolicy: Policy, parts: Part[]): Partial<Pol
     const patch: Partial<Policy> = {};
     for (const part of parts) {
         for (const field of PARTS_TO_POLICY_FIELDS[part]) {
-            if (field === 'customUnits') {
+            // customUnits (distanceRates/perDiem) and rules (codingRules) are nested objects that
+            // are merged into the target separately so we don't overwrite sibling sub-objects.
+            if (field === 'customUnits' || field === 'rules') {
                 continue;
             }
             // The PARTS_TO_POLICY_FIELDS values are typed as keyof Policy, so this assignment is safe.
@@ -167,6 +186,8 @@ function buildCopyPolicySettingsData(
     const isTagsSelected = parts.includes('tags');
     const isDistanceSelected = parts.includes('distanceRates');
     const isPerDiemSelected = parts.includes('perDiem');
+    const isCodingRulesSelected = parts.includes('codingRules');
+    const sourceCodingRules = isCodingRulesSelected ? getCopyableCodingRules(sourcePolicy) : undefined;
 
     const sourceCategoriesKey = `${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${sourcePolicy.id}` as const;
     const sourceTagsKey = `${ONYXKEYS.COLLECTION.POLICY_TAGS}${sourcePolicy.id}` as const;
@@ -187,6 +208,7 @@ function buildCopyPolicySettingsData(
                 ...targetPolicy,
                 ...policyFieldPatch,
                 ...(customUnitsPatch ? {customUnits: {...targetPolicy.customUnits, ...customUnitsPatch.customUnits}} : {}),
+                ...(isCodingRulesSelected ? {rules: {...targetPolicy.rules, codingRules: sourceCodingRules}} : {}),
                 pendingFields: {...targetPolicy.pendingFields, ...pendingFields},
             },
         });

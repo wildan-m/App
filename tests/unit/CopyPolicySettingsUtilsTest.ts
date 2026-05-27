@@ -147,6 +147,7 @@ describe('CopyPolicySettingsUtils', () => {
             connectedIntegrationCount: 1,
             hasWorkflowRules: true,
             hasWorkspaceRules: true,
+            codingRulesCount: 1,
             hasInvoiceConfiguration: true,
             isCollectPolicy: false,
         };
@@ -163,6 +164,12 @@ describe('CopyPolicySettingsUtils', () => {
         it('shows categories when the source has categories', () => {
             expect(isCopyPolicySettingsPartEnabledOnSource('categories', {...baseContext, categoriesCount: 0})).toBe(false);
             expect(isCopyPolicySettingsPartEnabledOnSource('categories', baseContext)).toBe(true);
+        });
+
+        it('shows merchant rules only when the source has at least one and it is not a Collect policy', () => {
+            expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', {...baseContext, codingRulesCount: 0})).toBe(false);
+            expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', baseContext)).toBe(true);
+            expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', {...baseContext, isCollectPolicy: true})).toBe(false);
         });
 
         it('shows per diem when rates exist', () => {
