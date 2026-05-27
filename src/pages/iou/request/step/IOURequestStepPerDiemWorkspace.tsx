@@ -1,6 +1,5 @@
 import React from 'react';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useOnyx from '@hooks/useOnyx';
 import usePersonalPolicy from '@hooks/usePersonalPolicy';
 import {getInitialPerDiemTargetReport} from '@libs/IOUUtils';
@@ -25,7 +24,6 @@ function IOURequestStepPerDiemWorkspace({route, navigation, transaction}: IOUReq
     } = route;
     const {accountID} = useCurrentUserPersonalDetails();
     const [selfDMReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${findSelfDMReportID()}`);
-    const defaultExpensePolicy = useDefaultExpensePolicy();
     const personalPolicy = usePersonalPolicy();
 
     return (
@@ -38,7 +36,7 @@ function IOURequestStepPerDiemWorkspace({route, navigation, transaction}: IOUReq
                     getPolicyExpenseChat(accountID, policy?.id),
                     selfDMReport,
                     iouType,
-                    defaultExpensePolicy,
+                    policy,
                     personalPolicy,
                     transaction?.isFromGlobalCreate ?? false,
                 );
