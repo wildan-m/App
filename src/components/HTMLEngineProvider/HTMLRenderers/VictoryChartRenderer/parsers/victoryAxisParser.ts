@@ -3,6 +3,7 @@ import type {SkTypeface} from '@shopify/react-native-skia';
 import type {TNode} from 'react-native-render-html';
 import type {PartialProcessNodeResult, RawAxisStyle} from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/types';
 import parseAttribute from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/utils/parseAttribute';
+import {isNumber, isNumberArray, isStringArray} from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/utils/validators';
 
 /**
  * Parse axis config from a `<victoryaxis>` node.
@@ -11,9 +12,10 @@ import parseAttribute from '@components/HTMLEngineProvider/HTMLRenderers/Victory
 function parseVictoryAxisNode(tnode: TNode, typeface: SkTypeface | null): PartialProcessNodeResult {
     const isDependentAxis = 'dependentaxis' in tnode.attributes && tnode.attributes.dependentaxis !== 'false';
     const orientation = parseAttribute<string>(tnode.attributes.orientation);
-    const tickCount = parseAttribute<number>(tnode.attributes.tickcount) ?? 0;
-    const tickValues = parseAttribute<number[]>(tnode.attributes.tickvalues);
-    const tickFormat = parseAttribute<string[]>(tnode.attributes.tickformat);
+    const tickCount = parseAttribute<number>(tnode.attributes.tickcount, isNumber) ?? 0;
+    // Validate the array shapes so `formatLabel`'s `.indexOf`/index access can never run against a non-array.
+    const tickValues = parseAttribute<number[]>(tnode.attributes.tickvalues, isNumberArray);
+    const tickFormat = parseAttribute<string[]>(tnode.attributes.tickformat, isStringArray);
     const formatLabel = (label: string | number) => tickFormat?.[tickValues?.indexOf(Number(label)) ?? -1] ?? String(label);
     const style = parseAttribute<RawAxisStyle>(tnode.attributes.style);
     const lineColor = style?.grid?.stroke;

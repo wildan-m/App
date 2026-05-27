@@ -1,13 +1,14 @@
 import type {TNode} from 'react-native-render-html';
 import type {LabelItem, PartialProcessNodeResult, RawLabelStyle} from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/types';
 import parseAttribute from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/utils/parseAttribute';
+import {isNumber} from '@components/HTMLEngineProvider/HTMLRenderers/VictoryChartRenderer/utils/validators';
 
 /**
  * Parse label config from a `<victorylabel>` node.
  */
 function parseVictoryLabelNode(tnode: TNode): PartialProcessNodeResult {
-    const x = parseAttribute<number>(tnode.attributes.x) ?? 0;
-    const y = parseAttribute<number>(tnode.attributes.y) ?? 0;
+    const x = parseAttribute<number>(tnode.attributes.x, isNumber) ?? 0;
+    const y = parseAttribute<number>(tnode.attributes.y, isNumber) ?? 0;
     const text = parseAttribute<string>(tnode.attributes.text) ?? '';
     const style = parseAttribute<RawLabelStyle>(tnode.attributes.style);
     const color = style?.fill;

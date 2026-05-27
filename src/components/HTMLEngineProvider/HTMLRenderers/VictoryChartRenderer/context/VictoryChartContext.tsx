@@ -28,8 +28,21 @@ const VictoryChartContext = createContext<VictoryChartContextValue | null>(null)
  */
 function VictoryChartProvider({tnode, children}: {tnode: TNode; children: React.ReactNode}) {
     const {regular: regularTypeface} = useChartDefaultTypeface();
-    const {data, xKey, yKeys, xAxis, yAxis, labelItems, legendItems} = processVictoryChartTree(tnode, regularTypeface);
-    const {nodeStyles: chartContentStyles, parentNodeStyles: chartContainerStyles} = parseStyles(tnode);
+
+    let processed: ProcessNodeResult;
+    let chartContentStyles: ReturnType<typeof parseStyles>['nodeStyles'];
+    let chartContainerStyles: ReturnType<typeof parseStyles>['parentNodeStyles'];
+    try {
+        processed = processVictoryChartTree(tnode, regularTypeface);
+        const styles = parseStyles(tnode);
+        chartContentStyles = styles.nodeStyles;
+        chartContainerStyles = styles.parentNodeStyles;
+    } catch {
+        // Fail closed on any unexpected malformed input: render nothing rather than crashing the surrounding chat/HTML view.
+        return null;
+    }
+
+    const {data, xKey, yKeys, xAxis, yAxis, labelItems, legendItems} = processed;
 
     const hasCartesianData = Object.keys(data).length > 0;
     const hasPolarData = false;
