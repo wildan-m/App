@@ -167,10 +167,8 @@ function CopyPolicySettingsSelectFeaturesPage() {
                 return perDiemCount > 0 ? `${perDiemCount} ${translate('workspace.common.perDiem').toLowerCase()}` : undefined;
             case 'invoices': {
                 const bankCount = bankAccountList ? Object.keys(bankAccountList).length : 0;
-                if (bankCount > 0 && invoiceCompany) {
-                    return `${bankCount} ${translate('common.bankAccounts').toLowerCase()}, ${invoiceCompany}`;
-                }
-                return invoiceCompany || undefined;
+                const bankAccountsText = bankCount > 0 ? `${bankCount} ${translate('common.bankAccounts').toLowerCase()}` : '';
+                return [bankAccountsText, invoiceCompany].filter(Boolean).join(', ') || undefined;
             }
             default:
                 return undefined;
