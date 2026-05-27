@@ -66,9 +66,14 @@ function EnablePaymentsPage() {
         );
     }
     const hasActivatedWallet = ([CONST.WALLET.TIER_NAME.GOLD, CONST.WALLET.TIER_NAME.PLATINUM] as string[]).includes(userWallet?.tierName ?? '');
-    const enablePaymentsStep = !hasExpensifyPaymentMethod(paymentCardList, bankAccountList ?? {}, hasActivatedWallet)
-        ? CONST.WALLET.STEP.ADD_BANK_ACCOUNT
-        : userWallet?.currentStep || CONST.WALLET.STEP.ADDITIONAL_DETAILS;
+    // Once a bank account has been submitted, the wallet advances currentStep past the bank step. A freshly-added bank account
+    // is not OPEN yet (it's SETUP/PENDING/VERIFYING), so hasExpensifyPaymentMethod stays false. We must not bounce the user back
+    // to ADD_BANK_ACCOUNT in that case — only force it while the wallet is still at the bank step (no currentStep yet).
+    const hasAdvancedPastBankAccountStep = !!userWallet?.currentStep && userWallet.currentStep !== CONST.WALLET.STEP.ADD_BANK_ACCOUNT;
+    const enablePaymentsStep =
+        !hasExpensifyPaymentMethod(paymentCardList, bankAccountList ?? {}, hasActivatedWallet) && !hasAdvancedPastBankAccountStep
+            ? CONST.WALLET.STEP.ADD_BANK_ACCOUNT
+            : userWallet?.currentStep || CONST.WALLET.STEP.ADDITIONAL_DETAILS;
 
     let CurrentStep: React.JSX.Element | null;
     switch (enablePaymentsStep) {
