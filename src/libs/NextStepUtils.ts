@@ -709,25 +709,39 @@ function buildNextStepNew(params: BuildNextStepNewParams): ReportNextStepDepreca
 
             // Manual submission
             if (hasTransactions && !policy?.harvesting?.enabled) {
-                optimisticNextStep.message = [
-                    {
-                        text: 'Waiting for ',
-                    },
-                    {
-                        text: `${ownerDisplayName}`,
-                        type: 'strong',
-                        clickToCopyText: ownerAccountID === currentUserAccountIDParam ? currentUserEmailParam : '',
-                    },
-                    {
-                        text: ' to ',
-                    },
-                    {
-                        text: 'submit',
-                    },
-                    {
-                        text: ' %expenses.',
-                    },
-                ];
+                optimisticNextStep.message = shouldShowMarkAsDone({isTrackIntentUser: isTrackOnboardingChoice(introSelected?.choice), report, policy})
+                    ? [
+                          {
+                              text: 'Waiting for ',
+                          },
+                          {
+                              text: `${ownerDisplayName}`,
+                              type: 'strong',
+                              clickToCopyText: ownerAccountID === currentUserAccountIDParam ? currentUserEmailParam : '',
+                          },
+                          {
+                              text: ' to mark this as done.',
+                          },
+                      ]
+                    : [
+                          {
+                              text: 'Waiting for ',
+                          },
+                          {
+                              text: `${ownerDisplayName}`,
+                              type: 'strong',
+                              clickToCopyText: ownerAccountID === currentUserAccountIDParam ? currentUserEmailParam : '',
+                          },
+                          {
+                              text: ' to ',
+                          },
+                          {
+                              text: 'submit',
+                          },
+                          {
+                              text: ' %expenses.',
+                          },
+                      ];
             }
 
             break;
