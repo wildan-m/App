@@ -493,8 +493,11 @@ function getQueryHashes(query: SearchQueryJSON) {
     const filterSet = new Set<string>(orderedQuery);
 
     // Certain filters shouldn't affect whether two searchers are similar or not, since they dont
-    // actually filter out results
-    const similarSearchIgnoredFilters = new Set<SearchFilterKey>([CONST.SEARCH.SYNTAX_FILTER_KEYS.GROUP_CURRENCY]);
+    // actually filter out results. FEED is included because the suggested "Card accruals"/"Statements"
+    // searches are feed-scoped: changing or adding a feed should keep the same suggested search highlighted
+    // (the feed value is already ignored below; ignoring its presence too keeps the highlight stable when
+    // the search has no default feed and would otherwise carry no feed filter at all).
+    const similarSearchIgnoredFilters = new Set<SearchFilterKey>([CONST.SEARCH.SYNTAX_FILTER_KEYS.GROUP_CURRENCY, CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED]);
 
     // Certain filters' values are significant in deciding which search we are on, so we want to include
     // their value when computing the similarSearchHash
