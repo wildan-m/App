@@ -667,6 +667,19 @@ function getMergeFieldUpdatedValues<K extends MergeFieldKey>({
             updatedValues.odometerEnd = transaction?.comment?.odometerEnd;
             updatedValues.odometerStartImage = transaction?.comment?.odometerStartImage;
             updatedValues.odometerEndImage = transaction?.comment?.odometerEndImage;
+            // An odometer expense has no map route. Clear any waypoints/routes carried over from a
+            // previously selected map-distance merchant so the merged expense isn't misclassified as a map request.
+            // getWaypoints returns an empty waypoint object for odometer expenses, and Onyx.merge of an empty
+            // object would leave stale waypoints in place, so set it to null explicitly.
+            updatedValues.waypoints = null;
+            updatedValues.routes = null;
+        } else {
+            // A map-distance expense has no odometer readings. Clear any carried over from a
+            // previously selected odometer merchant so the merged expense isn't misclassified as an odometer request.
+            updatedValues.odometerStart = null;
+            updatedValues.odometerEnd = null;
+            updatedValues.odometerStartImage = null;
+            updatedValues.odometerEndImage = null;
         }
     }
 
