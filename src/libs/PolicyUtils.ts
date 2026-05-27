@@ -327,8 +327,9 @@ function getEligibleBankAccountShareRecipients(policies: OnyxCollection<Policy> 
     for (const policy of Object.values(activePolicies)) {
         for (const admin of getAdminEmployees(policy)) {
             const email = admin?.email;
-            // Check if the email is for the active user or an existing user in the sharees array or admins list to avoid extra iterations
-            if (!email || email === currentUserLogin || adminMap.has(email) || shareesSet.has(email)) {
+            // Check if the email is for the active user or an existing user in the sharees array or admins list to avoid extra iterations.
+            // Exclude Expensify team/guide accounts (auto-provisioned on workspaces) so they are not offered as share recipients.
+            if (!email || email === currentUserLogin || adminMap.has(email) || shareesSet.has(email) || isExpensifyTeam(email)) {
                 continue;
             }
             const personalDetails = getPersonalDetailByEmail(email);
@@ -368,7 +369,9 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
         const admins = getAdminEmployees(policy);
         for (const admin of admins) {
             const email = admin?.email;
-            if (!email || email === currentUserLogin || alreadySharedSharees.has(email)) {
+            // Skip the current user, already-shared emails, and Expensify team/guide accounts so the Share
+            // option only appears when there is a real other admin to share the bank account with.
+            if (!email || email === currentUserLogin || alreadySharedSharees.has(email) || isExpensifyTeam(email)) {
                 continue;
             }
 
