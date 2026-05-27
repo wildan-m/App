@@ -15,10 +15,6 @@ function getReportURLForCurrentContext(reportID: string | undefined): string {
     if (!reportID) {
         return `${environmentURL}/r/`;
     }
-    const isInSearchContext = isSearchTopmostFullScreenRoute();
-    if (!isInSearchContext) {
-        return `${environmentURL}/${ROUTES.REPORT_WITH_ID.getRoute(reportID)}`;
-    }
 
     // Navigation can return routes with a leading slash or missing when still mounting.
     // Normalize everything to match the path shape used by ROUTES helpers.
@@ -30,6 +26,16 @@ function getReportURLForCurrentContext(reportID: string | undefined): string {
     };
 
     const activeRoute = normalizeRoute(Navigation.getActiveRoute());
+
+    // Treat the user as being in a search context either when the Search navigator is the topmost
+    // focused full-screen tab, or when the active route is already within the Search stack (e.g. the
+    // Spend super-wide report modal at `search/r/...`). The latter covers cases like opening an expense
+    // from Spend > Expenses, where the topmost-tab check doesn't resolve to Search even though the user
+    // is on a `search/...` route — without it the link falls through to the Inbox route.
+    const isInSearchContext = isSearchTopmostFullScreenRoute() || !!activeRoute?.startsWith(ROUTES.SEARCH_ROOT.route);
+    if (!isInSearchContext) {
+        return `${environmentURL}/${ROUTES.REPORT_WITH_ID.getRoute(reportID)}`;
+    }
 
     let backToRoute: string | undefined;
 
