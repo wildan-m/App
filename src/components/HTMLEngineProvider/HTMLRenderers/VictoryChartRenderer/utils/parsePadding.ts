@@ -4,6 +4,12 @@ import parseAttribute from './parseAttribute';
 
 type Padding = CartesianChartProps['padding'];
 
+// VictoryChart (web) applies 50 on every side when `padding` is not set.
+// victory-native resolves missing sides to 0, so unspecified sides need to be
+// filled in here to keep the two layouts aligned with the source `<victorylegend>`
+// coordinates baked against a 50px-padded layout.
+const VICTORY_CHART_DEFAULT_PADDING = 50;
+
 /**
  * Translate VictoryChart's `padding` attribute into victory-native's `padding` shape.
  */
@@ -13,25 +19,18 @@ function parsePadding(attribute: string): Padding {
         return padding;
     }
     if (lodashIsObject(padding)) {
-        let left: number | undefined;
-        let right: number | undefined;
-        let top: number | undefined;
-        let bottom: number | undefined;
-        if ('left' in padding && typeof padding.left === 'number') {
-            left = padding.left;
-        }
-        if ('right' in padding && typeof padding.right === 'number') {
-            right = padding.right;
-        }
-        if ('top' in padding && typeof padding.top === 'number') {
-            top = padding.top;
-        }
-        if ('bottom' in padding && typeof padding.bottom === 'number') {
-            bottom = padding.bottom;
-        }
-        return {left, right, top, bottom};
+        const pickSide = (side: 'left' | 'right' | 'top' | 'bottom'): number => {
+            const value = (padding as Record<string, unknown>)[side];
+            return typeof value === 'number' ? value : VICTORY_CHART_DEFAULT_PADDING;
+        };
+        return {
+            left: pickSide('left'),
+            right: pickSide('right'),
+            top: pickSide('top'),
+            bottom: pickSide('bottom'),
+        };
     }
-    return undefined;
+    return VICTORY_CHART_DEFAULT_PADDING;
 }
 
 export default parsePadding;
