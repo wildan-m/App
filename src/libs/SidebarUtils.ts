@@ -507,6 +507,18 @@ function updateReportsToDisplayInLHN({
             } else if (existingEntry !== report) {
                 getMutableCopy()[reportID] = report;
             }
+
+            // Enforce the mutual exclusion between a one-transaction expense report and its transaction thread.
+            // The thread may have been added to displayedReports during a brief window where the parent report
+            // actions cache did not yet contain the IOU action that links it back to the thread. Once we re-evaluate
+            // the expense report and confirm it should remain displayed, drop the thread to avoid a duplicated LHN row.
+            const oneTransactionThreadReportID = reportAttributes?.[report?.reportID]?.oneTransactionThreadReportID;
+            if (oneTransactionThreadReportID) {
+                const threadKey = `${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`;
+                if (threadKey in displayedReports) {
+                    delete getMutableCopy()[threadKey];
+                }
+            }
         } else if (reportID in displayedReports) {
             delete getMutableCopy()[reportID];
         }
