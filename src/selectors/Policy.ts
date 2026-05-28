@@ -93,7 +93,11 @@ const groupPaidPoliciesWithExpenseChatEnabledSelector = (policies: OnyxCollectio
         return CONST.EMPTY_ARRAY;
     }
     return Object.values(policies ?? {}).filter(
-        (policy): policy is Policy => !!policy?.isPolicyExpenseChatEnabled && !policy?.isJoinRequestPending && isPaidGroupPolicy(policy) && shouldShowPolicy(policy, false, currentUserLogin),
+        (policy): policy is Policy =>
+            !!policy?.isPolicyExpenseChatEnabled &&
+            !policy?.isJoinRequestPending &&
+            (isPaidGroupPolicy(policy) || policy?.type === CONST.POLICY.TYPE.SUBMIT) &&
+            shouldShowPolicy(policy, false, currentUserLogin),
     );
 };
 
