@@ -232,6 +232,12 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         );
     }, [route.params.policyID]);
 
+    const navigateToSubmitWorkspacePaymentsUpgrade = useCallback(() => {
+        Navigation.navigate(
+            ROUTES.WORKSPACE_UPGRADE.getRoute(route.params.policyID, CONST.UPGRADE_FEATURE_INTRO_MAPPING.payments.alias, ROUTES.WORKSPACE_WORKFLOWS.getRoute(route.params.policyID)),
+        );
+    }, [route.params.policyID]);
+
     // User should be allowed to add new Approval Workflow only if he's upgraded to Control Plan, otherwise redirected to the Upgrade Page
     const addApprovalAction = useCallback(() => {
         setApprovalWorkflow({
@@ -501,9 +507,10 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                 disabled: isSmartLimitEnabled || isDEWEnabled || isHRConnected || canAccessSubmit2026Features,
                 disabledAction: getAddApprovalsToggleDisabledAction(),
                 isActive:
-                    isHRConnected ||
-                    isDEWEnabled ||
-                    (([CONST.POLICY.APPROVAL_MODE.BASIC, CONST.POLICY.APPROVAL_MODE.ADVANCED].some((approvalMode) => approvalMode === policy?.approvalMode) && !hasApprovalError) ?? false),
+                    !canAccessSubmit2026Features &&
+                    (isHRConnected ||
+                        isDEWEnabled ||
+                        (([CONST.POLICY.APPROVAL_MODE.BASIC, CONST.POLICY.APPROVAL_MODE.ADVANCED].some((approvalMode) => approvalMode === policy?.approvalMode) && !hasApprovalError) ?? false)),
                 pendingAction: policy?.pendingFields?.approvalMode,
                 errors: getLatestErrorField(policy ?? {}, CONST.POLICY.COLLECTION_KEYS.APPROVAL_MODE),
                 onCloseError: () => clearPolicyErrorField(route.params.policyID, CONST.POLICY.COLLECTION_KEYS.APPROVAL_MODE),
@@ -668,7 +675,9 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                     </>
                 ),
                 isEndOptionRow: true,
-                isActive: policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO,
+                disabled: canAccessSubmit2026Features,
+                disabledAction: navigateToSubmitWorkspacePaymentsUpgrade,
+                isActive: !canAccessSubmit2026Features && policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO,
                 pendingAction: policy?.pendingFields?.reimbursementChoice,
                 errors: getLatestErrorField(policy ?? {}, CONST.POLICY.COLLECTION_KEYS.REIMBURSEMENT_CHOICE),
                 onCloseError: () => clearPolicyErrorField(route.params.policyID, CONST.POLICY.COLLECTION_KEYS.REIMBURSEMENT_CHOICE),
@@ -688,6 +697,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         shouldBlockApprovalWorkflowEditing,
         approvalSubtitle,
         navigateToSubmitWorkspaceApprovalsUpgrade,
+        navigateToSubmitWorkspacePaymentsUpgrade,
         promptConfigureApprovalsInHR,
         isDEWEnabled,
         shouldUseNarrowLayout,
