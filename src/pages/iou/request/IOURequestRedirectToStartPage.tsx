@@ -12,7 +12,7 @@ type IOURequestRedirectToStartPageProps = WithWritableReportOrNotFoundProps<type
 
 function IOURequestRedirectToStartPage({
     route: {
-        params: {iouType, iouRequestType},
+        params: {iouType, iouRequestType} = {} as IOURequestRedirectToStartPageProps['route']['params'],
     },
 }: IOURequestRedirectToStartPageProps) {
     const isIouTypeValid = Object.values(CONST.IOU.TYPE).includes(iouType);
