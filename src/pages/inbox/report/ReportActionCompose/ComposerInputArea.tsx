@@ -23,7 +23,7 @@ function ComposerInputArea() {
     return (
         <View
             testID={CONST.COMPOSER.TEST_ID.REPORT_ACTION_COMPOSE}
-            style={[isComposerFullSize && styles.chatItemFullComposeRow]}
+            style={isComposerFullSize ? styles.flex1 : undefined}
         >
             <ComposerLocalTime />
             <View style={isComposerFullSize ? styles.flex1 : {}}>

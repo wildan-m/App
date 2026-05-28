@@ -1,7 +1,12 @@
 import React from 'react';
+import {View} from 'react-native';
+import useOnyx from '@hooks/useOnyx';
+import useThemeStyles from '@hooks/useThemeStyles';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ComposerActionMenu from './ComposerActionMenu';
 import ComposerBox from './ComposerBox';
 import ComposerContainer from './ComposerContainer';
+import {useComposerState} from './ComposerContext';
 import type {SuggestionsRef} from './ComposerContext';
 import ComposerDefaultFooter from './ComposerDefaultFooter';
 import ComposerDropZone from './ComposerDropZone';
@@ -23,11 +28,23 @@ type ReportActionComposeProps = {
     reportID: string;
 };
 
+function ComposerLayout() {
+    const {reportID} = useComposerState();
+    const styles = useThemeStyles();
+    const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
+
+    return (
+        <View style={isComposerFullSize ? styles.chatItemFullComposeRow : undefined}>
+            <ComposerInputArea />
+            <ComposerDefaultFooter />
+        </View>
+    );
+}
+
 function ReportActionCompose({reportID}: ReportActionComposeProps) {
     return (
         <ComposerProvider reportID={reportID}>
-            <ComposerInputArea />
-            <ComposerDefaultFooter />
+            <ComposerLayout />
         </ComposerProvider>
     );
 }
