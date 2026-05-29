@@ -3849,6 +3849,7 @@ const translations = {
     personalInfoStep: {
         personalInfo: 'Personal info',
         enterYourLegalFirstAndLast: "What's your legal name?",
+        enterYourFullLegalName: 'Please enter your full legal name as it appears on your ID.',
         legalFirstName: 'Legal first name',
         legalLastName: 'Legal last name',
         legalName: 'Legal name',

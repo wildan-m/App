@@ -3656,6 +3656,7 @@ ${amount} para ${merchant} - ${date}`,
     personalInfoStep: {
         personalInfo: 'Información Personal',
         enterYourLegalFirstAndLast: '¿Cuál es tu nombre legal?',
+        enterYourFullLegalName: 'Introduce tu nombre legal completo tal y como aparece en tu documento de identidad.',
         legalFirstName: 'Nombre',
         legalLastName: 'Apellidos',
         legalName: 'Nombre legal',
