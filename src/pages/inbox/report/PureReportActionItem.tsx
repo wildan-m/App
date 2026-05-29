@@ -367,6 +367,13 @@ function PureReportActionItem({
 
     const isContextMenuDisabled = hasDraft || (hasActionErrors && !hasOnlyReceiptErrors) || !shouldDisplayContextMenuValue;
 
+    // Receipt errors are filtered out of getLatestErrorMessageField (they are handled separately by DotIndicatorMessage),
+    // so we surface them here for money request actions. Without this, a failed scan/receipt expense shows in the report
+    // with no way to dismiss it because the "Delete expense" dismiss button (rendered by DotIndicatorMessage) never appears.
+    const receiptErrors: Errors = isMoneyRequestAction(action)
+        ? (Object.fromEntries(Object.entries(action.errors ?? {}).filter(([, error]) => isReceiptError(error))) as Errors)
+        : {};
+
     /**
      * Show the ReportActionContextMenu modal popover.
      *
@@ -560,7 +567,7 @@ function PureReportActionItem({
                                                     hasDraft ? undefined : (action.pendingAction ?? (action.isOptimisticAction ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : undefined))
                                                 }
                                                 shouldHideOnDelete={!isDeletedParentAction}
-                                                errors={(linkedTransactionRouteError ?? !isOnSearch) ? getLatestErrorMessageField(action as OnyxDataWithErrors) : {}}
+                                                errors={(linkedTransactionRouteError ?? !isOnSearch) ? {...getLatestErrorMessageField(action as OnyxDataWithErrors), ...receiptErrors} : {}}
                                                 errorRowStyles={[styles.ml10, styles.mr2]}
                                                 needsOffscreenAlphaCompositing={isMoneyRequestAction(action)}
                                                 shouldDisableStrikeThrough
