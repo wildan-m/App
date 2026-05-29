@@ -114,15 +114,23 @@ function useReportActionsNewActionLiveTail({
                         reportScrollManager.scrollToIndex(index);
                     }, 100);
                 } else {
-                    setIsFloatingMessageCounterVisible(false);
-                    reportScrollManager.scrollToBottom();
+                    // The action can be a freshly inserted row at index 0 (e.g. a brand new report preview created when the
+                    // prior expense in the chat is already paid). On iOS that row is not laid out yet when this handler runs,
+                    // so a synchronous scrollToBottom is silently dropped by FlashList. Defer it like the index > 0 branch.
+                    setTimeout(() => {
+                        setIsFloatingMessageCounterVisible(false);
+                        reportScrollManager.scrollToBottom();
+                    }, 100);
                 }
                 if (action?.reportActionID) {
                     setActionIdToHighlight(action.reportActionID);
                 }
             } else {
-                setIsFloatingMessageCounterVisible(false);
-                reportScrollManager.scrollToBottom();
+                // Same freshly-inserted-row-at-index-0 condition can occur for current-user actions following a paid expense.
+                setTimeout(() => {
+                    setIsFloatingMessageCounterVisible(false);
+                    reportScrollManager.scrollToBottom();
+                }, 100);
             }
 
             setIsScrollToBottomEnabled(true);
