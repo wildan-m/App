@@ -75,6 +75,16 @@ type DomainOnyxUpdate =
 
 type AccountOnyxUpdate = OnyxUpdate<typeof ONYXKEYS.ACCOUNT>;
 
+// Tracks the signed-in account so non-render actions (e.g. updateTheme) can tell signed-in from signed-out state.
+// `connectWithoutView` is appropriate here since it is only read inside actions, never during render.
+let currentUserAccountID: number | undefined;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.SESSION,
+    callback: (session) => {
+        currentUserAccountID = session?.accountID;
+    },
+});
+
 type LockAccountOnyxUpdate = DomainOnyxUpdate | AccountOnyxUpdate;
 type LockAccountOnyxKey =
     | typeof ONYXKEYS.ACCOUNT
@@ -1214,6 +1224,16 @@ function setContactMethodAsDefault(
 }
 
 function updateTheme(theme: ValueOf<typeof CONST.THEME>, shouldGoBack = true) {
+    // If the user is not signed in (e.g. toggling high contrast from the sign-in screen footer), change the
+    // theme locally only. `PREFERRED_THEME` is preserved on sign-out, so the choice carries over once they sign in.
+    if (!currentUserAccountID) {
+        Onyx.set(ONYXKEYS.PREFERRED_THEME, theme);
+        if (shouldGoBack) {
+            Navigation.goBack();
+        }
+        return;
+    }
+
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.PREFERRED_THEME>> = [
         {
             onyxMethod: Onyx.METHOD.SET,

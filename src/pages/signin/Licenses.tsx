@@ -5,6 +5,7 @@ import RenderHTML from '@components/RenderHTML';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import HighContrastModeToggle from '@pages/signin/HighContrastModeToggle';
 
 const currentYear = new Date().getFullYear();
 
@@ -19,6 +20,9 @@ function Licenses() {
             </View>
             <View style={[styles.mt4, styles.alignItemsCenter, styles.mb2, styles.flexRow, styles.justifyContentBetween]}>
                 <LocalePicker size="small" />
+            </View>
+            <View style={styles.mb2}>
+                <HighContrastModeToggle />
             </View>
         </>
     );
