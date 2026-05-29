@@ -35,10 +35,21 @@ const subscribe: LinkingOptions<RootNavigatorParamList>['subscribe'] = (listener
         // Skip forwarding URLs while TabNavigator is mounting — its child
         // router hasn't run useNavigationBuilder yet, so React Navigation
         // can't handle nested NAVIGATE actions and throws an unhandled-action
-        // error. Protected-screen deep links will be handled separately by
-        // openReportFromDeepLink via waitForProtectedRoutes().
+        // error. We can't simply drop the URL though: deep links to root-level
+        // protected screens (e.g. /concierge) rely on React Navigation linking
+        // and are NOT re-navigated by openReportFromDeepLink once the user is
+        // authenticated, so dropping them loses the deep link entirely. Instead,
+        // defer forwarding until the TabNavigator's child router has mounted,
+        // then forward the original URL.
         const state = navigationRef.current?.getRootState();
         if (!isTabNavigatorReady(state)) {
+            const unsubscribe = navigationRef.current?.addListener('state', ({data}) => {
+                if (!isTabNavigatorReady(data?.state)) {
+                    return;
+                }
+                unsubscribe?.();
+                listener(url);
+            });
             return;
         }
 
