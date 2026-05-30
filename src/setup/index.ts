@@ -3,6 +3,7 @@ import {I18nManager} from 'react-native';
 import Config from 'react-native-config';
 import Onyx from 'react-native-onyx';
 import intlPolyfill from '@libs/IntlPolyfill';
+import subscribeToPushNotifications from '@libs/Notification/PushNotification/subscribeToPushNotifications';
 import {setDeviceID} from '@userActions/Device';
 import initOnyxDerivedValues from '@userActions/OnyxDerived';
 import CONST from '@src/CONST';
@@ -75,9 +76,11 @@ export default function () {
         ],
     });
 
-    // Must be imported after Onyx.init() and outside the React lifecycle so that push notification
+    // Must be called after Onyx.init() and outside the React lifecycle so that push notification
     // handlers are registered before any push arrives, including Android headless/background wake-ups.
-    import('@libs/Notification/PushNotification/subscribeToPushNotifications');
+    // This is a synchronous call (not a deferred dynamic import) so the handlers are bound before an
+    // early cold-start NotificationResponse can be dispatched and dropped.
+    subscribeToPushNotifications();
 
     initOnyxDerivedValues();
 

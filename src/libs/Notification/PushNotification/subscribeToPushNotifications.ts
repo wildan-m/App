@@ -15,44 +15,53 @@ import type {OnyxUpdatesFromServer} from '@src/types/onyx';
 import PushNotification from '.';
 import type {AnyPushNotificationData, PushNotificationData} from './NotificationType';
 
+let isSingleNewDotEntry: boolean | undefined;
+
 /**
  * Manage push notification subscriptions on sign-in/sign-out.
+ *
+ * This must be called synchronously during app setup (after Onyx.init()) so the push notification handlers
+ * are registered before any push event can be dispatched. In particular, on an Android cold start triggered
+ * by tapping a notification, the native NotificationResponse fires very early; if the handlers are not yet
+ * bound the tap is dropped and the app opens the last active chat instead of the notification's chat.
+ * Registering synchronously (rather than via a deferred dynamic import) closes that window.
  */
-// We do not depend on updates on the UI for notifications, so we can use `connectWithoutView` here.
-Onyx.connectWithoutView({
-    key: ONYXKEYS.NVP_PRIVATE_PUSH_NOTIFICATION_ID,
-    callback: (notificationID) => {
-        if (notificationID) {
-            PushNotification.register(notificationID);
-            PushNotification.init();
+function subscribeToPushNotifications() {
+    // We do not depend on updates on the UI for notifications, so we can use `connectWithoutView` here.
+    Onyx.connectWithoutView({
+        key: ONYXKEYS.NVP_PRIVATE_PUSH_NOTIFICATION_ID,
+        callback: (notificationID) => {
+            if (notificationID) {
+                PushNotification.register(notificationID);
+                PushNotification.init();
 
-            // Subscribe handlers for different push notification types
-            PushNotification.onReceived(PushNotification.TYPE.REPORT_COMMENT, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.REPORT_COMMENT, navigateToReport);
+                // Subscribe handlers for different push notification types
+                PushNotification.onReceived(PushNotification.TYPE.REPORT_COMMENT, applyOnyxData);
+                PushNotification.onSelected(PushNotification.TYPE.REPORT_COMMENT, navigateToReport);
 
-            PushNotification.onReceived(PushNotification.TYPE.REPORT_ACTION, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.REPORT_ACTION, navigateToReport);
+                PushNotification.onReceived(PushNotification.TYPE.REPORT_ACTION, applyOnyxData);
+                PushNotification.onSelected(PushNotification.TYPE.REPORT_ACTION, navigateToReport);
 
-            PushNotification.onReceived(PushNotification.TYPE.TRANSACTION, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.TRANSACTION, navigateToReport);
-        } else {
-            PushNotification.deregister();
-            PushNotification.clearNotifications();
-        }
-    },
-});
+                PushNotification.onReceived(PushNotification.TYPE.TRANSACTION, applyOnyxData);
+                PushNotification.onSelected(PushNotification.TYPE.TRANSACTION, navigateToReport);
+            } else {
+                PushNotification.deregister();
+                PushNotification.clearNotifications();
+            }
+        },
+    });
 
-let isSingleNewDotEntry: boolean | undefined;
-// Hybrid app config is not determined by changes in the UI, so we can use `connectWithoutView` here.
-Onyx.connectWithoutView({
-    key: ONYXKEYS.HYBRID_APP,
-    callback: (value) => {
-        if (!value) {
-            return;
-        }
-        isSingleNewDotEntry = value?.isSingleNewDotEntry;
-    },
-});
+    // Hybrid app config is not determined by changes in the UI, so we can use `connectWithoutView` here.
+    Onyx.connectWithoutView({
+        key: ONYXKEYS.HYBRID_APP,
+        callback: (value) => {
+            if (!value) {
+                return;
+            }
+            isSingleNewDotEntry = value?.isSingleNewDotEntry;
+        },
+    });
+}
 
 function applyOnyxData<TKey extends OnyxKey>({reportID, onyxData, lastUpdateID, previousUpdateID, hasPendingOnyxUpdates = false}: PushNotificationData<TKey>): Promise<void> {
     Log.info(`[PushNotification] Applying onyx data in the ${Visibility.isVisible() ? 'foreground' : 'background'}`, false, {reportID, lastUpdateID});
@@ -162,3 +171,5 @@ function getLastUpdateIDAppliedToClient(): Promise<number> {
         });
     });
 }
+
+export default subscribeToPushNotifications;
