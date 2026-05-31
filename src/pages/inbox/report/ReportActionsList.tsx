@@ -432,7 +432,12 @@ function ReportActionsList({
     }, [lastAction?.created]);
 
     const lastVisibleActionCreated = getReportLastVisibleActionCreated(report, transactionThreadReport);
-    const hasNewestReportAction = lastAction?.created === lastVisibleActionCreated || isReportPreviewAction(lastAction);
+    // Treat the report as showing the newest action when the last loaded action is at least as new as the report's
+    // last-visible-action marker. A freshly received message is merged into the loaded actions a render before the
+    // report's `lastVisibleActionCreated` metadata catches up; a strict equality check would briefly flip this to
+    // false, which poisons the `prevHasNewestReportAction` guard in `useScrollToEndOnNewMessageReceived` and suppresses
+    // the live-tail auto-scroll. `>=` is still false when there are genuinely newer, not-yet-loaded actions.
+    const hasNewestReportAction = (!!lastAction?.created && lastAction.created >= lastVisibleActionCreated) || isReportPreviewAction(lastAction);
 
     const {isFloatingMessageCounterVisible, setIsFloatingMessageCounterVisible, trackVerticalScrolling, onViewableItemsChanged} = useReportUnreadMessageScrollTracking({
         reportID: report.reportID,
