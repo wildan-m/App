@@ -33,6 +33,7 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [approvalWorkflow, approvalWorkflowMetadata] = useOnyx(ONYXKEYS.APPROVAL_WORKFLOW);
+    const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
     const isApprovalWorkflowLoading = isLoadingOnyxValue(approvalWorkflowMetadata);
     const personalDetailsByEmail = usePersonalDetailsByEmail();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -103,6 +104,13 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
                     return null;
                 }
 
+                // Deleting an agent only flags its SHARED_NVP_AGENT_PROMPT entry with a DELETE pending action; the
+                // policy employee record is left untouched. Mirror the employee.pendingAction === DELETE guard above
+                // so an agent deleted while offline stops appearing here and can't be re-added as an approver.
+                if (agentPrompts?.[`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`]?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+                    return null;
+                }
+
                 const {avatar, displayName = email, login} = personalDetails?.[accountID] ?? {};
 
                 return {
@@ -134,6 +142,7 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
         approverIndex,
         defaultApprover,
         personalDetails,
+        agentPrompts,
         icons.FallbackAvatar,
         shouldFilterOutExpensifyTeam,
     ]);
