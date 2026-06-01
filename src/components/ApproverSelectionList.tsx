@@ -94,7 +94,11 @@ function ApproverSelectionList({
         const isAlreadySelected = selectedMembers.some((selectedOption) => selectedOption.login === member.login);
         let newSelectedApprovers = [];
         if (!allowMultipleSelection) {
-            newSelectedApprovers = isAlreadySelected ? [] : [{...member, isSelected: true}];
+            // In single-select mode, re-tapping the already-selected approver should confirm the existing
+            // selection rather than empty it. An empty selection is treated as an approver removal by the
+            // approver page, which silently clears a pre-selected approver (e.g. a freshly created agent)
+            // when the field is opened and saved again without any edit.
+            newSelectedApprovers = isAlreadySelected ? selectedMembers : [{...member, isSelected: true}];
         } else {
             newSelectedApprovers = isAlreadySelected
                 ? selectedMembers.filter((selectedOption) => selectedOption.login !== member.login)
