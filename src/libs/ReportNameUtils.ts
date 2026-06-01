@@ -30,6 +30,7 @@ import {getForReportAction, getMovedReportID} from './ModifiedExpenseMessage';
 import Parser from './Parser';
 import {getDisplayNameOrDefault} from './PersonalDetailsUtils';
 import {getCleanedTagName, isPolicyAdmin, isPolicyFieldListEmpty} from './PolicyUtils';
+import {getAddExpensifyCardRuleMessage, getRemoveExpensifyCardRuleMessage, getUpdateExpensifyCardRuleMessage} from './SpendRuleChangeLogUtils';
 import {
     getActionableCard3DSTransactionApprovalMessage,
     getActionableCardFraudAlertResolutionMessage,
@@ -848,6 +849,17 @@ function computeChatThreadReportName(
     ) {
         return translate('parentReportAction.hiddenMessage');
     }
+    // Expensify card rule change-log actions compute their display text from the action's structured data
+    // (see PolicyChangeLogContent/SidebarUtils). Derive the thread header the same way so it stays consistent
+    // with the in-chat system message instead of falling back to the raw stored HTML.
+    const cardRuleMessage =
+        getAddExpensifyCardRuleMessage(translate, parentReportAction) ||
+        getUpdateExpensifyCardRuleMessage(translate, parentReportAction) ||
+        getRemoveExpensifyCardRuleMessage(translate, parentReportAction);
+    if (cardRuleMessage) {
+        return formatReportLastMessageText(cardRuleMessage);
+    }
+
     if (isAdminRoom(report) || isUserCreatedPolicyRoom(report)) {
         return reportActionMessage;
     }

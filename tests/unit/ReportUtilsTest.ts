@@ -1505,6 +1505,55 @@ describe('ReportUtils', () => {
                 // Note: The new computeReportName returns generic "removed 1 member" instead of expanding names like the old deprecated getReportName did
                 expect(computeReportName(threadOfRemovedRoomMemberAction, reports, policies, undefined, undefined, participantsPersonalDetails, reportActions)).toBe('removed 1 member');
             });
+
+            test('Expensify card rule update header matches the system message (issue 92293)', () => {
+                // When only the restriction type changes, the raw stored HTML still lists the unchanged max amount.
+                // The thread header must be derived from the action's structured data so it matches the in-chat message.
+                const parentReport = {
+                    ...LHNTestUtils.getFakeReport(),
+                    reportID: '101',
+                    type: CONST.REPORT.TYPE.CHAT,
+                    chatType: CONST.REPORT.CHAT_TYPE.POLICY_ADMINS,
+                    policyID: policy.id,
+                };
+                const cardRuleParentReportAction = {
+                    reportActionID: '103',
+                    actionName: CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_EXPENSIFY_CARD_RULE,
+                    message: [
+                        {
+                            type: 'COMMENT',
+                            html: "changed spend rule from only allow to block and max amount from $100.00 to $100.00 on 'mmmoo'",
+                            text: "changed spend rule from only allow to block and max amount from $100.00 to $100.00 on 'mmmoo'",
+                        },
+                    ],
+                    originalMessage: {
+                        oldAction: CONST.SPEND_RULES.ACTION.ALLOW,
+                        action: CONST.SPEND_RULES.ACTION.BLOCK,
+                        currency: CONST.CURRENCY.USD,
+                        oldAmounts: [{operator: CONST.SEARCH.SYNTAX_OPERATORS.LOWER_THAN_OR_EQUAL_TO, value: ['100.00']}],
+                        amounts: [{operator: CONST.SEARCH.SYNTAX_OPERATORS.GREATER_THAN, value: ['100.00']}],
+                        oldCards: [{cardID: 1, displayName: 'mmmoo'}],
+                        cards: [{cardID: 1, displayName: 'mmmoo'}],
+                    },
+                } as ReportAction;
+                const threadOfCardRuleAction = {
+                    ...LHNTestUtils.getFakeReport(),
+                    type: CONST.REPORT.TYPE.CHAT,
+                    chatType: undefined,
+                    parentReportID: parentReport.reportID,
+                    parentReportActionID: cardRuleParentReportAction.reportActionID,
+                    policyID: policy.id,
+                };
+
+                const reports = {[`${ONYXKEYS.COLLECTION.REPORT}${parentReport.reportID}`]: parentReport};
+                const policies = {[`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`]: policy};
+                const reportActions = {
+                    [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${threadOfCardRuleAction.parentReportID}`]: {[cardRuleParentReportAction.reportActionID]: cardRuleParentReportAction},
+                };
+                expect(computeReportName(threadOfCardRuleAction, reports, policies, undefined, undefined, participantsPersonalDetails, reportActions)).toBe(
+                    "changed spend rule from only allow to block on 'mmmoo'",
+                );
+            });
         });
 
         describe('Task Report', () => {

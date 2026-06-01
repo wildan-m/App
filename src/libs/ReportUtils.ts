@@ -252,6 +252,7 @@ import {
     getReportName as getReportNameFromNameUtils,
 } from './ReportNameUtils';
 import type {ArchivedReportsIDSet} from './SearchUIUtils';
+import {getAddExpensifyCardRuleMessage, getRemoveExpensifyCardRuleMessage, getUpdateExpensifyCardRuleMessage} from './SpendRuleChangeLogUtils';
 import {shouldRestrictUserBillableActions} from './SubscriptionUtils';
 import {isTaskCompleted} from './TaskUtils';
 import {
@@ -5870,6 +5871,18 @@ function getReportName(reportNameInformation: GetReportNameParams): string {
             parentReportActionMessage?.moderationDecision?.decision === CONST.MODERATION.MODERATOR_DECISION_PENDING_REMOVE
         ) {
             return translateLocal('parentReportAction.hiddenMessage');
+        }
+        // Expensify card rule change-log actions compute their display text from the action's structured data
+        // (see PolicyChangeLogContent/SidebarUtils). Derive the thread header the same way so it stays consistent
+        // with the in-chat system message instead of falling back to the raw stored HTML.
+        if (!isEmptyObject(parentReportAction)) {
+            const cardRuleMessage =
+                getAddExpensifyCardRuleMessage(translateLocal, parentReportAction) ||
+                getUpdateExpensifyCardRuleMessage(translateLocal, parentReportAction) ||
+                getRemoveExpensifyCardRuleMessage(translateLocal, parentReportAction);
+            if (cardRuleMessage) {
+                return formatReportLastMessageText(cardRuleMessage);
+            }
         }
         if (isAdminRoom(report) || isUserCreatedPolicyRoom(report)) {
             return getAdminRoomInvitedParticipants(translateLocal, parentReportAction, reportActionMessage);
