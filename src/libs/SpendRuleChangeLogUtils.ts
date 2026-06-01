@@ -174,8 +174,12 @@ type SpendRulePhraseAdjective = '' | typeof CONST.SPEND_RULES.ACTION.BLOCK | typ
 type SpendRulePhrase = {
     verb: SpendRulePhraseVerb;
     adjective: SpendRulePhraseAdjective;
+    /** Discriminator for the filter the phrase describes (e.g. 'merchant', 'category'), used to group consecutive same-type values. */
+    type: string;
     bodyWithAdjective: string;
     bodyWithoutAdjective: string;
+    /** Just the quoted value, without the leading adjective or the type noun. Used for the 2nd+ value of a same-type group. */
+    bodyBare: string;
 };
 
 function getSpendRulePhraseVerbWord(translate: LocalizedTranslate, verb: SpendRulePhraseVerb): string {
@@ -211,6 +215,13 @@ function joinSpendRulePhrases(translate: LocalizedTranslate, phrases: readonly S
     for (let i = 1; i < phrases.length; i++) {
         const phrase = phrases.at(i);
         if (!phrase) {
+            continue;
+        }
+        // When this value belongs to the same filter as the previous phrase, emit only the bare value so the
+        // type noun (e.g. "spend category") is not repeated for every value, e.g. "spend category 'A', 'B', 'C'".
+        const previousPhrase = phrases.at(i - 1);
+        if (previousPhrase && phrase.type === previousPhrase.type) {
+            parts.push(phrase.bodyBare);
             continue;
         }
         const useOwnAdjective = phrase.adjective !== '' && phrase.adjective !== firstAdjective;
@@ -258,6 +269,7 @@ function getAddExpensifyCardRuleMessage(translate: LocalizedTranslate, reportAct
 
 function getDiffPhrases(
     diff: SpendRuleStringDiff,
+    type: string,
     adjective: SpendRulePhraseAdjective,
     adjectiveWord: string,
     getDisplayName: (value: string) => string,
@@ -268,11 +280,14 @@ function getDiffPhrases(
     if (diff.added.length === 1 && diff.removed.length === 1) {
         const oldValue = getDisplayName(diff.removed.at(0) ?? '');
         const newValue = getDisplayName(diff.added.at(0) ?? '');
+        const changeBody = formatBodyChange({adjective: '', oldValue, newValue});
         diffPhrases.push({
             verb: 'changed',
             adjective,
+            type,
             bodyWithAdjective: formatBodyChange({adjective: adjectiveWord, oldValue, newValue}),
-            bodyWithoutAdjective: formatBodyChange({adjective: '', oldValue, newValue}),
+            bodyWithoutAdjective: changeBody,
+            bodyBare: changeBody,
         });
     } else {
         for (const value of diff.added) {
@@ -280,8 +295,10 @@ function getDiffPhrases(
             diffPhrases.push({
                 verb: 'added',
                 adjective,
+                type,
                 bodyWithAdjective: formatBody({adjective: adjectiveWord, value: display}),
                 bodyWithoutAdjective: formatBody({adjective: '', value: display}),
+                bodyBare: `'${display}'`,
             });
         }
         for (const value of diff.removed) {
@@ -289,8 +306,10 @@ function getDiffPhrases(
             diffPhrases.push({
                 verb: 'removed',
                 adjective,
+                type,
                 bodyWithAdjective: formatBody({adjective: adjectiveWord, value: display}),
                 bodyWithoutAdjective: formatBody({adjective: '', value: display}),
+                bodyBare: `'${display}'`,
             });
         }
     }
@@ -351,6 +370,7 @@ function getUpdateExpensifyCardRuleMessage(translate: LocalizedTranslate, report
     const phrases: SpendRulePhrase[] = [
         ...getDiffPhrases(
             merchantDiff,
+            'merchant',
             adjective,
             adjectiveWord,
             (value) => value,
@@ -359,6 +379,7 @@ function getUpdateExpensifyCardRuleMessage(translate: LocalizedTranslate, report
         ),
         ...getDiffPhrases(
             categoryDiff,
+            'category',
             adjective,
             adjectiveWord,
             (category) => getSpendRuleCategoryDisplayName(translate, category),
@@ -371,26 +392,26 @@ function getUpdateExpensifyCardRuleMessage(translate: LocalizedTranslate, report
         const oldValue = formatSpendRuleAmount(amountDiff.removed.at(0)?.value ?? [], currency);
         const newValue = formatSpendRuleAmount(amountDiff.added.at(0)?.value ?? [], currency);
         const body = translate('workspaceActions.expensifyCardRule.update.bodyMaxAmountChange', {oldValue, newValue});
-        phrases.push({verb: 'changed', adjective: '', bodyWithAdjective: body, bodyWithoutAdjective: body});
+        phrases.push({verb: 'changed', adjective: '', type: 'amount', bodyWithAdjective: body, bodyWithoutAdjective: body, bodyBare: body});
     } else {
         for (const amount of amountDiff.added) {
             const body = translate('workspaceActions.expensifyCardRule.update.bodyMaxAmountSet', {value: formatSpendRuleAmount(amount.value, currency)});
-            phrases.push({verb: 'set', adjective: '', bodyWithAdjective: body, bodyWithoutAdjective: body});
+            phrases.push({verb: 'set', adjective: '', type: 'amount', bodyWithAdjective: body, bodyWithoutAdjective: body, bodyBare: body});
         }
         if (amountDiff.removed.length > 0) {
             const body = translate('workspaceActions.expensifyCardRule.update.bodyMaxAmount');
-            const removedPhrase: SpendRulePhrase = {verb: 'removed', adjective: '', bodyWithAdjective: body, bodyWithoutAdjective: body};
+            const removedPhrase: SpendRulePhrase = {verb: 'removed', adjective: '', type: 'amount', bodyWithAdjective: body, bodyWithoutAdjective: body, bodyBare: body};
             phrases.push(...Array.from<SpendRulePhrase>({length: amountDiff.removed.length}).fill(removedPhrase));
         }
     }
 
     if (cardDiff.added.length > 0) {
         const body = translate('workspaceActions.expensifyCardRule.update.bodyAppliedToAdditionalCards', {count: cardDiff.added.length});
-        phrases.push({verb: 'applied', adjective: '', bodyWithAdjective: body, bodyWithoutAdjective: body});
+        phrases.push({verb: 'applied', adjective: '', type: 'card', bodyWithAdjective: body, bodyWithoutAdjective: body, bodyBare: body});
     }
     if (cardDiff.removed.length > 0) {
         const body = translate('workspaceActions.expensifyCardRule.update.bodyRemovedFromCards', {cards: getSpendRuleCardsSummary(translate, cardDiff.removed)});
-        phrases.push({verb: 'removed', adjective: '', bodyWithAdjective: body, bodyWithoutAdjective: body});
+        phrases.push({verb: 'removed', adjective: '', type: 'card', bodyWithAdjective: body, bodyWithoutAdjective: body, bodyBare: body});
     }
 
     if (phrases.length === 0) {
