@@ -7823,6 +7823,8 @@ ${reportName}
             newChat: '新しいチャット画面',
             copy: 'コメントをコピー',
             openDebug: 'テスト設定ダイアログを開く',
+            quickReportSearch: 'IDでレポートに移動するための検索を開く',
+            openWorkspace: '表示中のレポートのワークスペースを開く',
         },
     },
     guides: {

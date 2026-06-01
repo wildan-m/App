@@ -7887,6 +7887,8 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             newChat: 'Nieuw chatscherm',
             copy: 'Opmerking kopiëren',
             openDebug: 'Dialoogvenster testvoorkeuren openen',
+            quickReportSearch: 'Zoeken openen om naar een rapport te springen op ID',
+            openWorkspace: 'De werkruimte openen van het rapport dat je bekijkt',
         },
     },
     guides: {

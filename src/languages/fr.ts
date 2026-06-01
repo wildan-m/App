@@ -7962,6 +7962,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             newChat: 'Nouvel écran de discussion',
             copy: 'Copier le commentaire',
             openDebug: 'Ouvrir la boîte de dialogue des préférences de test',
+            quickReportSearch: 'Ouvrir la recherche pour accéder à un rapport par ID',
+            openWorkspace: 'Ouvrir l’espace de travail du rapport que vous consultez',
         },
     },
     guides: {

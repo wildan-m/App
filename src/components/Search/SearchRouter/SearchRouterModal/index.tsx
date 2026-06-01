@@ -13,7 +13,7 @@ const isMobileWebIOS = isMobileIOS();
 
 function SearchRouterModal() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const {isSearchRouterDisplayed} = useSearchRouterState();
+    const {isSearchRouterDisplayed, initialSearchQuery} = useSearchRouterState();
     const {closeSearchRouter} = useSearchRouterActions();
 
     // On mWeb Safari, the input caret stuck for a moment while the modal is animating. So, we hide the caret until the animation is done.
@@ -56,6 +56,7 @@ function SearchRouterModal() {
                         onRouterClose={closeSearchRouter}
                         shouldHideInputCaret={shouldHideInputCaret}
                         isSearchRouterDisplayed={isSearchRouterDisplayed}
+                        initialQuery={initialSearchQuery}
                     />
                 </FocusTrapForModal>
             </ScreenWrapperContainer>

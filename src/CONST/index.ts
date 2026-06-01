@@ -1076,6 +1076,28 @@ const CONST = {
             },
             type: KEYBOARD_SHORTCUT_NAVIGATION_TYPE,
         },
+        QUICK_REPORT_SEARCH: {
+            descriptionKey: 'quickReportSearch',
+            shortcutKey: 'U',
+            modifiers: ['CTRL'],
+            trigger: {
+                DEFAULT: {input: 'u', modifierFlags: keyModifierControl},
+                [PLATFORM_OS_MACOS]: {input: 'u', modifierFlags: keyModifierCommand},
+                [PLATFORM_IOS]: {input: 'u', modifierFlags: keyModifierCommand},
+            },
+            type: KEYBOARD_SHORTCUT_NAVIGATION_TYPE,
+        },
+        OPEN_WORKSPACE: {
+            descriptionKey: 'openWorkspace',
+            shortcutKey: 'B',
+            modifiers: ['CTRL'],
+            trigger: {
+                DEFAULT: {input: 'b', modifierFlags: keyModifierControl},
+                [PLATFORM_OS_MACOS]: {input: 'b', modifierFlags: keyModifierCommand},
+                [PLATFORM_IOS]: {input: 'b', modifierFlags: keyModifierCommand},
+            },
+            type: KEYBOARD_SHORTCUT_NAVIGATION_TYPE,
+        },
         NEW_CHAT: {
             descriptionKey: 'newChat',
             shortcutKey: 'K',

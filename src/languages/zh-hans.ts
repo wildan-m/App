@@ -7674,6 +7674,8 @@ ${reportName}
             newChat: '新聊天界面',
             copy: '复制评论',
             openDebug: '打开测试首选项对话框',
+            quickReportSearch: '打开搜索以通过 ID 跳转到报告',
+            openWorkspace: '打开你正在查看的报告所属的工作区',
         },
     },
     guides: {

@@ -58,10 +58,12 @@ type SearchRouterProps = {
     onRouterClose: () => void;
     shouldHideInputCaret?: TextInputProps['caretHidden'];
     isSearchRouterDisplayed?: boolean;
+    /** Query to pre-fill the input with when the router opens (e.g. when opened via the CMD+U shortcut) */
+    initialQuery?: string;
     ref?: React.Ref<View>;
 };
 
-function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDisplayed, ref}: SearchRouterProps) {
+function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDisplayed, initialQuery = '', ref}: SearchRouterProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {setShouldResetSearchQuery} = useSearchQueryActions();
@@ -84,6 +86,23 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const [selection, setSelection] = useState({start: textInputValue.length, end: textInputValue.length});
     const [autocompleteSubstitutions, setAutocompleteSubstitutions] = useState<SubstitutionMap>({});
     const textInputRef = useRef<AnimatedTextInputRef>(null);
+
+    // When the router is opened with a pre-filled query (e.g. via the CMD+U shortcut), seed the input once and
+    // place the caret at the end so the user can keep typing. A normal cmd+K open passes an empty query and is unaffected.
+    const hasAppliedInitialQuery = useRef(false);
+    useEffect(() => {
+        if (!isSearchRouterDisplayed) {
+            hasAppliedInitialQuery.current = false;
+            return;
+        }
+        if (hasAppliedInitialQuery.current || !initialQuery) {
+            return;
+        }
+        hasAppliedInitialQuery.current = true;
+        setTextInputValue(initialQuery);
+        setAutocompleteQueryValue(initialQuery);
+        setSelection({start: initialQuery.length, end: initialQuery.length});
+    }, [isSearchRouterDisplayed, initialQuery, setTextInputValue]);
 
     const {contextualReportID, isSearchRouterScreen} = useRootNavigationState(getContextualReportData);
 

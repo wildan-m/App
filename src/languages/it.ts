@@ -7917,6 +7917,8 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             newChat: 'Nuova schermata chat',
             copy: 'Copia commento',
             openDebug: 'Apri la finestra delle preferenze di test',
+            quickReportSearch: 'Apri la ricerca per passare a un report tramite ID',
+            openWorkspace: 'Apri lo spazio di lavoro del report che stai visualizzando',
         },
     },
     guides: {

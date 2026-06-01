@@ -7879,6 +7879,8 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             newChat: 'Nova tela de chat',
             copy: 'Copiar comentário',
             openDebug: 'Abrir caixa de diálogo de preferências de teste',
+            quickReportSearch: 'Abrir a busca para ir a um relatório por ID',
+            openWorkspace: 'Abrir o espaço de trabalho do relatório que você está visualizando',
         },
     },
     guides: {

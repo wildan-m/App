@@ -7928,6 +7928,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             newChat: 'Neuer Chat-Bildschirm',
             copy: 'Kommentar kopieren',
             openDebug: 'Testeinstellungen öffnen',
+            quickReportSearch: 'Suche öffnen, um per ID zu einem Bericht zu springen',
+            openWorkspace: 'Arbeitsbereich des angezeigten Berichts öffnen',
         },
     },
     guides: {

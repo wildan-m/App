@@ -7723,6 +7723,8 @@ ${amount} para ${merchant} - ${date}`,
             newChat: 'Nueva pantalla de chat',
             copy: 'Copiar comentario',
             openDebug: 'Abrir el diálogo de preferencias de pruebas',
+            quickReportSearch: 'Abrir la búsqueda para ir a un informe por ID',
+            openWorkspace: 'Abrir el espacio de trabajo del informe que estás viendo',
         },
     },
     guides: {

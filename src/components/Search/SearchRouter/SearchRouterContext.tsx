@@ -12,10 +12,12 @@ import {closeSearch, openSearch} from './toggleSearch';
 
 type SearchRouterStateContextType = {
     isSearchRouterDisplayed: boolean;
+    /** The query the SearchRouter input should be pre-filled with when it opens (empty for a normal open) */
+    initialSearchQuery: string;
 };
 
 type SearchRouterActionsContextType = {
-    openSearchRouter: () => void;
+    openSearchRouter: (initialQuery?: string) => void;
     closeSearchRouter: () => void;
     toggleSearch: () => void;
     registerSearchPageInput: (ref: AnimatedTextInputRef) => void;
@@ -34,7 +36,7 @@ const defaultSearchRouterActionsContext: SearchRouterActionsContextType = {
     unregisterSearchPageInput: () => {},
 };
 
-const SearchRouterStateContext = React.createContext<SearchRouterStateContextType>({isSearchRouterDisplayed: false});
+const SearchRouterStateContext = React.createContext<SearchRouterStateContextType>({isSearchRouterDisplayed: false, initialSearchQuery: ''});
 
 const SearchRouterActionsContext = React.createContext<SearchRouterActionsContextType>(defaultSearchRouterActionsContext);
 
@@ -43,6 +45,7 @@ const canListenPopState = typeof window !== 'undefined' && typeof window.addEven
 
 function SearchRouterContextProvider({children}: ChildrenProps) {
     const [isSearchRouterDisplayed, setIsSearchRouterDisplayed] = useState(false);
+    const [initialSearchQuery, setInitialSearchQuery] = useState('');
     const searchRouterDisplayedRef = useRef(false);
     const searchPageInputRef = useRef<AnimatedTextInputRef | undefined>(undefined);
     useEffect(() => {
@@ -81,7 +84,8 @@ function SearchRouterContextProvider({children}: ChildrenProps) {
         });
     };
 
-    const openSearchRouter = () => {
+    const openSearchRouter = (initialQuery = '') => {
+        setInitialSearchQuery(initialQuery);
         if (isBrowserWithHistory) {
             window.history.pushState({isSearchModalOpen: true} satisfies HistoryState, '');
         }
@@ -107,6 +111,7 @@ function SearchRouterContextProvider({children}: ChildrenProps) {
         cancelSpan(CONST.TELEMETRY.SPAN_SEARCH_ROUTER_LIST_RENDER);
         closeSearch(setIsSearchRouterDisplayed);
         searchRouterDisplayedRef.current = false;
+        setInitialSearchQuery('');
         if (isBrowserWithHistory) {
             const state = window.history.state as HistoryState | null;
             if (state?.isSearchModalOpen) {
@@ -169,7 +174,7 @@ function SearchRouterContextProvider({children}: ChildrenProps) {
 
     // Because of the React Compiler we don't need to memoize it manually
     // eslint-disable-next-line react/jsx-no-constructed-context-values
-    const stateContextValue = {isSearchRouterDisplayed};
+    const stateContextValue = {isSearchRouterDisplayed, initialSearchQuery};
 
     return (
         <SearchRouterActionsContext.Provider value={actionsContextValue}>

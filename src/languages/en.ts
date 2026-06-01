@@ -7955,6 +7955,8 @@ const translations = {
             newChat: 'New chat screen',
             copy: 'Copy comment',
             openDebug: 'Open testing preferences dialog',
+            quickReportSearch: 'Open search to jump to a report by ID',
+            openWorkspace: "Open the workspace of the report you're viewing",
         },
     },
     guides: {
