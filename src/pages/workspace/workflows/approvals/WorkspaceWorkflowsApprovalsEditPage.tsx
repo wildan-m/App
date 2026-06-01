@@ -140,16 +140,43 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
 
     const {currentApprovalWorkflow, defaultWorkflowMembers, usedApproverEmails} = getApprovalWorkflowData();
 
+    // A workflow seeded from "Add agent" lives only in the local APPROVAL_WORKFLOW state until it
+    // is saved, so `currentApprovalWorkflow` (derived from server policy data) can't represent it.
+    // Treat such an in-progress workflow as valid so the page doesn't fall back to the not-found
+    // view after the Collect → Control upgrade re-initializes it (see the init effect below).
+    const hasInProgressSeededWorkflow = !!approvalWorkflow?.approvers.some((approver) => approver?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
+
     const shouldShowNotFoundView =
         (isEmptyObject(policy) && !isLoadingReportData) ||
         !canEditWorkspaceSettings(policy) ||
         isPendingDeletePolicy(policy) ||
-        !currentApprovalWorkflow ||
+        (!currentApprovalWorkflow && !hasInProgressSeededWorkflow) ||
         isAnyHRReadOnlyWorkflowMode(policy);
 
     // Set the initial approval workflow when the page is loaded
     useEffect(() => {
         if (initialApprovalWorkflow) {
+            return;
+        }
+
+        // After "Add agent" seeds an agent into the local APPROVAL_WORKFLOW and "Additional approver"
+        // upgrades the workspace (Collect → Control), this page is re-entered from the approver-selection
+        // screen WITHOUT the seed route params. The seeded agent and the just-chosen approver only live in
+        // the local APPROVAL_WORKFLOW — neither is on the server yet — so re-deriving the workflow from
+        // server policy data here would either clear it (currentApprovalWorkflow undefined) or overwrite it
+        // (currentApprovalWorkflow re-derived from server), dropping the agent at index 0 and collapsing the
+        // chosen approver into first position (the reported bug). When there's no fresh seed request but the
+        // live workflow still holds a pending (optimistic) seeded approver, adopt it as-is so the agent stays
+        // the first approver and the chosen approver stays second.
+        const hasFreshSeedRequest =
+            (route.params.seedApproverEmail !== undefined && route.params.seedApproverEmail !== '') || route.params.seedApproverAccountID !== undefined;
+        const pendingSeededApprover = approvalWorkflow?.approvers.find((approver) => approver?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD);
+        if (!isDeleting.current && !hasFreshSeedRequest && pendingSeededApprover && approvalWorkflow) {
+            setInitialApprovalWorkflow({
+                members: approvalWorkflow.members,
+                approvers: approvalWorkflow.approvers.filter((approver): approver is Approver => !!approver),
+                isDefault: approvalWorkflow.isDefault,
+            });
             return;
         }
 
@@ -237,6 +264,7 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
         route.params.seedApproverEmail,
         route.params.seedApproverAccountID,
         personalDetails,
+        approvalWorkflow,
     ]);
 
     // Reconcile a pending (optimistic) seeded approver with the real personal detail once
