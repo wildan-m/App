@@ -12,6 +12,7 @@ import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import {isDelayedSubmissionEnabled} from '@libs/PolicyUtils';
 import {getIOUActionForReportID} from '@libs/ReportActionsUtils';
 import {
+    buildOptimisticCreatedReportAction,
     buildOptimisticExpenseReport,
     buildOptimisticMarkedAsResolvedReportAction,
     buildOptimisticMoneyRequestEntities,
@@ -21,6 +22,8 @@ import {
     buildOptimisticReportLevelRejectAction,
     buildOptimisticReportLevelRejectCommentAction,
     buildOptimisticReportPreview,
+    buildOptimisticSelfDMReport,
+    findSelfDMReportID,
     generateReportID,
     getDisplayedReportID,
     getParsedComment,
@@ -52,6 +55,7 @@ type RejectMoneyRequestData = {
             | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
             | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
             | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
+            | typeof ONYXKEYS.SELF_DM_REPORT_ID
         >
     >;
     successData: Array<
@@ -175,6 +179,7 @@ function prepareRejectMoneyRequestData(
             | typeof ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE
             | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
             | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
+            | typeof ONYXKEYS.SELF_DM_REPORT_ID
         >
     > = [];
 
@@ -277,6 +282,91 @@ function prepareRejectMoneyRequestData(
                     },
                 },
             );
+
+            // The rejected expense is now unreported (reportID = '0'), which means it has to render
+            // inside the rejecting user's selfDM chat. If that user has no selfDM report yet, the
+            // unreported expense has nowhere to surface. Provision an optimistic selfDM report the
+            // same way the canonical move-to-selfDM path in changeTransactionsReport (Transaction.ts) does.
+            const existingSelfDMReportID = findSelfDMReportID();
+            if (!existingSelfDMReportID) {
+                const selfDMCreatedTime = DateUtils.getDBTime();
+                const selfDMReport = buildOptimisticSelfDMReport(selfDMCreatedTime);
+                const selfDMCreatedReportAction = buildOptimisticCreatedReportAction({emailCreatingAction: currentUserLogin, created: selfDMCreatedTime});
+
+                optimisticData.push(
+                    {
+                        onyxMethod: Onyx.METHOD.SET,
+                        key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReport.reportID}`,
+                        value: {
+                            ...selfDMReport,
+                            pendingFields: {
+                                createChat: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                            },
+                        },
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: ONYXKEYS.SELF_DM_REPORT_ID,
+                        value: selfDMReport.reportID,
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReport.reportID}`,
+                        value: {isOptimisticReport: true},
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.SET,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReport.reportID}`,
+                        value: {
+                            [selfDMCreatedReportAction.reportActionID]: selfDMCreatedReportAction,
+                        },
+                    },
+                );
+
+                successData.push(
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReport.reportID}`,
+                        value: {
+                            pendingFields: {
+                                createChat: null,
+                            },
+                        },
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReport.reportID}`,
+                        value: {isOptimisticReport: false},
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReport.reportID}`,
+                        value: {
+                            [selfDMCreatedReportAction.reportActionID]: {
+                                pendingAction: null,
+                            },
+                        },
+                    },
+                );
+
+                failureData.push(
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT}${selfDMReport.reportID}`,
+                        value: null,
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${selfDMReport.reportID}`,
+                        value: null,
+                    },
+                    {
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReport.reportID}`,
+                        value: null,
+                    },
+                );
+            }
 
             // And delete the corresponding REPORTPREVIEW action
             const parentReportID = report?.parentReportID;
