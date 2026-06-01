@@ -473,7 +473,19 @@ function ReportActionsList({
             onTrackScrolling: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
                 const offset = event.nativeEvent.contentOffset.y;
                 scrollOffsetRef.current = offset;
-                setHasScrolledOverThreshold(offset > CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD);
+                setHasScrolledOverThreshold((prevHasScrolledOverThreshold) => {
+                    // Apply hysteresis so a small offset adjustment near the threshold (such as the one
+                    // maintainVisibleContentPosition emits while pinning the list during content insertion) cannot
+                    // re-toggle the flag and start an infinite re-render loop. Turn on above the threshold, and only
+                    // turn back off once the offset has dropped clearly below it.
+                    if (offset > CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD) {
+                        return true;
+                    }
+                    if (offset < CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD - CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD_HYSTERESIS) {
+                        return false;
+                    }
+                    return prevHasScrolledOverThreshold;
+                });
                 onScroll?.(event);
             },
             hasOnceLoadedReportActions: !!reportLoadingState?.hasOnceLoadedReportActions,

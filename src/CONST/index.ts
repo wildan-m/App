@@ -1752,6 +1752,11 @@ const CONST = {
             THREAD_DISABLED: ['CREATED'],
             LATEST_MESSAGES_PILL_SCROLL_OFFSET_THRESHOLD: 2000,
             ACTION_VISIBLE_THRESHOLD: 250,
+            // Hysteresis (dead band) applied to ACTION_VISIBLE_THRESHOLD so that the small, programmatic scroll-offset
+            // adjustments emitted while maintainVisibleContentPosition keeps the list pinned cannot re-toggle the
+            // threshold state and start an infinite re-render loop. The flag only clears once the offset drops clearly
+            // below the threshold (ACTION_VISIBLE_THRESHOLD - ACTION_VISIBLE_THRESHOLD_HYSTERESIS).
+            ACTION_VISIBLE_THRESHOLD_HYSTERESIS: 100,
             MAX_GROUPING_TIME: 300000,
         },
         CANCEL_PAYMENT_REASONS: {
