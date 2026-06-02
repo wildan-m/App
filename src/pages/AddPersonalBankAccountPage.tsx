@@ -8,6 +8,7 @@ import ScrollView from '@components/ScrollView';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import getActiveTabName from '@libs/Navigation/helpers/getActiveTabName';
 import {isFullScreenName} from '@libs/Navigation/helpers/isNavigatorName';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import {clearPersonalBankAccount} from '@userActions/BankAccounts';
@@ -23,10 +24,11 @@ function AddPersonalBankAccountPage() {
     const [personalBankAccount] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT);
     const shouldShowSuccess = personalBankAccount?.shouldShowSuccess ?? false;
     const topmostFullScreenRoute = navigationRef.current?.getRootState()?.routes.findLast((route) => isFullScreenName(route.name));
+    const activeTab = getActiveTabName(topmostFullScreenRoute);
     const kycWallRef = useContext(KYCWallContext);
 
     const goBack = () => {
-        switch (topmostFullScreenRoute?.name) {
+        switch (activeTab) {
             case NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR:
                 Navigation.goBack(ROUTES.SETTINGS_WALLET);
                 break;
