@@ -24,7 +24,7 @@ function TravelLegalNamePage() {
 
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>) => {
         updateLegalName(values.legalFirstName?.trim() ?? '', values.legalLastName?.trim() ?? '', formatPhoneNumber, currentUserPersonalDetails);
-        Navigation.closeRHPFlow();
+        Navigation.goBack();
     };
 
     const handleBackButtonPress = () => {
