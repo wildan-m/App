@@ -720,7 +720,12 @@ function ReportActionsList({
         if (actionBadgeTargetIndex < 0) {
             return;
         }
-        reportScrollManager.scrollToIndex(actionBadgeTargetIndex);
+        // Defer the scroll until pending interactions (navigation/layout transitions) finish, like the other scrolls in
+        // this component. Scrolling synchronously here races with the report's focus/layout pass and can leave the
+        // inverted list parked at an offset with no rendered cells, painting a blank chat on iOS.
+        InteractionManager.runAfterInteractions(() => {
+            reportScrollManager.scrollToIndex(actionBadgeTargetIndex);
+        });
     }, [actionBadgeTargetIndex, reportScrollManager]);
 
     /**
