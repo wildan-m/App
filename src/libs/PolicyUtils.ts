@@ -1648,13 +1648,16 @@ function getNetSuitePayableAccountOptions(policy: Policy | undefined, selectedBa
 }
 
 function getNetSuiteReceivableAccountOptions(policy: Policy | undefined, selectedBankAccountId: string | undefined): SelectorType[] {
-    const receivableAccounts = policy?.connections?.netsuite?.options.data.receivableList;
+    const receivableAccounts = policy?.connections?.netsuite?.options.data.receivableList ?? [];
 
-    return (receivableAccounts ?? []).map(({id, name}) => ({
+    // When nothing is explicitly set, default to the first receivable account so the field is never blank on a fresh connection.
+    const effectiveSelectionId = selectedBankAccountId ?? receivableAccounts.at(0)?.id;
+
+    return receivableAccounts.map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: id === selectedBankAccountId,
+        isSelected: id === effectiveSelectionId,
     }));
 }
 

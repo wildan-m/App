@@ -56,7 +56,8 @@ function NetSuiteExportConfigurationPage({policy}: WithPolicyConnectionsProps) {
 
     const {subsidiaryList, receivableList, taxAccountsList, items} = policy?.connections?.netsuite?.options?.data ?? {};
     const selectedSubsidiary = (subsidiaryList ?? []).find((subsidiary) => subsidiary.internalID === config?.subsidiaryID);
-    const selectedReceivable = receivableList?.find((account) => account.id === config?.receivableAccount);
+    // When no receivable account is explicitly set, default to the first one so the "Export invoices to" row is never blank on a fresh connection.
+    const selectedReceivable = config?.receivableAccount ? receivableList?.find((account) => account.id === config?.receivableAccount) : receivableList?.at(0);
     const selectedItem = items?.find((item) => item.id === config?.invoiceItem);
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
