@@ -150,8 +150,11 @@ function WorkspacePageWithSections({
         selector: emailSelector,
     });
 
+    // Pages that opt out of the VBBA call (shouldSkipVBBACall) never load reimbursement data, so their
+    // loading state must not depend on the shared reimbursementAccount.isLoading flag - otherwise a value
+    // left set by another page (e.g. Invoices) keeps the spinner up forever.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const isLoading = (reimbursementAccount?.isLoading || isPageLoading) ?? true;
+    const isLoading = ((shouldSkipVBBACall ? false : reimbursementAccount?.isLoading) || isPageLoading) ?? true;
     const isUsingECard = account?.isUsingExpensifyCard ?? false;
     const content = typeof children === 'function' ? children(policyID, isUsingECard) : children;
     const {shouldUseNarrowLayout} = useResponsiveLayout();
