@@ -71,6 +71,11 @@ function MoneyReportHeaderEducationalModals({reportID, ref}: MoneyReportHeaderEd
                     }),
                 );
             }
+        } else if (rejectModalAction === CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT) {
+            dismissRejectUseExplanation();
+            if (reportID) {
+                Navigation.navigate(ROUTES.REJECT_EXPENSE_REPORT.getRoute(reportID));
+            }
         } else {
             dismissRejectUseExplanation();
             if (requestParentReportAction) {
