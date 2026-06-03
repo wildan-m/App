@@ -9457,6 +9457,13 @@ function getAllReportErrors(
         delete errorSources.export;
     }
 
+    // A `notFound` errorField signals that the report is inaccessible (it renders the dedicated not-found page), not a
+    // user-fixable error. It must not count as a report error, otherwise it surfaces as a red brick road / Fix badge in
+    // the LHN. This mirrors how `shouldDisplayReportInLHN` already ignores it via `isReportInAccessible`.
+    if (reportErrorFields.notFound) {
+        delete errorSources.notFound;
+    }
+
     // Combine all error messages keyed by microtime into one object
     const errorSourcesArray = Object.values(errorSources ?? {});
     const allReportErrors = {};
