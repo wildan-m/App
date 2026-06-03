@@ -149,7 +149,10 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
                                 ?.filter((u) => u.accountID !== personalDetail.accountID)
                                 .map((u) => ({
                                     login: u.login ?? '',
-                                    accountID: u.accountID,
+                                    // For a non-existing user the accountID is an optimistic, client-generated value that the
+                                    // server cannot resolve. Forward it only when it belongs to a real (known) account, otherwise
+                                    // send just the email so the server creates the account, mirroring the normal new-DM flow.
+                                    accountID: personalDetails?.[u.accountID] ? u.accountID : undefined,
                                 })) ?? [],
                         personalDetails,
                         newReportObject: report,
