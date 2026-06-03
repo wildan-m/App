@@ -18,7 +18,6 @@ import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolation from '@hooks/useTransactionViolation';
 import {convertAmountToDisplayString} from '@libs/CurrencyUtils';
-import DateUtils from '@libs/DateUtils';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -237,7 +236,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                         >
                             <MenuItemWithTopDescription
                                 shouldShowRightIcon
-                                title={rate.startDate ? DateUtils.formatToReadableString(rate.startDate) : ''}
+                                title={rate.startDate || translate('common.none')}
                                 description={translate('workspace.distanceRates.startDate')}
                                 descriptionTextStyle={styles.textNormal}
                                 onPress={editStartDate}
@@ -253,7 +252,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                         >
                             <MenuItemWithTopDescription
                                 shouldShowRightIcon
-                                title={rate.endDate ? DateUtils.formatToReadableString(rate.endDate) : ''}
+                                title={rate.endDate || translate('common.none')}
                                 description={translate('workspace.distanceRates.endDate')}
                                 descriptionTextStyle={styles.textNormal}
                                 onPress={editEndDate}
