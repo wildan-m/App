@@ -10,6 +10,7 @@ import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import blurActiveElement from '@libs/Accessibility/blurActiveElement';
 import {setDraftValues} from '@libs/actions/FormActions';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -36,7 +37,13 @@ function WorkspaceCreateTaxValuePage({
     const [formDraft] = useOnyx(ONYXKEYS.FORMS.WORKSPACE_NEW_TAX_FORM_DRAFT);
     const [currentValue, setCurrentValue] = useState(formDraft?.[INPUT_IDS.VALUE]);
 
-    const goBack = () => Navigation.goBack(ROUTES.WORKSPACE_TAX_CREATE.getRoute(policyID));
+    const goBack = () => {
+        // Blur the value field's input before returning so the "Value" menu item that triggered this page
+        // does not keep keyboard focus on the create-tax page. Without this, a focused menu item (a button on web)
+        // swallows the next Enter keypress and re-navigates here instead of letting the form's Save button submit.
+        blurActiveElement();
+        Navigation.goBack(ROUTES.WORKSPACE_TAX_CREATE.getRoute(policyID));
+    };
 
     const save = () => {
         const normalizedValue = currentValue !== undefined ? String(Number(currentValue)) : currentValue;
