@@ -42,4 +42,19 @@ function saveSettingsTabPathToSessionStorage(url: string) {
     saveTabPathToSessionStorage(CONST.SESSION_STORAGE_KEYS.LAST_VISITED_PATH.SETTINGS_TAB, url);
 }
 
-export {clearSessionStorage, saveSettingsTabPathToSessionStorage, saveWorkspacesTabPathToSessionStorage, getWorkspacesTabStateFromSessionStorage};
+function saveSearchTabPathToSessionStorage(url: string) {
+    saveTabPathToSessionStorage(CONST.SESSION_STORAGE_KEYS.LAST_VISITED_PATH.SEARCH_TAB, url);
+}
+
+function getSearchTabStateFromSessionStorage() {
+    return getTabStateFromSessionStorage(CONST.SESSION_STORAGE_KEYS.LAST_VISITED_PATH.SEARCH_TAB);
+}
+
+export {
+    clearSessionStorage,
+    saveSettingsTabPathToSessionStorage,
+    saveWorkspacesTabPathToSessionStorage,
+    getWorkspacesTabStateFromSessionStorage,
+    saveSearchTabPathToSessionStorage,
+    getSearchTabStateFromSessionStorage,
+};

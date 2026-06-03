@@ -32,7 +32,7 @@ import getActiveTabName from './helpers/getActiveTabName';
 import getAdaptedStateFromPath from './helpers/getAdaptedStateFromPath';
 import getPathFromState from './helpers/getPathFromState';
 import {isSplitNavigatorName} from './helpers/isNavigatorName';
-import {saveSettingsTabPathToSessionStorage, saveWorkspacesTabPathToSessionStorage} from './helpers/lastVisitedTabPathUtils';
+import {saveSearchTabPathToSessionStorage, saveSettingsTabPathToSessionStorage, saveWorkspacesTabPathToSessionStorage} from './helpers/lastVisitedTabPathUtils';
 import {linkingConfig} from './linkingConfig';
 import Navigation, {navigationRef} from './Navigation';
 
@@ -91,6 +91,8 @@ function parseAndLogRoute(state: NavigationState) {
             saveWorkspacesTabPathToSessionStorage(currentPath);
         } else if (activeTabName === NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR) {
             saveSettingsTabPathToSessionStorage(currentPath);
+        } else if (activeTabName === NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR) {
+            saveSearchTabPathToSessionStorage(currentPath);
         }
     }
 

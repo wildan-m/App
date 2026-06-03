@@ -7,6 +7,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import clearSelectedText from '@libs/clearSelectedText/clearSelectedText';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
+import {getSearchTabStateFromSessionStorage} from '@libs/Navigation/helpers/lastVisitedTabPathUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildCannedSearchQuery, buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
@@ -45,23 +46,48 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
                 forceTransaction: true,
             });
 
-            const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);
-
-            if (lastSearchRoute) {
-                const {q, ...rest} = lastSearchRoute.params as SearchFullscreenNavigatorParamList[typeof SCREENS.SEARCH.ROOT];
-                const queryJSON = buildSearchQueryJSON(q);
-                if (queryJSON) {
-                    const query = buildSearchQueryString(queryJSON);
-                    Navigation.navigate(
-                        ROUTES.SEARCH_ROOT.getRoute({
-                            query,
-                            ...rest,
-                        }),
-                    );
-                    return;
+            // Try to restore the search the user last had open. The route params (`q` plus the rest) are
+            // turned into a query string and navigated to. Returns true when navigation happened.
+            const navigateToSearchRoute = (searchRouteParams: SearchFullscreenNavigatorParamList[typeof SCREENS.SEARCH.ROOT] | undefined) => {
+                if (!searchRouteParams) {
+                    return false;
                 }
+                const {q, ...rest} = searchRouteParams;
+                const queryJSON = buildSearchQueryJSON(q);
+                if (!queryJSON) {
+                    return false;
+                }
+                const query = buildSearchQueryString(queryJSON);
+                Navigation.navigate(
+                    ROUTES.SEARCH_ROOT.getRoute({
+                        query,
+                        ...rest,
+                    }),
+                );
+                return true;
+            };
+
+            // 1. Fast in-memory path: the preserved navigator state, if it's still mounted.
+            const lastSearchRoute = getLastRoute(navigationRef.getRootState(), NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, SCREENS.SEARCH.ROOT);
+            if (navigateToSearchRoute(lastSearchRoute?.params as SearchFullscreenNavigatorParamList[typeof SCREENS.SEARCH.ROOT] | undefined)) {
+                return;
             }
 
+            // 2. Durable fallback: the last Spend-tab path saved in sessionStorage. Unlike the preserved
+            // state (cleaned when the Search navigator unmounts on a tab switch) and the Onyx value below
+            // (only written when a report is opened), this is saved on every navigation within the Spend tab,
+            // so it survives bouncing to another tab even when the user just selected a search in the LHN.
+            const sessionSearchRouteParams = getSearchTabStateFromSessionStorage()
+                ?.routes?.find((route) => route.name === NAVIGATORS.TAB_NAVIGATOR)
+                ?.state?.routes?.find((route) => route.name === NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR)
+                ?.state?.routes?.findLast((route) => route.name === SCREENS.SEARCH.ROOT)?.params as
+                | SearchFullscreenNavigatorParamList[typeof SCREENS.SEARCH.ROOT]
+                | undefined;
+            if (navigateToSearchRoute(sessionSearchRouteParams)) {
+                return;
+            }
+
+            // 3. Onyx fallback (last opened report's search), then the default canned search.
             const lastQueryJSON = lastSearchParams?.queryJSON;
             const lastQueryFromOnyx = lastQueryJSON ? buildSearchQueryString(lastQueryJSON) : undefined;
             const defaultSearchQuery = buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE});
