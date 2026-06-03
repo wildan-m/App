@@ -1715,7 +1715,12 @@ function Search({
         return <FullPageOfflineBlockingView>{null}</FullPageOfflineBlockingView>;
     }
 
-    if (hasErrors) {
+    // Only show the blocking error view once the search request has finished. While the request is still
+    // in flight the `errors` field and the `isLoading` flag aren't always observed on the same render
+    // frame, so the view could otherwise paint with `errors` present before the request settles and then
+    // re-render, making the error page flash. This mirrors the transient-state guard the empty view below
+    // uses; falling through keeps the loading skeleton up until the request settles.
+    if (hasErrors && !searchResults?.search?.isLoading) {
         const isInvalidQuery = searchRequestResponseStatusCode === CONST.JSON_CODE.INVALID_SEARCH_QUERY;
         cancelNavigationSpans();
         return (
