@@ -452,6 +452,7 @@ function MoneyRequestReceiptView({
                     isChatIOUReportArchived,
                     originalReportID,
                     true,
+                    true,
                 );
                 return;
             }

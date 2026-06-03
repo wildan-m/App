@@ -27,6 +27,7 @@ import {
 import {getAmount, getCurrency, isOnHold, removeTransactionFromDuplicateTransactionViolation} from '@libs/TransactionUtils';
 import {clearByKey as clearPdfByOnyxKey} from '@userActions/CachedPDFPaths';
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
+import {deleteRequestsByPredicate} from '@userActions/PersistedRequests';
 import {optimisticReportLastData} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -306,7 +307,25 @@ function cleanUpMoneyRequest(
     isChatIOUReportArchived: boolean | undefined,
     originalReportID: string | undefined,
     isSingleTransactionView = false,
+    /** When true, also purge any queued write for this transactionID and enqueue a server-side DELETE so a ghost upload can't resurrect the transaction. */
+    shouldEnsureServerCleanup = false,
 ) {
+    if (shouldEnsureServerCleanup) {
+        // The optimistic create for this transaction may still be sitting in the persisted request queue (e.g. it failed on a flaky
+        // network and is awaiting retry). Drop it so reconnecting cannot replay the create and bring the discarded transaction back.
+        deleteRequestsByPredicate((request) => {
+            const data = request.data as {transactionID?: string} | undefined;
+            return data?.transactionID === transactionID;
+        });
+
+        // If the create already reached the server before we discarded, enqueue a DELETE so the server-side record is removed too.
+        const deleteParameters: DeleteMoneyRequestParams = {
+            transactionID,
+            reportActionID: reportAction.reportActionID,
+        };
+        API.write(WRITE_COMMANDS.DELETE_MONEY_REQUEST, deleteParameters, {optimisticData: [], successData: [], failureData: []});
+    }
+
     const {shouldDeleteTransactionThread, shouldDeleteIOUReport, updatedReportAction, updatedIOUReport, updatedReportPreviewAction, transactionThreadID, reportPreviewAction} =
         prepareToCleanUpMoneyRequest(transactionID, reportAction, transactionThreadReport, iouReport, chatReport, isChatIOUReportArchived, false);
 
