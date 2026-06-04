@@ -1,8 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {SearchQueryJSON} from '@components/Search/types';
+import {shouldOptimisticallyUpdateSearch} from '@libs/actions/IOU/SearchUpdate';
 import {flushDeferredWrite, getOptimisticWatchKey, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
+import {getReportOrDraftReport} from '@libs/ReportUtils';
 import {isSearchDataLoaded, isTransactionSearchType} from '@libs/SearchUIUtils';
 import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import CONST from '@src/CONST';
@@ -22,6 +24,8 @@ type UseOptimisticSearchTrackingParams = {
     transactions: OnyxCollection<Transaction> | undefined;
     /** Report actions collection used to augment search data with optimistic IOU actions. */
     reportActions: OnyxCollection<ReportActions> | undefined;
+    /** Current user's account ID, used to validate the optimistic item against the active query. */
+    currentUserAccountID: number;
 };
 
 /**
@@ -33,7 +37,7 @@ type UseOptimisticSearchTrackingParams = {
  * Returns `searchDataWithOptimisticTransaction` (used to compute filteredData -> sortedData)
  * and a `trackingState` object to pass to `useStableOptimisticSortedData`.
  */
-function useOptimisticSearchTracking({searchResults, queryJSON, transactions, reportActions}: UseOptimisticSearchTrackingParams) {
+function useOptimisticSearchTracking({searchResults, queryJSON, transactions, reportActions, currentUserAccountID}: UseOptimisticSearchTrackingParams) {
     const {type} = queryJSON;
 
     const hasPendingWriteOnMount = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
@@ -148,6 +152,16 @@ function useOptimisticSearchTracking({searchResults, queryJSON, transactions, re
             : undefined;
         const optimisticTransaction = optimisticTransactionKey ? transactions?.[optimisticTransactionKey] : undefined;
         if (!optimisticTransactionKey || !optimisticTransaction?.transactionID || searchData[optimisticTransactionKey] || optimisticTransaction.reportID === CONST.REPORT.SPLIT_REPORT_ID) {
+            return searchData;
+        }
+
+        // Only inject the optimistic transaction when it actually belongs in the active search. This mirrors the
+        // guard the creation-time snapshot merge already applies (`shouldOptimisticallyUpdateSearch`), so a query
+        // carrying filters the new transaction can't satisfy (e.g. a `withdrawn` date filter) doesn't surface a
+        // just-created expense that the server would never return.
+        const optimisticTransactionReport = getReportOrDraftReport(optimisticTransaction.reportID);
+        const isInvoice = type === CONST.SEARCH.DATA_TYPES.INVOICE;
+        if (!shouldOptimisticallyUpdateSearch(queryJSON, optimisticTransactionReport, isInvoice, currentUserAccountID, optimisticTransaction)) {
             return searchData;
         }
 

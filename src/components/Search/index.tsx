@@ -319,7 +319,7 @@ function Search({
         skipDeferralOnFocusRef,
         rearmTracking,
         trackingState: optimisticTrackingState,
-    } = useOptimisticSearchTracking({searchResults, queryJSON, transactions, reportActions});
+    } = useOptimisticSearchTracking({searchResults, queryJSON, transactions, reportActions, currentUserAccountID: accountID});
 
     const isExpenseReportType = type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
 
