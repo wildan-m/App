@@ -16,13 +16,13 @@ let cachedChartFonts: ChartFontsValue | null = null;
 let loadPromise: Promise<ChartFontsValue> | null = null;
 const chartFontLoadListeners = new Set<() => void>();
 
-function resolveChartFontAsset(source: DataModule | string): string {
+function resolveChartFontAsset(source: DataModule | string): string | null {
     if (typeof source === 'string') {
         return source;
     }
 
     if (typeof source === 'number') {
-        return Image.resolveAssetSource(source).uri;
+        return Image.resolveAssetSource(source)?.uri ?? null;
     }
 
     if ('default' in source && typeof source.default === 'string') {
@@ -33,13 +33,26 @@ function resolveChartFontAsset(source: DataModule | string): string {
         return source.uri;
     }
 
-    throw new Error('Unsupported chart font asset source');
+    return null;
 }
 
 function loadTypefaceFromAsset(source: DataModule | string): Promise<SkTypeface | null> {
     const uri = resolveChartFontAsset(source);
 
-    return Skia.Data.fromURI(uri).then((data) => Skia.Typeface.MakeFreeTypeFaceFromData(data));
+    if (!uri) {
+        Log.hmmm('Chart font asset could not be resolved to a URI');
+        return Promise.resolve(null);
+    }
+
+    return Skia.Data.fromURI(uri)
+        .then((data) => Skia.Typeface.MakeFreeTypeFaceFromData(data))
+        .catch((error: unknown) => {
+            Log.hmmm('Chart font failed to decode', {
+                uri,
+                error: error instanceof Error ? error.message : String(error),
+            });
+            return null;
+        });
 }
 
 function loadChartSkiaTypefaces(): Promise<ChartDefaultTypeface> {
