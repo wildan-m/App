@@ -36,9 +36,13 @@ function HelpPage() {
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const isPaidPolicyAdmin = useIsPaidPolicyAdmin();
     const isApprovedAccountant = !!account?.isApprovedAccountant;
-    const accountManagerDetails = account?.accountManagerAccountID ? personalDetails?.[account.accountManagerAccountID] : null;
-    const partnerManagerDetails = account?.partnerManagerAccountID ? personalDetails?.[account.partnerManagerAccountID] : null;
-    const guideDetails = account?.guideDetails?.email ? getPersonalDetailByEmail(account.guideDetails.email) : null;
+    const accountManagerDetailsRaw = account?.accountManagerAccountID ? personalDetails?.[account.accountManagerAccountID] : null;
+    const partnerManagerDetailsRaw = account?.partnerManagerAccountID ? personalDetails?.[account.partnerManagerAccountID] : null;
+    const guideDetailsRaw = account?.guideDetails?.email ? getPersonalDetailByEmail(account.guideDetails.email) : null;
+    // When Concierge is assigned to a manager/guide slot, hide that card so it isn't duplicated with the dedicated Concierge button.
+    const accountManagerDetails = accountManagerDetailsRaw?.login === CONST.EMAIL.CONCIERGE ? null : accountManagerDetailsRaw;
+    const partnerManagerDetails = partnerManagerDetailsRaw?.login === CONST.EMAIL.CONCIERGE ? null : partnerManagerDetailsRaw;
+    const guideDetails = guideDetailsRaw?.login === CONST.EMAIL.CONCIERGE ? null : guideDetailsRaw;
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS);
