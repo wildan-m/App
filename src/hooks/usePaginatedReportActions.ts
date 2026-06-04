@@ -46,6 +46,16 @@ function usePaginatedReportActions(reportID: string | undefined, reportActionID?
 
     const initialReportLastReadTime = useRef(report?.lastReadTime);
 
+    // For a brand-new conversation the report has not finished loading on the first render, so
+    // `report?.lastReadTime` is `undefined` then. Capturing it unconditionally would permanently
+    // snapshot that `undefined` and suppress the "New" unread marker on first open. Instead, lazily
+    // capture the value on the first render where it is actually defined; assigning only while the
+    // ref is still empty preserves the original "snapshot before the report is marked read" intent.
+    if (initialReportLastReadTime.current === undefined && report?.lastReadTime !== undefined) {
+        // eslint-disable-next-line react-hooks/refs -- one-time lazy capture of lastRead before the report is marked read
+        initialReportLastReadTime.current = report.lastReadTime;
+    }
+
     const id = useMemo(() => {
         /* eslint-disable react-hooks/refs -- initialReportLastReadTime snapshots lastRead at first render for stable unread deep-link anchor */
         if (treatAsNoPaginationAnchor) {
