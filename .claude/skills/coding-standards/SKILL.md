@@ -13,8 +13,9 @@ Coding standards for the Expensify App. Each standard is a standalone file in `r
 | Category | Prefix | Focus |
 |----------|--------|-------|
 | Performance | `PERF-*` | Render optimization, memo patterns, useEffect hygiene, data selection |
-| Consistency | `CONSISTENCY-*` | Platform checks, magic values, unused props, ESLint discipline |
+| Consistency | `CONSISTENCY-*` | Platform checks, magic values, unused props, ESLint discipline, naming, localization, JSDocs, file conventions |
 | Clean React Patterns | `CLEAN-REACT-PATTERNS-*` | Composition, component ownership, state structure |
+| UI | `UI-*` | Loading indicators, scrollable pages, and other UI conventions |
 
 ## Quick Reference
 
@@ -42,6 +43,13 @@ Coding standards for the Expensify App. Each standard is a standalone file in `r
 - [CONSISTENCY-4](rules/consistency-4-no-unused-props.md) — No unused props
 - [CONSISTENCY-5](rules/consistency-5-justify-eslint-disable.md) — Justify ESLint disables
 - [CONSISTENCY-6](rules/consistency-6-proper-error-handling.md) — Proper error handling
+- [CONSISTENCY-7](rules/consistency-7-callback-naming.md) — Name callbacks for what they do, not the event
+- [CONSISTENCY-8](rules/consistency-8-localize-copy.md) — Localize user-visible copy
+- [CONSISTENCY-9](rules/consistency-9-localize-numbers.md) — Localize numbers, amounts, dates, and phone numbers
+- [CONSISTENCY-10](rules/consistency-10-file-naming.md) — Name non-platform files after their export
+- [CONSISTENCY-11](rules/consistency-11-jsdocs.md) — Document functions with JSDocs
+- [CONSISTENCY-12](rules/consistency-12-file-header-description.md) — Add a header description to new non-trivial files
+- [CONSISTENCY-13](rules/consistency-13-justify-settimeout.md) — Justify new setTimeout calls
 
 ### Clean React Patterns
 - [CLEAN-REACT-PATTERNS-0](rules/clean-react-0-compiler.md) — React Compiler compliance
@@ -50,6 +58,10 @@ Coding standards for the Expensify App. Each standard is a standalone file in `r
 - [CLEAN-REACT-PATTERNS-3](rules/clean-react-3-context-free-contracts.md) — Context-free component contracts
 - [CLEAN-REACT-PATTERNS-4](rules/clean-react-4-no-side-effect-spaghetti.md) — No side-effect spaghetti
 - [CLEAN-REACT-PATTERNS-5](rules/clean-react-5-narrow-state.md) — Keep state narrow
+
+### UI
+- [UI-1](rules/ui-1-correct-loading-indicator.md) — Use the correct loading indicator based on navigation context
+- [UI-2](rules/ui-2-scrollable-page.md) — Make new pages scrollable with ScrollView
 
 ## Usage
 
