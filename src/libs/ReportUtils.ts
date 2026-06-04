@@ -5917,7 +5917,7 @@ function getReportName(reportNameInformation: GetReportNameParams): string {
     }
 
     if (isInvoiceReport(report)) {
-        formattedName = getInvoiceReportName(report, policy, invoiceReceiverPolicy);
+        formattedName = getInvoiceReportName(report, policy, invoiceReceiverPolicy, personalDetails);
     }
 
     if (isInvoiceRoom(report)) {
@@ -6141,7 +6141,10 @@ function getParentNavigationSubtitle(
         const invoiceReceiverPolicyID = getInvoiceReceiverPolicyID(parentReport);
         const invoiceReceiverPolicy = invoiceReceiverPolicyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${invoiceReceiverPolicyID}`] : undefined;
         const isCurrentUserReceiver = isCurrentUserInvoiceReceiver(parentReport);
-        const invoicePayerName = getInvoicePayerName(parentReport, invoiceReceiverPolicy);
+        const parentInvoiceReceiver = parentReport?.invoiceReceiver;
+        const invoiceReceiverPersonalDetail =
+            parentInvoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL ? allPersonalDetails?.[parentInvoiceReceiver.accountID] : undefined;
+        const invoicePayerName = getInvoicePayerName(parentReport, invoiceReceiverPolicy, invoiceReceiverPersonalDetail);
 
         let reportName = senderWorkspaceName;
         if (!isCurrentUserReceiver && invoicePayerName) {
@@ -12721,7 +12724,7 @@ function getChatListItemReportName(action: ReportAction & {reportName?: string},
         const properInvoiceReport = report;
         properInvoiceReport.chatReportID = report.parentReportID;
 
-        return getInvoiceReportName(properInvoiceReport);
+        return getInvoiceReportName(properInvoiceReport, undefined, undefined, allPersonalDetails ?? undefined);
     }
 
     if (action?.reportName) {

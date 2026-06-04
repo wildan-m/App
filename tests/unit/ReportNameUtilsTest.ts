@@ -1027,15 +1027,48 @@ describe('ReportNameUtils', () => {
             expect(normalizedName).toBe('Ragnar Lothbrok');
         });
 
-        test('Invoice payer name falls back to provided personal details', () => {
+        test('Invoice payer name uses the provided invoice receiver personal detail', () => {
             const report: Report = {
                 reportID: 'invoice-chat-3',
                 invoiceReceiver: {type: CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL, accountID: 1},
             };
-            const name = getInvoicePayerName(report, undefined, null);
+            const name = getInvoicePayerName(report, undefined, participantsPersonalDetails[1]);
 
             const normalizedName = name?.replaceAll('\u00A0', ' ');
             expect(normalizedName).toBe('Ragnar Lothbrok');
+        });
+
+        test('Invoice payer name returns the hidden default when no receiver personal detail is provided', () => {
+            // Regression guard for the Onyx.connect deprecation: the helper must rely solely on the
+            // passed-in invoice receiver personal detail, not a module-level Onyx.connect() global.
+            // Before the refactor this resolved accountID 1 ("Ragnar Lothbrok") from the global store.
+            const report: Report = {
+                reportID: 'invoice-chat-4',
+                invoiceReceiver: {type: CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL, accountID: 1},
+            };
+            const name = getInvoicePayerName(report, undefined, undefined);
+
+            expect(name).toBe(translate(CONST.LOCALES.EN, 'common.hidden'));
+        });
+
+        test('Invoices chat name resolves the receiver name from the passed-in personal details', () => {
+            // The personal details are threaded in via the `personalDetails` argument rather than a global.
+            const receiverPolicy = {name: 'Vendor Workspace'} as unknown as Policy;
+            const report: Report = {
+                reportID: 'invoice-chat-5',
+                invoiceReceiver: {type: CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL, accountID: 3},
+                policyName: 'Vendor Workspace',
+            };
+
+            const name = getInvoicesChatName({
+                report,
+                receiverPolicy,
+                personalDetails: participantsPersonalDetails,
+                currentUserAccountID,
+            });
+
+            const normalizedName = name?.replaceAll('\u00A0', ' ');
+            expect(normalizedName).toBe('Lagertha Lothbrok');
         });
     });
 
