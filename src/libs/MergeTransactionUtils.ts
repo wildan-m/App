@@ -244,7 +244,7 @@ function getMergeableDataAndConflictFields(
             // Card takes precedence over split expense
             // See https://github.com/Expensify/App/issues/68189#issuecomment-3167156907
             const isTargetExpenseSplit = isExpenseSplit(targetTransaction);
-            if (isFromCreditCardImport(targetTransaction) || isTargetExpenseSplit) {
+            if (isCardImportForMerge(targetTransaction) || isTargetExpenseSplit) {
                 mergeableData[field] = targetValue;
                 mergeableData.currency = getCurrency(targetTransaction);
                 if (isTargetExpenseSplit) {
@@ -287,7 +287,7 @@ function getMergeableDataAndConflictFields(
 
         // Use the reimbursable flag coming from card transactions automatically
         // See https://github.com/Expensify/App/issues/69598
-        if (field === 'reimbursable' && isFromCreditCardImport(targetTransaction)) {
+        if (field === 'reimbursable' && isCardImportForMerge(targetTransaction)) {
             mergeableData[field] = targetValue;
             continue;
         }
@@ -497,6 +497,32 @@ function areTransactionsEligibleForMerge(transaction1: OnyxEntry<Transaction>, t
 }
 
 /**
+ * Determine whether a transaction is a personal card transaction imported from a CSV spreadsheet.
+ *
+ * `isFromCreditCardImport()` deliberately returns `false` for these (their `bank` is `upload`) to avoid a
+ * search snapshot inconsistency, so they are not detected by it. For merge purposes, however, an imported
+ * personal card transaction still carries genuine card identity (a real `cardID` and a non-cash `cardName`)
+ * that must be preserved over a plain cash receipt. A cash receipt has no `cardID`, so the `cardID` check
+ * keeps this narrow and never matches a cash transaction.
+ */
+function isImportedPersonalCardTransaction(transaction: OnyxEntry<Transaction>): boolean {
+    return (
+        transaction?.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD &&
+        !!transaction?.cardID &&
+        !!transaction?.cardName &&
+        !transaction.cardName.includes(CONST.EXPENSE.TYPE.CASH_CARD_NAME)
+    );
+}
+
+/**
+ * Treat both centrally-managed card imports and CSV-imported personal card transactions as the "card side"
+ * when deciding the merge target and preserving card metadata.
+ */
+function isCardImportForMerge(transaction: OnyxEntry<Transaction>): boolean {
+    return isFromCreditCardImport(transaction) || isImportedPersonalCardTransaction(transaction);
+}
+
+/**
  * Determines the correct target and source transactions for merging based on transaction types.
  *
  * Rules:
@@ -519,7 +545,7 @@ function selectTargetAndSourceTransactionsForMerge(
 ) {
     // If target transaction is a card or split expense, always preserve the target transaction
     // Card takes precedence over split expense
-    if (isFromCreditCardImport(sourceTransaction) || (isExpenseSplit(sourceTransaction) && !isFromCreditCardImport(targetTransaction))) {
+    if (isCardImportForMerge(sourceTransaction) || (isExpenseSplit(sourceTransaction) && !isCardImportForMerge(targetTransaction))) {
         return {
             targetTransaction: sourceTransaction,
             sourceTransaction: targetTransaction,
