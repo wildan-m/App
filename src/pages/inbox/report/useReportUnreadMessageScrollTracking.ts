@@ -4,6 +4,7 @@ import type {RefObject} from 'react';
 import type {NativeScrollEvent, NativeSyntheticEvent, ViewToken} from 'react-native';
 import {readNewestAction} from '@userActions/Report';
 import CONST from '@src/CONST';
+import type {ReportAction} from '@src/types/onyx';
 
 type Args = {
     /** The report ID */
@@ -32,6 +33,9 @@ type Args = {
 
     /** The index of the action badge target report action in the sorted visible actions list (-1 if none) */
     actionBadgeTargetIndex?: number;
+
+    /** The report action ID of the action badge target, used to detect on-screen state by identity (indexes shift when messages are inserted) */
+    actionBadgeTargetReportActionID?: string;
 };
 
 export default function useReportUnreadMessageScrollTracking({
@@ -44,6 +48,7 @@ export default function useReportUnreadMessageScrollTracking({
     isInverted,
     hasOnceLoadedReportActions,
     actionBadgeTargetIndex = -1,
+    actionBadgeTargetReportActionID,
 }: Args) {
     const [isFloatingMessageCounterVisible, setIsFloatingMessageCounterVisible] = useState(false);
     const [isActionBadgeAboveViewport, setIsActionBadgeAboveViewport] = useState(false);
@@ -55,6 +60,7 @@ export default function useReportUnreadMessageScrollTracking({
         isFocused: boolean;
         hasOnceLoadedReportActions: boolean;
         actionBadgeTargetIndex: number;
+        actionBadgeTargetReportActionID: string | undefined;
     }>({
         reportID,
         unreadMarkerReportActionIndex,
@@ -62,6 +68,7 @@ export default function useReportUnreadMessageScrollTracking({
         isFocused: true,
         hasOnceLoadedReportActions,
         actionBadgeTargetIndex,
+        actionBadgeTargetReportActionID,
     });
     // We want to save the updated value on ref to use it in onViewableItemsChanged
     // because FlatList requires the callback to be stable and we cannot add a dependency on the useCallback.
@@ -146,9 +153,16 @@ export default function useReportUnreadMessageScrollTracking({
         // Track whether the action badge target is above the viewport (i.e., not visible and at a higher index in the inverted list)
         const badgeTargetIndex = ref.current.actionBadgeTargetIndex;
         if (badgeTargetIndex !== -1) {
-            // In an inverted list, higher indexes are "above" (older messages). The target is above the viewport
-            // when its index is greater than the max visible index.
-            const isAbove = isInverted ? badgeTargetIndex > maxIndex : badgeTargetIndex < minIndex;
+            // Determine on-screen state by identity (report action ID) rather than by numeric index. Inserting a new
+            // message shifts every index by one, so a freshly-computed badgeTargetIndex can disagree with the
+            // (possibly stale) indexes captured in viewableItems; report action IDs are stable across that shift.
+            // If the target is among the currently visible items, it is not above the viewport.
+            const badgeTargetReportActionID = ref.current.actionBadgeTargetReportActionID;
+            const isTargetVisible =
+                !!badgeTargetReportActionID && viewableItems.some((viewableItem) => (viewableItem.item as ReportAction | undefined)?.reportActionID === badgeTargetReportActionID);
+            // In an inverted list, higher indexes are "above" (older messages). When the target is off-screen,
+            // it is above the viewport when its index is greater than the max visible index.
+            const isAbove = isTargetVisible ? false : isInverted ? badgeTargetIndex > maxIndex : badgeTargetIndex < minIndex;
             setIsActionBadgeAboveViewport(isAbove);
         } else {
             setIsActionBadgeAboveViewport(false);
@@ -172,8 +186,9 @@ export default function useReportUnreadMessageScrollTracking({
     // When actionBadgeTargetIndex changes, recalculate visibility
     useEffect(() => {
         ref.current.actionBadgeTargetIndex = actionBadgeTargetIndex;
+        ref.current.actionBadgeTargetReportActionID = actionBadgeTargetReportActionID;
         onViewableItemsChanged({viewableItems: ref.current.previousViewableItems, changed: []});
-    }, [onViewableItemsChanged, actionBadgeTargetIndex]);
+    }, [onViewableItemsChanged, actionBadgeTargetIndex, actionBadgeTargetReportActionID]);
 
     return {
         isFloatingMessageCounterVisible,

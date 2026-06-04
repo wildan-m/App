@@ -332,6 +332,7 @@ function ReportActionsList({
             },
             hasOnceLoadedReportActions: !!reportLoadingState?.hasOnceLoadedReportActions,
             actionBadgeTargetIndex,
+            actionBadgeTargetReportActionID: reportAttributes?.actionTargetReportActionID,
         });
 
     const {isScrollToBottomEnabled, setIsScrollToBottomEnabled, completeLiveTailPruneAfterScrollToBottom} = useReportActionsNewActionLiveTail({
