@@ -44,9 +44,12 @@ function SearchPage({route}: SearchPageProps) {
     const [hasFilterBars = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
 
     const [lastNonEmptySearchResults, setLastNonEmptySearchResults] = useState<SearchResults | undefined>(undefined);
+    const [searchRequestResponseStatusCode, setSearchRequestResponseStatusCode] = useState<number | null>(null);
 
     useConfirmReadyToOpenApp();
-    useSearchPageSetup(currentSearchQueryJSON);
+    // Pass the setter so the page-level search (the only search trigger when the cache is empty) reports
+    // its response code, so the error page is not suppressed after a cache clear.
+    useSearchPageSetup(currentSearchQueryJSON, setSearchRequestResponseStatusCode);
 
     // Adjust state during rendering rather than in a useEffect: the value is consumed in the same
     // render below (`searchResults = lastNonEmptySearchResults` when sorting), so a useEffect would
@@ -105,8 +108,6 @@ function SearchPage({route}: SearchPageProps) {
 
         setIsSorting(false);
     }, [currentSearchResults?.isLoading, isSorting, prevIsLoading]);
-
-    const [searchRequestResponseStatusCode, setSearchRequestResponseStatusCode] = useState<number | null>(null);
 
     const handleSearchAction = useCallback((value: SearchParams | string) => {
         if (typeof value === 'string') {
@@ -168,8 +169,10 @@ function SearchPage({route}: SearchPageProps) {
                     queryJSON={currentSearchQueryJSON}
                     metadata={metadata}
                     searchResults={searchResults}
+                    searchRequestResponseStatusCode={searchRequestResponseStatusCode}
                     isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
                     footerData={footerData}
+                    handleSearchAction={handleSearchAction}
                     shouldShowFooter={shouldShowFooter}
                     onSortPressedCallback={onSortPressedCallback}
                     searchOverlayContent={searchOverlayContent}

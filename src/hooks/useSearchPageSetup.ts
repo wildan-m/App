@@ -21,8 +21,13 @@ let lastSavedSearchHash: number | undefined;
  * - Fires the search() API call so data starts loading alongside the skeleton
  * - Fires openSearch() to load bank account data
  * - Re-fires openSearch() when coming back online
+ *
+ * `setSearchRequestResponseStatusCode` lets the page-level search report its resolved response
+ * code, mirroring what `handleSearchAction` does for input-initiated searches. Without it, a search
+ * fired here (the only trigger when the cache is empty) leaves the status code at its initial `null`,
+ * which keeps the error page suppressed (see `hasUnresolvedErrors` in the Search component).
  */
-function useSearchPageSetup(queryJSON: Readonly<SearchQueryJSON> | undefined) {
+function useSearchPageSetup(queryJSON: Readonly<SearchQueryJSON> | undefined, setSearchRequestResponseStatusCode?: (statusCode: number | null) => void) {
     const {isOffline} = useNetwork();
     const prevIsOffline = usePrevious(isOffline);
     const {clearSelectedTransactions} = useSearchSelectionActions();
@@ -69,8 +74,11 @@ function useSearchPageSetup(queryJSON: Readonly<SearchQueryJSON> | undefined) {
             return;
         }
         const shouldSkipWaitForWrites = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites});
-    }, [hash, isOffline, shouldUseLiveData, queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals]);
+        setSearchRequestResponseStatusCode?.(null);
+        search({queryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals, isLoading: false, skipWaitForWrites: shouldSkipWaitForWrites})?.then((jsonCode) =>
+            setSearchRequestResponseStatusCode?.(Number(jsonCode ?? 0)),
+        );
+    }, [hash, isOffline, shouldUseLiveData, queryJSON, isSnapshotDataLoaded, isSnapshotSearchLoading, currentSearchKey, shouldCalculateTotals, setSearchRequestResponseStatusCode]);
 
     useFocusEffect(() => {
         openSearch();

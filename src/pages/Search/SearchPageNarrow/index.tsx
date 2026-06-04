@@ -36,8 +36,6 @@ import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import {isSearchDataLoaded} from '@libs/SearchUIUtils';
 import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import variables from '@styles/variables';
-import {searchInServer} from '@userActions/Report';
-import {search} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {SearchResults} from '@src/types/onyx';
@@ -52,12 +50,14 @@ type SearchPageNarrowProps = {
     queryJSON?: SearchQueryJSON;
     metadata?: SearchResultsInfo;
     searchResults?: SearchResults;
+    searchRequestResponseStatusCode: number | null;
     isMobileSelectionModeEnabled: boolean;
     footerData: {
         count: number | undefined;
         total: number | undefined;
         currency: string | undefined;
     };
+    handleSearchAction: (value: SearchParams | string) => void;
     shouldShowFooter: boolean;
     onSortPressedCallback: () => void;
     /** Overlay rendered above Search content during expense-creation flows (SearchStaticList or null). */
@@ -75,9 +75,11 @@ const tabBarContent = <TabBarBottomContent selectedTab={NAVIGATION_TABS.SEARCH} 
 function SearchPageNarrow({
     queryJSON,
     searchResults,
+    searchRequestResponseStatusCode,
     isMobileSelectionModeEnabled,
     metadata,
     footerData,
+    handleSearchAction,
     shouldShowFooter,
     onSortPressedCallback,
     searchOverlayContent,
@@ -103,8 +105,6 @@ function SearchPageNarrow({
     const route = useRoute();
     const {saveScrollOffset} = useContext(ScrollOffsetContext);
     const receiptDropTargetRef = useRef<View>(null);
-
-    const [searchRequestResponseStatusCode, setSearchRequestResponseStatusCode] = useState<number | null>(null);
 
     const scrollOffset = useSharedValue(0);
     const topBarOffset = useSharedValue<number>(StyleUtils.searchHeaderDefaultOffset);
@@ -162,14 +162,6 @@ function SearchPageNarrow({
     const shouldDisplayCancelSearch = shouldUseNarrowLayout && searchRouterListVisible;
     const cancelSearchCallback = useCallback(() => {
         setSearchRouterListVisible(false);
-    }, []);
-
-    const handleSearchAction = useCallback((value: SearchParams | string) => {
-        if (typeof value === 'string') {
-            searchInServer(value);
-        } else {
-            search(value)?.then((jsonCode) => setSearchRequestResponseStatusCode(Number(jsonCode ?? 0)));
-        }
     }, []);
 
     const {addRouteKey, removeRouteKey} = useFullScreenBlockingViewActions();
