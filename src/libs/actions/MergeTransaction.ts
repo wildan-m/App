@@ -446,6 +446,28 @@ function mergeTransactionRequest({
         const optimisticReportDeletionData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> =
             transactionsOfDeletableReport.length === 1
                 ? [
+                      // Use merge instead of set to avoid deleting the report too quickly, which could cause a brief "not found" page to appear
+                      // when navigating back to it. The remaining parts of the report object will be removed in successData after the API call.
+                      {
+                          onyxMethod: Onyx.METHOD.MERGE,
+                          key: `${ONYXKEYS.COLLECTION.REPORT}${transactionToDelete.reportID}`,
+                          value: {
+                              reportID: null,
+                              stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                              statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
+                              participants: {
+                                  [currentUserAccountIDParam]: {
+                                      notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
+                                  },
+                              },
+                          },
+                      },
+                  ]
+                : [];
+
+        const successReportDeletionData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> =
+            transactionsOfDeletableReport.length === 1
+                ? [
                       {
                           onyxMethod: Onyx.METHOD.SET,
                           key: `${ONYXKEYS.COLLECTION.REPORT}${transactionToDelete.reportID}`,
@@ -545,7 +567,7 @@ function mergeTransactionRequest({
         // Failure data
         sourceTransactionFailureData.push(failureSourceTransactionData, ...failureReportDeletionData, ...failureSourceReportActionData);
         // Success data
-        sourceTransactionSuccessData.push(...successSourceReportActionData);
+        sourceTransactionSuccessData.push(...successReportDeletionData, ...successSourceReportActionData);
     } else {
         const whisperAction = getTrackExpenseActionableWhisper(sourceTransaction.transactionID, selfDMReportID);
         const sourceIouAction = getIOUActionForReportID(selfDMReportID, sourceTransaction.transactionID);
