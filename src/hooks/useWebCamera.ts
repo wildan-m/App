@@ -72,6 +72,12 @@ function useWebCamera({onUnmount}: UseWebCameraOptions = {}) {
             .getUserMedia({video: {facingMode: {exact: 'environment'}, zoom: {ideal: 1}}})
             .then((stream) => {
                 setCameraPermissionState('granted');
+                // Persist the confirmed grant at module scope so it survives the scan step
+                // unmounting/remounting (e.g. navigating back to retake a photo). Without this,
+                // the grant lives only in component state and is lost on remount, and on browsers
+                // where the Permissions API does not report camera access (mobile Safari) the
+                // stale cache makes queryCameraPermission re-show the permission prompt.
+                cachedPermissionState = 'granted';
                 for (const track of stream.getTracks()) {
                     track.stop();
                 }
