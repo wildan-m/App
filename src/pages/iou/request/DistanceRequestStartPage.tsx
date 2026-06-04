@@ -64,7 +64,12 @@ function DistanceRequestStartPage({
 
     const transactionRequestType = useMemo(() => {
         if (!transaction?.iouRequestType) {
-            return lastDistanceExpenseType ?? selectedTab ?? CONST.IOU.REQUEST_TYPE.DISTANCE_MAP;
+            // Prefer the currently selected tab over the last-created distance type. The OnyxTabNavigator
+            // displays the tab from `selectedTab`, so deriving the type from it keeps the rebuilt draft
+            // transaction in sync with the visible tab. Falling back to `lastDistanceExpenseType` here (e.g.
+            // after creating an Odometer expense) would re-init the draft as Odometer while the Map tab is
+            // shown, leaving the transaction without waypoints and opening the "Not here" page on waypoint tap.
+            return selectedTab ?? lastDistanceExpenseType ?? CONST.IOU.REQUEST_TYPE.DISTANCE_MAP;
         }
 
         return transaction.iouRequestType;
