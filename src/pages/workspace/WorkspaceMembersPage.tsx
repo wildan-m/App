@@ -257,6 +257,14 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         // Check if any of the members are approvers
         const hasApprovers = selectedEmployees.some((email) => isPolicyApprover(policy, email));
 
+        // Collect the approval-workflow reassignments triggered by removing an approver, but do NOT
+        // dispatch them yet. They must only run after the member removal succeeds: each reassignment is
+        // an independent request, so firing it up-front leaves the approver pointing at the owner even
+        // when the removal itself fails on the backend (e.g. the approver still has reports awaiting
+        // approval). removeMembers already reverts its own optimistic approver change on failure, so
+        // deferring these keeps the approver coupled to the removal outcome.
+        const pendingApprovalWorkflowUpdates: Array<() => void> = [];
+
         if (hasApprovers) {
             const ownerEmail = ownerDetails.login;
             let currentWorkflows = approvalWorkflows;
@@ -279,16 +287,29 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 for (const workflow of updatedWorkflows) {
                     if (workflow?.removeApprovalWorkflow) {
                         const {removeApprovalWorkflow, ...updatedWorkflow} = workflow;
-                        removeApprovalWorkflowAction(updatedWorkflow, policy);
+                        pendingApprovalWorkflowUpdates.push(() => removeApprovalWorkflowAction(updatedWorkflow, policy));
                     } else {
-                        updateApprovalWorkflow(workflow, [], [], policy);
+                        pendingApprovalWorkflowUpdates.push(() => updateApprovalWorkflow(workflow, [], [], policy));
                     }
                 }
             }
         }
 
         setSelectedEmployees([]);
-        removeMembers(policy, selectedEmployees, policyMemberEmailsToAccountIDs);
+        const removeMembersPromise = removeMembers(policy, selectedEmployees, policyMemberEmailsToAccountIDs);
+        if (pendingApprovalWorkflowUpdates.length === 0) {
+            return;
+        }
+        removeMembersPromise?.then((response) => {
+            // Skip the approval-workflow reassignment when the member removal did not succeed, so the
+            // original approver is preserved after the user dismisses the removal error.
+            if (response?.jsonCode !== CONST.JSON_CODE.SUCCESS) {
+                return;
+            }
+            for (const dispatchApprovalWorkflowUpdate of pendingApprovalWorkflowUpdates) {
+                dispatchApprovalWorkflowUpdate();
+            }
+        });
     };
 
     /**

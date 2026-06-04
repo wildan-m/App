@@ -559,7 +559,7 @@ function removeMembers(policy: OnyxEntry<Policy>, selectedMemberEmails: string[]
         policyID,
     };
 
-    API.write(WRITE_COMMANDS.DELETE_MEMBERS_FROM_WORKSPACE, params, {optimisticData, successData, failureData});
+    return API.write(WRITE_COMMANDS.DELETE_MEMBERS_FROM_WORKSPACE, params, {optimisticData, successData, failureData});
 }
 
 function buildUpdateWorkspaceMembersRoleOnyxData(policy: OnyxEntry<Policy>, selectedMemberEmails: string[], selectedMemberAccountIDs: number[], newRole: ValueOf<typeof CONST.POLICY.ROLE>) {
