@@ -2638,9 +2638,31 @@ function getDisplayedReportID(reportID: string, isOffline: boolean): string {
  */
 function isOneOnOneChat(report: OnyxEntry<Report>): boolean {
     const participants = report?.participants ?? {};
+
+    // De-duplicate participants that have a leftover optimistic personal-detail entry sharing a login with a real
+    // (non-optimistic) entry. When a DM is created offline, an optimistic participant is added; after reconnecting the
+    // backend returns the real account ID for the same user alongside the stale optimistic one, so the report briefly
+    // holds two entries for a single user. Mirror the de-duplication that getParticipantsAccountIDsForDisplay applies so
+    // such a 1:1 DM is not miscounted as having multiple participants. (Inlined rather than reusing that helper because
+    // it calls isOneOnOneChat itself, which would recurse.)
+    const nonOptimisticLoginMap: Record<string, boolean | undefined> = {};
+    for (const accountID of Object.keys(participants)) {
+        const personalDetail = allPersonalDetails?.[accountID];
+        if (personalDetail?.login && !personalDetail.isOptimisticPersonalDetail) {
+            nonOptimisticLoginMap[personalDetail.login] = true;
+        }
+    }
+    const dedupedAccountIDs = Object.keys(participants).filter((accountID) => {
+        const personalDetail = allPersonalDetails?.[accountID];
+        if (personalDetail?.login && personalDetail.isOptimisticPersonalDetail) {
+            return !nonOptimisticLoginMap[personalDetail.login];
+        }
+        return true;
+    });
+
     const participant = deprecatedCurrentUserAccountID ? participants[deprecatedCurrentUserAccountID] : undefined;
     const isCurrentUserParticipant = participant ? 1 : 0;
-    const participantAmount = Object.keys(participants).length - isCurrentUserParticipant;
+    const participantAmount = dedupedAccountIDs.length - isCurrentUserParticipant;
     if (participantAmount !== 1) {
         return false;
     }
