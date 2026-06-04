@@ -2,7 +2,17 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getIsOffline} from '@libs/NetworkState';
 import {getLinkedTransactionID} from '@libs/ReportActionsUtils';
 import {computeReportName} from '@libs/ReportNameUtils';
-import {generateIsEmptyReport, generateReportAttributes, hasVisibleReportFieldViolations, isArchivedReport, isPolicyAdmin, isPolicyExpenseChat, isValidReport} from '@libs/ReportUtils';
+import {
+    generateIsEmptyReport,
+    generateReportAttributes,
+    getReportNotificationPreference,
+    hasVisibleReportFieldViolations,
+    isArchivedReport,
+    isPolicyAdmin,
+    isPolicyExpenseChat,
+    isUnread,
+    isValidReport,
+} from '@libs/ReportUtils';
 import SidebarUtils from '@libs/SidebarUtils';
 import createOnyxDerivedValueConfig from '@userActions/OnyxDerived/createOnyxDerivedValueConfig';
 import {hasKeyTriggeredCompute} from '@userActions/OnyxDerived/utils';
@@ -341,6 +351,11 @@ export default createOnyxDerivedValueConfig({
                     actionTargetReportActionID = actionGreenTargetReportActionID;
                 }
 
+                // Track plain unread state (e.g. a new group message that isn't an @mention) so the Inbox tab
+                // can surface its green dot for it. Mirror the LHN's unread rule (unread and not muted).
+                const oneTransactionThreadReport = oneTransactionThreadReportID ? reports[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`] : undefined;
+                const reportIsUnread = isUnread(report, oneTransactionThreadReport, isReportArchived) && getReportNotificationPreference(report) !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE;
+
                 acc[report.reportID] = {
                     reportName: report
                         ? computeReportName({
@@ -366,6 +381,7 @@ export default createOnyxDerivedValueConfig({
                     reportErrors,
                     oneTransactionThreadReportID,
                     needsParentChatErrorPropagation,
+                    isUnread: reportIsUnread,
                 };
 
                 return acc;

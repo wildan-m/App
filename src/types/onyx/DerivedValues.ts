@@ -47,6 +47,12 @@ type ReportAttributes = {
     oneTransactionThreadReportID?: string;
 
     /**
+     * Whether the report has unread content that should surface the Inbox tab green dot. Mirrors the LHN's
+     * unread rule (unread and not muted), so a plain new message — not just an @mention — lights the tab.
+     */
+    isUnread?: boolean;
+
+    /**
      * True when this report (typically a child expense report) has an RBR-worthy reason that should
      * propagate up to its parent workspace chat. Set by the per-report pass; consumed by the propagation
      * loop. We track it separately from `brickRoadStatus` because we suppress the child's own RBR/Fix badge

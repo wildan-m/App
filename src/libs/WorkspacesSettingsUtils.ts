@@ -21,6 +21,18 @@ const getBrickRoadForPolicy = (reportID: string, reportAttributes: ReportAttribu
     return reportAttributes?.[reportID]?.brickRoadStatus;
 };
 
+/**
+ * @returns the effective Inbox tab BrickRoad for a report: its own brickRoadStatus, or INFO when the report
+ * is simply unread (e.g. a new group message that isn't an @mention) so the tab green dot surfaces for it too.
+ */
+const getInboxTabBrickRoadForReport = (reportID: string, reportAttributes: ReportAttributesDerivedValue['reports'] | undefined): BrickRoad => {
+    const attributes = reportAttributes?.[reportID];
+    if (attributes?.brickRoadStatus) {
+        return attributes.brickRoadStatus;
+    }
+    return attributes?.isUnread ? CONST.BRICK_ROAD_INDICATOR_STATUS.INFO : undefined;
+};
+
 function getChatTabBrickRoadReportID(orderedReportIDs: string[], reportAttributes: ReportAttributesDerivedValue['reports'] | undefined): string | undefined {
     if (!orderedReportIDs.length) {
         return undefined;
@@ -29,7 +41,7 @@ function getChatTabBrickRoadReportID(orderedReportIDs: string[], reportAttribute
     let reportIDWithGBR: string | undefined;
 
     for (const reportID of orderedReportIDs) {
-        const brickRoad = getBrickRoadForPolicy(reportID, reportAttributes);
+        const brickRoad = getInboxTabBrickRoadForReport(reportID, reportAttributes);
         if (brickRoad === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO) {
             reportIDWithGBR = reportID;
         }
@@ -43,7 +55,7 @@ function getChatTabBrickRoadReportID(orderedReportIDs: string[], reportAttribute
 
 function getChatTabBrickRoad(orderedReportIDs: string[], reportAttributes: ReportAttributesDerivedValue['reports'] | undefined): BrickRoad | undefined {
     const reportID = getChatTabBrickRoadReportID(orderedReportIDs, reportAttributes);
-    return reportID ? getBrickRoadForPolicy(reportID, reportAttributes) : undefined;
+    return reportID ? getInboxTabBrickRoadForReport(reportID, reportAttributes) : undefined;
 }
 
 /**
