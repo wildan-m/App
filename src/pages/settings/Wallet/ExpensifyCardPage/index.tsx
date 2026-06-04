@@ -1,5 +1,5 @@
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import type {OnyxCollection} from 'react-native-onyx';
@@ -29,7 +29,7 @@ import useNetwork from '@hooks/useNetwork';
 import useNonPersonalCardList from '@hooks/useNonPersonalCardList';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {freezeCard, unfreezeCard} from '@libs/actions/Card';
+import {freezeCard, openCardDetailsPage, unfreezeCard} from '@libs/actions/Card';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import navigateToCardTransactions from '@libs/CardNavigationUtils';
 import {
@@ -98,7 +98,14 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const cardList = useNonPersonalCardList();
     const [cardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${cardList?.[cardID]?.fundID}`);
     const styles = useThemeStyles();
-    const {isOffline} = useNetwork();
+
+    // Fetch the latest details for the card being viewed so data that is populated per-card on the backend
+    // (e.g. the spend rule association after a virtual card is replaced) is loaded, mirroring WorkspaceExpensifyCardDetailsPage.
+    const fetchCardDetails = useCallback(() => {
+        openCardDetailsPage(Number(cardID));
+    }, [cardID]);
+    const {isOffline} = useNetwork({onReconnect: fetchCardDetails});
+    useEffect(() => fetchCardDetails(), [fetchCardDetails]);
     const {translate} = useLocalize();
     const {executeScenario} = useMultifactorAuthentication();
     const shouldDisplayCardDomain = !isTravelCard(cardList?.[cardID]) && (!cardList?.[cardID]?.nameValuePairs?.issuedBy || !cardList?.[cardID]?.nameValuePairs?.isVirtual);
