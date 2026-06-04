@@ -17,6 +17,7 @@ function BaseSearchList({
     ListFooterComponent,
     onViewableItemsChanged,
     onLayout,
+    onContentSizeChange,
     contentContainerStyle,
 }: BaseSearchListProps) {
     const renderItemWithoutKeyboardFocus = useCallback(
@@ -39,6 +40,7 @@ function BaseSearchList({
             ListFooterComponent={ListFooterComponent}
             onViewableItemsChanged={onViewableItemsChanged}
             onLayout={onLayout}
+            onContentSizeChange={onContentSizeChange}
             removeClippedSubviews
             drawDistance={250}
             contentContainerStyle={contentContainerStyle}

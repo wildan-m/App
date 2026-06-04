@@ -17,6 +17,7 @@ type BaseSearchListProps = Pick<
     | 'keyExtractor'
     | 'showsVerticalScrollIndicator'
     | 'onLayout'
+    | 'onContentSizeChange'
 > & {
     /** The data to display in the list */
     data: SearchListItem[];

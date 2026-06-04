@@ -60,6 +60,11 @@ const easing = Easing.bezier(0.76, 0.0, 0.24, 1.0);
 // Keep a ref to the horizontal scroll offset so we can restore it if users change the search query
 let savedHorizontalScrollOffset = 0;
 
+// How long, after the list regains focus, we keep trying to restore the saved scroll position
+// as rows lay out. After this window we stop so later user-driven scrolling/pagination isn't
+// pulled back to the saved offset.
+const SCROLL_RESTORE_WINDOW_MS = 2000;
+
 type SearchListItem = TransactionListItemType | TransactionGroupListItemType | ReportActionListItemType | TaskListItemType;
 type SearchListItemComponentType = typeof TransactionListItem | typeof ChatListItem | typeof TransactionGroupListItem | typeof TaskListItem | typeof ExpenseReportListItem;
 
@@ -407,18 +412,58 @@ function SearchList({
         [data, isEditingCell, wasRecentlyEditingCell],
     );
 
+    // The saved scroll position cannot be restored in a single frame when the list holds more
+    // than one page of results: on focus only the first rows are laid out, so the list's content
+    // is shorter than the saved offset and a one-shot scrollToOffset is clamped to that short
+    // height - the user lands around the first page instead of where they left. We remember the
+    // pending offset and keep re-applying it as more rows lay out (see onContentSizeChange below),
+    // then stop once the content is tall enough to honor it.
+    const pendingScrollOffset = useRef<number | undefined>(undefined);
+
     useFocusEffect(
         useCallback(() => {
-            const offset = getScrollOffset(route);
-            requestAnimationFrame(() => {
-                if (!offset || !listRef.current) {
+            pendingScrollOffset.current = getScrollOffset(route);
+            if (!pendingScrollOffset.current) {
+                return;
+            }
+
+            const frameId = requestAnimationFrame(() => {
+                if (!pendingScrollOffset.current || !listRef.current) {
                     return;
                 }
 
-                listRef.current.scrollToOffset({offset, animated: false});
+                listRef.current.scrollToOffset({offset: pendingScrollOffset.current, animated: false});
             });
+
+            // Safety stop: if the list never grows tall enough to reach the saved offset (e.g. rows
+            // were removed since), give up after the window so later pagination isn't pulled back.
+            const timeoutId = setTimeout(() => {
+                pendingScrollOffset.current = undefined;
+            }, SCROLL_RESTORE_WINDOW_MS);
+
+            return () => {
+                cancelAnimationFrame(frameId);
+                clearTimeout(timeoutId);
+                pendingScrollOffset.current = undefined;
+            };
         }, [getScrollOffset, route]),
     );
+
+    // As the list lays out more rows its content height grows; re-apply the saved offset on each
+    // growth so the restore lands at the exact position instead of being clamped to a short list.
+    // Once the content is tall enough to reach the offset we apply it one last time and clear the
+    // pending value, so subsequent user-driven pagination/scrolling is left untouched.
+    const handleContentSizeChange = useCallback((width: number, height: number) => {
+        if (!pendingScrollOffset.current || !listRef.current) {
+            return;
+        }
+
+        listRef.current.scrollToOffset({offset: pendingScrollOffset.current, animated: false});
+
+        if (height >= pendingScrollOffset.current) {
+            pendingScrollOffset.current = undefined;
+        }
+    }, []);
 
     useImperativeHandle(ref, () => ({scrollToIndex}), [scrollToIndex]);
 
@@ -540,6 +585,7 @@ function SearchList({
                 ListFooterComponent={ListFooterComponent}
                 onViewableItemsChanged={onViewableItemsChanged}
                 onLayout={onLayout}
+                onContentSizeChange={handleContentSizeChange}
                 contentContainerStyle={contentContainerStyle}
                 newTransactions={newTransactions}
                 selectedTransactions={selectedTransactions}

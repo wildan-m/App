@@ -31,6 +31,7 @@ function BaseSearchList({
     ListFooterComponent,
     onViewableItemsChanged,
     onLayout,
+    onContentSizeChange,
     contentContainerStyle,
     flattenedItemsLength,
     newTransactions,
@@ -151,6 +152,7 @@ function BaseSearchList({
             ListFooterComponent={ListFooterComponent}
             onViewableItemsChanged={onViewableItemsChanged}
             onLayout={onLayout}
+            onContentSizeChange={onContentSizeChange}
             removeClippedSubviews
             drawDistance={250}
             contentContainerStyle={contentContainerStyle}
