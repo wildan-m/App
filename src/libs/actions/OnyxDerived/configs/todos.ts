@@ -1,6 +1,7 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
-import {isApproveAction, isExportAction, isPrimaryPayAction, isSubmitAction} from '@libs/ReportPrimaryActionUtils';
-import {hasOnlyNonReimbursableTransactions} from '@libs/ReportUtils';
+import {isApproveAction, isExportAction, isSubmitAction} from '@libs/ReportPrimaryActionUtils';
+import {hasHeldExpenses} from '@libs/ReportUtils';
+import {canIOUBePaid} from '@userActions/IOU/ReportWorkflow';
 import createOnyxDerivedValueConfig from '@userActions/OnyxDerived/createOnyxDerivedValueConfig';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -64,18 +65,10 @@ const createTodosReportsAndTransactions = ({
         if (isApproveAction(report, reportTransactions, currentUserAccountID, reportMetadata, policy)) {
             reportsToApprove.push(report);
         }
-        if (
-            isPrimaryPayAction({
-                report,
-                reportTransactions,
-                currentUserAccountID,
-                currentUserLogin: login,
-                bankAccountList,
-                policy,
-                reportNameValuePairs: reportNameValuePair,
-            }) &&
-            !hasOnlyNonReimbursableTransactions(report.reportID, reportTransactions)
-        ) {
+        const chatReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`];
+        const canBePaid = canIOUBePaid(report, chatReport, policy, bankAccountList, login, currentUserAccountID, reportTransactions, false, reportNameValuePair);
+        const canOnlyBePaidElsewhere = canIOUBePaid(report, chatReport, policy, bankAccountList, login, currentUserAccountID, reportTransactions, true, reportNameValuePair);
+        if ((canBePaid || canOnlyBePaidElsewhere) && !hasHeldExpenses(reportTransactions)) {
             reportsToPay.push(report);
         }
         if (isExportAction(report, login, policy, reportActions) && policy?.exporter === login) {
