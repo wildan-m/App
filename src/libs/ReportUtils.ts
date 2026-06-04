@@ -5356,7 +5356,18 @@ function getTransactionReportName({
     }
 
     const amount = getTransactionAmount(transaction, !isEmptyObject(report) && isExpenseReport(report), transaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) ?? 0;
-    const formattedAmount = convertToDisplayString(amount, getCurrency(transaction)) ?? '';
+    let formattedAmount = convertToDisplayString(amount, getCurrency(transaction)) ?? '';
+
+    // For a completed scan expense the transaction's own amount can still read 0 while the scanned value already
+    // lives on the parent expense report's total (the same total the report preview already trusts). Fall back to
+    // the report total so the LHN thread title doesn't keep showing "$0.00 expense" once scanning finishes.
+    if (amount === 0 && !isEmptyObject(report) && isExpenseReport(report)) {
+        const {totalDisplaySpend} = getMoneyRequestSpendBreakdown(report, reports);
+        if (totalDisplaySpend) {
+            formattedAmount = convertToDisplayString(totalDisplaySpend, report.currency) ?? '';
+        }
+    }
+
     const comment = getMerchantOrDescription(transaction);
     return translate('iou.threadExpenseReportName', formattedAmount, Parser.htmlToText(comment));
 }
