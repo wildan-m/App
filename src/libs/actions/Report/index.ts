@@ -332,6 +332,13 @@ type OpenReportActionParams = {
     /** The optimistic selfDM report when it exists on the server but was filtered out from OpenApp response (e.g., no actions yet) */
     optimisticSelfDMReport?: Report;
 
+    /**
+     * The already-resolved parent (expense) report for the legacy money-request-preview fallback. Passed in so the actor of
+     * the materialized IOU `create` action can be derived from the authoritative `ownerAccountID` synchronously, instead of
+     * relying on `allReports`, which may not yet contain the parent report (e.g. a non-owner opens the report first).
+     */
+    transactionThreadParentReport?: Report;
+
     /** The current user's login */
     currentUserLogin?: string;
 
@@ -1461,6 +1468,7 @@ function openReport(params: OpenReportActionParams) {
         parentReportID,
         shouldAddPendingFields = true,
         optimisticSelfDMReport,
+        transactionThreadParentReport,
         currentUserLogin,
         currentUserAccountID,
         isSelfTourViewed,
@@ -1610,10 +1618,17 @@ function openReport(params: OpenReportActionParams) {
         const transactionParentReportID = parentReportID ?? transaction?.reportID;
         const iouReportActionID = rand64();
 
-        // Get the parent report to determine the actual submitter/owner of the expense
-        // Use optimisticSelfDMReport if provided (when selfDM exists but wasn't in allReports)
+        // Get the parent report to determine the actual submitter/owner of the expense.
+        // Use optimisticSelfDMReport if provided (when selfDM exists but wasn't in allReports), then prefer the
+        // authoritative parent report passed in by the caller. Falling back to allReports last is unsafe on its own:
+        // when a non-owner opens the report first, the parent report may not be in their cache yet, so the owner-derived
+        // actor would silently fall back to currentUserAccountID and become canonical.
         const parentReport =
-            transactionParentReportID === optimisticSelfDMReport?.reportID ? optimisticSelfDMReport : allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionParentReportID}`];
+            transactionParentReportID === optimisticSelfDMReport?.reportID
+                ? optimisticSelfDMReport
+                : transactionThreadParentReport?.reportID === transactionParentReportID
+                  ? transactionThreadParentReport
+                  : allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionParentReportID}`];
         const submitterAccountID = parentReport?.ownerAccountID ?? currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID;
         const submitterEmail = PersonalDetailsUtils.getLoginsByAccountIDs([submitterAccountID]).at(0) ?? currentUserLogin ?? '';
         const submitterPersonalDetails = PersonalDetailsUtils.getPersonalDetailByEmail(submitterEmail);
@@ -2215,6 +2230,7 @@ function createTransactionThreadReport(params: CreateTransactionThreadReportPara
         parentReportID: selfDMReportID,
         shouldAddPendingFields,
         optimisticSelfDMReport,
+        transactionThreadParentReport: reportToUse,
         currentUserLogin,
         currentUserAccountID,
         isSelfTourViewed,
