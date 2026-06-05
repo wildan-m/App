@@ -12,6 +12,7 @@ import TextPicker from '@components/TextPicker';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {setDraftValues} from '@libs/actions/FormActions';
 import {addErrorMessage} from '@libs/ErrorUtils';
 import {hasCircularReferences} from '@libs/Formula';
 import Navigation from '@libs/Navigation/Navigation';
@@ -135,27 +136,21 @@ function WorkspaceCreateReportFieldsPage({
         [policy?.fieldList, translate],
     );
 
-    const handleOnValueCommitted = useCallback(
-        (inputValues: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_REPORT_FIELDS_FORM>) => (initialValue: string) => {
-            // Mirror optimisticType logic from createReportField: if user enters a formula
-            // while type is Text, automatically switch the type to Formula in the form, otherwise back to Text.
-            const isFormula = hasFormulaPartsInInitialValue(initialValue);
-            if (isFormula) {
-                formRef.current?.resetForm({
-                    ...inputValues,
-                    [INPUT_IDS.TYPE]: CONST.REPORT_FIELD_TYPES.FORMULA,
-                    [INPUT_IDS.INITIAL_VALUE]: initialValue,
-                });
-            } else {
-                formRef.current?.resetForm({
-                    ...inputValues,
-                    [INPUT_IDS.TYPE]: CONST.REPORT_FIELD_TYPES.TEXT,
-                    [INPUT_IDS.INITIAL_VALUE]: initialValue,
-                });
-            }
-        },
-        [],
-    );
+    const handleOnValueCommitted = useCallback((initialValue: string) => {
+        // Mirror optimisticType logic from createReportField: if the user enters a formula while type is
+        // Text, automatically switch the type to Formula, otherwise back to Text.
+        const nextType = hasFormulaPartsInInitialValue(initialValue) ? CONST.REPORT_FIELD_TYPES.FORMULA : CONST.REPORT_FIELD_TYPES.TEXT;
+
+        // Persist the switched type to the form draft, not just the local form state. Committing the
+        // initial value writes INITIAL_VALUE to the draft, which makes FormProvider re-sync the draft into
+        // its input values on the next render; a type held only in local state would be clobbered back to
+        // the stale draft type. Writing it to the draft (the same path TypeSelectorPage uses) keeps the two
+        // in agreement so the auto-switch sticks.
+        setDraftValues(ONYXKEYS.FORMS.WORKSPACE_REPORT_FIELDS_FORM, {
+            [INPUT_IDS.TYPE]: nextType,
+            [INPUT_IDS.INITIAL_VALUE]: initialValue,
+        });
+    }, []);
 
     const listValues = [...(formDraft?.[INPUT_IDS.LIST_VALUES] ?? [])].sort(localeCompare).join(', ');
 
@@ -244,7 +239,7 @@ function WorkspaceCreateReportFieldsPage({
                                     maxLength={CONST.WORKSPACE_REPORT_FIELD_POLICY_MAX_LENGTH}
                                     multiline={false}
                                     role={CONST.ROLE.PRESENTATION}
-                                    onValueCommitted={handleOnValueCommitted(inputValues)}
+                                    onValueCommitted={handleOnValueCommitted}
                                     shouldSaveDraft
                                 />
                             )}
