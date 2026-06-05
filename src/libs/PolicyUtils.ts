@@ -617,6 +617,21 @@ function shouldFilterExpensifyTeam(policyOwner: string | undefined, currentUserL
 const isPolicyUser = (policy: OnyxInputOrEntry<Policy>, currentUserLogin?: string): boolean => getPolicyRole(policy, currentUserLogin) === CONST.POLICY.ROLE.USER;
 
 /**
+ * Checks whether the given user both submits expenses (is a regular "user" member in at least one policy)
+ * and approves expenses (is an approver in at least one policy). These are the managers/admins for whom the
+ * unfiltered Expenses list is overwhelming, so we seed a default "My expenses" saved search for them.
+ */
+function isSubmitterAndApprover(allPolicies: OnyxCollection<Policy>, currentUserLogin: string | undefined): boolean {
+    if (!currentUserLogin) {
+        return false;
+    }
+    const policies = Object.values(allPolicies ?? {});
+    const isSubmitter = policies.some((policy) => isPolicyUser(policy, currentUserLogin));
+    const isApprover = policies.some((policy) => isPolicyApprover(policy, currentUserLogin));
+    return isSubmitter && isApprover;
+}
+
+/**
  * Checks if the current user is an auditor of the policy
  */
 const isPolicyAuditor = (policy: OnyxInputOrEntry<Policy>, currentUserLogin?: string): boolean =>
@@ -2560,6 +2575,7 @@ export {
     isPolicyTaxEnabled,
     sortPoliciesByName,
     isPolicyApprover,
+    isSubmitterAndApprover,
     tryNavigateToSubmitWorkspaceUpgrade,
     canAccessSubmitWorkspaceFeatures,
     getRulesDocumentSourceURL,

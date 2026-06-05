@@ -215,6 +215,9 @@ const ONYXKEYS = {
     /** This NVP contains the training modals the user denied showing again */
     NVP_HAS_SEEN_TRACK_TRAINING: 'nvp_hasSeenTrackTraining',
 
+    /** One-time flag indicating the default "My expenses" saved search has been seeded for this user */
+    NVP_HAS_SEEDED_MY_EXPENSES_SEARCH: 'nvp_hasSeededMyExpensesSearch',
+
     /** Indicates which locale should be used */
     NVP_PREFERRED_LOCALE: 'nvp_preferredLocale',
 
@@ -1513,6 +1516,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_ACTIVE_POLICY_ID]: string;
     [ONYXKEYS.NVP_DISMISSED_REFERRAL_BANNERS]: OnyxTypes.DismissedReferralBanners;
     [ONYXKEYS.NVP_HAS_SEEN_TRACK_TRAINING]: boolean;
+    [ONYXKEYS.NVP_HAS_SEEDED_MY_EXPENSES_SEARCH]: boolean;
     [ONYXKEYS.NVP_PRIVATE_SUBSCRIPTION]: OnyxTypes.PrivateSubscription;
     [ONYXKEYS.NVP_PERSONAL_OFFSETS]: boolean;
     [ONYXKEYS.NVP_PRIVATE_PROMO_CODE]: string | null;

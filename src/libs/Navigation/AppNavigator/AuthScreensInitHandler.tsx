@@ -9,6 +9,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReconcileHighContrastIntent from '@hooks/useReconcileHighContrastIntent';
 import useReportAttributes from '@hooks/useReportAttributes';
+import useSeedDefaultExpensesSearch from '@hooks/useSeedDefaultExpensesSearch';
 import {init, isClientTheLeader} from '@libs/ActiveClientManager';
 import Log from '@libs/Log';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
@@ -75,6 +76,7 @@ function AuthScreensInitHandler() {
     reportAttributesRef.current = reportAttributes;
 
     useReconcileHighContrastIntent();
+    useSeedDefaultExpensesSearch();
 
     useEffect(() => {
         if (!Navigation.isActiveRoute(ROUTES.SIGN_IN_MODAL)) {

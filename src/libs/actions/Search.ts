@@ -44,7 +44,7 @@ import {
     isInvoiceReport,
     isIOUReport as isIOUReportUtil,
 } from '@libs/ReportUtils';
-import {serializeQueryJSONForBackend} from '@libs/SearchQueryUtils';
+import {buildQueryStringFromFilterFormValues, buildSearchQueryJSON, serializeQueryJSONForBackend} from '@libs/SearchQueryUtils';
 import type {SearchKey} from '@libs/SearchUIUtils';
 import {isTransactionGroupListItemType} from '@libs/SearchUIUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
@@ -390,6 +390,23 @@ function saveSearch({queryJSON, newName}: {queryJSON: Readonly<SearchQueryJSON>;
         },
     ];
     API.write(WRITE_COMMANDS.SAVE_SEARCH, {jsonQuery, newName: saveSearchName}, {optimisticData, failureData, successData});
+}
+
+/**
+ * Seeds a default "My expenses" saved search filtered to the current user. Used to give submit-and-approve
+ * users (managers/admins) the same "my expenses only" default they had in Expensify Classic, instead of the
+ * unfiltered Expenses list. The one-time gating is owned by the caller (see useSeedDefaultExpensesSearch).
+ */
+function seedMyExpensesSavedSearch(accountID: number, savedSearchName: string) {
+    const queryString = buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        [FILTER_KEYS.FROM]: [`${accountID}`],
+    });
+    const queryJSON = buildSearchQueryJSON(queryString);
+    if (!queryJSON) {
+        return;
+    }
+    saveSearch({queryJSON, newName: savedSearchName});
 }
 
 function deleteSavedSearch(hash: number) {
@@ -1456,6 +1473,7 @@ function setOptimisticDataForTransactionThreadPreview(item: TransactionListItemT
 
 export {
     saveSearch,
+    seedMyExpensesSavedSearch,
     search,
     rejectMoneyRequestsOnSearch,
     exportSearchItemsToCSV,
