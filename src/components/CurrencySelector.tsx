@@ -5,6 +5,8 @@ import type {View} from 'react-native';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import getPlatform from '@libs/getPlatform';
+import mergeRefs from '@libs/mergeRefs';
 import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -57,6 +59,7 @@ function CurrencySelector({
     const currencyTitleDescStyle = currency && !shouldShowCurrencySymbol ? styles.textNormal : null;
 
     const didOpenCurrencySelector = useRef(false);
+    const menuItemRef = useRef<View | null>(null);
     const isFocused = useIsFocused();
 
     useEffect(() => {
@@ -64,6 +67,14 @@ function CurrencySelector({
             return;
         }
         didOpenCurrencySelector.current = false;
+        // On web/desktop, focus is restored to this currency MenuItem (role "button") when we return
+        // from the currency picker. While it holds focus, the Confirm button's submit-on-Enter shortcut
+        // is suppressed and Enter re-activates the MenuItem (re-opening the picker) instead of submitting
+        // the form. Blur it so the next Enter submits the form and creates the workspace.
+        // getPlatform() resolves to WEB for both browser and the desktop (Electron) build.
+        if (getPlatform() === CONST.PLATFORM.WEB) {
+            menuItemRef.current?.blur();
+        }
         onBlur?.();
     }, [isFocused, onBlur]);
 
@@ -77,7 +88,7 @@ function CurrencySelector({
         <MenuItemWithTopDescription
             shouldShowRightIcon
             title={shouldShowCurrencySymbol && currency ? `${currency} - ${getCurrencySymbol(currency)}` : currency}
-            ref={ref}
+            ref={mergeRefs(ref, menuItemRef)}
             descriptionTextStyle={currencyTitleDescStyle}
             brickRoadIndicator={errorText ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
             description={label ?? translate('common.currency')}
