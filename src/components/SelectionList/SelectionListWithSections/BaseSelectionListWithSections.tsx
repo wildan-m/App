@@ -229,6 +229,17 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         selectRow(focusedItem);
     };
 
+    // Handles the Enter key. When a row is focused, it toggles/selects that row. When no row is focused but there is an
+    // enabled confirm action (e.g. the "Next" button on the multi-select invite flows), Enter confirms the current
+    // selection instead of being a no-op — so pressing Enter while the search field is focused advances the flow.
+    const selectFocusedItemOrConfirm = (e?: KeyboardEvent) => {
+        if (!getFocusedItem() && confirmButtonOptions?.onConfirm && !confirmButtonOptions.isDisabled) {
+            confirmButtonOptions.onConfirm(e, getFocusedItem());
+            return;
+        }
+        selectFocusedItem();
+    };
+
     const focusTextInput = () => {
         innerTextInputRef.current?.focus();
     };
@@ -271,11 +282,13 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     const disableEnterShortcut = activeElementRole && [CONST.ROLE.BUTTON, CONST.ROLE.CHECKBOX, CONST.ROLE.SWITCH].includes(activeElementRole as InteractiveElementRoles);
     const syncedSearchValue = searchValueForFocusSync ?? textInputOptions?.value;
 
-    useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, selectFocusedItem, {
+    const canConfirmWithEnter = !!confirmButtonOptions?.onConfirm && !confirmButtonOptions.isDisabled;
+
+    useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, selectFocusedItemOrConfirm, {
         captureOnInputs: true,
         shouldBubble: itemsCount > 0 && !getFocusedItem(),
         shouldStopPropagation,
-        isActive: !disableKeyboardShortcuts && isScreenFocused && focusedIndex >= 0 && !disableEnterShortcut,
+        isActive: !disableKeyboardShortcuts && isScreenFocused && (focusedIndex >= 0 || canConfirmWithEnter) && !disableEnterShortcut,
     });
 
     useKeyboardShortcut(
