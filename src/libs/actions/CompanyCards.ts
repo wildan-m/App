@@ -66,6 +66,7 @@ type ImportCSVCompanyCardsData = {
     lastSelectedFeed?: CompanyCardFeedWithDomainID;
     workspaceCardFeeds?: OnyxEntry<CardFeeds>;
     existingInstanceID?: string;
+    translate: LocaleContextProps['translate'];
 };
 
 type OptimisticCompanyCardCSVTransaction = Pick<Transaction, 'transactionID' | 'amount' | 'created' | 'currency' | 'merchant' | 'category' | 'tag' | 'comment' | 'cardName' | 'bank'> & {
@@ -1121,6 +1122,7 @@ function importCSVCompanyCards({
     lastSelectedFeed,
     workspaceCardFeeds,
     existingInstanceID,
+    translate,
 }: ImportCSVCompanyCardsData): Promise<ImportFinalModal> {
     const feedName = layoutType as CompanyCardFeed;
     const {csvDataWithGeneratedIDs, normalizedColumnMappings, transactions} = buildOptimisticCompanyCardCSVTransactions(csvData, columnMappings, feedName);
@@ -1215,7 +1217,13 @@ function importCSVCompanyCards({
     }
 
     return API.write(WRITE_COMMANDS.IMPORT_CSV_COMPANY_CARDS, parameters, {optimisticData, successData, failureData})
-        .then(() => importFinalModalResult.promise)
+        .then(() => {
+            // The CSV import only seeds the feed settings; the imported cards' assignable pool (WORKSPACE_CARDS_LIST.cardList)
+            // is loaded on-demand by OPEN_POLICY_COMPANY_CARDS_FEED. Fetch it now so the cards appear in the assignment flow
+            // without requiring a manual page refresh.
+            openPolicyCompanyCardsFeed(workspaceAccountID, policyID, feedName, translate);
+            return importFinalModalResult.promise;
+        })
         .catch(() => {
             importFinalModalResult.cancel();
             return getImportFailedFinalModal();

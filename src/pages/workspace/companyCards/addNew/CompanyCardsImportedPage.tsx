@@ -146,6 +146,7 @@ function CompanyCardsImportedPage({route}: CompanyCardsImportedPageProps) {
             lastSelectedFeed: lastSelectedFeed ?? undefined,
             workspaceCardFeeds,
             existingInstanceID: addNewCard?.data?.existingInstanceID,
+            translate,
         });
         const didShowImportFinalModal = await showImportSpreadsheetConfirmModal(importFinalModal);
         if (!didShowImportFinalModal) {
