@@ -10,11 +10,12 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearMoneyRequestAmount, getMoneyRequestParticipantsFromReport, setMoneyRequestAmount} from '@libs/actions/IOU/MoneyRequest';
+import {clearMoneyRequestAmount, getMoneyRequestParticipantsFromReport, setMoneyRequestAmount, setMoneyRequestTaxAmount, setMoneyRequestTaxRate} from '@libs/actions/IOU/MoneyRequest';
 import {convertToBackendAmount, convertToFrontendAmountAsString, getLocalizedCurrencySymbol} from '@libs/CurrencyUtils';
-import {calculateAmount} from '@libs/IOUUtils';
+import {calculateAmount, isMovingTransactionFromTrackExpense} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {shouldEnableNegative} from '@libs/ReportUtils';
+import {calculateTaxAmount, getTaxValue} from '@libs/TransactionUtils';
 import {isParticipantP2P} from '@pages/iou/request/step/IOURequestStepAmount';
 import IOURequestStepCurrencyModal from '@pages/iou/request/step/IOURequestStepCurrencyModal';
 import {resetSplitShares, setDraftSplitTransaction, setSplitShares} from '@userActions/IOU/Split';
@@ -227,6 +228,25 @@ function AmountField({
         setMoneyRequestAmount(transactionID, backendAmount, currency);
     };
 
+    /**
+     * When moving a transaction off a track expense, `TaxController` deliberately skips recomputing the tax amount
+     * (it preserves the tracked selection), so editing the total inline would leave the tax amount stale. Mirror
+     * `IOURequestStepAmount` and recompute the tax here whenever the total or currency changes for that flow.
+     */
+    const recomputeTaxForMovedTransaction = (backendAmount: number, currency: string) => {
+        if (isEditingSplitBill || !transactionID || !isMovingTransactionFromTrackExpense(action)) {
+            return;
+        }
+        const taxCode = currency !== policy?.outputCurrency ? policy?.taxRates?.foreignTaxDefault : policy?.taxRates?.defaultExternalID;
+        if (!taxCode) {
+            return;
+        }
+        const taxPercentage = getTaxValue(policy, transactionForHandlers, taxCode) ?? '';
+        const taxAmount = convertToBackendAmount(calculateTaxAmount(taxPercentage, Math.abs(backendAmount), decimals));
+        setMoneyRequestTaxRate(transactionID, taxCode);
+        setMoneyRequestTaxAmount(transactionID, taxAmount);
+    };
+
     const updateCurrency = (value: string) => {
         hideCurrencyPicker();
 
@@ -239,6 +259,7 @@ function AmountField({
 
         buildAndSaveSplitShares(updatedAmount, value);
         persistMainDraftTotal(updatedAmount, value);
+        recomputeTaxForMovedTransaction(updatedAmount, value);
     };
 
     const handleAmountChange = (newAmount: string) => {
@@ -264,6 +285,7 @@ function AmountField({
 
         buildAndSaveSplitShares(parsedAmount, effectiveCurrency);
         persistMainDraftTotal(parsedAmount, effectiveCurrency);
+        recomputeTaxForMovedTransaction(parsedAmount, effectiveCurrency);
     };
 
     return (
