@@ -19,8 +19,9 @@ import {
 import type {MergeFieldKey, MergeTransactionUpdateValues} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isPaidGroupPolicy, isPolicyAdmin} from '@libs/PolicyUtils';
-import {getIOUActionForReportID, getReportAction, getTrackExpenseActionableWhisper} from '@libs/ReportActionsUtils';
+import {getAllReportActions, getIOUActionForReportID, getReportAction, getTrackExpenseActionableWhisper} from '@libs/ReportActionsUtils';
 import {
+    buildOptimisticCreatedReportAction,
     buildOptimisticIOUReportAction,
     getReportOrDraftReport,
     getReportTransactions,
@@ -681,6 +682,42 @@ function mergeTransactionRequest({
                     parentReportActionID: targetIOUActionOnOriginalReport.reportActionID,
                 },
             });
+
+            // The reparented transaction thread is the report we navigate to after the merge. When it has no
+            // CREATED action cached locally, ReportActionsList shows an infinite offline skeleton (it gates on
+            // `isOffline && !someActionIsCREATED`), so the RHP never renders offline. Seed an optimistic CREATED
+            // action so the thread renders immediately, but only when one isn't already present (avoid duplicates).
+            const threadAlreadyHasCreatedAction = Object.values(getAllReportActions(targetTransactionThreadReportID)).some(
+                (action) => action?.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED,
+            );
+            if (!threadAlreadyHasCreatedAction) {
+                const optimisticThreadCreatedAction = buildOptimisticCreatedReportAction({emailCreatingAction: currentUserEmailParam});
+                optimisticData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${targetTransactionThreadReportID}`,
+                    value: {
+                        [optimisticThreadCreatedAction.reportActionID]: optimisticThreadCreatedAction,
+                    },
+                });
+
+                // Drop the optimistic action once the request resolves so the server's authoritative report
+                // actions take over (the thread already exists server-side with its own CREATED action).
+                successData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${targetTransactionThreadReportID}`,
+                    value: {
+                        [optimisticThreadCreatedAction.reportActionID]: null,
+                    },
+                });
+
+                failureData.push({
+                    onyxMethod: Onyx.METHOD.MERGE,
+                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${targetTransactionThreadReportID}`,
+                    value: {
+                        [optimisticThreadCreatedAction.reportActionID]: null,
+                    },
+                });
+            }
         }
 
         optimisticData.push({
