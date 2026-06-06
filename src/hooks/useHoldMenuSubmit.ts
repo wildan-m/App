@@ -63,7 +63,7 @@ function useHoldMenuSubmit({moneyRequestReport, chatReport, requestType, payment
         if (isApprove) {
             approveMoneyRequest({
                 expenseReport: moneyRequestReport,
-                policy: activePolicy,
+                policy,
                 currentUserAccountIDParam: currentUserDetails.accountID,
                 currentUserEmailParam: currentUserDetails.email ?? '',
                 hasViolations,
