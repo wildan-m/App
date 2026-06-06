@@ -417,7 +417,7 @@ function SettlementButton({
                     return chatReport?.invoiceReceiver?.policyID;
                 }
 
-                if (canUseActivePolicy) {
+                if (hasActivePolicyAsAdmin) {
                     return activePolicy.id;
                 }
 
