@@ -40,6 +40,7 @@ import pointerEventsAuto from './utils/pointerEventsAuto';
 import pointerEventsBoxNone from './utils/pointerEventsBoxNone';
 import pointerEventsNone from './utils/pointerEventsNone';
 import positioning from './utils/positioning';
+import scrollbarGutterStable from './utils/scrollbarGutterStable';
 import sizing from './utils/sizing';
 import spacing from './utils/spacing';
 import textDecorationLine from './utils/textDecorationLine';
@@ -286,6 +287,9 @@ const staticStyles = (theme: ThemeColors) =>
         editedLabelStyles,
         emojiDefaultStyles,
         addToWalletButtonStyles,
+        scrollbarGutterStable: {
+            ...scrollbarGutterStable,
+        },
         autoCompleteSuggestionsContainer: {
             backgroundColor: theme.appBG,
             borderRadius: 8,
