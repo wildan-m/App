@@ -1163,7 +1163,9 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 }
 
                 const reportPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
-                const completeReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`];
+                const completeReport =
+                    (searchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`] as Report | undefined) ??
+                    allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`];
 
                 if (!completeReport) {
                     return false;
