@@ -70,6 +70,9 @@ type ReceiptImageProps = (
     /** Whether we should display the receipt with ThumbnailImage component */
     shouldUseThumbnailImage?: boolean;
 
+    /** Whether an eReceipt should render the lightweight MCC-icon thumbnail instead of the full-size eReceipt (used in list views to avoid re-mounting the heavy eReceipt subtree on every recycle) */
+    shouldUseEReceiptThumbnail?: boolean;
+
     /** Whether we should display the receipt with initial object position */
     shouldUseInitialObjectPosition?: boolean;
 
@@ -141,6 +144,7 @@ function ReceiptImage({
     isPDFThumbnail,
     isThumbnail = false,
     shouldUseThumbnailImage = false,
+    shouldUseEReceiptThumbnail = false,
     isEReceipt = false,
     source,
     isAuthTokenRequired,
@@ -192,7 +196,7 @@ function ReceiptImage({
         );
     }
 
-    if (isEReceipt && !isPerDiemRequest) {
+    if (isEReceipt && !isPerDiemRequest && !shouldUseEReceiptThumbnail) {
         return (
             <EReceiptWithSizeCalculation
                 transactionID={transactionID}
@@ -203,7 +207,7 @@ function ReceiptImage({
         );
     }
 
-    if (isThumbnail || (isEReceipt && isPerDiemRequest)) {
+    if (isThumbnail || (isEReceipt && (isPerDiemRequest || shouldUseEReceiptThumbnail))) {
         const props = isThumbnail && {fileExtension, isReceiptThumbnail: true};
         return (
             <View style={style ?? [styles.w100, styles.h100]}>

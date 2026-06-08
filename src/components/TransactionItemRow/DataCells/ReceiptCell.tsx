@@ -63,6 +63,7 @@ function ReceiptCell({transactionItem, isSelected, style, shouldUseNarrowLayout}
             <ReceiptImage
                 source={source}
                 isEReceipt={isEReceipt}
+                shouldUseEReceiptThumbnail
                 transactionID={transactionItem.transactionID}
                 shouldUseThumbnailImage
                 thumbnailContainerStyles={styles.bgTransparent}
