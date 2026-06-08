@@ -18,7 +18,7 @@ import willRouteNavigateToRHP from '@libs/Navigation/helpers/willRouteNavigateTo
 import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
 import {getIsOffline} from '@libs/NetworkState';
-import {findLastAccessedReport, getReportIDFromLink, getRouteFromLink} from '@libs/ReportUtils';
+import {findLastAccessedReport, getReportIDFromLink, getRouteFromLink, isMoneyRequestReport} from '@libs/ReportUtils';
 import shouldSkipDeepLinkNavigation from '@libs/shouldSkipDeepLinkNavigation';
 import {endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import * as Url from '@libs/Url';
@@ -218,6 +218,20 @@ function openLink(href: string, environmentURL: string, isAttachment = false) {
         if (shouldCloseRHP) {
             Navigation.closeRHPFlow();
         }
+
+        // When the link points at a report/expense (e.g. a hyperlinked report in a Concierge or #admins chat),
+        // open it in the RHP on top of the current chat instead of replacing the whole central pane, so the user
+        // keeps their conversation context. This mirrors how a report preview card opens a report on wide layouts.
+        // On narrow layouts the wide RHP is not available, so we fall through to the normal full-page navigation.
+        const linkedReportID = getReportIDFromLink(href);
+        if (linkedReportID && !isNarrowLayout) {
+            const rhpReportRoute = isMoneyRequestReport(linkedReportID)
+                ? ROUTES.EXPENSE_REPORT_RHP.getRoute({reportID: linkedReportID, backTo: Navigation.getActiveRoute()})
+                : ROUTES.SEARCH_REPORT.getRoute({reportID: linkedReportID, backTo: Navigation.getActiveRoute()});
+            Navigation.navigate(rhpReportRoute);
+            return;
+        }
+
         Navigation.navigate(internalNewExpensifyPath as Route);
         return;
     }
