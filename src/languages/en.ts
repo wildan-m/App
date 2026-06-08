@@ -169,6 +169,7 @@ const translations = {
         contacts: 'Contacts',
         recents: 'Recents',
         close: 'Close',
+        expand: 'Expand',
         comment: 'Comment',
         download: 'Download',
         downloading: 'Downloading',

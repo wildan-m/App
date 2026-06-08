@@ -119,6 +119,7 @@ const translations: TranslationDeepObject<typeof en> = {
         contacts: 'Contactos',
         recents: 'Recientes',
         close: 'Cerrar',
+        expand: 'Expandir',
         comment: 'Comentario',
         download: 'Descargar',
         downloading: 'Descargando',
