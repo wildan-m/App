@@ -1879,6 +1879,27 @@ function traverseAndUpdatedQuery(queryJSON: SearchQueryJSON | Readonly<SearchQue
     return standardQuery;
 }
 
+/**
+ * Builds the query string for the current search with the keyword filter removed,
+ * while preserving the search type and every other applied filter.
+ */
+function buildQueryStringWithoutKeyword(queryJSON: SearchQueryJSON | Readonly<SearchQueryJSON>): SearchQueryString {
+    const filtersWithoutKeyword = queryJSON.flatFilters.filter((filter) => filter.key !== CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD);
+    return buildSearchQueryString({...queryJSON, flatFilters: filtersWithoutKeyword});
+}
+
+/**
+ * Returns the keyword portion of a query as user-editable text, so the page search input
+ * can present itself as a keyword field rather than echoing the whole query.
+ */
+function getKeywordFromQuery(queryJSON: SearchQueryJSON | Readonly<SearchQueryJSON>): string {
+    const keywordFilter = queryJSON.flatFilters.find((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD);
+    if (!keywordFilter) {
+        return '';
+    }
+    return buildFilterValuesString(CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD, keywordFilter.filters).trim();
+}
+
 function getKeywordQueryWithCurrentSearchContext(queryString: SearchQueryString, currentQueryJSON: Readonly<SearchQueryJSON>): SearchQueryString {
     const autocompleteRanges = (parseForAutocomplete(queryString) as SearchAutocompleteResult).ranges;
     const hasOnlyKeywordSearch = queryString.trim().length > 0 && autocompleteRanges.length === 0;
@@ -1886,8 +1907,7 @@ function getKeywordQueryWithCurrentSearchContext(queryString: SearchQueryString,
         return queryString;
     }
 
-    const currentFiltersWithoutKeywords = currentQueryJSON.flatFilters.filter((filter) => filter.key !== CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD);
-    const currentQueryString = buildSearchQueryString({...currentQueryJSON, flatFilters: currentFiltersWithoutKeywords});
+    const currentQueryString = buildQueryStringWithoutKeyword(currentQueryJSON);
     return `${currentQueryString} ${queryString}`;
 }
 
@@ -2193,6 +2213,8 @@ export {
     sanitizeSearchValue,
     getQueryWithUpdatedValues,
     getKeywordQueryWithCurrentSearchContext,
+    buildQueryStringWithoutKeyword,
+    getKeywordFromQuery,
     getCurrentSearchQueryJSON,
     getQueryWithoutFilters,
     isDefaultExpensesQuery,

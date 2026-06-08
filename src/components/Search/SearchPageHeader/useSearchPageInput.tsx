@@ -11,7 +11,6 @@ import type {SubstitutionMap} from '@components/Search/SearchRouter/getQueryWith
 import {getUpdatedSubstitutionsMap} from '@components/Search/SearchRouter/getUpdatedSubstitutionsMap';
 import updateAutocompleteSubstitutionsForSelection from '@components/Search/SearchRouter/updateAutocompleteSubstitutionsForSelection';
 import type {SearchQueryJSON, SearchQueryString} from '@components/Search/types';
-import useFeedKeysWithAssignedCards from '@hooks/useFeedKeysWithAssignedCards';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -23,7 +22,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import {getAutocompleteQueryWithComma, getTrimmedUserSearchQueryPreservingComma} from '@libs/SearchAutocompleteUtils';
-import {buildUserReadableQueryString, getKeywordQueryWithCurrentSearchContext, getQueryWithUpdatedValues, sanitizeSearchValue} from '@libs/SearchQueryUtils';
+import {buildQueryStringWithoutKeyword, getKeywordFromQuery, getKeywordQueryWithCurrentSearchContext, getQueryWithUpdatedValues, sanitizeSearchValue} from '@libs/SearchQueryUtils';
 import StringUtils from '@libs/StringUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -41,7 +40,6 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
-    const feedKeysWithCards = useFeedKeysWithAssignedCards();
     const personalDetails = usePersonalDetails();
     const reportAttributes = useReportAttributes();
 
@@ -67,20 +65,9 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
     const {inputQuery: originalInputQuery} = queryJSON;
     const taxRates = getAllTaxRates(policies);
     const shouldShowQuery = searchContext?.shouldShowSearchQuery ?? false;
-    const queryText = buildUserReadableQueryString({
-        queryJSON,
-        PersonalDetails: personalDetails,
-        reports,
-        taxRates,
-        cardList: personalAndWorkspaceCards,
-        cardFeeds: allFeeds,
-        policies,
-        currentUserAccountID,
-        autoCompleteWithSpace: true,
-        translate,
-        feedKeysWithCards,
-        reportAttributes,
-    });
+    // Present the page search bar as a keyword field: show only the keyword portion of the
+    // current query, not the whole type/status/filters string.
+    const queryText = getKeywordFromQuery(queryJSON);
 
     useEffect(() => {
         hasMountedRef.current = true;
@@ -138,6 +125,24 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
             setTextInputValue('');
             setAutocompleteQueryValue('');
         }
+    }
+
+    // Clearing the page search input re-runs the current search with the keyword removed,
+    // keeping the search type and every other filter in place (instead of resetting to the default view).
+    function clearSearch() {
+        const queryWithoutKeyword = buildQueryStringWithoutKeyword(queryJSON);
+        const updatedQuery = getQueryWithUpdatedValues(queryWithoutKeyword);
+
+        setTextInputValue('');
+        setAutocompleteQueryValue('');
+
+        if (!updatedQuery) {
+            return;
+        }
+
+        setSearchContext(true);
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: updatedQuery}));
+        onSubmit();
     }
 
     function handleKeyPress(e: TextInputKeyPressEvent) {
@@ -228,6 +233,7 @@ function useSearchPageInput({queryJSON, onSearch, onSubmit}: UseSearchPageInputP
         onListItemPress,
         onSearchQueryChange,
         submitSearch,
+        clearSearch,
     };
 }
 

@@ -34,6 +34,7 @@ function SearchPageInputNarrow({queryJSON, searchRouterListVisible, hideSearchRo
         onListItemPress,
         onSearchQueryChange,
         submitSearch,
+        clearSearch,
     } = useSearchPageInput({
         queryJSON,
         onSearch: handleSearch,
@@ -65,6 +66,7 @@ function SearchPageInputNarrow({queryJSON, searchRouterListVisible, hideSearchRo
                         onSubmit={() => {
                             KeyboardUtils.dismiss().then(() => submitSearch(textInputValue));
                         }}
+                        onClear={clearSearch}
                         autoFocus={false}
                         onFocus={onSearchRouterFocus}
                         touchableInputWrapperStyle={styles.searchPageInputNarrowTouchableWrapper}

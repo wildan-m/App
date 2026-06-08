@@ -35,6 +35,13 @@ type SearchAutocompleteInputProps = {
     /** Callback invoked when the user submits the input */
     onSubmit?: () => void;
 
+    /**
+     * Callback invoked when the user clears the input via the clear (X) button.
+     * When provided, it replaces the default behavior of only emptying the local text,
+     * letting the page search re-execute with the keyword removed but other filters kept.
+     */
+    onClear?: () => void;
+
     /** Whether the input is full width */
     isFullWidth: boolean;
 
@@ -80,6 +87,7 @@ function SearchAutocompleteInput({
     value,
     onSearchQueryChange,
     onSubmit = () => {},
+    onClear,
     isFullWidth,
     disabled = false,
     shouldDelayFocus = false,
@@ -192,6 +200,10 @@ function SearchAutocompleteInput({
     };
 
     const clearInput = () => {
+        if (onClear) {
+            onClear();
+            return;
+        }
         onSearchQueryChange('');
         setSearchContext(false);
     };

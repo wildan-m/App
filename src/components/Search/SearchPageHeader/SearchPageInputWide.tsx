@@ -37,6 +37,7 @@ function SearchPageInputWide({queryJSON, handleSearch}: SearchPageInputWideProps
         onListItemPress,
         onSearchQueryChange,
         submitSearch,
+        clearSearch,
     } = useSearchPageInput({
         queryJSON,
         onSearch: handleSearch,
@@ -82,6 +83,7 @@ function SearchPageInputWide({queryJSON, handleSearch}: SearchPageInputWideProps
                         }
                         submitSearch(textInputValue);
                     }}
+                    onClear={clearSearch}
                     autoFocus={false}
                     onFocus={showAutocompleteList}
                     onBlur={hideAutocompleteList}
