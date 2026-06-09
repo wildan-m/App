@@ -184,6 +184,38 @@ function setSelfTourViewed(shouldUpdateOnyxDataOnlyLocally = false) {
     API.write(WRITE_COMMANDS.SELF_TOUR_VIEWED, null, {optimisticData});
 }
 
+/**
+ * Records, one time, that the Home page "For You" section has had actionable items.
+ * Once set, the section remains visible going forward even after the items are cleared.
+ */
+function setHasViewedForYouTodos() {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.NVP_HAS_VIEWED_FOR_YOU_TODOS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.NVP_HAS_VIEWED_FOR_YOU_TODOS,
+            value: true,
+        },
+    ];
+
+    API.write(WRITE_COMMANDS.SET_HAS_VIEWED_FOR_YOU_TODOS, null, {optimisticData});
+}
+
+/**
+ * Records, one time, the date the Home page "Discover" section first became eligible.
+ * This anchors the 60-day auto-removal window, mirroring the "Getting Started" section.
+ */
+function setDiscoverSectionFirstShownDate() {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.NVP_DISCOVER_SECTION_FIRST_SHOWN_DATE>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.NVP_DISCOVER_SECTION_FIRST_SHOWN_DATE,
+            value: DateUtils.getDBTime(),
+        },
+    ];
+
+    API.write(WRITE_COMMANDS.SET_DISCOVER_SECTION_FIRST_SHOWN_DATE, null, {optimisticData});
+}
+
 function dismissProductTraining(elementName: string, isDismissedUsingCloseButton = false) {
     const date = new Date();
     const dismissedMethod = isDismissedUsingCloseButton ? 'x' : 'click';
@@ -215,6 +247,8 @@ export {
     setOnboardingErrorMessage,
     setOnboardingCompanySize,
     setSelfTourViewed,
+    setHasViewedForYouTodos,
+    setDiscoverSectionFirstShownDate,
     setOnboardingMergeAccountStepValue,
     updateOnboardingValuesAndNavigation,
     setOnboardingUserReportedIntegration,

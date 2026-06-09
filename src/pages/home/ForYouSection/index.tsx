@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {View} from 'react-native';
 import BaseWidgetItem from '@components/BaseWidgetItem';
 import WidgetContainer from '@components/WidgetContainer';
@@ -8,6 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {setHasViewedForYouTodos} from '@libs/actions/Welcome';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildQueryStringFromFilterFormValues} from '@libs/SearchQueryUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
@@ -33,6 +34,7 @@ function ForYouSection() {
     const [hasLoadedApp = false] = useOnyx(ONYXKEYS.HAS_LOADED_APP);
     const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
     const [singleReportIDs = EMPTY_TODOS_SINGLE_REPORT_IDS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosSingleReportIDsSelector});
+    const [hasViewedForYouTodos = false] = useOnyx(ONYXKEYS.NVP_HAS_VIEWED_FOR_YOU_TODOS);
 
     const icons = useMemoizedLazyExpensifyIcons(['MoneyBag', 'Send', 'ThumbsUp', 'Export']);
 
@@ -42,6 +44,17 @@ function ForYouSection() {
     const exportCount = reportCounts?.[CONST.SEARCH.SEARCH_KEYS.EXPORT] ?? 0;
 
     const hasAnyTodos = submitCount > 0 || approveCount > 0 || payCount > 0 || exportCount > 0;
+
+    // The section stays hidden until the user has actionable items, then remains visible from then on.
+    const shouldShowSection = hasAnyTodos || hasViewedForYouTodos;
+
+    // Persist the one-way latch the first time the user has actionable items.
+    useEffect(() => {
+        if (!hasAnyTodos || hasViewedForYouTodos) {
+            return;
+        }
+        setHasViewedForYouTodos();
+    }, [hasAnyTodos, hasViewedForYouTodos]);
 
     const createNavigationHandler = useCallback(
         (action: string, queryParams: Record<string, unknown>, reportID?: string) => () => {
@@ -127,8 +140,16 @@ function ForYouSection() {
         </View>
     );
 
+    const isInitialLoad = !hasLoadedApp && (isLoadingApp || isLoadingReportData || reportCounts === undefined);
+
+    // Hide the section entirely until it has had actionable items (and keep it visible once it has).
+    // During the initial load we only reserve space for returning users whose latch is already set,
+    // so a brand-new user never sees the empty widget flash before it resolves to hidden.
+    if (isInitialLoad ? !hasViewedForYouTodos : !shouldShowSection) {
+        return null;
+    }
+
     const renderContent = () => {
-        const isInitialLoad = !hasLoadedApp && (isLoadingApp || isLoadingReportData || reportCounts === undefined);
         if (isInitialLoad) {
             const reasonAttributes: SkeletonSpanReasonAttributes = {
                 context: 'ForYouSection.ForYouSkeleton',

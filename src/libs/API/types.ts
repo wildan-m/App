@@ -557,6 +557,8 @@ const WRITE_COMMANDS = {
     SET_PERSONAL_DETAILS_AND_SHIP_EXPENSIFY_CARDS: 'SetPersonalDetailsAndShipExpensifyCards',
     SET_INVOICING_TRANSFER_BANK_ACCOUNT: 'SetInvoicingTransferBankAccount',
     SELF_TOUR_VIEWED: 'SelfTourViewed',
+    SET_HAS_VIEWED_FOR_YOU_TODOS: 'SetHasViewedForYouTodos',
+    SET_DISCOVER_SECTION_FIRST_SHOWN_DATE: 'SetDiscoverSectionFirstShownDate',
     UPDATE_INVOICE_COMPANY_NAME: 'UpdateInvoiceCompanyName',
     UPDATE_INVOICE_COMPANY_WEBSITE: 'UpdateInvoiceCompanyWebsite',
     GET_CORPAY_BANK_ACCOUNT_FIELDS: 'GetCorpayBankAccountFields',
@@ -1193,6 +1195,8 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.RETRY_TRAVEL_CARDS_PROVISIONING]: Parameters.RetryTravelCardsProvisioningParams;
     [WRITE_COMMANDS.SET_PERSONAL_DETAILS_AND_SHIP_EXPENSIFY_CARDS]: Parameters.SetPersonalDetailsAndShipExpensifyCardsParams;
     [WRITE_COMMANDS.SELF_TOUR_VIEWED]: null;
+    [WRITE_COMMANDS.SET_HAS_VIEWED_FOR_YOU_TODOS]: null;
+    [WRITE_COMMANDS.SET_DISCOVER_SECTION_FIRST_SHOWN_DATE]: null;
 
     // Xero API
     [WRITE_COMMANDS.UPDATE_XERO_TENANT_ID]: Parameters.UpdateXeroGenericTypeParams;

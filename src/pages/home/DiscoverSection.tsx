@@ -1,5 +1,5 @@
 import {delegateEmailSelector} from '@selectors/Account';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Image, Linking, View} from 'react-native';
 import HomeTestDriveImage from '@assets/images/home-testdrive-image.png';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
@@ -14,10 +14,11 @@ import useParentReportAction from '@hooks/useParentReportAction';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {completeTestDriveTask} from '@libs/actions/Task';
-import {setSelfTourViewed} from '@libs/actions/Welcome';
+import {setDiscoverSectionFirstShownDate, setSelfTourViewed} from '@libs/actions/Welcome';
 import {getTestDriveURL} from '@libs/TourUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import isWithinDiscoverPeriod from './utils/isWithinDiscoverPeriod';
 
 const MAX_NUMBER_OF_LINES_TITLE = 4;
 
@@ -37,8 +38,20 @@ function DiscoverSection() {
     const parentReportAction = useParentReportAction(viewTourTaskReport);
     const [onboarding] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
     const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
+    const [discoverSectionFirstShownDate] = useOnyx(ONYXKEYS.NVP_DISCOVER_SECTION_FIRST_SHOWN_DATE);
 
-    if (onboarding?.selfTourViewed || !onboarding) {
+    const isDismissed = onboarding?.selfTourViewed || !onboarding;
+    const isWithinShowPeriod = isWithinDiscoverPeriod(discoverSectionFirstShownDate);
+
+    // Anchor the 60-day window the first time the section is eligible to show.
+    useEffect(() => {
+        if (isDismissed || discoverSectionFirstShownDate) {
+            return;
+        }
+        setDiscoverSectionFirstShownDate();
+    }, [isDismissed, discoverSectionFirstShownDate]);
+
+    if (isDismissed || !isWithinShowPeriod) {
         return null;
     }
 

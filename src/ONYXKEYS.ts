@@ -281,6 +281,12 @@ const ONYXKEYS = {
     /** The end date (yyyy-MM-dd HH:mm:ss) of the workspace owner’s free trial period. */
     NVP_LAST_DAY_FREE_TRIAL: 'nvp_private_lastDayFreeTrial',
 
+    /** One-way latch set the first time the Home page "For You" section has had actionable items, so it stays visible afterwards. */
+    NVP_HAS_VIEWED_FOR_YOU_TODOS: 'nvp_private_hasViewedForYouTodos',
+
+    /** The date (yyyy-MM-dd HH:mm:ss) the Home page "Discover" section first became eligible, used to auto-remove it after 60 days. */
+    NVP_DISCOVER_SECTION_FIRST_SHOWN_DATE: 'nvp_private_discoverSectionFirstShownDate',
+
     /** ID associated with the payment card added by the user. */
     NVP_BILLING_FUND_ID: 'nvp_expensify_billingFundID',
 
@@ -1611,6 +1617,8 @@ type OnyxValuesMapping = {
     [ONYXKEYS.COPY_POLICY_SETTINGS]: OnyxTypes.CopyPolicySettings;
     [ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL]: string;
+    [ONYXKEYS.NVP_HAS_VIEWED_FOR_YOU_TODOS]: boolean;
+    [ONYXKEYS.NVP_DISCOVER_SECTION_FIRST_SHOWN_DATE]: string;
     [ONYXKEYS.NVP_BILLING_FUND_ID]: number;
     [ONYXKEYS.NVP_PRIVATE_FREEBIE_CREDITS]: number;
     [ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED]: number;
