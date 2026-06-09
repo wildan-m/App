@@ -2,13 +2,15 @@ import {getAgentAccountIDFlags, getReportParticipantAccountIDs} from '@selectors
 import {getReportChatType} from '@selectors/Report';
 import {agentZeroProcessingAgentIDsSelector} from '@selectors/ReportNameValuePairs';
 import {accountIDSelector} from '@selectors/Session';
-import React, {createContext, useContext, useEffect} from 'react';
+import React, {createContext, useCallback, useContext, useEffect} from 'react';
+import type {OnyxEntry} from 'react-native-onyx';
 import useOnyx from '@hooks/useOnyx';
 import {clearConciergeThinkingKickoff, subscribeToReportReasoningEvents, unsubscribeFromReportReasoningChannel} from '@libs/actions/Report';
 import AgentZeroOptimisticStore from '@libs/AgentZeroOptimisticStore';
 import type {ReasoningEntry} from '@libs/AgentZeroReasoningStore';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {ReportNameValuePairs} from '@src/types/onyx';
 
 type AgentZeroStatusState = {
     /**
@@ -18,6 +20,14 @@ type AgentZeroStatusState = {
      * current user — a human viewing the chat is never the thinking persona.
      */
     candidateAgentIDs: number[];
+
+    /**
+     * The accountID a legacy scalar processing-indicator should be attributed to in this room:
+     * Concierge in Concierge/admin rooms, or the custom agent participant in a custom-agent room.
+     * Passed into the per-agent label hook so a scalar NVP (written during a deploy overlap) labels
+     * the right persona instead of always Concierge.
+     */
+    scalarOwnerAccountID: number;
 };
 
 type AgentZeroStatusActions = {
@@ -27,6 +37,7 @@ type AgentZeroStatusActions = {
 
 const defaultState: AgentZeroStatusState = {
     candidateAgentIDs: [],
+    scalarOwnerAccountID: CONST.ACCOUNT_ID.CONCIERGE,
 };
 
 const defaultActions: AgentZeroStatusActions = {
@@ -57,27 +68,35 @@ function AgentZeroStatusProvider({reportID, children}: React.PropsWithChildren<{
     // A custom-agent chat has a participant — excluding the current user — whose accountID owns
     // an agent prompt. Excluding the current user prevents a user who owns agents from turning
     // their own DMs into agent chats.
-    const hasAgentParticipant = participantAccountIDs?.some((accountID) => accountID !== currentUserAccountID && !!agentAccountIDFlags?.[accountID]) ?? false;
+    const agentParticipantAccountIDs = participantAccountIDs?.filter((accountID) => accountID !== currentUserAccountID && !!agentAccountIDFlags?.[accountID]) ?? [];
+    const hasAgentParticipant = agentParticipantAccountIDs.length > 0;
     const isAgentZeroChat = isConciergeChat || isAdmin || hasAgentParticipant;
+    const includeConcierge = isConciergeChat || isAdmin;
 
     if (!reportID || !isAgentZeroChat) {
         return children;
     }
 
+    // Who a legacy scalar indicator belongs to: Concierge in Concierge/admin rooms, otherwise the
+    // room's custom agent participant. Custom-agent DMs have exactly one agent participant.
+    const scalarOwnerAccountID = includeConcierge ? CONST.ACCOUNT_ID.CONCIERGE : (agentParticipantAccountIDs.at(0) ?? CONST.ACCOUNT_ID.CONCIERGE);
+
     return (
         <AgentZeroStatusGate
             key={reportID}
             reportID={reportID}
-            includeConcierge={isConciergeChat || isAdmin}
+            includeConcierge={includeConcierge}
+            scalarOwnerAccountID={scalarOwnerAccountID}
         >
             {children}
         </AgentZeroStatusGate>
     );
 }
 
-function AgentZeroStatusGate({reportID, includeConcierge, children}: React.PropsWithChildren<{reportID: string; includeConcierge: boolean}>) {
+function AgentZeroStatusGate({reportID, includeConcierge, scalarOwnerAccountID, children}: React.PropsWithChildren<{reportID: string; includeConcierge: boolean; scalarOwnerAccountID: number}>) {
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
-    const [serverAgentIDs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {selector: agentZeroProcessingAgentIDsSelector});
+    const serverAgentIDsSelector = useCallback((reportNameValuePairs: OnyxEntry<ReportNameValuePairs>) => agentZeroProcessingAgentIDsSelector(reportNameValuePairs, scalarOwnerAccountID), [scalarOwnerAccountID]);
+    const [serverAgentIDs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {selector: serverAgentIDsSelector});
 
     // One reasoning Pusher subscription per report (not per agent). The handler in Report
     // actions routes each event to the right agent's reasoning history by its actorAccountID.
@@ -126,7 +145,7 @@ function AgentZeroStatusGate({reportID, includeConcierge, children}: React.Props
         return a - b;
     });
 
-    const stateValue = {candidateAgentIDs};
+    const stateValue = {candidateAgentIDs, scalarOwnerAccountID};
     const actionsValue = {kickoffWaitingIndicator};
 
     return (

@@ -84,11 +84,16 @@ function selectNewestReportAction(reportActions: OnyxEntry<ReportActions>): Newe
  *   decide when its final reply has landed: the indicator only clears once the newest
  *   reportAction's actorAccountID matches this agent AND the server NVP signals done.
  */
-function useAgentZeroStatusIndicator(reportID: string, agentAccountID: number = CONST.ACCOUNT_ID.CONCIERGE): AgentZeroStatusState {
+function useAgentZeroStatusIndicator(reportID: string, agentAccountID: number = CONST.ACCOUNT_ID.CONCIERGE, scalarOwnerAccountID: number = CONST.ACCOUNT_ID.CONCIERGE): AgentZeroStatusState {
     // Server-driven processing label for this agent, from report name-value pairs (e.g. "Looking
     // up categories..."). The selector narrows to this agent's slot so the hook only re-renders
-    // when its own label changes.
-    const serverLabelSelector = useCallback((reportNameValuePairs: OnyxEntry<ReportNameValuePairs>) => getAgentZeroProcessingLabel(reportNameValuePairs, agentAccountID), [agentAccountID]);
+    // when its own label changes. `scalarOwnerAccountID` tells the label reader which agent a legacy
+    // scalar indicator belongs to (the room's agent), so a deploy-overlap scalar isn't always
+    // attributed to Concierge.
+    const serverLabelSelector = useCallback(
+        (reportNameValuePairs: OnyxEntry<ReportNameValuePairs>) => getAgentZeroProcessingLabel(reportNameValuePairs, agentAccountID, scalarOwnerAccountID),
+        [agentAccountID, scalarOwnerAccountID],
+    );
     const [serverLabel] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {selector: serverLabelSelector});
 
     // Track the newest report action so we can fetch missed actions and detect actual Concierge replies.

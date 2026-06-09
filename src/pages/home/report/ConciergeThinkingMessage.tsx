@@ -38,7 +38,7 @@ type ConciergeThinkingMessageProps = {
  * bubble is attributed to the agent the server actually named — not a guessed persona.
  */
 function ConciergeThinkingMessage({report}: ConciergeThinkingMessageProps) {
-    const {candidateAgentIDs} = useAgentZeroStatus();
+    const {candidateAgentIDs, scalarOwnerAccountID} = useAgentZeroStatus();
     const shouldSuppress = useShouldSuppressConciergeIndicators(report?.reportID);
     const reportID = report?.reportID;
 
@@ -54,14 +54,15 @@ function ConciergeThinkingMessage({report}: ConciergeThinkingMessageProps) {
                     report={report}
                     reportID={reportID}
                     agentAccountID={agentAccountID}
+                    scalarOwnerAccountID={scalarOwnerAccountID}
                 />
             ))}
         </>
     );
 }
 
-function ConciergeThinkingBubble({report, reportID, agentAccountID}: {report: OnyxEntry<Report>; reportID: string; agentAccountID: number}) {
-    const {isProcessing, reasoningHistory, statusLabel} = useAgentZeroStatusIndicator(reportID, agentAccountID);
+function ConciergeThinkingBubble({report, reportID, agentAccountID, scalarOwnerAccountID}: {report: OnyxEntry<Report>; reportID: string; agentAccountID: number; scalarOwnerAccountID: number}) {
+    const {isProcessing, reasoningHistory, statusLabel} = useAgentZeroStatusIndicator(reportID, agentAccountID, scalarOwnerAccountID);
 
     if (!isProcessing) {
         return null;
