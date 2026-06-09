@@ -42,23 +42,23 @@ async function requestPermissions({
 
 async function checkPermissions({
     onGrant,
-    onDeny,
     onAskForPermissions,
     onPreciseLocationNotGranted,
+    onShowSettings,
     onError,
-}: Pick<BackgroundLocationPermissionsFlowProps, 'onDeny' | 'onGrant'> & {onAskForPermissions: () => void; onPreciseLocationNotGranted: () => void; onError: () => void}) {
+}: Pick<BackgroundLocationPermissionsFlowProps, 'onGrant'> & {onAskForPermissions: () => void; onPreciseLocationNotGranted: () => void; onShowSettings: () => void; onError: () => void}) {
     try {
         const {granted, canAskAgain} = await getForegroundPermissionsAsync();
 
         if (!canAskAgain && !granted) {
-            onDeny();
+            onShowSettings();
             return;
         }
 
         const {granted: bgGranted, canAskAgain: bgCanAskAgain} = await getBackgroundPermissionsAsync();
 
         if (!bgCanAskAgain && !bgGranted) {
-            onDeny();
+            onShowSettings();
             return;
         }
 
@@ -84,6 +84,7 @@ async function checkPermissions({
 function BackgroundLocationPermissionsFlow({startPermissionsFlow, setStartPermissionsFlow, onError, onGrant, onDeny}: BackgroundLocationPermissionsFlowProps) {
     const [showFirstAskModal, setShowFirstAskModal] = useState(false);
     const [showPreciseLocationModal, setShowPreciseLocationModal] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const {asset: ReceiptLocationMarker} = useMemoizedLazyAsset(() => loadIllustration('ReceiptLocationMarker'));
     const {translate} = useLocalize();
 
@@ -94,9 +95,15 @@ function BackgroundLocationPermissionsFlow({startPermissionsFlow, setStartPermis
             return;
         }
 
-        checkPermissions({onGrant, onDeny, onError, onAskForPermissions: () => setShowFirstAskModal(true), onPreciseLocationNotGranted: () => setShowPreciseLocationModal(true)});
+        checkPermissions({
+            onGrant,
+            onError,
+            onAskForPermissions: () => setShowFirstAskModal(true),
+            onPreciseLocationNotGranted: () => setShowPreciseLocationModal(true),
+            onShowSettings: () => setShowSettingsModal(true),
+        });
         setStartPermissionsFlow(false);
-    }, [startPermissionsFlow, onDeny, onGrant, setStartPermissionsFlow, onError]);
+    }, [startPermissionsFlow, onGrant, setStartPermissionsFlow, onError]);
 
     const requestPermissionsFirstAsk = () => {
         setShowFirstAskModal(false);
@@ -145,6 +152,27 @@ function BackgroundLocationPermissionsFlow({startPermissionsFlow, setStartPermis
                 confirmText={translate('common.settings')}
                 cancelText={translate('common.dismiss')}
                 prompt={translate('gps.preciseLocationRequiredModal.prompt')}
+                iconSource={ReceiptLocationMarker}
+                iconFill={false}
+                iconWidth={140}
+                iconHeight={120}
+                shouldCenterIcon
+                shouldReverseStackedButtons
+            />
+            <ConfirmModal
+                isVisible={showSettingsModal}
+                title={translate('gps.locationRequiredModal.title')}
+                prompt={translate('gps.locationRequiredModal.prompt')}
+                onConfirm={() => {
+                    setShowSettingsModal(false);
+                    Linking.openSettings();
+                }}
+                onCancel={() => {
+                    setShowSettingsModal(false);
+                    onDeny();
+                }}
+                confirmText={translate('common.settings')}
+                cancelText={translate('common.dismiss')}
                 iconSource={ReceiptLocationMarker}
                 iconFill={false}
                 iconWidth={140}

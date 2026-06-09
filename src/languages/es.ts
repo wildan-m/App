@@ -9958,16 +9958,16 @@ ${amount} para ${merchant} - ${date}`,
         },
         locationRequiredModal: {
             title: 'Se requiere acceso a la ubicación',
-            prompt: 'Por favor, permite el acceso a la ubicación en la configuración de tu dispositivo para iniciar el seguimiento de distancia por GPS.',
+            prompt: 'Expensify usa la ubicación precisa de tu dispositivo para registrar tu kilometraje y convertir tus viajes en gastos de distancia. Permite el acceso a la ubicación para iniciar el seguimiento de distancia por GPS.',
             allow: 'Permitir',
         },
         androidBackgroundLocationRequiredModal: {
             title: 'Se requiere acceso a la ubicación en segundo plano',
-            prompt: 'Por favor, permite el acceso a la ubicación en segundo plano en la configuración de tu dispositivo (opción "Permitir solo con la app en uso") para iniciar el seguimiento de distancia por GPS.',
+            prompt: 'Expensify recopila tu ubicación precisa, incluso en segundo plano mientras la app está cerrada o no está en uso, para registrar tu kilometraje y calcular la distancia de tus gastos. Para continuar, elige la opción "Permitir todo el tiempo" para la ubicación en la configuración de tu dispositivo.',
         },
         preciseLocationRequiredModal: {
             title: 'Se requiere ubicación precisa',
-            prompt: 'Por favor, habilita la "ubicación precisa" en la configuración de tu dispositivo para iniciar el seguimiento de distancia por GPS.',
+            prompt: 'Expensify necesita tu ubicación precisa para registrar con exactitud el kilometraje y la distancia de tus gastos. Habilita la "ubicación precisa" en la configuración de tu dispositivo para iniciar el seguimiento de distancia por GPS.',
         },
         desktop: {
             title: 'Registra la distancia en tu teléfono',

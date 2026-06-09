@@ -8776,16 +8776,16 @@ const translations = {
         },
         locationRequiredModal: {
             title: 'Location access required',
-            prompt: 'Please allow location access in your device settings to start GPS distance tracking.',
+            prompt: "Expensify uses your device's precise location to track your mileage and turn your trips into distance expenses. Allow location access to start GPS distance tracking.",
             allow: 'Allow',
         },
         androidBackgroundLocationRequiredModal: {
             title: 'Background location access required',
-            prompt: 'Please allow background location access in your device settings ("Allow all the time" option) to start GPS distance tracking.',
+            prompt: 'Expensify collects your precise location, including in the background while the app is closed or not in use, to track your mileage and calculate distance for your expenses. To continue, choose the "Allow all the time" option for location in your device settings.',
         },
         preciseLocationRequiredModal: {
             title: 'Precise location required',
-            prompt: 'Please enable "precise location" in your device settings to start GPS distance tracking.',
+            prompt: 'Expensify needs your precise location to accurately track mileage and distance for your expenses. Enable "Precise location" in your device settings to start GPS distance tracking.',
         },
         desktop: {
             title: 'Track distance on your phone',
