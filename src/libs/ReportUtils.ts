@@ -1715,10 +1715,25 @@ function isPaidGroupPolicy(report: OnyxEntry<Report>): boolean {
 }
 
 /**
- * Whether the provided report belongs to a Control or Collect policy and is an expense report
+ * Whether the provided report belongs to a Control or Collect policy and is an expense report.
+ *
+ * Billing / paid-only counterpart — excludes the free Submit plan. Use this only for paid-only
+ * concerns; for group-feature gates (report fields, violations, workspace usability) that should
+ * include Submit, use `isGroupPolicyExpenseReport` instead.
  */
 function isPaidGroupPolicyExpenseReport(report: OnyxEntry<Report>): boolean {
     return isExpenseReport(report) && isPaidGroupPolicy(report);
+}
+
+/**
+ * Whether the provided report belongs to any group policy (paid Team/Corporate or free Submit) and is an expense report.
+ *
+ * Submit-inclusive counterpart of `isPaidGroupPolicyExpenseReport`. Use this for group-feature gates
+ * (e.g. report fields) that Submit workspaces should have; use `isPaidGroupPolicyExpenseReport` for
+ * billing / paid-only concerns that must keep Submit excluded.
+ */
+function isGroupPolicyExpenseReport(report: OnyxEntry<Report>): boolean {
+    return isExpenseReport(report) && isReportInGroupPolicy(report);
 }
 
 /**
@@ -13214,6 +13229,7 @@ export {
     isOptimisticPersonalDetail,
     isPaidGroupPolicy,
     isPaidGroupPolicyExpenseReport,
+    isGroupPolicyExpenseReport,
     isPayer,
     isPolicyAdmin,
     isPolicyExpenseChat,

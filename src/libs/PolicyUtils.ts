@@ -1079,6 +1079,13 @@ function isPendingDeletePolicy(policy: OnyxEntry<Policy>): boolean {
     return policy?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 }
 
+/**
+ * Returns true only for a paid group workspace (Team/Corporate) — the free Submit plan is excluded by design.
+ *
+ * Use this ONLY for billing / paid-only concerns (subscriptions, payments, company cards, travel, invoices).
+ * For "does this workspace have group features?" gates (violations, report fields, workspace chat / report
+ * creation, expense-workspace usability) that Submit should also satisfy, use `isGroupPolicy` instead.
+ */
 function isPaidGroupPolicy(policy: OnyxInputOrEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.TEAM || policy?.type === CONST.POLICY.TYPE.CORPORATE;
 }
