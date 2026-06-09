@@ -81,13 +81,13 @@ function HomePage() {
                                 <>
                                     <View style={styles.homePageLeftColumn}>
                                         <TimeSensitiveSection />
+                                        <GettingStartedSection />
                                         <ForYouSection />
                                         <SpendOverTimeSection />
                                         <DiscoverSection />
                                     </View>
                                     <View style={styles.homePageRightColumn}>
                                         <FreeTrialSection />
-                                        <GettingStartedSection />
                                         <UpcomingTravelSection />
                                         <YourSpendSection />
                                         <AnnouncementSection />

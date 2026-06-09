@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
+import type {OnyxCollection} from 'react-native-onyx';
 import BaseWidgetItem from '@components/BaseWidgetItem';
 import WidgetContainer from '@components/WidgetContainer';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -11,11 +12,13 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildQueryStringFromFilterFormValues} from '@libs/SearchQueryUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import isWithinGettingStartedPeriod from '@pages/home/GettingStartedSection/utils/isWithinGettingStartedPeriod';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {accountIDSelector} from '@src/selectors/Session';
 import todosReportCountsSelector, {EMPTY_TODOS_SINGLE_REPORT_IDS, todosSingleReportIDsSelector} from '@src/selectors/Todos';
+import type {Report} from '@src/types/onyx';
 import EmptyState from './EmptyState';
 import ForYouSkeleton from './ForYouSkeleton';
 
@@ -25,6 +28,13 @@ function ForYouSection() {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
+    const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
+    const hasEverHadExpenseReportSelector = useCallback(
+        (reports: OnyxCollection<Report>) =>
+            Object.values(reports ?? {}).some((report) => report?.type === CONST.REPORT.TYPE.EXPENSE && (report.ownerAccountID === accountID || report.managerID === accountID)),
+        [accountID],
+    );
+    const [hasEverHadExpenseReport = false] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: hasEverHadExpenseReportSelector});
     const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [isLoadingReportData = false] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
     // HAS_LOADED_APP flips to true once the first OpenApp completes and persists across reconnects.
@@ -127,8 +137,14 @@ function ForYouSection() {
         </View>
     );
 
+    const isInitialLoad = !hasLoadedApp && (isLoadingApp || isLoadingReportData || reportCounts === undefined);
+
+    // Hide the empty "For You" slot for recently onboarded users (within the 60-day window) who have never had a report
+    // populate it, so an actionless widget doesn't occupy a prominent Home position during onboarding. Once a report has
+    // been created/approved/paid (or the onboarding window has passed), the empty state is kept as before.
+    const shouldHideEmptySlot = !isInitialLoad && !hasAnyTodos && isWithinGettingStartedPeriod(firstDayFreeTrial) && !hasEverHadExpenseReport;
+
     const renderContent = () => {
-        const isInitialLoad = !hasLoadedApp && (isLoadingApp || isLoadingReportData || reportCounts === undefined);
         if (isInitialLoad) {
             const reasonAttributes: SkeletonSpanReasonAttributes = {
                 context: 'ForYouSection.ForYouSkeleton',
@@ -142,6 +158,10 @@ function ForYouSection() {
 
         return hasAnyTodos ? renderTodoItems() : <EmptyState />;
     };
+
+    if (shouldHideEmptySlot) {
+        return null;
+    }
 
     return <WidgetContainer title={translate('homePage.forYou')}>{renderContent()}</WidgetContainer>;
 }
