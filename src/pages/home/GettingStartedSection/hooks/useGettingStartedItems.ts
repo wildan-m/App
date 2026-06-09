@@ -103,6 +103,15 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
             route: ROUTES.WORKSPACE_MEMBERS.getRoute(activePolicyID),
         });
 
+        items.push({
+            key: 'linkCompanyCards',
+            label: translate('homePage.gettingStartedSection.linkCompanyCards'),
+            isComplete: hasCompanyCardFeeds(allCardFeeds),
+            route: ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(activePolicyID),
+            isFeatureEnabled: policy.areCompanyCardsEnabled,
+            enableFeature: () => enableCompanyCards(activePolicyID, true, false),
+        });
+
         return {shouldShowSection: true, items};
     }
 
