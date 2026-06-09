@@ -1032,6 +1032,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Buchhaltungskategorien anpassen',
             linkCompanyCards: 'Firmenkarten verknüpfen',
             setupRules: 'Ausgabelimits einrichten',
+            configureApprovalWorkflow: 'Genehmigungsworkflow einrichten',
             inviteAccountant: 'Lade deine:n Steuerberater:in ein',
         },
         freeTrialSection: {

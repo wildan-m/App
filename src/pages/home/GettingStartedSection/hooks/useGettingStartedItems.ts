@@ -10,6 +10,7 @@ import {
     getValidConnectedIntegration,
     hasAccountingFeatureConnection,
     hasConfiguredRules,
+    hasCustomApprovalWorkflow,
     hasCustomCategories,
     isPaidGroupPolicy,
     isPendingDeletePolicy,
@@ -146,6 +147,15 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
             label: translate('homePage.gettingStartedSection.setupRules'),
             isComplete: hasConfiguredRules(policy),
             route: ROUTES.WORKSPACE_RULES.getRoute(activePolicyID),
+        });
+    }
+
+    if (policy.areWorkflowsEnabled) {
+        items.push({
+            key: 'configureApprovalWorkflow',
+            label: translate('homePage.gettingStartedSection.configureApprovalWorkflow'),
+            isComplete: hasCustomApprovalWorkflow(policy),
+            route: ROUTES.WORKSPACE_WORKFLOWS.getRoute(activePolicyID),
         });
     }
 

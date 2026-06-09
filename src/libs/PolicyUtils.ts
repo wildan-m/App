@@ -965,6 +965,38 @@ function hasConfiguredRules(policy: OnyxEntry<Policy>): boolean {
 }
 
 /**
+ * Whether the policy has at least one customized approval workflow.
+ * Used to auto-complete the "Configure approval workflow" Getting started step.
+ * A workflow is considered customized when any of the following hold:
+ * - The default workflow's first approver is modified (policy.approver differs from the workspace owner).
+ * - An additional approver is added to a chain (a non-pending-delete member has a forwardsTo).
+ * - A new (non-default) workflow exists (a non-pending-delete member submits to someone other than the default approver).
+ */
+function hasCustomApprovalWorkflow(policy: OnyxEntry<Policy>): boolean {
+    if (!policy) {
+        return false;
+    }
+
+    // The default workflow's first approver was changed from the workspace owner.
+    if (!!policy.approver && policy.approver !== policy.owner) {
+        return true;
+    }
+
+    const defaultApprover = getDefaultApprover(policy);
+    return Object.values(policy.employeeList ?? {}).some((employee) => {
+        if (employee?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+            return false;
+        }
+        // An additional approver was added to a chain (ApprovesTo / multi-level approval).
+        if (employee?.forwardsTo) {
+            return true;
+        }
+        // A new (non-default) workflow exists when a member submits to someone other than the default approver.
+        return !!employee?.submitsTo && employee.submitsTo !== defaultApprover;
+    });
+}
+
+/**
  * Gets a tag list of a policy by a tag index
  */
 function getTagList(policyTagList: OnyxEntry<PolicyTagLists>, tagIndex: number): ValueOf<PolicyTagLists> {
@@ -2453,6 +2485,7 @@ export {
     hasTags,
     hasCustomCategories,
     hasConfiguredRules,
+    hasCustomApprovalWorkflow,
     getTaxByID,
     getUnitRateValue,
     getRateDisplayValue,
