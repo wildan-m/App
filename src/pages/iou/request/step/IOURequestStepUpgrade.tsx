@@ -23,7 +23,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {createNewReport} from '@libs/actions/Report';
 import {changeTransactionsReport, setTransactionReport} from '@libs/actions/Transaction';
 import type CreateWorkspaceParams from '@libs/API/parameters/CreateWorkspaceParams';
-import getPlatform from '@libs/getPlatform';
 import {navigateToCreatedReportInReports} from '@libs/Navigation/helpers/getCreateReportRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -71,8 +70,6 @@ function IOURequestStepUpgrade({
     const isDistanceRateUpgrade = upgradePath === CONST.UPGRADE_PATHS.DISTANCE_RATES;
     const isCategorizing = upgradePath === CONST.UPGRADE_PATHS.CATEGORIES;
     const isReporting = upgradePath === CONST.UPGRADE_PATHS.REPORTS;
-    const platform = getPlatform();
-    const isWeb = platform === CONST.PLATFORM.WEB;
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
@@ -118,12 +115,11 @@ function IOURequestStepUpgrade({
         .filter((value) => value.id !== CONST.UPGRADE_FEATURE_INTRO_MAPPING.policyPreventMemberChangingTitle.id)
         .find((f) => f.alias === upgradePath);
 
+    // Defer the navigation to a microtask on every platform so the preceding Navigation.goBack (which
+    // removes the Upgrade screen) settles before we navigate. Running it immediately on native races the
+    // goBack and leaves a stale Confirmation screen in the money-request modal stack (#93069).
     const navigateWithMicrotask = (route: Route) => {
-        if (isWeb) {
-            Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.navigate(route));
-        } else {
-            Navigation.navigate(route);
-        }
+        Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.navigate(route));
     };
 
     const afterUpgradeAcknowledged = useCallback(() => {
