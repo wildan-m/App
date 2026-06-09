@@ -45,6 +45,7 @@ import replaceWithSplitNavigator from './helpers/replaceWithSplitNavigator';
 import setNavigationActionToMicrotaskQueue from './helpers/setNavigationActionToMicrotaskQueue';
 import {linkingConfig} from './linkingConfig';
 import {SPLIT_TO_SIDEBAR} from './linkingConfig/RELATIONS';
+import navigateAfterInteraction from './navigateAfterInteraction';
 import navigationRef from './navigationRef';
 import TransitionTracker from './TransitionTracker';
 import type {
@@ -1037,6 +1038,19 @@ function revealRouteBeforeDismissingModal(route: Route, options?: {afterTransiti
             type: CONST.NAVIGATION.ACTION_TYPE.REPLACE_FULLSCREEN_UNDER_RHP,
             payload: {route, collapseTabToLeaf: options?.collapseTabToLeaf},
         });
+
+        // `collapseTabToLeaf` tags the inserted leaf route with `noEnterAnimation`, so it mounts with
+        // animation: NONE and never emits a `transitionStart`. Gating its dismiss on
+        // `waitForUpcomingTransition` would always fall through to the MAX_TRANSITION_START_WAIT_MS
+        // fallback, producing a visible ~1s delay before the revealed screen appears. Since there is no
+        // enter transition to wait on, defer the dismiss past the current interaction (a no-op frame on
+        // web/Android, an InteractionManager wait on iOS so the inserted route paints before the dismiss).
+        if (options?.collapseTabToLeaf) {
+            navigateAfterInteraction(() => {
+                dismissModal({afterTransition: options?.afterTransition, waitForTransition: getIsNarrowLayout()});
+            });
+            return;
+        }
 
         TransitionTracker.runAfterTransitions({
             callback: () => {
