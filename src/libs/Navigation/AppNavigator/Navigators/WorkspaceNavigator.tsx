@@ -23,13 +23,15 @@ function hasNoEnterAnimationFlag(params: unknown): boolean {
 function WorkspaceNavigator({route}: PlatformStackScreenProps<TabNavigatorParamList, typeof NAVIGATORS.WORKSPACE_NAVIGATOR>) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
-    // On narrow layout, slide in the split navigator and enable swipe-back, except when the leaf route carries
+    // On narrow layout, enable swipe-back and slide in the split navigator, except when the leaf route carries
     // `noEnterAnimation` (set by handleReplaceFullscreenUnderRHP for `collapseTabToLeaf`), where it mounts instantly.
+    // The flag must only suppress the enter animation — swipe-back stays enabled on narrow layout regardless.
     const buildSplitNavigatorOptions = ({route: screenRoute}: {route: {params?: unknown}}) => {
-        if (!shouldUseNarrowLayout || hasNoEnterAnimationFlag(screenRoute.params)) {
+        if (!shouldUseNarrowLayout) {
             return {animation: Animations.NONE};
         }
-        return {animation: Animations.SLIDE_FROM_RIGHT, gestureEnabled: true};
+        const animation = hasNoEnterAnimationFlag(screenRoute.params) ? Animations.NONE : Animations.SLIDE_FROM_RIGHT;
+        return {animation, gestureEnabled: true};
     };
 
     return (
