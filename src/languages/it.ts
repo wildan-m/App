@@ -1046,6 +1046,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Personalizza le categorie contabili',
             linkCompanyCards: 'Collega carte aziendali',
             setupRules: 'Configura le regole di spesa',
+            configureApprovalWorkflow: 'Configura il flusso di approvazione',
             inviteAccountant: 'Invita il tuo commercialista',
         },
         yourSpend: {

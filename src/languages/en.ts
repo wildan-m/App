@@ -1098,6 +1098,7 @@ const translations = {
             inviteAccountant: 'Invite your accountant',
             linkCompanyCards: 'Link company cards',
             setupRules: 'Set up spend rules',
+            configureApprovalWorkflow: 'Configure approval workflow',
         },
         upcomingTravel: 'Upcoming travel',
         upcomingTravelSection: {

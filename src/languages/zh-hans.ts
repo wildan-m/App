@@ -1015,6 +1015,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: '自定义会计类别',
             linkCompanyCards: '关联公司卡',
             setupRules: '设置消费规则',
+            configureApprovalWorkflow: '配置审批工作流',
             inviteAccountant: '邀请你的会计',
         },
         yourSpend: {title: '您的支出', awaitingApproval: '等待审批', repaidLast30Days: '过去30天内已偿还', recentTransactions: ({lastFour}: {lastFour: string}) => `最近交易 • ${lastFour}`},

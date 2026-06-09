@@ -69,8 +69,8 @@ function HomePage() {
                                 <>
                                     <FreeTrialSection />
                                     <TimeSensitiveSection />
-                                    <GettingStartedSection />
                                     <ForYouSection />
+                                    <GettingStartedSection />
                                     <UpcomingTravelSection />
                                     <YourSpendSection />
                                     <SpendOverTimeSection />
@@ -82,12 +82,12 @@ function HomePage() {
                                     <View style={styles.homePageLeftColumn}>
                                         <TimeSensitiveSection />
                                         <ForYouSection />
+                                        <GettingStartedSection />
                                         <SpendOverTimeSection />
                                         <DiscoverSection />
                                     </View>
                                     <View style={styles.homePageRightColumn}>
                                         <FreeTrialSection />
-                                        <GettingStartedSection />
                                         <UpcomingTravelSection />
                                         <YourSpendSection />
                                         <AnnouncementSection />

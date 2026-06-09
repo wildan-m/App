@@ -1048,6 +1048,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Personnaliser les catégories comptables',
             linkCompanyCards: 'Lier des cartes d’entreprise',
             setupRules: 'Configurer les règles de dépense',
+            configureApprovalWorkflow: 'Configurer le flux d’approbation',
             inviteAccountant: 'Inviter votre comptable',
         },
         yourSpend: {

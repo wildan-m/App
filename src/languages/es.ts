@@ -1006,6 +1006,7 @@ const translations: TranslationDeepObject<typeof en> = {
             inviteAccountant: 'Invita a tu contador',
             linkCompanyCards: 'Vincular tarjetas corporativas',
             setupRules: 'Configurar reglas de gasto',
+            configureApprovalWorkflow: 'Configurar flujo de aprobación',
         },
         upcomingTravel: 'Próximos viajes',
         upcomingTravelSection: {

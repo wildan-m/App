@@ -103,6 +103,15 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
             route: ROUTES.WORKSPACE_MEMBERS.getRoute(activePolicyID),
         });
 
+        items.push({
+            key: 'linkCompanyCards',
+            label: translate('homePage.gettingStartedSection.linkCompanyCards'),
+            isComplete: hasCompanyCardFeeds(allCardFeeds),
+            route: ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(activePolicyID),
+            isFeatureEnabled: policy.areCompanyCardsEnabled,
+            enableFeature: () => enableCompanyCards(activePolicyID, true, false),
+        });
+
         return {shouldShowSection: true, items};
     }
 
@@ -146,6 +155,16 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
             label: translate('homePage.gettingStartedSection.setupRules'),
             isComplete: hasConfiguredRules(policy),
             route: ROUTES.WORKSPACE_RULES.getRoute(activePolicyID),
+        });
+    }
+
+    if (policy.areWorkflowsEnabled) {
+        const activeMemberCount = Object.values(policy.employeeList ?? {}).filter((member) => member?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length;
+        items.push({
+            key: 'configureApprovalWorkflow',
+            label: translate('homePage.gettingStartedSection.configureApprovalWorkflow'),
+            isComplete: activeMemberCount >= MIN_MEMBERS_FOR_ACCOUNTANT_INVITED,
+            route: ROUTES.WORKSPACE_MEMBERS.getRoute(activePolicyID),
         });
     }
 
