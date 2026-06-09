@@ -1032,6 +1032,8 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Buchhaltungskategorien anpassen',
             linkCompanyCards: 'Firmenkarten verknüpfen',
             setupRules: 'Ausgabelimits einrichten',
+            addFirstExpense: 'Erste Ausgabe hinzufügen',
+            linkPersonalCard: 'Persönliche Karte verknüpfen',
             inviteAccountant: 'Lade deine:n Steuerberater:in ein',
         },
         freeTrialSection: {

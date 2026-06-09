@@ -29,6 +29,10 @@ function GettingStartedRow({item}: GettingStartedRowProps) {
         if (!item.isFeatureEnabled) {
             item.enableFeature?.();
         }
+        if (item.onPress) {
+            item.onPress();
+            return;
+        }
         Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.navigate(item.route));
     };
 

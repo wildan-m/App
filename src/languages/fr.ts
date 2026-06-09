@@ -1048,6 +1048,8 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Personnaliser les catégories comptables',
             linkCompanyCards: 'Lier des cartes d’entreprise',
             setupRules: 'Configurer les règles de dépense',
+            addFirstExpense: 'Ajouter une première dépense',
+            linkPersonalCard: 'Associer une carte personnelle',
             inviteAccountant: 'Inviter votre comptable',
         },
         yourSpend: {

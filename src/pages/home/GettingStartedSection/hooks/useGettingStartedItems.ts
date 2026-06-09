@@ -3,9 +3,11 @@ import useLocalize from '@hooks/useLocalize';
 import useOnboardingIntent from '@hooks/useOnboardingIntent';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import {startMoneyRequest} from '@libs/actions/IOU/MoneyRequest';
 import {enablePolicyCategories} from '@libs/actions/Policy/Category';
-import {hasCompanyCardFeeds} from '@libs/CardUtils';
+import {hasCompanyCardFeeds, isPersonalCard} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {generateReportID} from '@libs/ReportUtils';
 import {
     getValidConnectedIntegration,
     hasAccountingFeatureConnection,
@@ -31,6 +33,7 @@ type GettingStartedItem = {
     route: Route;
     isFeatureEnabled?: boolean;
     enableFeature?: () => void;
+    onPress?: () => void;
 };
 
 type UseGettingStartedItemsResult = {
@@ -56,11 +59,13 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${activePolicyID}`);
     const [allCardFeeds] = useCardFeeds(activePolicyID);
+    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
+    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
     const isAccountingEnabled = !!policy?.areConnectionsEnabled || hasAccountingFeatureConnection(policy);
 
     const emptyResult: UseGettingStartedItemsResult = {shouldShowSection: false, items: []};
 
-    if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
+    if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE && intent !== CONST.ONBOARDING_CHOICES.PERSONAL_SPEND) {
         return emptyResult;
     }
 
@@ -84,6 +89,36 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         isComplete: true,
         route: shouldUseNarrowLayout ? ROUTES.WORKSPACE_INITIAL.getRoute(activePolicyID, Navigation.getActiveRoute()) : ROUTES.WORKSPACE_OVERVIEW.getRoute(activePolicyID),
     });
+
+    if (intent === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND) {
+        items.push({
+            key: 'customizeCategories',
+            label: translate('homePage.gettingStartedSection.customizeCategories'),
+            isComplete: hasCustomCategories(policyCategories),
+            route: ROUTES.WORKSPACE_CATEGORIES.getRoute(activePolicyID),
+            isFeatureEnabled: policy.areCategoriesEnabled,
+            enableFeature: () => enablePolicyCategories({policy, categories: policyCategories ?? {}, tags: {}, reports: [], transactionsAndViolations: {}}, true, false),
+        });
+
+        const hasCreatedExpense = Object.values(allTransactions ?? {}).some((transaction) => !!transaction);
+        items.push({
+            key: 'addFirstExpense',
+            label: translate('homePage.gettingStartedSection.addFirstExpense'),
+            isComplete: hasCreatedExpense,
+            route: ROUTES.HOME,
+            onPress: () => startMoneyRequest(CONST.IOU.TYPE.CREATE, generateReportID(), undefined),
+        });
+
+        const hasPersonalCard = Object.values(cardList ?? {}).some((card) => isPersonalCard(card));
+        items.push({
+            key: 'linkPersonalCard',
+            label: translate('homePage.gettingStartedSection.linkPersonalCard'),
+            isComplete: hasPersonalCard,
+            route: ROUTES.SETTINGS_WALLET,
+        });
+
+        return {shouldShowSection: true, items};
+    }
 
     if (intent === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
         items.push({

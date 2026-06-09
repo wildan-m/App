@@ -1098,6 +1098,8 @@ const translations = {
             inviteAccountant: 'Invite your accountant',
             linkCompanyCards: 'Link company cards',
             setupRules: 'Set up spend rules',
+            addFirstExpense: 'Add a first expense',
+            linkPersonalCard: 'Link personal card',
         },
         upcomingTravel: 'Upcoming travel',
         upcomingTravelSection: {

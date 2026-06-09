@@ -104,9 +104,9 @@ describe('GettingStartedSection', () => {
     });
 
     describe('visibility', () => {
-        it('does not render when intent is not manage-team', async () => {
+        it('does not render when intent is not supported', async () => {
             await Onyx.set(ONYXKEYS.NVP_INTRO_SELECTED, {
-                choice: CONST.ONBOARDING_CHOICES.PERSONAL_SPEND,
+                choice: CONST.ONBOARDING_CHOICES.LOOKING_AROUND,
             });
             await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TEST_POLICY_ID);
             await Onyx.set(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);

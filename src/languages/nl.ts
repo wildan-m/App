@@ -1044,6 +1044,8 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Boekhoudcategorieën aanpassen',
             linkCompanyCards: 'Bedrijfspassen koppelen',
             setupRules: 'Uitgavenregels instellen',
+            addFirstExpense: 'Voeg een eerste uitgave toe',
+            linkPersonalCard: 'Koppel een persoonlijke kaart',
             inviteAccountant: 'Nodig je accountant uit',
         },
         yourSpend: {
