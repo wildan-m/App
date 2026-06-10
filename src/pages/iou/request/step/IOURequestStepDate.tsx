@@ -17,13 +17,15 @@ import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {shouldUseTransactionDraft} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {getDistanceRateCustomUnitRate, isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {isPolicyExpenseChat as isPolicyExpenseChatReportUtil} from '@libs/ReportUtils';
-import {getFormattedCreated, hasReceipt, isDistanceRequest} from '@libs/TransactionUtils';
-import {setCustomUnitRateID, setMoneyRequestCreated} from '@userActions/IOU/MoneyRequest';
+import {calculateTaxAmount, getDefaultTaxCode, getDistanceInMeters, getFormattedCreated, getTaxValue, hasReceipt, isDistanceRequest} from '@libs/TransactionUtils';
+import {setCustomUnitRateID, setMoneyRequestCreated, setMoneyRequestTaxAmount, setMoneyRequestTaxRate, setMoneyRequestTaxValue} from '@userActions/IOU/MoneyRequest';
 import {setDraftSplitTransaction} from '@userActions/IOU/Split';
 import {updateMoneyRequestDate} from '@userActions/IOU/UpdateMoneyRequest';
 import CONST from '@src/CONST';
@@ -135,6 +137,25 @@ function IOURequestStepDate({
                     expenseDate: newCreated,
                 });
                 setCustomUnitRateID(transactionID, rateID, transaction, effectivePolicy);
+
+                // The date-driven rate change must also re-sync the tax tied to the new rate,
+                // mirroring the manual rate selection in IOURequestStepDistanceRate. Without this,
+                // the tax of the previously selected rate would stay on the transaction.
+                const shouldShowTax = isTaxTrackingEnabled(isPolicyExpenseChat || isTrackExpense, effectivePolicy, true);
+                if (shouldShowTax && rateID) {
+                    const newRate = DistanceRequestUtils.getRateByCustomUnitRateID({policy: effectivePolicy, customUnitRateID: rateID});
+                    const policyCustomUnitRate = getDistanceRateCustomUnitRate(effectivePolicy, rateID);
+                    const defaultTaxCode = getDefaultTaxCode(effectivePolicy, transaction, undefined, rateID) ?? '';
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                    const taxRateExternalID = policyCustomUnitRate?.attributes?.taxRateExternalID || defaultTaxCode;
+                    const currentUnit = DistanceRequestUtils.getDistanceUnit(transaction, newRate);
+                    const taxableAmount = DistanceRequestUtils.getTaxableAmount(effectivePolicy, rateID, getDistanceInMeters(transaction, currentUnit));
+                    const taxValue = taxRateExternalID ? getTaxValue(effectivePolicy, transaction, taxRateExternalID) : undefined;
+                    const taxAmount = convertToBackendAmount(calculateTaxAmount(taxValue, taxableAmount, getCurrencyDecimals(newRate?.currency)));
+                    setMoneyRequestTaxAmount(transactionID, taxAmount, isTransactionDraft);
+                    setMoneyRequestTaxRate(transactionID, taxRateExternalID ?? null, isTransactionDraft);
+                    setMoneyRequestTaxValue(transactionID, taxValue ?? null, isTransactionDraft);
+                }
             }
         }
 
