@@ -1,4 +1,3 @@
-import {findFocusedRoute} from '@react-navigation/native';
 import type {SeverityLevel} from '@sentry/react-native';
 import * as Sentry from '@sentry/react-native';
 import {useEffect, useMemo} from 'react';
@@ -14,7 +13,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {TransactionPending3DSReview} from '@src/types/onyx';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import Navigation, {isMFAFlowScreen} from './Navigation';
+import Navigation, {getDeepestFocusedScreen, isMFAFlowScreen} from './Navigation';
 
 function addBreadcrumb(message: string, data?: Record<string, string | number | boolean | undefined>, level: SeverityLevel = 'info'): void {
     Sentry.addBreadcrumb({
@@ -61,7 +60,11 @@ function useNavigateTo3DSAuthorizationChallenge() {
         if (!state) {
             return false;
         }
-        const focusedScreen = findFocusedRoute(state)?.name;
+        // Use getDeepestFocusedScreen (not findFocusedRoute) so we still recognize the MFA flow
+        // while its modal navigator is mid-mount and the target screen lives in params.screen
+        // rather than in state. Otherwise the guard misses the in-progress passkey/card-reveal
+        // flow during that window and incorrectly navigates to the 3DS authorization screen.
+        const focusedScreen = getDeepestFocusedScreen(state)?.name;
         if (!focusedScreen) {
             return false;
         }
