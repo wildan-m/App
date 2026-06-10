@@ -36,7 +36,7 @@ import {setNameValuePair} from '@libs/actions/User';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
-import {getConnectedIntegration} from '@libs/PolicyUtils';
+import {getConnectedIntegration, getPolicyByCustomUnitID} from '@libs/PolicyUtils';
 import {getSecondaryExportReportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditMultipleTransactions,
@@ -181,6 +181,7 @@ type ShouldShowBulkDuplicateParams = {
     allReports: OnyxCollection<Report> | undefined;
     allTransactionViolations: OnyxCollection<TransactionViolations> | undefined;
     allReportNameValuePairs: OnyxCollection<ReportNameValuePairs> | undefined;
+    policies: OnyxCollection<Policy> | undefined;
     defaultExpensePolicyID: string | undefined;
     activePolicyExpenseChat: Report | undefined;
     typeExpenseReport: boolean;
@@ -230,6 +231,7 @@ function shouldShowBulkDuplicateOption({
     allReports,
     allTransactionViolations,
     allReportNameValuePairs,
+    policies,
     defaultExpensePolicyID,
     activePolicyExpenseChat,
     typeExpenseReport,
@@ -273,7 +275,9 @@ function shouldShowBulkDuplicateOption({
         const report = reportID ? ((searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] as Report | undefined) ?? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`]) : undefined;
 
         if (isPerDiemRequest(transaction)) {
-            const policyID = report?.policyID;
+            // A deleted expense has no report (reportID is TRASH_REPORT_ID), so its policy cannot be read from `report`.
+            // Recover the per diem's owning policy from the transaction's custom unit instead, mirroring the single-expense duplicate guard.
+            const policyID = report?.policyID ?? (isDeletedTransaction({reportID}) ? getPolicyByCustomUnitID(transaction, policies)?.id : undefined);
             if (!policyID || defaultExpensePolicyID !== policyID) {
                 return false;
             }
@@ -1079,6 +1083,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 allReports,
                 allTransactionViolations,
                 allReportNameValuePairs,
+                policies,
                 defaultExpensePolicyID: defaultExpensePolicy?.id,
                 activePolicyExpenseChat,
                 typeExpenseReport: isExpenseReportType,
@@ -1091,6 +1096,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             allReports,
             allTransactionViolations,
             allReportNameValuePairs,
+            policies,
             defaultExpensePolicy?.id,
             activePolicyExpenseChat,
             isExpenseReportType,
