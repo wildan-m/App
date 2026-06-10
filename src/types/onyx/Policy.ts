@@ -2138,6 +2138,9 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Whether the self approval or submitting is enabled */
         preventSelfApproval?: boolean;
 
+        /** Whether receipts on this policy are publicly viewable by anyone with the URL */
+        isReceiptVisibilityPublic?: boolean;
+
         /** When the monthly scheduled submit should happen */
         autoReportingOffset?: AutoReportingOffset;
 

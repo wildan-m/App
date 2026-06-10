@@ -57,6 +57,7 @@ import type {
     SetPolicyDefaultReportTitleParams,
     SetPolicyPreventMemberCreatedTitleParams,
     SetPolicyPreventSelfApprovalParams,
+    SetPolicyReceiptVisibilityParams,
     SetPolicyProhibitedExpensesParams,
     SetPolicyRulesEnabledParams,
     SetWorkspaceApprovalModeParams,
@@ -6876,6 +6877,65 @@ function setPolicyPreventSelfApproval(policyID: string, preventSelfApproval: boo
     });
 }
 
+function setPolicyReceiptVisibilityPublic(policyID: string, isReceiptVisibilityPublic: boolean, currentIsReceiptVisibilityPublic: boolean | undefined) {
+    if (isReceiptVisibilityPublic === currentIsReceiptVisibilityPublic) {
+        return;
+    }
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                isReceiptVisibilityPublic,
+                pendingFields: {
+                    isReceiptVisibilityPublic: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                pendingFields: {
+                    isReceiptVisibilityPublic: null,
+                },
+                errorFields: null,
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                isReceiptVisibilityPublic: currentIsReceiptVisibilityPublic ?? false,
+                pendingFields: {
+                    isReceiptVisibilityPublic: null,
+                },
+                errorFields: {
+                    isReceiptVisibilityPublic: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                },
+            },
+        },
+    ];
+
+    const parameters: SetPolicyReceiptVisibilityParams = {
+        isReceiptVisibilityPublic,
+        policyID,
+    };
+
+    API.write(WRITE_COMMANDS.SET_POLICY_RECEIPT_VISIBILITY, parameters, {
+        optimisticData,
+        successData,
+        failureData,
+    });
+}
+
 /**
  * Call the API to apply automatic approval limit for the given policy
  * @param policyID - id of the policy to apply the limit to
@@ -7586,6 +7646,7 @@ export {
     clearQBDErrorField,
     setPolicyPreventMemberCreatedTitle,
     setPolicyPreventSelfApproval,
+    setPolicyReceiptVisibilityPublic,
     setPolicyAutomaticApprovalLimit,
     setPolicyAutomaticApprovalRate,
     setPolicyAutoReimbursementLimit,
