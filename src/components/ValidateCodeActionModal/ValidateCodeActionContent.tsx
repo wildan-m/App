@@ -6,6 +6,7 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ValidateCodeActionContentProps} from './type';
 import ValidateCodeForm from './ValidateCodeForm';
@@ -33,13 +34,17 @@ function ValidateCodeActionContent({
     const firstRenderRef = useRef(true);
 
     useEffect(() => {
-        if (!firstRenderRef.current || validateCodeAction?.validateCodeSent) {
+        // De-dupe the auto-send across reloads using the time the code was last requested rather than a sticky global flag:
+        // re-send on a genuinely fresh open (or state older than the resend window), but suppress a duplicate send on a reload that happens within the window.
+        const lastRequestedAt = validateCodeAction?.validateCodeRequestedAt;
+        const isWithinResendWindow = !!lastRequestedAt && Date.now() - lastRequestedAt < CONST.REQUEST_CODE_DELAY * 1000;
+        if (!firstRenderRef.current || isWithinResendWindow) {
             return;
         }
         firstRenderRef.current = false;
 
         sendValidateCode();
-        // We only want to send validate code on first render not on change of validateCodeSent, so we don't add it as a dependency.
+        // We only want to send validate code on first render not on change of the request timestamp, so we don't add it as a dependency.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sendValidateCode]);
 

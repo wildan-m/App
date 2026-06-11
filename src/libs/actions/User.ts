@@ -530,6 +530,7 @@ function requestValidateCodeAction() {
             key: ONYXKEYS.VALIDATE_ACTION_CODE,
             value: {
                 validateCodeSent: false,
+                validateCodeRequestedAt: Date.now(),
                 isLoading: true,
                 pendingFields: {
                     actionVerified: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
