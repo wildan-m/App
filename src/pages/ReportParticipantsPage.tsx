@@ -243,6 +243,7 @@ function ReportParticipantsPage({report, route}: ReportParticipantsPageProps) {
             isDisabled,
             text: formatPhoneNumber(getDisplayNameOrDefault(details)),
             alternateText: formatPhoneNumber(details?.login ?? ''),
+            shouldAlwaysShowAlternateTextTooltip: true,
             rightElement: isAdmin ? <Badge text={translate('common.admin')} /> : null,
             pendingAction,
             icons: [

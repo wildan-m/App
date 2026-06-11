@@ -7,7 +7,7 @@ type LayoutChangeEvent = {
     target: HTMLElement;
 };
 
-function TextWithTooltip({testID, text, shouldShowTooltip, style, numberOfLines = 1, forwardedFSClass}: TextWithTooltipProps) {
+function TextWithTooltip({testID, text, shouldShowTooltip, shouldAlwaysShowTooltip = false, style, numberOfLines = 1, forwardedFSClass}: TextWithTooltipProps) {
     const [showTooltip, setShowTooltip] = useState(false);
 
     return (
@@ -24,7 +24,7 @@ function TextWithTooltip({testID, text, shouldShowTooltip, style, numberOfLines 
                     if (!shouldShowTooltip) {
                         return;
                     }
-                    if (target.scrollWidth > target.offsetWidth || target.scrollHeight > target.offsetHeight) {
+                    if (shouldAlwaysShowTooltip || target.scrollWidth > target.offsetWidth || target.scrollHeight > target.offsetHeight) {
                         setShowTooltip(true);
                         return;
                     }

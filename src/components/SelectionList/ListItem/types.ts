@@ -40,6 +40,9 @@ type ListItem<K extends string | number = string> = {
     /** Whether to force hide the alternate text even if it exists */
     shouldHideAlternateText?: boolean;
 
+    /** Whether the alternate text tooltip should always show on hover, even when the alternate text is not truncated */
+    shouldAlwaysShowAlternateTextTooltip?: boolean;
+
     /** Accessibility label for screen readers */
     accessibilityLabel?: string;
 

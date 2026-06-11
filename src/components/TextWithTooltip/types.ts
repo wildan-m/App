@@ -8,6 +8,9 @@ type TextWithTooltipProps = ForwardedFSClassProps & {
     /** Whether to show the tooltip text */
     shouldShowTooltip?: boolean;
 
+    /** Whether to always show the tooltip on hover, even when the text is not truncated */
+    shouldAlwaysShowTooltip?: boolean;
+
     /** Additional styles */
     style?: StyleProp<TextStyle>;
 
