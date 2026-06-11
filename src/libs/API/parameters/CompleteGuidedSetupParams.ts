@@ -11,6 +11,8 @@ type CompleteGuidedSetupParams = {
     paymentSelected?: string;
     companySize?: OnboardingCompanySize;
     userReportedIntegration?: OnboardingAccounting;
+    /** The free-text accounting system name the user entered when they selected "Other" on the onboarding accounting step. */
+    userReportedIntegrationOther?: string;
     policyID?: string;
     selfDMReportID?: string;
     selfDMCreatedReportActionID?: string;

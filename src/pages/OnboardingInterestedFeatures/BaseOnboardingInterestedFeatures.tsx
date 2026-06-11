@@ -59,6 +59,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
     const [onboardingAdminsChatReportID] = useOnyx(ONYXKEYS.ONBOARDING_ADMINS_CHAT_REPORT_ID);
     const [onboardingCompanySize] = useOnyx(ONYXKEYS.ONBOARDING_COMPANY_SIZE);
     const [userReportedIntegration] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION);
+    const [userReportedIntegrationOther] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION_OTHER);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
@@ -187,6 +188,8 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
 
             const shouldCreateWorkspace = !onboardingPolicyID && !paidGroupPolicy;
             const newUserReportedIntegration = selectedFeatures.some((feature) => feature === CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED) ? userReportedIntegration : undefined;
+            // Only forward the free-text accounting system name when the user selected "Other" and the connections feature is still enabled.
+            const newUserReportedIntegrationOther = newUserReportedIntegration === 'other' ? userReportedIntegrationOther : undefined;
             const featuresMap = features.map((feature) => ({
                 ...feature,
                 enabled: selectedFeatures.includes(feature.id),
@@ -231,6 +234,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                 onboardingPolicyID: policyID,
                 companySize: onboardingCompanySize,
                 userReportedIntegration: newUserReportedIntegration,
+                userReportedIntegrationOther: newUserReportedIntegrationOther,
                 firstName: currentUserPersonalDetails?.firstName,
                 lastName: currentUserPersonalDetails?.lastName,
                 selectedInterestedFeatures: featuresMap.filter((feature) => feature.enabled).map((feature) => feature.id),
@@ -277,6 +281,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
         paidGroupPolicy,
         session?.email,
         userReportedIntegration,
+        userReportedIntegrationOther,
         features,
         selectedFeatures,
         currentUserPersonalDetails?.firstName,

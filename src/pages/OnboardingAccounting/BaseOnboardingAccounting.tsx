@@ -11,6 +11,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
+import TextInput from '@components/TextInput';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnboardingStepCounter from '@hooks/useOnboardingStepCounter';
@@ -19,7 +20,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {setOnboardingAdminsChatReportID, setOnboardingPolicyID, setOnboardingUserReportedIntegration} from '@libs/actions/Welcome';
+import {setOnboardingAdminsChatReportID, setOnboardingPolicyID, setOnboardingUserReportedIntegration, setOnboardingUserReportedIntegrationOther} from '@libs/actions/Welcome';
 import Navigation from '@libs/Navigation/Navigation';
 import {isPaidGroupPolicy, isPolicyAdmin} from '@libs/PolicyUtils';
 import variables from '@styles/variables';
@@ -109,9 +110,11 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [onboardingUserReportedIntegration] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION);
+    const [onboardingUserReportedIntegrationOther] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION_OTHER);
     const onboardingStep = useOnboardingStepCounter(SCREENS.ONBOARDING.ACCOUNTING);
 
     const [userReportedIntegration, setUserReportedIntegration] = useState<OnboardingAccounting | undefined>(onboardingUserReportedIntegration ?? undefined);
+    const [otherIntegrationName, setOtherIntegrationName] = useState(onboardingUserReportedIntegrationOther ?? '');
     const [error, setError] = useState('');
 
     const paidGroupPolicy = Object.values(allPolicies ?? {}).find((policy) => isPaidGroupPolicy(policy) && isPolicyAdmin(policy, session?.email));
@@ -180,6 +183,8 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
         }
 
         setOnboardingUserReportedIntegration(userReportedIntegration);
+        // Capture the free-text accounting system name only when "Other" is selected; clear it otherwise so a stale value isn't submitted.
+        setOnboardingUserReportedIntegrationOther(userReportedIntegration === 'other' ? otherIntegrationName.trim() : '');
 
         // Navigate to the next onboarding step interested features with the selected integration
         Navigation.navigate(ROUTES.ONBOARDING_INTERESTED_FEATURES.getRoute(route.params?.backTo));
@@ -187,6 +192,10 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
 
     const handleIntegrationSelect = (integrationKey: OnboardingListItem['keyForList']) => {
         setUserReportedIntegration(integrationKey === 'none' ? null : integrationKey);
+        // Reset the typed "Other" name whenever the user switches away from the "Other" option.
+        if (integrationKey !== 'other') {
+            setOtherIntegrationName('');
+        }
         setError('');
     };
 
@@ -242,6 +251,17 @@ function BaseOnboardingAccounting({shouldUseNativeStyles, route}: BaseOnboarding
             </View>
             <ScrollView style={[onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5, styles.pt3, styles.pb8]}>
                 <View style={[styles.flexRow, styles.flexWrap, styles.gap3, styles.mb3]}>{accountingOptions.map(renderOption)}</View>
+                {userReportedIntegration === 'other' && (
+                    <TextInput
+                        label={translate('onboarding.accounting.otherLabel')}
+                        placeholder={translate('onboarding.accounting.otherPlaceholder')}
+                        accessibilityLabel={translate('onboarding.accounting.otherLabel')}
+                        role={CONST.ROLE.PRESENTATION}
+                        value={otherIntegrationName}
+                        onChangeText={setOtherIntegrationName}
+                        containerStyles={[styles.mb3]}
+                    />
+                )}
             </ScrollView>
             <FixedFooter style={[styles.pt3, styles.ph5]}>
                 {!!error && (

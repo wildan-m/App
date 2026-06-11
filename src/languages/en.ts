@@ -3124,6 +3124,8 @@ const translations = {
         accounting: {
             title: 'Do you use any accounting software?',
             none: 'None',
+            otherLabel: 'Which accounting software do you use?',
+            otherPlaceholder: 'Accounting software name',
         },
         interestedFeatures: {
             title: 'What features are you interested in?',
