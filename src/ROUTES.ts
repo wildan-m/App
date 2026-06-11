@@ -184,6 +184,7 @@ const DYNAMIC_ROUTES = {
         path: 'money-request/tax-rate/:action/:iouType/:transactionID/:reportID?',
         entryScreens: [
             SCREENS.MONEY_REQUEST.STEP_CONFIRMATION,
+            SCREENS.MONEY_REQUEST.CREATE,
             SCREENS.REPORT,
             SCREENS.RIGHT_MODAL.EXPENSE_REPORT,
             SCREENS.RIGHT_MODAL.SEARCH_REPORT,
@@ -202,6 +203,7 @@ const DYNAMIC_ROUTES = {
         path: 'money-request/tax-amount/:action/:iouType/:transactionID/:reportID?',
         entryScreens: [
             SCREENS.MONEY_REQUEST.STEP_CONFIRMATION,
+            SCREENS.MONEY_REQUEST.CREATE,
             SCREENS.REPORT,
             SCREENS.RIGHT_MODAL.EXPENSE_REPORT,
             SCREENS.RIGHT_MODAL.SEARCH_REPORT,
@@ -220,6 +222,7 @@ const DYNAMIC_ROUTES = {
         path: 'money-request/category/:action/:iouType/:transactionID/:reportID/:reportActionID?',
         entryScreens: [
             SCREENS.MONEY_REQUEST.STEP_CONFIRMATION,
+            SCREENS.MONEY_REQUEST.CREATE,
             SCREENS.MONEY_REQUEST.SPLIT_EXPENSE_EDIT,
             SCREENS.REPORT,
             SCREENS.RIGHT_MODAL.EXPENSE_REPORT,
@@ -239,6 +242,7 @@ const DYNAMIC_ROUTES = {
         path: 'money-request/attendees/:action/:iouType/:transactionID/:reportID',
         entryScreens: [
             SCREENS.MONEY_REQUEST.STEP_CONFIRMATION,
+            SCREENS.MONEY_REQUEST.CREATE,
             SCREENS.REPORT,
             SCREENS.RIGHT_MODAL.EXPENSE_REPORT,
             SCREENS.RIGHT_MODAL.SEARCH_REPORT,
