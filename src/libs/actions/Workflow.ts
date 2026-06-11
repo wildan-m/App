@@ -104,7 +104,16 @@ function updateApprovalWorkflow(approvalWorkflow: ApprovalWorkflow, membersToRem
 
     const previousDefaultApprover = getDefaultApprover(policy);
     const newDefaultApprover = approvalWorkflow.isDefault ? approvalWorkflow.approvers.at(0)?.email : undefined;
-    const previousEmployeeList = Object.fromEntries(Object.entries(policy.employeeList ?? {}).map(([key, value]) => [key, {...value, pendingAction: null}]));
+    // Reset every employee's pending action for the optimistic baseline, but preserve an in-flight
+    // DELETE (e.g. an agent deleted offline that is still an approver here). Erasing it would let the
+    // workflow save re-assert the agent as a normal employee, leaving a stale workflow and colliding
+    // with the queued DELETE_AGENT on reconnect.
+    const previousEmployeeList = Object.fromEntries(
+        Object.entries(policy.employeeList ?? {}).map(([key, value]) => [
+            key,
+            {...value, pendingAction: value.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? value.pendingAction : null},
+        ]),
+    );
     const updatedEmployees = convertApprovalWorkflowToPolicyEmployees({
         previousEmployeeList,
         approvalWorkflow,
