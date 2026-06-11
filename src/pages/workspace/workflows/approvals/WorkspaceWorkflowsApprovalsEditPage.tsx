@@ -24,6 +24,7 @@ import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import withPolicyAndFullscreenLoading from '@pages/workspace/withPolicyAndFullscreenLoading';
 import type {WithPolicyAndFullscreenLoadingProps} from '@pages/workspace/withPolicyAndFullscreenLoading';
 import {
+    buildDeferredAgentWorkflowSaveKey,
     clearApprovalWorkflow,
     queueDeferredAgentWorkflowSave,
     removeApprovalWorkflow,
@@ -52,6 +53,7 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
     const isLoadingApprovalWorkflow = isLoadingOnyxValue(approvalWorkflowMetadata);
     const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
     const [optimisticAgentAccountIDMapping] = useOnyx(ONYXKEYS.OPTIMISTIC_AGENT_ACCOUNT_ID_MAPPING);
+    const [deferredAgentWorkflowSaves] = useOnyx(ONYXKEYS.DEFERRED_AGENT_WORKFLOW_SAVES);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [initialApprovalWorkflow, setInitialApprovalWorkflow] = useState<ApprovalWorkflow | undefined>();
     const formRef = useRef<ScrollView>(null);
@@ -141,10 +143,35 @@ function WorkspaceWorkflowsApprovalsEditPage({policy, isLoadingReportData = true
             currentUserLogin: currentUserPersonalDetails?.login,
         });
 
+        const matchedWorkflow = result.approvalWorkflows.find((workflow) => workflow.approvers.at(0)?.email === firstApprover);
+
+        // Overlay any deferred agent workflow save on top of the server-derived workflow, mirroring
+        // `useDeferredAgentWorkflowReconciliation` on the Workflows page. When the admin saved this
+        // page while a freshly-created agent's CREATE_AGENT was still pending (e.g. offline), the edit
+        // was stashed in `DEFERRED_AGENT_WORKFLOW_SAVES` instead of being pushed to the server — so the
+        // matched workflow above still carries the previous approver. Without this overlay the RHP shows
+        // that stale previous approver while the Workflows page (which applies the same overlay) shows
+        // the pending agent: the asymmetry reported in this bug.
+        const deferredEntry = matchedWorkflow ? deferredAgentWorkflowSaves?.[buildDeferredAgentWorkflowSaveKey(route.params.policyID, firstApprover)] : undefined;
+        const addAgentErrors = policy.errorFields?.[CONST.POLICY.COLLECTION_KEYS.ADD_AGENT];
+        const currentApprovalWorkflow =
+            matchedWorkflow && deferredEntry
+                ? {
+                      ...matchedWorkflow,
+                      approvers: deferredEntry.approvalWorkflow.approvers
+                          .filter((approver): approver is NonNullable<typeof approver> => !!approver)
+                          .map((approver) =>
+                              addAgentErrors && approver.accountID === deferredEntry.pendingAgentAccountID && approver.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD
+                                  ? {...approver, errors: addAgentErrors}
+                                  : approver,
+                          ),
+                  }
+                : matchedWorkflow;
+
         return {
             defaultWorkflowMembers: result.availableMembers,
             usedApproverEmails: result.usedApproverEmails,
-            currentApprovalWorkflow: result.approvalWorkflows.find((workflow) => workflow.approvers.at(0)?.email === firstApprover),
+            currentApprovalWorkflow,
         };
     };
 
