@@ -34,12 +34,29 @@ type ClearApprovalWorkflowApproverParams = {
     currentApprovalWorkflow: ApprovalWorkflowOnyx | undefined;
 };
 
+/**
+ * Build the "previous" employee list used to diff against the edited approval workflow. ADD/UPDATE
+ * pending actions are cleared so genuine field changes are detected, but a DELETE pending action is
+ * preserved: an employee deleted offline (e.g. an agent) must stay flagged for deletion through the
+ * workflow edit. Otherwise the DELETE-preservation guards in convertApprovalWorkflowToPolicyEmployees
+ * treat it as a new employee and downgrade it to UPDATE, resurfacing the deleted agent as a
+ * greyed-out workflow.
+ */
+function buildPreviousEmployeeList(policy: Policy) {
+    return Object.fromEntries(
+        Object.entries(policy.employeeList ?? {}).map(([key, value]) => [
+            key,
+            {...value, pendingAction: value.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? value.pendingAction : null},
+        ]),
+    );
+}
+
 function createApprovalWorkflow({approvalWorkflow, policy, addExpenseApprovalsTaskReport}: CreateApprovalWorkflowParams) {
     if (!policy) {
         return;
     }
 
-    const previousEmployeeList = Object.fromEntries(Object.entries(policy.employeeList ?? {}).map(([key, value]) => [key, {...value, pendingAction: null}]));
+    const previousEmployeeList = buildPreviousEmployeeList(policy);
     const previousApprovalMode = policy.approvalMode;
     const updatedEmployees = convertApprovalWorkflowToPolicyEmployees({previousEmployeeList, approvalWorkflow, type: CONST.APPROVAL_WORKFLOW.TYPE.CREATE});
 
@@ -104,7 +121,7 @@ function updateApprovalWorkflow(approvalWorkflow: ApprovalWorkflow, membersToRem
 
     const previousDefaultApprover = getDefaultApprover(policy);
     const newDefaultApprover = approvalWorkflow.isDefault ? approvalWorkflow.approvers.at(0)?.email : undefined;
-    const previousEmployeeList = Object.fromEntries(Object.entries(policy.employeeList ?? {}).map(([key, value]) => [key, {...value, pendingAction: null}]));
+    const previousEmployeeList = buildPreviousEmployeeList(policy);
     const updatedEmployees = convertApprovalWorkflowToPolicyEmployees({
         previousEmployeeList,
         approvalWorkflow,
@@ -208,7 +225,7 @@ function removeApprovalWorkflow(approvalWorkflow: ApprovalWorkflow, policy: Onyx
         return;
     }
 
-    const previousEmployeeList = Object.fromEntries(Object.entries(policy.employeeList ?? {}).map(([key, value]) => [key, {...value, pendingAction: null}]));
+    const previousEmployeeList = buildPreviousEmployeeList(policy);
     const updatedEmployees = convertApprovalWorkflowToPolicyEmployees({previousEmployeeList, approvalWorkflow, type: CONST.APPROVAL_WORKFLOW.TYPE.REMOVE});
     // Deep merge at the employee level to preserve fields not included in updatedEmployees (e.g., overLimitForwardsTo)
     const mergedEmployeeList = Object.fromEntries(Object.keys({...previousEmployeeList, ...updatedEmployees}).map((key) => [key, {...previousEmployeeList[key], ...updatedEmployees[key]}]));

@@ -415,10 +415,13 @@ function convertApprovalWorkflowToPolicyEmployees({
     // which will set the submitsTo field to the default approver email on backend.
     if (membersToRemove) {
         for (const {email} of membersToRemove) {
+            // Preserve an in-flight DELETE so an employee deleted offline (e.g. an agent) isn't
+            // downgraded to ADD/UPDATE and resurfaced as a greyed-out workflow.
+            const previousPendingAction = previousEmployeeList[email]?.pendingAction;
             updatedEmployeeList[email] = {
                 ...(updatedEmployeeList[email] ? updatedEmployeeList[email] : {email}),
                 submitsTo: defaultApprover,
-                pendingAction,
+                pendingAction: previousPendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? previousPendingAction : pendingAction,
             };
         }
     }
@@ -427,10 +430,13 @@ function convertApprovalWorkflowToPolicyEmployees({
     // which will reset the forwardsTo on the backend.
     if (approversToRemove) {
         for (const {email} of approversToRemove) {
+            // Preserve an in-flight DELETE so an approver deleted offline (e.g. an agent) isn't
+            // downgraded to ADD/UPDATE and resurfaced as a greyed-out workflow.
+            const previousPendingAction = previousEmployeeList[email]?.pendingAction;
             updatedEmployeeList[email] = {
                 ...(updatedEmployeeList[email] ? updatedEmployeeList[email] : {email}),
                 forwardsTo: '',
-                pendingAction,
+                pendingAction: previousPendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE ? previousPendingAction : pendingAction,
             };
         }
     }
