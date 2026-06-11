@@ -1,0 +1,20 @@
+diff --git a/node_modules/time-analytics-webpack-plugin/dist/loader.js b/node_modules/time-analytics-webpack-plugin/dist/loader.js
+index 7a40d29..7a81942 100644
+--- a/node_modules/time-analytics-webpack-plugin/dist/loader.js
++++ b/node_modules/time-analytics-webpack-plugin/dist/loader.js
+@@ -57,9 +57,13 @@ function hackWrapLoaderModule(loaderPaths, wrapLoaderModuleCallback) {
+     // TODO: check whether thread-loader works for this case or not
+     Module.prototype.require = wrapRequire(originModuleRequire);
+ }
+-const loader = function timeAnalyticHackLoader(source) {
++const loader = function timeAnalyticHackLoader(source, sourceMap, meta) {
+     // console.log('Time analytics plugin: normal loader is executed');
+-    return source;
++    // Forward the source map and meta untouched. This pass-through loader is
++    // injected at the front of every rule.use, so it runs last in the normal
++    // phase; returning only `source` would discard the source map produced by
++    // the upstream loaders (e.g. babel-loader) and break devtools sourcemaps.
++    this.callback(null, source, sourceMap, meta);
+ };
+ /**
+  * Override `require` method, so that we could return a wrapped loader function.
