@@ -219,11 +219,26 @@ function DynamicIOURequestStepUpgradePage({
                 }
 
                 break;
-            case CONST.UPGRADE_PATHS.CATEGORIES:
+            case CONST.UPGRADE_PATHS.CATEGORIES: {
                 Navigation.goBack(backPath);
-                navigateWithMicrotask(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, CONST.IOU.TYPE.SUBMIT, transactionID, reportID)));
+
+                // Re-anchor the transaction and route to the newly-created workspace's expense chat so the
+                // Category step can resolve the new policy. Without this the page stays on the self-DM report
+                // (which has no policyID), categories never load, and the list spins forever. Mirrors the
+                // DISTANCE_RATES branch above.
+                if (shouldSubmitExpense) {
+                    setTransactionReport(transactionID, {reportID: expenseReportID}, true);
+                    Navigation.setParams({reportID: expenseReportID});
+                }
+
+                navigateWithMicrotask(
+                    createDynamicRoute(
+                        DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, CONST.IOU.TYPE.SUBMIT, transactionID, shouldSubmitExpense ? expenseReportID : reportID),
+                    ),
+                );
 
                 break;
+            }
             default:
                 Navigation.goBack(backPath);
         }
