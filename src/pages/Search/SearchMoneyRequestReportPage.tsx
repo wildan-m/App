@@ -307,6 +307,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
     }, [reportTransactions, shouldUseSnapshotTransaction, snapshotTransaction?.pendingAction]);
     const hasAnyTransactions = reportTransactions.length > 0 || shouldUseSnapshotTransaction;
     const wereAllTransactionsDeleted = useMemo(() => hasAnyTransactions && activeTransactionsCount === 0, [hasAnyTransactions, activeTransactionsCount]);
+    const isReportBeingCreatedOptimistically = report?.pendingFields?.createReport === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
 
     const shouldShowAccessErrorPage = useMemo((): boolean => {
         if (isLoadingApp !== false) {
@@ -321,7 +322,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
             return true;
         }
 
-        if (isReportPendingDeletion || wereAllTransactionsDeleted || wasParentActionDeleted || isThreadReportDeletedForReview) {
+        if (isReportPendingDeletion || wereAllTransactionsDeleted || (wasParentActionDeleted && !isReportBeingCreatedOptimistically) || isThreadReportDeletedForReview) {
             return true;
         }
 
@@ -338,6 +339,7 @@ function SearchMoneyRequestReportPage({route}: SearchMoneyRequestPageProps) {
         hasAnyTransactions,
         deleteTransactionNavigateBackUrl,
         wasParentActionDeleted,
+        isReportBeingCreatedOptimistically,
         isThreadReportDeletedForReview,
     ]);
 
