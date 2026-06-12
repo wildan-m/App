@@ -83,6 +83,9 @@ type FirstRowReportHeaderProps<TItem extends ListItem> = {
     /** Callback passed as goToItem in actionCell, triggered by clicking actionButton */
     handleOnButtonPress?: (event?: ModifiedMouseEvent) => void;
 
+    /** The hash of the current search, used by the pay action to update the search snapshot */
+    hash?: number;
+
     /** Color of the secondary avatar border, usually should match the container background */
     avatarBorderColor?: ColorValue;
 
@@ -114,6 +117,7 @@ function HeaderFirstRow<TItem extends ListItem>({
     onDownArrowClick,
     isExpanded,
     chatReport,
+    hash,
 }: FirstRowReportHeaderProps<TItem>) {
     const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const styles = useThemeStyles();
@@ -192,7 +196,7 @@ function HeaderFirstRow<TItem extends ListItem>({
                         isLoading={isActionLoading}
                         policyID={reportItem.policyID}
                         reportID={reportItem.reportID}
-                        hash={reportItem.hash}
+                        hash={hash}
                         amount={reportItem.total}
                         extraSmall={!isLargeScreenWidth}
                         chatReport={chatReport}
@@ -302,6 +306,7 @@ function ReportListItemHeader<TItem extends ListItem>({
                 isIndeterminate={isIndeterminate}
                 onDownArrowClick={onDownArrowClick}
                 isExpanded={isExpanded}
+                hash={currentSearchHash}
             />
         </View>
     ) : (
@@ -318,6 +323,7 @@ function ReportListItemHeader<TItem extends ListItem>({
                 onDownArrowClick={onDownArrowClick}
                 isExpanded={isExpanded}
                 chatReport={chatReport}
+                hash={currentSearchHash}
             />
         </View>
     );
