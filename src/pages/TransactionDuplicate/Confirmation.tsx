@@ -109,9 +109,20 @@ function Confirmation() {
         // the kept transaction's report so the user doesn't land on the discarded one.
         const keptReportRoute = ROUTES.REPORT_WITH_ID.getRoute(mergeParams.reportID);
         setDeleteTransactionNavigateBackUrl(keptReportRoute);
+        // The merge soft-deletes the discarded duplicates' transaction threads. Capture their
+        // stack screens before navigating so we can drop them afterwards; otherwise the browser
+        // back button lands on a now-deleted report and renders the "Not here" page. Mirrors the
+        // single-transaction delete flow in SplitTransactionUpdate.updateSplitTransactions.
+        const discardedThreadScreenKeys = Object.values(transactionThreadReportIDMap)
+            .map((threadReportID) => Navigation.getReportRouteByID(threadReportID)?.key)
+            .filter((key): key is string => !!key);
         mergeDuplicates({...mergeParams, ...taxData, currentUserAccountID, currentUserLogin: currentUserLogin ?? ''});
+        const removeDiscardedThreadScreens = () => {
+            discardedThreadScreenKeys.forEach((key) => Navigation.removeScreenByKey(key));
+        };
         if (isSuperWideRHPDisplayed) {
             Navigation.dismissToSuperWideRHP();
+            requestAnimationFrame(removeDiscardedThreadScreens);
             return;
         }
         const topmostReportID = Navigation.getTopmostReportId?.();
@@ -120,7 +131,8 @@ function Confirmation() {
         } else {
             Navigation.goBack(keptReportRoute);
         }
-    }, [childReportID, transactionsMergeParams, taxData, currentUserAccountID, currentUserLogin, isSuperWideRHPDisplayed]);
+        requestAnimationFrame(removeDiscardedThreadScreens);
+    }, [childReportID, transactionsMergeParams, taxData, currentUserAccountID, currentUserLogin, isSuperWideRHPDisplayed, transactionThreadReportIDMap]);
 
     const handleResolveDuplicates = useCallback(() => {
         resolveDuplicates({...transactionsMergeParams, ...taxData, transactionThreadReportIDMap});
