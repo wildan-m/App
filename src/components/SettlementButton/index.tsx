@@ -101,6 +101,7 @@ function SettlementButton({
     wrapperStyle,
     shouldUseShortForm = false,
     hasOnlyHeldExpenses = false,
+    shouldUseMarkAsDoneCopy = false,
     sentryLabel,
 }: SettlementButtonProps) {
     const icons = useMemoizedLazyExpensifyIcons(['CheckCircle', 'ThumbsUp', 'Bank', 'Cash', 'Wallet', 'Building', 'User']);
@@ -588,7 +589,9 @@ function SettlementButton({
     };
 
     let customText: string;
-    if (shouldUseShortForm) {
+    if (shouldUseMarkAsDoneCopy) {
+        customText = translate('common.markAsDone');
+    } else if (shouldUseShortForm) {
         customText = translate('iou.pay');
     } else if (lastPaymentMethod === CONST.IOU.PAYMENT_TYPE.ELSEWHERE) {
         customText = translate('iou.payElsewhere', formattedAmount);

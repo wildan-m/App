@@ -1,5 +1,5 @@
 import {delegateEmailSelector} from '@selectors/Account';
-import {hasSeenTourSelector} from '@selectors/Onboarding';
+import {hasSeenTourSelector, isTrackIntentUserSelector} from '@selectors/Onboarding';
 import React from 'react';
 import type {ValueOf} from 'type-fest';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
@@ -22,6 +22,7 @@ import {
     hasUpdatedTotal,
     hasViolations as hasViolationsReportUtils,
     isInvoiceReport as isInvoiceReportUtils,
+    shouldShowMarkAsDone,
 } from '@libs/ReportUtils';
 import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
 import {approveMoneyRequest, canIOUBePaid as canIOUBePaidIOUActions} from '@userActions/IOU/ReportWorkflow';
@@ -85,6 +86,7 @@ function PayActionButton({
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
@@ -133,6 +135,7 @@ function PayActionButton({
     const canIOUBePaidAndApproved = canIOUBePaid;
 
     const formattedAmount = getTotalAmountForIOUReportPreviewButton(iouReport, policy, reportPreviewAction, transactions, convertToDisplayString);
+    const shouldUseMarkAsDoneCopy = shouldShowMarkAsDone({isTrackIntentUser, report: iouReport, policy});
 
     const confirmApproval = () => {
         if (isDelegateAccessRestricted) {
@@ -241,6 +244,7 @@ function PayActionButton({
             }}
             isDisabled={isOffline && !canAllowSettlement}
             isLoading={!isOffline && !canAllowSettlement}
+            shouldUseMarkAsDoneCopy={shouldUseMarkAsDoneCopy}
             sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.PAY_BUTTON}
         />
     );

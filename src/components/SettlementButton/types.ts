@@ -112,6 +112,9 @@ type SettlementButtonProps = WithSentryLabel & {
 
     /** Whether we the report has only held expenses */
     hasOnlyHeldExpenses?: boolean;
+
+    /** Whether the button should display the "Mark as done" copy instead of the default Pay copy (track-intent, submit-and-close, self-owned reports) */
+    shouldUseMarkAsDoneCopy?: boolean;
 };
 
 export default SettlementButtonProps;
