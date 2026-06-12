@@ -346,7 +346,7 @@ function convertToDistanceInMeters(distance: number, unit: Unit): number {
  * A rate is eligible if the date falls within its startDate/endDate bounds (inclusive).
  * Missing bounds mean unbounded in that direction.
  */
-function isRateEligibleForDate(rate: MileageRate, expenseDate: string): boolean {
+function isRateEligibleForDate(rate: Pick<MileageRate, 'startDate' | 'endDate'>, expenseDate: string): boolean {
     if (rate.startDate && expenseDate < rate.startDate) {
         return false;
     }

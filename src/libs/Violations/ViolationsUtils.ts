@@ -487,7 +487,10 @@ const ViolationsUtils = {
         if (customUnitRateID && customUnitRateID.length > 0 && !isSelfDM) {
             const isPerDiem = TransactionUtils.isPerDiemRequest(updatedTransaction);
             const customRate = isPerDiem ? getPerDiemRateCustomUnitRate(policy, customUnitRateID) : getDistanceRateCustomUnitRate(policy, customUnitRateID);
-            if (customRate && customRate.enabled !== false) {
+            // Per-diem rates carry no date bounds, so only distance rates need the date-eligibility check.
+            const expenseDate = updatedTransaction.modifiedCreated ?? updatedTransaction.created;
+            const isRateEligibleForExpenseDate = isPerDiem || (!!customRate && DistanceRequestUtils.isRateEligibleForDate(customRate, expenseDate));
+            if (customRate && customRate.enabled !== false && isRateEligibleForExpenseDate) {
                 newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY});
             } else {
                 newTransactionViolations.push({
