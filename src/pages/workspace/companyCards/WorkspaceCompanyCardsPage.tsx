@@ -40,6 +40,7 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         feedName,
         selectedFeed,
         bankName,
+        companyCardEntries,
         isFeedPending,
         isFeedAdded,
         onyxMetadata: {cardListMetadata},
@@ -75,6 +76,8 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
         loadPolicyCompanyCardsPage();
     }, [loadPolicyCompanyCardsPage, isOffline, hasFeedsLoaded]);
 
+    const hasCards = (companyCardEntries ?? []).length > 0;
+
     const loadPolicyCompanyCardsFeed = useCallback(() => {
         if (isLoading || !bankName || isFeedPending || isOffline) {
             return;
@@ -84,8 +87,17 @@ function WorkspaceCompanyCardsPage({route}: WorkspaceCompanyCardsPageProps) {
     }, [bankName, domainOrWorkspaceAccountID, isFeedPending, isLoading, policyID, translate, isOffline]);
 
     useEffect(() => {
+        // Skip the per-feed card list fetch when the selected feed's cards are already cached.
+        // Without this guard the effect re-fires on every mount (e.g. navigating away and back),
+        // re-running openPolicyCompanyCardsFeed and re-flashing the skeleton loader. This mirrors
+        // the hasFeedsLoaded guard above. The guard lives in the effect, not in the callback, so
+        // the manual "Try again" reload path (onReloadFeed) can still force a refresh on demand.
+        if (hasCards) {
+            return;
+        }
+
         loadPolicyCompanyCardsFeed();
-    }, [loadPolicyCompanyCardsFeed]);
+    }, [loadPolicyCompanyCardsFeed, hasCards]);
 
     const [shouldShowOfflineModal, setShouldShowOfflineModal] = useState(false);
     const {assignCard, isAssigningCardDisabled} = useAssignCard({feedName, policyID, setShouldShowOfflineModal});
