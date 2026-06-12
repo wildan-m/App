@@ -6480,7 +6480,11 @@ function getExpenseReportStateAndStatus(policy: OnyxEntry<Policy>, betas: OnyxEn
     const isSubmitAndCloseLocal = isSubmitAndClose(policy);
     const arePaymentsDisabled = policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO;
 
-    if (isInstantSubmitEnabledLocal && arePaymentsDisabled && isSubmitAndCloseLocal && !isEmptyOptimisticReport) {
+    // Submit & close with payments disabled means there is no approver and no payment step, so a non-empty report has
+    // nowhere further to go and the backend immediately closes it. Mark it closed/done optimistically regardless of
+    // instant submit, otherwise disabling workflows (which also sets autoReporting: false) leaves the offline preview
+    // stuck on "Draft" while online correctly shows "Done".
+    if (arePaymentsDisabled && isSubmitAndCloseLocal && !isEmptyOptimisticReport) {
         return {
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
