@@ -1315,7 +1315,25 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             const includeReportLevelExport = ((isExpenseReportType || typeInvoice) && areFullReportsSelected) || (typeExpense && !isExpenseReportType && isAllOneTransactionReport);
 
             const policy = selectedPolicyIDs.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${selectedPolicyIDs.at(0)}`] : undefined;
-            const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, policy, includeReportLevelExport);
+
+            // Account-level and integration export templates (plus the standard expense/report-level templates).
+            const accountAndIntegrationTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, undefined, includeReportLevelExport);
+
+            // Policy-level in-app templates from every selected workspace, so custom workspace templates (e.g. "Default CSV")
+            // still appear when the selected reports span more than one workspace.
+            const policyLevelTemplates = selectedPolicyIDs
+                .map((policyID) => policies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`])
+                .filter(Boolean)
+                .flatMap((selectedPolicy) => getExportTemplates([], {}, translate, selectedPolicy, false));
+
+            // De-duplicate the combined list by template name (account/integration templates take precedence).
+            const exportTemplatesByName = new Map<string, (typeof accountAndIntegrationTemplates)[number]>();
+            for (const template of [...accountAndIntegrationTemplates, ...policyLevelTemplates]) {
+                if (template.templateName && !exportTemplatesByName.has(template.templateName)) {
+                    exportTemplatesByName.set(template.templateName, template);
+                }
+            }
+            const exportTemplates = Array.from(exportTemplatesByName.values());
 
             const exportOptions: PopoverMenuItem[] = [];
 
