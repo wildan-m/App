@@ -3,7 +3,6 @@ import React from 'react';
 import {View} from 'react-native';
 import Badge from '@components/Badge';
 import Button from '@components/Button';
-import CustomListHeader from '@components/SelectionListWithModal/CustomListHeader';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDomainDocumentTitle from '@hooks/useDomainDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -66,13 +65,6 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
         pendingAction: domainPendingAction?.[accountID]?.pendingAction,
     });
 
-    const getCustomListHeader = () => (
-        <CustomListHeader
-            canSelectMultiple={false}
-            leftHeaderText={translate('domain.admins.title')}
-        />
-    );
-
     const hasSettingsErrors = hasDomainAdminsSettingsErrors(domainErrors);
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
@@ -103,10 +95,10 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
             domainAccountID={domainAccountID}
             accountIDs={adminAccountIDs ?? []}
             headerTitle={translate('domain.admins.title')}
+            memberColumnLabel={translate('domain.admins.title')}
             searchPlaceholder={translate('domain.admins.findAdmin')}
             headerIcon={illustrations.UserShield}
             headerContent={headerContent}
-            getCustomListHeader={getCustomListHeader}
             getCustomRightElement={getCustomRightElement}
             getCustomRowProps={getCustomRowProps}
             onDismissError={(item) => clearAdminError(domainAccountID, item.accountID)}

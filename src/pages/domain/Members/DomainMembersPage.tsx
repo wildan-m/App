@@ -15,7 +15,6 @@ import DropdownButton from '@components/Search/FilterDropdowns/DropdownButton';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/FilterPopupButton';
 import SingleSelectPopup from '@components/Search/FilterDropdowns/SingleSelectPopup';
 import SectionSubtitleHTML from '@components/SectionSubtitleHTML';
-import CustomListHeader from '@components/SelectionListWithModal/CustomListHeader';
 import Text from '@components/Text';
 import useClearSelectedDomainMembersOnMoveComplete from '@hooks/useClearSelectedDomainMembersOnMoveComplete';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -133,18 +132,6 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         return <Text style={styles.flex1}>{group?.details.name ?? '-'}</Text>;
     };
 
-    const getCustomListHeader = () => {
-        return (
-            <CustomListHeader
-                canSelectMultiple={canSelectMultiple}
-                leftHeaderText={translate('domain.members.title')}
-                rightHeaderText={translate('common.group')}
-                shouldDivideEqualWidth
-                shouldShowRightCaret
-                shouldAdjustWidthForAvatar
-            />
-        );
-    };
     useClearSelectedDomainMembersOnMoveComplete(clearSelectedMembers);
 
     useSearchBackPress({
@@ -355,7 +342,8 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 accountIDs={memberIDs ?? []}
                 preFilter={groupPreFilter}
                 headerTitle={translate('domain.members.title')}
-                getCustomListHeader={getCustomListHeader}
+                memberColumnLabel={translate('domain.members.title')}
+                groupColumnLabel={translate('common.group')}
                 searchPlaceholder={translate('domain.members.findMember')}
                 onSelectRow={(item) => Navigation.navigate(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, item.accountID))}
                 headerIcon={illustrations.Profile}
@@ -369,7 +357,6 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 searchBarAccessory={groupFilterDropdown}
                 emptyStateTitle={translate('domain.members.emptyMembers.title')}
                 emptyStateSubtitle={translate('domain.members.emptyMembers.subtitle')}
-                turnOnSelectionModeOnLongPress
                 onBackButtonPress={() => {
                     if (isMobileSelectionModeEnabled) {
                         clearSelectedMembers();
