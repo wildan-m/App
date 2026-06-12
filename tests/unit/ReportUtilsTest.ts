@@ -12775,6 +12775,36 @@ describe('ReportUtils', () => {
             // Then the report name should be the default expense report name
             expect(expenseReport.reportName).toBe(CONST.REPORT.DEFAULT_EXPENSE_REPORT_NAME);
         });
+
+        it('should optimistically mark a submit & close report with payments disabled as done even when instant submit is off', async () => {
+            // Given a workspace with approvals and payments disabled. Disabling workflows turns off instant submit
+            // (autoReporting: false) while setting submit & close (approvalMode: OPTIONAL) and payments disabled
+            // (reimbursementChoice: REIMBURSEMENT_NO).
+            const policyID = '93371';
+            const chatReportID = '933710';
+            const workflowsDisabledPolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                autoReporting: false,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.OPTIONAL,
+                reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO,
+            };
+            const reportDraft: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                policyID,
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, workflowsDisabledPolicy);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_DRAFT}${chatReportID}`, reportDraft);
+            await waitForBatchedUpdates();
+
+            // When a non-empty expense report is optimistically created offline (without the ASAP submit beta)
+            const expenseReport = buildOptimisticExpenseReport({chatReportID, policyID, payeeAccountID: 1, total: 100, currency: CONST.CURRENCY.USD, betas: []});
+
+            // Then the report is optimistically closed/done, matching the online backend result instead of being stuck on Draft/Open
+            expect(expenseReport.stateNum).toBe(CONST.REPORT.STATE_NUM.APPROVED);
+            expect(expenseReport.statusNum).toBe(CONST.REPORT.STATUS_NUM.CLOSED);
+        });
     });
 
     describe('hasEmptyReportsForPolicy', () => {
