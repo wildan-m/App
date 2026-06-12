@@ -126,7 +126,7 @@ type WorkspaceMemberFilterOption = SingleSelectItem<WorkspaceMemberFilterValue>;
 function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembersPageProps) {
     useWorkspaceDocumentTitle(policy?.name, 'common.members');
     const icons = useMemoizedLazyExpensifyIcons(['Download', 'FallbackAvatar', 'MakeAdmin', 'Plus', 'RemoveMembers', 'Sync', 'Table', 'User', 'UserEye']);
-    const policyMemberEmailsToAccountIDs = useMemo(() => getMemberAccountIDsForWorkspace(policy?.employeeList, true), [policy?.employeeList]);
+    const policyMemberEmailsToAccountIDs = useMemo(() => getMemberAccountIDsForWorkspace(policy?.employeeList, true), [policy?.employeeList, personalDetails]);
     const employeeListDetails = useMemo(() => policy?.employeeList ?? ({} as PolicyEmployeeList), [policy?.employeeList]);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const styles = useThemeStyles();
