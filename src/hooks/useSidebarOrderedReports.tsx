@@ -317,6 +317,19 @@ function SidebarOrderedReportsContextProvider({
         return orderedReportIDs.filter((reportID) => baseSet.has(reportID) || reportID === stickyReportID);
     }, [orderedReportIDs, reportsToDisplayInLHN, activeTab, stickyReportTab, stickyReportID]);
 
+    // Once the user moves off the sticky report, stop pinning it. On a narrow layout, opening a report
+    // from the Unread/To-do tab makes it the focused report; pressing back returns to the LHN and the
+    // focused report is cleared. Detecting that "was focused, now isn't" transition lets us drop the
+    // (now read) report from the tab immediately, instead of leaving it pinned until the next tab switch.
+    // The transition guard (rather than simply "no report is focused") is what keeps it pinned during the
+    // brief window while the report is still opening and has not yet become the focused report.
+    useEffect(() => {
+        if (!stickyReportID || prevDerivedCurrentReportID !== stickyReportID || derivedCurrentReportID === stickyReportID) {
+            return;
+        }
+        setStickyReport(undefined);
+    }, [stickyReportID, derivedCurrentReportID, prevDerivedCurrentReportID]);
+
     // The count shown in each tab's badge, derived from the full "All" set (not the currently filtered view).
     const inboxTabCounts = useMemo(() => SidebarUtils.getInboxTabCounts(orderedReportIDs, reportsToDisplayInLHN), [orderedReportIDs, reportsToDisplayInLHN]);
 
