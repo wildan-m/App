@@ -1,6 +1,7 @@
 import {isConnectionInProgress} from '@libs/actions/connections';
 import {shouldShowQBOReimbursableExportDestinationAccountError} from '@libs/actions/connections/QuickbooksOnline';
 import {hasDomainErrors} from '@libs/DomainUtils';
+import {isMergeHRCompleteSetupNeeded} from '@libs/HRUtils';
 import {getUberConnectionErrorDirectlyFromPolicy, shouldShowCustomUnitsError, shouldShowEmployeeListError, shouldShowPolicyError, shouldShowSyncError} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -12,6 +13,7 @@ import usePoliciesWithCardFeedErrors from './usePoliciesWithCardFeedErrors';
 type PolicyIndicatorChecksResult = {
     policyStatus: IndicatorStatus | undefined;
     domainStatus: IndicatorStatus | undefined;
+    infoStatus: IndicatorStatus | undefined;
     policyIDWithErrors: string | undefined;
 };
 
@@ -41,14 +43,20 @@ function usePolicyIndicatorChecks(): PolicyIndicatorChecksResult {
         [CONST.INDICATOR_STATUS.HAS_DOMAIN_ERRORS]: Object.values(allDomainErrors ?? {}).some((domainErrors) => hasDomainErrors(domainErrors)),
     };
 
+    const infoChecks: Partial<Record<IndicatorStatus, Policy | undefined>> = {
+        [CONST.INDICATOR_STATUS.HAS_MERGE_HR_COMPLETE_SETUP]: cleanPolicies.find(isMergeHRCompleteSetupNeeded),
+    };
+
     const [policyStatus] = Object.entries(policyChecks).find(([, value]) => value) ?? [];
     const [domainStatus] = Object.entries(domainChecks).find(([, value]) => value) ?? [];
+    const [infoStatus] = Object.entries(infoChecks).find(([, value]) => value) ?? [];
 
     const policyIDWithErrors = Object.values(policyChecks).find(Boolean)?.id;
 
     return {
         policyStatus: policyStatus as IndicatorStatus | undefined,
         domainStatus: domainStatus as IndicatorStatus | undefined,
+        infoStatus: infoStatus as IndicatorStatus | undefined,
         policyIDWithErrors,
     };
 }

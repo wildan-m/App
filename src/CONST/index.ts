@@ -7624,6 +7624,7 @@ const CONST = {
         HAS_DOMAIN_ERRORS: 'hasDomainErrors',
         HAS_LOCKED_BANK_ACCOUNT: 'hasLockedBankAccount',
         HAS_DEVICE_MANAGEMENT_ERROR: 'hasDeviceManagementError',
+        HAS_MERGE_HR_COMPLETE_SETUP: 'hasMergeHRCompleteSetup',
     },
 
     DEBUG: {
