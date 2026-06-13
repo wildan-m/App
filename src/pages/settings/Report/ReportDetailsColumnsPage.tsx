@@ -54,7 +54,7 @@ function ReportDetailsColumnsPage() {
     const [reportTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {selector: reportTransactionsSelector}, [reportTransactionsSelector]);
     const currentUserDetails = useCurrentUserPersonalDetails();
 
-    const allTypeCustomColumns = Object.values(CONST.SEARCH.REPORT_DETAILS_CUSTOM_COLUMNS) as SearchCustomColumnIds[];
+    const allTypeCustomColumns = [...CONST.SEARCH.REPORT_DETAILS_CUSTOM_COLUMNS] as SearchCustomColumnIds[];
 
     // Wait for transactions to load before rendering. ColumnsSettingsList snapshots
     // currentColumns in useState on mount and does not sync prop updates, so we must

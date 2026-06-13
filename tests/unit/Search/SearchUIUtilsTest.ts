@@ -9112,7 +9112,7 @@ describe('SearchUIUtils', () => {
     describe('Test getCustomColumns', () => {
         it('should return custom columns for EXPENSE type', () => {
             const columns = SearchUIUtils.getCustomColumns(CONST.SEARCH.DATA_TYPES.EXPENSE);
-            expect(columns).toEqual(Object.values(CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE));
+            expect(columns).toEqual([...CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE]);
         });
 
         it('should return custom columns for CATEGORY groupBy', () => {

@@ -4185,7 +4185,7 @@ function isSearchResultsEmpty(searchResults: SearchResults, groupBy?: SearchGrou
 function getCustomColumns(value?: SearchDataTypes | SearchGroupBy): SearchCustomColumnIds[] {
     switch (value) {
         case CONST.SEARCH.DATA_TYPES.EXPENSE:
-            return Object.values(CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE);
+            return [...CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE];
         case CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT:
             return Object.values(CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE_REPORT);
         case CONST.SEARCH.DATA_TYPES.INVOICE:
@@ -5710,7 +5710,7 @@ function getColumnsToShow({
           };
 
     // If the user has set custom columns for the search, we need to respect their preference and order
-    const allowedColumns: string[] = isExpenseReportView ? Object.values(CONST.SEARCH.REPORT_DETAILS_CUSTOM_COLUMNS) : Object.values(CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE);
+    const allowedColumns: string[] = isExpenseReportView ? [...CONST.SEARCH.REPORT_DETAILS_CUSTOM_COLUMNS] : [...CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE];
     const filteredVisibleColumns = visibleColumns.filter((column) => allowedColumns.includes(column));
     const isDefaultExpenseColumnSelection = arraysEqual(Object.values(CONST.SEARCH.TYPE_DEFAULT_COLUMNS.EXPENSE), filteredVisibleColumns);
     const shouldUseCustomResult = !isDefaultExpenseColumnSelection && filteredVisibleColumns.length > 0;

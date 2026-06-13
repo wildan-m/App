@@ -3075,7 +3075,7 @@ describe('SearchQueryUtils', () => {
         it('should exclude columns from being reset if type is expense', () => {
             const form: Partial<SearchAdvancedFiltersForm> = {
                 type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-                columns: [CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE.DATE, CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE.MERCHANT],
+                columns: [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.MERCHANT],
                 merchant: 'test',
             };
             const result = getAdvancedFiltersToReset(form);
@@ -3088,7 +3088,7 @@ describe('SearchQueryUtils', () => {
         it('should exclude columns from being reset', () => {
             const form: Partial<SearchAdvancedFiltersForm> = {
                 type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
-                columns: [CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE.DATE, CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE.MERCHANT],
+                columns: [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.MERCHANT],
                 merchant: 'test',
             };
             const result = getAdvancedFiltersToReset(form);
