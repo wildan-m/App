@@ -4,6 +4,7 @@ import {createTransactionThreadReport, setOptimisticTransactionThread} from '@li
 import {setActiveTransactionIDs} from '@libs/actions/TransactionThreadNavigation';
 import Navigation from '@libs/Navigation/Navigation';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
+import {isOneTransactionReport} from '@libs/ReportUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Report, ReportAction, Transaction} from '@src/types/onyx';
@@ -48,6 +49,20 @@ function useNavigateToTransactionThread() {
     return ({transactionID, reportActions, report, transaction, siblingTransactionIDs, backTo}: NavigateToTransactionThreadParams) => {
         const iouAction = getIOUActionForTransactionID(reportActions, transactionID);
         const resolvedBackTo = backTo ?? Navigation.getActiveRoute();
+
+        // A one-transaction expense report is viewed via the expense report screen (which renders MoneyReportHeader,
+        // showing the report name), not the transaction thread (which renders MoneyRequestHeader, showing the
+        // expense's merchant/amount). Opening the thread here would surface "$X for Merchant" in the header instead
+        // of the report name. We mirror the convention already encoded in replaceOptimisticReportWithActualReport,
+        // where one-transaction expenses are accessed through the one expense report screen.
+        if (report?.reportID && isOneTransactionReport(report)) {
+            setActiveTransactionIDs(siblingTransactionIDs).then(() => {
+                markReportIDAsExpense(report.reportID);
+                Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: report.reportID, backTo: resolvedBackTo}));
+            });
+            return;
+        }
+
         let reportIDToNavigate = iouAction?.childReportID;
 
         const routeParams: {reportID: string | undefined; reportActionID?: string; backTo?: string} = {
