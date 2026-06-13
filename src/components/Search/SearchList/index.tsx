@@ -319,12 +319,26 @@ function SearchList({
             return {splitData: data, stickyHeaderIndices: undefined};
         }
         const {splitData, stickyHeaderIndices: allIndices} = splitGroupsIntoPairs(data);
-        const activeIndices = allIndices.filter((idx) => {
+        // Only expanded groups need a sticky header. We additionally keep the header of the group that
+        // immediately follows each expanded group sticky, so it can push the expanded group's header off the
+        // top once that group's expenses are scrolled away (a pinned header is only released when the next
+        // sticky header replaces it). Adding just this boundary header avoids the jelly scrolling that marking
+        // every collapsed header sticky would reintroduce.
+        const activeIndices = new Set<number>();
+        allIndices.forEach((idx, i) => {
             const item = splitData.at(idx);
             const originalKey = item?.keyForList?.replace('header_', '') ?? '';
-            return expandedGroups.has(originalKey);
+            if (!expandedGroups.has(originalKey)) {
+                return;
+            }
+            activeIndices.add(idx);
+            const nextHeaderIndex = allIndices.at(i + 1);
+            if (nextHeaderIndex !== undefined) {
+                activeIndices.add(nextHeaderIndex);
+            }
         });
-        return {splitData, stickyHeaderIndices: activeIndices.length > 0 ? activeIndices : undefined};
+        const sortedIndices = [...activeIndices].sort((a, b) => a - b);
+        return {splitData, stickyHeaderIndices: sortedIndices.length > 0 ? sortedIndices : undefined};
     }, [data, shouldSplitGroups, expandedGroups]);
 
     const getItemType = useCallback(
