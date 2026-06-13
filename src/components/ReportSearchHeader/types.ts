@@ -13,6 +13,9 @@ type ReportSearchHeaderProps = {
 
     /** Color of the secondary avatar border, usually should match the container background */
     avatarBorderColor?: ColorValue;
+
+    /** Whether the report avatar should be rendered (honors the Avatar column toggle in Edit columns) */
+    shouldShowAvatar?: boolean;
 };
 
 export default ReportSearchHeaderProps;

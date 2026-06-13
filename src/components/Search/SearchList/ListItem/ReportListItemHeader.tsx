@@ -9,6 +9,7 @@ import {PressableWithFeedback} from '@components/Pressable';
 import ReportSearchHeader from '@components/ReportSearchHeader';
 import {useSearchQueryContext, useSearchResultsContext} from '@components/Search/SearchContext';
 import {useRowSelection} from '@components/Search/SearchSelectionProvider';
+import type {SearchColumnType} from '@components/Search/types';
 import type {ListItem} from '@components/SelectionList/types';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -65,11 +66,17 @@ type ReportListItemHeaderProps<TItem extends ListItem> = SearchListActionProps &
 
     /** Whether the item is hovered */
     isHovered?: boolean;
+
+    /** The columns currently visible in the table (used to honor the Avatar/Action toggles in Edit columns) */
+    columns?: SearchColumnType[];
 };
 
 type FirstRowReportHeaderProps<TItem extends ListItem> = {
     /** The report currently being looked at */
     report: TransactionReportGroupListItemType;
+
+    /** The columns currently visible in the table (used to honor the Avatar/Action toggles in Edit columns) */
+    columns?: SearchColumnType[];
 
     /** Callback to fire when a checkbox is pressed */
     onCheckboxPress?: (item: TItem) => void;
@@ -114,6 +121,7 @@ function HeaderFirstRow<TItem extends ListItem>({
     onDownArrowClick,
     isExpanded,
     chatReport,
+    columns,
 }: FirstRowReportHeaderProps<TItem>) {
     const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const styles = useThemeStyles();
@@ -122,6 +130,10 @@ function HeaderFirstRow<TItem extends ListItem>({
     const theme = useTheme();
     const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportItem.reportID}`, {selector: isActionLoadingSelector});
     const {isSelected} = useRowSelection(reportItem.keyForList);
+
+    // Honor the Avatar/Action toggles from Display > Edit columns. When `columns` is undefined (other call sites) default to showing both.
+    const shouldShowAvatar = !columns || columns.includes(CONST.SEARCH.TABLE_COLUMNS.AVATAR);
+    const shouldShowAction = !columns || columns.includes(CONST.SEARCH.TABLE_COLUMNS.ACTION);
 
     let total = reportItem.total ?? 0;
     if (total) {
@@ -154,6 +166,7 @@ function HeaderFirstRow<TItem extends ListItem>({
                         style={[{maxWidth: 700}]}
                         transactions={reportItem.transactions}
                         avatarBorderColor={avatarBorderColor}
+                        shouldShowAvatar={shouldShowAvatar}
                     />
                 </View>
             </View>
@@ -183,7 +196,7 @@ function HeaderFirstRow<TItem extends ListItem>({
                     </View>
                 )}
             </View>
-            {isLargeScreenWidth && (
+            {isLargeScreenWidth && shouldShowAction && (
                 <View style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ACTION)]}>
                     <ActionCell
                         action={reportItem.action}
@@ -219,6 +232,7 @@ function ReportListItemHeader<TItem extends ListItem>({
     personalPolicyID,
     userBillingGracePeriodEnds,
     ownerBillingGracePeriodEnd,
+    columns,
 }: ReportListItemHeaderProps<TItem>) {
     const StyleUtils = useStyleUtils();
     const styles = useThemeStyles();
@@ -302,6 +316,7 @@ function ReportListItemHeader<TItem extends ListItem>({
                 isIndeterminate={isIndeterminate}
                 onDownArrowClick={onDownArrowClick}
                 isExpanded={isExpanded}
+                columns={columns}
             />
         </View>
     ) : (
@@ -318,6 +333,7 @@ function ReportListItemHeader<TItem extends ListItem>({
                 onDownArrowClick={onDownArrowClick}
                 isExpanded={isExpanded}
                 chatReport={chatReport}
+                columns={columns}
             />
         </View>
     );

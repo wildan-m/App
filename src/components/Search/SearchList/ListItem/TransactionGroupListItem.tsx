@@ -475,6 +475,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
                     isExpanded={isExpanded}
                     userBillingGracePeriodEnds={userBillingGracePeriodEnds}
                     ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
+                    columns={columns}
                 />
             );
         }

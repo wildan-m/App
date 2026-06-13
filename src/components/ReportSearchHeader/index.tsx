@@ -6,7 +6,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import type ReportSearchHeaderProps from './types';
 
-function ReportSearchHeader({report, style, transactions, avatarBorderColor}: ReportSearchHeaderProps) {
+function ReportSearchHeader({report, style, transactions, avatarBorderColor, shouldShowAvatar = true}: ReportSearchHeaderProps) {
     const styles = useThemeStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
 
@@ -23,6 +23,7 @@ function ReportSearchHeader({report, style, transactions, avatarBorderColor}: Re
                 shouldUseCustomSearchTitleName
                 shouldEnableDetailPageNavigation={false}
                 shouldEnableAvatarNavigation={false}
+                shouldShowAvatar={shouldShowAvatar}
                 avatarBorderColor={avatarBorderColor}
                 size={isLargeScreenWidth ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
                 customDisplayNameStyle={styles.fontWeightNormal}
@@ -34,6 +35,7 @@ function ReportSearchHeader({report, style, transactions, avatarBorderColor}: Re
         report,
         transactions,
         avatarBorderColor,
+        shouldShowAvatar,
         styles.fontWeightNormal,
         styles.textLineHeightNormal,
         styles.minHeight4,

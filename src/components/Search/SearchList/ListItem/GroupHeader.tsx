@@ -247,6 +247,7 @@ function GroupHeader({
                     personalPolicyID={personalPolicyID}
                     userBillingGracePeriodEnds={userBillingGracePeriodEnds}
                     ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
+                    columns={subHeaderColumns}
                 />
             );
         }

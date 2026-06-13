@@ -73,6 +73,9 @@ type AvatarWithDisplayNameProps = {
     /** Whether we should display the status of the report */
     shouldDisplayStatus?: boolean;
 
+    /** Whether the avatar should be rendered (used to honor the Avatar column toggle in search tables) */
+    shouldShowAvatar?: boolean;
+
     /** Transactions inside report */
     transactions?: TransactionListItemType[];
 
@@ -179,6 +182,7 @@ function AvatarWithDisplayName({
     openParentReportInCurrentTab = false,
     avatarBorderColor: avatarBorderColorProp,
     shouldDisplayStatus = false,
+    shouldShowAvatar = true,
     customDisplayNameStyle = {},
     parentNavigationSubtitleTextStyles,
     parentNavigationStatusContainerStyles = {},
@@ -297,20 +301,22 @@ function AvatarWithDisplayName({
         <View style={[styles.appContentHeaderTitle, styles.flex1]}>
             {!!report && !!title && (
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]}>
-                    <View accessibilityLabel={title}>
-                        {shouldEnableAvatarNavigation ? (
-                            <PressableWithoutFeedback
-                                sentryLabel={CONST.SENTRY_LABEL.AVATAR_WITH_DISPLAY_NAME.SHOW_ACTOR_DETAILS}
-                                onPress={showActorDetails}
-                                accessibilityLabel={title}
-                                role={getButtonRole(true)}
-                            >
-                                {multipleAvatars}
-                            </PressableWithoutFeedback>
-                        ) : (
-                            multipleAvatars
-                        )}
-                    </View>
+                    {shouldShowAvatar && (
+                        <View accessibilityLabel={title}>
+                            {shouldEnableAvatarNavigation ? (
+                                <PressableWithoutFeedback
+                                    sentryLabel={CONST.SENTRY_LABEL.AVATAR_WITH_DISPLAY_NAME.SHOW_ACTOR_DETAILS}
+                                    onPress={showActorDetails}
+                                    accessibilityLabel={title}
+                                    role={getButtonRole(true)}
+                                >
+                                    {multipleAvatars}
+                                </PressableWithoutFeedback>
+                            ) : (
+                                multipleAvatars
+                            )}
+                        </View>
+                    )}
 
                     <View style={[styles.flex1, styles.flexColumn]}>
                         {shouldShowReportTitleEditButton ? (
