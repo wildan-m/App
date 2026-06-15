@@ -2,6 +2,7 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import CONST from '@src/CONST';
 import type {BankAccountList, Policy, Report, ReportMetadata, Transaction, TransactionViolation} from '@src/types/onyx';
+import {isAuthenticationError} from './actions/connections';
 import {arePaymentsEnabled, getSubmitToAccountID, getValidConnectedIntegration, hasDynamicExternalWorkflow, hasIntegrationAutoSync, isPreferredExporter} from './PolicyUtils';
 import {hasPendingDEWApprove} from './ReportActionsUtils';
 import {isAddExpenseAction} from './ReportPrimaryActionUtils';
@@ -165,7 +166,7 @@ function canExport(report: Report, currentUserLogin: string, policy?: Policy) {
     const connectedIntegration = getValidConnectedIntegration(policy);
     const syncEnabled = hasIntegrationAutoSync(policy, connectedIntegration);
 
-    if (!connectedIntegration || !isExpense || !isExporter) {
+    if (!connectedIntegration || !isExpense || !isExporter || isAuthenticationError(policy, connectedIntegration)) {
         return false;
     }
 
