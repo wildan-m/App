@@ -1534,6 +1534,36 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         // Removing the ghost IOU report on API failure which can cause unexpected errors.
         failureData?.push(...additionalFailureData);
 
+        // The rate selected on the confirmation page is forwarded to the server only as API params; the
+        // moved transaction's own custom unit is patched by the server response. When a distance expense
+        // is submitted from the self DM to a workspace offline there is no response to apply, so the
+        // transaction keeps its self-DM (P2P) custom unit and the Rate field renders blank. Update the
+        // transaction's custom unit optimistically so the selected workspace rate resolves offline too.
+        if (isDistance && customUnitRateID) {
+            optimisticData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
+                value: {
+                    comment: {
+                        customUnit: {
+                            customUnitRateID,
+                            customUnitID: workspaceParams.customUnitID,
+                            defaultP2PRate: null,
+                        },
+                    },
+                },
+            });
+            failureData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
+                value: {
+                    comment: {
+                        customUnit: sourceTransaction?.comment?.customUnit ?? null,
+                    },
+                },
+            });
+        }
+
         const workspaceParamsForAPI = hasManualDistanceOverrideForRequest ? {...workspaceParams, waypoints: undefined} : workspaceParams;
         const params = {
             amount,
