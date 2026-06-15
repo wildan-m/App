@@ -86,6 +86,7 @@ function ApprovalWorkflowSection({
         avatar: m.avatar,
         displayName: m.displayName,
         email: m.email,
+        pendingAction: m.pendingAction,
     }));
     const pressAction = isDisabled ? undefined : onPress;
     const accessibilityLabel = translate('workflowsPage.accessibilityLabel', {

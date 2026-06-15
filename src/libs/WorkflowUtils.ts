@@ -98,6 +98,7 @@ function buildMemberFromEmployee(employee: PolicyEmployee, personalDetailsByEmai
         email,
         avatar: personalDetailsByEmail[email]?.avatar,
         displayName: personalDetailsByEmail[email]?.displayName ?? email,
+        pendingAction: employee.pendingAction,
         pendingFields: employee.pendingFields,
     };
 }

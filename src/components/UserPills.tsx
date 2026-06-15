@@ -5,6 +5,8 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
 import CONST from '@src/CONST';
+import type {PendingAction} from '@src/types/onyx/OnyxCommon';
+import OfflineWithFeedback from './OfflineWithFeedback';
 import PressableWithoutFeedback from './Pressable/PressableWithoutFeedback';
 import Text from './Text';
 import Tooltip from './Tooltip';
@@ -15,6 +17,9 @@ type UserPillData = {
     displayName: string;
     accountID?: number;
     email?: string;
+
+    /** Pending action used to render the pill with reduced opacity while an offline change (e.g. inviting a member) is in flight. */
+    pendingAction?: PendingAction;
 };
 
 type UserPillsProps = {
@@ -51,14 +56,28 @@ function UserPills({users, maxVisible = DEFAULT_MAX_VISIBLE, onShowAllPress, sho
         <View style={[styles.flexRow, styles.flexWrap, styles.userPillsContainer]}>
             {visibleUsers.map((user) => {
                 const hasRealAccountID = user.accountID !== undefined && user.accountID !== CONST.DEFAULT_NUMBER_ID;
-                return (
+                const key = hasRealAccountID ? user.accountID : (user.email ?? user.displayName);
+                const pill = (
                     <UserPill
-                        key={hasRealAccountID ? user.accountID : (user.email ?? user.displayName)}
                         avatar={user.avatar}
                         displayName={user.displayName}
                         accountID={user.accountID}
                         email={user.email}
                     />
+                );
+                // Wrap pending pills so an in-flight offline change (e.g. inviting a member) renders the
+                // pill at reduced opacity, matching the approver row. Non-pending pills stay unwrapped to
+                // avoid changing layout for the other UserPills callers.
+                if (!user.pendingAction) {
+                    return <React.Fragment key={key}>{pill}</React.Fragment>;
+                }
+                return (
+                    <OfflineWithFeedback
+                        key={key}
+                        pendingAction={user.pendingAction}
+                    >
+                        {pill}
+                    </OfflineWithFeedback>
                 );
             })}
             {hiddenCount > 0 && (

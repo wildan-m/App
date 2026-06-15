@@ -96,6 +96,13 @@ type Member = {
     avatar?: AvatarSource;
 
     /**
+     * Pending action that mirrors the underlying personal detail. When set (e.g. `ADD` while a new
+     * member is being invited offline), the member's pill on the workflows page renders with reduced
+     * opacity, matching the approver row so both fields signal the pending state consistently.
+     */
+    pendingAction?: PendingAction;
+
+    /**
      * Pending states for offline updates
      */
     pendingFields?: PendingFields<'submitsTo' | 'forwardsTo'>;
