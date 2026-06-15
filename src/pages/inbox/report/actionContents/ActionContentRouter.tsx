@@ -153,14 +153,14 @@ function ActionContentRouter({
     const reportOwnerAccountID = report?.ownerAccountID;
 
     if (isIOURequestReportAction(action)) {
-        if (report?.type !== CONST.REPORT.TYPE.CHAT) {
-            return null;
-        }
         const moneyRequestOriginalMessage = isMoneyRequestAction(action) ? getOriginalMessage(action) : undefined;
         const isSplitBill = moneyRequestOriginalMessage?.type === CONST.IOU.REPORT_ACTION_TYPE.SPLIT;
         const isSplitScanWithNoAmount = isSplitBill && moneyRequestOriginalMessage?.amount === 0;
         const shouldShowSplitPreview = isSplitBill || isSplitScanWithNoAmount;
-        if (report.chatType !== CONST.REPORT.CHAT_TYPE.SELF_DM && !shouldShowSplitPreview) {
+        // In a regular chat (not a self-DM and not a split) the single expense preview is intentionally not shown
+        // because the chat shows the report preview instead. In every other context - including a non-chat container
+        // report such as the expense report surfaced by Search > Chats - we still render the transaction preview.
+        if (report?.type === CONST.REPORT.TYPE.CHAT && report?.chatType !== CONST.REPORT.CHAT_TYPE.SELF_DM && !shouldShowSplitPreview) {
             return null;
         }
         return (
