@@ -41,7 +41,11 @@ function getStateFromPath(path: Route): PartialState<NavigationState> {
         const focusedRoute = findFocusedRouteWithOnyxTabGuard(getStateFromPath(pathWithoutDynamicSuffix) ?? {});
         const entryScreens: ReadonlyArray<Screen | '*'> = DYNAMIC_ROUTES[dynamicRoute as DynamicRouteKey]?.entryScreens ?? [];
 
-        if (focusedRoute?.name && entryScreens.some((s) => s === '*' || s === focusedRoute.name)) {
+        // Only accept the candidate when the base path resolves to a real screen. If it resolves to
+        // Not Found, the suffix is a false-positive greedy match against another route's segments
+        // (e.g. a tag named "a" makes `.../tag/0/a/edit` look like the profile route `a/:accountID`),
+        // and must not be accepted - even for the `'*'` wildcard - so we fall back to the standard parser.
+        if (focusedRoute?.name && focusedRoute.name !== SCREENS.NOT_FOUND && entryScreens.some((s) => s === '*' || s === focusedRoute.name)) {
             // Merge the base route's params with params extracted from the dynamic suffix.
             // This gives the dynamic route screen access to all context it needs.
             const mergedParams = {
