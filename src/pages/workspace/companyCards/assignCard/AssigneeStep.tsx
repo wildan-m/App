@@ -6,6 +6,7 @@ import SelectionList from '@components/SelectionList';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
 import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -21,7 +22,7 @@ import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import {getSearchValueForPhoneOrEmail, sortAlphabetically} from '@libs/OptionsListUtils';
 import {getHeaderMessage} from '@libs/PersonalDetailOptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
-import {filterGuideAndAccountManager, getGuideAndAccountManagerInfo, getIneligibleInvitees, isDeletedPolicyEmployee} from '@libs/PolicyUtils';
+import {canEditWorkspaceSettings, filterGuideAndAccountManager, getGuideAndAccountManagerInfo, getIneligibleInvitees, isDeletedPolicyEmployee} from '@libs/PolicyUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
 import Navigation from '@navigation/Navigation';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -44,6 +45,7 @@ function AssigneeStep({route}: AssigneeStepProps) {
     const {isOffline} = useNetwork();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const policy = usePolicy(policyID);
+    const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
     const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -63,9 +65,14 @@ function AssigneeStep({route}: AssigneeStepProps) {
         exclusions: softExclusions,
     } = useMemo(() => getGuideAndAccountManagerInfo(policy, account?.accountManagerAccountID, personalDetails), [policy, account?.accountManagerAccountID, personalDetails]);
 
+    // Only full workspace admins may invite a new member, so only offer the "invite this email" option to
+    // them. This mirrors the access gate on the invite-new-member step (AccessOrNotFoundWrapper ADMIN
+    // variant -> canEditWorkspaceSettings); otherwise a Card Admin taps the option and lands on "Not here".
+    const canInviteNewMember = canEditWorkspaceSettings(policy, currentUserLogin);
+
     const {searchTerm, setSearchTerm, debouncedSearchTerm, availableOptions, areOptionsInitialized} = usePersonalDetailSearchSelector({
         selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_SINGLE,
-        includeUserToInvite: true,
+        includeUserToInvite: canInviteNewMember,
         excludeLogins: excludedUsers,
         excludeFromSuggestionsOnly: softExclusions,
         includeRecentReports: true,
