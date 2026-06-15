@@ -7,6 +7,7 @@ import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import RenderHTML from '@components/RenderHTML';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
+import SectionSubtitleHTML from '@components/SectionSubtitleHTML';
 import useChatWithAgent from '@hooks/useChatWithAgent';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -144,9 +145,10 @@ function AgentsPage() {
             {shouldUseNarrowLayout && <View style={[styles.ph5, styles.pb3]}>{newAgentButton}</View>}
             {hasAgents ? (
                 <>
-                    <View style={[styles.renderHTML, styles.ph5, styles.pb3, styles.pt3]}>
-                        <RenderHTML html={translate('agentsPage.subtitle')} />
-                    </View>
+                    <SectionSubtitleHTML
+                        html={translate('agentsPage.subtitle')}
+                        wrapperStyle={[styles.ph5, styles.pb3, styles.pt3]}
+                    />
                     <FlatList
                         data={agentItems}
                         renderItem={renderItem}
