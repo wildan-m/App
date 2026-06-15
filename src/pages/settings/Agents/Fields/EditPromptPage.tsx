@@ -16,6 +16,7 @@ import {updateAgentPrompt} from '@libs/actions/Agent';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -87,7 +88,7 @@ function EditPromptPage({route}: EditPromptPageProps) {
                 shouldValidateOnBlur
                 keyboardSubmitBehavior={CONST.KEYBOARD_SUBMIT_BEHAVIOR.SUBMIT_ONLY}
             >
-                <View style={[styles.flex1, shouldUseScrollableLayout && styles.minHeight42]}>
+                <View style={shouldUseScrollableLayout ? styles.minHeight42 : styles.flex1}>
                     <InputWrapper
                         InputComponent={TextInput}
                         inputID={INPUT_IDS.PROMPT}
@@ -96,10 +97,12 @@ function EditPromptPage({route}: EditPromptPageProps) {
                         role={CONST.ROLE.PRESENTATION}
                         defaultValue={Str.htmlDecode(agentPrompt?.prompt ?? '')}
                         multiline
-                        containerStyles={[styles.flex1]}
-                        touchableInputWrapperStyle={[styles.flex1]}
-                        textInputContainerStyles={[styles.flex1]}
-                        inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                        autoGrowHeight={shouldUseScrollableLayout}
+                        maxAutoGrowHeight={shouldUseScrollableLayout ? variables.textInputAutoGrowMaxHeight : undefined}
+                        containerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                        touchableInputWrapperStyle={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                        textInputContainerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                        inputStyle={shouldUseScrollableLayout ? [styles.textAlignVerticalTop] : [styles.flex1, styles.textAlignVerticalTop]}
                     />
                 </View>
             </FormProvider>

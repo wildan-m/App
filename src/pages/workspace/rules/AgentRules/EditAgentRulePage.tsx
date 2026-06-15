@@ -21,6 +21,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
+import variables from '@styles/variables';
 import {deletePolicyAgentRule, updatePolicyAgentRule} from '@userActions/Policy/Rules';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -136,7 +137,7 @@ function EditAgentRulePage({
                     }
                 >
                     <View style={styles.flex1}>
-                        <View style={[styles.flex1, shouldUseScrollableLayout && styles.minHeight42]}>
+                        <View style={shouldUseScrollableLayout ? styles.minHeight42 : styles.flex1}>
                             <InputWrapper
                                 InputComponent={TextInput}
                                 inputID={INPUT_IDS.PROMPT}
@@ -147,10 +148,12 @@ function EditAgentRulePage({
                                 defaultValue={agentRule.prompt}
                                 multiline
                                 shouldLabelStayOnSingleLine
-                                containerStyles={[styles.flex1]}
-                                touchableInputWrapperStyle={[styles.flex1]}
-                                textInputContainerStyles={[styles.flex1]}
-                                inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                                autoGrowHeight={shouldUseScrollableLayout}
+                                maxAutoGrowHeight={shouldUseScrollableLayout ? variables.textInputAutoGrowMaxHeight : undefined}
+                                containerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                touchableInputWrapperStyle={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                textInputContainerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                inputStyle={shouldUseScrollableLayout ? [styles.textAlignVerticalTop] : [styles.flex1, styles.textAlignVerticalTop]}
                             />
                         </View>
                         <Text style={[styles.textMicroSupporting, styles.textAlignCenter, styles.mt2]}>{translate('workspace.rules.agentRules.disclaimer')}</Text>

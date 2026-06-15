@@ -137,7 +137,7 @@ function AddAgentRulePage({
                     keyboardSubmitBehavior={CONST.KEYBOARD_SUBMIT_BEHAVIOR.SUBMIT_ONLY}
                 >
                     <View style={styles.flex1}>
-                        <View style={[styles.flex1, shouldUseScrollableLayout && styles.minHeight42]}>
+                        <View style={shouldUseScrollableLayout ? styles.minHeight42 : styles.flex1}>
                             <InputWrapper
                                 InputComponent={TextInput}
                                 inputID={INPUT_IDS.PROMPT}
@@ -147,10 +147,12 @@ function AddAgentRulePage({
                                 onKeyPress={handleKeyPress}
                                 multiline
                                 shouldLabelStayOnSingleLine
-                                containerStyles={[styles.flex1]}
-                                touchableInputWrapperStyle={[styles.flex1]}
-                                textInputContainerStyles={[styles.flex1]}
-                                inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                                autoGrowHeight={shouldUseScrollableLayout}
+                                maxAutoGrowHeight={shouldUseScrollableLayout ? variables.textInputAutoGrowMaxHeight : undefined}
+                                containerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                touchableInputWrapperStyle={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                textInputContainerStyles={shouldUseScrollableLayout ? undefined : [styles.flex1]}
+                                inputStyle={shouldUseScrollableLayout ? [styles.textAlignVerticalTop] : [styles.flex1, styles.textAlignVerticalTop]}
                             />
                         </View>
                         <Text style={[styles.textMicroSupporting, styles.textAlignCenter, styles.mt2]}>{translate('workspace.rules.agentRules.disclaimer')}</Text>
