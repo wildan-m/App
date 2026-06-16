@@ -888,6 +888,70 @@ describe('getPrimaryAction', () => {
         ).toBe(CONST.REPORT.PRIMARY_ACTIONS.REMOVE_HOLD);
     });
 
+    it('should return REMOVE HOLD instead of SUBMIT for an open report where every expense is on hold', async () => {
+        // The submitter opens a report whose expenses are all on hold. Submitting it would be
+        // rejected (there is nothing to submit), so the primary action must be REMOVE HOLD, not SUBMIT.
+        const report = {
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            stateNum: CONST.REPORT.STATE_NUM.OPEN,
+            statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+        } as unknown as Report;
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = {};
+
+        // Two held expenses so the single-transaction REMOVE HOLD path does not apply.
+        const heldExpenses = [1, 2].map((index) => {
+            const transactionID = `TRANSACTION_${index}`;
+            const holdActionID = `HOLD_ACTION_${index}`;
+            const childReportID = `CHILD_REPORT_${index}`;
+            const transaction = {
+                transactionID,
+                reportID: `${REPORT_ID}`,
+                comment: {hold: holdActionID},
+            } as unknown as Transaction;
+            const reportAction = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+                type: CONST.REPORT.ACTIONS.TYPE.IOU,
+                reportActionID: `REPORT_ACTION_${index}`,
+                actorAccountID: CURRENT_USER_ACCOUNT_ID,
+                childType: CONST.REPORT.TYPE.CHAT,
+                childReportID,
+                message: [{html: 'html'}],
+                originalMessage: {
+                    type: CONST.IOU.REPORT_ACTION_TYPE.CREATE,
+                    IOUTransactionID: transactionID,
+                },
+            } as unknown as ReportAction;
+            const holdAction = {
+                reportActionID: holdActionID,
+                reportID: childReportID,
+                actorAccountID: CURRENT_USER_ACCOUNT_ID,
+            };
+            return {transaction, reportAction, holdAction, holdActionID, childReportID};
+        });
+
+        const reportActionsForReport = Object.fromEntries(heldExpenses.map(({reportAction}) => [reportAction.reportActionID, reportAction]));
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, reportActionsForReport);
+        await Promise.all(heldExpenses.map(({childReportID, holdActionID, holdAction}) => Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${childReportID}`, {[holdActionID]: holdAction})));
+
+        expect(
+            getReportPrimaryAction({
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                chatReport,
+                reportTransactions: heldExpenses.map(({transaction}) => transaction),
+                violations: {},
+                bankAccountList: {},
+                policy: policy as Policy,
+                reportActions: heldExpenses.map(({reportAction}) => reportAction),
+                isChatReportArchived: false,
+            }),
+        ).toBe(CONST.REPORT.PRIMARY_ACTIONS.REMOVE_HOLD);
+    });
+
     it('should not return REMOVE HOLD for closed reports with transactions on hold', async () => {
         const report = {
             reportID: REPORT_ID,
