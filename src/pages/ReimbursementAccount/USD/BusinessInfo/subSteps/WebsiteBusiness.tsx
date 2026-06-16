@@ -1,28 +1,24 @@
 import {Str} from 'expensify-common';
 import React, {useCallback, useMemo} from 'react';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
-import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import SingleFieldStep from '@components/SubStepForms/SingleFieldStep';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReimbursementAccountStepFormSubmit from '@hooks/useReimbursementAccountStepFormSubmit';
 import type {SubPageProps} from '@hooks/useSubPage/types';
 import {getDefaultCompanyWebsite} from '@libs/BankAccountUtils';
-import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {getFieldRequiredErrors, isValidWebsite} from '@libs/ValidationUtils';
 import {addBusinessWebsiteForDraft} from '@userActions/BankAccounts';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/ReimbursementAccountForm';
-import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 const COMPANY_WEBSITE_KEY = INPUT_IDS.BUSINESS_INFO_STEP.COMPANY_WEBSITE;
 const STEP_FIELDS = [COMPANY_WEBSITE_KEY];
 
 function WebsiteBusiness({onNext, onMove, isEditing}: SubPageProps) {
     const {translate} = useLocalize();
-    const [reimbursementAccount, reimbursementAccountResult] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
-    const isLoadingReimbursementAccount = isLoadingOnyxValue(reimbursementAccountResult);
+    const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
 
@@ -50,14 +46,6 @@ function WebsiteBusiness({onNext, onMove, isEditing}: SubPageProps) {
         },
         shouldSaveDraft: true,
     });
-
-    if (isLoadingReimbursementAccount) {
-        const reasonAttributes: SkeletonSpanReasonAttributes = {
-            context: 'WebsiteBusiness',
-            isLoadingReimbursementAccount,
-        };
-        return <FullScreenLoadingIndicator reasonAttributes={reasonAttributes} />;
-    }
 
     return (
         <SingleFieldStep<typeof ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM>

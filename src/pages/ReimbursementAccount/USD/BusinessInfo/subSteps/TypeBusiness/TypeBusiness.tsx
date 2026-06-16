@@ -2,18 +2,15 @@ import React from 'react';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
-import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReimbursementAccountStepFormSubmit from '@hooks/useReimbursementAccountStepFormSubmit';
 import type {SubPageProps} from '@hooks/useSubPage/types';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {getFieldRequiredErrors} from '@libs/ValidationUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/ReimbursementAccountForm';
-import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import BusinessTypePicker from './BusinessTypePicker';
 
 const COMPANY_INCORPORATION_TYPE_KEY = INPUT_IDS.BUSINESS_INFO_STEP.INCORPORATION_TYPE;
@@ -23,8 +20,7 @@ function TypeBusiness({onNext, isEditing}: SubPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
-    const [reimbursementAccount, reimbursementAccountResult] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
-    const isLoadingReimbursementAccount = isLoadingOnyxValue(reimbursementAccountResult);
+    const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM> =>
         getFieldRequiredErrors(values, STEP_FIELDS, translate);
@@ -36,14 +32,6 @@ function TypeBusiness({onNext, isEditing}: SubPageProps) {
         onNext,
         shouldSaveDraft: isEditing,
     });
-
-    if (isLoadingReimbursementAccount) {
-        const reasonAttributes: SkeletonSpanReasonAttributes = {
-            context: 'TypeBusiness',
-            isLoadingReimbursementAccount,
-        };
-        return <FullScreenLoadingIndicator reasonAttributes={reasonAttributes} />;
-    }
 
     return (
         <FormProvider
