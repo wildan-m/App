@@ -659,7 +659,7 @@ function MoneyRequestReceiptView({
                                             onLoad={() => setIsLoading(false)}
                                             onLoadFailure={() => setIsLoading(false)}
                                         />
-                                        {canShowDistanceEReceipt && hovered && !!displayedTransaction && <HoveredDistanceEReceipt transaction={displayedTransaction} />}
+                                        {canShowDistanceEReceipt && hovered && !isLoading && !!displayedTransaction && <HoveredDistanceEReceipt transaction={displayedTransaction} />}
                                     </>
                                 </ReceiptHoverZoom>
                             </View>
