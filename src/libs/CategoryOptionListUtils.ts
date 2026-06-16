@@ -8,7 +8,7 @@ import type {PolicyCategories} from '@src/types/onyx';
 import type * as OnyxCommon from '@src/types/onyx/OnyxCommon';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import times from '@src/utils/times';
-import {getDecodedCategoryName, processCategoryNameSegments} from './CategoryUtils';
+import {getCategoryGLCode, getDecodedCategoryName, processCategoryNameSegments} from './CategoryUtils';
 import type {OptionTree} from './OptionsListUtils';
 import tokenizedSearch from './tokenizedSearch';
 
@@ -19,6 +19,9 @@ type Category = {
     enabled: boolean;
     isSelected?: boolean;
     pendingAction?: OnyxCommon.PendingAction;
+
+    /** The GL code associated with the category, surfaced in the picker when the workspace enables it */
+    glCode?: string;
 };
 
 type Hierarchy = Record<string, Category & {[key: string]: Hierarchy & Category}>;
@@ -30,7 +33,7 @@ type Hierarchy = Record<string, Category & {[key: string]: Hierarchy & Category}
  * @param options[].enabled - a flag to enable/disable option in a list
  * @param options[].name - a name of an option
  */
-function getCategoryOptionTree(options: Record<string, Category> | Category[], selectedOptions: Category[] = []): OptionTree[] {
+function getCategoryOptionTree(options: Record<string, Category> | Category[], selectedOptions: Category[] = [], shouldShowGLCodes = false): OptionTree[] {
     const optionCollection = new Map<string, OptionTree>();
     for (const option of Object.values(options)) {
         const array = processCategoryNameSegments(option.name);
@@ -58,8 +61,10 @@ function getCategoryOptionTree(options: Record<string, Category> | Category[], s
             const leafName = getDecodedCategoryName(optionName.trim());
             const decodedCategoryName = getDecodedCategoryName(option.name);
             const tooltipText = isChild ? decodedCategoryName : getDecodedCategoryName(searchText);
+            // Only the human-visible label gains the GL code suffix; keyForList/searchText/value stay the raw name so selection still matches the policy.
+            const glCodeSuffix = isChild && shouldShowGLCodes && option.glCode ? ` (${option.glCode})` : '';
             optionCollection.set(searchText, {
-                text: `${indents}${leafName}`,
+                text: `${indents}${leafName}${glCodeSuffix}`,
                 keyForList: searchText,
                 searchText,
                 tooltipText,
@@ -84,6 +89,7 @@ function getCategoryListSections({
     recentlyUsedCategories = [],
     maxRecentReportsToShow = CONST.IOU.MAX_RECENT_REPORTS_TO_SHOW,
     translate,
+    shouldShowGLCodes = false,
 }: {
     categories: PolicyCategories;
     localeCompare: LocaleContextProps['localeCompare'];
@@ -92,8 +98,13 @@ function getCategoryListSections({
     recentlyUsedCategories?: string[];
     maxRecentReportsToShow?: number;
     translate: LocalizedTranslate;
+    shouldShowGLCodes?: boolean;
 }): CategoryTreeSection[] {
-    const sortedCategories = sortCategories(categories, localeCompare);
+    // Carry the GL code (already present on the source policy categories) so it can be surfaced in the picker label/search.
+    const sortedCategories = sortCategories(categories, localeCompare).map((category) => ({
+        ...category,
+        glCode: shouldShowGLCodes ? getCategoryGLCode(categories, category.name) : undefined,
+    }));
     const enabledCategories = Object.values(sortedCategories).filter((category) => category.enabled);
     const enabledCategoriesNames = new Set(enabledCategories.map((category) => category.name));
     const selectedOptionsWithDisabledState: Category[] = [];
@@ -110,7 +121,7 @@ function getCategoryListSections({
     }
 
     if (numberOfEnabledCategories === 0 && selectedOptions.length > 0) {
-        const data = getCategoryOptionTree(selectedOptionsWithDisabledState);
+        const data = getCategoryOptionTree(selectedOptionsWithDisabledState, [], shouldShowGLCodes);
         categorySections.push({
             // "Selected" section
             title: '',
@@ -126,7 +137,9 @@ function getCategoryListSections({
         const categoriesForSearch = [...selectedOptionsWithDisabledState, ...enabledCategories];
 
         // Step 2: Get search results using tokenizedSearch
-        let searchCategories: Category[] = tokenizedSearch(categoriesForSearch, searchValue, (category) => [category.name]).map((category) => ({
+        let searchCategories: Category[] = tokenizedSearch(categoriesForSearch, searchValue, (category) =>
+            shouldShowGLCodes && category.glCode ? [category.name, category.glCode] : [category.name],
+        ).map((category) => ({
             ...category,
             // Temporarily store if it was selected
             wasSelected: selectedOptions.some((selectedOption) => selectedOption.name === category.name),
@@ -157,7 +170,7 @@ function getCategoryListSections({
         }));
 
         // Step 6: Generate the option tree and push the section
-        const data = getCategoryOptionTree(finalSearchCategories);
+        const data = getCategoryOptionTree(finalSearchCategories, [], shouldShowGLCodes);
         categorySections.push({
             // "Search" section
             title: '',
@@ -169,7 +182,7 @@ function getCategoryListSections({
     }
 
     if (selectedOptions.length > 0) {
-        const data = getCategoryOptionTree(selectedOptionsWithDisabledState);
+        const data = getCategoryOptionTree(selectedOptionsWithDisabledState, [], shouldShowGLCodes);
         categorySections.push({
             // "Selected" section
             title: '',
@@ -182,7 +195,7 @@ function getCategoryListSections({
     const filteredCategories = enabledCategories.filter((category) => !selectedOptionNames.has(category.name));
 
     if (numberOfEnabledCategories < CONST.STANDARD_LIST_ITEM_LIMIT) {
-        const data = getCategoryOptionTree(filteredCategories, selectedOptionsWithDisabledState);
+        const data = getCategoryOptionTree(filteredCategories, selectedOptionsWithDisabledState, shouldShowGLCodes);
         categorySections.push({
             // "All" section when items amount less than the threshold
             title: '',
@@ -201,12 +214,13 @@ function getCategoryListSections({
         .map((categoryName) => ({
             name: categoryName,
             enabled: categories[categoryName].enabled ?? false,
+            glCode: shouldShowGLCodes ? getCategoryGLCode(categories, categoryName) : undefined,
         }));
 
     if (filteredRecentlyUsedCategories.length > 0) {
         const cutRecentlyUsedCategories = filteredRecentlyUsedCategories.slice(0, maxRecentReportsToShow);
 
-        const data = getCategoryOptionTree(cutRecentlyUsedCategories);
+        const data = getCategoryOptionTree(cutRecentlyUsedCategories, [], shouldShowGLCodes);
         categorySections.push({
             // "Recent" section
             title: translate('common.recent'),
@@ -215,7 +229,7 @@ function getCategoryListSections({
         });
     }
 
-    const data = getCategoryOptionTree(filteredCategories, selectedOptionsWithDisabledState);
+    const data = getCategoryOptionTree(filteredCategories, selectedOptionsWithDisabledState, shouldShowGLCodes);
     categorySections.push({
         // "All" section when items amount more than the threshold
         title: translate('common.all'),
@@ -260,6 +274,7 @@ function sortCategories(categories: Record<string, Category>, localeCompare: Loc
             name: category.name,
             pendingAction: category.pendingAction,
             enabled: category.enabled ?? false,
+            glCode: category.glCode,
         });
     }
 
@@ -270,12 +285,13 @@ function sortCategories(categories: Record<string, Category>, localeCompare: Loc
      */
     const flatHierarchy = (initialHierarchy: Hierarchy) =>
         Object.values(initialHierarchy).reduce((acc: Category[], category) => {
-            const {name, pendingAction, enabled, ...subcategories} = category;
+            const {name, pendingAction, enabled, glCode, ...subcategories} = category;
             if (name) {
                 const categoryObject: Category = {
                     name,
                     pendingAction,
                     enabled: enabled ?? false,
+                    glCode,
                 };
 
                 acc.push(categoryObject);

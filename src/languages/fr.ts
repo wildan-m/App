@@ -5725,6 +5725,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             deleteFailureMessage: "Une erreur s'est produite lors de la suppression de la catégorie, veuillez réessayer",
             categoryName: 'Nom de la catégorie',
             requiresCategory: 'Les membres doivent catégoriser toutes les dépenses',
+            showGLCodesInCategorySelector: 'Afficher les codes GL lors de la sélection d’une catégorie',
             needCategoryForExportToIntegration: (connectionName: string) => `Toutes les dépenses doivent être catégorisées afin de pouvoir être exportées vers ${connectionName}.`,
             subtitle: 'Obtenez une meilleure vue d’ensemble de l’endroit où l’argent est dépensé. Utilisez nos catégories par défaut ou ajoutez les vôtres.',
             emptyCategories: {

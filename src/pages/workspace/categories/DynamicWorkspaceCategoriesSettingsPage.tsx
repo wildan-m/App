@@ -21,7 +21,7 @@ import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import {setWorkspaceRequiresCategory} from '@userActions/Policy/Category';
+import {setWorkspaceRequiresCategory, setWorkspaceShowGLCodesInCategorySelector} from '@userActions/Policy/Category';
 import {clearPolicyErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
@@ -51,6 +51,13 @@ function DynamicWorkspaceCategoriesSettingsPage({policy, route}: DynamicWorkspac
         [policyData],
     );
 
+    const updateShowGLCodesInCategorySelector = useCallback(
+        (value: boolean) => {
+            setWorkspaceShowGLCodesInCategorySelector(policyData, value);
+        },
+        [policyData],
+    );
+
     const data = useMemo(() => {
         if (!policyData.policy?.mccGroup) {
             return [];
@@ -69,6 +76,7 @@ function DynamicWorkspaceCategoriesSettingsPage({policy, route}: DynamicWorkspac
 
     const hasEnabledCategories = hasEnabledOptions(policyData.categories);
     const isToggleDisabled = !policy?.areCategoriesEnabled || !hasEnabledCategories || isConnectedToAccounting;
+    const isShowGLCodesToggleDisabled = !policy?.areCategoriesEnabled || !hasEnabledCategories || !policy?.glCodes;
 
     const onSelectItem = (item: ListItem) => {
         if (!item.groupID) {
@@ -117,6 +125,18 @@ function DynamicWorkspaceCategoriesSettingsPage({policy, route}: DynamicWorkspac
                         wrapperStyle={[styles.pv2, styles.mh5]}
                         errors={policy?.errorFields?.requiresCategory ?? undefined}
                         onCloseError={() => clearPolicyErrorField(policy?.id, 'requiresCategory')}
+                        shouldPlaceSubtitleBelowSwitch
+                    />
+                    <ToggleSettingOptionRow
+                        title={translate('workspace.categories.showGLCodesInCategorySelector')}
+                        switchAccessibilityLabel={translate('workspace.categories.showGLCodesInCategorySelector')}
+                        isActive={policy?.shouldShowGLCodesInCategorySelector ?? false}
+                        onToggle={updateShowGLCodesInCategorySelector}
+                        pendingAction={policy?.pendingFields?.shouldShowGLCodesInCategorySelector}
+                        disabled={isShowGLCodesToggleDisabled}
+                        wrapperStyle={[styles.pv2, styles.mh5]}
+                        errors={policy?.errorFields?.shouldShowGLCodesInCategorySelector ?? undefined}
+                        onCloseError={() => clearPolicyErrorField(policy?.id, 'shouldShowGLCodesInCategorySelector')}
                         shouldPlaceSubtitleBelowSwitch
                     />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
