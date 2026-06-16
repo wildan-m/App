@@ -12,6 +12,7 @@ import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs
 import * as ErrorUtils from '@libs/ErrorUtils';
 import Log from '@libs/Log';
 import {clearPreservedSearchNavigatorStates} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
+import Navigation from '@libs/Navigation/Navigation';
 import * as NetworkStore from '@libs/Network/NetworkStore';
 import * as SequentialQueue from '@libs/Network/SequentialQueue';
 import CONFIG from '@src/CONFIG';
@@ -323,6 +324,10 @@ function disconnect({stashedCredentials, stashedSession}: DisconnectParams) {
                     });
                     Onyx.set(ONYXKEYS.STASHED_CREDENTIALS, {});
                     Onyx.set(ONYXKEYS.STASHED_SESSION, {});
+                    // Reset navigation to home so we don't keep pointing at a route from the delegate's
+                    // session (e.g. a report that no longer exists in the owner's data once Onyx is
+                    // cleared), which would otherwise render the "It's not here" not found page.
+                    Navigation.resetToHome();
                     confirmReadyToOpenApp();
                     openApp().then(() => {
                         if (!CONFIG.IS_HYBRID_APP) {
