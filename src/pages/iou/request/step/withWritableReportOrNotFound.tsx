@@ -1,7 +1,6 @@
 import type {ComponentType} from 'react';
 import React, {useEffect} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -10,6 +9,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {MoneyRequestNavigatorParamList} from '@libs/Navigation/types';
 import {canUserPerformWriteAction} from '@libs/ReportUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import {openReport} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -100,7 +100,7 @@ export default function <TProps extends WithWritableReportOrNotFoundProps<MoneyR
         }
 
         if (iouTypeParamIsInvalid || !canUserPerformWriteAction(report ?? {reportID: ''}, isReportArchived)) {
-            return <FullPageNotFoundView shouldShow />;
+            return <NotFoundPage />;
         }
 
         return (

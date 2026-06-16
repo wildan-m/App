@@ -2,7 +2,6 @@ import {useIsFocused} from '@react-navigation/native';
 import type {ComponentType} from 'react';
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import useOnyx from '@hooks/useOnyx';
 import getComponentDisplayName from '@libs/getComponentDisplayName';
@@ -11,6 +10,7 @@ import {shouldUseTransactionDraft} from '@libs/IOUUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {MoneyRequestNavigatorParamList} from '@libs/Navigation/types';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -88,7 +88,7 @@ export default function <TProps extends WithFullTransactionOrNotFoundProps<Money
         // In addition, the not-found page should be shown only if the component screen's route is active (i.e. is focused).
         // This is to prevent it from showing when the modal is being dismissed while navigating to a different route (e.g. on requesting money).
         if (!transactionID) {
-            return <FullPageNotFoundView shouldShow={isFocused} />;
+            return isFocused ? <NotFoundPage /> : null;
         }
 
         if (isLoadingTransaction && shouldShowLoadingIndicator) {
