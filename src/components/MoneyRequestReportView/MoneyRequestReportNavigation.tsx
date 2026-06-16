@@ -26,6 +26,13 @@ type MoneyRequestReportNavigationContentProps = MoneyRequestReportNavigationProp
     allReports: Array<string | undefined>;
     isSearchLoading: boolean;
     lastSearchQuery: OnyxEntry<LastSearchParams>;
+    lastValidReports: Array<string | undefined> | null;
+    setLastValidReports: (reports: Array<string | undefined>) => void;
+};
+
+type MoneyRequestReportNavigationStandaloneProps = MoneyRequestReportNavigationProps & {
+    lastValidReports: Array<string | undefined> | null;
+    setLastValidReports: (reports: Array<string | undefined>) => void;
 };
 
 type SnapshotGuard = {
@@ -79,23 +86,27 @@ const buildSnapshotGuardSelector =
         return {hasMultiple: count > 1, includesReport};
     };
 
-function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersion, allReports, isSearchLoading, lastSearchQuery}: MoneyRequestReportNavigationContentProps) {
+function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersion, allReports, isSearchLoading, lastSearchQuery, lastValidReports, setLastValidReports}: MoneyRequestReportNavigationContentProps) {
     const styles = useThemeStyles();
 
     const liveCurrentIndex = allReports.indexOf(reportID);
 
     // Cache the last list where the current report was still present. When the search snapshot
-    // is refreshed and the current report drops out (e.g. after approving from Spend > Needs
-    // Approval), keep using the cached list so the carousel stays populated and the user can
-    // navigate to the next report instead of the arrows disappearing. setState during render is
-    // the React-recommended pattern for storing information from previous renders. We compare
-    // by content rather than reference because useSearchSections rebuilds allReports via
-    // filter/map each render, so identity comparison would refire the setState every render and
-    // trigger an infinite update loop.
-    const [lastValidReports, setLastValidReports] = useState<Array<string | undefined> | null>(null);
-    if (liveCurrentIndex !== -1 && !isSameReportList(allReports, lastValidReports)) {
+    // is refreshed and the current report drops out (e.g. after submitting/approving/paying from
+    // Spend > Drafts / Needs Approval / Ready to Pay), keep using the cached list so the carousel
+    // stays populated and the user can navigate to the next report instead of the arrows
+    // disappearing. The cache is owned by the parent (MoneyRequestReportNavigation) so it survives
+    // the fast-path <-> standalone remount that the post-action search refresh triggers; storing it
+    // here in component-local state lost the fallback exactly when it was needed. We update it from
+    // an effect (not during render) because the setter belongs to a different component, and we
+    // compare by content rather than reference because allReports is rebuilt via filter/map each
+    // render, so identity comparison would refire the update every render.
+    useEffect(() => {
+        if (liveCurrentIndex === -1 || isSameReportList(allReports, lastValidReports)) {
+            return;
+        }
         setLastValidReports(allReports);
-    }
+    }, [liveCurrentIndex, allReports, lastValidReports, setLastValidReports]);
     const effectiveAllReports = liveCurrentIndex === -1 && lastValidReports ? lastValidReports : allReports;
     const currentIndex = effectiveAllReports.indexOf(reportID);
 
@@ -202,7 +213,7 @@ function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersi
 }
 
 // All Onyx subscriptions via useSearchSections. Mounts if there are no sorted report IDs in the context.
-function MoneyRequestReportNavigationStandalone({reportID, shouldDisplayNarrowVersion}: MoneyRequestReportNavigationProps) {
+function MoneyRequestReportNavigationStandalone({reportID, shouldDisplayNarrowVersion, lastValidReports, setLastValidReports}: MoneyRequestReportNavigationStandaloneProps) {
     const {allReports, isSearchLoading, lastSearchQuery} = useSearchSections();
 
     return (
@@ -212,6 +223,8 @@ function MoneyRequestReportNavigationStandalone({reportID, shouldDisplayNarrowVe
             allReports={allReports}
             isSearchLoading={isSearchLoading}
             lastSearchQuery={lastSearchQuery}
+            lastValidReports={lastValidReports}
+            setLastValidReports={setLastValidReports}
         />
     );
 }
@@ -243,6 +256,12 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
         setShouldKeepMounted(true);
     }
 
+    // Own the "last valid report list" cache here, in the parent that stays mounted across the
+    // fast-path <-> standalone swap below. Keeping it in the swapped children lost the fallback on
+    // every remount (e.g. the post-submit search refresh toggles isSearchLoading), so the arrows
+    // disappeared once the current report dropped out of the live results.
+    const [lastValidReports, setLastValidReports] = useState<Array<string | undefined> | null>(null);
+
     if (!shouldKeepMounted) {
         return null;
     }
@@ -257,6 +276,8 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
                 allReports={allReports}
                 isSearchLoading={isSearchLoading}
                 lastSearchQuery={lastSearchQuery}
+                lastValidReports={lastValidReports}
+                setLastValidReports={setLastValidReports}
             />
         );
     }
@@ -265,6 +286,8 @@ function MoneyRequestReportNavigation({reportID, shouldDisplayNarrowVersion}: Mo
         <MoneyRequestReportNavigationStandalone
             reportID={reportID}
             shouldDisplayNarrowVersion={shouldDisplayNarrowVersion}
+            lastValidReports={lastValidReports}
+            setLastValidReports={setLastValidReports}
         />
     );
 }
