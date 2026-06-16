@@ -30,7 +30,6 @@ import {
 import {hasSubmissionBlockingViolations} from './TransactionUtils';
 
 let introSelected: OnyxEntry<IntroSelected>;
-// eslint-disable-next-line rulesdir/no-onyx-connect -- NextStepUtils is a pure utility called from action files that cannot use hooks
 Onyx.connect({
     key: ONYXKEYS.NVP_INTRO_SELECTED,
     callback: (value) => {
