@@ -1,4 +1,4 @@
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import Checkbox from '@components/Checkbox';
@@ -55,6 +55,7 @@ type FeatureListItem = ListItem & {
 function CopyPolicySettingsSelectFeaturesPage() {
     const route = useRoute<PlatformStackRouteProp<PolicyCopySettingsNavigatorParamList, typeof SCREENS.POLICY_COPY_SETTINGS.SELECT_FEATURES>>();
     const sourcePolicyID = route?.params?.policyID;
+    const {canGoBack} = useNavigation();
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -319,7 +320,7 @@ function CopyPolicySettingsSelectFeaturesPage() {
             >
                 <HeaderWithBackButton
                     title={translate('workspace.copyPolicySettings.title')}
-                    onBackButtonPress={() => Navigation.goBack(sourcePolicyID ? ROUTES.POLICY_COPY_SETTINGS.getRoute(sourcePolicyID) : undefined)}
+                    onBackButtonPress={() => (canGoBack() ? Navigation.goBack() : Navigation.goBack(sourcePolicyID ? ROUTES.POLICY_COPY_SETTINGS.getRoute(sourcePolicyID) : undefined))}
                 />
                 <View style={[styles.ph5, styles.pv3]}>
                     <Text style={[styles.textHeadline]}>{translate('workspace.copyPolicySettings.selectSettings.title')}</Text>
