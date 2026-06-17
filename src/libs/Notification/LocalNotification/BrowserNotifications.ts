@@ -3,6 +3,7 @@ import {Str} from 'expensify-common';
 import type {ImageSourcePropType} from 'react-native';
 import EXPENSIFY_ICON_URL from '@assets/images/expensify-logo-round-clearspace.png';
 import * as AppUpdate from '@libs/actions/AppUpdate';
+import Log from '@libs/Log';
 import {translateLocal} from '@libs/Localize';
 import {getForReportAction} from '@libs/ModifiedExpenseMessage';
 import NotificationPermission from '@libs/Notification/notificationPermission';
@@ -55,25 +56,33 @@ function push(
 
         // We cache these notifications so that we can clear them later
         const notificationID = Str.guid();
-        notificationCache[notificationID] = new Notification(title, {
-            body,
-            icon: SafeString(icon),
-            data,
-            silent: true,
-            tag,
-        });
-        if (!silent) {
-            playSound(SOUNDS.RECEIVE);
+        try {
+            notificationCache[notificationID] = new Notification(title, {
+                body,
+                icon: SafeString(icon),
+                data,
+                silent: true,
+                tag,
+            });
+            if (!silent) {
+                playSound(SOUNDS.RECEIVE);
+            }
+            notificationCache[notificationID].onclick = () => {
+                onClick();
+                window.parent.focus();
+                window.focus();
+                notificationCache[notificationID].close();
+            };
+            notificationCache[notificationID].onclose = () => {
+                delete notificationCache[notificationID];
+            };
+        } catch (error) {
+            // Some browsers (e.g. Samsung Internet on Android) expose the Notification permission API but do
+            // not support the `Notification` constructor, which throws "TypeError: Illegal constructor".
+            // Degrade gracefully by skipping the in-browser notification instead of letting the synchronous
+            // throw escape the promise chain as an unhandled rejection (Sentry APP-2D7).
+            Log.warn('[BrowserNotifications] Failed to show browser notification', {error: String(error)});
         }
-        notificationCache[notificationID].onclick = () => {
-            onClick();
-            window.parent.focus();
-            window.focus();
-            notificationCache[notificationID].close();
-        };
-        notificationCache[notificationID].onclose = () => {
-            delete notificationCache[notificationID];
-        };
     });
 }
 
