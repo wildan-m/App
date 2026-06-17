@@ -2099,7 +2099,10 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         if (activeExportDownload?.state === CONST.EXPORT_DOWNLOAD.STATE.PREPARING && !activeExportDownload?.shouldSendFromConcierge) {
             return;
         }
-        if (activeExportID) {
+        // Don't clear the export download when the user has requested Concierge delivery.
+        // clearExportDownload dispatches the CLEAR_EXPORT_DOWNLOAD backend command, which would
+        // cancel the in-flight delivery the user just requested via "Send me the file when it's ready".
+        if (activeExportID && !activeExportDownload?.shouldSendFromConcierge) {
             clearExportDownload(activeExportID, activeExportDownload);
         }
         setActiveExportID(undefined);
