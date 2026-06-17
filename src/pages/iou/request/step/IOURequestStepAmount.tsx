@@ -243,6 +243,16 @@ function IOURequestStepAmount({
                 const taxAmount = convertToBackendAmount(calculateTaxAmount(taxPercentage, amountInSmallestCurrencyUnits, decimals));
                 setMoneyRequestTaxAmount(transactionID, taxAmount);
             }
+        } else if (selectedCurrency !== originalCurrency) {
+            // When the currency changes in the normal create/submit flow, re-apply the new currency's default tax rate
+            // so the confirmation page reflects the correct rate instead of keeping the previous currency's default.
+            const taxCode = getDefaultTaxCode(policy, transaction, selectedCurrency);
+            if (taxCode) {
+                setMoneyRequestTaxRate(transactionID, taxCode);
+                const taxPercentage = getTaxValue(policy, transaction, taxCode) ?? '';
+                const taxAmount = convertToBackendAmount(calculateTaxAmount(taxPercentage, amountInSmallestCurrencyUnits, decimals));
+                setMoneyRequestTaxAmount(transactionID, taxAmount);
+            }
         }
 
         if (backTo) {
