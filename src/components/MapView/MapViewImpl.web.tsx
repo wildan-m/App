@@ -269,6 +269,13 @@ function MapViewImpl({
                 style={{...StyleUtils.getTextColorStyle(theme.mapAttributionText), zIndex: -1}}
                 mapStyle={styleURL}
                 interactive={interactive}
+                // Disables fog (invisible on this flat top-down view) to avoid a Mapbox fog-opacity
+                // teardown crash that surfaces as an uncaught `Cannot read properties of undefined
+                // (reading 'get')` from a deferred callback (Sentry APP-R3). The fog hotfix was removed
+                // in the mapbox-gl 3.x upgrade on the assumption the upgrade fixed it, but the crash
+                // still reaches users. react-map-gl's fog prop type omits null, but passing null clears
+                // the style's fog: it differs from the initial undefined, so setFog(null) actually fires.
+                fog={null as never}
             >
                 {interactive && shouldDisplayCurrentLocation && (
                     <Marker
