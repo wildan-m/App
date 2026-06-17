@@ -136,6 +136,29 @@ function isCategoryMissing(category: string | undefined): boolean {
     return category === CONST.SEARCH.CATEGORY_EMPTY_VALUE || category === CONST.SEARCH.CATEGORY_DEFAULT_VALUE;
 }
 
+/**
+ * Reconcile the `missingCategory` violation against the live policy at render time, mirroring
+ * `syncMissingAttendeesViolation`. A Search/Spend row reads its violations from the snapshot or the
+ * live transaction violations, neither of which is recomputed when the "members must categorize all
+ * expenses" rule (`requiresCategory`) is toggled for an expense whose data comes from the Search
+ * snapshot. This adds the violation when the rule now requires a category and none is set, and removes
+ * a stale one when the rule is turned off or a category is set, so the row's indicator updates live.
+ */
+function syncMissingCategoryViolation<T extends {name: string}>(violations: T[], requiresCategory: boolean, category: string | undefined, isSelfDM = false): T[] {
+    const hasMissingCategoryViolation = violations.some((violation) => violation.name === CONST.VIOLATIONS.MISSING_CATEGORY);
+    const shouldShowMissingCategory = requiresCategory && isCategoryMissing(category) && !isSelfDM;
+
+    if (!hasMissingCategoryViolation && shouldShowMissingCategory) {
+        return [...violations, {name: CONST.VIOLATIONS.MISSING_CATEGORY, type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true} as unknown as T];
+    }
+
+    if (hasMissingCategoryViolation && !shouldShowMissingCategory) {
+        return violations.filter((violation) => violation.name !== CONST.VIOLATIONS.MISSING_CATEGORY);
+    }
+
+    return violations;
+}
+
 function isCategoryDescriptionRequired(policyCategories: PolicyCategories | undefined, category: string | undefined, areRulesEnabled: boolean | undefined): boolean {
     if (!policyCategories || !category || !areRulesEnabled) {
         return false;
@@ -226,6 +249,7 @@ export {
     updateCategoryInMccGroup,
     getEnabledCategoriesCount,
     isCategoryMissing,
+    syncMissingCategoryViolation,
     isCategoryDescriptionRequired,
     getCategoryGLCode,
     getDecodedCategoryName,

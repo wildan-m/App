@@ -22,9 +22,10 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import {handleActionButtonPress as handleActionButtonPressUtil} from '@libs/actions/Search';
 import {syncMissingAttendeesViolation} from '@libs/AttendeeUtils';
+import {syncMissingCategoryViolation} from '@libs/CategoryUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isAttendeeTrackingEnabled} from '@libs/PolicyUtils';
-import {isInvoiceReport} from '@libs/ReportUtils';
+import {isInvoiceReport, isSelfDM} from '@libs/ReportUtils';
 import {
     isDeletedTransaction as isDeletedTransactionUtil,
     isViolationDismissed,
@@ -156,7 +157,17 @@ function TransactionListItem<TItem extends ListItem>({
         isInvoice,
     );
 
-    const transactionViolations = mergeProhibitedViolations(attendeeOnyxViolations);
+    // Sync missingCategory violation with the current "members must categorize all expenses" rule
+    // (requiresCategory). Use live transaction/policy data so the row's indicator updates immediately
+    // when the rule changes, without needing to open the expense.
+    const categoryOnyxViolations = syncMissingCategoryViolation(
+        attendeeOnyxViolations,
+        !!policyForViolations?.requiresCategory,
+        transaction?.category ?? transactionItem.category ?? '',
+        isSelfDM(reportForViolations),
+    );
+
+    const transactionViolations = mergeProhibitedViolations(categoryOnyxViolations);
 
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
