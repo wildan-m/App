@@ -3123,6 +3123,20 @@ ${amount} para ${merchant} - ${date}`,
                         [Ir a conectar mis tarjetas corporativas](${corporateCardLink}).
                     `),
             },
+            issueExpensifyCardTask: {
+                title: ({expensifyCardLink}) => `Emite [tarjetas Expensify](${expensifyCardLink})`,
+                description: ({expensifyCardLink}) =>
+                    dedent(`
+                        Personaliza los controles y agiliza los gastos con la Tarjeta Expensify.
+
+                        1. Haz clic en *Espacios de trabajo*.
+                        2. Selecciona tu espacio de trabajo.
+                        3. Haz clic en *Tarjeta Expensify*.
+                        4. Sigue las instrucciones para emitir tus tarjetas.
+
+                        [Ir a la Tarjeta Expensify](${expensifyCardLink}).
+                    `),
+            },
             inviteTeamTask: {
                 title: ({workspaceMembersLink}) => `Invita a [tu equipo](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>

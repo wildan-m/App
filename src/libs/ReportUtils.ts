@@ -60,6 +60,7 @@ import type {
     TransactionViolation,
     TransactionViolations,
     VisibleReportActionsDerivedValue,
+    WorkspaceCardsList,
 } from '@src/types/onyx';
 import type {ReportTransactionsAndViolations} from '@src/types/onyx/DerivedValues';
 import type {Attendee, Participant} from '@src/types/onyx/IOU';
@@ -104,6 +105,7 @@ import {removeDraftTransactionsByIDs} from './actions/TransactionEdit';
 import type {OnboardingCompanySize, OnboardingMessage, OnboardingPurpose, OnboardingTaskLinks} from './actions/Welcome/OnboardingFlow';
 import {getOnboardingMessages} from './actions/Welcome/OnboardingFlow';
 import type {AddCommentOrAttachmentParams} from './API/parameters';
+import {hasIssuedExpensifyCard} from './CardUtils';
 import {getCategoryGLCode} from './CategoryUtils';
 import {convertToDisplayString} from './CurrencyUtils';
 import DateUtils from './DateUtils';
@@ -1059,6 +1061,13 @@ Onyx.connect({
     key: ONYXKEYS.COLLECTION.POLICY_DRAFTS,
     waitForCollectionCallback: true,
     callback: (value) => (allPolicyDrafts = value),
+});
+
+let allWorkspaceCardsList: OnyxCollection<WorkspaceCardsList>;
+Onyx.connect({
+    key: ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST,
+    waitForCollectionCallback: true,
+    callback: (value) => (allWorkspaceCardsList = value),
 });
 
 let deprecatedAllReports: OnyxCollection<Report>;
@@ -11554,6 +11563,7 @@ type PrepareOnboardingOnyxDataParams = {
     onboardingPolicyID?: string;
     userReportedIntegration?: OnboardingAccounting;
     wasInvited?: boolean;
+    selectedInterestedFeatures?: string[];
     companySize: OnboardingCompanySize | undefined;
     isInvitedAccountant?: boolean;
     onboardingPurposeSelected?: OnboardingPurpose;
@@ -11571,6 +11581,7 @@ function prepareOnboardingOnyxData({
     onboardingPolicyID,
     userReportedIntegration,
     wasInvited,
+    selectedInterestedFeatures,
     companySize,
     isInvitedAccountant,
     onboardingPurposeSelected,
@@ -11649,6 +11660,7 @@ function prepareOnboardingOnyxData({
         testDriveURL: `${environmentURL}/${testDriveURL}`,
         workspaceAccountingLink: `${environmentURL}/${ROUTES.POLICY_ACCOUNTING.getRoute(onboardingPolicyID)}`,
         corporateCardLink: `${environmentURL}/${ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(onboardingPolicyID)}`,
+        expensifyCardLink: `${environmentURL}/${ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(onboardingPolicyID)}`,
     };
 
     // Text message
@@ -11671,6 +11683,12 @@ function prepareOnboardingOnyxData({
     let addExpenseApprovalsTaskReportID;
     let setupTagsTaskReportID;
     let setupCategoriesAndTagsTaskReportID;
+    // When the user opted into the Expensify Card but not company cards during onboarding, swap the "Link company cards"
+    // task for the "Issue Expensify cards" task. In every other case (company cards selected, both selected, or no
+    // selection provided) keep the existing "Link company cards" task and hide the Expensify Card task.
+    const isExpensifyCardSelected = !!selectedInterestedFeatures?.includes(CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED);
+    const isCompanyCardsSelected = !!selectedInterestedFeatures?.includes(CONST.POLICY.MORE_FEATURES.ARE_COMPANY_CARDS_ENABLED);
+    const shouldShowExpensifyCardTask = isExpensifyCardSelected && !isCompanyCardsSelected;
     const tasks = onboardingMessage.tasks;
     const tasksData = tasks
         .filter((task) => {
@@ -11679,6 +11697,14 @@ function prepareOnboardingOnyxData({
             }
 
             if (([CONST.ONBOARDING_TASK_TYPE.ADD_ACCOUNTING_INTEGRATION, CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES_AND_TAGS] as string[]).includes(task.type) && !userReportedIntegration) {
+                return false;
+            }
+
+            if (task.type === CONST.ONBOARDING_TASK_TYPE.CONNECT_CORPORATE_CARD && shouldShowExpensifyCardTask) {
+                return false;
+            }
+
+            if (task.type === CONST.ONBOARDING_TASK_TYPE.ISSUE_EXPENSIFY_CARD && !shouldShowExpensifyCardTask) {
                 return false;
             }
             // Exclude createWorkspace and viewTour tasks from #admin room, for test drive receivers,
@@ -11721,6 +11747,14 @@ function prepareOnboardingOnyxData({
 
             if (task.type === CONST.ONBOARDING_TASK_TYPE.INVITE_ACCOUNTANT && isInvitedAccountant) {
                 isTaskAutoCompleted = true;
+            }
+
+            // Mark the "Issue Expensify cards" task as complete when the workspace already has Expensify cards provisioned.
+            if (task.type === CONST.ONBOARDING_TASK_TYPE.ISSUE_EXPENSIFY_CARD) {
+                const workspaceAccountID = getPolicy(onboardingPolicyID)?.policyAccountID;
+                if (workspaceAccountID && hasIssuedExpensifyCard(workspaceAccountID, allWorkspaceCardsList)) {
+                    isTaskAutoCompleted = true;
+                }
             }
 
             const completedTaskReportAction = isTaskAutoCompleted

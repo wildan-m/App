@@ -5437,6 +5437,7 @@ async function completeOnboarding({
         onboardingPolicyID,
         userReportedIntegration,
         wasInvited,
+        selectedInterestedFeatures,
         companySize,
         isInvitedAccountant,
         onboardingPurposeSelected,

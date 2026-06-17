@@ -3335,6 +3335,21 @@ const translations = {
                     `),
             },
 
+            issueExpensifyCardTask: {
+                title: ({expensifyCardLink}) => `Issue [Expensify cards](${expensifyCardLink})`,
+                description: ({expensifyCardLink}) =>
+                    dedent(`
+                        Customize controls and streamline spending with the Expensify Card.
+
+                        1. Click *Workspaces*.
+                        2. Select your workspace.
+                        3. Click *Expensify Card*.
+                        4. Follow the prompts to issue your cards.
+
+                        [Take me to Expensify Card](${expensifyCardLink}).
+                    `),
+            },
+
             inviteTeamTask: {
                 title: ({workspaceMembersLink}) => `Invite [your team](${workspaceMembersLink})`,
                 description: ({workspaceMembersLink}) =>

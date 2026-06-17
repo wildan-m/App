@@ -44,6 +44,7 @@ type OnboardingTaskLinks = Partial<{
     workspaceConfirmationLink: string;
     testDriveURL: string;
     corporateCardLink: string;
+    expensifyCardLink: string;
 }>;
 
 type OnboardingTask = {
@@ -271,6 +272,13 @@ const getOnboardingMessages = (locale?: Locale) => {
         autoCompleted: false,
     };
 
+    const issueExpensifyCardTask: OnboardingTask = {
+        type: CONST.ONBOARDING_TASK_TYPE.ISSUE_EXPENSIFY_CARD,
+        title: ({expensifyCardLink}) => translate(resolvedLocale, 'onboarding.tasks.issueExpensifyCardTask.title', {expensifyCardLink}),
+        description: ({expensifyCardLink}) => translate(resolvedLocale, 'onboarding.tasks.issueExpensifyCardTask.description', {expensifyCardLink}),
+        autoCompleted: false,
+    };
+
     const inviteTeamTask: OnboardingTask = {
         type: CONST.ONBOARDING_TASK_TYPE.INVITE_TEAM,
         autoCompleted: false,
@@ -340,6 +348,7 @@ const getOnboardingMessages = (locale?: Locale) => {
             testDriveAdminTask,
             addAccountingIntegrationTask,
             connectCorporateCardTask,
+            issueExpensifyCardTask,
             inviteTeamTask,
             setupCategoriesAndTags,
             setupCategoriesTask,

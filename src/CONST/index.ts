@@ -7889,6 +7889,7 @@ const CONST = {
         TRACK_EXPENSE: 'trackExpense',
         ADD_ACCOUNTING_INTEGRATION: 'addAccountingIntegration',
         CONNECT_CORPORATE_CARD: 'connectCorporateCard',
+        ISSUE_EXPENSIFY_CARD: 'issueExpensifyCard',
         INVITE_TEAM: 'inviteTeam',
         SETUP_CATEGORIES_AND_TAGS: 'setupCategoriesAndTags',
         SETUP_TAGS: 'setupTags',
