@@ -24,6 +24,7 @@ import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import {getCommandURL} from '@libs/ApiUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
+import Log from '@libs/Log';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
@@ -829,6 +830,12 @@ function search({
             })
             .finally(() => {
                 inFlightSearchRequests.delete(dedupeKey);
+            })
+            .catch((error) => {
+                // The search request is fired and forgotten by its callers (e.g. useSearchPageSetup, useSearchHighlightAndScroll),
+                // so a rejection would otherwise escape to the global onunhandledrejection handler and be reported as a crash.
+                // User-facing error states already come from the failureData Onyx updates, so we only need to log the rejection here.
+                Log.warn('[Search] search request rejected', {error});
             });
 
     if (skipWaitForWrites) {
