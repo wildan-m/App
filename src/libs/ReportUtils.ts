@@ -5090,6 +5090,30 @@ function canEditFieldOfMoneyRequest({
         CONST.EDIT_REQUEST_FIELD.BILLABLE,
     ];
 
+    // Legacy/imported unreported expenses (e.g. scraper/emailed-in or imported personal-card cash expenses)
+    // often have no IOU money-request report action linking back to them, because NewDot only backfills that
+    // action lazily when the report is opened (see the legacy fallback in Report.openReport). Moving such an
+    // expense to a report does not depend on that action existing - changeTransactionsReport already falls back
+    // to the transaction ID when no old IOU action is found - so don't let the missing action hide the option
+    // here the way it does for the other editable fields. This keeps legacy/imported unreported expenses at
+    // parity with natively-created NewDot unreported expenses, which the unreported branch below already allows.
+    const isUnreportedExpense = !transaction?.reportID || transaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+    if (fieldToEdit === CONST.EDIT_REQUEST_FIELD.REPORT && isUnreportedExpense && !isMoneyRequestAction(reportAction)) {
+        // Still exclude a transaction that failed to be created, mirroring the validity guard in canEditMoneyRequest.
+        if (!transaction?.transactionID || (transaction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD && !isEmptyObject(transaction.errors))) {
+            return false;
+        }
+        // Mirror the per-diem-rates guard used by the unreported branch below.
+        if (isPerDiemRequest(transaction)) {
+            const perDiemPolicy = getPolicyByCustomUnitID(transaction, allPolicies);
+            const perDiemCustomUnit = getPerDiemCustomUnit(perDiemPolicy);
+            if (!perDiemPolicy?.arePerDiemRatesEnabled || isEmptyObject(perDiemCustomUnit?.rates)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     if (!isMoneyRequestAction(reportAction) || !canEditMoneyRequest(reportAction, transaction, isChatReportArchived, report, policy)) {
         return false;
     }
@@ -5150,9 +5174,6 @@ function canEditFieldOfMoneyRequest({
             (isDeleteAction ? isRequestor : true)
         );
     }
-
-    // Unreported transaction from OldDot can have the reportID as an empty string
-    const isUnreportedExpense = !transaction?.reportID || transaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
 
     if (fieldToEdit === CONST.EDIT_REQUEST_FIELD.DISTANCE_RATE) {
         // The distance rate can be modified only on the distance expense reports
