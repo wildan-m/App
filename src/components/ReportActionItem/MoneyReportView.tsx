@@ -35,7 +35,6 @@ import {
     isClosedExpenseReportWithNoExpenses as isClosedExpenseReportWithNoExpensesReportUtils,
     isGroupPolicyExpenseReport as isGroupPolicyExpenseReportUtils,
     isInvoiceReport as isInvoiceReportUtils,
-    isReportFieldDisabled,
     isReportFieldDisabledForUser,
     isReportFieldOfTypeTitle,
     isSettled as isSettledReportUtils,
@@ -147,10 +146,7 @@ function MoneyReportView({
         return {sortedPolicyReportFields: sorted, fieldValues: values, fieldsByName: byName};
     }, [policy?.fieldList, report]);
 
-    const enabledReportFields = sortedPolicyReportFields.filter(
-        (reportField) => !isReportFieldDisabled(report, reportField, policy) || reportField.type === CONST.REPORT_FIELD_TYPES.FORMULA,
-    );
-    const isOnlyTitleFieldEnabled = enabledReportFields.length === 1 && isReportFieldOfTypeTitle(enabledReportFields.at(0));
+    const isOnlyTitleFieldEnabled = !sortedPolicyReportFields.some((reportField) => !isReportFieldOfTypeTitle(reportField));
     const isClosedExpenseReportWithNoExpenses = isClosedExpenseReportWithNoExpensesReportUtils(report);
     const isGroupPolicyExpenseReport = isGroupPolicyExpenseReportUtils(report);
     const isInvoiceReport = isInvoiceReportUtils(report);

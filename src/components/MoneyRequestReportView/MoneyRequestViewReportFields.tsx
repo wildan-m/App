@@ -17,7 +17,6 @@ import {
     getReportFieldMaps,
     isGroupPolicyExpenseReport as isGroupPolicyExpenseReportUtils,
     isInvoiceReport as isInvoiceReportUtils,
-    isReportFieldDisabled,
     isReportFieldDisabledForUser,
     isReportFieldOfTypeTitle,
     shouldHideSingleReportField,
@@ -115,10 +114,7 @@ function MoneyRequestViewReportFields({report, policy, isCombinedReport = false,
             });
     }, [policy, report, currentUserAccountID]);
 
-    const enabledReportFields = sortedPolicyReportFields.filter(
-        (reportField) => !isReportFieldDisabled(report, reportField, policy) || reportField.type === CONST.REPORT_FIELD_TYPES.FORMULA,
-    );
-    const isOnlyTitleFieldEnabled = enabledReportFields.length === 1 && isReportFieldOfTypeTitle(enabledReportFields.at(0));
+    const isOnlyTitleFieldEnabled = !sortedPolicyReportFields.some((reportField) => !isReportFieldOfTypeTitle(reportField));
     const isGroupPolicyExpenseReport = isGroupPolicyExpenseReportUtils(report);
     const isInvoiceReport = isInvoiceReportUtils(report);
 
