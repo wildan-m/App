@@ -92,7 +92,9 @@ function SearchSelectionProvider({children}: SearchSelectionProviderProps) {
                 selectedTransactions,
                 areAllMatchingItemsSelected,
                 selectedReports: options?.data ? deriveSelectedReports(selectedTransactions, options.data) : prevState.selectedReports,
-                shouldTurnOffSelectionMode: false,
+                // Turn mobile selection mode off once a toggle deselects the last row. Entering selection mode commits a
+                // non-empty selection (the long-pressed item), so the mode is not turned off the instant it is turned on.
+                shouldTurnOffSelectionMode: isEmptyObject(selectedTransactions),
             };
         });
     };
