@@ -9268,8 +9268,17 @@ function getAllReportActionsErrorsAndReportActionThatRequiresAttention(
     const reportActionErrors: ErrorFields = {};
     let reportAction: OnyxEntry<ReportAction>;
 
+    // When the money request being paid has been deleted, the only money request action left is the orphaned "pay" action.
+    // Its stale failure error should not drive the red brick road, so detect whether any non-pay money request action still exists.
+    const hasActiveMoneyRequestAction = reportActionsArray.some((action) => isMoneyRequestAction(action) && getOriginalMessage(action)?.type !== CONST.IOU.REPORT_ACTION_TYPE.PAY);
+
     for (const action of reportActionsArray) {
         if (action && !isEmptyValueObject(action.errors)) {
+            // Skip the orphaned "pay" action's error when its money request no longer exists.
+            if (!hasActiveMoneyRequestAction && isMoneyRequestAction(action) && getOriginalMessage(action)?.type === CONST.IOU.REPORT_ACTION_TYPE.PAY) {
+                continue;
+            }
+
             Object.assign(reportActionErrors, action.errors);
 
             if (!reportAction) {
