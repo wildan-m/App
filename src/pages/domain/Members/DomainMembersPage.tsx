@@ -14,6 +14,7 @@ import ScrollView from '@components/ScrollView';
 import DropdownButton from '@components/Search/FilterDropdowns/DropdownButton';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/FilterPopupButton';
 import MultiSelectPopup from '@components/Search/FilterDropdowns/MultiSelectPopup';
+import type {MultiSelectItem} from '@components/Search/FilterDropdowns/MultiSelectPopup';
 import SectionSubtitleHTML from '@components/SectionSubtitleHTML';
 import CustomListHeader from '@components/SelectionListWithModal/CustomListHeader';
 import Text from '@components/Text';
@@ -97,13 +98,22 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         },
     ];
 
+    const handleGroupFilterChange = (items: Array<MultiSelectItem<string>>) => {
+        handleGroupChange(items);
+        // Clear any existing member selection so selection mode does not carry over from the previous group filter.
+        clearSelectedMembers();
+        if (shouldUseNarrowLayout && isMobileSelectionModeEnabled) {
+            turnOffMobileSelectionMode();
+        }
+    };
+
     const groupPopoverComponent = ({closeOverlay}: PopoverComponentProps) => (
         <MultiSelectPopup
             label={translate('common.group')}
             items={groupOptions}
             value={selectedGroups}
             closeOverlay={closeOverlay}
-            onChange={handleGroupChange}
+            onChange={handleGroupFilterChange}
         />
     );
 
