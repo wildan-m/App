@@ -59,7 +59,7 @@ function TabSelectorItem({
                 styles.userSelectNone,
                 isOfflineWithPendingAction ? styles.offlineFeedbackPending : undefined,
             ]}
-            wrapperStyle={equalWidth ? styles.flex1 : styles.flexGrow1}
+            wrapperStyle={equalWidth ? [styles.flex1, styles.mnw0] : styles.flexGrow1}
             onLongPress={onLongPress}
             onPress={() => {
                 scrollToTab(tabKey);

@@ -26,7 +26,7 @@ type TabLabelProps = {
 function TabLabel({title = '', activeOpacity = 0, inactiveOpacity = 1, hasIcon = false, textStyle}: TabLabelProps) {
     const styles = useThemeStyles();
     return (
-        <View style={{maxWidth: variables.tabSelectorMaxTabLabelWidth}}>
+        <View style={{flexShrink: 1, minWidth: 0, maxWidth: variables.tabSelectorMaxTabLabelWidth}}>
             <Animated.View style={[{opacity: activeOpacity}]}>
                 <Text
                     numberOfLines={1}

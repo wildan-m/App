@@ -4482,6 +4482,7 @@ const staticStyles = (theme: ThemeColors) =>
             justifyContent: 'center',
             borderRadius: variables.buttonBorderRadius,
             scrollMarginInline: variables.tabSelectorScrollMarginInline,
+            minWidth: 0,
         },
 
         tabSelector: {
