@@ -58,13 +58,18 @@ function getCategoryOptionTree(options: Record<string, Category> | Category[], s
             const leafName = getDecodedCategoryName(optionName.trim());
             const decodedCategoryName = getDecodedCategoryName(option.name);
             const tooltipText = isChild ? decodedCategoryName : getDecodedCategoryName(searchText);
+            const isOptionDisabled = isChild ? !option.enabled || option.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE : isParentOptionDisabled;
+            const isOptionSelected = isChild ? !!option.isSelected : !!selectedParentOption;
             optionCollection.set(searchText, {
                 text: `${indents}${leafName}`,
                 keyForList: searchText,
                 searchText,
                 tooltipText,
-                isDisabled: isChild ? !option.enabled || option.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE : isParentOptionDisabled,
-                isSelected: isChild ? !!option.isSelected : !!selectedParentOption,
+                isDisabled: isOptionDisabled,
+                isSelected: isOptionSelected,
+                // A synthesized parent placeholder row (a non-child that is disabled and not selected) is not selectable,
+                // so hide its dead selection (radio/checkbox) button while keeping the row visible for hierarchy context.
+                shouldHideSelectionButton: !isChild && isOptionDisabled && !isOptionSelected,
                 pendingAction: option.pendingAction,
             });
         }

@@ -119,6 +119,7 @@ type OptionTree = {
     tooltipText: string;
     isDisabled: boolean;
     isSelected: boolean;
+    shouldHideSelectionButton?: boolean;
     pendingAction?: PendingAction;
 } & Option;
 
