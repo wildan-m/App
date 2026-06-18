@@ -174,6 +174,33 @@ Onyx.connectWithoutView({
 });
 
 /**
+ * Detects navigations that originate from outside the app (a native share intent or a
+ * report deep link opened from another app). These must supersede the promo modal instead
+ * of being blocked by it, otherwise the share page / report never opens while the modal is up.
+ * The action is inspected the same way OnboardingGuard inspects its target navigations.
+ */
+function isExternalEntryNavigation(action: NavigationAction): boolean {
+    // Native share intent — delivered as a navigation to the Share modal navigator.
+    if (
+        (action.type === CONST.NAVIGATION.ACTION_TYPE.NAVIGATE || action.type === CONST.NAVIGATION.ACTION_TYPE.PUSH || action.type === CONST.NAVIGATION.ACTION_TYPE.REPLACE) &&
+        (action.payload as {name?: string} | undefined)?.name === NAVIGATORS.SHARE_MODAL_NAVIGATOR
+    ) {
+        return true;
+    }
+
+    // Report deep link opened from another app — resolves to a RESET/NAVIGATE whose
+    // resulting focused route is the report screen (not the promo modal).
+    if ((action.type === CONST.NAVIGATION.ACTION_TYPE.RESET || action.type === CONST.NAVIGATION.ACTION_TYPE.NAVIGATE) && !!action.payload) {
+        const targetFocusedRoute = findFocusedRoute(action.payload as NavigationState);
+        if (targetFocusedRoute?.name === SCREENS.REPORT || targetFocusedRoute?.name === SCREENS.SHARE.ROOT) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Block navigation while the AI features promo modal is active (on top of the stack).
  * Mirrors the pattern from MigratedUserWelcomeModalGuard.
  */
@@ -183,7 +210,8 @@ function shouldBlockWhileModalActive(state: NavigationState, action: NavigationA
         hasRedirectedToAIFeaturesPromoModal &&
         !isProductTrainingElementDismissed(CONST.AI_FEATURES_PROMO_MODAL, dismissedProductTraining) &&
         state.routes.at(-1)?.name === NAVIGATORS.AI_FEATURES_PROMO_MODAL_NAVIGATOR &&
-        !isAllowedAction
+        !isAllowedAction &&
+        !isExternalEntryNavigation(action)
     );
 }
 
