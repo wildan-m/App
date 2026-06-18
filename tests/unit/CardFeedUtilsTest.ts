@@ -10,7 +10,7 @@ import {
 } from '@libs/CardFeedUtils';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
-import type {Card, CardFeeds, CardList, CompanyCardFeed, Policy, WorkspaceCardsList} from '@src/types/onyx';
+import type {Card, CardFeeds, CardList, CompanyCardFeed, Domain, Policy, WorkspaceCardsList} from '@src/types/onyx';
 import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
 import {translateLocal} from '../utils/TestHelper';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
@@ -140,6 +140,23 @@ const cardFeedsMock: OnyxCollection<CardFeeds> = {
     },
 };
 
+// getCardFeedsForDisplayPerPolicy now gates feeds on the current user's domain/workspace-admin
+// standing for the fund. These fixtures make the current user a domain admin of fund 1234 so the
+// mock feeds (which carry no linkedPolicyIDs) are visible.
+const CURRENT_USER_ACCOUNT_ID = 777;
+const adminDomainForFund1234: OnyxCollection<Domain> = {
+    domain_1234: {
+        validated: true,
+        accountID: 1234,
+        email: '+@feed.com',
+        // Backend-provided keys; not camelCase in Onyx data. Current user is a domain admin.
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        domain_defaultSecurityGroupID: '0',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        expensify_adminPermissions_0: CURRENT_USER_ACCOUNT_ID,
+    },
+};
+
 describe('Card Feed Utils', () => {
     beforeAll(() => {
         IntlStore.load(CONST.LOCALES.EN);
@@ -190,18 +207,18 @@ describe('Card Feed Utils', () => {
         });
     });
 
-    it('returns card feeds grouped per policy', () => {
-        const cardFeedsForDisplayPerPolicy = getCardFeedsForDisplayPerPolicy(cardFeedsMock, translateLocal, undefined, undefined);
-        expect(cardFeedsForDisplayPerPolicy).toEqual({
-            '': [
-                {id: '1234_oauth.americanexpressfdx.com 1001', fundID: '1234', feed: 'oauth.americanexpressfdx.com 1001', name: 'American Express', linkedPolicyIDs: undefined, country: ''},
-            ],
-            AA1BB2CC3: [
-                {id: '1234_vcf', fundID: '1234', feed: 'vcf', name: 'Custom feed name', linkedPolicyIDs: undefined, country: ''},
-                {id: '1234_oauth.citibank.com', fundID: '1234', feed: 'oauth.citibank.com', name: 'Citibank', linkedPolicyIDs: undefined, country: ''},
-            ],
-            XX1YY2ZZ3: [{id: '1234_stripe', fundID: '1234', feed: 'stripe', name: 'Stripe', linkedPolicyIDs: undefined, country: ''}],
-        });
+    it('enumerates each feed once under the fund key for a domain admin (no per-workspace duplication, no dropped feeds)', () => {
+        const result = getCardFeedsForDisplayPerPolicy(cardFeedsMock, translateLocal, undefined, undefined, adminDomainForFund1234, CURRENT_USER_ACCOUNT_ID);
+        expect(Object.keys(result)).toEqual(['1234']);
+        expect(result['1234']).toHaveLength(4);
+        expect(result['1234']?.map((feed) => feed.id)).toEqual(
+            expect.arrayContaining(['1234_oauth.americanexpressfdx.com 1001', '1234_vcf', '1234_oauth.citibank.com', '1234_stripe']),
+        );
+    });
+
+    it('hides all feeds when the user is neither a domain admin nor a workspace admin for the fund', () => {
+        const result = getCardFeedsForDisplayPerPolicy(cardFeedsMock, translateLocal, undefined, undefined, undefined, CURRENT_USER_ACCOUNT_ID);
+        expect(result).toEqual({});
     });
 
     it('returns card feeds with country when feed has country in company cards settings', () => {
@@ -215,13 +232,13 @@ describe('Card Feed Utils', () => {
                 },
             },
         };
-        const result = getCardFeedsForDisplayPerPolicy(cardFeedsWithCountry, translateLocal, undefined, undefined);
-        expect(result.POL1).toHaveLength(1);
-        expect(result.POL1?.at(0)?.country).toBe('US');
-        expect(result.POL1?.at(0)?.id).toBe('1234_vcf');
+        const result = getCardFeedsForDisplayPerPolicy(cardFeedsWithCountry, translateLocal, undefined, undefined, adminDomainForFund1234, CURRENT_USER_ACCOUNT_ID);
+        expect(result['1234']).toHaveLength(1);
+        expect(result['1234']?.at(0)?.country).toBe('US');
+        expect(result['1234']?.at(0)?.id).toBe('1234_vcf');
     });
 
-    it('returns card feeds with linkedPolicyIDs when feed has linkedPolicyIDs in company cards settings', () => {
+    it('indexes a feed with linkedPolicyIDs under each linked policy the user administers', () => {
         const linkedPolicyIDs = ['POLICY_A', 'POLICY_B'];
         const cardFeedsWithLinkedPolicies: OnyxCollection<CardFeeds> = {
             sharedNVP_private_domain_member_1234: {
@@ -233,7 +250,11 @@ describe('Card Feed Utils', () => {
                 },
             },
         };
-        const result = getCardFeedsForDisplayPerPolicy(cardFeedsWithLinkedPolicies, translateLocal, undefined, undefined);
+        const policies: OnyxCollection<Policy> = {
+            policy_POLICY_A: createTestPolicy({id: 'POLICY_A'}),
+            policy_POLICY_B: createTestPolicy({id: 'POLICY_B'}),
+        };
+        const result = getCardFeedsForDisplayPerPolicy(cardFeedsWithLinkedPolicies, translateLocal, undefined, policies, undefined, CURRENT_USER_ACCOUNT_ID);
         expect(result.POLICY_A).toHaveLength(1);
         expect(result.POLICY_A?.at(0)?.linkedPolicyIDs).toEqual(linkedPolicyIDs);
         expect(result.POLICY_A?.at(0)?.id).toBe('1234_stripe');
@@ -242,7 +263,7 @@ describe('Card Feed Utils', () => {
         expect(result.POLICY_B?.at(0)?.id).toBe('1234_stripe');
     });
 
-    it('groups an orphan feed (no linkedPolicyIDs and no preferredPolicy) under a policy whose policyAccountID matches the fundID', () => {
+    it('shows an orphan feed once under the fund key when the user administers a workspace whose policyAccountID matches the fundID', () => {
         const orphanCardFeeds: OnyxCollection<CardFeeds> = {
             sharedNVP_private_domain_member_1234: {
                 settings: {
@@ -256,13 +277,14 @@ describe('Card Feed Utils', () => {
         const policies: OnyxCollection<Policy> = {
             policy_ORPHAN: createTestPolicy({id: 'ORPHAN_WORKSPACE', policyAccountID: 1234}),
         };
-        const result = getCardFeedsForDisplayPerPolicy(orphanCardFeeds, translateLocal, undefined, policies);
-        expect(result.ORPHAN_WORKSPACE).toHaveLength(1);
-        expect(result.ORPHAN_WORKSPACE?.at(0)?.id).toBe('1234_oauth.americanexpressfdx.com 1001');
+        const result = getCardFeedsForDisplayPerPolicy(orphanCardFeeds, translateLocal, undefined, policies, undefined, CURRENT_USER_ACCOUNT_ID);
+        expect(result['1234']).toHaveLength(1);
+        expect(result['1234']?.at(0)?.id).toBe('1234_oauth.americanexpressfdx.com 1001');
+        expect(result.ORPHAN_WORKSPACE).toBeUndefined();
         expect(result['']).toBeUndefined();
     });
 
-    it('stores an orphan feed under the empty-string key when no policy matches the fundID', () => {
+    it('hides an orphan feed when no workspace policyAccountID matches and the user is not a domain admin', () => {
         const orphanCardFeeds: OnyxCollection<CardFeeds> = {
             sharedNVP_private_domain_member_1234: {
                 settings: {
@@ -276,15 +298,13 @@ describe('Card Feed Utils', () => {
         const policies: OnyxCollection<Policy> = {
             policy_OTHER: createTestPolicy({id: 'OTHER_WORKSPACE', policyAccountID: 9999}),
         };
-        const result = getCardFeedsForDisplayPerPolicy(orphanCardFeeds, translateLocal, undefined, policies);
-        expect(result['']).toHaveLength(1);
-        expect(result['']?.at(0)?.id).toBe('1234_oauth.americanexpressfdx.com 1001');
-        expect(result.OTHER_WORKSPACE).toBeUndefined();
+        const result = getCardFeedsForDisplayPerPolicy(orphanCardFeeds, translateLocal, undefined, policies, undefined, CURRENT_USER_ACCOUNT_ID);
+        expect(result).toEqual({});
     });
 });
 
 describe('getFeedInfo', () => {
-    const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(cardFeedsMock, translateLocal, undefined, undefined);
+    const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(cardFeedsMock, translateLocal, undefined, undefined, adminDomainForFund1234, CURRENT_USER_ACCOUNT_ID);
 
     it('returns undefined when feedId is empty', () => {
         expect(getFeedInfo('', cardFeedsByPolicy)).toBeUndefined();

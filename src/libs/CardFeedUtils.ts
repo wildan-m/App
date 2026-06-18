@@ -6,7 +6,8 @@ import type IllustrationsType from '@styles/theme/illustrations/types';
 import CONST from '@src/CONST';
 import type {CombinedCardFeeds} from '@src/hooks/useCardFeeds';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Card, CardFeeds, CardList, PersonalDetailsList, Policy, WorkspaceCardsList} from '@src/types/onyx';
+import {isAdminSelector} from '@src/selectors/Domain';
+import type {Card, CardFeeds, CardList, Domain, PersonalDetailsList, Policy, WorkspaceCardsList} from '@src/types/onyx';
 import type {CardFeedsStatus, CardFeedsStatusByDomainID, CardFeedWithNumber, CombinedCardFeed} from '@src/types/onyx/CardFeeds';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
@@ -27,7 +28,7 @@ import {
     isPersonalCard,
 } from './CardUtils';
 import type {CompanyCardFeedIcons} from './CardUtils';
-import {getDescriptionForPolicyDomainCard} from './PolicyUtils';
+import {getDescriptionForPolicyDomainCard, isPolicyAdmin} from './PolicyUtils';
 import type {OptionData} from './ReportUtils';
 
 type CardFilterItem = Partial<OptionData> & AdditionalCardProps & {isCardFeed?: boolean; correspondingCards?: string[]; cardFeedKey: string; plaidUrl?: string; keyForList: string};
@@ -557,14 +558,49 @@ function getCardFeedsForDisplay(
 }
 
 /**
+ * Whether a corporate (company) card feed on `fundID` should be visible to the current user.
+ *
+ * Visibility is decided from admin standing only — never from `preferredPolicy` or a
+ * `policyAccountID` bucket match that can land more than once:
+ *  1. If the feed has `linkedPolicyIDs`, show it when the user is an admin of at least one
+ *     non-deleted linked policy.
+ *  2. Otherwise show it when the user is a domain admin of the domain whose ID matches the
+ *     fundID, or administers a non-deleted policy whose `policyAccountID` equals the fundID.
+ */
+function isCompanyCardFeedVisibleToAdmin(
+    fundID: string,
+    linkedPolicyIDs: string[] | undefined,
+    policies: OnyxCollection<Policy>,
+    domains: OnyxCollection<Domain>,
+    currentUserAccountID: number,
+): boolean {
+    const validLinkedPolicyIDs = linkedPolicyIDs?.filter(Boolean);
+    if (validLinkedPolicyIDs?.length) {
+        return validLinkedPolicyIDs.some((linkedPolicyID) => {
+            const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${linkedPolicyID.toUpperCase()}`];
+            return isPolicyAdmin(policy) && policy?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+        });
+    }
+
+    const numericFundID = Number(fundID);
+    const domain = domains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${numericFundID}`] ?? Object.values(domains ?? {}).find((entry) => entry?.accountID === numericFundID);
+    if (isAdminSelector(currentUserAccountID)(domain)) {
+        return true;
+    }
+
+    return Object.values(policies ?? {}).some(
+        (policy) => policy?.policyAccountID === numericFundID && isPolicyAdmin(policy) && policy?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+    );
+}
+
+/**
  * Given a collection of card feeds, return formatted card feeds grouped per policy.
  *
- * Each feed is assigned to one or more policies using a three-tier fallback:
- *  1. **linkedPolicyIDs** – if the feed has explicit linked policies, it is indexed under each of them.
- *  2. **preferredPolicy** – if there are no linked policies but a preferred policy exists, use that.
- *  3. **policyAccountID match** – if neither is set (orphan feed), fall back to any policy whose
- *     policyAccountID matches the feed's fundID so the feed still surfaces under the correct workspace.
- *     If no policy matches, the feed is stored under an empty-string key to avoid being silently lost.
+ * Each feed is enumerated exactly once (by `${fundID}_${feed}`) and is included only when the
+ * current user is a domain/workspace admin for its fund. A feed with `linkedPolicyIDs` is indexed
+ * under each linked policy so it appears as "available" for those workspaces; a feed with no
+ * linked policy is indexed once under its fund key so a domain admin still sees it (in the
+ * "from other workspaces" group) without it being duplicated per workspace or silently dropped.
  *
  * Note: "Expensify Card" feeds are not included.
  */
@@ -573,6 +609,8 @@ function getCardFeedsForDisplayPerPolicy(
     translate: LocalizedTranslate,
     feedKeysWithCards: FeedKeysWithAssignedCards | undefined,
     policies: OnyxCollection<Policy>,
+    domains: OnyxCollection<Domain>,
+    currentUserAccountID: number,
 ): Record<string, CardFeedForDisplay[]> {
     const cardFeedsForDisplayPerPolicy = {} as Record<string, CardFeedForDisplay[]>;
 
@@ -584,7 +622,6 @@ function getCardFeedsForDisplayPerPolicy(
         }
 
         for (const [key, feedData] of Object.entries(getOriginalCompanyFeeds(cardFeeds, feedKeysWithCards, Number(fundID)))) {
-            const preferredPolicy = feedData && 'preferredPolicy' in feedData ? (feedData.preferredPolicy ?? '') : '';
             const country = feedData && 'country' in feedData ? (feedData.country ?? '') : '';
             const linkedPolicyIDs = feedData && 'linkedPolicyIDs' in feedData ? feedData.linkedPolicyIDs : undefined;
             const feed = key as CardFeedWithNumber;
@@ -598,30 +635,21 @@ function getCardFeedsForDisplayPerPolicy(
                 name: getCustomOrFormattedFeedName(translate, feed, cardFeeds?.settings?.companyCardNicknames?.[feed], false) ?? feed,
             };
 
+            if (!isCompanyCardFeedVisibleToAdmin(fundID, linkedPolicyIDs, policies, domains, currentUserAccountID)) {
+                continue;
+            }
+
             const validLinkedPolicyIDs = linkedPolicyIDs?.filter(Boolean);
             if (validLinkedPolicyIDs?.length) {
                 // Index the feed under each linked policy so it appears for all of them
                 for (const linkedPolicyID of validLinkedPolicyIDs) {
                     (cardFeedsForDisplayPerPolicy[linkedPolicyID] ||= []).push(feedEntry);
                 }
-            } else if (preferredPolicy) {
-                (cardFeedsForDisplayPerPolicy[preferredPolicy] ||= []).push(feedEntry);
             } else {
-                // Orphan feed: no linkedPolicyIDs and no preferredPolicy.
-                // Find policies whose policyAccountID matches the fundID so the feed
-                // still appears under the correct workspace.
-                const numericFundID = Number(fundID);
-                const matchingPolicies = Object.values(policies ?? {}).filter((policy) => policy?.policyAccountID === numericFundID);
-                if (matchingPolicies.length) {
-                    for (const policy of matchingPolicies) {
-                        if (policy?.id) {
-                            (cardFeedsForDisplayPerPolicy[policy.id] ||= []).push(feedEntry);
-                        }
-                    }
-                } else {
-                    // Still store under empty key so the feed is not silently lost
-                    (cardFeedsForDisplayPerPolicy[''] ||= []).push(feedEntry);
-                }
+                // No linked policy: enumerate once under the fund key so the feed surfaces for the
+                // domain admin exactly once, instead of once per policyAccountID match (duplicates)
+                // or being dropped into an empty bucket (missing feeds).
+                (cardFeedsForDisplayPerPolicy[fundID] ||= []).push(feedEntry);
             }
         }
     }

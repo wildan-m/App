@@ -7,6 +7,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
 import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
+import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useFeedKeysWithAssignedCards from './useFeedKeysWithAssignedCards';
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
@@ -54,13 +55,15 @@ function getDefaultCardFeed(
 
 const useCardFeedsForDisplay = () => {
     const {localeCompare, translate} = useLocalize();
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [allDomains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN);
     const feedKeysWithCards = useFeedKeysWithAssignedCards();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const eligiblePoliciesIDsArray = eligiblePoliciesSelector(allPolicies);
 
-    const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate, feedKeysWithCards, allPolicies);
+    const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate, feedKeysWithCards, allPolicies, allDomains, currentUserAccountID);
 
     const defaultCardFeed = getDefaultCardFeed(eligiblePoliciesIDsArray, activePolicyID, cardFeedsByPolicy, localeCompare);
 

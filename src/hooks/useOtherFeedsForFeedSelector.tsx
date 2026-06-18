@@ -45,11 +45,17 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
 
     const getOtherFeeds = () => {
         const otherPolicyFeeds: CardFeedListItem[] = [];
+        const seenFeedIDs = new Set<string>();
         for (const [feedPolicyID, cardFeeds] of Object.entries(cardFeedsByPolicy ?? {})) {
             for (const feed of cardFeeds) {
                 if (feed?.linkedPolicyIDs?.includes(policyID)) {
                     continue;
                 }
+                // A feed can be indexed under more than one policy bucket; render it only once.
+                if (seenFeedIDs.has(feed.id)) {
+                    continue;
+                }
+                seenFeedIDs.add(feed.id);
                 const feedName = feed.feed;
                 const plaidUrl = getPlaidInstitutionIconUrl(feedName);
                 const domain = allDomains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${feed.fundID}`];
@@ -64,8 +70,8 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
                     country: feed?.country,
                     alternateText: domainName ?? feedPolicy?.name,
                     text: getCustomOrFormattedFeedName(translate, feedName, feed.name),
-                    // Composite key so rows stay distinct if the same feed id appears under multiple policies
-                    keyForList: `${feedPolicyID}_${feed.id}`,
+                    // Each feed id is rendered once (deduped above), so the id is a stable, unique key.
+                    keyForList: feed.id,
                     isSelected: feed.id === selectedFeedName,
                     brickRoadIndicator: shouldShowRBR ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
                     canShowSeveralIndicators: shouldShowRBR,

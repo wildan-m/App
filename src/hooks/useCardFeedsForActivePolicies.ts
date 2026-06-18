@@ -1,37 +1,22 @@
-import type {OnyxCollection} from 'react-native-onyx';
 import {getCardFeedsForDisplayPerPolicy} from '@libs/CardFeedUtils';
-import {getActivePolicies, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Policy} from '@src/types/onyx';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useFeedKeysWithAssignedCards from './useFeedKeysWithAssignedCards';
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
 
-function useEligiblePoliciesSelector() {
-    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
-    return (policies: OnyxCollection<Policy>) => {
-        const activePolicies = getActivePolicies(policies, currentUserLogin);
-        return Object.values(activePolicies ?? {}).reduce((policiesIDs, policy) => {
-            if (isPaidGroupPolicy(policy) && policy?.areCompanyCardsEnabled) {
-                policiesIDs.push(policy.id);
-            }
-            return policiesIDs;
-        }, [] as string[]);
-    };
-}
-
 const useCardFeedsForActivePolicies = () => {
     const {translate} = useLocalize();
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const [allFeeds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [allDomains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN);
     const feedKeysWithCards = useFeedKeysWithAssignedCards();
-    const eligiblePoliciesSelector = useEligiblePoliciesSelector();
-    const eligiblePoliciesIDsArray = eligiblePoliciesSelector(allPolicies);
 
-    const allCardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate, feedKeysWithCards, allPolicies);
-    const eligiblePolicyIdsSet = new Set(eligiblePoliciesIDsArray ?? []);
-    const cardFeedsByPolicy = Object.fromEntries(Object.entries(allCardFeedsByPolicy).filter(([policyID]) => eligiblePolicyIdsSet.has(policyID)));
+    // Enumerate each feed once, gated by the user's domain/workspace-admin status inside
+    // getCardFeedsForDisplayPerPolicy. No eligible-policy filter here: it used to drop the
+    // non-linked bucket, hiding domain feeds that aren't tied to one of the user's active policies.
+    const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate, feedKeysWithCards, allPolicies, allDomains, currentUserAccountID);
 
     return {cardFeedsByPolicy};
 };

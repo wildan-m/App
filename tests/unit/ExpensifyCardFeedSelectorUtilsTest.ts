@@ -104,39 +104,54 @@ describe('getAdminExpensifyCardFeedEntries', () => {
         }),
     ]);
 
-    it('shows an orphan feed when the fund has an issued Expensify Card', () => {
-        const cardList = createCardList(createRandomExpensifyCard(1, {fundID: orphanFundID.toString()}));
-
-        const entries = getAdminExpensifyCardFeedEntries(cardSettingsCollection, adminPolicyForFund, {}, currentUserAccountID, cardList);
+    it('shows an orphan feed when the user administers a workspace whose policyAccountID matches the fundID', () => {
+        const entries = getAdminExpensifyCardFeedEntries(cardSettingsCollection, adminPolicyForFund, {}, currentUserAccountID);
 
         expect(entries).toHaveLength(1);
         expect(entries.at(0)?.fundID).toBe(orphanFundID);
     });
 
-    it('hides an orphan feed when the fund has no issued Expensify Card', () => {
-        const cardList: CardList = {};
+    it('shows an orphan feed to a domain admin even when no Expensify Card is issued to the current user', () => {
+        const domains: OnyxCollection<Domain> = {
+            [`${ONYXKEYS.COLLECTION.DOMAIN}${orphanFundID}`]: {
+                ...createDomain('+@company.com', orphanFundID),
+                // Current user is listed as a domain admin
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                expensify_adminPermissions_0: currentUserAccountID,
+            },
+        };
 
-        const entries = getAdminExpensifyCardFeedEntries(cardSettingsCollection, adminPolicyForFund, {}, currentUserAccountID, cardList);
+        const entries = getAdminExpensifyCardFeedEntries(cardSettingsCollection, {}, domains, currentUserAccountID);
+
+        expect(entries).toHaveLength(1);
+        expect(entries.at(0)?.fundID).toBe(orphanFundID);
+    });
+
+    it('hides an orphan feed when the user is neither a domain admin nor admin of a matching workspace', () => {
+        const unrelatedPolicy = createPolicyCollection([createAdminPolicy({id: 'UNRELATED', policyAccountID: 9999})]);
+
+        const entries = getAdminExpensifyCardFeedEntries(cardSettingsCollection, unrelatedPolicy, {}, currentUserAccountID);
 
         expect(entries).toHaveLength(0);
     });
 
-    it('still shows a feed with a preferredPolicy even when the fund has no issued Expensify Card', () => {
+    it('ignores preferredPolicy: an orphan feed with only a preferredPolicy is hidden when the user has no admin standing for the fund', () => {
         const settingsWithPreferredPolicy: OnyxCollection<ExpensifyCardSettings> = {
             [`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${orphanFundID}`]: {...orphanFeedSettings, preferredPolicy: workspacePolicyID},
         };
+        const unrelatedPolicy = createPolicyCollection([createAdminPolicy({id: 'UNRELATED', policyAccountID: 9999})]);
 
-        const entries = getAdminExpensifyCardFeedEntries(settingsWithPreferredPolicy, adminPolicyForFund, {}, currentUserAccountID, {});
+        const entries = getAdminExpensifyCardFeedEntries(settingsWithPreferredPolicy, unrelatedPolicy, {}, currentUserAccountID);
 
-        expect(entries).toHaveLength(1);
+        expect(entries).toHaveLength(0);
     });
 
-    it('still shows a feed with linkedPolicyIDs even when the fund has no issued Expensify Card', () => {
+    it('shows a feed with linkedPolicyIDs when the user administers a linked policy', () => {
         const settingsWithLinkedPolicies: OnyxCollection<ExpensifyCardSettings> = {
             [`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${orphanFundID}`]: {...orphanFeedSettings, linkedPolicyIDs: [workspacePolicyID]},
         };
 
-        const entries = getAdminExpensifyCardFeedEntries(settingsWithLinkedPolicies, adminPolicyForFund, {}, currentUserAccountID, {});
+        const entries = getAdminExpensifyCardFeedEntries(settingsWithLinkedPolicies, adminPolicyForFund, {}, currentUserAccountID);
 
         expect(entries).toHaveLength(1);
     });

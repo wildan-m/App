@@ -139,7 +139,7 @@ describe('useOtherFeedsForFeedSelector', () => {
             feed: 'oauth.chase.com',
             fundID: 999,
             country: 'US',
-            keyForList: `${otherPolicyID}_999_oauth.chase.com`,
+            keyForList: '999_oauth.chase.com',
             isSelected: false,
         });
         expect(React.isValidElement(result.current.at(0)?.leftElement)).toBe(true);
