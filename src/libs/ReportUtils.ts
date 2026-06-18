@@ -104,7 +104,7 @@ import {removeDraftTransactionsByIDs} from './actions/TransactionEdit';
 import type {OnboardingCompanySize, OnboardingMessage, OnboardingPurpose, OnboardingTaskLinks} from './actions/Welcome/OnboardingFlow';
 import {getOnboardingMessages} from './actions/Welcome/OnboardingFlow';
 import type {AddCommentOrAttachmentParams} from './API/parameters';
-import {getCategoryGLCode} from './CategoryUtils';
+import {getCategoryGLCode, isCategoryMissing} from './CategoryUtils';
 import {convertToDisplayString} from './CurrencyUtils';
 import DateUtils from './DateUtils';
 import {getEnvironmentURL} from './Environment/Environment';
@@ -2280,7 +2280,13 @@ function pushTransactionViolationsOnyxData(
     } of nonInvoiceReportItems) {
         for (const transaction of Object.values(transactions)) {
             const pendingUpdate = transactionAutoSelections.get(transaction.transactionID);
-            const modifiedTransaction = pendingUpdate ? {...transaction, ...pendingUpdate} : transaction;
+            const mergedTransaction = pendingUpdate ? {...transaction, ...pendingUpdate} : transaction;
+
+            // New expenses are seeded with the 'Uncategorized' sentinel rather than an empty category, and
+            // getViolationsOnyxData only treats a falsy category as "missing". Normalize the sentinel to empty
+            // here so re-enabling categories flags these existing uncategorized expenses; without this the
+            // missingCategory violation is never recomputed and only appears after the expense is opened.
+            const modifiedTransaction = isCategoryMissing(mergedTransaction.category) ? {...mergedTransaction, category: ''} : mergedTransaction;
 
             const existingViolations = violations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`];
             const optimisticViolations = ViolationsUtils.getViolationsOnyxData({
