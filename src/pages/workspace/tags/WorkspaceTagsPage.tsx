@@ -62,6 +62,7 @@ import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import {
     getCleanedTagName,
     getConnectedIntegration,
+    getCountOfEnabledTagsOfList,
     getCurrentConnectionName,
     getTagApproverRule,
     getTagLists,
@@ -244,6 +245,18 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
     const glCodeTextStyle = useMemo(() => [styles.alignSelfStart], [styles.alignSelfStart]);
     const switchContainerStyle = useMemo(() => [StyleUtils.getMinimumWidth(variables.w72)], [StyleUtils]);
 
+    // For single-level tags, the lock icon on each row only needs the list's enabled-tag count, which is identical for every
+    // row. Compute it once here instead of recomputing it for every tag (via isDisablingOrDeletingLastEnabledTag) while
+    // building the list below — that recount made building the row data O(n²) and froze the page for workspaces with many tags.
+    const singleLevelTagList = policyTagLists?.at(0);
+    const isSingleLevelTagListRequired = !!singleLevelTagList?.required;
+    const enabledTagsCountInSingleLevelList = useMemo(() => getCountOfEnabledTagsOfList(singleLevelTagList?.tags), [singleLevelTagList?.tags]);
+    // Equivalent to isDisablingOrDeletingLastEnabledTag(singleLevelTagList, [tag]) for a single tag, but in constant time.
+    const isLastEnabledTagInSingleLevelList = useCallback(
+        (tag: PolicyTag) => isSingleLevelTagListRequired && tag.enabled && enabledTagsCountInSingleLevelList === 1,
+        [isSingleLevelTagListRequired, enabledTagsCountInSingleLevelList],
+    );
+
     const tagList = useMemo<TagListItem[]>(() => {
         if (isMultiLevelTags) {
             return policyTagLists.map((policyTagList) => {
@@ -365,7 +378,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                                     }
                                     updateWorkspaceTagEnabled(newValue, tag.name);
                                 }}
-                                showLockIcon={!canWriteTags || isDisablingOrDeletingLastEnabledTag(policyTagLists.at(0), [tag])}
+                                showLockIcon={!canWriteTags || isLastEnabledTagInSingleLevelList(tag)}
                             />
                         </View>
                     </>
@@ -387,7 +400,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                             }
                             updateWorkspaceTagEnabled(newValue, tag.name);
                         }}
-                        showLockIcon={!canWriteTags || isDisablingOrDeletingLastEnabledTag(policyTagLists.at(0), [tag])}
+                        showLockIcon={!canWriteTags || isLastEnabledTagInSingleLevelList(tag)}
                     />
                 ),
             };
@@ -412,6 +425,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
         styles.mr3,
         canWriteTags,
         withReadOnlyFallback,
+        isLastEnabledTagInSingleLevelList,
     ]);
 
     const filterTag = useCallback((tag: TagListItem, searchInput: string) => {
