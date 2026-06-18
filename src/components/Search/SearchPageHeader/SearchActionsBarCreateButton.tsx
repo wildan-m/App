@@ -1,3 +1,4 @@
+import {useFocusEffect} from '@react-navigation/native';
 import {emailSelector} from '@selectors/Session';
 import {validTransactionDraftIDsSelector} from '@selectors/TransactionDraft';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
@@ -101,6 +102,15 @@ function SearchActionsBarCreateButton() {
     });
 
     const hideCreateMenu = useCallback(() => setIsCreateMenuActive(false), []);
+
+    // Close the menu when the screen loses focus (e.g. navigating away with the browser back button),
+    // otherwise the popover's transparent backdrop is left mounted on top of the next screen and blocks all clicks.
+    useFocusEffect(
+        useCallback(() => {
+            return () => hideCreateMenu();
+        }, [hideCreateMenu]),
+    );
+
     const showCreateMenu = useCallback(() => {
         if (!createButtonRef.current) {
             return;
