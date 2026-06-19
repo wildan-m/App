@@ -1,4 +1,5 @@
 import {BaseNavigationContainer, NavigationIndependentTree} from '@react-navigation/core';
+import {StackActions} from '@react-navigation/native';
 import type {StackCardInterpolationProps} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -117,7 +118,12 @@ function MultifactorAuthenticationModalNavigator() {
             return;
         }
         if (mfaNavigationRef.isReady() && mfaNavigationRef.canGoBack()) {
-            mfaNavigationRef.goBack();
+            // Pop the whole stack back to the transparent MFA_INITIAL placeholder rather than a single
+            // screen. In HybridApp the terminal outcome screens are pushed (not replaced) onto PROMPT, so
+            // the stack is [MFA_INITIAL, PROMPT, OUTCOME]; a single goBack() pops only OUTCOME and reveals
+            // the leftover PROMPT page underneath during the slide-out. popToTop collapses straight to the
+            // transparent placeholder so nothing real is exposed behind the closing outcome screen.
+            mfaNavigationRef.dispatch(StackActions.popToTop());
         }
         backdropProgress.set(withTiming(0, {duration: CONST.ANIMATED_TRANSITION}));
         const handle = Navigation.runAfterUpcomingTransition(() => {
