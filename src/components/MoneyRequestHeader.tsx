@@ -123,7 +123,7 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
             const brokenConnectionError = transactionViolations?.find((violation) => violation.data?.rterType === CONST.RTER_VIOLATION_TYPES.BROKEN_CARD_CONNECTION);
             const cardID = brokenConnectionError?.data?.cardID;
             const card = cardID ? cardList?.[cardID] : undefined;
-            const isBrokenPersonalCard = isPersonalCard(card);
+            const isBrokenPersonalCard = !!card && isPersonalCard(card);
 
             if (isBrokenPersonalCard && brokenConnectionError) {
                 return undefined;
