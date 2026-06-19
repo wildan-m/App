@@ -24,13 +24,14 @@ function withAgentAccessDenied(getComponent: () => React.ComponentType): () => R
                 // Redirect on every focus (not just the initial false->true transition) so navigating back
                 // onto a guarded screen that the split navigator keeps mounted (e.g. a stale agents route
                 // left over from the owner session) bounces the agent to a page they can access instead of
-                // rendering a blank pane.
+                // rendering a blank pane. Replace (don't push) the guarded route so it isn't left in the back
+                // stack to re-trap the agent on Profile when they press back.
                 useFocusEffect(
                     useCallback(() => {
                         if (!isAgent || Navigation.isActiveRoute(ROUTES.SETTINGS_PROFILE.route)) {
                             return;
                         }
-                        Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute());
+                        Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute(), {forceReplace: true});
                     }, [isAgent]),
                 );
 
