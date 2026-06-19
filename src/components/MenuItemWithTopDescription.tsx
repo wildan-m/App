@@ -15,6 +15,7 @@ function MenuItemWithTopDescription({highlighted, outerWrapperStyle, ref, ...pro
         shouldHighlight: highlighted ?? false,
         highlightColor: theme.messageHighlightBG,
         itemEnterDelay: 0,
+        skipInitialFade: true,
     });
 
     return (
