@@ -6,6 +6,7 @@ import {createTypeMenuSections, doesSearchItemMatchSort} from '@libs/SearchUIUti
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isTrackIntentUserSelector} from '@src/selectors/Onboarding';
+import todosReportCountsSelector from '@src/selectors/Todos';
 import type {Policy, Session} from '@src/types/onyx';
 import useCardFeedsForDisplay from './useCardFeedsForDisplay';
 import useCreateEmptyReportConfirmation from './useCreateEmptyReportConfirmation';
@@ -68,6 +69,8 @@ const useSearchTypeMenuSections = (queryParams?: UseSearchTypeMenuSectionsParams
     const [savedSearches] = useOnyx(ONYXKEYS.SAVED_SEARCHES);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
+    const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
+    const hasReportsAwaitingApproval = reportCounts[CONST.SEARCH.SEARCH_KEYS.APPROVE] > 0;
     const [pendingReportCreation, setPendingReportCreation] = useState<{policyID: string; policyName?: string; onConfirm: (shouldDismissEmptyReportsConfirmation: boolean) => void} | null>(
         null,
     );
@@ -111,6 +114,7 @@ const useSearchTypeMenuSections = (queryParams?: UseSearchTypeMenuSectionsParams
                 defaultExpensifyCard,
                 draftTransactionIDs,
                 isTrackIntentUser: isTrackIntentUser ?? false,
+                hasReportsAwaitingApproval,
             }),
         [
             currentUserLoginAndAccountID?.email,
@@ -123,6 +127,7 @@ const useSearchTypeMenuSections = (queryParams?: UseSearchTypeMenuSectionsParams
             isOffline,
             draftTransactionIDs,
             isTrackIntentUser,
+            hasReportsAwaitingApproval,
         ],
     );
 
