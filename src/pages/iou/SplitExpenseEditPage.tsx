@@ -1,4 +1,5 @@
 import {policyTypeSelector} from '@selectors/Policy';
+import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {View} from 'react-native';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
@@ -9,6 +10,8 @@ import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import {useSearchResultsContext} from '@components/Search/SearchContext';
+import Switch from '@components/Switch';
+import Text from '@components/Text';
 import useAllTransactions from '@hooks/useAllTransactions';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -24,24 +27,26 @@ import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useSplitEffectivePolicy from '@hooks/useSplitEffectivePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {ViolationField} from '@hooks/useViolations';
+import {setDraftSplitTransaction} from '@libs/actions/IOU/Split';
 import {initDraftSplitExpenseDataForEdit, removeSplitExpenseField, updateSplitExpenseField} from '@libs/actions/IOU/SplitExpenseItems';
 import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import {openPolicyTagsPage} from '@libs/actions/Policy/Tag';
 import {getDecodedLeafCategoryName, isCategoryDescriptionRequired, isCategoryMissing} from '@libs/CategoryUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import {isBillableEnabledOnPolicy} from '@libs/MoneyRequestReportUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SplitExpenseParamList} from '@libs/Navigation/types';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
-import {getDistanceRateCustomUnitRate, getTagLists, hasAnyPaidPolicy, isGroupPolicyByType} from '@libs/PolicyUtils';
+import {getDistanceRateCustomUnitRate, getTagLists, hasAnyPaidPolicy, isGroupPolicyByType, isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {getReportName} from '@libs/ReportNameUtils';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {getParsedComment, getReportOrDraftReport, getTransactionDetails, isSelfDM} from '@libs/ReportUtils';
 import {getTagVisibility, hasEnabledTags} from '@libs/TagsOptionsListUtils';
-import {getDistanceInMeters, getRateID, getTag, getTagForDisplay, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest} from '@libs/TransactionUtils';
+import {getDistanceInMeters, getRateID, getTag, getTagForDisplay, getTaxName, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -210,6 +215,31 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
 
         return '';
     };
+
+    // Tax / Billable / Reimbursable visibility, mirroring MoneyRequestView so an individual split
+    // surfaces the same fields a regular expense does when the workspace enables them.
+    const splitBillable = splitExpenseDraftTransactionDetails?.billable;
+    const splitReimbursable = splitExpenseDraftTransactionDetails?.reimbursable;
+    const shouldShowTax = isTaxTrackingEnabled(isPolicyExpenseChat || isExpenseUnreported, effectivePolicy, isDistance);
+    const shouldShowBillable = (isPolicyExpenseChat || isExpenseUnreported) && (isBillableEnabledOnPolicy(effectivePolicy) || !!splitBillable);
+    const shouldShowReimbursable = (isPolicyExpenseChat || (isExpenseUnreported && !!effectivePolicy)) && effectivePolicy?.disabledFields?.reimbursable !== true;
+
+    const taxRateTitle = getTaxName(effectivePolicy, splitExpenseDraftTransaction, isExpenseUnreported);
+    const taxRatesDescription = effectivePolicy?.taxRates?.name;
+    const taxAmountTitle = convertToDisplayString(Math.abs(splitExpenseDraftTransactionDetails?.taxAmount ?? 0), currency);
+
+    const saveSplitBillable = useCallback(
+        (newBillable: boolean) => {
+            setDraftSplitTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, splitExpenseDraftTransaction, {billable: newBillable}, effectivePolicy);
+        },
+        [splitExpenseDraftTransaction, effectivePolicy],
+    );
+    const saveSplitReimbursable = useCallback(
+        (newReimbursable: boolean) => {
+            setDraftSplitTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, splitExpenseDraftTransaction, {reimbursable: newReimbursable}, effectivePolicy);
+        },
+        [splitExpenseDraftTransaction, effectivePolicy],
+    );
 
     const distanceRequestFields = isDistance ? (
         <>
@@ -424,6 +454,80 @@ function SplitExpenseEditPage({route}: SplitExpensePageProps) {
                             style={[styles.moneyRequestMenuItem]}
                             titleStyle={styles.flex1}
                         />
+                        {shouldShowTax && (
+                            <MenuItemWithTopDescription
+                                shouldShowRightIcon
+                                key={translate('common.tax')}
+                                title={taxRateTitle}
+                                description={taxRatesDescription ?? translate('common.tax')}
+                                numberOfLinesTitle={2}
+                                onPress={() => {
+                                    Navigation.navigate(
+                                        ROUTES.MONEY_REQUEST_STEP_TAX_RATE.getRoute(
+                                            CONST.IOU.ACTION.EDIT,
+                                            CONST.IOU.TYPE.SPLIT_EXPENSE,
+                                            CONST.IOU.OPTIMISTIC_TRANSACTION_ID,
+                                            reportID,
+                                            Navigation.getActiveRoute(),
+                                        ),
+                                    );
+                                }}
+                                style={[styles.moneyRequestMenuItem]}
+                                titleStyle={styles.flex1}
+                            />
+                        )}
+                        {shouldShowTax && (
+                            <MenuItemWithTopDescription
+                                shouldShowRightIcon
+                                key={translate('iou.taxAmount')}
+                                title={taxAmountTitle}
+                                description={translate('iou.taxAmount')}
+                                numberOfLinesTitle={2}
+                                onPress={() => {
+                                    Navigation.navigate(
+                                        ROUTES.MONEY_REQUEST_STEP_TAX_AMOUNT.getRoute(
+                                            CONST.IOU.ACTION.EDIT,
+                                            CONST.IOU.TYPE.SPLIT_EXPENSE,
+                                            CONST.IOU.OPTIMISTIC_TRANSACTION_ID,
+                                            reportID,
+                                            Navigation.getActiveRoute(),
+                                        ),
+                                    );
+                                }}
+                                style={[styles.moneyRequestMenuItem]}
+                                titleStyle={styles.flex1}
+                            />
+                        )}
+                        {shouldShowReimbursable && (
+                            <View style={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.mh5]}>
+                                <Text
+                                    accessible={false}
+                                    aria-hidden
+                                >
+                                    {Str.UCFirst(translate('iou.reimbursable'))}
+                                </Text>
+                                <Switch
+                                    accessibilityLabel={Str.UCFirst(translate('iou.reimbursable'))}
+                                    isOn={!!splitReimbursable}
+                                    onToggle={saveSplitReimbursable}
+                                />
+                            </View>
+                        )}
+                        {shouldShowBillable && (
+                            <View style={[styles.flexRow, styles.optionRow, styles.justifyContentBetween, styles.alignItemsCenter, styles.mh5]}>
+                                <Text
+                                    accessible={false}
+                                    aria-hidden
+                                >
+                                    {translate('common.billable')}
+                                </Text>
+                                <Switch
+                                    accessibilityLabel={translate('common.billable')}
+                                    isOn={!!splitBillable}
+                                    onToggle={saveSplitBillable}
+                                />
+                            </View>
+                        )}
                         <MenuItemWithTopDescription
                             key={translate('common.report')}
                             description={translate('common.report')}

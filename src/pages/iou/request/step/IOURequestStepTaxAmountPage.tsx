@@ -68,6 +68,8 @@ function IOURequestStepTaxAmountPage({
     const textInput = useRef<BaseTextInputRef | null>(null);
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isEditingSplitBill = isEditing && iouType === CONST.IOU.TYPE.SPLIT;
+    const isEditingSplitExpense = isEditing && iouType === CONST.IOU.TYPE.SPLIT_EXPENSE;
+    const isEditingSplitDraft = isEditingSplitBill || isEditingSplitExpense;
     const focusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     useRestartOnReceiptFailure(transaction, reportID, iouType, action);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -77,7 +79,7 @@ function IOURequestStepTaxAmountPage({
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
 
-    const currentTransaction = isEditingSplitBill && !isEmptyObject(splitDraftTransaction) ? splitDraftTransaction : transaction;
+    const currentTransaction = isEditingSplitDraft && !isEmptyObject(splitDraftTransaction) ? splitDraftTransaction : transaction;
     const transactionDetails = getTransactionDetails(currentTransaction);
     const currency = transactionDetails?.currency;
     const decimals = getCurrencyDecimals(currency);
@@ -101,7 +103,7 @@ function IOURequestStepTaxAmountPage({
     const updateTaxAmount = (currentAmount: CurrentMoney) => {
         const taxAmountInSmallestCurrencyUnits = convertToBackendAmount(Number.parseFloat(currentAmount.amount));
 
-        if (isEditingSplitBill) {
+        if (isEditingSplitDraft) {
             setDraftSplitTransaction(transactionID, splitDraftTransaction, {taxAmount: taxAmountInSmallestCurrencyUnits});
             navigateBack();
             return;

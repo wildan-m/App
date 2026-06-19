@@ -63,7 +63,9 @@ function IOURequestStepTaxRatePage({
 
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isEditingSplitBill = isEditing && iouType === CONST.IOU.TYPE.SPLIT;
-    const currentTransaction = isEditingSplitBill && !isEmptyObject(splitDraftTransaction) ? splitDraftTransaction : transaction;
+    const isEditingSplitExpense = isEditing && iouType === CONST.IOU.TYPE.SPLIT_EXPENSE;
+    const isEditingSplitDraft = isEditingSplitBill || isEditingSplitExpense;
+    const currentTransaction = isEditingSplitDraft && !isEmptyObject(splitDraftTransaction) ? splitDraftTransaction : transaction;
     const taxRates = policy?.taxRates;
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
@@ -112,7 +114,7 @@ function IOURequestStepTaxRatePage({
         const taxAmount = getTaxAmount(policy, currentTransaction, taxes.code, getAmount(currentTransaction, false, true), decimals);
         const taxValue = getTaxValue(policy, currentTransaction, taxes.code) ?? '';
 
-        if (isEditingSplitBill) {
+        if (isEditingSplitDraft) {
             setDraftSplitTransaction(currentTransaction.transactionID, splitDraftTransaction, {
                 taxAmount: convertToBackendAmount(taxAmount ?? 0),
                 taxCode: taxes.code,
