@@ -33,6 +33,7 @@ import {
     getReportOrDraftReport,
     getReportTransactions,
     hasHeldExpenses as hasHeldExpensesReportUtils,
+    hasOnlyHeldExpenses,
     hasOnlyNonReimbursableTransactions,
     hasOutstandingChildRequest,
     isArchivedReport,
@@ -140,6 +141,10 @@ function canApproveIOU(
     const reportTransactions = iouTransactions ?? getReportTransactions(iouReport?.reportID);
     const hasOnlyPendingCardOrScanningTransactions = reportTransactions.length > 0 && reportTransactions.every((transaction) => isScanning(transaction) || isPending(transaction));
     if (hasOnlyPendingCardOrScanningTransactions) {
+        return false;
+    }
+    // A report whose transactions are all on hold cannot be approved yet (the hold must be removed first), so it should not request the approver's attention.
+    if (hasOnlyHeldExpenses(reportTransactions)) {
         return false;
     }
     const isPayAtEndExpenseReport = isPayAtEndExpenseReportReportUtils(iouReport ?? undefined, reportTransactions);
