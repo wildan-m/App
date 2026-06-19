@@ -6485,6 +6485,10 @@ const CONST = {
     DOT_SEPARATOR: '•',
     BULLET: '●',
 
+    // Prefix used for platform-generated tax rate IDs (see covertTaxNameToID). These internal IDs
+    // should never be surfaced as a user-facing tax code — only user-assigned codes are displayed.
+    DEFAULT_TAX_ID_PREFIX: 'id_',
+
     DEFAULT_TAX: {
         defaultExternalID: 'id_TAX_EXEMPT',
         defaultValue: '0%',
