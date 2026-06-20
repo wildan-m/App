@@ -108,6 +108,7 @@ function SpendRulePageBase({policyID, ruleID, titleKey, testID}: SpendRulePageBa
 
     const openMaxAmountCurrencyMismatchModal = () => {
         showConfirmModal({
+            id: `spend-rule-max-amount-currency-mismatch-${currentRuleID}`,
             title: translate('workspace.rules.spendRules.maxAmountCurrencyMismatchTitle'),
             prompt: translate('workspace.rules.spendRules.maxAmountCurrencyMismatchPrompt'),
             confirmText: translate('workspace.rules.spendRules.reviewSelectedCards'),
@@ -123,6 +124,7 @@ function SpendRulePageBase({policyID, ruleID, titleKey, testID}: SpendRulePageBa
 
     const openCurrenciesCurrencyMismatchModal = () => {
         showConfirmModal({
+            id: `spend-rule-currencies-currency-mismatch-${currentRuleID}`,
             title: translate('workspace.rules.spendRules.currenciesCurrencyMismatchTitle'),
             prompt: translate('workspace.rules.spendRules.currenciesCurrencyMismatchPrompt'),
             confirmText: translate('workspace.rules.spendRules.reviewSelectedCards'),
