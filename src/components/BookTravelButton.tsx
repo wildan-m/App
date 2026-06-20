@@ -123,21 +123,23 @@ function BookTravelButton({
             return;
         }
 
-        if (areTravelPersonalDetailsMissing(privatePersonalDetails)) {
-            shouldResumeBookingRef.current = true;
-            Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policy?.id ?? String(CONST.DEFAULT_NUMBER_ID)));
-            return;
-        }
-
         // The primary login of the user is where Spotnana sends the emails with booking confirmations, itinerary etc. It can't be a phone number.
         if (!primaryContactMethod || Str.isSMSLogin(primaryContactMethod)) {
             setErrorMessage(<RenderHTML html={translate('travel.phoneError', phoneErrorMethodsRoute)} />);
             return;
         }
 
-        // Spotnana requires a private domain email for travel booking
+        // Spotnana requires a private domain email for travel booking. This must be checked before the missing-personal-details
+        // check below, otherwise a brand-new public-domain user (who has not yet filled in their legal name) is routed to the
+        // "What's your legal name?" page instead of being shown the "use your work email" message they can actually act on.
         if (isEmailPublicDomain(primaryContactMethod)) {
             navigateToPublicDomainError();
+            return;
+        }
+
+        if (areTravelPersonalDetailsMissing(privatePersonalDetails)) {
+            shouldResumeBookingRef.current = true;
+            Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_MISSING_PERSONAL_DETAILS.getRoute(policy?.id ?? String(CONST.DEFAULT_NUMBER_ID)));
             return;
         }
 
