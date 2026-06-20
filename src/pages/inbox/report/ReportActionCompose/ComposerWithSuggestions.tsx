@@ -965,7 +965,9 @@ function ComposerWithSuggestions({
             mobileInputScrollPosition.current = 0;
             // Note: use the value when the clear happened, not the current value which might have changed already
             onClearProp(textOnClear);
-            updateComment('', true);
+            // Clear the draft synchronously (not debounced) so navigating away right after sending cannot
+            // cancel a pending empty-draft save and leave the just-sent text behind as a stale draft.
+            updateComment('');
         },
         [onClearProp, updateComment],
     );
