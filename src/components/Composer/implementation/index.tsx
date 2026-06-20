@@ -39,6 +39,9 @@ function Composer({
     isDisabled = false,
     onClear = () => {},
     onPasteFile = () => {},
+    // Web handles HTML paste via the useHtmlPaste hook, so this native-only prop is destructured here only to keep it from leaking onto the DOM input.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    onPasteHtml = () => {},
     onSelectionChange = () => {},
     checkComposerVisibility = () => false,
     selection: selectionProp = {

@@ -1094,6 +1094,7 @@ function ComposerWithSuggestions({
                         composerRef.current?.blur();
                         onPasteFile(files);
                     }}
+                    onPasteHtml={replaceSelectionWithText}
                     onClear={onClear}
                     isDisabled={disabled}
                     selection={selection}

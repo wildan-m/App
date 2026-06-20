@@ -25,6 +25,7 @@ const excludeReportMentionStyle: Array<keyof MarkdownStyle> = ['mentionReport'];
 function Composer({
     onClear: onClearProp = () => {},
     onPasteFile = () => {},
+    onPasteHtml = () => {},
     isDisabled = false,
     maxLines,
     isComposerFullSize = false,
@@ -100,6 +101,13 @@ function Composer({
             if (clipboardContent?.type === 'text/plain') {
                 return;
             }
+            // When the clipboard carries an HTML flavor (e.g. rich text copied from a chat), convert it back to
+            // Markdown the same way the web composer does (useHtmlPaste -> Parser.htmlToMarkdown) and insert it at
+            // the current caret/selection, instead of treating the clip as a file to attach.
+            if (clipboardContent?.type === 'text/html') {
+                onPasteHtml(Parser.htmlToMarkdown(clipboardContent.data ?? '', {}));
+                return;
+            }
             const mimeType = clipboardContent?.type ?? '';
             const fileURI = clipboardContent?.data;
             const baseFileName = fileURI?.split('/').pop() ?? 'file';
@@ -111,7 +119,7 @@ function Composer({
                 .then((size) => (file = {...file, size}))
                 .finally(() => onPasteFile(file));
         },
-        [onPasteFile],
+        [onPasteFile, onPasteHtml],
     );
 
     const maxHeightStyle = useMemo(

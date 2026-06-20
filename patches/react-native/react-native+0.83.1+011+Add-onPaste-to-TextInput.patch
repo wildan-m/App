@@ -450,7 +450,7 @@ index fb8f4b1..b2bfdaa 100644
      textAttributes = TextAttributes()
  
      applyTextAttributes()
-@@ -367,10 +375,50 @@ public open class ReactEditText public constructor(context: Context) : AppCompat
+@@ -367,10 +375,61 @@ public open class ReactEditText public constructor(context: Context) : AppCompat
     * Called when a context menu option for the text view is selected.
     * React Native replaces copy (as rich text) with copy as plain text.
     */
@@ -483,6 +483,17 @@ index fb8f4b1..b2bfdaa 100644
 +                      pasteWatcher?.onPaste(type, data)
 +                  }
 +                  // Prevents default behavior to avoid inserting raw binary data into the text field
++                  return true
++              }
++          }
++
++          if (clipData.description.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
++              val html: String? = item.htmlText ?: item.coerceToHtmlText(getContext())
++              if (html != null) {
++                  if (pasteWatcher != null) {
++                      pasteWatcher?.onPaste(ClipDescription.MIMETYPE_TEXT_HTML, html)
++                  }
++                  // Prevents the default plain-text paste so the Markdown isn't also inserted as plain text
 +                  return true
 +              }
 +          }

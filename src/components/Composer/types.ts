@@ -43,6 +43,9 @@ type ComposerProps = Omit<TextInputProps, 'onClear'> &
         /** Callback method to handle pasting a file */
         onPasteFile?: (files: FileObject | FileObject[]) => void;
 
+        /** Callback method to insert Markdown converted from pasted HTML at the current selection (native only) */
+        onPasteHtml?: (markdown: string) => void;
+
         /** General styles to apply to the text input */
 
         style?: StyleProp<TextStyle>;
