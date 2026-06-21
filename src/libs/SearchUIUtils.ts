@@ -5955,6 +5955,7 @@ function getColumnsToShow({
  * - 5, 6, 7: Failed
  * - 8: Cleared (succeeded and complete)
  * - 9: Cleared (settled, pending batch processing)
+ * - 10: Cash back (ACH cash back credit) — exact value to be confirmed with the backend team
  * - All others: Pending (processing)
  */
 const settlementStatusMap = new Map<number, ValueOf<typeof CONST.SEARCH.SETTLEMENT_STATUS>>([
@@ -5963,6 +5964,7 @@ const settlementStatusMap = new Map<number, ValueOf<typeof CONST.SEARCH.SETTLEME
     [7, CONST.SEARCH.SETTLEMENT_STATUS.FAILED],
     [8, CONST.SEARCH.SETTLEMENT_STATUS.CLEARED],
     [9, CONST.SEARCH.SETTLEMENT_STATUS.CLEARED],
+    [10, CONST.SEARCH.SETTLEMENT_STATUS.CASH_BACK],
 ]);
 
 function getSettlementStatus(state: number | undefined): ValueOf<typeof CONST.SEARCH.SETTLEMENT_STATUS> | undefined {
@@ -6020,6 +6022,16 @@ function getSettlementStatusBadgeProps(
                 },
                 textStyles: {
                     color: theme.reportStatusBadge.draft.textColor,
+                },
+            };
+        case CONST.SEARCH.SETTLEMENT_STATUS.CASH_BACK:
+            return {
+                text: translate('settlement.status.cashBack'),
+                badgeStyles: {
+                    backgroundColor: theme.reportStatusBadge.paid.backgroundColor,
+                },
+                textStyles: {
+                    color: theme.reportStatusBadge.paid.textColor,
                 },
             };
         default:

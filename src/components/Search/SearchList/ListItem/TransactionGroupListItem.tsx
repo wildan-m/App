@@ -29,7 +29,7 @@ import {search} from '@libs/actions/Search';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {ModifiedMouseEvent} from '@libs/Navigation/helpers/openInternalRouteInNewTab';
-import {getSections} from '@libs/SearchUIUtils';
+import {getSections, getSettlementStatus} from '@libs/SearchUIUtils';
 import {mergeProhibitedViolations, shouldShowViolation} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
@@ -122,6 +122,10 @@ function TransactionGroupListItem<TItem extends ListItem>({
     const [transactionsSnapshot] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${groupItem.transactionsQueryJSON?.hash}`);
 
     const isExpenseReportType = searchType === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
+    // ACH cash back credit rows are surfaced as a non-expandable withdrawal group (no underlying transactions to drill into yet).
+    const isCashBackWithdrawalGroup =
+        groupBy === CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID &&
+        getSettlementStatus((groupItem as TransactionWithdrawalIDGroupListItemType).state) === CONST.SEARCH.SETTLEMENT_STATUS.CASH_BACK;
     const reportGroupID = isExpenseReportType ? (groupItem as TransactionReportGroupListItemType).reportID : undefined;
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
 
@@ -295,7 +299,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
         if (isExpenseReportType || transactions.length === 0) {
             onSelectRow(item, transactionPreviewData, event);
         }
-        if (!isExpenseReportType) {
+        if (!isExpenseReportType && !isCashBackWithdrawalGroup) {
             handleToggle();
         }
     };
@@ -360,7 +364,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
                     canSelectMultiple={canSelectMultiple}
                     isSelectAllChecked={isSelectAllChecked}
                     isIndeterminate={isIndeterminate}
-                    onDownArrowClick={onExpandIconPress}
+                    onDownArrowClick={isCashBackWithdrawalGroup ? undefined : onExpandIconPress}
                     isExpanded={isExpanded}
                 />
             ),

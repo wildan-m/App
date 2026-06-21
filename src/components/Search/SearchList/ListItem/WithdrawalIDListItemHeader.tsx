@@ -84,6 +84,9 @@ function WithdrawalIDListItemHeader<TItem extends ListItem>({
     );
     const badgeProps = getSettlementStatusBadgeProps(withdrawalIDItem.state, translate, theme);
     const settlementStatus = getSettlementStatus(withdrawalIDItem.state);
+    // A cash back credit is a credit back to the bank account, so its total reads as a negative amount (the opposite sign of a card settlement).
+    const isCashBack = settlementStatus === CONST.SEARCH.SETTLEMENT_STATUS.CASH_BACK;
+    const displayedTotal = isCashBack ? -Math.abs(withdrawalIDItem.total) : withdrawalIDItem.total;
     const statusBadge = !!badgeProps && (
         <StatusBadge
             text={badgeProps.text}
@@ -172,7 +175,7 @@ function WithdrawalIDListItemHeader<TItem extends ListItem>({
                 style={StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL, {shouldRemoveTotalColumnFlex: true})}
             >
                 <TotalCell
-                    total={withdrawalIDItem.total}
+                    total={displayedTotal}
                     currency={withdrawalIDItem.currency}
                 />
             </View>
@@ -221,7 +224,7 @@ function WithdrawalIDListItemHeader<TItem extends ListItem>({
                 {!isLargeScreenWidth && (
                     <View style={[styles.flexShrink0, styles.flexRow, styles.alignItemsCenter]}>
                         <TotalCell
-                            total={withdrawalIDItem.total}
+                            total={displayedTotal}
                             currency={withdrawalIDItem.currency}
                         />
                         {!!onDownArrowClick && (

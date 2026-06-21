@@ -6616,6 +6616,7 @@ const CONST = {
             PENDING: 'pending',
             CLEARED: 'cleared',
             FAILED: 'failed',
+            CASH_BACK: 'cashBack',
         },
         IS_VALUES: {
             READ: 'read',
