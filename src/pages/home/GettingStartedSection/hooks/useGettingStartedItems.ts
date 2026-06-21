@@ -72,7 +72,11 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         return emptyResult;
     }
 
-    if (!isWithinGettingStartedPeriod(firstDayFreeTrial)) {
+    // Control (corporate) workspaces never receive the free-trial NVP, so fall back to the workspace's own
+    // creation date to keep the getting-started window open for newly created Control workspaces (e.g. created
+    // via the "Other" onboarding choice). Trial users keep their existing behavior since the trial start and
+    // workspace creation effectively coincide for new sign-ups.
+    if (!isWithinGettingStartedPeriod(firstDayFreeTrial ?? policy.created)) {
         return emptyResult;
     }
 
