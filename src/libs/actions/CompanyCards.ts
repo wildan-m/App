@@ -1318,4 +1318,5 @@ export {
     linkCardFeedToPolicy,
     seedCardFeedRefresh,
     startCardFeedRefresh,
+    parseCSVAmount,
 };

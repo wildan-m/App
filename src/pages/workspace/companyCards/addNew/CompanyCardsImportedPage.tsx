@@ -16,7 +16,7 @@ import {goBackFromInvalidPolicy} from '@libs/PolicyUtils';
 import type {WorkspaceSplitNavigatorParamList} from '@navigation/types';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
-import {importCSVCompanyCards} from '@userActions/CompanyCards';
+import {importCSVCompanyCards, parseCSVAmount} from '@userActions/CompanyCards';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -78,6 +78,51 @@ function CompanyCardsImportedPage({route}: CompanyCardsImportedPageProps) {
 
     const requiredColumns = columnRoles.filter((role) => role.isRequired);
 
+    // Scan the mapped rows for the exact data conditions that `buildOptimisticCompanyCardCSVTransactions` uses to silently skip a row
+    // (empty card number, posted date or currency, or an amount that can't be parsed). Returns a human-readable list of the offending
+    // rows and missing fields so the user gets an actionable message instead of the generic import-failure modal.
+    const findInvalidRows = (): string | undefined => {
+        const columnNamesByIndex = Object.values(spreadsheet?.columns ?? {});
+        const columnMappings = columnNames.map((_, index) => columnNamesByIndex.at(index) ?? CONST.CSV_IMPORT_COLUMNS.IGNORE);
+        const cardNumberColumnIndex = columnMappings.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.CARD_NUMBER);
+        const postedDateColumnIndex = columnMappings.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.POSTED_DATE);
+        const currencyColumnIndex = columnMappings.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.CURRENCY);
+        const amountColumnIndex = columnMappings.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.AMOUNT);
+
+        const dataColumns = spreadsheet?.data ?? [];
+        const rowCount = dataColumns.at(0)?.length ?? 0;
+        // The first row holds headers when `containsHeader` is set, so skip it when scanning the actual data.
+        const firstDataRowIndex = spreadsheet?.containsHeader ? 1 : 0;
+        const getCell = (columnIndex: number, rowIndex: number) => (columnIndex >= 0 ? (dataColumns.at(columnIndex)?.at(rowIndex) ?? '') : '');
+
+        const invalidRows: string[] = [];
+        for (let rowIndex = firstDataRowIndex; rowIndex < rowCount; rowIndex++) {
+            const missingFields: string[] = [];
+            if (!getCell(cardNumberColumnIndex, rowIndex).trim()) {
+                missingFields.push(translate('workspace.companyCards.addNewCard.csvColumns.cardNumber'));
+            }
+            if (!getCell(postedDateColumnIndex, rowIndex).trim()) {
+                missingFields.push(translate('workspace.companyCards.addNewCard.csvColumns.postedDate'));
+            }
+            if (!getCell(currencyColumnIndex, rowIndex).trim()) {
+                missingFields.push(translate('workspace.companyCards.addNewCard.csvColumns.currency'));
+            }
+            if (parseCSVAmount(getCell(amountColumnIndex, rowIndex)) === undefined) {
+                missingFields.push(translate('workspace.companyCards.addNewCard.csvColumns.amount'));
+            }
+            if (missingFields.length === 0) {
+                continue;
+            }
+            // Report the row number as it appears in the user's file (1-based, header row included).
+            invalidRows.push(`${rowIndex + 1} (${missingFields.join(', ')})`);
+            if (invalidRows.length >= CONST.COMPANY_CARDS.MAX_INVALID_ROWS_TO_REPORT) {
+                break;
+            }
+        }
+
+        return invalidRows.length > 0 ? invalidRows.join('; ') : undefined;
+    };
+
     const validate = () => {
         const columns = Object.values(spreadsheet?.columns ?? {});
         let errors: Errors = {};
@@ -93,7 +138,12 @@ function CompanyCardsImportedPage({route}: CompanyCardsImportedPageProps) {
             if (duplicate) {
                 errors.duplicates = translate('workspace.companyCards.addNewCard.csvErrors.duplicateColumns', duplicate);
             } else {
-                errors = {};
+                const invalidRows = findInvalidRows();
+                if (invalidRows) {
+                    errors.invalidRows = translate('workspace.companyCards.addNewCard.csvErrors.invalidRows', invalidRows);
+                } else {
+                    errors = {};
+                }
             }
         }
         return errors;

@@ -5634,6 +5634,7 @@ const translations = {
                 csvErrors: {
                     requiredColumns: (missingColumns: string) => `Please assign a column to each of the attributes: ${missingColumns}.`,
                     duplicateColumns: (duplicateColumn: string) => `Oops! You've mapped a single field ("${duplicateColumn}") to multiple columns. Please review and try again.`,
+                    invalidRows: (invalidRows: string) => `These rows are missing required values and can't be imported: ${invalidRows}. Please fix them and try again.`,
                 },
             },
             statementCloseDate: {

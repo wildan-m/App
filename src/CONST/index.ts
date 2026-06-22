@@ -4605,6 +4605,8 @@ const CONST = {
         CONNECTION_ERROR: 'connectionError',
         WORKSPACE_FEEDS_LOAD_ERROR: 'workspaceFeedsLoadError',
         FEED_LOAD_ERROR: 'feedLoadError',
+        // Cap on how many invalid CSV rows we list in the import validation error to keep the message readable.
+        MAX_INVALID_ROWS_TO_REPORT: 10,
         STEP: {
             SELECT_BANK: 'SelectBank',
             SELECT_FEED_TYPE: 'SelectFeedType',
