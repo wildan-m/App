@@ -9,6 +9,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getQuickbooksOnlineSetupLink} from '@libs/actions/connections/QuickbooksOnline';
+import getUAForWebView from '@libs/getUAForWebView';
 import {enablePolicyTaxes} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -63,6 +64,7 @@ function ConnectToQuickbooksOnlineFlow({policyID}: ConnectToQuickbooksOnlineFlow
                             Cookie: `authToken=${authToken}`,
                         },
                     }}
+                    userAgent={getUAForWebView()}
                     incognito // 'incognito' prop required for Android, issue here https://github.com/react-native-webview/react-native-webview/issues/1352
                     startInLoadingState
                     renderLoading={renderLoading}
