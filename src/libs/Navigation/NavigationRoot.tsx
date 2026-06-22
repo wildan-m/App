@@ -18,6 +18,7 @@ import shouldOpenLastVisitedPath from '@libs/shouldOpenLastVisitedPath';
 import {getPathFromURL} from '@libs/Url';
 import {updateLastVisitedPath} from '@userActions/App';
 import {updateOnboardingLastVisitedPath} from '@userActions/Welcome';
+import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import {endSpan, getSpan, startSpan} from '@src/libs/telemetry/activeSpans';
 import {navigationIntegration} from '@src/libs/telemetry/integrations';
@@ -141,7 +142,7 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
             return undefined;
         }
 
-        if (shouldOpenLastVisitedPath(lastVisitedPath) && authenticated) {
+        if (shouldOpenLastVisitedPath(lastVisitedPath) && !CONFIG.IS_HYBRID_APP && authenticated) {
             // Only skip restoration if there's a specific deep link that's not the root
             // This allows restoration when app is killed and reopened without a deep link
             const isRootPath = !path || path === '' || path === '/';
