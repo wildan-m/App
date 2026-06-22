@@ -123,7 +123,7 @@ function useReconcileSelectionWithData({
     archivedReportsIDSet,
     outstandingReportsByPolicyID,
 }: ReconcileSelectionParams) {
-    const {selectedTransactions, areAllMatchingItemsSelected} = useSearchSelectionContext();
+    const {selectedTransactions, areAllMatchingItemsSelected, excludedTransactions} = useSearchSelectionContext();
     const {applySelection} = useSearchSelectionActions();
 
     useEffect(() => {
@@ -146,11 +146,14 @@ function useReconcileSelectionWithData({
                     if (transactionGroup.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
                         continue;
                     }
-                    if (reportKey && (reportKey in selectedTransactions || areAllMatchingItemsSelected)) {
+                    // An item the user deselected while "select all matching" is active is excluded, so all-matching
+                    // must not re-include it on a data reconcile.
+                    const includedByAllMatching = areAllMatchingItemsSelected && !!reportKey && !excludedTransactions[reportKey];
+                    if (reportKey && (reportKey in selectedTransactions || includedByAllMatching)) {
                         const [, emptyReportSelection] = mapEmptyReportToSelectedEntry(transactionGroup);
                         newTransactionList[reportKey] = {
                             ...emptyReportSelection,
-                            isSelected: areAllMatchingItemsSelected || selectedTransactions[reportKey]?.isSelected,
+                            isSelected: includedByAllMatching || selectedTransactions[reportKey]?.isSelected,
                         };
                     }
                     continue;
@@ -169,9 +172,11 @@ function useReconcileSelectionWithData({
                 for (const transactionItem of transactionGroup.transactions) {
                     const listKey = transactionItem.keyForList ?? transactionItem.transactionID;
                     const isSelected = listKey in selectedTransactions || transactionItem.transactionID in selectedTransactions;
+                    // Rows deselected while "select all matching" is active are excluded, so all-matching must not re-include them.
+                    const includedByAllMatching = areAllMatchingItemsSelected && !excludedTransactions[listKey];
 
                     // Include transaction if: already individually selected, part of select-all, or group-level propagation (expense report / empty group expanded)
-                    const shouldInclude = isSelected || areAllMatchingItemsSelected || propagateSelectionToAllRows;
+                    const shouldInclude = isSelected || includedByAllMatching || propagateSelectionToAllRows;
                     if (!shouldInclude) {
                         continue;
                     }
@@ -201,7 +206,7 @@ function useReconcileSelectionWithData({
 
                     newTransactionList[listKey] = {
                         ...baseEntry,
-                        isSelected: areAllMatchingItemsSelected || !!previousSelection?.isSelected || propagateSelectionToAllRows,
+                        isSelected: includedByAllMatching || !!previousSelection?.isSelected || propagateSelectionToAllRows,
                         canReject: currentUserEmail && transactionItem.report ? canRejectReportAction(currentUserEmail, transactionItem.report) : false,
                         policyID: transactionItem.report?.policyID,
                         groupKey: previousSelection?.groupKey ?? (propagateSelectionToAllRows && !isExpenseReportType ? reportKey : undefined),
@@ -214,7 +219,9 @@ function useReconcileSelectionWithData({
                     continue;
                 }
                 const listKey = transactionItem.keyForList ?? transactionItem.transactionID;
-                if (!(listKey in selectedTransactions) && !(transactionItem.transactionID in selectedTransactions) && !areAllMatchingItemsSelected) {
+                // Rows deselected while "select all matching" is active are excluded, so all-matching must not re-include them.
+                const includedByAllMatching = areAllMatchingItemsSelected && !excludedTransactions[listKey];
+                if (!(listKey in selectedTransactions) && !(transactionItem.transactionID in selectedTransactions) && !includedByAllMatching) {
                     continue;
                 }
 
@@ -239,7 +246,7 @@ function useReconcileSelectionWithData({
 
                 newTransactionList[listKey] = {
                     ...baseEntry,
-                    isSelected: areAllMatchingItemsSelected || !!flatPreviousSelection?.isSelected,
+                    isSelected: includedByAllMatching || !!flatPreviousSelection?.isSelected,
                     canReject: currentUserEmail && transactionItem.report ? canRejectReportAction(currentUserEmail, transactionItem.report) : false,
                     policyID: transactionItem.report?.policyID,
                 };
@@ -266,7 +273,7 @@ function useReconcileSelectionWithData({
         // hook doc above): including it would re-run this reconcile on every checkbox press. We only want it to
         // run when the underlying data, focus, or select-all state changes.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filteredData, applySelection, areAllMatchingItemsSelected, isFocused, outstandingReportsByPolicyID, isExpenseReportType]);
+    }, [filteredData, applySelection, areAllMatchingItemsSelected, excludedTransactions, isFocused, outstandingReportsByPolicyID, isExpenseReportType]);
 }
 
 /** Turn mobile selection mode off once nothing is selected and the selection asked to exit the mode. */

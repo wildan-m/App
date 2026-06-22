@@ -16,6 +16,7 @@ type SelectionState = {
     currentSelectedTransactionReportID: string | undefined;
     shouldTurnOffSelectionMode: boolean;
     areAllMatchingItemsSelected: boolean;
+    excludedTransactions: Record<string, boolean>;
 };
 
 const defaultSelectionState: SelectionState = {
@@ -25,6 +26,7 @@ const defaultSelectionState: SelectionState = {
     currentSelectedTransactionReportID: undefined,
     shouldTurnOffSelectionMode: false,
     areAllMatchingItemsSelected: false,
+    excludedTransactions: {},
 };
 
 // Owns selection state + pure setters only; the write actions (toggle/toggleAll) live in SearchWriteActionsProvider.
@@ -84,6 +86,37 @@ function SearchSelectionProvider({children}: SearchSelectionProviderProps) {
             }
 
             const totalSelectableItemsCount = options?.totalSelectableItemsCount;
+
+            // While "select all matching" is active, toggling an individual row must narrow the selection — record
+            // the deselected row in `excludedTransactions` (or re-include a previously excluded one) — instead of
+            // flipping `areAllMatchingItemsSelected` off, which would silently drop every non-visible matching item.
+            // `totalSelectableItemsCount` is only passed by the per-row/group toggle, so the data-reconcile commit
+            // (which omits it) never mutates the exclusion set. An empty result means the user deselected everything
+            // (e.g. the header "deselect all"), which falls through below to clear the flag and exclusions.
+            if (prevState.areAllMatchingItemsSelected && totalSelectableItemsCount && Object.keys(selectedTransactions).length > 0) {
+                const excludedTransactions = {...prevState.excludedTransactions};
+                for (const key of Object.keys(prevState.selectedTransactions)) {
+                    if (key in selectedTransactions) {
+                        continue;
+                    }
+                    excludedTransactions[key] = true;
+                }
+                for (const key of Object.keys(selectedTransactions)) {
+                    if (!(key in excludedTransactions)) {
+                        continue;
+                    }
+                    delete excludedTransactions[key];
+                }
+
+                return {
+                    ...prevState,
+                    selectedTransactions,
+                    excludedTransactions,
+                    selectedReports: options?.data ? deriveSelectedReports(selectedTransactions, options.data) : prevState.selectedReports,
+                    shouldTurnOffSelectionMode: false,
+                };
+            }
+
             const areAllMatchingItemsSelected =
                 totalSelectableItemsCount && totalSelectableItemsCount !== Object.keys(selectedTransactions).length ? false : prevState.areAllMatchingItemsSelected;
 
@@ -91,6 +124,7 @@ function SearchSelectionProvider({children}: SearchSelectionProviderProps) {
                 ...prevState,
                 selectedTransactions,
                 areAllMatchingItemsSelected,
+                excludedTransactions: areAllMatchingItemsSelected ? prevState.excludedTransactions : {},
                 selectedReports: options?.data ? deriveSelectedReports(selectedTransactions, options.data) : prevState.selectedReports,
                 shouldTurnOffSelectionMode: false,
             };
@@ -129,6 +163,7 @@ function SearchSelectionProvider({children}: SearchSelectionProviderProps) {
             return {
                 ...prevState,
                 areAllMatchingItemsSelected: shouldSelectAll,
+                excludedTransactions: {},
             };
         });
     };
@@ -153,6 +188,7 @@ function SearchSelectionProvider({children}: SearchSelectionProviderProps) {
                 selectedTransactions: {},
                 selectedReports: [],
                 areAllMatchingItemsSelected: false,
+                excludedTransactions: {},
             };
         });
     };
@@ -239,11 +275,14 @@ function useSyncSelectedReports(data: SearchData) {
 
 /** Narrow per-row selection read: whether the row for `keyForList` is selected (or covered by select-all). */
 function useRowSelection(keyForList: string | undefined): {isSelected: boolean} {
-    const {selectedTransactions, areAllMatchingItemsSelected} = useSearchSelectionContext();
+    const {selectedTransactions, areAllMatchingItemsSelected, excludedTransactions} = useSearchSelectionContext();
     if (!keyForList) {
         return {isSelected: false};
     }
-    return {isSelected: areAllMatchingItemsSelected || !!selectedTransactions[keyForList]?.isSelected};
+    if (areAllMatchingItemsSelected) {
+        return {isSelected: !excludedTransactions[keyForList]};
+    }
+    return {isSelected: !!selectedTransactions[keyForList]?.isSelected};
 }
 
 /** Aggregate count of currently-selected transactions, for the selection top bar. */

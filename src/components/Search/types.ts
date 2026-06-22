@@ -213,6 +213,12 @@ type SearchSelectionContextValue = {
     /** True when at least one transaction is selected. */
     hasSelectedTransactions: boolean;
     areAllMatchingItemsSelected: boolean;
+    /**
+     * Rows the user has individually deselected while "select all matching" is active. Their keys are kept here
+     * (instead of collapsing the whole all-matching selection) so the rest of the matching items — including the
+     * ones not currently rendered — stay selected.
+     */
+    excludedTransactions: Record<string, boolean>;
 };
 
 type SearchSelectionActionsValue = {
