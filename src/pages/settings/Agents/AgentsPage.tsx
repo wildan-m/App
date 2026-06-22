@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {FlatList, View} from 'react-native';
 import Button from '@components/Button';
 import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericEmptyStateComponent';
@@ -11,6 +11,7 @@ import useChatWithAgent from '@hooks/useChatWithAgent';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -49,12 +50,18 @@ function AgentsPage() {
     const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
     const personalDetailsList = usePersonalDetails();
 
-    useEffect(() => {
+    const fetchAgents = useCallback(() => {
         if (!isCustomAgentEnabled) {
             return;
         }
         openAgentsPage();
     }, [isCustomAgentEnabled]);
+
+    useNetwork({onReconnect: fetchAgents});
+
+    useEffect(() => {
+        fetchAgents();
+    }, [fetchAgents]);
 
     const agentItems: AgentItem[] = Object.entries(agentPrompts ?? {})
         .map(([key, agentPrompt]) => {
