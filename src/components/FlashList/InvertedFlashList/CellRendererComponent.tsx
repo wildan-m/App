@@ -7,10 +7,19 @@ type CellRendererComponentProps = ViewProps & {
     style?: StyleProp<ViewStyle>;
 };
 
+/** Prefix used to build a stable `nativeID` for every inverted cell. The list wraps these IDs (reversed) in
+ * `experimental_accessibilityOrder` so screen readers traverse the messages in visual order. */
+const INVERTED_CELL_NATIVE_ID_PREFIX = 'inverted-flashlist-cell-';
+
+function getInvertedCellNativeID(index: number) {
+    return `${INVERTED_CELL_NATIVE_ID_PREFIX}${index}`;
+}
+
 function CellRendererComponent(props: CellRendererComponentProps) {
     return (
         <View
             {...props}
+            nativeID={getInvertedCellNativeID(props.index)}
             style={[
                 props.style,
                 /**
@@ -27,3 +36,4 @@ function CellRendererComponent(props: CellRendererComponentProps) {
 }
 
 export default CellRendererComponent;
+export {getInvertedCellNativeID};
