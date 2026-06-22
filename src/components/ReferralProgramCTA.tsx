@@ -11,6 +11,7 @@ import CONST from '@src/CONST';
 import createDynamicRoute from '@src/libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@src/libs/Navigation/Navigation';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
+import {close as closeModal} from '@userActions/Modal';
 import Icon from './Icon';
 import {PressableWithoutFeedback} from './Pressable';
 import RenderHTML from './RenderHTML';
@@ -56,7 +57,11 @@ function ReferralProgramCTA({referralContentType, style, onDismiss}: ReferralPro
             <PressableWithoutFeedback
                 sentryLabel={CONST.SENTRY_LABEL.REFERRAL_PROGRAM.CTA}
                 onPress={() => {
-                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(referralContentType), Navigation.getActiveRouteWithoutParams()));
+                    const referralRoute = createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(referralContentType), Navigation.getActiveRouteWithoutParams());
+                    // The CTA can be rendered inside a right-docked JS modal (e.g. the manual-expense participant picker). That modal
+                    // overlays the navigation stack, so a plain navigate would push the referral RHP *underneath* it and it would only
+                    // surface once the modal is dismissed. Close any open modal first, then navigate so the RHP opens on the first tap.
+                    closeModal(() => Navigation.navigate(referralRoute));
                 }}
                 style={[styles.pAbsolute, styles.t0, styles.b0, styles.l0, {right: CLOSE_BUTTON_OFFSET}]}
                 accessibilityLabel={translate(`referralProgram.${referralContentType}.header`)}
