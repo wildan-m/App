@@ -28,13 +28,13 @@ Onyx.connectWithoutView({
 
             // Subscribe handlers for different push notification types
             PushNotification.onReceived(PushNotification.TYPE.REPORT_COMMENT, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.REPORT_COMMENT, navigateToReport);
+            PushNotification.onSelected(PushNotification.TYPE.REPORT_COMMENT, applyOnyxDataAndNavigateToReport);
 
             PushNotification.onReceived(PushNotification.TYPE.REPORT_ACTION, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.REPORT_ACTION, navigateToReport);
+            PushNotification.onSelected(PushNotification.TYPE.REPORT_ACTION, applyOnyxDataAndNavigateToReport);
 
             PushNotification.onReceived(PushNotification.TYPE.TRANSACTION, applyOnyxData);
-            PushNotification.onSelected(PushNotification.TYPE.TRANSACTION, navigateToReport);
+            PushNotification.onSelected(PushNotification.TYPE.TRANSACTION, applyOnyxDataAndNavigateToReport);
         } else {
             PushNotification.deregister();
             PushNotification.clearNotifications();
@@ -150,6 +150,17 @@ function navigateToReport({reportID}: AnyPushNotificationData): Promise<void> {
     });
 
     return Promise.resolve();
+}
+
+/**
+ * When a notification is tapped, apply the Onyx data carried in the notification payload before navigating.
+ * This guarantees the tapped message is written to Onyx locally even when the device is offline and even when
+ * the background PushReceived handler (which normally applies the data on receive) never ran. applyOnyxData
+ * routes the update through applyOnyxUpdatesReliably, which dedupes by lastUpdateID/previousUpdateID, so
+ * re-applying it on tap is a no-op when the receive-time handler already applied it.
+ */
+function applyOnyxDataAndNavigateToReport<TKey extends OnyxKey>(data: PushNotificationData<TKey>): Promise<void> {
+    return applyOnyxData(data).then(() => navigateToReport(data));
 }
 
 function getLastUpdateIDAppliedToClient(): Promise<number> {
