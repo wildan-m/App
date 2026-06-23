@@ -153,6 +153,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
         ruleID: DEFAULT_SPEND_RULE_ID,
         isDefault: true,
         isBlock: true,
+        hasMerchantRestriction: true,
         disabled: true,
         actionLabel: blockLabel,
         cardSummary: translate('workspace.rules.spendRules.defaultRuleDescription'),
@@ -162,12 +163,19 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
     };
     const customSpendRules: SpendRuleTableItem[] = cardRules.map((rule) => {
         const ruleSummary = rule.summaryParts.map((part) => part.text).join(', ');
+        const getActionLabel = () => {
+            if (!rule.hasMerchantRestriction) {
+                return translate('workspace.rules.spendRules.max');
+            }
+            return rule.isBlock ? blockLabel : translate('workspace.rules.spendRules.allow');
+        };
         return {
             keyForList: rule.ruleID,
             ruleID: rule.ruleID,
             isDefault: false,
             isBlock: rule.isBlock,
-            actionLabel: rule.isBlock ? blockLabel : translate('workspace.rules.spendRules.allow'),
+            hasMerchantRestriction: rule.hasMerchantRestriction,
+            actionLabel: getActionLabel(),
             cardSummary: rule.cardSummary,
             ruleSummary,
             searchTokens: rule.searchTokens,

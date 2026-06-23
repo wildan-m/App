@@ -20,6 +20,7 @@ type SpendRuleTableItem = TableData & {
     ruleID: string;
     isDefault: boolean;
     isBlock: boolean;
+    hasMerchantRestriction: boolean;
     actionLabel: string;
     cardSummary: string;
     ruleSummary: string;
@@ -39,11 +40,13 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lock', 'CircleSlash', 'Checkmark']);
+    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lock', 'CircleSlash', 'Checkmark', 'CoinsButton']);
     const {processedData} = useTableContext<SpendRuleTableItem>();
 
     const tableRowItem = processedData.at(rowIndex) ?? item;
     const isDeleting = tableRowItem.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+    const isMaxOnly = !tableRowItem.isDefault && !tableRowItem.hasMerchantRestriction;
+    const badgeIcon = isMaxOnly ? Expensicons.CoinsButton : tableRowItem.isBlock ? Expensicons.CircleSlash : Expensicons.Checkmark;
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'WorkspaceSpendRulesTableItem',
@@ -93,10 +96,10 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                     <Badge
                                         text={tableRowItem.actionLabel}
-                                        icon={tableRowItem.isBlock ? Expensicons.CircleSlash : Expensicons.Checkmark}
+                                        icon={badgeIcon}
                                         badgeStyles={[styles.ml0, styles.justifyContentCenter, StyleUtils.getMinimumWidth(variables.componentSizeNormal)]}
-                                        error={tableRowItem.isBlock}
-                                        success={!tableRowItem.isBlock}
+                                        error={!isMaxOnly && tableRowItem.isBlock}
+                                        success={!isMaxOnly && !tableRowItem.isBlock}
                                         isCondensed
                                     />
                                     <TextWithTooltip
@@ -118,10 +121,10 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
                                 <View style={[styles.justifyContentCenter]}>
                                     <Badge
                                         text={tableRowItem.actionLabel}
-                                        icon={tableRowItem.isBlock ? Expensicons.CircleSlash : Expensicons.Checkmark}
+                                        icon={badgeIcon}
                                         badgeStyles={[styles.ml0, styles.justifyContentCenter, StyleUtils.getMinimumWidth(variables.componentSizeNormal)]}
-                                        error={tableRowItem.isBlock}
-                                        success={!tableRowItem.isBlock}
+                                        error={!isMaxOnly && tableRowItem.isBlock}
+                                        success={!isMaxOnly && !tableRowItem.isBlock}
                                         isCondensed
                                     />
                                 </View>

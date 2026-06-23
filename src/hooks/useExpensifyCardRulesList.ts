@@ -69,6 +69,7 @@ export default function useExpensifyCardRules(policyID: string) {
                 action: formValues.restrictionAction,
                 pendingAction: cardRule.pendingAction,
                 isBlock: formValues.restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK,
+                hasMerchantRestriction: formValues.merchantNames.length > 0 || formValues.categories.length > 0,
                 searchTokens: [...cardNames, ...formValues.merchantNames, ...formValues.categories, formattedAmount],
             };
         })
