@@ -39,7 +39,7 @@ function MoneyRequestHeaderActions({reportID, onBackButtonPress}: MoneyRequestHe
             style={
                 shouldDisplayNarrowButtons
                     ? [styles.flexRow, styles.gap2, shouldDisplayTransactionNavigation && styles.mr3]
-                    : [styles.flexRow, styles.gap2, styles.pb3, styles.ph5, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter]
+                    : [styles.flexRow, styles.gap2, styles.pt2, styles.pb3, styles.ph5, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter]
             }
         >
             <MoneyRequestHeaderPrimaryAction reportID={reportID} />
