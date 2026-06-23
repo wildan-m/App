@@ -363,6 +363,7 @@ function FormProvider({
         resetFormFieldError,
         submit,
         scrollToEnd,
+        setTouchedInput,
     }));
 
     const registerInput = useCallback<RegisterInput>(

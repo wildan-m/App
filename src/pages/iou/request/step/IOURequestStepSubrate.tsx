@@ -5,7 +5,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapperWithRef from '@components/Form/InputWrapper';
-import type {FormOnyxValues} from '@components/Form/types';
+import type {FormOnyxValues, FormRef} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
@@ -86,6 +86,7 @@ function IOURequestStepSubrate({
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const {showConfirmModal} = useConfirmModal();
     const textInputRef = useRef<AnimatedTextInputRef>(null);
+    const formRef = useRef<FormRef>(null);
     const parsedIndex = parseInt(pageIndex, 10);
     const selectedDestination = transaction?.comment?.customUnit?.customUnitRateID;
     const allSubrates = transaction?.comment?.customUnit?.subRates ?? [];
@@ -219,6 +220,7 @@ function IOURequestStepSubrate({
                     ]}
                 />
                 <FormProvider
+                    ref={formRef}
                     style={[styles.flexGrow1, styles.mh5]}
                     formID={ONYXKEYS.FORMS.MONEY_REQUEST_SUBRATE_FORM}
                     enabledWhenOffline
@@ -248,6 +250,12 @@ function IOURequestStepSubrate({
                                 TransitionTracker.runAfterTransitions({
                                     callback: () => {
                                         requestIdleCallback(() => textInputRef.current?.focus());
+
+                                        // Mark Quantity as touched now (after this change's validation cycle has
+                                        // already run) so that the next subrate selection surfaces the empty-Quantity
+                                        // error on the second selection instead of the third. The programmatic focus()
+                                        // above does not mark the field as touched on its own.
+                                        formRef.current?.setTouchedInput(`quantity${pageIndex}`);
                                     },
                                     waitForUpcomingTransition: true,
                                 });

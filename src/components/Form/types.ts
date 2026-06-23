@@ -191,6 +191,7 @@ type FormRef<TFormID extends OnyxFormKey = OnyxFormKey> = {
     resetFormFieldError: (fieldID: keyof Form) => void;
     submit: () => void;
     scrollToEnd: () => void;
+    setTouchedInput: (inputID: keyof Form) => void;
 };
 
 type FormWrapperRef = {
