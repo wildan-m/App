@@ -257,6 +257,12 @@ function extractKeyFromPropertyNode(node: ts.PropertyAssignment | ts.MethodDecla
 /**
  * Build a dot-notation path from a node by traversing up the AST to find property assignments.
  * Useful for building paths like "common.save" from a string literal node.
+ *
+ * A property whose value is (or is wrapped in) a function is treated as an atomic unit: the walk
+ * never descends into the object that function returns. So a plural key like
+ * `key: (params) => ({one: '...', other: '...'})` resolves to `key`, not `key.one`/`key.other`.
+ * This keeps the function wrapper and its parameters intact when the value is later extracted and
+ * re-injected (e.g. during incremental translation).
  */
 // eslint-disable-next-line rulesdir/no-negated-variables
 function buildDotNotationPath(node: ts.Node, rootNode?: ts.Node): string | null {
@@ -265,6 +271,13 @@ function buildDotNotationPath(node: ts.Node, rootNode?: ts.Node): string | null 
 
     // Traverse up the tree until we reach the root node or source file
     while (current && current !== rootNode && !ts.isSourceFile(current)) {
+        // Crossing a function boundary means everything collected so far lives inside that function's
+        // body (e.g. the `one`/`other` properties of a plural key's returned object). Those keys are
+        // internal to a function-typed translation value, so discard them and keep only the property
+        // that holds the function itself.
+        if (ts.isArrowFunction(current) || ts.isFunctionExpression(current)) {
+            pathParts.length = 0;
+        }
         if (ts.isPropertyAssignment(current)) {
             const key = extractKeyFromPropertyNode(current);
             if (key) {

@@ -633,6 +633,75 @@ describe('generateTranslations', () => {
             expect(translateSpy).toHaveBeenCalledWith('it', 'New value!', undefined, expect.anything());
         });
 
+        it('preserves the function wrapper of a plural key (function returning {one, other}) in incremental mode', async () => {
+            // English source with a plural key: a function returning an object with one/other plural forms,
+            // where `other` is itself a function. The translatable strings live inside the returned object.
+            fs.writeFileSync(
+                EN_PATH,
+                dedent(`
+                const strings = {
+                    greeting: 'Hello',
+                    codingRules: ({sourcePolicyName}: {sourcePolicyName: string}) => ({
+                        one: \`copied 1 trading rule from \${sourcePolicyName}\`,
+                        other: (count: number) => \`copied \${count} trading rules from \${sourcePolicyName}\`,
+                    }),
+                };
+                export default strings;
+            `),
+                'utf8',
+            );
+
+            // Existing Italian translation does NOT have the plural key yet (it's being added).
+            fs.writeFileSync(
+                IT_PATH,
+                dedent(`
+                import type en from './en';
+
+                const strings = {
+                    greeting: '[it] Hello',
+                };
+                export default strings;
+            `),
+                'utf8',
+            );
+
+            // Mock Git.diff to mark the plural key's lines as added (lines 3-6 of en.ts above).
+            mockIsValidRef.mockReturnValue(true);
+            mockDiff.mockReturnValue({
+                files: [
+                    {
+                        filePath: 'src/languages/en.ts',
+                        hunks: [],
+                        addedLines: new Set([3, 4, 5, 6]),
+                        removedLines: new Set(),
+                        modifiedLines: new Set(),
+                    },
+                ],
+                hasChanges: true,
+            });
+
+            process.argv = ['ts-node', 'generateTranslations.ts', '--dry-run', '--verbose', '--locales', 'it', '--compare-ref', 'main'];
+
+            await generateTranslations();
+            const itContent = fs.readFileSync(IT_PATH, 'utf8');
+
+            // The strings inside the plural key should be translated.
+            // eslint-disable-next-line no-template-curly-in-string
+            expect(itContent).toContain('[it] copied 1 trading rule from ${sourcePolicyName}');
+            // eslint-disable-next-line no-template-curly-in-string
+            expect(itContent).toContain('[it] copied ${count} trading rules from ${sourcePolicyName}');
+
+            // The outer function wrapper and its parameter must be preserved (not flattened to a plain object).
+            expect(itContent).toContain('({sourcePolicyName}');
+            expect(itContent).toMatch(/codingRules:\s*\(\{?\s*sourcePolicyName/);
+            expect(itContent).toContain('=> ({');
+            // The inner `other` function must also be preserved.
+            expect(itContent).toMatch(/other:\s*\(count: number\)\s*=>/);
+
+            // It must NOT have flattened the key into a plain object literal (the bug).
+            expect(itContent).not.toMatch(/codingRules:\s*\{\s*one:/);
+        });
+
         it('translates only specified paths when --paths is provided', async () => {
             const strings = {
                 greeting: 'Hello',
