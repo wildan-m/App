@@ -185,6 +185,10 @@ function IOURequestStartPage({
     }, []);
 
     const navigateBack = () => {
+        // The embedded manual-flow confirmation may have pre-inserted the destination report under the RHP.
+        // Remove it while the RHP is still on top so the original screen (e.g. the LHN we started from) is
+        // fully restored underneath, instead of being revealed when closeRHPFlow pops the RHP.
+        Navigation.removePreInsertedFullscreenIfNeeded();
         Navigation.closeRHPFlow();
     };
 
