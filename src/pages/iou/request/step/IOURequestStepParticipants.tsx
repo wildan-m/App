@@ -5,7 +5,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useParticipantSubmission from '@hooks/useParticipantSubmission';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseIOUUtils, navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
+import {getIsWorkspacesOnlyForTransaction, isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseIOUUtils, navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {endSpan} from '@libs/telemetry/activeSpans';
 import {getRequestType, isFromCreditCardImport, isPerDiemRequest, isTimeRequest as isTimeRequestUtil} from '@libs/TransactionUtils';
@@ -142,7 +142,7 @@ function IOURequestStepParticipants({
                 action={action}
                 isPerDiemRequest={isPerDiem}
                 isTimeRequest={isTime}
-                isWorkspacesOnly={false}
+                isWorkspacesOnly={getIsWorkspacesOnlyForTransaction(initialTransaction, iouRequestType)}
                 isTransactionFromCreditCardImport={isTransactionFromCreditCardImport}
                 initiallySelectedReportID={selectedParticipant?.reportID}
                 shouldMoveSelectedToTop
