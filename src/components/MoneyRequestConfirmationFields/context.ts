@@ -1,4 +1,6 @@
 import {createContext, useContext} from 'react';
+import type {RefObject} from 'react';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type CONST from '@src/CONST';
 
@@ -30,6 +32,9 @@ type ConfirmationFieldsContextValue = {
     isManualDistanceRequest: boolean;
     isOdometerDistanceRequest: boolean;
     isGPSDistanceRequest: boolean;
+
+    // Interaction — scrolls a focused inline footer input (Description/Merchant) above the soft keyboard on native
+    onInputFocus?: (inputRef: RefObject<BaseTextInputRef | null>) => void;
 };
 
 const ConfirmationFieldsContext = createContext<ConfirmationFieldsContextValue | null>(null);

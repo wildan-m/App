@@ -1,5 +1,6 @@
 import React from 'react';
-import type {ReactNode} from 'react';
+import type {ReactNode, RefObject} from 'react';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type CONST from '@src/CONST';
 import ConfirmationFieldsContext from './context';
@@ -56,6 +57,9 @@ type ProviderProps = {
     /** Whether the active transaction is a GPS distance request */
     isGPSDistanceRequest?: boolean;
 
+    /** Scrolls a focused inline footer input (Description/Merchant) above the soft keyboard on native */
+    onInputFocus?: (inputRef: RefObject<BaseTextInputRef | null>) => void;
+
     /** Block components rendered inside the Provider */
     children: ReactNode;
 };
@@ -78,6 +82,7 @@ function Provider({
     isManualDistanceRequest = false,
     isOdometerDistanceRequest = false,
     isGPSDistanceRequest = false,
+    onInputFocus,
     children,
 }: ProviderProps) {
     const value = {
@@ -98,6 +103,7 @@ function Provider({
         isManualDistanceRequest,
         isOdometerDistanceRequest,
         isGPSDistanceRequest,
+        onInputFocus,
     };
     return <ConfirmationFieldsContext.Provider value={value}>{children}</ConfirmationFieldsContext.Provider>;
 }

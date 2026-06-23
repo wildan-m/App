@@ -1,8 +1,9 @@
 import {useIsFocused} from '@react-navigation/native';
 import {FlashList} from '@shopify/flash-list';
 import type {FlashListRef, ListRenderItemInfo} from '@shopify/flash-list';
-import React, {useImperativeHandle, useRef} from 'react';
-import {View} from 'react-native';
+import React, {useCallback, useEffect, useImperativeHandle, useRef} from 'react';
+import {Keyboard, View} from 'react-native';
+import type {NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Footer from '@components/SelectionList/components/Footer';
 import SelectionListEmptyState from '@components/SelectionList/components/SelectionListEmptyState';
@@ -17,6 +18,7 @@ import useSelectionListTextInput from '@components/SelectionList/hooks/useSelect
 import ListItemRenderer from '@components/SelectionList/ListItem/ListItemRenderer';
 import {getListboxRole} from '@components/SelectionList/utils/getListboxRole';
 import Text from '@components/Text';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useKeyboardState from '@hooks/useKeyboardState';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
 import useScrollEnabled from '@hooks/useScrollEnabled';
@@ -25,6 +27,9 @@ import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import type {FlattenedItem, ListItem, SelectionListWithSectionsProps} from './types';
+
+// Gap (in px) kept between a focused footer input and the top of the soft keyboard when scrolling it into view.
+const FOCUSED_INPUT_KEYBOARD_PADDING = 16;
 
 function getItemType<TItem extends ListItem>(item: FlattenedItem<TItem>): ValueOf<typeof CONST.SECTION_LIST_ITEM_TYPE> {
     return item?.type ?? CONST.SECTION_LIST_ITEM_TYPE.ROW;
@@ -90,6 +95,72 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     const {flattenedData, disabledIndexes, itemsCount, selectedItems, initialFocusedIndex, firstFocusableIndex} = useFlattenedSections(sections, initiallyFocusedItemKey);
     const listRef = useRef<FlashListRef<FlattenedItem<TItem>> | null>(null);
     const {scrollToIndex, debouncedScrollToIndex} = useSelectionListScroll(listRef, flattenedData);
+
+    // Tracks the list's current vertical scroll offset so `scrollToFocusedInput` can compute an absolute target offset.
+    const scrollOffsetRef = useRef(0);
+    const keyboardListenerRef = useRef<ReturnType<typeof Keyboard.addListener> | null>(null);
+    const scrollToInputTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Scrolls a focused footer input (e.g. the inline Description/Merchant fields) above the soft keyboard on native.
+    // The list's `KeyboardAvoidingView` only shrinks the container; it never scrolls a focused input that ends up
+    // behind the keyboard into view, so we measure the input once the keyboard is shown and scroll by the overlap.
+    const scrollToFocusedInput = useCallback((inputRef: React.RefObject<BaseTextInputRef | null>) => {
+        const input = inputRef.current;
+        if (!listRef.current || !input || !('measureInWindow' in input)) {
+            return;
+        }
+
+        if (scrollToInputTimeoutRef.current) {
+            clearTimeout(scrollToInputTimeoutRef.current);
+        }
+        if (keyboardListenerRef.current) {
+            keyboardListenerRef.current.remove();
+        }
+
+        const performScroll = (keyboardTop: number) => {
+            input.measureInWindow((x: number, y: number, width: number, height: number) => {
+                const inputBottom = y + height;
+                // Keep a small gap between the input and the top of the keyboard.
+                const targetBottom = keyboardTop - FOCUSED_INPUT_KEYBOARD_PADDING;
+                if (inputBottom <= targetBottom) {
+                    return;
+                }
+                listRef.current?.scrollToOffset({offset: scrollOffsetRef.current + (inputBottom - targetBottom), animated: true});
+            });
+        };
+
+        // Wait for the keyboard to fully appear so its top edge and the input layout are settled before scrolling.
+        keyboardListenerRef.current = Keyboard.addListener('keyboardDidShow', (event) => {
+            keyboardListenerRef.current?.remove();
+            keyboardListenerRef.current = null;
+            if (scrollToInputTimeoutRef.current) {
+                clearTimeout(scrollToInputTimeoutRef.current);
+                scrollToInputTimeoutRef.current = null;
+            }
+            performScroll(event.endCoordinates.screenY);
+        });
+
+        // Fallback for when the keyboard is already open (no `keyboardDidShow` event fires).
+        scrollToInputTimeoutRef.current = setTimeout(() => {
+            keyboardListenerRef.current?.remove();
+            keyboardListenerRef.current = null;
+            const metrics = Keyboard.metrics();
+            if (!metrics) {
+                return;
+            }
+            performScroll(metrics.screenY);
+        }, CONST.ANIMATED_TRANSITION);
+    }, []);
+
+    useEffect(
+        () => () => {
+            if (scrollToInputTimeoutRef.current) {
+                clearTimeout(scrollToInputTimeoutRef.current);
+            }
+            keyboardListenerRef.current?.remove();
+        },
+        [],
+    );
 
     const {focusedIndex, setFocusedIndex, setFocusedIndexFromRowFocus, setFocusedIndexWithoutScrollOnChange, suppressNextFocusScroll, isKeyboardNavigating, setHasKeyBeenPressed} =
         useSelectionListKeyboardFocus({
@@ -176,12 +247,13 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         () => ({
             focusTextInput,
             scrollToIndex,
+            scrollToFocusedInput,
             clearInputAfterSelect,
             updateAndScrollToFocusedIndex,
             updateExternalTextInputFocus,
             getFocusedOption: getFocusedItem,
         }),
-        [focusTextInput, scrollToIndex, clearInputAfterSelect, updateAndScrollToFocusedIndex, updateExternalTextInputFocus, getFocusedItem],
+        [focusTextInput, scrollToIndex, scrollToFocusedInput, clearInputAfterSelect, updateAndScrollToFocusedIndex, updateExternalTextInputFocus, getFocusedItem],
     );
 
     const syncedSearchValue = searchValueForFocusSync ?? textInputOptions?.value;
@@ -327,7 +399,8 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                     onEndReachedThreshold={onEndReachedThreshold}
                     onScrollBeginDrag={onScrollBeginDrag}
                     scrollEnabled={scrollEnabled}
-                    onScroll={() => {
+                    onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+                        scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
                         onScroll?.();
                         triggerScrollEvent();
                     }}

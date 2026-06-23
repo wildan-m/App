@@ -2,6 +2,7 @@ import type {ReactElement, ReactNode} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import type {BaseSelectionListProps} from '@components/SelectionList/types';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import type CONST from '@src/CONST';
 
 type Section<TItem extends ListItem> = {
@@ -60,6 +61,7 @@ type SelectionListWithSectionsProps<TItem extends ListItem> = BaseSelectionListP
 type SelectionListWithSectionsHandle<TItem extends ListItem = ListItem> = {
     focusTextInput: () => void;
     scrollToIndex: (index: number) => void;
+    scrollToFocusedInput: (inputRef: React.RefObject<BaseTextInputRef | null>) => void;
     clearInputAfterSelect: () => void;
     updateAndScrollToFocusedIndex: (index: number, shouldScroll?: boolean) => void;
     updateExternalTextInputFocus: (isTextInputFocused: boolean) => void;

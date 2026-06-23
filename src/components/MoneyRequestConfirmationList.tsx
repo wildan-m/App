@@ -1,7 +1,9 @@
 import {useIsFocused} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import type {RefObject} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useAttendees from '@hooks/useAttendees';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
@@ -56,6 +58,7 @@ import TaxController from './MoneyRequestConfirmationList/TaxController';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
 import BareUserListItem from './SelectionList/ListItem/BareUserListItem';
 import SelectionListWithSections from './SelectionList/SelectionListWithSections';
+import type {SelectionListWithSectionsHandle} from './SelectionList/SelectionListWithSections/types';
 
 type MoneyRequestConfirmationListProps = {
     /** Callback to inform parent modal of success */
@@ -203,6 +206,14 @@ function MoneyRequestConfirmationList({
     isTimeRequest = false,
     shouldHideToSection = false,
 }: MoneyRequestConfirmationListProps) {
+    const selectionListRef = useRef<SelectionListWithSectionsHandle>(null);
+
+    // Scroll a focused inline footer input (Description/Merchant) above the soft keyboard on native, where the
+    // KeyboardAvoidingView only shrinks the container and never scrolls the focused field into view.
+    const handleInputFocus = useCallback((inputRef: RefObject<BaseTextInputRef | null>) => {
+        selectionListRef.current?.scrollToFocusedInput(inputRef);
+    }, []);
+
     const policyCategories = usePolicyCategoriesForConfirmation(policyID);
     const {policyTags, policyTagLists} = usePolicyTagsForConfirmation(policyID);
     const transactionReport = useTransactionReportForConfirmation(transaction?.reportID);
@@ -542,6 +553,7 @@ function MoneyRequestConfirmationList({
                 }}
                 compactControls={{showMoreFields, setShowMoreFields}}
                 onSubmitForm={confirm}
+                onInputFocus={handleInputFocus}
             />
         </View>
     );
@@ -611,6 +623,7 @@ function MoneyRequestConfirmationList({
             />
             <MouseProvider>
                 <SelectionListWithSections<MoneyRequestConfirmationListItem>
+                    ref={selectionListRef}
                     sections={sections}
                     ListItem={BareUserListItem}
                     onSelectRow={navigateToParticipantPage}

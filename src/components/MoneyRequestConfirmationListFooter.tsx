@@ -1,6 +1,8 @@
 import React from 'react';
+import type {RefObject} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type CONST from '@src/CONST';
@@ -107,6 +109,9 @@ type MoneyRequestConfirmationListFooterProps = {
 
     /** Triggers submit from inline inputs */
     onSubmitForm?: () => void;
+
+    /** Scrolls a focused inline footer input (Description/Merchant) above the soft keyboard on native */
+    onInputFocus?: (inputRef: RefObject<BaseTextInputRef | null>) => void;
 };
 
 function MoneyRequestConfirmationListFooter({
@@ -136,6 +141,7 @@ function MoneyRequestConfirmationListFooter({
     receiptOptions,
     compactControls,
     onSubmitForm,
+    onInputFocus,
 }: MoneyRequestConfirmationListFooterProps) {
     const styles = useThemeStyles();
     const isInLandscapeMode = useIsInLandscapeMode();
@@ -163,6 +169,7 @@ function MoneyRequestConfirmationListFooter({
             isManualDistanceRequest={distanceFlags.isManualDistanceRequest}
             isOdometerDistanceRequest={distanceFlags.isOdometerDistanceRequest}
             isGPSDistanceRequest={distanceFlags.isGPSDistanceRequest}
+            onInputFocus={onInputFocus}
         >
             <View style={isCompactMode ? styles.flex1 : undefined}>
                 <View>
