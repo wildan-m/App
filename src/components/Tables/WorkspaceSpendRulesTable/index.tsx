@@ -44,6 +44,12 @@ function WorkspaceSpendRulesTable({rulesData, selectionEnabled, selectedKeys, on
     const compareItems: CompareItemsCallback<SpendRuleTableItem, SpendRulesTableColumnKey> = (a, b, activeSorting) => {
         const orderMultiplier = activeSorting.order === 'asc' ? 1 : -1;
 
+        // Keep the built-in default rule grouped above the custom rules for any sort column or direction,
+        // so the "Default" and "Custom rules" section headers each render exactly once and never split apart.
+        if (a.isDefault !== b.isDefault) {
+            return a.isDefault ? -1 : 1;
+        }
+
         if (activeSorting.columnKey === 'type') {
             const aVal = a.isBlock ? 0 : 1;
             const bVal = b.isBlock ? 0 : 1;
