@@ -47,6 +47,9 @@ type SingleSelectPopupProps<T> = {
 
     /** Whether the popover should keep a fixed height while filtering results. */
     shouldUseFixedPopoverHeight?: boolean;
+
+    /** Whether the search input should skip auto-focusing on open (prevents the keyboard from auto-raising) */
+    disableAutoFocus?: boolean;
 };
 
 function SingleSelectPopup<T extends string>({
@@ -64,6 +67,7 @@ function SingleSelectPopup<T extends string>({
     itemHeight,
     shouldShowList = true,
     shouldUseFixedPopoverHeight,
+    disableAutoFocus,
 }: SingleSelectPopupProps<T>) {
     const [selectedItem, setSelectedItem] = useState(value);
 
@@ -100,6 +104,7 @@ function SingleSelectPopup<T extends string>({
                     shouldShowList={shouldShowList}
                     itemHeight={itemHeight}
                     shouldUseFixedPopoverHeight={shouldUseFixedPopoverHeight}
+                    disableAutoFocus={disableAutoFocus}
                 />
             </ListFilterHeightContextProvider>
         </BasePopup>

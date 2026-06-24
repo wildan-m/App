@@ -28,9 +28,12 @@ type CurrencyPopupProps = {
 
     /** Whether the currency list should be visible */
     shouldShowList?: boolean;
+
+    /** Whether the search input should skip auto-focusing on open (prevents the keyboard from auto-raising) */
+    disableAutoFocus?: boolean;
 };
 
-function CurrencyPopup({label, onBackButtonPress, onChange, closeOverlay, value, defaultValue, searchPlaceholder, shouldShowList}: CurrencyPopupProps) {
+function CurrencyPopup({label, onBackButtonPress, onChange, closeOverlay, value, defaultValue, searchPlaceholder, shouldShowList, disableAutoFocus}: CurrencyPopupProps) {
     const {currencyList} = useCurrencyListState();
     const {getCurrencySymbol} = useCurrencyListActions();
 
@@ -50,6 +53,7 @@ function CurrencyPopup({label, onBackButtonPress, onChange, closeOverlay, value,
             defaultValue={defaultValue}
             shouldShowList={shouldShowList}
             shouldUseFixedPopoverHeight
+            disableAutoFocus={disableAutoFocus}
         />
     );
 }

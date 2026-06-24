@@ -81,6 +81,9 @@ function SearchPageFooter({count, total, currency, defaultCurrency, isTotalLoadi
             searchPlaceholder={translate('common.search')}
             defaultValue={defaultCurrency}
             shouldShowList={isExpanded}
+            // On narrow layout the picker is a bottom-anchored, keyboard-avoiding popover; auto-focusing the search
+            // input raises the keyboard a beat after the popover settles and shoves it upward, causing a visible jump.
+            disableAutoFocus={shouldUseNarrowLayout}
         />
     );
 

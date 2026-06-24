@@ -35,6 +35,9 @@ type SingleSelectProps<T> = SearchFilterCommonProps<SingleSelectItem<T> | undefi
     allowDeselect?: boolean;
     hasTitle?: boolean;
     hasHeader?: boolean;
+
+    /** Whether the search input should skip auto-focusing on open (prevents the keyboard from auto-raising) */
+    disableAutoFocus?: boolean;
 };
 
 function SingleSelect<T extends string>({
@@ -51,6 +54,7 @@ function SingleSelect<T extends string>({
     shouldUseFixedPopoverHeight,
     footer,
     allowDeselect,
+    disableAutoFocus,
     onChange,
 }: SingleSelectProps<T>) {
     const {translate} = useLocalize();
@@ -111,6 +115,7 @@ function SingleSelect<T extends string>({
         label: isSearchable ? (searchPlaceholder ?? translate('common.search')) : undefined,
         onChangeText: setSearchTerm,
         headerMessage: noResultsFound ? translate('common.noResultsFound') : undefined,
+        disableAutoFocus,
         style: {
             containerStyle: selectionListTextInputStyle,
         },
