@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
+import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
@@ -119,6 +120,16 @@ function NonUSDVerifiedBankAccountFlowPage({route}: NonUSDVerifiedBankAccountFlo
         const prevPage = pages.at(prevIndex);
         Navigation.goBack(ROUTES.BANK_ACCOUNT_NON_USD_SETUP.getRoute({policyID, page: prevPage?.pageName, subPage: prevPage?.lastSubPage, backTo}));
     }, [backTo, currentPageIndex, pages, policyID]);
+
+    // The wizard pushes each step as its own screen, so the Android hardware back button's default single-screen pop
+    // bypasses the custom onBackButtonPress logic above. Route it through the same handler so hardware back matches the
+    // header back button instead of stepping onto the previous wizard screen.
+    useAndroidBackButtonHandler(
+        useCallback(() => {
+            onBackButtonPress();
+            return true;
+        }, [onBackButtonPress]),
+    );
 
     return (
         <View style={[styles.flex1, styles.appBG]}>

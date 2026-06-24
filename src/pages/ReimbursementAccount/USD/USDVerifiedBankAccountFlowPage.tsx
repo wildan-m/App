@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import {View} from 'react-native';
+import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getRequiredKYBDocuments} from '@libs/BankAccountUtils';
@@ -134,6 +135,16 @@ function USDVerifiedBankAccountFlowPage({route}: USDVerifiedBankAccountFlowPageP
         const prevPage = pages.at(prevIndex);
         Navigation.goBack(ROUTES.BANK_ACCOUNT_USD_SETUP.getRoute({policyID, page: prevPage?.pageName, subPage: prevPage?.lastSubPage, backTo}));
     }, [backTo, currentEntry?.pageName, currentPageIndex, policyID, reimbursementAccount?.achData?.state, shouldSkipVerifyIdentity, shouldSkipKYBDocs]);
+
+    // The wizard pushes each step as its own screen, so the Android hardware back button's default single-screen pop
+    // bypasses the custom onBackButtonPress logic above. Route it through the same handler so hardware back matches the
+    // header back button (e.g. on the pending validation step it returns to the entry screen instead of the previous step).
+    useAndroidBackButtonHandler(
+        useCallback(() => {
+            onBackButtonPress();
+            return true;
+        }, [onBackButtonPress]),
+    );
 
     return (
         <View style={[styles.flex1, styles.appBG]}>
