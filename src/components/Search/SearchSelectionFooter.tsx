@@ -141,9 +141,19 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     );
     const shouldShowFooter = (!areAllMatchingItemsSelected && selectedTransactionsKeys.length > 0) || (shouldAllowFooterTotals && !!metadata?.count);
     const wasMetadataLoading = usePrevious(isMetadataLoading);
+    const previousMetadataCount = usePrevious(metadataCount);
+    const previousMetadataTotal = usePrevious(metadataTotal);
 
     const shouldResetCustomCurrencyAfterLiveRefresh =
         !!selectedCurrency && selectedCurrency !== effectiveDefaultCurrency && !!wasMetadataLoading && !isMetadataLoading && metadata?.offset === 0;
+    // Deleting/adding/editing an expense changes the live snapshot's count or total, but the converted footer
+    // total lives in a separate one-shot auxiliary snapshot that is not refetched on that change. Such a change
+    // does not always go through a full offset-0 loading cycle, so the live-refresh reset above can miss it.
+    // Fall back to the default currency (whose total is already up to date) whenever the underlying expense set changes.
+    const didLiveSnapshotDataChange =
+        (previousMetadataCount !== undefined && metadataCount !== undefined && previousMetadataCount !== metadataCount) ||
+        (previousMetadataTotal !== undefined && metadataTotal !== undefined && previousMetadataTotal !== metadataTotal);
+    const shouldResetCustomCurrencyAfterDataChange = !!selectedCurrency && selectedCurrency !== effectiveDefaultCurrency && didLiveSnapshotDataChange;
     const shouldResetCustomCurrencyForGroupSelection = hasSelectedGroup && !!selectedCurrency;
     const shouldResetCustomCurrencyForUncoveredSelection =
         hasPartialSelection && !!selectedCurrency && !!footerTotalDataRecord && !isFooterTotalConverting && !areAllSelectedInAuxiliarySnapshot;
@@ -154,7 +164,7 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
             defaultCurrency: effectiveDefaultCurrency,
             footerTotalHash: footerCurrencyState.footerTotalHash,
         });
-    } else if (shouldResetCustomCurrencyAfterLiveRefresh || shouldResetCustomCurrencyForGroupSelection) {
+    } else if (shouldResetCustomCurrencyAfterLiveRefresh || shouldResetCustomCurrencyForGroupSelection || shouldResetCustomCurrencyAfterDataChange) {
         setFooterCurrencyState({
             searchHash: currentSearchHash,
             selectedCurrency: undefined,
