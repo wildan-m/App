@@ -280,6 +280,12 @@ function getForReportAction({
 
     const hasModifiedMerchant = isReportActionOriginalMessageAnObject && 'oldMerchant' in reportActionOriginalMessage && 'merchant' in reportActionOriginalMessage;
 
+    // A distance/rate change is rendered as a single dedicated sentence rather than the generic
+    // "changed the ..." fragments. A date change can recalculate the rate (when the new date falls
+    // under a different rate period), so the date change can accompany the distance change in the
+    // same action. We capture the distance message here and combine it with any other fragments
+    // (e.g. the date change) at the end, instead of returning early and discarding them.
+    let distanceRequestMessage = '';
     if (hasModifiedAmount) {
         const oldCurrency = reportActionOriginalMessage?.oldCurrency;
         const oldAmountValue = reportActionOriginalMessage?.oldAmount ?? 0;
@@ -291,18 +297,19 @@ function getForReportAction({
         // Only Distance edits should modify amount and merchant (which stores distance) in a single transaction.
         // We check the merchant is in distance format (includes @) as a sanity check
         if (hasModifiedMerchant && (reportActionOriginalMessage?.merchant ?? '').includes('@')) {
-            return getForDistanceRequest(translate, reportActionOriginalMessage?.merchant ?? '', reportActionOriginalMessage?.oldMerchant ?? '', amount, oldAmount);
+            distanceRequestMessage = getForDistanceRequest(translate, reportActionOriginalMessage?.merchant ?? '', reportActionOriginalMessage?.oldMerchant ?? '', amount, oldAmount);
+        } else {
+            buildMessageFragmentForValue(
+                translate,
+                amount,
+                reportActionOriginalMessage?.oldAmount !== undefined ? oldAmount : '',
+                translate('iou.amount'),
+                false,
+                setFragments,
+                removalFragments,
+                changeFragments,
+            );
         }
-        buildMessageFragmentForValue(
-            translate,
-            amount,
-            reportActionOriginalMessage?.oldAmount !== undefined ? oldAmount : '',
-            translate('iou.amount'),
-            false,
-            setFragments,
-            removalFragments,
-            changeFragments,
-        );
     }
 
     const hasModifiedComment = isReportActionOriginalMessageAnObject && 'oldComment' in reportActionOriginalMessage && 'newComment' in reportActionOriginalMessage;
@@ -331,7 +338,9 @@ function getForReportAction({
         buildMessageFragmentForValue(translate, reportActionOriginalMessage.created, formattedOldCreated, translate('common.date'), false, setFragments, removalFragments, changeFragments);
     }
 
-    if (hasModifiedMerchant) {
+    // Skip the standalone merchant fragment when the distance message already describes the merchant
+    // change, otherwise the merchant change would be reported twice.
+    if (hasModifiedMerchant && !distanceRequestMessage) {
         buildMessageFragmentForValue(
             translate,
             reportActionOriginalMessage?.merchant ?? '',
@@ -511,6 +520,11 @@ function getForReportAction({
         getMessageLine(translate, `\n${translate('iou.removed')}`, removalFragments);
 
     if (message === '') {
+        // When the only change is a distance/rate update, return its dedicated message on its own.
+        if (distanceRequestMessage) {
+            return distanceRequestMessage;
+        }
+
         // If we don't have enough structured information to build a detailed message but we
         // know the change was AI-generated, fall back to an AI-attributed generic summary so
         // users can still understand that Concierge updated the expense automatically.
@@ -519,6 +533,12 @@ function getForReportAction({
         }
 
         return translate('iou.changedTheExpense');
+    }
+
+    // When a distance/rate change is accompanied by other changes (e.g. a date change that
+    // recalculated the rate), prepend the distance message so neither change is dropped.
+    if (distanceRequestMessage) {
+        return `${distanceRequestMessage}${message}`;
     }
     return `${message.substring(1, message.length)}`;
 }
