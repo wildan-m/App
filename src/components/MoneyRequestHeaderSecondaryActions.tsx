@@ -409,6 +409,14 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
 
                 temporarilyDisableDuplicateAction();
                 duplicateTransaction([transaction]);
+
+                // After duplicating, redirect back to the parent report's table view (where the new duplicate row
+                // is visible) instead of leaving the user on the single-expense preview, mirroring the delete action.
+                if (isInNarrowPaneModal) {
+                    Navigation.navigateBackToLastSuperWideRHPScreen();
+                    return;
+                }
+                onBackButtonPress();
             },
             shouldCloseModalOnSelect: shouldDuplicateCloseModalOnSelect,
         },
