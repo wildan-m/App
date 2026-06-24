@@ -114,6 +114,7 @@ import {
     hasMissingSmartscanFields,
     hasReservationList,
     hasRoute as hasRouteTransactionUtils,
+    isAmountMissing,
     isFromCreditCardImport as isCardTransactionTransactionUtils,
     isCategoryBeingAnalyzed,
     isCustomUnitRateIDForP2P,
@@ -315,6 +316,10 @@ function MoneyRequestView({
     const isOdometerDistanceRequest = isOdometerDistanceRequestTransactionUtils(transaction);
     const isMapDistanceRequest = isMapDistanceRequestTransactionUtils(transaction) || isDistanceTypeRequest(transaction);
     const isTransactionScanning = isScanning(updatedTransaction ?? transaction);
+    // When a receipt scan fails, the amount is left at its placeholder of 0. We must surface that as an empty
+    // field with an error instead of a misleading "$0.00", mirroring how a missing merchant is handled.
+    const isScanFailedWithMissingAmount =
+        (updatedTransaction ?? transaction)?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED && isAmountMissing(updatedTransaction ?? transaction, false);
     const hasRoute = hasRouteTransactionUtils(transactionBackup ?? transaction, isDistanceRequest);
 
     const rawActualAttendees = isFromMergeTransaction && updatedTransaction ? updatedTransaction.comment?.attendees : transactionAttendees;
@@ -557,6 +562,8 @@ function MoneyRequestView({
     if (isTransactionScanning) {
         merchantTitle = translate('iou.receiptStatusTitle');
         amountTitle = translate('iou.receiptStatusTitle');
+    } else if (isScanFailedWithMissingAmount) {
+        amountTitle = '';
     }
 
     const shouldNavigateToUpgradePath = !policyForMovingExpenses && !shouldSelectPolicy;
@@ -701,6 +708,10 @@ function MoneyRequestView({
             merchant: {
                 isError: !isSettled && !isCancelled && isPolicyExpenseChat && isEmptyMerchant,
                 translationPath: canEditMerchant ? 'common.error.enterMerchant' : 'common.error.missingMerchantName',
+            },
+            amount: {
+                isError: !isSettled && !isCancelled && isScanFailedWithMissingAmount,
+                translationPath: canEditAmount ? 'common.error.enterAmount' : 'common.error.missingAmount',
             },
             date: {
                 isError: transactionDate === '',
