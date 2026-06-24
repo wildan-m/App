@@ -35,6 +35,13 @@ function PDFView({onToggleKeyboard, fileName, onPress, isFocused, sourceURL, sty
     const [maxCanvasHeight] = useOnyx(ONYXKEYS.MAX_CANVAS_HEIGHT);
     const [maxCanvasWidth] = useOnyx(ONYXKEYS.MAX_CANVAS_WIDTH);
 
+    // The max-canvas limits are computed asynchronously and merged into Onyx after a probe resolves.
+    // If the previewer mounts before they are available, the devicePixelRatio passed to the underlying
+    // page flips from undefined to a number once they load, forcing a mid-flight canvas re-render that
+    // wipes the rendered text for some embedded fonts. Wait until all limits are present so the page is
+    // rendered once with a stable devicePixelRatio.
+    const areCanvasLimitsReady = maxCanvasArea !== undefined && maxCanvasHeight !== undefined && maxCanvasWidth !== undefined;
+
     /**
      * On small screens notify parent that the keyboard has opened or closed.
      *
@@ -96,37 +103,49 @@ function PDFView({onToggleKeyboard, fileName, onPress, isFocused, sourceURL, sty
                 style={outerContainerStyle}
                 tabIndex={0}
             >
-                <PDFPreviewer
-                    contentContainerStyle={style as CSSProperties}
-                    file={sourceURL}
-                    pageMaxWidth={variables.pdfPageMaxWidth}
-                    isSmallScreen={shouldUseNarrowLayout}
-                    maxCanvasWidth={maxCanvasWidth}
-                    maxCanvasHeight={maxCanvasHeight}
-                    maxCanvasArea={maxCanvasArea}
-                    LoadingComponent={
-                        <LoadingIndicator
-                            style={
-                                isUsedAsChatAttachment && [
-                                    styles.chatItemPDFAttachmentLoading,
-                                    StyleUtils.getWidthAndHeightStyle(LOADING_THUMBNAIL_WIDTH, LOADING_THUMBNAIL_HEIGHT),
-                                    styles.pRelative,
-                                ]
-                            }
-                        />
-                    }
-                    shouldShowErrorComponent={false}
-                    onLoadError={onLoadError}
-                    rotation={rotation}
-                    renderPasswordForm={({isPasswordInvalid, onSubmit, onPasswordChange}) => (
-                        <PDFPasswordForm
-                            isFocused={!!isFocused}
-                            isPasswordInvalid={isPasswordInvalid}
-                            onSubmit={onSubmit}
-                            onPasswordUpdated={onPasswordChange}
-                        />
-                    )}
-                />
+                {!areCanvasLimitsReady ? (
+                    <LoadingIndicator
+                        style={
+                            isUsedAsChatAttachment && [
+                                styles.chatItemPDFAttachmentLoading,
+                                StyleUtils.getWidthAndHeightStyle(LOADING_THUMBNAIL_WIDTH, LOADING_THUMBNAIL_HEIGHT),
+                                styles.pRelative,
+                            ]
+                        }
+                    />
+                ) : (
+                    <PDFPreviewer
+                        contentContainerStyle={style as CSSProperties}
+                        file={sourceURL}
+                        pageMaxWidth={variables.pdfPageMaxWidth}
+                        isSmallScreen={shouldUseNarrowLayout}
+                        maxCanvasWidth={maxCanvasWidth}
+                        maxCanvasHeight={maxCanvasHeight}
+                        maxCanvasArea={maxCanvasArea}
+                        LoadingComponent={
+                            <LoadingIndicator
+                                style={
+                                    isUsedAsChatAttachment && [
+                                        styles.chatItemPDFAttachmentLoading,
+                                        StyleUtils.getWidthAndHeightStyle(LOADING_THUMBNAIL_WIDTH, LOADING_THUMBNAIL_HEIGHT),
+                                        styles.pRelative,
+                                    ]
+                                }
+                            />
+                        }
+                        shouldShowErrorComponent={false}
+                        onLoadError={onLoadError}
+                        rotation={rotation}
+                        renderPasswordForm={({isPasswordInvalid, onSubmit, onPasswordChange}) => (
+                            <PDFPasswordForm
+                                isFocused={!!isFocused}
+                                isPasswordInvalid={isPasswordInvalid}
+                                onSubmit={onSubmit}
+                                onPasswordUpdated={onPasswordChange}
+                            />
+                        )}
+                    />
+                )}
             </View>
         );
     };
