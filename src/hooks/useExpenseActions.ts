@@ -11,9 +11,11 @@ import type {SecondaryActionEntry} from '@components/MoneyReportHeaderActions/ty
 import {useMoneyReportTransactionThread} from '@components/MoneyReportTransactionThreadContext';
 import {useSearchQueryContext, useSearchSelectionActions} from '@components/Search/SearchContext';
 import {duplicateReport as duplicateReportAction, duplicateExpenseTransaction as duplicateTransactionAction} from '@libs/actions/IOU/Duplicate';
+import {addPendingNewTransactionIDs, isOneToTwoTransactionTransition} from '@libs/actions/IOU/PendingNewTransactions';
 import {setupMergeTransactionDataAndNavigate} from '@libs/actions/MergeTransaction';
 import {deleteAppReport} from '@libs/actions/Report';
 import initSplitExpense from '@libs/actions/SplitExpenses';
+import {generateTransactionID} from '@libs/actions/Transaction';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getExistingTransactionID} from '@libs/IOUUtils';
 import Log from '@libs/Log';
@@ -28,6 +30,7 @@ import {
     getAddExpenseDropdownOptions,
     getPolicyExpenseChat,
     isDM,
+    isMoneyRequestReport,
     isOpenReport,
     isSelfDM,
     navigateOnDeleteExpense,
@@ -231,14 +234,25 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         const optimisticIOUReportID = generateReportID();
         const activePolicyCategories = allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${defaultExpensePolicy?.id}`] ?? {};
 
+        // When the duplicate lands in the report that is currently open and that report holds a single expense,
+        // the 1→2 transition fresh-mounts the report list, so useNewTransactions' diff loses the newly-added row.
+        // Mirror the request/track-expense flows by registering the duplicate in the report's pendingNewTransactionIDs
+        // fallback so the new row still highlights on that first mount.
+        const shouldHighlightDuplicateOnReport =
+            !!moneyRequestReport?.reportID &&
+            activePolicyExpenseChat?.iouReportID === moneyRequestReport.reportID &&
+            isOneToTwoTransactionTransition(isMoneyRequestReport(moneyRequestReport), transactions);
+
         for (const item of transactionList) {
             const existingTransactionID = getExistingTransactionID(item.linkedTrackedExpenseReportAction);
             const existingTransactionDraft = existingTransactionID ? transactionDrafts?.[existingTransactionID] : undefined;
+            const optimisticTransactionID = generateTransactionID();
 
             duplicateTransactionAction({
                 transaction: item,
                 optimisticChatReportID,
                 optimisticIOUReportID,
+                optimisticTransactionID,
                 isASAPSubmitBetaEnabled,
                 introSelected,
                 quickAction,
@@ -256,6 +270,10 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
                 currentUser: {accountID: currentUserPersonalDetails?.accountID, email: currentUserPersonalDetails?.email ?? ''},
                 currentUserLocalCurrency: currentUserPersonalDetails?.localCurrencyCode ?? CONST.CURRENCY.USD,
             });
+
+            if (shouldHighlightDuplicateOnReport) {
+                addPendingNewTransactionIDs(moneyRequestReport.reportID, existingTransactionDraft?.transactionID ?? optimisticTransactionID);
+            }
         }
     };
 

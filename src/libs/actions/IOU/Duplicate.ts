@@ -736,6 +736,7 @@ type DuplicateExpenseTransactionParams = {
     shouldDeferAutoSubmit?: boolean;
     existingIOUReport?: OnyxEntry<OnyxTypes.Report>;
     optimisticReportPreviewActionID?: string;
+    optimisticTransactionID?: string;
     currentUser: CurrentUser;
     currentUserLocalCurrency: string | undefined;
 };
@@ -762,6 +763,7 @@ function duplicateExpenseTransaction({
     shouldDeferAutoSubmit = false,
     existingIOUReport,
     optimisticReportPreviewActionID: externalReportPreviewActionID,
+    optimisticTransactionID,
     currentUser,
     currentUserLocalCurrency,
 }: DuplicateExpenseTransactionParams) {
@@ -781,6 +783,7 @@ function duplicateExpenseTransaction({
         optimisticCreatedReportActionID: NumberUtils.rand64(),
         optimisticIOUReportID,
         optimisticReportPreviewActionID: externalReportPreviewActionID ?? NumberUtils.rand64(),
+        optimisticTransactionID,
         participantParams: {
             payeeAccountID: currentUserAccountID,
             payeeEmail: currentUserLogin,
