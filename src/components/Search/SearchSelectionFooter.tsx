@@ -59,17 +59,12 @@ function areAllSelectedExpensesInAuxiliarySnapshot(selectedTransactions: Selecte
 }
 
 function shouldAllowFooterCurrencyChange(
-    hasSelectedGroup: boolean,
     hasPartialSelection: boolean,
     areAllSelectedForFooter: boolean,
     footerTotalData: Record<string, unknown> | undefined,
     isFooterTotalConverting: boolean,
     selectedTransactions: SelectedTransactions,
 ): boolean {
-    if (hasSelectedGroup) {
-        return false;
-    }
-
     if (!hasPartialSelection || areAllSelectedForFooter) {
         return true;
     }
@@ -110,7 +105,6 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     const metadataTotal = metadata?.total;
     const isMetadataLoading = !!metadata?.isLoading;
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
-    const hasSelectedGroup = selectedTransactionsKeys.some(isGroupEntry);
     const selectedExpenseCount = useMemo(
         () =>
             selectedTransactionsKeys.reduce((count, key) => {
@@ -154,7 +148,6 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
         (previousMetadataCount !== undefined && metadataCount !== undefined && previousMetadataCount !== metadataCount) ||
         (previousMetadataTotal !== undefined && metadataTotal !== undefined && previousMetadataTotal !== metadataTotal);
     const shouldResetCustomCurrencyAfterDataChange = !!selectedCurrency && selectedCurrency !== effectiveDefaultCurrency && didLiveSnapshotDataChange;
-    const shouldResetCustomCurrencyForGroupSelection = hasSelectedGroup && !!selectedCurrency;
     const shouldResetCustomCurrencyForUncoveredSelection =
         hasPartialSelection && !!selectedCurrency && !!footerTotalDataRecord && !isFooterTotalConverting && !areAllSelectedInAuxiliarySnapshot;
     if (shouldResetCustomCurrencyForUncoveredSelection) {
@@ -164,7 +157,7 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
             defaultCurrency: effectiveDefaultCurrency,
             footerTotalHash: footerCurrencyState.footerTotalHash,
         });
-    } else if (shouldResetCustomCurrencyAfterLiveRefresh || shouldResetCustomCurrencyForGroupSelection || shouldResetCustomCurrencyAfterDataChange) {
+    } else if (shouldResetCustomCurrencyAfterLiveRefresh || shouldResetCustomCurrencyAfterDataChange) {
         setFooterCurrencyState({
             searchHash: currentSearchHash,
             selectedCurrency: undefined,
@@ -288,7 +281,6 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
             isTotalLoading={isFooterTotalLoading}
             onCurrencyChange={handleFooterCurrencyChange}
             shouldAllowCurrencyChange={shouldAllowFooterCurrencyChange(
-                hasSelectedGroup,
                 hasPartialSelection,
                 areAllSelectedForFooter,
                 footerTotalDataRecord,
