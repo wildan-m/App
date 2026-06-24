@@ -108,10 +108,7 @@ function useRecentlyAddedData(): {transactions: RecentlyAddedExpense[]} {
     const snapshotData = searchResults?.data;
 
     const transactions = useMemo(() => {
-        const data = snapshotData;
-        if (!data) {
-            return [];
-        }
+        const data = snapshotData ?? {};
 
         const reportOwnerByReportID = new Map<string, number | undefined>();
         const snapshotTransactions: Transaction[] = [];
@@ -137,8 +134,36 @@ function useRecentlyAddedData(): {transactions: RecentlyAddedExpense[]} {
             }
         }
 
-        const filtered = snapshotTransactions.filter((transaction): transaction is Transaction & {reportID: string} => {
+        // The snapshot is replaced wholesale by every search response, and a search re-fires on each focus.
+        // A search that runs in the instant after a delete can come back transiently empty/partial, which would
+        // otherwise blank out expenses the client still holds locally (e.g. the sibling of a just-deleted split).
+        // To stay resilient, also surface recently-added expenses from the local `transactions_` collection, and
+        // drop anything the user has locally deleted.
+        const pendingDeleteTransactionIDs = new Set<string>();
+        for (const [key, transaction] of Object.entries(localTransactions ?? {})) {
+            if (!transaction) {
+                continue;
+            }
+            const transactionID = transaction.transactionID ?? key.slice(ONYXKEYS.COLLECTION.TRANSACTION.length);
+            if (transaction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+                pendingDeleteTransactionIDs.add(transactionID);
+            }
+        }
+
+        const snapshotTransactionIDs = new Set(snapshotTransactions.map((transaction) => transaction?.transactionID).filter(Boolean));
+        // Local expenses the user recently added (they carry an `inserted` timestamp) that the latest snapshot is
+        // missing. They always belong to the signed-in user, so they fall through the `ownerAccountID === undefined`
+        // branch of the owner filter below.
+        const localOnlyRecentTransactions = Object.values(localTransactions ?? {}).filter(
+            (transaction): transaction is Transaction => !!transaction && !!transaction.inserted && !!transaction.reportID && !snapshotTransactionIDs.has(transaction.transactionID),
+        );
+
+        const filtered = [...snapshotTransactions, ...localOnlyRecentTransactions].filter((transaction): transaction is Transaction & {reportID: string} => {
             if (!transaction?.reportID) {
+                return false;
+            }
+            // Hide expenses the user has locally deleted; their snapshot copy can linger until the next search settles.
+            if (pendingDeleteTransactionIDs.has(transaction.transactionID)) {
                 return false;
             }
             // Unreported expenses have no parent report to resolve ownership from, but always belong to the user.
@@ -174,7 +199,7 @@ function useRecentlyAddedData(): {transactions: RecentlyAddedExpense[]} {
                 threadReportID: getIOUActionForTransactionID(snapshotReportActions, transaction.transactionID)?.childReportID,
                 transaction,
             }));
-    }, [snapshotData, accountID, insertedByTransactionID]);
+    }, [snapshotData, accountID, insertedByTransactionID, localTransactions]);
 
     return {transactions};
 }
