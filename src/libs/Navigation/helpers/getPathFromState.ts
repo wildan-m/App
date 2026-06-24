@@ -1,6 +1,7 @@
 import {findFocusedRoute, getPathFromState as RNGetPathFromState} from '@react-navigation/native';
 import type {NavigationState, PartialState} from '@react-navigation/routers';
 import {config, normalizedConfigs} from '@libs/Navigation/linkingConfig/config';
+import SCREENS from '@src/SCREENS';
 import type {Screen} from '@src/SCREENS';
 import getDynamicRouteQueryParams from './dynamicRoutesUtils/getDynamicRouteQueryParams';
 import isDynamicRouteScreen from './dynamicRoutesUtils/isDynamicRouteScreen';
@@ -147,6 +148,16 @@ function getPathFromStateWithDynamicRoute(state: State): string {
 function getPathFromState(state: State): string {
     const focusedRoute = findFocusedRoute(state);
     const screenName = focusedRoute?.name ?? '';
+
+    // The logged-out sign-in page is registered as SCREENS.HOME at the root of PublicScreens, and there is no
+    // top-level path mapping for it, so React Navigation derives the path from the screen name ("Home"), producing
+    // "/Home" in the address bar. Only the public sign-in page has SCREENS.HOME directly at the root of the
+    // navigation state — the authenticated home screen is always nested inside the Tab navigator — so when the
+    // top-level route is SCREENS.HOME we emit the root path "/" instead.
+    const topLevelRoute = state.routes[state.index ?? state.routes.length - 1];
+    if (topLevelRoute?.name === SCREENS.HOME) {
+        return '/';
+    }
 
     if (isDynamicRouteScreen(screenName as Screen)) {
         return getPathFromStateWithDynamicRoute(state);
