@@ -672,6 +672,18 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                                       }
                                                   }
 
+                                                  // If the workspace has other eligible existing business bank accounts, let the user switch to one
+                                                  // of them instead of starting the connect-from-scratch flow (matches the "Add bank account" branch).
+                                                  if (hasValidExistingAccounts && !shouldShowContinueModal) {
+                                                      Navigation.navigate(
+                                                          ROUTES.BANK_ACCOUNT_CONNECT_EXISTING_BUSINESS_BANK_ACCOUNT.getRoute(
+                                                              route.params.policyID,
+                                                              ROUTES.WORKSPACE_WORKFLOWS.getRoute(route.params.policyID),
+                                                          ),
+                                                      );
+                                                      return;
+                                                  }
+
                                                   navigateToBankAccountRoute({policyID: route.params.policyID, backTo: ROUTES.WORKSPACE_WORKFLOWS.getRoute(route.params.policyID)});
                                               }
                                             : undefined
