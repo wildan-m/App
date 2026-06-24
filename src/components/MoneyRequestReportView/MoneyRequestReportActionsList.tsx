@@ -3,7 +3,7 @@ import {useIsFocused, useRoute} from '@react-navigation/native';
 import {isTrackIntentUserSelector} from '@selectors/Onboarding';
 import isEmpty from 'lodash/isEmpty';
 import React, {useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
-import type {LayoutChangeEvent, ListRenderItemInfo, NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
+import type {LayoutChangeEvent, ListRenderItemInfo, NativeScrollEvent, NativeSyntheticEvent, ViewToken} from 'react-native';
 import {DeviceEventEmitter, View} from 'react-native';
 import FlatListWithScrollKey from '@components/FlatList/FlatListWithScrollKey';
 import ScrollView from '@components/ScrollView';
@@ -461,6 +461,35 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
         },
     });
 
+    // Surface the existing "Latest messages" pill on initial top-aligned load when the newest comment is
+    // below the viewport. The scroll-tracking hook only reveals the pill on an actual scroll event or when
+    // there's an unread marker, so on first render of a top-aligned expense view (e.g. a Concierge reply that
+    // is already read) the user otherwise gets no indication that there are comments below the fold.
+    const latestCommentPillStateRef = useRef({newestActionIndex: -1, hasUnreadMarker: false});
+    latestCommentPillStateRef.current = {
+        newestActionIndex: visibleReportActions.length - 1,
+        hasUnreadMarker: !!unreadMarkerReportActionID,
+    };
+    const handleViewableItemsChanged = useCallback(
+        (info: {viewableItems: ViewToken[]; changed: ViewToken[]}) => {
+            onViewableItemsChanged(info);
+
+            const {newestActionIndex, hasUnreadMarker} = latestCommentPillStateRef.current;
+            // The scroll-tracking hook already owns pill visibility when there's an unread marker, and there is
+            // nothing to surface when the report has no comments.
+            if (hasUnreadMarker || newestActionIndex < 0) {
+                return;
+            }
+
+            const viewableIndexes = info.viewableItems.map((item) => item.index).filter((value): value is number => typeof value === 'number');
+            // When no comment is viewable but comments exist they are all below the fold; otherwise the newest
+            // comment is below the fold when its index is greater than the largest visible index.
+            const isNewestCommentBelowViewport = viewableIndexes.length === 0 || Math.max(...viewableIndexes) < newestActionIndex;
+            setIsFloatingMessageCounterVisible(isNewestCommentBelowViewport);
+        },
+        [onViewableItemsChanged, setIsFloatingMessageCounterVisible],
+    );
+
     useScrollToEndOnNewMessageReceived({
         sizeChangeType: 'grewFromReportActions',
         scrollOffsetRef,
@@ -726,7 +755,7 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                         data={visibleReportActions}
                         renderItem={renderItem}
                         extraData={draftReportActionID}
-                        onViewableItemsChanged={onViewableItemsChanged}
+                        onViewableItemsChanged={handleViewableItemsChanged}
                         keyExtractor={keyExtractor}
                         onLayout={recordTimeToMeasureItemLayout}
                         onEndReached={onEndReached}
