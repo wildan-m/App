@@ -533,6 +533,17 @@ function setOrQueuePusherDraftTarget(runtime: PusherDraftPacingRuntime, event: C
     const latestEvent = getNewestPusherDraftTarget(runtime);
     const activeStreamSessionID = latestEvent?.streamSessionID ?? currentDraftRef.current?.streamSessionID;
     if (activeStreamSessionID && activeStreamSessionID !== event.streamSessionID) {
+        // A different stream session (e.g. an Agent responding alongside Concierge) must not hijack the
+        // session that is still mid-reveal. Without this guard, two concurrent sessions interleave their
+        // events and reset each other's visible offset to 0, so the bubble stays stuck on the first token
+        // (attributed to whichever sender's event landed last) until the real comment arrives.
+        const isCurrentSessionStillRevealing =
+            !!currentTarget?.bodyMarkdown &&
+            (visibleSourceOffsetRef.current < currentTarget.bodyMarkdown.length || queuedPusherDraftEventsRef.current.length > 0 || !!completedPusherDraftEventRef.current);
+        if (isCurrentSessionStillRevealing) {
+            return true;
+        }
+
         stopPusherDraftPace(runtime);
         stopFinalRenderedHTMLReveal(runtime);
         completedPusherDraftEventRef.current = null;
