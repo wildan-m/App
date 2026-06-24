@@ -221,6 +221,17 @@ function updateMultipleMoneyRequests({
         if (changes.reimbursable !== undefined && canEditField(CONST.EDIT_REQUEST_FIELD.REIMBURSABLE)) {
             transactionChanges.reimbursable = changes.reimbursable;
         }
+        // Attendees apply to expense/track expenses but never to invoices (matching the single-expense
+        // shouldShowAttendees gate). The page only surfaces the option when every selection is eligible.
+        if (
+            changes.attendees &&
+            changes.attendees.length > 0 &&
+            supportsExpenseFields &&
+            !isInvoiceReportReportUtils(baseIouReport ?? undefined) &&
+            canEditField(CONST.EDIT_REQUEST_FIELD.ATTENDEES)
+        ) {
+            transactionChanges.attendees = changes.attendees;
+        }
 
         transactionChanges = removeUnchangedBulkEditFields(transactionChanges, transaction, baseIouReport, transactionPolicy);
 
@@ -260,6 +271,11 @@ function updateMultipleMoneyRequests({
         }
         if (transactionChanges.reimbursable !== undefined) {
             updates.reimbursable = transactionChanges.reimbursable;
+        }
+        // Attendees are sent as a JSON string, matching how the single-expense UpdateMoneyRequestAttendees
+        // command serializes them before they are folded into the bulk `updates` payload.
+        if (transactionChanges.attendees) {
+            updates.attendees = JSON.stringify(transactionChanges.attendees);
         }
 
         // Skip if no updates

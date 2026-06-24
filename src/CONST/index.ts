@@ -5230,6 +5230,7 @@ const CONST = {
         REIMBURSABLE: 'reimbursable',
         BILLABLE: 'billable',
         REPORT: 'report',
+        ATTENDEES: 'attendees',
     },
     FOOTER: {
         EXPENSE_MANAGEMENT_URL: `${USE_EXPENSIFY_URL}/expense-management`,

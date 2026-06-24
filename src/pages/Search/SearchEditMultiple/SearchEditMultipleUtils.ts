@@ -1,7 +1,7 @@
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
-import {isIOUReport} from '@libs/ReportUtils';
-import {getTagArrayFromName, isDistanceRequest, isPerDiemRequest} from '@libs/TransactionUtils';
+import {isInvoiceReport, isIOUReport} from '@libs/ReportUtils';
+import {getTagArrayFromName, isDistanceRequest, isPerDiemRequest, shouldShowAttendees} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, ReportActions, SearchResults, Transaction} from '@src/types/onyx';
@@ -104,6 +104,32 @@ function isBulkEditTaxTrackingEnabled(
 }
 
 /**
+ * Attendees can only be bulk edited when attendee tracking is enabled for every selected transaction's policy.
+ * Reported expenses use their own workspace policy; unreported (track) expenses fall back to the bulk-edit
+ * workspace policy because they have no report to resolve a per-transaction policy from. Invoices never
+ * support attendees, mirroring the single-expense gate in shouldShowAttendees.
+ */
+function isBulkEditAttendeesEnabled(
+    selectedTransactionContexts: Array<{transaction: Transaction; report: OnyxEntry<Report>; transactionPolicy: OnyxEntry<Policy>}>,
+    bulkEditPolicy: OnyxEntry<Policy>,
+): boolean {
+    if (selectedTransactionContexts.length === 0) {
+        return false;
+    }
+    return selectedTransactionContexts.every(({transaction, report, transactionPolicy}) => {
+        const isUnreportedExpense = !transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+        const policy = isUnreportedExpense ? bulkEditPolicy : transactionPolicy;
+        let iouType: typeof CONST.IOU.TYPE.SUBMIT | typeof CONST.IOU.TYPE.TRACK | typeof CONST.IOU.TYPE.INVOICE = CONST.IOU.TYPE.SUBMIT;
+        if (isInvoiceReport(report)) {
+            iouType = CONST.IOU.TYPE.INVOICE;
+        } else if (isUnreportedExpense) {
+            iouType = CONST.IOU.TYPE.TRACK;
+        }
+        return shouldShowAttendees(iouType, policy);
+    });
+}
+
+/**
  * After a hard refresh, transaction/report/reportAction data may only exist in the search snapshot,
  * not in the main Onyx collections. These helpers fill gaps from the snapshot so bulk edit can work.
  */
@@ -162,6 +188,7 @@ export {
     hasCustomUnitMerchantInSelection,
     areAllTransactionsExpenseCompatible,
     isBulkEditTaxTrackingEnabled,
+    isBulkEditAttendeesEnabled,
     withSnapshotTransactions,
     withSnapshotReportActions,
     withSnapshotReports,

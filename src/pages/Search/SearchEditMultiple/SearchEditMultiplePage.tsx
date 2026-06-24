@@ -21,7 +21,16 @@ import {getCleanedTagName, getTagLists, hasDependentTags as hasDependentTagsPoli
 import {canEditFieldOfMoneyRequest, isInvoiceReport, isIOUReport} from '@libs/ReportUtils';
 import {getSearchBulkEditPolicyID} from '@libs/SearchUIUtils';
 import {hasEnabledTags, shouldShowDependentTagList} from '@libs/TagsOptionsListUtils';
-import {getTagArrayFromName, getTaxName, hasSplitExpenseInSelection, isDistanceRequest, isManagedCardTransaction, isPerDiemRequest, isTimeRequest} from '@libs/TransactionUtils';
+import {
+    getAttendeesListDisplayString,
+    getTagArrayFromName,
+    getTaxName,
+    hasSplitExpenseInSelection,
+    isDistanceRequest,
+    isManagedCardTransaction,
+    isPerDiemRequest,
+    isTimeRequest,
+} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -31,6 +40,7 @@ import {
     areAllTransactionsExpenseCompatible,
     getTransactionEditContext,
     hasCustomUnitMerchantInSelection,
+    isBulkEditAttendeesEnabled,
     isBulkEditTaxTrackingEnabled,
     withSnapshotReportActions,
     withSnapshotReports,
@@ -119,6 +129,8 @@ function SearchEditMultiplePage() {
     const areSelectedTransactionsExpenses = areAllTransactionsExpenseCompatible(selectedTransactionContexts);
     const areCategoriesEnabled = areSelectedTransactionsExpenses && !!policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {});
     const areTagsEnabled = areSelectedTransactionsExpenses && !!policy?.areTagsEnabled && hasEnabledTags(policyTagLists);
+    const areAttendeesEnabled = isBulkEditAttendeesEnabled(selectedTransactionContexts, policy);
+    const draftAttendees = Array.isArray(draftTransaction?.comment?.attendees) ? draftTransaction.comment.attendees : [];
 
     useEffect(() => {
         return () => {
@@ -160,6 +172,9 @@ function SearchEditMultiplePage() {
         }
         if (typeof draftTransaction.reimbursable === 'boolean') {
             changes.reimbursable = draftTransaction.reimbursable;
+        }
+        if (Array.isArray(draftTransaction.comment?.attendees) && draftTransaction.comment.attendees.length > 0) {
+            changes.attendees = draftTransaction.comment.attendees;
         }
 
         if (Object.keys(changes).length === 0) {
@@ -276,6 +291,15 @@ function SearchEditMultiplePage() {
                       title: draftTransaction?.taxCode ? (getTaxName(policy, draftTransaction) ?? '') : '',
                       route: ROUTES.SEARCH_EDIT_MULTIPLE_TAX_RHP,
                       disabled: hasPartiallyEditableTaxRateTransaction || hasSplitTransaction,
+                  },
+              ]
+            : []),
+        ...(areAttendeesEnabled
+            ? [
+                  {
+                      description: translate('iou.attendees'),
+                      title: draftAttendees.length > 0 ? getAttendeesListDisplayString(draftAttendees) : '',
+                      route: ROUTES.SEARCH_EDIT_MULTIPLE_ATTENDEES_RHP,
                   },
               ]
             : []),
