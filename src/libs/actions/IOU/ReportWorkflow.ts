@@ -291,7 +291,9 @@ function getBadgeFromIOUReport(
     if (canBePaidElsewhere) {
         return hasOnlyNonReimbursableTransactions(iouReport?.reportID) ? undefined : CONST.REPORT.ACTION_BADGE.PAY;
     }
-    if (canApproveIOU(iouReport, policy, reportMetadata, currentUserAccountID)) {
+    // Submit workspaces surface an "Approve" button that only opens the upgrade-on-approval modal,
+    // so approving is not a real outstanding action there — don't show the LHN "Approve" badge for them.
+    if (canApproveIOU(iouReport, policy, reportMetadata, currentUserAccountID) && !isSubmitPolicy(policy)) {
         return CONST.REPORT.ACTION_BADGE.APPROVE;
     }
     const isWaitingSubmitFromCurrentUser = canSubmitAndIsAwaitingForCurrentUser(
