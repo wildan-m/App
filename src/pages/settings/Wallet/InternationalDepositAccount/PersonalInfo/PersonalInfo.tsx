@@ -6,6 +6,7 @@ import useSubStep from '@hooks/useSubStep';
 import type {SubStepProps} from '@hooks/useSubStep/types';
 import {getLatestErrorMessage} from '@libs/ErrorUtils';
 import {formatE164PhoneNumber} from '@libs/LoginUtils';
+import {getCurrentAddress, getStreetLines} from '@libs/PersonalDetailsUtils';
 import Navigation from '@navigation/Navigation';
 import {addPersonalBankAccount} from '@userActions/BankAccounts';
 import CONST from '@src/CONST';
@@ -50,11 +51,31 @@ function PersonalInfoPage() {
                   plaidAccessToken: plaidData?.plaidAccessToken ?? '',
               };
         const finalPhoneNumber = personalBankAccount?.phoneNumber ?? privatePersonalDetails?.phoneNumber ?? '';
+
+        // When the Address substep was skipped (e.g. re-adding a bank account after the address was already saved),
+        // the flat address fields are never written into the bank-account form draft and private personal details only
+        // expose the address as a nested addresses[] array. Fall back to the saved address so a complete address is
+        // always submitted, otherwise the account is flagged for review and redirects to Confirm Address.
+        const currentAddress = getCurrentAddress(privatePersonalDetails);
+        const [savedStreet1, savedStreet2] = getStreetLines(currentAddress?.street ?? currentAddress?.addressLine1);
+        const finalAddressStreet = personalBankAccount?.addressStreet ?? savedStreet1 ?? '';
+        const finalAddressStreet2 = personalBankAccount?.addressStreet2 ?? savedStreet2 ?? currentAddress?.street2 ?? currentAddress?.addressLine2 ?? '';
+        const finalAddressCity = personalBankAccount?.addressCity ?? currentAddress?.city ?? '';
+        const finalAddressState = personalBankAccount?.addressState ?? currentAddress?.state ?? '';
+        const finalAddressZipCode = personalBankAccount?.addressZipCode ?? currentAddress?.zip ?? currentAddress?.zipPostCode ?? '';
+        const finalCountry = personalBankAccount?.country ?? currentAddress?.country ?? '';
+
         const accountData = {
             ...privatePersonalDetails,
             ...personalBankAccount,
             ...bankAccountWithToken,
             phoneNumber: formatE164PhoneNumber(finalPhoneNumber, countryCode),
+            addressStreet: finalAddressStreet,
+            addressStreet2: finalAddressStreet2,
+            addressCity: finalAddressCity,
+            addressState: finalAddressState,
+            addressZipCode: finalAddressZipCode,
+            country: finalCountry,
         };
         if (confirmedOwnershipDetails.current) {
             accountData.confirmedOwnershipDetails = true;
