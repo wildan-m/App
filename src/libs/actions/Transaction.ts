@@ -1152,10 +1152,24 @@ function changeTransactionsReport({
             if (duplicateTransactionIDs) {
                 for (const id of duplicateTransactionIDs) {
                     const siblingViolations = allTransactionViolation?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${id}`] ?? [];
+                    const siblingViolationsWithoutDuplicate = siblingViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
                     optimisticData.push({
                         onyxMethod: Onyx.METHOD.SET,
                         key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${id}`,
-                        value: siblingViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION),
+                        value: siblingViolationsWithoutDuplicate,
+                    });
+                    // Re-assert the cleared sibling violations when the server response arrives so the
+                    // duplicate violation does not reappear after going back online.
+                    successData.push({
+                        onyxMethod: Onyx.METHOD.SET,
+                        key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${id}`,
+                        value: siblingViolationsWithoutDuplicate,
+                    });
+                    // Restore the original sibling violations if the request fails.
+                    failureData.push({
+                        onyxMethod: Onyx.METHOD.SET,
+                        key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${id}`,
+                        value: siblingViolations,
                     });
                 }
             }
