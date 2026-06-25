@@ -13,6 +13,11 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
 import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
+// Split-validation errors owned by SplitBillController. Like violation errors, these represent real
+// validation that can only be resolved by fixing the split amounts, so the focus/validation-reset
+// effect below must not clear them when unrelated state (e.g. merchant validity) changes.
+const SPLIT_VALIDATION_ERRORS: string[] = ['iou.error.invalidSplit', 'iou.error.invalidSplitParticipants', 'iou.error.invalidSplitYourself'];
+
 type UseFormErrorManagementParams = {
     /** Transaction being confirmed */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
@@ -202,11 +207,13 @@ function useFormErrorManagement({
             setFormError('');
             return;
         }
-        // Check 1: If formError does NOT start with "violations.", clear it and return
+        // Check 1: If formError does NOT start with "violations." (and isn't a preserved split error),
+        // clear it and return.
         // Reset the form error whenever the screen gains or loses focus
-        // but preserve violation-related errors since those represent real validation issues
-        // that can only be resolved by fixing the underlying issue
-        if (currentFormError && !currentFormError.startsWith(CONST.VIOLATIONS_PREFIX)) {
+        // but preserve violation-related errors and split-validation errors since those represent real
+        // validation issues that can only be resolved by fixing the underlying issue. SplitBillController
+        // owns the split errors and clears them itself once the split amounts become valid.
+        if (currentFormError && !currentFormError.startsWith(CONST.VIOLATIONS_PREFIX) && !SPLIT_VALIDATION_ERRORS.includes(currentFormError)) {
             setFormError('');
             return;
         }
