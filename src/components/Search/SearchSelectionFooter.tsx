@@ -30,6 +30,12 @@ type FooterCurrencyState = {
 
     /** Hash of the auxiliary flat-query snapshot used for converted footer totals in grouped views */
     footerTotalHash: number | undefined;
+
+    /**
+     * True when the footer currency was applied while a live search refresh was already in flight. The next
+     * offset-zero refresh completion is then expected and must not reset the just-applied currency.
+     */
+    ignoreNextLiveRefreshReset?: boolean;
 };
 
 function getObjectMember(value: unknown, memberName: string): unknown {
@@ -154,13 +160,26 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
             defaultCurrency: effectiveDefaultCurrency,
             footerTotalHash: footerCurrencyState.footerTotalHash,
         });
-    } else if (shouldResetCustomCurrencyAfterLiveRefresh || shouldResetCustomCurrencyForGroupSelection) {
+    } else if (shouldResetCustomCurrencyForGroupSelection) {
         setFooterCurrencyState({
             searchHash: currentSearchHash,
             selectedCurrency: undefined,
             defaultCurrency: effectiveDefaultCurrency,
             footerTotalHash: undefined,
         });
+    } else if (shouldResetCustomCurrencyAfterLiveRefresh) {
+        if (footerCurrencyState.ignoreNextLiveRefreshReset) {
+            // This refresh was already in flight when the currency was applied, so it does not reflect an
+            // expense edit that would invalidate the converted totals. Consume the one-time guard instead.
+            setFooterCurrencyState({...footerCurrencyState, ignoreNextLiveRefreshReset: false});
+        } else {
+            setFooterCurrencyState({
+                searchHash: currentSearchHash,
+                selectedCurrency: undefined,
+                defaultCurrency: effectiveDefaultCurrency,
+                footerTotalHash: undefined,
+            });
+        }
     }
 
     const handleFooterCurrencyChange = useCallback(
@@ -180,6 +199,9 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
                 selectedCurrency: currency,
                 defaultCurrency: effectiveDefaultCurrency,
                 footerTotalHash: flatQueryJSON?.hash,
+                // A live refresh already in flight when the currency is applied will complete shortly and must
+                // not be mistaken for an expense edit that should reset the currency.
+                ignoreNextLiveRefreshReset: isMetadataLoading,
             });
 
             // Resetting to the default currency reads the existing native live snapshot, so no extra request is needed.
@@ -196,7 +218,7 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
                 targetCurrency: nextCurrency,
             });
         },
-        [currentSearchHash, currentSearchQueryJSON, effectiveDefaultCurrency],
+        [currentSearchHash, currentSearchQueryJSON, effectiveDefaultCurrency, isMetadataLoading],
     );
 
     const footerData = useMemo(() => {
