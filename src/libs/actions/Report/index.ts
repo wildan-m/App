@@ -2240,12 +2240,25 @@ function createTransactionThreadReport(params: CreateTransactionThreadReportPara
 function navigateToReport(reportID: string | undefined, options?: {shouldDismissModal?: boolean; afterTransition?: () => void}) {
     const shouldDismissModal = options?.shouldDismissModal ?? true;
 
+    const navigateToReportRoute = () => {
+        const route = ROUTES.REPORT_WITH_ID.getRoute(reportID);
+        if (options?.afterTransition) {
+            Navigation.navigate(route, {afterTransition: options.afterTransition});
+        } else {
+            Navigation.navigate(route);
+        }
+    };
+
     if (shouldDismissModal) {
         if (!reportID) {
             Navigation.dismissModal({afterTransition: options?.afterTransition});
             return;
         }
-        Navigation.dismissModal();
+        // Run the report navigation only after the modal dismissal transition completes. Dispatching the navigate in a
+        // separate setTimeout used to race the deferred DISMISS_MODAL action, and when the dismissal won the race it
+        // popped the stack back over the just-navigated report (e.g. the new group chat not opening in Firefox).
+        Navigation.dismissModal({afterTransition: navigateToReportRoute});
+        return;
     }
 
     if (!reportID) {
@@ -2253,14 +2266,7 @@ function navigateToReport(reportID: string | undefined, options?: {shouldDismiss
     }
     // In some cases when RHP modal gets hidden and then we navigate to report Composer focus breaks, wrapping navigation in setTimeout fixes this
     setTimeout(() => {
-        Navigation.isNavigationReady().then(() => {
-            const route = ROUTES.REPORT_WITH_ID.getRoute(reportID);
-            if (options?.afterTransition) {
-                Navigation.navigate(route, {afterTransition: options.afterTransition});
-            } else {
-                Navigation.navigate(route);
-            }
-        });
+        Navigation.isNavigationReady().then(navigateToReportRoute);
     }, 0);
 }
 
