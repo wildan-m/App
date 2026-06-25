@@ -10,7 +10,6 @@ import {PressableWithoutFeedback} from '@components/Pressable';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
-import isSidePanelReportSupported from '@components/SidePanel/isSidePanelReportSupported';
 import Text from '@components/Text';
 import useActivePolicy from '@hooks/useActivePolicy';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -232,11 +231,11 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                 firstName: currentUserPersonalDetails?.firstName,
                 lastName: currentUserPersonalDetails?.lastName,
                 selectedInterestedFeatures: featuresMap.filter((feature) => feature.enabled).map((feature) => feature.id),
-                shouldWaitForRHPVariantInitialization: isSidePanelReportSupported,
+                shouldWaitForRHPVariantInitialization: true,
                 introSelected,
                 isSelfTourViewed,
             });
-            const rhpVariant = isSidePanelReportSupported ? extractRHPVariantFromResponse(response) : undefined;
+            const rhpVariant = extractRHPVariantFromResponse(response);
 
             // Avoid creating new WS because onboardingPolicyID is cleared before unmounting
             TransitionTracker.runAfterTransitions({

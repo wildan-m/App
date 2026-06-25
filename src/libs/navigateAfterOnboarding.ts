@@ -79,6 +79,20 @@ function navigateAfterOnboarding(
         return;
     }
 
+    // On mobile (small screen), the admins/bespoke variants are meant to land in the workspace's #admins room.
+    // shouldOpenRHPVariant returns false on native (Side Panel doesn't exist there), so without this carve-out
+    // navigation falls through to getReportIDAfterOnboarding, whose small-screen branch excludes any report from
+    // the onboarding policy - including the freshly created #admins room - and the user ends up on Home instead.
+    if (
+        isSmallScreenWidth &&
+        (variant === CONST.ONBOARDING_RHP_VARIANT.INBOX_ADMINS_BESPOKE || variant === CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM) &&
+        onboardingAdminsChatReportID &&
+        !shouldPreventOpenAdminRoom
+    ) {
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(onboardingAdminsChatReportID));
+        return;
+    }
+
     if (shouldOpenRHPVariant(variantOverride)) {
         handleRHPVariantNavigation(onboardingPolicyID, variantOverride);
         return;
