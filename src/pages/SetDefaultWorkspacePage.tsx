@@ -54,7 +54,11 @@ function SetDefaultWorkspacePage({route}: SetDefaultWorkspacePageProps) {
         setNameValuePair(ONYXKEYS.NVP_ACTIVE_POLICY_ID, selectedPolicyID, activePolicyID ?? '');
 
         if (policy?.areCategoriesEnabled) {
-            Navigation.navigate(navigateTo);
+            // Replace this transient selector instead of pushing on top of it, so the forwarded
+            // step (e.g. the dynamic Category route) is not left sitting above SET_DEFAULT_WORKSPACE.
+            // Otherwise useDynamicBackPath rebuilds the back target from the live stack and lands the
+            // user back on the workspace selector instead of dismissing the expense RHP.
+            Navigation.navigate(navigateTo, {forceReplace: true});
             return;
         }
 
