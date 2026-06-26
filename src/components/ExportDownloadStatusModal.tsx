@@ -93,7 +93,7 @@ function ExportDownloadStatusModal({exportID, isVisible, onClose, failedBody}: E
     const handleGoToConcierge = () => {
         onClose();
         if (conciergeReportID) {
-            Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: conciergeReportID}));
+            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeReportID));
         }
     };
 
