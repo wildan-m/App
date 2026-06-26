@@ -544,7 +544,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
                                     <WorkspaceSpendRulesTable
                                         rulesData={areCardsEnabled ? spendRulesTableData : []}
                                         selectionEnabled={canWriteRules}
-                                        selectedKeys={filteredSelectedSpendRuleKeys}
+                                        selectedKeys={selectedSpendRuleKeys}
                                         onRowSelectionChange={handleSpendRuleSelectionChange}
                                         emptyStateContent={areCardsEnabled ? undefined : cardRulesEmptyState}
                                     />
@@ -553,7 +553,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
                                     <WorkspaceExpenseDefaultsTable
                                         rulesData={expenseDefaultsTableData}
                                         selectionEnabled={canWriteRules}
-                                        selectedKeys={filteredSelectedExpenseDefaultKeys}
+                                        selectedKeys={selectedExpenseDefaultKeys}
                                         onRowSelectionChange={handleExpenseDefaultSelectionChange}
                                     />
                                 )}
