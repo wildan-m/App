@@ -1,9 +1,8 @@
-import type React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
+import {useMoneyReportHeaderModals} from '@components/MoneyReportHeaderModalsContext';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
-import {useSearchSelectionActions} from '@components/Search/SearchContext';
 import {openOldDotLink} from '@libs/actions/Link';
 import {exportReportToCSV, exportReportToPDF, exportToIntegration, markAsManuallyExported} from '@libs/actions/Report';
 import {getExportTemplates, queueExportSearchWithTemplate} from '@libs/actions/Search';
@@ -18,7 +17,6 @@ import type * as OnyxTypes from '@src/types/onyx';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useDecisionModal from './useDecisionModal';
 import useExportAgainModal from './useExportAgainModal';
-import useExportDownloadStatusModal from './useExportDownloadStatusModal';
 import {useMemoizedLazyExpensifyIcons} from './useLazyAsset';
 import useLocalize from './useLocalize';
 import useNetwork from './useNetwork';
@@ -39,9 +37,6 @@ type UseExportActionsReturn = {
     beginExportWithTemplate: (templateName: string, templateType: string, transactionIDList: string[], policyID?: string) => void;
     showOfflineModal: () => void;
     showDownloadErrorModal: () => void;
-
-    /** The realtime export status modal for the in-progress template export (or null when none is active). Render it directly in the consumer. */
-    exportDownloadStatusModal: React.JSX.Element | null;
 };
 
 function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsParams): UseExportActionsReturn {
@@ -69,8 +64,9 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
 
     const {showDecisionModal} = useDecisionModal();
     const {triggerExportOrConfirm} = useExportAgainModal(moneyRequestReport?.reportID, moneyRequestReport?.policyID);
-    const {clearSelectedTransactions} = useSearchSelectionActions();
-    const {trackExport, exportDownloadStatusModal} = useExportDownloadStatusModal(() => clearSelectedTransactions(undefined, true));
+    // The export status modal is rendered at the stable MoneyReportHeaderModals provider level so it
+    // survives the orientation-driven remount of MoneyReportHeaderActions; we only trigger it here.
+    const {trackExport} = useMoneyReportHeaderModals();
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Table',
@@ -258,7 +254,6 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         beginExportWithTemplate,
         showOfflineModal,
         showDownloadErrorModal,
-        exportDownloadStatusModal,
     };
 }
 

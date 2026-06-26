@@ -17,6 +17,9 @@ type MoneyReportHeaderModalsContextValue = {
     openRejectModal: (action: RejectModalAction) => void;
     showOfflineModal: () => void;
     showDownloadErrorModal: () => void;
+
+    /** Start tracking a queued export so the status modal (rendered at this stable provider level) shows for it */
+    trackExport: (exportID: string) => void;
 };
 
 const defaultValue: MoneyReportHeaderModalsContextValue = {
@@ -26,6 +29,7 @@ const defaultValue: MoneyReportHeaderModalsContextValue = {
     openRejectModal: () => {},
     showOfflineModal: () => {},
     showDownloadErrorModal: () => {},
+    trackExport: () => {},
 };
 
 const MoneyReportHeaderModalsContext = createContext<MoneyReportHeaderModalsContextValue>(defaultValue);

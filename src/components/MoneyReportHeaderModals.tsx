@@ -1,7 +1,9 @@
 import React, {useRef, useState} from 'react';
 import type {ReactNode} from 'react';
+import {useSearchSelectionActions} from '@components/Search/SearchContext';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDecisionModal from '@hooks/useDecisionModal';
+import useExportDownloadStatusModal from '@hooks/useExportDownloadStatusModal';
 import useHoldMenuModal from '@hooks/useHoldMenuModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -54,6 +56,11 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
     const {showDecisionModal} = useDecisionModal();
     const {translate} = useLocalize();
 
+    // Export status modal — rendered here (a stable position that survives the orientation-driven
+    // remount of MoneyReportHeaderActions) so it stays open when the device is rotated.
+    const {clearSelectedTransactions} = useSearchSelectionActions();
+    const {trackExport, exportDownloadStatusModal} = useExportDownloadStatusModal(() => clearSelectedTransactions(undefined, true));
+
     const showOfflineModal = () => {
         showDecisionModal({
             title: translate('common.youAppearToBeOffline'),
@@ -104,6 +111,7 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
         openRejectModal: (action: RejectModalAction) => educationalModalsRef.current?.openRejectModal(action),
         showOfflineModal,
         showDownloadErrorModal,
+        trackExport,
     };
 
     return (
@@ -121,6 +129,8 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
                     isVisible={isPDFModalVisible}
                     onClose={() => setIsPDFModalVisible(false)}
                 />
+
+                {exportDownloadStatusModal}
             </MoneyReportTransactionThreadProvider>
         </MoneyReportHeaderModalsContext.Provider>
     );
