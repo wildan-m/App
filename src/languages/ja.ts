@@ -6239,6 +6239,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} はこのワークスペースの承認者です。このワークスペースの共有を解除すると、承認ワークフロー内でその承認者はワークスペースのオーナーである ${ownerName} に置き換えられます`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'このメンバーには未報告のExpensify Cardの取引があるため、ワークスペースから削除できません。',
             removeMembersTitle: () => ({
                 one: 'メンバーを削除',
                 other: 'メンバーを削除',

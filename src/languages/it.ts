@@ -6312,6 +6312,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} è un approvatore in questo spazio di lavoro. Quando smetti di condividere questo spazio di lavoro con loro, li sostituiremo nel flusso di approvazione con il proprietario dello spazio di lavoro, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Questo membro ha transazioni della Expensify Card non riportate e non può essere rimosso dallo spazio di lavoro.',
             removeMembersTitle: () => ({
                 one: 'Rimuovi membro',
                 other: 'Rimuovi membri',

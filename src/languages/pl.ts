@@ -6286,6 +6286,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} jest osobą zatwierdzającą w tym obszarze roboczym. Gdy przestaniesz udostępniać im ten obszar roboczy, zastąpimy ich w procesie zatwierdzania właścicielem obszaru roboczego, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Ten członek ma niezgłoszone transakcje Expensify Card i nie można go usunąć z obszaru roboczego.',
             removeMembersTitle: () => ({
                 one: 'Usuń członka',
                 other: 'Usuń członków',

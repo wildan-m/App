@@ -16,8 +16,10 @@ import WorkspaceMembersTable from '@components/Tables/WorkspaceMembersTable';
 import Text from '@components/Text';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import TextLink from '@components/TextLink';
+import useCardFeeds from '@hooks/useCardFeeds';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useExpensifyCardFeeds from '@hooks/useExpensifyCardFeeds';
 import useHRSyncResultsModal from '@hooks/useHRSyncResultsModal';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -44,6 +46,7 @@ import {
     updateWorkspaceMembersRole,
 } from '@libs/actions/Policy/Member';
 import {removeApprovalWorkflow as removeApprovalWorkflowAction, updateApprovalWorkflow} from '@libs/actions/Workflow';
+import {getAllCardsForWorkspace, getCardholderAccountIDsWithUnreportedTransactions} from '@libs/CardUtils';
 import {getLatestErrorMessageField} from '@libs/ErrorUtils';
 import {getConnectedHRProvider} from '@libs/HRUtils';
 import Log from '@libs/Log';
@@ -129,6 +132,18 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const [invitedEmailsToAccountIDsDraft] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_INVITE_MEMBERS_DRAFT}${policyID}`);
     const illustrations = useMemoizedLazyIllustrations(['ReceiptWrangler', 'EmptyShelves']);
 
+    // Cardholders who still have unreported Expensify Card transactions can't be removed from a group workspace,
+    // otherwise the backend reassigns those transactions to the member's individual workspace.
+    const workspaceAccountID = policy?.policyAccountID ?? CONST.DEFAULT_NUMBER_ID;
+    const [cardFeeds] = useCardFeeds(policyID);
+    const [allCardsList] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST);
+    const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
+    const expensifyCardSettings = useExpensifyCardFeeds(policyID);
+    const cardholderAccountIDsWithUnreportedTransactions = useMemo(() => {
+        const workspaceCards = getAllCardsForWorkspace(workspaceAccountID, allCardsList, cardFeeds, expensifyCardSettings);
+        return getCardholderAccountIDsWithUnreportedTransactions(workspaceCards, allTransactions);
+    }, [workspaceAccountID, allCardsList, cardFeeds, expensifyCardSettings, allTransactions]);
+
     const accountIDs = useMemo(() => Object.values(policyMemberEmailsToAccountIDs ?? {}).map((accountID) => Number(accountID)), [policyMemberEmailsToAccountIDs]);
     const prevAccountIDs = usePrevious(accountIDs);
     const invitedEmails = useMemo(() => Object.keys(invitedEmailsToAccountIDsDraft ?? {}), [invitedEmailsToAccountIDsDraft]);
@@ -213,6 +228,19 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const removeUsers = () => {
+        // Defense-in-depth: never remove a member who still has unreported Expensify Card transactions, otherwise the
+        // backend reassigns those transactions out of the company workspace and into the member's individual workspace.
+        const hasBlockedMember = selectedEmployees.some((email) => cardholderAccountIDsWithUnreportedTransactions.has(Number(policyMemberEmailsToAccountIDs[email])));
+        if (hasBlockedMember) {
+            showConfirmModal({
+                title: translate('workspace.people.removeMembersTitle', {count: selectedEmployees.length}),
+                prompt: translate('workspace.people.cannotRemoveMemberWithUnreportedCardTransactions'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+            return;
+        }
+
         // Check if any of the members are approvers
         const hasApprovers = selectedEmployees.some((email) => isPolicyApprover(policy, email));
 
@@ -366,7 +394,8 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 employeeUserID: policyEmployee.employeeUserID,
                 employeePayrollID: policyEmployee.employeePayrollID,
                 isInteractive: !details.isOptimisticPersonalDetail,
-                isSelectionDisabled: !(isPolicyAdmin && accountID !== policy?.ownerAccountID && accountID !== session?.accountID),
+                isSelectionDisabled:
+                    !(isPolicyAdmin && accountID !== policy?.ownerAccountID && accountID !== session?.accountID) || cardholderAccountIDsWithUnreportedTransactions.has(accountID),
                 shouldShowEmployeeUserID: shouldShowCustomField1Column,
                 shouldShowEmployeePayrollID: shouldShowCustomField2Column,
                 errors: getLatestErrorMessageField(policyEmployee),
@@ -390,6 +419,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         invitedPrimaryToSecondaryLogins,
         openMemberDetails,
         dismissError,
+        cardholderAccountIDsWithUnreportedTransactions,
     ]);
 
     useEffect(() => {

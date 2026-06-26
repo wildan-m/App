@@ -522,6 +522,43 @@ function getCardsByCardholderName(cardsList: OnyxEntry<WorkspaceCardsList>, poli
     return Object.values(cards).filter((card: Card) => card.accountID && policyMembersAccountIDs.includes(card.accountID));
 }
 
+/**
+ * Given the Expensify Cards belonging to a workspace and all transactions, returns the set of cardholder
+ * account IDs that have at least one unreported Expensify Card transaction (a transaction not attached to a
+ * report). Members in this set should not be removable from the workspace, because removing them reassigns
+ * those transactions out of the company workspace and into the member's individual workspace.
+ */
+function getCardholderAccountIDsWithUnreportedTransactions(workspaceCards: CardList, allTransactions: OnyxCollection<Transaction>): Set<number> {
+    const cardIDToAccountID = new Map<number, number>();
+    for (const card of Object.values(workspaceCards ?? {})) {
+        if (!isExpensifyCard(card) || !card.accountID) {
+            continue;
+        }
+        cardIDToAccountID.set(card.cardID, card.accountID);
+    }
+
+    const accountIDsWithUnreportedTransactions = new Set<number>();
+    if (cardIDToAccountID.size === 0) {
+        return accountIDsWithUnreportedTransactions;
+    }
+
+    for (const transaction of Object.values(allTransactions ?? {})) {
+        if (!transaction?.cardID) {
+            continue;
+        }
+        const accountID = cardIDToAccountID.get(transaction.cardID);
+        if (!accountID) {
+            continue;
+        }
+        const isUnreported = !transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+        if (isUnreported) {
+            accountIDsWithUnreportedTransactions.add(accountID);
+        }
+    }
+
+    return accountIDsWithUnreportedTransactions;
+}
+
 function sortCardsByCardholderName(cards: Card[], personalDetails: OnyxEntry<PersonalDetailsList>, localeCompare: LocaleContextProps['localeCompare']): Card[] {
     return cards.sort((cardA: Card, cardB: Card) => {
         const userA = cardA.accountID ? (personalDetails?.[cardA.accountID] ?? {}) : {};
@@ -1980,6 +2017,7 @@ export {
     isExpensifyCardPendingAction,
     getFundIdFromSettingsKey,
     getCardsByCardholderName,
+    getCardholderAccountIDsWithUnreportedTransactions,
     filterCardsByPersonalDetails,
     getCompanyCardDescription,
     getPlaidInstitutionIconUrl,

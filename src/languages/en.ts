@@ -6378,6 +6378,7 @@ const translations = {
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} is an approver in this workspace. When you unshare this workspace with them, we’ll replace them in the approval workflow with the workspace owner, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'This member has unreported Expensify Card transactions and can’t be removed from the workspace.',
             removeMembersTitle: () => ({
                 one: 'Remove member',
                 other: 'Remove members',

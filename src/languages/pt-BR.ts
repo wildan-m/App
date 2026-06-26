@@ -6286,6 +6286,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} é um aprovador neste workspace. Quando você deixar de compartilhar este workspace com essa pessoa, nós a substituiremos no fluxo de aprovação pelo proprietário do workspace, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Este membro tem transações do Expensify Card não reportadas e não pode ser removido do workspace.',
             removeMembersTitle: () => ({
                 one: 'Remover membro',
                 other: 'Remover membros',

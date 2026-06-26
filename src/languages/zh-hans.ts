@@ -6120,6 +6120,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} 是此工作区的审批人。当你取消与 TA 共享此工作区时，我们会在审批流程中将其替换为工作区所有者 ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: '该成员有未上报的 Expensify Card 交易，无法从工作区中移除。',
             removeMembersTitle: () => ({
                 one: '移除成员',
                 other: '移除成员',

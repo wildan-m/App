@@ -6155,6 +6155,7 @@ ${amount} para ${merchant} - ${date}`,
             }),
             removeMembersWarningPrompt: (memberName, ownerName) =>
                 `${memberName} es un aprobador en este espacio de trabajo. Cuando lo elimine de este espacio de trabajo, los sustituiremos en el flujo de trabajo de aprobación por el propietario del espacio de trabajo, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Este miembro tiene transacciones de Expensify Card sin reportar y no se puede eliminar del espacio de trabajo.',
             removeMembersTitle: () => ({
                 one: 'Eliminar miembro',
                 other: 'Eliminar miembros',

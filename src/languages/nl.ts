@@ -6290,6 +6290,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} is een fiatteur in deze workspace. Wanneer je deze workspace niet meer met hen deelt, vervangen we hen in de goedkeuringsworkflow door de workspace-eigenaar, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Dit lid heeft niet-gerapporteerde Expensify Card-transacties en kan niet uit de workspace worden verwijderd.',
             removeMembersTitle: () => ({
                 one: 'Lid verwijderen',
                 other: 'Leden verwijderen',

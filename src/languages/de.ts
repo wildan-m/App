@@ -6324,6 +6324,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             }),
             removeMembersWarningPrompt: (memberName: string, ownerName: string) =>
                 `${memberName} ist eine approvierende Person in diesem Workspace. Wenn du diesen Workspace nicht mehr mit ihr teilst, ersetzen wir sie im Genehmigungsworkflow durch die/den Workspace-Inhaber·in, ${ownerName}`,
+            cannotRemoveMemberWithUnreportedCardTransactions: 'Dieses Mitglied hat nicht gemeldete Expensify Card-Transaktionen und kann nicht aus dem Workspace entfernt werden.',
             removeMembersTitle: () => ({
                 one: 'Mitglied entfernen',
                 other: 'Mitglieder entfernen',
