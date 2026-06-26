@@ -152,7 +152,8 @@ function useReportActionsScroll({
     const isTransactionThreadReport = isTransactionThread(parentReportAction) && !isSentMoneyReportAction(parentReportAction);
     const isMoneyRequestOrInvoiceReport = isMoneyRequestReport(report) || isInvoiceReport(report);
     const shouldBeAlignedToTop = isTransactionThreadReport || isMoneyRequestOrInvoiceReport;
-    const initialScrollActionID = linkedReportActionID ?? unreadMarkerReportActionID;
+    // For expense views (aligned to top), never anchor the initial scroll to the unread marker; only an explicit deep link should.
+    const initialScrollActionID = linkedReportActionID ?? (shouldBeAlignedToTop ? undefined : unreadMarkerReportActionID);
     // The CREATED-action case is intentionally excluded here; its scroll behavior is handled by shouldFocusToTopOnMount logic instead.
     const initialScrollKey =
         initialScrollActionID && !(shouldBeAlignedToTop && sortedVisibleReportActionsObjects[initialScrollActionID]?.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED)
