@@ -246,6 +246,46 @@ const webViewStyles = (theme: ThemeColors) =>
             h1: {
                 marginBottom: 8,
             },
+
+            table: {
+                marginTop: 8,
+                marginBottom: 8,
+                borderColor: theme.border,
+                borderTopWidth: 1,
+                borderLeftWidth: 1,
+                borderRadius: variables.componentBorderRadiusSmall,
+                overflow: 'hidden',
+            },
+
+            tr: {
+                flexDirection: 'row',
+                flexWrap: 'nowrap',
+            },
+
+            caption: {
+                textAlign: 'center',
+                marginBottom: 4,
+            },
+
+            th: {
+                flex: 1,
+                borderColor: theme.border,
+                borderRightWidth: 1,
+                borderBottomWidth: 1,
+                paddingVertical: 6,
+                paddingHorizontal: 8,
+                backgroundColor: theme.highlightBG,
+                fontWeight: FontUtils.fontWeight.bold,
+            },
+
+            td: {
+                flex: 1,
+                borderColor: theme.border,
+                borderRightWidth: 1,
+                borderBottomWidth: 1,
+                paddingVertical: 6,
+                paddingHorizontal: 8,
+            },
         },
 
         baseFontStyle: {
