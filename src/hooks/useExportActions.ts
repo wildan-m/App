@@ -8,7 +8,9 @@ import {openOldDotLink} from '@libs/actions/Link';
 import {exportReportToCSV, exportReportToPDF, exportToIntegration, markAsManuallyExported} from '@libs/actions/Report';
 import {getExportTemplates, queueExportSearchWithTemplate} from '@libs/actions/Search';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getConnectedIntegration, getValidConnectedIntegration} from '@libs/PolicyUtils';
+import {flattenPopoverMenuItemGroups} from '@libs/PopoverMenuSections';
 import {getFilteredReportActionsForReportView} from '@libs/ReportActionsUtils';
 import {getSecondaryExportReportActions} from '@libs/ReportSecondaryActionUtils';
 import {getIntegrationIcon, isExported as isExportedUtils} from '@libs/ReportUtils';
@@ -45,7 +47,7 @@ type UseExportActionsReturn = {
 };
 
 function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsParams): UseExportActionsReturn {
-    const {translate} = useLocalize();
+    const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
 
@@ -211,6 +213,36 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         ? getSecondaryExportReportActions(accountID, currentUserLogin ?? '', moneyRequestReport, bankAccountList, policy ?? undefined, exportTemplates)
         : [];
 
+    // Group the export submenu into accounting actions, custom templates (alphabetical) and default
+    // templates (alphabetical) so dividers can separate the groups, mirroring the Search export menu.
+    const standardTemplateNames = new Set(
+        exportTemplates
+            .filter((template) => template.templateName === CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT || template.templateName === CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT)
+            .map((template) => template.name),
+    );
+    const accountingExportGroup: Array<DropdownOption<string>> = [];
+    const customTemplateExportGroup: Array<DropdownOption<string>> = [];
+    const defaultTemplateExportGroup: Array<DropdownOption<string>> = [];
+    for (const action of secondaryExportActions) {
+        const actionKey = String(action);
+        const option = exportSubmenuOptions[actionKey];
+        if (!option) {
+            continue;
+        }
+        if (actionKey === CONST.REPORT.EXPORT_OPTIONS.EXPORT_TO_INTEGRATION || actionKey === CONST.REPORT.EXPORT_OPTIONS.MARK_AS_EXPORTED) {
+            accountingExportGroup.push(option);
+        } else if (actionKey === CONST.REPORT.EXPORT_OPTIONS.DOWNLOAD_CSV || standardTemplateNames.has(actionKey)) {
+            defaultTemplateExportGroup.push(option);
+        } else {
+            customTemplateExportGroup.push(option);
+        }
+    }
+    const exportSubMenuItems = flattenPopoverMenuItemGroups([
+        accountingExportGroup,
+        sortAlphabetically(customTemplateExportGroup, 'text', localeCompare),
+        sortAlphabetically(defaultTemplateExportGroup, 'text', localeCompare),
+    ]);
+
     const exportActionEntries: Record<string, DropdownOption<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>> & Pick<PopoverMenuItem, 'backButtonText' | 'rightIcon'>> = {
         [CONST.REPORT.SECONDARY_ACTIONS.EXPORT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.EXPORT,
@@ -219,7 +251,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
             icon: expensifyIcons.Export,
             rightIcon: expensifyIcons.ArrowRight,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.EXPORT,
-            subMenuItems: secondaryExportActions.map((action) => exportSubmenuOptions[action as string]),
+            subMenuItems: exportSubMenuItems,
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF,

@@ -61,4 +61,30 @@ function sortAndSectionPopoverMenuItems<TValue extends string, TItem extends Dro
     });
 }
 
-export {REPORT_MORE_MENU_SECTIONS, TRANSACTION_MORE_MENU_SECTIONS, sortAndSectionPopoverMenuItems};
+/**
+ * Flattens an ordered list of menu-item groups into a single list, inserting a divider (via the
+ * `addSeparatorBefore` flag that `PopoverMenu` already renders) before the first item of every
+ * non-empty group after the first non-empty one. Empty groups are skipped so no stray dividers
+ * are produced.
+ */
+function flattenPopoverMenuItemGroups<TItem extends {addSeparatorBefore?: boolean}>(groups: TItem[][]): TItem[] {
+    const result: TItem[] = [];
+
+    for (const group of groups) {
+        let isFirstInGroup = true;
+        for (const item of group) {
+            // Place a divider before the first item of every group except the first non-empty one
+            // (empty groups push nothing, so `result.length > 0` marks "a previous group was emitted").
+            if (isFirstInGroup && result.length > 0) {
+                result.push({...item, addSeparatorBefore: true});
+            } else {
+                result.push(item);
+            }
+            isFirstInGroup = false;
+        }
+    }
+
+    return result;
+}
+
+export {REPORT_MORE_MENU_SECTIONS, TRANSACTION_MORE_MENU_SECTIONS, sortAndSectionPopoverMenuItems, flattenPopoverMenuItemGroups};

@@ -41,8 +41,10 @@ import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setNameValuePair} from '@libs/actions/User';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
+import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import {getConnectedIntegration, isSubmitPolicy} from '@libs/PolicyUtils';
+import {flattenPopoverMenuItemGroups} from '@libs/PopoverMenuSections';
 import {getSecondaryExportReportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditMultipleTransactions,
@@ -1375,7 +1377,12 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             const policy = selectedPolicyIDs.length === 1 ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${selectedPolicyIDs.at(0)}`] : undefined;
             const exportTemplates = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, policy, includeReportLevelExport);
 
-            const exportOptions: PopoverMenuItem[] = [];
+            // The export menu is built as four ordered groups so dividers can be placed between them:
+            // accounting actions, "Export current view", custom templates (alphabetical), default templates (alphabetical).
+            const accountingGroup: PopoverMenuItem[] = [];
+            const currentViewGroup: PopoverMenuItem[] = [];
+            const customTemplateGroup: PopoverMenuItem[] = [];
+            const defaultTemplateGroup: PopoverMenuItem[] = [];
 
             const connectedIntegration = getConnectedIntegration(policy);
             const isReportsTab = isExpenseReportType;
@@ -1469,7 +1476,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 };
 
                 if (canExportAllReportsToIntegration) {
-                    exportOptions.push({
+                    accountingGroup.push({
                         text: connectionNameFriendly,
                         icon: integrationIcon,
                         onSelected: () => handleExportAction(() => exportToIntegrationOnSearch(hash, selectedReportIDs, connectedIntegration, currentSearchKey)),
@@ -1481,7 +1488,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 }
 
                 if (canMarkAllReportsAsExported) {
-                    exportOptions.push({
+                    accountingGroup.push({
                         text: translate('workspace.common.markAsExported'),
                         icon: integrationIcon,
                         onSelected: () => handleExportAction(() => markAsManuallyExported(selectedReportIDs, connectedIntegration)),
@@ -1493,7 +1500,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 }
             }
 
-            exportOptions.push({
+            // "Basic export" is a default template, so it lives in the default-templates group.
+            defaultTemplateGroup.push({
                 text: translate('export.basicExport'),
                 icon: expensifyIcons.Table,
                 onSelected: () => {
@@ -1505,7 +1513,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
             const isGroupedSearch = !!getValidGroupBy(queryJSON?.groupBy);
             if (!isGroupedSearch) {
-                exportOptions.push({
+                currentViewGroup.push({
                     text: translate('export.currentView'),
                     icon: expensifyIcons.Table,
                     onSelected: () => {
@@ -1520,7 +1528,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 for (const template of exportTemplates) {
                     const isStandardTemplate =
                         template.templateName === CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT || template.templateName === CONST.REPORT.EXPORT_OPTIONS.REPORT_LEVEL_EXPORT;
-                    exportOptions.push({
+                    (isStandardTemplate ? defaultTemplateGroup : customTemplateGroup).push({
                         text: template.name,
                         icon: isStandardTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil,
                         description: template.description,
@@ -1533,7 +1541,14 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 }
             }
 
-            return exportOptions;
+            // Sort the template groups alphabetically by their visible label, then stitch the groups
+            // together with dividers between them.
+            return flattenPopoverMenuItemGroups([
+                accountingGroup,
+                currentViewGroup,
+                sortAlphabetically(customTemplateGroup, 'text', localeCompare),
+                sortAlphabetically(defaultTemplateGroup, 'text', localeCompare),
+            ]);
         };
 
         const subMenuItems = getExportOptions();
