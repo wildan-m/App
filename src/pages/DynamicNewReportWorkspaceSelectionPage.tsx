@@ -167,14 +167,18 @@ function DynamicNewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelec
         },
     });
 
-    // Open the confirmation modal after pendingPolicySelection is committed so the hook has the correct policyName
+    // Open the confirmation modal after pendingPolicySelection is committed so the hook has the correct policyName.
+    // Only depend on pendingPolicySelection: openCreateReportConfirmation is a fresh closure on every render, and
+    // opening the modal re-renders this page (it subscribes to the modal context), so keeping it in the deps would
+    // re-fire this effect after each open and stack modals without bound, freezing the app.
     useEffect(() => {
         if (!pendingPolicySelection) {
             return;
         }
 
         openCreateReportConfirmation();
-    }, [pendingPolicySelection, openCreateReportConfirmation]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pendingPolicySelection]);
 
     const selectPolicy = (policy?: WorkspaceListItem) => {
         if (!policy?.policyID) {
