@@ -48,7 +48,7 @@ import {
 } from '@libs/ReportUtils';
 import {serializeQueryJSONForBackend} from '@libs/SearchQueryUtils';
 import type {SearchKey} from '@libs/SearchUIUtils';
-import {isTransactionGroupListItemType} from '@libs/SearchUIUtils';
+import {getSuggestedSearches, getSuggestedSearchesVisibility, isTransactionGroupListItemType, TODO_SEARCH_KEYS} from '@libs/SearchUIUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {hasOnlyPendingCardTransactions} from '@libs/TransactionUtils';
@@ -99,6 +99,25 @@ type TransactionPreviewData = {
     hasTransaction: boolean;
     hasTransactionThreadReport: boolean;
 };
+
+// Used by triggerTodoSearches to build the to-do queries and decide which are applicable.
+// Read only inside the action (never during render), so connectWithoutView is appropriate.
+let currentTodoSearchSession: {accountID?: number; email?: string} = {};
+Onyx.connectWithoutView({
+    key: ONYXKEYS.SESSION,
+    callback: (value) => {
+        currentTodoSearchSession = {accountID: value?.accountID, email: value?.email};
+    },
+});
+
+let allPoliciesForTodoSearches: OnyxCollection<Policy>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.POLICY,
+    waitForCollectionCallback: true,
+    callback: (value) => {
+        allPoliciesForTodoSearches = value;
+    },
+});
 
 function getChatReportForSearchPay(chatReport: OnyxEntry<Report>, snapshotReport: Report, searchData?: SearchResultDataType): OnyxEntry<Report> {
     const chatReportID = snapshotReport.chatReportID ?? snapshotReport.parentReportID;
@@ -1674,6 +1693,38 @@ function setOptimisticDataForTransactionThreadPreview(item: TransactionListItemT
     Onyx.update(onyxUpdates);
 }
 
+/**
+ * Fires the to-do searches (submit/approve/pay/export) that backfill the report, report action and transaction
+ * data the action badges are derived from. OpenApp/ReconnectApp no longer return that underlying data, so without
+ * this the badges stay missing until the user manually opens a page (Home/Search) that runs these searches.
+ *
+ * Meant to be called asynchronously after OpenApp/ReconnectApp lands, so the badge data is always present.
+ * Only the applicable searches for the current user are fired (gated by suggested-search visibility), matching
+ * what the Home page does, so users without the relevant workspaces don't make unnecessary requests.
+ */
+function triggerTodoSearches() {
+    const accountID = currentTodoSearchSession.accountID ?? CONST.DEFAULT_NUMBER_ID;
+    const {visibility} = getSuggestedSearchesVisibility(currentTodoSearchSession.email, {}, allPoliciesForTodoSearches, undefined);
+    const suggestedSearches = getSuggestedSearches(accountID);
+
+    for (const searchKey of TODO_SEARCH_KEYS) {
+        if (!visibility[searchKey]) {
+            continue;
+        }
+        const queryJSON = suggestedSearches[searchKey].searchQueryJSON;
+        if (!queryJSON) {
+            continue;
+        }
+        search({
+            queryJSON,
+            searchKey,
+            offset: 0,
+            isLoading: false,
+            shouldCalculateTotals: false,
+        });
+    }
+}
+
 export {
     saveSearch,
     search,
@@ -1706,5 +1757,6 @@ export {
     getPolicyFromSearchSnapshot,
     getReportFromSearchSnapshot,
     resolveSearchPayPaymentMethod,
+    triggerTodoSearches,
 };
 export type {TransactionPreviewData};

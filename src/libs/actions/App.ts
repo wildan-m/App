@@ -34,6 +34,7 @@ import clearOnyxAndSeedFullReconnect from './clearOnyxAndSeedFullReconnect';
 import {setShouldForceOffline} from './Network';
 import {getAll, rollbackOngoingRequest, save} from './PersistedRequests';
 import {createDraftInitialWorkspace, createWorkspace, generateDefaultWorkspaceName, generatePolicyID} from './Policy/Policy';
+import {triggerTodoSearches} from './Search';
 
 type PolicyParamsForOpenOrReconnect = {
     policyIDList: string[];
@@ -472,6 +473,12 @@ function openApp(shouldKeepPublicRooms = false, allReportsWithDraftComments?: Re
                 getOnyxDataForOpenOrReconnect(true, undefined, shouldKeepPublicRooms, allReportsWithDraftComments),
             );
         })
+        .then((response) => {
+            // OpenApp no longer returns the report actions/transactions the action badges are derived from, so backfill
+            // that data by firing the to-do searches once OpenApp lands. Preserve the resolved value for callers.
+            triggerTodoSearches();
+            return response;
+        })
         .finally(() => {
             if (!bootsplashSpan) {
                 return;
@@ -524,6 +531,9 @@ function reconnectApp(updateIDFrom: OnyxEntry<number> = 0) {
                 const isFullReconnect = !updateIDFrom;
                 return API.writeWithNoDuplicatesReconnectConflictAction(WRITE_COMMANDS.RECONNECT_APP, params, getOnyxDataForOpenOrReconnect(false, isFullReconnect, isSidebarLoaded));
             })
+            // Backfill the report actions/transactions the action badges are derived from, which ReconnectApp no
+            // longer returns, by firing the to-do searches once the reconnect lands (fire-and-forget).
+            .then(() => triggerTodoSearches())
             .finally(() => {
                 if (!bootsplashSpan) {
                     return;
