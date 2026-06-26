@@ -13,6 +13,7 @@ import useLocalize from '@hooks/useLocalize';
 import useMarkAsRead from '@hooks/useMarkAsRead';
 import useNetworkWithOfflineStatus from '@hooks/useNetworkWithOfflineStatus';
 import useOnyx from '@hooks/useOnyx';
+import usePrevious from '@hooks/usePrevious';
 import useReportActionsScroll from '@hooks/useReportActionsScroll';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -316,6 +317,17 @@ function ReportActionsList({
         }
         loadOlderChats(false);
     };
+
+    // While the Concierge history is collapsed, the list is short enough that onEndReached fires (and is suppressed by the
+    // guard above) before the user can reveal it. Once "Show history" is tapped, FlashList does not re-emit onEndReached for
+    // the already-in-threshold oldest action, so re-arm pagination ourselves the moment the hidden history is revealed.
+    const prevShowHiddenHistory = usePrevious(showHiddenHistory);
+    useEffect(() => {
+        if (!prevShowHiddenHistory || showHiddenHistory) {
+            return;
+        }
+        loadOlderChats(false);
+    }, [loadOlderChats, prevShowHiddenHistory, showHiddenHistory]);
 
     const loadNewerChatsAfterTransitions = () => {
         if (!isSearchTopmostFullScreenRoute()) {
