@@ -184,6 +184,10 @@ function ShareRootPage() {
                         id={CONST.TAB.SHARE.NAVIGATOR_ID}
                         tabBar={TabSelector}
                         defaultSelectedTab={isFileScannable ? CONST.TAB.SHARE.SUBMIT : CONST.TAB.SHARE.SHARE}
+                        // The Share screen is a modal whose only sensible back action is to close. `'none'` keeps the
+                        // tab navigator from consuming the back/swipe gesture (to switch to the initial tab) so it
+                        // propagates to the stack and dismisses the screen, matching the web back-button behavior.
+                        backBehavior="none"
                         lazyLoadEnabled
                     >
                         <TopTab.Screen name={CONST.TAB.SHARE.SHARE}>{() => <ShareTab />}</TopTab.Screen>

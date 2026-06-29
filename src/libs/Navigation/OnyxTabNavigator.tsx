@@ -1,6 +1,6 @@
 import type {MaterialTopTabNavigationEventMap} from '@react-navigation/material-top-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import type {EventMapCore, NavigationState, ParamListBase, ScreenListeners} from '@react-navigation/native';
+import type {EventMapCore, NavigationState, ParamListBase, ScreenListeners, TabRouterOptions} from '@react-navigation/native';
 import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -15,7 +15,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {SelectedTabRequest} from '@src/types/onyx';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import {backBehavior, defaultScreenOptions} from './OnyxTabNavigatorConfig';
+import {backBehavior as defaultBackBehavior, defaultScreenOptions} from './OnyxTabNavigatorConfig';
 
 type OnyxTabNavigatorProps<TTabName extends string = SelectedTabRequest> = ChildrenProps & {
     /** ID of the tab component to be saved in onyx */
@@ -55,6 +55,10 @@ type OnyxTabNavigatorProps<TTabName extends string = SelectedTabRequest> = Child
 
     /** Whether tabs should have equal width */
     equalWidth?: boolean;
+
+    /** Overrides the platform default tab back behavior. Pass `'none'` so a back/swipe gesture closes the
+     * whole screen instead of being consumed by the tab navigator to switch to the initial tab. */
+    backBehavior?: TabRouterOptions['backBehavior'];
 };
 
 const TopTab = createMaterialTopTabNavigator<ParamListBase, string>();
@@ -97,6 +101,7 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
     lazyLoadEnabled = false,
     onTabSelect,
     equalWidth = false,
+    backBehavior = defaultBackBehavior,
     ...rest
 }: OnyxTabNavigatorProps<TTabName>) {
     const styles = useThemeStyles();
