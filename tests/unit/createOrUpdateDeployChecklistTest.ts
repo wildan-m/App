@@ -287,6 +287,71 @@ describe('createOrUpdateDeployChecklist', () => {
         });
     });
 
+    test('filters out a cherry-picked PR listed on an older (not immediately-previous) checklist', async () => {
+        vol.reset();
+        vol.fromJSON({
+            [PATH_TO_PACKAGE_JSON]: JSON.stringify({version: '1.0.2-1'}),
+        });
+
+        // An older checklist (cycle N) where PR #6 was cherry-picked and released.
+        const olderChecklistWithCherryPick = {
+            url: `https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/issues/26`,
+            title: 'Older Deploy Checklist',
+            number: 26,
+            labels: [LABELS.STAGING_DEPLOY_CASH],
+            html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/26`,
+            body:
+                `${baseExpectedOutput('1.0.0-0')}` +
+                `${closedCheckbox}${basePRList.at(3)}` +
+                `${lineBreak}${closedCheckbox}${basePRList.at(4)}` +
+                `${lineBreak}${closedCheckbox}${basePRList.at(5)}${lineBreak}` +
+                `${lineBreakDouble}${ccApplauseLeads}`,
+        };
+
+        // The cherry-picked PR's original merge commit (#6) only now enters the staging comparison,
+        // appearing once, so the in-log "appears twice" dedup doesn't fire. It is NOT on the
+        // immediately-previous checklist (which lists 1,2,3) but IS on the older one (which lists 4,5,6).
+        mockGetMergedPRsDeployedBetween.mockImplementation(async (fromRef, toRef, repositoryName) => {
+            if (fromRef === '1.0.1-0-staging' && toRef === '1.0.2-1-staging') {
+                if (repositoryName === CONST.MOBILE_EXPENSIFY_REPO) {
+                    return {mergedPRs: [], submoduleUpdates: []};
+                }
+                return toMergedPRs([6, 7, 8]);
+            }
+            return {mergedPRs: [], submoduleUpdates: []};
+        });
+
+        mockListIssues.mockImplementation((args: Arguments) => {
+            if (args.labels === CONST.LABELS.STAGING_DEPLOY) {
+                // Most-recent (closed, cycle N+1) first, then the older one (cycle N) with the cherry-pick.
+                return Promise.resolve({data: [closedDeployChecklist, olderChecklistWithCherryPick]});
+            }
+            return Promise.resolve({data: []});
+        });
+
+        const result = await run();
+
+        // PR #6 must be excluded; only the genuinely-new PRs 7 and 8 should appear.
+        expect(result).toStrictEqual({
+            owner: CONST.GITHUB_OWNER,
+            repo: CONST.APP_REPO,
+            title: `Deploy Checklist: New Expensify ${fns.format(new Date(), 'yyyy-MM-dd')}`,
+            labels: [CONST.LABELS.STAGING_DEPLOY, CONST.LABELS.LOCK_DEPLOY, CONST.LABELS.DAILY],
+            html_url: `https://github.com/${process.env.GITHUB_REPOSITORY}/issues/29`,
+            assignees: [CONST.APPLAUSE_BOT],
+            body:
+                `${baseExpectedOutput('1.0.2-1', false)}` +
+                `${openCheckbox}${basePRList.at(6)}` +
+                `${lineBreak}${openCheckbox}${basePRList.at(7)}` +
+                `${lineBreakDouble}${buildChronologicalSection([7, 8])}` +
+                `${lineBreak}${deployerVerificationsHeader}` +
+                `${lineBreak}${openCheckbox}${sentryVerificationCurrentRelease('1.0.2-1')}` +
+                `${lineBreak}${openCheckbox}${sentryVerificationPreviousRelease('1.0.1-0')}` +
+                `${lineBreak}${openCheckbox}${ghVerification}` +
+                `${lineBreak}${ccApplauseLeads}`,
+        });
+    });
+
     test('creates new issue when there are no Mobile-Expensify PRs', async () => {
         vol.reset();
         vol.fromJSON({

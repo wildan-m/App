@@ -228,11 +228,33 @@ async function run(): Promise<IssuesCreateResponse | void> {
         const {mergedPRs: mergedPREntries, submoduleUpdates} = await GitUtils.getMergedPRsDeployedBetween(previousChecklistData.tag, newStagingTag, CONST.APP_REPO);
         const mergedPRs = mergedPREntries.map((pr) => pr.prNumber).sort((a, b) => a - b);
 
-        const previousPRNumbers = new Set(previousChecklistData.PRList.map((pr) => pr.number));
-        const previousMobileExpensifyPRNumbers = new Set(previousChecklistData.PRListMobileExpensify.map((pr) => pr.number));
+        // Build the set of PR numbers already listed on recent checklists. A cherry-picked PR is
+        // listed on the checklist of the cycle it was cherry-picked in, but its original merge commit
+        // (a different SHA, so commit-ancestry comparison can't match it) may not enter the staging
+        // comparison until several cycles later. By then the single immediately-previous checklist no
+        // longer lists that PR, so it would re-surface in the chronological section. Unioning the PR
+        // numbers of all recent checklists keeps it filtered out regardless of how many cycles elapse.
+        // When updating the current open checklist we skip it (index 0) so its own in-progress PRs
+        // aren't mistaken for already-deployed ones.
+        const checklistsToExcludeFrom = shouldCreateNewDeployChecklist ? recentDeployChecklists : recentDeployChecklists.slice(1);
+        const previousPRNumbers = new Set<number>();
+        const previousMobileExpensifyPRNumbers = new Set<number>();
+        for (const checklist of checklistsToExcludeFrom) {
+            try {
+                const checklistData = getDeployChecklistData(checklist);
+                for (const pr of checklistData.PRList) {
+                    previousPRNumbers.add(pr.number);
+                }
+                for (const pr of checklistData.PRListMobileExpensify) {
+                    previousMobileExpensifyPRNumbers.add(pr.number);
+                }
+            } catch (parseError) {
+                console.warn(`Could not parse the PR list from checklist #${checklist.number}; skipping it when de-duplicating cherry-picked PRs`, parseError);
+            }
+        }
         core.startGroup('Filtering PRs:');
-        core.info('mergedPRs includes cherry-picked PRs that have already been released with previous checklist, so we need to filter these out');
-        core.info(`Found ${previousPRNumbers.size} PRs in the previous checklist:`);
+        core.info('mergedPRs includes cherry-picked PRs that have already been released with a previous checklist, so we need to filter these out');
+        core.info(`Found ${previousPRNumbers.size} PRs across recent checklists:`);
         core.info(JSON.stringify(Array.from(previousPRNumbers)));
         const newPRNumbers = mergedPRs.filter((prNum) => !previousPRNumbers.has(prNum));
         core.info(`Found ${newPRNumbers.length} PRs deployed since the previous checklist:`);
@@ -240,7 +262,7 @@ async function run(): Promise<IssuesCreateResponse | void> {
 
         const removedPRs = mergedPRs.filter((prNum) => previousPRNumbers.has(prNum));
         if (removedPRs.length > 0) {
-            core.info(`⚠️⚠️ Filtered out the following cherry-picked PRs that were released with the previous checklist: ${removedPRs.join(', ')} ⚠️⚠️`);
+            core.info(`⚠️⚠️ Filtered out the following cherry-picked PRs that were already released with a recent checklist: ${removedPRs.join(', ')} ⚠️⚠️`);
         }
         core.endGroup();
         console.info(`[api] Checklist PRs: ${newPRNumbers.join(', ')}`);
