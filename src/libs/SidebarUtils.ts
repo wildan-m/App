@@ -426,7 +426,9 @@ function getReportsToDisplayInLHN({
 
         if (shouldDisplay) {
             const requiresAttention = reportAttributes?.[report?.reportID]?.requiresAttention ?? false;
-            const isUnreadReport = getIsUnreadReportForInboxTab(report, isReportArchived);
+            const oneTransactionThreadReportID = reportAttributes?.[report?.reportID]?.oneTransactionThreadReportID;
+            const oneTransactionThreadReport = oneTransactionThreadReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`] : undefined;
+            const isUnreadReport = getIsUnreadReportForInboxTab(report, oneTransactionThreadReport, isReportArchived);
             reportsToDisplay[reportID] =
                 requiresAttention || hasErrorsOtherThanFailedReceipt || isUnreadReport ? {...report, requiresAttention, hasErrorsOtherThanFailedReceipt, isUnreadReport} : report;
         }
@@ -512,7 +514,9 @@ function updateReportsToDisplayInLHN({
 
         if (shouldDisplay) {
             const requiresAttention = reportAttributes?.[report?.reportID]?.requiresAttention ?? false;
-            const isUnreadReport = getIsUnreadReportForInboxTab(report, isReportArchived);
+            const oneTransactionThreadReportID = reportAttributes?.[report?.reportID]?.oneTransactionThreadReportID;
+            const oneTransactionThreadReport = oneTransactionThreadReportID ? reports?.[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`] : undefined;
+            const isUnreadReport = getIsUnreadReportForInboxTab(report, oneTransactionThreadReport, isReportArchived);
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             const hasFlags = requiresAttention || hasErrorsOtherThanFailedReceipt || isUnreadReport;
             const existingEntry = displayedReports[reportID];
@@ -1528,10 +1532,13 @@ function getRoomWelcomeMessage(
  * Whether a report should appear in the "Unread" Inbox tab: it has unread messages and is not muted.
  * Computed once while building the LHN report set (which is cached/incremental) so the tab filter only reads a flag.
  */
-function getIsUnreadReportForInboxTab(report: Report, isReportArchived: boolean): boolean {
+function getIsUnreadReportForInboxTab(report: Report, oneTransactionThreadReport: OnyxEntry<Report>, isReportArchived: boolean): boolean {
     // The `lastActorAccountID` guard matches getOptionData: it keeps chats whose only visible message was
     // deleted out of the Unread tab even though isUnread() can still be true (lastVisibleActionCreated isn't reset).
-    return isUnread(report, undefined, isReportArchived) && !!report.lastActorAccountID && getReportNotificationPreference(report) !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE;
+    // Pass the one-transaction thread so the Unread tab stays consistent with the LHN row's bold state (getOptionData):
+    // for a one-transaction report the unread condition can live in the transaction thread, which isUnread() only
+    // sees when the thread report is supplied.
+    return isUnread(report, oneTransactionThreadReport, isReportArchived) && !!report.lastActorAccountID && getReportNotificationPreference(report) !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE;
 }
 
 /** Whether a report belongs in the "To-do" Inbox tab: it has an outstanding GBR (requiresAttention) or RBR (errors). */
