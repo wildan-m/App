@@ -6,6 +6,7 @@ import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
@@ -17,6 +18,7 @@ import usePermissions from '@hooks/usePermissions';
 import usePolicyData from '@hooks/usePolicyData';
 import usePolicyFeatureWriteAccess from '@hooks/usePolicyFeatureWriteAccess';
 import useStyleUtils from '@hooks/useStyleUtils';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import Tab from '@libs/actions/Tab';
@@ -31,7 +33,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {getRequireFieldsRuleCategoryRoute} from '@src/ROUTES';
-import type {RequireFieldsRuleForm, RequireFieldsRuleToggleFieldKey} from '@src/types/form/RequireFieldsRuleForm';
+import type {RequireFieldsRuleDirection, RequireFieldsRuleForm, RequireFieldsRuleToggleFieldKey} from '@src/types/form/RequireFieldsRuleForm';
 import INPUT_IDS from '@src/types/form/RequireFieldsRuleForm';
 import type {Policy, PolicyCategory} from '@src/types/onyx';
 
@@ -52,11 +54,22 @@ function getValidationError(
     }
 
     const effectiveForm = getEffectiveRequireFieldsRuleForm(category, form);
+    const isWaiveDirection = effectiveForm[INPUT_IDS.DIRECTION] === CONST.REQUIRE_FIELDS_RULE_DIRECTION.DO_NOT_REQUIRE;
     const isAttendeeFieldApplicable = isAttendeeTrackingEnabled(policy);
+    const hasReceipt = !!effectiveForm[INPUT_IDS.REQUIRE_RECEIPT];
+    const hasItemizedReceipt = !!effectiveForm[INPUT_IDS.REQUIRE_ITEMIZED_RECEIPT];
+
+    if (isWaiveDirection) {
+        if (!hasReceipt && !hasItemizedReceipt) {
+            return translate('workspace.rules.requireFieldsRule.confirmErrorField');
+        }
+        return '';
+    }
+
     const hasDescription = !!effectiveForm[INPUT_IDS.REQUIRE_DESCRIPTION];
     const hasAttendees = isAttendeeFieldApplicable && !!effectiveForm[INPUT_IDS.REQUIRE_ATTENDEES];
 
-    if (!hasDescription && !hasAttendees && !categoryHasLegacyReceiptRules(category)) {
+    if (!hasDescription && !hasAttendees && !hasReceipt && !hasItemizedReceipt && !categoryHasLegacyReceiptRules(category)) {
         return translate('workspace.rules.requireFieldsRule.confirmErrorField');
     }
 
@@ -66,6 +79,7 @@ function getValidationError(
 function RequireFieldsRulePageBase({policyID, categoryName, testID}: RequireFieldsRulePageBaseProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const policyData = usePolicyData(policyID);
     const {policy} = policyData;
@@ -93,7 +107,7 @@ function RequireFieldsRulePageBase({policyID, categoryName, testID}: RequireFiel
         if (!isEditing) {
             if (initializedDraftForRuleKeyRef.current !== ROUTES.NEW) {
                 initializedDraftForRuleKeyRef.current = ROUTES.NEW;
-                setDraftRequireFieldsRule({});
+                setDraftRequireFieldsRule({[INPUT_IDS.DIRECTION]: CONST.REQUIRE_FIELDS_RULE_DIRECTION.REQUIRE});
             }
             return;
         }
@@ -128,15 +142,40 @@ function RequireFieldsRulePageBase({policyID, categoryName, testID}: RequireFiel
         }, [fetchPolicyData]),
     );
 
+    const direction: RequireFieldsRuleDirection = form?.[INPUT_IDS.DIRECTION] ?? CONST.REQUIRE_FIELDS_RULE_DIRECTION.REQUIRE;
+    const isWaiveDirection = direction === CONST.REQUIRE_FIELDS_RULE_DIRECTION.DO_NOT_REQUIRE;
+
+    // On the `Do not require` (waive) path only Receipt and Itemized receipt are supported in this release.
     const fieldToggles: Array<{key: RequireFieldsRuleToggleFieldKey; label: string; isVisible: boolean}> = [
-        {key: INPUT_IDS.REQUIRE_DESCRIPTION, label: translate('common.description'), isVisible: true},
-        {key: INPUT_IDS.REQUIRE_ATTENDEES, label: translate('iou.attendees'), isVisible: isAttendeeFieldApplicable},
+        {key: INPUT_IDS.REQUIRE_DESCRIPTION, label: translate('common.description'), isVisible: !isWaiveDirection},
+        {key: INPUT_IDS.REQUIRE_RECEIPT, label: translate('workspace.rules.requireFieldsRule.receipt'), isVisible: true},
+        {key: INPUT_IDS.REQUIRE_ITEMIZED_RECEIPT, label: translate('workspace.rules.requireFieldsRule.itemizedReceipt'), isVisible: true},
+        {key: INPUT_IDS.REQUIRE_ATTENDEES, label: translate('iou.attendees'), isVisible: !isWaiveDirection && isAttendeeFieldApplicable},
+    ];
+
+    const directionOptions: Array<{value: RequireFieldsRuleDirection; label: string}> = [
+        {value: CONST.REQUIRE_FIELDS_RULE_DIRECTION.REQUIRE, label: translate('workspace.rules.requireFieldsRule.directionRequire')},
+        {value: CONST.REQUIRE_FIELDS_RULE_DIRECTION.DO_NOT_REQUIRE, label: translate('workspace.rules.requireFieldsRule.directionDoNotRequire')},
     ];
 
     const errorMessage = getValidationError(form, selectedCategory, policy, translate);
 
     const handleToggleField = (fieldKey: RequireFieldsRuleToggleFieldKey, value: boolean) => {
         updateDraftRequireFieldsRule({[fieldKey]: value});
+    };
+
+    const handleDirectionChange = (newDirection: RequireFieldsRuleDirection) => {
+        if (newDirection === direction) {
+            return;
+        }
+        // Switching direction resets the field selections, since the two directions expose different fields.
+        updateDraftRequireFieldsRule({
+            [INPUT_IDS.DIRECTION]: newDirection,
+            [INPUT_IDS.REQUIRE_DESCRIPTION]: false,
+            [INPUT_IDS.REQUIRE_ATTENDEES]: false,
+            [INPUT_IDS.REQUIRE_RECEIPT]: false,
+            [INPUT_IDS.REQUIRE_ITEMIZED_RECEIPT]: false,
+        });
     };
 
     const handleSave = () => {
@@ -222,7 +261,26 @@ function RequireFieldsRulePageBase({policyID, categoryName, testID}: RequireFiel
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.REQUIRE_FIELDS_RULE_CATEGORY}
                     />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv3]} />
-                    <Text style={[styles.textLabel, styles.textSupporting, styles.lh16, styles.ph5, styles.pv3]}>{translate('workspace.rules.requireFieldsRule.thenWarnMember')}</Text>
+                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexWrap, styles.gap2, styles.ph5, styles.pv3]}>
+                        <View style={[styles.flexRow, {backgroundColor: theme.border, borderRadius: variables.componentBorderRadiusLarge, padding: 2}]}>
+                            {directionOptions.map((option) => {
+                                const isSelected = direction === option.value;
+                                return (
+                                    <PressableWithFeedback
+                                        key={option.value}
+                                        accessibilityLabel={option.label}
+                                        role={CONST.ROLE.BUTTON}
+                                        onPress={() => handleDirectionChange(option.value)}
+                                        disabled={!canWriteRules}
+                                        style={[styles.ph3, styles.pv1, {borderRadius: variables.componentBorderRadiusLarge, backgroundColor: isSelected ? theme.appBG : undefined}]}
+                                    >
+                                        <Text style={isSelected ? [styles.textMicroBold, styles.textStrong] : [styles.textMicro, styles.textSupporting]}>{option.label}</Text>
+                                    </PressableWithFeedback>
+                                );
+                            })}
+                        </View>
+                        <Text style={[styles.textLabel, styles.textSupporting, styles.lh16]}>{translate('workspace.rules.requireFieldsRule.theFollowing')}</Text>
+                    </View>
                     {fieldToggles
                         .filter((field) => field.isVisible)
                         .map((field) => {
