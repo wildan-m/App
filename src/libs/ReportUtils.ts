@@ -405,6 +405,8 @@ type OptimisticNewReport = Pick<
     | 'pendingFields'
     | 'chatReportID'
     | 'nextStep'
+    | 'submitterUserID'
+    | 'submitterPayrollID'
 > & {reportName: string};
 
 type BuildOptimisticIOUReportActionParams = {
@@ -6872,6 +6874,18 @@ function buildOptimisticEmptyReport(
           }
         : {};
     optimisticEmptyReport.ownerAccountID = accountID;
+
+    // Seed the submitter's member custom fields so Search custom-field columns render immediately after
+    // the report is created (e.g. via "Move Expense" > "Create Report"), instead of only after the report
+    // is opened and the backend fills these in. OpenReport later overwrites them with authoritative values.
+    const submitterEmployee = login ? policy?.employeeList?.[login] : undefined;
+    if (submitterEmployee?.employeeUserID) {
+        optimisticEmptyReport.submitterUserID = submitterEmployee.employeeUserID;
+    }
+    if (submitterEmployee?.employeePayrollID) {
+        optimisticEmptyReport.submitterPayrollID = submitterEmployee.employeePayrollID;
+    }
+
     return optimisticEmptyReport;
 }
 
