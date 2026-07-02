@@ -185,6 +185,12 @@ function MoneyRequestReceiptView({
     // redrawn locally, so don't surface the e-receipt overlay — the receipt box already shows the pending map.
     const canShowDistanceEReceipt = isMapDistanceRequest && !isPendingReceiptRegeneration;
     const hasReceipt = hasReceiptTransactionUtils(displayedTransaction);
+    // A scanned/shared receipt that gets moved to another report or workspace can come back with its `receipt`
+    // object still intact (source/filename/thumbnail) but without a truthy `receipt.state`. That makes `hasReceipt`
+    // false, and because the empty-state gate is suppressed while a receipt object exists, the receipt silently
+    // disappears (it isn't even replaced by the empty state). Treat a receipt that still has a source as displayable
+    // so it keeps rendering from that source instead of vanishing into the gap between the two gates.
+    const hasDisplayableReceipt = hasReceipt || hasReceiptSource(displayedTransaction);
     const isTransactionScanning = isScanning(displayedTransaction);
     const didReceiptScanSucceed = hasReceipt && didReceiptScanSucceedTransactionUtils(transaction);
     const isInvoice = isInvoiceReport(moneyRequestReport);
@@ -265,9 +271,9 @@ function MoneyRequestReceiptView({
         return CONST.IOU.TYPE.SUBMIT;
     }, [isTrackExpense, isInvoice]);
 
-    const receiptURIs = hasReceipt ? getThumbnailAndImageURIs(displayedTransaction) : undefined;
+    const receiptURIs = hasDisplayableReceipt ? getThumbnailAndImageURIs(displayedTransaction) : undefined;
     const isEReceiptTransaction = !!displayedTransaction && !hasReceiptSource(displayedTransaction) && hasEReceipt(displayedTransaction);
-    const canZoomReceipt = hasReceipt && !isLoading && !isEReceiptTransaction && !!receiptURIs?.image;
+    const canZoomReceipt = hasDisplayableReceipt && !isLoading && !isEReceiptTransaction && !!receiptURIs?.image;
     // Disable the hover-zoom wrapper while the distance map is regenerating. This also resets the shared hover state,
     // so the e-receipt overlay waits for a fresh pointer move instead of flashing during the regeneration → new-source gap.
     const canHoverZoomReceipt = canZoomReceipt && !isPendingReceiptRegeneration;
@@ -287,7 +293,7 @@ function MoneyRequestReceiptView({
     const transactionToCheck = updatedTransaction ?? transaction;
     const doesTransactionHaveReceipt = !!transactionToCheck?.receipt && !isEmptyObject(transactionToCheck?.receipt);
     // Empty state for invoices should be displayed only in WideRHP
-    const shouldShowReceiptEmptyState = (isDisplayedInWideRHP || !isInvoice) && !hasReceipt && !!transactionToCheck && !doesTransactionHaveReceipt;
+    const shouldShowReceiptEmptyState = (isDisplayedInWideRHP || !isInvoice) && !hasDisplayableReceipt && !!transactionToCheck && !doesTransactionHaveReceipt;
     const isMarkAsCash = parentReport && currentUserLogin ? isMarkAsCashActionForTransaction(currentUserLogin, parentReport, transactionViolations, policy) : false;
 
     const routeDistanceMeters = transaction?.comment?.customUnit?.routeDistanceMeters;
@@ -583,7 +589,7 @@ function MoneyRequestReceiptView({
                     />
                 </OfflineWithFeedback>
             )}
-            {(hasReceipt || !isEmptyObject(errors)) && (
+            {(hasDisplayableReceipt || !isEmptyObject(errors)) && (
                 <OfflineWithFeedback
                     shouldDisableOpacity={canShowReceiptActions}
                     pendingAction={receiptPendingAction}
@@ -621,7 +627,7 @@ function MoneyRequestReceiptView({
                     style={[shouldShowAuditMessage ? styles.mt3 : styles.mv3, !showReceiptErrorWithEmptyState && styles.flex1]}
                     contentContainerStyle={styles.flex1}
                 >
-                    {hasReceipt && (
+                    {hasDisplayableReceipt && (
                         <View
                             ref={receiptContainerRef}
                             style={[styles.getMoneyRequestViewImage(showBorderlessLoading), receiptStyle, showBorderlessLoading && styles.flex1]}
@@ -742,7 +748,7 @@ function MoneyRequestReceiptView({
                     {!hasReceiptUploadError && !!shouldShowAuditMessage && hasReceipt && (!isLoading || !fillSpace) && receiptAuditMessagesRow}
                 </OfflineWithFeedback>
             )}
-            {!shouldShowReceiptEmptyState && !hasReceipt && <View style={{marginVertical: 6}} />}
+            {!shouldShowReceiptEmptyState && !hasDisplayableReceipt && <View style={{marginVertical: 6}} />}
             {!hasReceiptUploadError && !!shouldShowAuditMessage && !hasReceipt && receiptAuditMessagesRow}
             {AttachmentErrorModal}
             {PDFValidationComponent}
