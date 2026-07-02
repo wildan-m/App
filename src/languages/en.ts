@@ -2931,6 +2931,8 @@ const translations = {
         title: 'Agents',
         subtitle: `<muted-text>Agents handle your workflows for you, so you get hours back in your day. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Learn more</a>.</muted-text>`,
         newAgent: 'New agent',
+        agent: 'Agent',
+        findAgent: 'Find an agent',
         emptyAgents: {
             title: 'No agents created',
             subtitle: `<muted-text><centered-text>Stop manually doing stuff. Instruct an agent instead and save yourself lots of time. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Learn more</a>.</centered-text></muted-text>`,

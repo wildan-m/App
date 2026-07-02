@@ -2861,6 +2861,8 @@ ${amount} für ${merchant} – ${date}`,
         title: 'Agenten',
         subtitle: `<muted-text>Agents übernehmen Ihre Workflows für Sie, sodass Sie täglich Stunden zurückgewinnen. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Mehr erfahren</a>.</muted-text>`,
         newAgent: 'Neue:r Agent:in',
+        agent: 'Agent',
+        findAgent: 'Agent suchen',
         emptyAgents: {
             title: 'Keine Agenten erstellt',
             subtitle: `<muted-text><centered-text>Hören Sie auf, Dinge manuell zu erledigen. Geben Sie stattdessen einem Agenten Anweisungen und sparen Sie eine Menge Zeit. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Erfahren Sie mehr</a>.</centered-text></muted-text>`,

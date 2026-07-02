@@ -143,6 +143,7 @@ export default {
     domainAdminsTableActionColumnWidth: 140,
     workspaceTableActionColumnWidth: 64,
     workspaceMembersRoleColumnWidth: 148,
+    agentsTableActionsColumnWidth: 224,
     sectionMenuItemHeight: 52,
     sectionMenuItemHeightCompact: 44,
     optionsListSectionHeaderHeight: getValueUsingPixelRatio(32, 38),

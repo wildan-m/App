@@ -2729,6 +2729,8 @@ ${amount} para ${merchant} - ${date}`,
         title: 'Agentes',
         subtitle: `<muted-text>Los agentes gestionan tus flujos de trabajo por ti, para que recuperes horas en tu día. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Más información</a>.</muted-text>`,
         newAgent: 'Nuevo agente',
+        agent: 'Agente',
+        findAgent: 'Buscar un agente',
         emptyAgents: {
             title: 'No se han creado agentes.',
             subtitle: `<muted-text><centered-text>Deja de hacerlo todo manualmente. Da instrucciones a un agente y ahórrate mucho tiempo. <a href="${CONST.CUSTOM_AGENTS_HELP_URL}">Más información</a>.</centered-text></muted-text>`,
