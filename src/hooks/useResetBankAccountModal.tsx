@@ -15,6 +15,13 @@ import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
 import useThemeStyles from './useThemeStyles';
 
+// Shared across every mounted consumer of this hook. `reimbursementAccount.shouldShowResetModal` is a single global
+// Onyx flag, but the success screen can have several instances of this hook mounted at once (e.g. the entry point
+// screen kept mounted underneath the USD validation screen). A per-instance guard would let each instance open its
+// own confirm modal from the same flag, stacking duplicates. This module-level guard ensures only the first instance
+// opens the modal (and runs the disconnect action), no matter how many are mounted.
+let isResetModalOpen = false;
+
 type ResetBankAccountModalOptions = {
     /** Reimbursement account data */
     reimbursementAccount: OnyxEntry<OnyxTypes.ReimbursementAccount>;
@@ -110,8 +117,6 @@ function useResetBankAccountModal({
         }
     };
 
-    // Guards against showing the modal more than once (e.g. React StrictMode double-invoking effects)
-    const isModalOpenRef = useRef(false);
     // Tracks whether the consuming component is still mounted so we can discard the modal resolution
     // (destructive reset actions, parent state setters and navigation) if it unmounts while the modal is open.
     const isMountedRef = useRef(true);
@@ -123,10 +128,10 @@ function useResetBankAccountModal({
     }, []);
 
     const showResetModal = useEffectEvent(() => {
-        if (isModalOpenRef.current) {
+        if (isResetModalOpen) {
             return;
         }
-        isModalOpenRef.current = true;
+        isResetModalOpen = true;
         showConfirmModal({
             title: translate('workspace.bankAccount.areYouSure'),
             confirmText: isInOpenState ? translate('workspace.bankAccount.yesDisconnectMyBankAccount') : translate('workspace.bankAccount.yesStartOver'),
@@ -141,7 +146,7 @@ function useResetBankAccountModal({
             danger: true,
             shouldShowCancelButton: true,
         }).then(({action}) => {
-            isModalOpenRef.current = false;
+            isResetModalOpen = false;
             // Discard the resolution if the consuming component unmounted while the modal was open
             if (!isMountedRef.current) {
                 return;
@@ -156,7 +161,7 @@ function useResetBankAccountModal({
 
     useEffect(() => {
         if (!shouldShowResetModal) {
-            isModalOpenRef.current = false;
+            isResetModalOpen = false;
             return;
         }
         showResetModal();
