@@ -3,9 +3,12 @@ import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useSearchResults from '@hooks/useSearchResults';
 import useThemeStyles from '@hooks/useThemeStyles';
+import tokenizedSearch from '@libs/tokenizedSearch';
 import type {AccessVariant} from '@pages/workspace/AccessOrNotFoundWrapper';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxCommon from '@src/types/onyx/OnyxCommon';
@@ -15,6 +18,7 @@ import ErrorMessageRow from './ErrorMessageRow';
 import HeaderWithBackButton from './HeaderWithBackButton';
 import OfflineWithFeedback from './OfflineWithFeedback';
 import ScreenWrapper from './ScreenWrapper';
+import SearchBar from './SearchBar';
 import SelectionList from './SelectionList';
 import SingleSelectListItem from './SelectionList/ListItem/SingleSelectListItem';
 import type SingleSelectWithAvatarListItem from './SelectionList/ListItem/SingleSelectWithAvatarListItem';
@@ -99,6 +103,18 @@ type SelectionScreenProps<T = string> = {
     /** Whether to show the text input */
     shouldShowTextInput?: boolean;
 
+    /** Whether to show a search bar above the list to filter the items. Only rendered when the number of items exceeds CONST.SEARCH_BAR_THRESHOLD. */
+    shouldShowSearchBar?: boolean;
+
+    /** Label for the search bar input. Defaults to the generic "Search" copy. */
+    searchInputLabel?: string;
+
+    /** Predicate deciding whether an item matches the current search input. Defaults to a tokenized search over the item's `text`. */
+    filterData?: (item: SelectorType<T>, searchInput: string) => boolean;
+
+    /** Optional comparator used to sort the filtered results before rendering. */
+    sortData?: (data: Array<SelectorType<T>>) => Array<SelectorType<T>>;
+
     /** Whether to allow each row's title to wrap onto multiple lines instead of truncating */
     isRowMultilineSupported?: boolean;
 
@@ -138,6 +154,10 @@ function SelectionScreen<T = string>({
     shouldSingleExecuteRowSelect,
     headerTitleAlreadyTranslated,
     shouldShowTextInput,
+    shouldShowSearchBar = false,
+    searchInputLabel,
+    filterData,
+    sortData,
     textInputOptions,
     shouldUpdateFocusedIndex = false,
     isRowMultilineSupported = false,
@@ -147,6 +167,11 @@ function SelectionScreen<T = string>({
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const isConnectionEmpty = isEmpty(policy?.connections?.[connectionName]);
+
+    const defaultFilterData = (item: SelectorType<T>, searchInput: string) => tokenizedSearch([item], searchInput, (option) => [option.text ?? '']).length > 0;
+    const [searchValue, setSearchValue, filteredData] = useSearchResults(data, filterData ?? defaultFilterData, sortData);
+    const isSearchBarVisible = shouldShowSearchBar && data.length > CONST.SEARCH_BAR_THRESHOLD;
+    const listData = isSearchBarVisible ? filteredData : data;
 
     return (
         <AccessOrNotFoundWrapper
@@ -164,6 +189,14 @@ function SelectionScreen<T = string>({
                     onBackButtonPress={onBackButtonPress}
                 />
                 {headerContent}
+                {isSearchBarVisible && (
+                    <SearchBar
+                        label={searchInputLabel ?? translate('common.search')}
+                        inputValue={searchValue}
+                        onChangeText={setSearchValue}
+                        shouldShowEmptyState={filteredData.length === 0}
+                    />
+                )}
                 <OfflineWithFeedback
                     pendingAction={pendingAction}
                     style={[styles.flex1]}
@@ -171,7 +204,7 @@ function SelectionScreen<T = string>({
                     shouldDisableOpacity={!data.length}
                 >
                     <SelectionList
-                        data={data}
+                        data={listData}
                         ListItem={ListItem}
                         onSelectRow={onSelectRow}
                         showScrollIndicator
