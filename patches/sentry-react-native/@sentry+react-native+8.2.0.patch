@@ -31,3 +31,103 @@ index 5dc57a3..8887025 100644
    end
  
    rn_package_json_path = File.join(rn_path, 'package.json')
+diff --git a/node_modules/@sentry/react-native/ios/RNSentryTimeToDisplay.m b/node_modules/@sentry/react-native/ios/RNSentryTimeToDisplay.m
+index 41044b3..d4aac51 100644
+--- a/node_modules/@sentry/react-native/ios/RNSentryTimeToDisplay.m
++++ b/node_modules/@sentry/react-native/ios/RNSentryTimeToDisplay.m
+@@ -27,21 +27,35 @@ + (void)initialize
+ 
+ + (void)setActiveSpanId:(NSString *)spanId
+ {
+-    activeSpanId = spanId;
++    // Guard the shared mutable statics. setActiveSpanId: runs on the JS thread
++    // (exported as RCT_EXPORT_SYNCHRONOUS_TYPED_METHOD) while the readers run on
++    // the frames-tracker display-link thread, so all access must be serialized.
++    @synchronized([RNSentryTimeToDisplay class]) {
++        activeSpanId = spanId;
++    }
+ }
+ 
+ + (NSNumber *)popTimeToDisplayFor:(NSString *)screenId
+ {
+-    NSNumber *value = screenIdToRenderDuration[screenId];
+-    [screenIdToRenderDuration removeObjectForKey:screenId];
+-    return value;
++    @synchronized([RNSentryTimeToDisplay class]) {
++        NSNumber *value = screenIdToRenderDuration[screenId];
++        [screenIdToRenderDuration removeObjectForKey:screenId];
++        return value;
++    }
+ }
+ 
+ + (void)putTimeToInitialDisplayForActiveSpan:(NSNumber *)value
+ {
+-    if (activeSpanId != nil) {
+-        NSString *prefixedSpanId = [@"ttid-navigation-" stringByAppendingString:activeSpanId];
+-        [self putTimeToDisplayFor:prefixedSpanId value:value];
++    // @synchronized on the class is recursive, so the nested putTimeToDisplayFor:
++    // call below re-enters the same lock safely. Capture activeSpanId into a local
++    // strong reference so a concurrent setActiveSpanId: cannot deallocate the string
++    // out from under stringByAppendingString: (the reported EXC_BAD_ACCESS).
++    @synchronized([RNSentryTimeToDisplay class]) {
++        NSString *spanId = activeSpanId;
++        if (spanId != nil) {
++            NSString *prefixedSpanId = [@"ttid-navigation-" stringByAppendingString:spanId];
++            [self putTimeToDisplayFor:prefixedSpanId value:value];
++        }
+     }
+ }
+ 
+@@ -50,28 +64,30 @@ + (void)putTimeToDisplayFor:(NSString *)screenId value:(NSNumber *)value
+     if (!screenId)
+         return;
+ 
+-    // If key already exists, just update the value,
+-    // this should never happen as TTD is recorded once per navigation
+-    // We avoid updating the age to avoid the age array shift
+-    if ([screenIdToRenderDuration objectForKey:screenId]) {
+-        [screenIdToRenderDuration setObject:value forKey:screenId];
+-        return;
+-    }
+-
+-    // If we haven't reached capacity yet, just append
+-    if (screenIdAge.count < TIME_TO_DISPLAY_ENTRIES_MAX_SIZE) {
+-        [screenIdToRenderDuration setObject:value forKey:screenId];
+-        [screenIdAge addObject:screenId];
+-    } else {
+-        // Remove oldest entry, in most case will already be removed by pop
+-        NSString *oldestKey = screenIdAge[screenIdCurrentIndex];
+-        [screenIdToRenderDuration removeObjectForKey:oldestKey];
+-
+-        [screenIdToRenderDuration setObject:value forKey:screenId];
+-        screenIdAge[screenIdCurrentIndex] = screenId;
+-
+-        // Update circular index, point to the new oldest
+-        screenIdCurrentIndex = (screenIdCurrentIndex + 1) % TIME_TO_DISPLAY_ENTRIES_MAX_SIZE;
++    @synchronized([RNSentryTimeToDisplay class]) {
++        // If key already exists, just update the value,
++        // this should never happen as TTD is recorded once per navigation
++        // We avoid updating the age to avoid the age array shift
++        if ([screenIdToRenderDuration objectForKey:screenId]) {
++            [screenIdToRenderDuration setObject:value forKey:screenId];
++            return;
++        }
++
++        // If we haven't reached capacity yet, just append
++        if (screenIdAge.count < TIME_TO_DISPLAY_ENTRIES_MAX_SIZE) {
++            [screenIdToRenderDuration setObject:value forKey:screenId];
++            [screenIdAge addObject:screenId];
++        } else {
++            // Remove oldest entry, in most case will already be removed by pop
++            NSString *oldestKey = screenIdAge[screenIdCurrentIndex];
++            [screenIdToRenderDuration removeObjectForKey:oldestKey];
++
++            [screenIdToRenderDuration setObject:value forKey:screenId];
++            screenIdAge[screenIdCurrentIndex] = screenId;
++
++            // Update circular index, point to the new oldest
++            screenIdCurrentIndex = (screenIdCurrentIndex + 1) % TIME_TO_DISPLAY_ENTRIES_MAX_SIZE;
++        }
+     }
+ }
+ 
