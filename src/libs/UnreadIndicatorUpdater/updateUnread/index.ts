@@ -20,6 +20,20 @@ Onyx.connectWithoutView({
     },
 });
 
+// The page-specific title is only ever set by pages via useDocumentTitle; nothing clears it when the
+// session is cleared on logout, so the tab title stays stuck on the last visited page. Reset it here
+// once the user is logged out so the title falls back to CONFIG.SITE_TITLE.
+Onyx.connectWithoutView({
+    key: ONYXKEYS.SESSION,
+    callback: (session) => {
+        if (session?.authToken) {
+            return;
+        }
+        currentPageTitle = '';
+        updateDocumentTitle();
+    },
+});
+
 /**
  * Set the current page-specific title (called by useDocumentTitle hook)
  * @param title - The page-specific title
