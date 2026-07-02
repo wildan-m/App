@@ -73,19 +73,27 @@ function DynamicSuccessPage({route}: DynamicSuccessPageProps) {
             clearTwoFactorAuthData(true);
             return;
         }
-        goBack();
-        if (dynamicForwardPath) {
-            const policyID = route.params?.policyID;
-            if (policyID) {
-                // Open Xero setup the same way ConnectToXeroFlow does per platform: on web open the link inline in a
-                // new browser tab (within this button's gesture), on native navigate to the in-app WebView setup
-                // screen. Calling openLink on native would open the external browser instead of the WebView.
-                if (getPlatform() === CONST.PLATFORM.WEB) {
-                    openLink(getXeroSetupLink(policyID), environmentURL);
-                } else {
+        const policyID = route.params?.policyID;
+        // On native, defer opening the Xero setup screen until the 2FA modal-dismiss transition has finished.
+        // Pushing the setup screen synchronously right after goBack() lands it mid-transition, so it renders behind
+        // the dismissing 2FA modal and the user is left on a blank page. Running the navigation inside the back
+        // navigation's afterTransition callback mirrors the USD bank account branch in goBack() above, which already
+        // waits for the transition before doing its follow-up work.
+        if (dynamicForwardPath && policyID && getPlatform() !== CONST.PLATFORM.WEB) {
+            Navigation.goBack(dynamicBackPath, {
+                afterTransition: () => {
+                    clearTwoFactorAuthData();
                     Navigation.navigate(ROUTES.POLICY_ACCOUNTING_XERO_SETUP.getRoute(policyID));
-                }
-            }
+                },
+            });
+            return;
+        }
+
+        goBack();
+        if (dynamicForwardPath && policyID && getPlatform() === CONST.PLATFORM.WEB) {
+            // On web open the Xero setup link inline in a new browser tab within this button's user gesture.
+            // Calling openLink on native would open the external browser instead of the in-app WebView.
+            openLink(getXeroSetupLink(policyID), environmentURL);
         }
     };
 
