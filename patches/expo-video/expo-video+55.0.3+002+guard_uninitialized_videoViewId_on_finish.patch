@@ -1,0 +1,15 @@
+diff --git a/node_modules/expo-video/android/src/main/java/expo/modules/video/FullscreenPlayerActivity.kt b/node_modules/expo-video/android/src/main/java/expo/modules/video/FullscreenPlayerActivity.kt
+index fe0f3e4b639..74ddb9ef9ec 100644
+--- a/node_modules/expo-video/android/src/main/java/expo/modules/video/FullscreenPlayerActivity.kt
++++ b/node_modules/expo-video/android/src/main/java/expo/modules/video/FullscreenPlayerActivity.kt
+@@ -116,7 +116,9 @@ class FullscreenPlayerActivity : Activity() {
+   override fun finish() {
+     super.finish()
+     didFinish = true
+-    VideoManager.getVideoView(videoViewId).attachPlayer()
++    if (::videoViewId.isInitialized) {
++      VideoManager.getVideoView(videoViewId).attachPlayer()
++    }
+ 
+     // Disable the exit transition
+     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
