@@ -17,6 +17,7 @@ import type {SearchColumnType} from '@components/Search/types';
 import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import usePolicy from '@hooks/usePolicy';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
@@ -136,8 +137,13 @@ function TransactionItemRowWide({
     const isAmountColumnWide = amountColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;
     const isTaxAmountColumnWide = taxAmountColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;
     const reportForCustomColumns = transactionItem.report ?? report;
-    const submitterUserID = reportForCustomColumns?.submitterUserID;
-    const submitterPayrollID = reportForCustomColumns?.submitterPayrollID;
+    // The submitter's custom field columns are baked into the search snapshot at query time, so they go stale after the
+    // member's custom field is edited. Prefer the live workspace member data (keyed by the submitter's login) so the value
+    // reflects the edit immediately, falling back to the snapshot value when the member/field isn't available.
+    const livePolicyForCustomColumns = usePolicy(reportPolicyID);
+    const submitterEmployee = transactionItem.from?.login ? livePolicyForCustomColumns?.employeeList?.[transactionItem.from.login] : undefined;
+    const submitterUserID = submitterEmployee?.employeeUserID ?? reportForCustomColumns?.submitterUserID;
+    const submitterPayrollID = submitterEmployee?.employeePayrollID ?? reportForCustomColumns?.submitterPayrollID;
     const orderDealNumbers = reportForCustomColumns?.orderDealNumbers;
 
     const renderColumn = (column: SearchColumnType): React.ReactNode => {

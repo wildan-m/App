@@ -13,6 +13,7 @@ import UserInfoCell from '@components/Search/SearchList/ListItem/UserInfoCell';
 import WorkspaceCell from '@components/Search/SearchList/ListItem/WorkspaceCell';
 import {useRowSelection} from '@components/Search/SearchSelectionProvider';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import usePolicy from '@hooks/usePolicy';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -50,8 +51,13 @@ function ExpenseReportListItemRowWide({
 
     const currency = item.currency ?? CONST.CURRENCY.USD;
     const {totalDisplaySpend = 0, nonReimbursableSpend = 0, reimbursableSpend = 0, isAllScanning: isScanning = false} = item;
-    const submitterUserID = item.submitterUserID;
-    const submitterPayrollID = item.submitterPayrollID;
+    // The submitter's custom field columns are baked into the search snapshot at query time, so they go stale after the
+    // member's custom field is edited. Prefer the live workspace member data (keyed by the submitter's login) so the value
+    // reflects the edit immediately, falling back to the snapshot value when the member/field isn't available.
+    const livePolicyForCustomColumns = usePolicy(item.policyID);
+    const submitterEmployee = item.from?.login ? livePolicyForCustomColumns?.employeeList?.[item.from.login] : undefined;
+    const submitterUserID = submitterEmployee?.employeeUserID ?? item.submitterUserID;
+    const submitterPayrollID = submitterEmployee?.employeePayrollID ?? item.submitterPayrollID;
     const orderDealNumbers = item.orderDealNumbers;
 
     const columnComponents = {
