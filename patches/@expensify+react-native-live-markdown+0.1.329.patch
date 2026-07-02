@@ -1,0 +1,39 @@
+diff --git a/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js b/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js
+index d2095e8..e852c8e 100644
+--- a/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js
++++ b/node_modules/@expensify/react-native-live-markdown/lib/commonjs/parseExpensiMark.js
+@@ -21,7 +21,7 @@ function isJest() {
+ if (__DEV__ && !isWeb() && !isJest() && _htmlEntities.decode.__workletHash === undefined) {
+   throw new Error("[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.");
+ }
+-const MAX_PARSABLE_LENGTH = 4000;
++const MAX_PARSABLE_LENGTH = 15000;
+ function parseMarkdownToHTML(markdown) {
+   const parser = new _expensifyCommon.ExpensiMark();
+   const html = parser.replace(markdown, {
+diff --git a/node_modules/@expensify/react-native-live-markdown/lib/module/parseExpensiMark.js b/node_modules/@expensify/react-native-live-markdown/lib/module/parseExpensiMark.js
+index 3d1511d..44db040 100644
+--- a/node_modules/@expensify/react-native-live-markdown/lib/module/parseExpensiMark.js
++++ b/node_modules/@expensify/react-native-live-markdown/lib/module/parseExpensiMark.js
+@@ -17,7 +17,7 @@ function isJest() {
+ if (__DEV__ && !isWeb() && !isJest() && decode.__workletHash === undefined) {
+   throw new Error("[react-native-live-markdown] `parseExpensiMark` requires `html-entities` package to be workletized. Please add `'worklet';` directive at the top of `node_modules/html-entities/lib/index.js` using patch-package. Make sure you've installed `html-entities` version 2.5.3 exactly as otherwise there is no `lib/` directory.");
+ }
+-const MAX_PARSABLE_LENGTH = 4000;
++const MAX_PARSABLE_LENGTH = 15000;
+ function parseMarkdownToHTML(markdown) {
+   const parser = new ExpensiMark();
+   const html = parser.replace(markdown, {
+diff --git a/node_modules/@expensify/react-native-live-markdown/src/parseExpensiMark.ts b/node_modules/@expensify/react-native-live-markdown/src/parseExpensiMark.ts
+index ebb462d..348eea2 100644
+--- a/node_modules/@expensify/react-native-live-markdown/src/parseExpensiMark.ts
++++ b/node_modules/@expensify/react-native-live-markdown/src/parseExpensiMark.ts
+@@ -23,7 +23,7 @@ if (__DEV__ && !isWeb() && !isJest() && (decode as WorkletFunction<unknown[], un
+   );
+ }
+ 
+-const MAX_PARSABLE_LENGTH = 4000;
++const MAX_PARSABLE_LENGTH = 15000;
+ 
+ type Token = ['TEXT' | 'HTML', string];
+ type StackItem = {tag: string; children: Array<StackItem | string>};
