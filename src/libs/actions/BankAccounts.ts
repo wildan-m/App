@@ -838,6 +838,8 @@ function getCorpayBankAccountFields(country: string, currency: string) {
                 value: {
                     isLoading: true,
                     isSuccess: false,
+                    bankCountry: country,
+                    bankCurrency: currency,
                 },
             },
         ],
@@ -848,6 +850,8 @@ function getCorpayBankAccountFields(country: string, currency: string) {
                 value: {
                     isLoading: false,
                     isSuccess: true,
+                    bankCountry: country,
+                    bankCurrency: currency,
                 },
             },
         ],
