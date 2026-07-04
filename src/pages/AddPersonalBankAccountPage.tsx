@@ -1,5 +1,6 @@
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import ConfirmationPage from '@components/ConfirmationPage';
+import FullscreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -19,7 +20,7 @@ import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
-import React, {useContext, useEffect} from 'react';
+import React, {useContext} from 'react';
 
 import PersonalInfoPage from './settings/Wallet/InternationalDepositAccount/PersonalInfo/PersonalInfo';
 
@@ -27,6 +28,8 @@ function AddPersonalBankAccountPage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [personalBankAccount] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT);
+    const [, personalBankAccountDraftResult] = useOnyx(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM_DRAFT);
+    const isDraftLoaded = personalBankAccountDraftResult.status === 'loaded';
     const shouldShowSuccess = personalBankAccount?.shouldShowSuccess ?? false;
     const topmostFullScreenRoute = navigationRef.current?.getRootState()?.routes.findLast((route) => isFullScreenName(route.name));
     const kycWallRef = useContext(KYCWallContext);
@@ -59,8 +62,6 @@ function AddPersonalBankAccountPage() {
         }
     };
 
-    useEffect(() => clearPersonalBankAccount, []);
-
     if (shouldShowSuccess) {
         return (
             <ScreenWrapper
@@ -87,6 +88,12 @@ function AddPersonalBankAccountPage() {
                 </FullPageNotFoundView>
             </ScreenWrapper>
         );
+    }
+
+    // Wait for the persisted form draft to load so the flow can resume at the correct sub-step
+    // instead of momentarily rendering the first screen before the draft hydrates.
+    if (!isDraftLoaded) {
+        return <FullscreenLoadingIndicator reasonAttributes={{context: 'AddPersonalBankAccountPage'}} />;
     }
 
     return <PersonalInfoPage />;

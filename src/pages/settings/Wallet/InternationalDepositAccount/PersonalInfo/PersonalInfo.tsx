@@ -23,6 +23,7 @@ import LegalName from './substeps/LegalNameStep';
 import ManualBankAccountDetails from './substeps/ManualBankAccountDetailsStep';
 import PhoneNumber from './substeps/PhoneNumberStep';
 import PlaidBankAccount from './substeps/PlaidBankAccountStep';
+import getInitialSubstepForPersonalInfo from './utils/getInitialSubstepForPersonalInfo';
 import getSkippedStepsPersonalInfo from './utils/getSkippedStepsPersonalInfo';
 
 const bodyContentInfoSet: Array<React.ComponentType<SubStepProps>> = [LegalName, Address, PhoneNumber, Confirmation];
@@ -70,6 +71,8 @@ function PersonalInfoPage() {
     };
 
     const skipSteps = getSkippedStepsPersonalInfo(privatePersonalDetails);
+    const bodyContent = isManual ? bodyContentWithManualSetup : bodyContentWithPlaid;
+    const startFrom = getInitialSubstepForPersonalInfo(personalBankAccount, isManual, skipSteps, bodyContent.length - 1);
 
     const {
         componentToRender: SubStep,
@@ -80,9 +83,10 @@ function PersonalInfoPage() {
         screenIndex,
         goToTheLastStep,
     } = useSubStep({
-        bodyContent: isManual ? bodyContentWithManualSetup : bodyContentWithPlaid,
+        bodyContent,
         skipSteps,
         onFinished: submitBankAccountForm,
+        startFrom,
     });
 
     const handleBackButtonPress = () => {
