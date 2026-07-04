@@ -3,7 +3,7 @@ import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CustomUnit, Rate, TaxRateAttributes} from '@src/types/onyx/Policy';
+import type {CustomUnit, Rate, RateAttributes} from '@src/types/onyx/Policy';
 import type {OnyxData} from '@src/types/onyx/Request';
 
 import type {NullishDeep, OnyxUpdate} from 'react-native-onyx';
@@ -89,7 +89,7 @@ function validateCreateDistanceRateForm(
     return errors;
 }
 
-type PolicyDistanceRateUpdateField = keyof Pick<Rate, 'name' | 'rate' | 'startDate' | 'endDate'> | keyof TaxRateAttributes;
+type PolicyDistanceRateUpdateField = keyof Pick<Rate, 'name' | 'rate' | 'startDate' | 'endDate'> | keyof Pick<RateAttributes, 'taxClaimablePercentage' | 'taxRateExternalID'>;
 
 /**
  * Builds optimistic, success, and failure Onyx data for policy distance rate updates
@@ -194,4 +194,25 @@ function getRateStatus(rate: Rate): string {
     return CONST.CUSTOM_UNITS.RATE_STATUS.ACTIVE;
 }
 
-export {validateRateValue, getOptimisticRateName, validateTaxClaimableValue, validateCreateDistanceRateForm, buildOnyxDataForPolicyDistanceRateUpdates, getRateStatus};
+/**
+ * Returns true when a rate was auto-generated from a government rate and has not been edited since,
+ * i.e. its current value and effective dates still match the stored government rate snapshot.
+ */
+function isGovernmentRateUnmodified(rate: Rate): boolean {
+    const governmentRate = rate.attributes?.governmentRate;
+    if (!governmentRate) {
+        return false;
+    }
+
+    return rate.rate === governmentRate.rate && rate.startDate === governmentRate.startDate && rate.endDate === governmentRate.endDate;
+}
+
+export {
+    validateRateValue,
+    getOptimisticRateName,
+    validateTaxClaimableValue,
+    validateCreateDistanceRateForm,
+    buildOnyxDataForPolicyDistanceRateUpdates,
+    getRateStatus,
+    isGovernmentRateUnmodified,
+};

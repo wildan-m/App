@@ -14,13 +14,31 @@ import type {WorkspaceTravelSettings} from './TravelSettings';
 /** Distance units */
 type Unit = 'mi' | 'km';
 
-/** Tax rate attributes of the policy distance rate */
-type TaxRateAttributes = {
+/** Snapshot of the government rate a distance rate was auto-generated from */
+type GovernmentRateSnapshot = {
+    /** ID of the source government rate this snapshot was generated from */
+    sourceRateID: string;
+
+    /** Amount to be reimbursed per unit at the time of generation */
+    rate: number;
+
+    /** ISO 8601 date string for when the government rate becomes effective */
+    startDate?: string | null;
+
+    /** ISO 8601 date string for when the government rate expires */
+    endDate?: string | null;
+};
+
+/** Attributes of the policy distance rate */
+type RateAttributes = {
     /** Percentage of the tax that can be reclaimable */
     taxClaimablePercentage?: number;
 
     /** External ID associated to this tax rate */
     taxRateExternalID?: string;
+
+    /** Snapshot of the government rate this rate was auto-generated from, when applicable */
+    governmentRate?: GovernmentRateSnapshot;
 };
 
 /** Model of policy subrate */
@@ -59,8 +77,8 @@ type Rate = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Form fields that triggered the errors */
         errorFields?: OnyxCommon.ErrorFields;
 
-        /** Tax rate attributes of the policy */
-        attributes?: TaxRateAttributes;
+        /** Attributes of the policy distance rate */
+        attributes?: RateAttributes;
 
         /** Subrates of the given rate */
         subRates?: Subrate[];
@@ -74,7 +92,7 @@ type Rate = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** ISO 8601 date string for when this rate expires */
         endDate?: string | null;
     },
-    keyof TaxRateAttributes
+    keyof RateAttributes
 >;
 
 /** Custom unit attributes */
@@ -2804,7 +2822,8 @@ export type {
     CustomUnit,
     Attributes,
     Rate,
-    TaxRateAttributes,
+    RateAttributes,
+    GovernmentRateSnapshot,
     TaxRate,
     TaxRates,
     TaxRatesWithDefault,
