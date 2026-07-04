@@ -158,7 +158,12 @@ function getMatchingFullScreenRoute(route: NavigationRoute) {
         });
     }
 
-    if (RHP_TO_WORKSPACE[route.name]) {
+    // Dynamic screens are skipped here for the same reason they're skipped in the backTo block above:
+    // RHP_TO_WORKSPACE is a 1:1 inverse of WORKSPACE_TO_RHP, so a screen reachable from more than one
+    // central screen (e.g. the company-card details/export RHP, opened from both Members and Company cards)
+    // collapses to a single central and would resolve the wrong page. Dynamic screens must derive their
+    // underlying full-screen from their own URL (handled by the dynamic-suffix block below) instead.
+    if (RHP_TO_WORKSPACE[route.name] && !isDynamicScreen) {
         const paramsFromRoute = getParamsFromRoute(RHP_TO_WORKSPACE[route.name]);
 
         const workspaceSplitRoute = getInitialSplitNavigatorState(
