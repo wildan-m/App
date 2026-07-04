@@ -192,12 +192,12 @@ describe('UserUtils', () => {
                     validatedDate: null,
                 },
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                '16_default_lastlogin': {
+                '16_default_sentinel': {
                     // lastLogin still at the default sentinel, so `created` is the effective timestamp
                     created: '2024-02-01 00:00:00',
                     accountID: 1,
                     partnerID: CONST.PARTNER_ID.ANDROID,
-                    partnerUserID: 'default-lastlogin-device',
+                    partnerUserID: 'default-sentinel-device',
                     lastLogin: '2008-01-01 00:00:00',
                     validatedDate: null,
                 },
@@ -214,7 +214,7 @@ describe('UserUtils', () => {
 
             const result = UserUtils.getDeviceLogins(logins);
 
-            expect(result.map((login) => login.partnerUserID)).toEqual(['newest-device', 'older-device', 'default-lastlogin-device']);
+            expect(result.map((login) => login.partnerUserID)).toEqual(['newest-device', 'older-device', 'default-sentinel-device']);
         });
     });
 });
