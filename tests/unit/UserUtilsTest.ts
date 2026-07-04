@@ -178,4 +178,43 @@ describe('UserUtils', () => {
             expect(Object.keys(result ?? {})).toEqual(['user@example.com']);
         });
     });
+
+    describe('getDeviceLogins', () => {
+        test('returns device logins ordered by most recent activity first', () => {
+            const logins = {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '14_older': {
+                    created: '2024-01-01 00:00:00',
+                    accountID: 1,
+                    partnerID: CONST.PARTNER_ID.IPHONE,
+                    partnerUserID: 'older-device',
+                    lastLogin: '2024-03-01 10:00:00',
+                    validatedDate: null,
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '16_default_lastlogin': {
+                    // lastLogin still at the default sentinel, so `created` is the effective timestamp
+                    created: '2024-02-01 00:00:00',
+                    accountID: 1,
+                    partnerID: CONST.PARTNER_ID.ANDROID,
+                    partnerUserID: 'default-lastlogin-device',
+                    lastLogin: '2008-01-01 00:00:00',
+                    validatedDate: null,
+                },
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                '83_newest': {
+                    created: '2024-01-15 00:00:00',
+                    accountID: 1,
+                    partnerID: CONST.PARTNER_ID.NEWDOT,
+                    partnerUserID: 'newest-device',
+                    lastLogin: '2024-05-01 09:00:00',
+                    validatedDate: null,
+                },
+            };
+
+            const result = UserUtils.getDeviceLogins(logins);
+
+            expect(result.map((login) => login.partnerUserID)).toEqual(['newest-device', 'older-device', 'default-lastlogin-device']);
+        });
+    });
 });
