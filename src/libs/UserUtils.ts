@@ -98,7 +98,11 @@ function isDeviceLogin(login: NewLogin) {
 }
 
 function getDeviceLogins(logins: OnyxEntry<Logins>) {
-    return Object.values(logins ?? {})?.filter(isDeviceLogin);
+    // Sort by each login's effective timestamp (getLastLogin) in descending order so the most recently used device appears first.
+    // Server timestamps use a fixed, lexicographically-sortable `YYYY-MM-DD HH:mm:ss` format, so a string comparison yields the correct order.
+    return Object.values(logins ?? {})
+        ?.filter(isDeviceLogin)
+        .sort((a, b) => getLastLogin(b).localeCompare(getLastLogin(a)));
 }
 
 function hasDeviceManagementError(logins: OnyxEntry<Logins>) {
