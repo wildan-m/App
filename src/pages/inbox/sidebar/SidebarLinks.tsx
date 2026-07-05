@@ -10,6 +10,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import {setSidebarLoaded} from '@libs/actions/App';
 import Navigation from '@libs/Navigation/Navigation';
+import {getReportAction} from '@libs/ReportActionsUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import {cancelSpan} from '@libs/telemetry/activeSpans';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
@@ -82,7 +83,14 @@ function SidebarLinks({insets, optionListItems, hasReportData, priorityMode = CO
             }
             // Keep this report visible in the active To-do/Unread tab even after opening it marks it read.
             setStickyReportID(option.reportID);
-            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(option.reportID, actionTargetReportActionID));
+
+            // The inbox row deep links to a specific report action (e.g. the pay action preview) so the report opens
+            // scrolled to it. That target action ID comes from stored report attributes and can be stale while the
+            // underlying IOU preview action is still optimistic/pending or has just been reconciled to a new ID by the
+            // server. If it no longer resolves to an action present in the report, drop it and open the report itself,
+            // so the row consistently lands on the correct report instead of hitting LinkedActionNotFoundGuard.
+            const resolvedActionTargetReportActionID = actionTargetReportActionID && getReportAction(option.reportID, actionTargetReportActionID) ? actionTargetReportActionID : undefined;
+            Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(option.reportID, resolvedActionTargetReportActionID));
         },
         [shouldUseNarrowLayout, isActiveReport, setStickyReportID],
     );
