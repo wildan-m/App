@@ -42,7 +42,15 @@ function BaseSidebarScreen() {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
-    const shouldShowSkeleton = isLoadingApp && !hasEverFinishedLoading;
+    // `hasEverFinishedLoading` resets to false on a full JS reload (e.g. a staging/production deploy refresh),
+    // and `isLoadingApp` flips to true optimistically while OpenApp runs, so this full-screen skeleton would
+    // otherwise hide the sidebar even when reports are already hydrated from the persistent Onyx cache. When
+    // any report data is cached, skip the full-screen skeleton and mount SidebarLinksData, whose own overlay
+    // skeleton is correctly gated on the ordered report set (`isLoadingReportData && !hasReportData`); if the
+    // cache turns out to hold no renderable rows, that inner gate still shows the skeleton, so there is no
+    // regression for the genuinely-empty first-run case.
+    const [hasCachedReports = false] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: (reports) => Object.keys(reports ?? {}).length > 0});
+    const shouldShowSkeleton = isLoadingApp && !hasEverFinishedLoading && !hasCachedReports;
 
     return (
         <ScreenWrapper

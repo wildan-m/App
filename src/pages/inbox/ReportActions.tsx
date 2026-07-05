@@ -64,7 +64,13 @@ function ReportActions() {
     // Concierge is excluded so the body still mounts under the app-load skeleton, seeding sessionStartTime
     // before content appeared.
     const isConciergeMainDM = isConciergeChatReport(report, conciergeReportID);
-    const shouldShowAppLoadSkeleton = !!isLoadingApp && !isOffline && !!report && !shouldWaitForTransactions && !shouldDisplayMoneyRequestActionsList && !isConciergeMainDM;
+    // `isLoadingApp` is true optimistically on every app boot/reconnect, so it does not imply this report's
+    // messages are missing. When report actions are already in the persistent Onyx cache, mount the list and
+    // render them immediately rather than flashing the app-load skeleton (kept in sync with the guard's
+    // `shouldShowSkeletonForAppLoad` in ReportActionsListContext, which also consults the cache).
+    const hasCachedReportActions = reportActions.length > 0;
+    const shouldShowAppLoadSkeleton =
+        !!isLoadingApp && !isOffline && !!report && !shouldWaitForTransactions && !shouldDisplayMoneyRequestActionsList && !isConciergeMainDM && !hasCachedReportActions;
 
     useMarkOpenReportEndOnSkeleton(report, shouldShowAppLoadSkeleton);
 
