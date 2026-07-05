@@ -11,6 +11,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {setSidebarLoaded} from '@libs/actions/App';
 import Navigation from '@libs/Navigation/Navigation';
 import type {OptionData} from '@libs/ReportUtils';
+import {useIsAgentAccount} from '@libs/SessionUtils';
 import {cancelSpan} from '@libs/telemetry/activeSpans';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 
@@ -51,6 +52,7 @@ function SidebarLinks({insets, optionListItems, hasReportData, priorityMode = CO
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const {setStickyReportID} = useSidebarOrderedReportsActions();
     const [isLoadingReportData = true] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
+    const isAgentAccount = useIsAgentAccount();
 
     useEffect(() => {
         ReportActionContextMenu.hideContextMenu(false);
@@ -98,7 +100,9 @@ function SidebarLinks({insets, optionListItems, hasReportData, priorityMode = CO
     // (e.g. switching accounts/delegate sessions or re-authenticating after an Onyx clear, where openApp() repopulates reports).
     // Gating on the unfiltered set — rather than the current tab's filtered list — avoids the reconnect flash on the
     // Unread/To-do tabs, where the filtered list is legitimately empty while reports still exist.
-    const shouldShowLoadingSkeleton = isLoadingReportData && !hasReportData;
+    // Agent accounts have no LHN chat list to load (they are blocked from the inbox and redirected to Settings), so the
+    // skeleton would otherwise stay stuck forever when copiloting into one — never show it for an agent session.
+    const shouldShowLoadingSkeleton = isLoadingReportData && !hasReportData && !isAgentAccount;
 
     const sidebarSkeletonReasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'SidebarLinks',
