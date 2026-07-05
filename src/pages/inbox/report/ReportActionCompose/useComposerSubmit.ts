@@ -76,7 +76,7 @@ function useComposerSubmit(reportID: string) {
         }
 
         if (attachmentFileRef.current) {
-            kickoffWaitingIndicator();
+            kickoffWaitingIndicator(draftMessageTrimmed);
             addAttachmentWithComment({
                 report: targetReport,
                 notifyReportID: reportID,
@@ -159,7 +159,7 @@ function useComposerSubmit(reportID: string) {
                 },
             });
         }
-        kickoffWaitingIndicator();
+        kickoffWaitingIndicator(draftMessageTrimmed);
         addComment({
             report: targetReport,
             notifyReportID: reportID,

@@ -4858,6 +4858,7 @@ export {
     isReportPreviewAction,
     isReversedTransaction,
     getMentionedAccountIDsFromAction,
+    getMentionedEmailsFromMessage,
     isSentMoneyReportAction,
     isSplitBillAction,
     isTaskAction,

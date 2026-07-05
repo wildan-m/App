@@ -3,15 +3,17 @@ import useOnyx from '@hooks/useOnyx';
 import {clearConciergeThinkingKickoff, subscribeToReportReasoningEvents, unsubscribeFromReportReasoningChannel} from '@libs/actions/Report';
 import AgentZeroOptimisticStore from '@libs/AgentZeroOptimisticStore';
 import type {ReasoningEntry} from '@libs/AgentZeroReasoningStore';
-import {isDM} from '@libs/ReportUtils';
+import {getMentionedEmailsFromMessage} from '@libs/ReportActionsUtils';
+import {getParsedComment, isDM} from '@libs/ReportUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type Report from '@src/types/onyx/Report';
 
+import type {AgentParticipant} from '@selectors/AgentZeroChat';
 import type {OnyxEntry} from 'react-native-onyx';
 
-import {getCustomAgentParticipantAccountID, getReportParticipantAccountIDs} from '@selectors/AgentZeroChat';
+import {getAgentParticipants, getReportParticipantAccountIDs} from '@selectors/AgentZeroChat';
 import {getReportChatType} from '@selectors/Report';
 import {getNewestReportActionSelector} from '@selectors/ReportAction';
 import {agentZeroProcessingAgentIDsSelector} from '@selectors/ReportNameValuePairs';
@@ -29,8 +31,13 @@ type AgentZeroStatusState = {
 };
 
 type AgentZeroStatusActions = {
-    /** Optimistically show the current AgentZero persona's thinking indicator. */
-    kickoffWaitingIndicator: () => void;
+    /**
+     * Optimistically show an AgentZero persona's thinking indicator on message send. In a
+     * Concierge/admin chat or a 1:1 agent DM the whole chat is with the agent, so any message
+     * kicks it off. In a group chat only an agent explicitly `@mentioned` in `messageText` is
+     * kicked off — an unambiguous request to respond.
+     */
+    kickoffWaitingIndicator: (messageText?: string) => void;
 };
 
 type ReportMeta = {
@@ -69,16 +76,18 @@ const AgentZeroStatusActionsContext = createContext<AgentZeroStatusActions>(defa
 function AgentZeroStatusProvider({reportID, children}: React.PropsWithChildren<{reportID: string | undefined}>) {
     const [reportMeta] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {selector: reportMetaSelector});
     const {chatType, isDM: isDMReport = false, participantAccountIDs} = reportMeta ?? {};
-    const [agentParticipantAccountID] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: getCustomAgentParticipantAccountID(participantAccountIDs)});
+    const [agentParticipants = []] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: getAgentParticipants(participantAccountIDs)});
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
 
+    const customAgentParticipants = agentParticipants.filter((agent) => agent.isCustomAgent);
     const isConciergeChat = reportID === conciergeReportID;
     const isAdmin = chatType === CONST.REPORT.CHAT_TYPE.POLICY_ADMINS;
-    const isCustomAgentChat = agentParticipantAccountID !== undefined;
+    const isCustomAgentChat = customAgentParticipants.length > 0;
+    const isConciergeParticipant = agentParticipants.some((agent) => agent.accountID === CONST.ACCOUNT_ID.CONCIERGE);
     const otherParticipantCount = currentUserAccountID === undefined ? 0 : (participantAccountIDs ?? []).filter((accountID) => accountID !== currentUserAccountID).length;
-    const customAgentDMAccountID = isCustomAgentChat && isDMReport && otherParticipantCount === 1 ? agentParticipantAccountID : undefined;
-    const isAgentZeroChat = isConciergeChat || isAdmin || isCustomAgentChat;
+    const customAgentDMAccountID = isCustomAgentChat && isDMReport && otherParticipantCount === 1 ? customAgentParticipants.at(0)?.accountID : undefined;
+    const isAgentZeroChat = isConciergeChat || isAdmin || isCustomAgentChat || isConciergeParticipant;
 
     if (!reportID || !isAgentZeroChat) {
         return children;
@@ -90,6 +99,7 @@ function AgentZeroStatusProvider({reportID, children}: React.PropsWithChildren<{
             reportID={reportID}
             includeConcierge={isConciergeChat || isAdmin}
             customAgentDMAccountID={customAgentDMAccountID}
+            agentParticipants={agentParticipants}
         >
             {children}
         </AgentZeroStatusGate>
@@ -100,8 +110,9 @@ function AgentZeroStatusGate({
     reportID,
     includeConcierge,
     customAgentDMAccountID,
+    agentParticipants,
     children,
-}: React.PropsWithChildren<{reportID: string; includeConcierge: boolean; customAgentDMAccountID?: number}>) {
+}: React.PropsWithChildren<{reportID: string; includeConcierge: boolean; customAgentDMAccountID?: number; agentParticipants: AgentParticipant[]}>) {
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
     const [serverAgentIDs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {selector: agentZeroProcessingAgentIDsSelector});
 
@@ -122,14 +133,34 @@ function AgentZeroStatusGate({
 
     const optimisticAgentAccountID = includeConcierge ? CONST.ACCOUNT_ID.CONCIERGE : customAgentDMAccountID;
 
-    // The composer calls this before the server's processing-indicator NVP lands. Concierge and
-    // custom-agent DMs both use the same per-agent optimistic store; other custom-agent contexts
-    // remain server-driven so report-activity agents don't appear before Auth decides to run them.
-    const kickoffWaitingIndicator = () => {
-        if (optimisticAgentAccountID === undefined) {
+    // The composer calls this before the server's processing-indicator NVP lands.
+    //
+    // Concierge/admin chats and 1:1 agent DMs are dedicated to a single agent, so any sent
+    // message optimistically kicks off its indicator. In a group chat a message may not be for
+    // the agent at all, so we only kick off an agent the user has *explicitly @mentioned* — an
+    // unambiguous request to respond. Un-mentioned agents stay server-driven, matching the
+    // existing "don't guess in group chats" behavior.
+    const kickoffWaitingIndicator = (messageText?: string) => {
+        const baselineActionID = newestReportAction?.reportActionID ?? null;
+        if (optimisticAgentAccountID !== undefined) {
+            AgentZeroOptimisticStore.increment(reportID, optimisticAgentAccountID, baselineActionID);
             return;
         }
-        AgentZeroOptimisticStore.increment(reportID, optimisticAgentAccountID, newestReportAction?.reportActionID ?? null);
+        if (!messageText || agentParticipants.length === 0) {
+            return;
+        }
+        // Parse the message the same way the sent comment is parsed so short mentions resolve to
+        // full logins, then kick off every agent participant the user explicitly @mentioned.
+        const mentionedEmails = new Set(getMentionedEmailsFromMessage(getParsedComment(messageText, {reportID})).map((email) => email.toLowerCase()));
+        if (mentionedEmails.size === 0) {
+            return;
+        }
+        for (const agent of agentParticipants) {
+            if (!agent.login || !mentionedEmails.has(agent.login.toLowerCase())) {
+                continue;
+            }
+            AgentZeroOptimisticStore.increment(reportID, agent.accountID, baselineActionID);
+        }
     };
     const [shouldKickoff] = useOnyx(ONYXKEYS.CONCIERGE_THINKING_KICKOFF);
     useEffect(() => {
@@ -145,6 +176,12 @@ function AgentZeroStatusGate({
         candidateIDs.add(CONST.ACCOUNT_ID.CONCIERGE);
     } else if (customAgentDMAccountID !== undefined) {
         candidateIDs.add(customAgentDMAccountID);
+    }
+    // Group-chat agent participants are candidates too so an explicit-mention optimistic kickoff
+    // can render immediately. Candidacy alone shows nothing — each bubble still gates on its own
+    // `isProcessing` (optimistic kickoff or server label), so un-mentioned messages surface no bubble.
+    for (const agent of agentParticipants) {
+        candidateIDs.add(agent.accountID);
     }
     if (currentUserAccountID !== undefined) {
         candidateIDs.delete(currentUserAccountID);
