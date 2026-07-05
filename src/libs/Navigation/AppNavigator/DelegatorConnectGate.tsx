@@ -42,7 +42,11 @@ function DelegatorConnectGate({children, delegatorEmail}: DelegatorConnectGatePr
             activePolicyID,
             isFromOldDot: true,
         })?.then((success) => {
-            App.setAppLoading(!!success);
+            // Once connect() settles, the delegate's openApp() has already run, so the app is no longer loading.
+            // Clear IS_LOADING_APP so loading-gated UI (LHN skeleton, Home "Begin" section) is unblocked.
+            // Passing `!!success` left IS_LOADING_APP stuck true after a successful copilot switch, and since only
+            // openApp() (never reconnectApp()) resets it, the Home page kept showing a skeleton for the copilot.
+            App.setAppLoading(false);
             return success;
         }) ?? Promise.resolve(undefined);
 
