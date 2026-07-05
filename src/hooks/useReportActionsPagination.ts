@@ -1,6 +1,6 @@
 import {getReportPreviewAction} from '@libs/actions/IOU/MoneyRequestBuilder';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
-import {getCombinedReportActions, getFilteredReportActionsForReportView, isCreatedAction} from '@libs/ReportActionsUtils';
+import {getCombinedReportActions, getFilteredReportActionsForReportView, getOneTransactionThreadReportID, getSortedReportActionsForDisplay, isCreatedAction} from '@libs/ReportActionsUtils';
 import {isConciergeChatReport, isInvoiceReport, isMoneyRequestReport, isReportTransactionThread as isReportTransactionThreadUtil} from '@libs/ReportUtils';
 
 import getReportActionsToDisplay from '@pages/inbox/report/getReportActionsToDisplay';
@@ -61,6 +61,25 @@ function useReportActionsPagination(reportID: string | undefined, reportActionID
 
     const isReportTransactionThread = isReportTransactionThreadUtil(report);
 
+    // When viewing a one-transaction thread directly via link, getOneTransactionThreadReportID
+    // rejects the CHAT-type thread report so the normal merge path is skipped. Detect this case
+    // by checking from the parent IOU report's perspective whether this thread is the sole
+    // transaction thread, then reverse the merge direction so parent system messages (Submitted,
+    // etc.) appear in the combined view.
+    const parentReportIDForCombine = isReportTransactionThread ? report?.parentReportID : undefined;
+    const [parentReportForCombine] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportIDForCombine}`);
+    const [parentChatReportForCombine] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportForCombine?.chatReportID}`);
+    const [parentReportActionsRaw] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportIDForCombine}`);
+
+    const parentReportActionsForCombine = useMemo(() => getSortedReportActionsForDisplay(parentReportActionsRaw, true, true), [parentReportActionsRaw]);
+
+    const isOneTransactionFromParentView = useMemo(() => {
+        if (!isReportTransactionThread || !parentReportForCombine || !parentReportActionsForCombine?.length) {
+            return false;
+        }
+        return getOneTransactionThreadReportID(parentReportForCombine, parentChatReportForCombine, parentReportActionsForCombine, isOffline) === reportID;
+    }, [isReportTransactionThread, parentReportForCombine, parentChatReportForCombine, parentReportActionsForCombine, isOffline, reportID]);
+
     const lastAction = allReportActions?.at(-1);
     const shouldAddCreatedAction = !isCreatedAction(lastAction) && (isMoneyRequestReport(report) || isInvoiceReport(report) || isReportTransactionThread || isConciergeChat);
 
@@ -77,10 +96,15 @@ function useReportActionsPagination(reportID: string | undefined, reportActionID
         [allReportActions, lastAction, report, reportPreviewAction, shouldAddCreatedAction, thread.transactionThreadReport],
     );
 
-    const reportActions = useMemo(
-        () => (reportActionsToDisplay ? getCombinedReportActions(reportActionsToDisplay, thread.transactionThreadReportID ?? null, thread.transactionThreadReportActions ?? []) : []),
-        [reportActionsToDisplay, thread.transactionThreadReportActions, thread.transactionThreadReportID],
-    );
+    const reportActions = useMemo(() => {
+        if (!reportActionsToDisplay) {
+            return [];
+        }
+        if (isOneTransactionFromParentView && parentReportActionsForCombine?.length) {
+            return getCombinedReportActions(parentReportActionsForCombine, reportID ?? null, reportActionsToDisplay);
+        }
+        return getCombinedReportActions(reportActionsToDisplay, thread.transactionThreadReportID ?? null, thread.transactionThreadReportActions ?? []);
+    }, [reportActionsToDisplay, thread.transactionThreadReportActions, thread.transactionThreadReportID, isOneTransactionFromParentView, parentReportActionsForCombine, reportID]);
 
     const allReportActionIDs = useMemo(() => allReportActions.map((action) => action.reportActionID), [allReportActions]);
 
@@ -94,7 +118,9 @@ function useReportActionsPagination(reportID: string | undefined, reportActionID
         oldestUnreadReportAction,
         transactionThreadReportID: thread.transactionThreadReportID,
         transactionThreadReport: thread.transactionThreadReport,
-        parentReportActionForTransactionThread: thread.parentReportActionForTransactionThread,
+        parentReportActionForTransactionThread: isOneTransactionFromParentView
+            ? parentReportActionsForCombine?.find((action) => action.reportActionID === report?.parentReportActionID)
+            : thread.parentReportActionForTransactionThread,
         treatAsNoPaginationAnchor,
         setTreatAsNoPaginationAnchor,
         reportPreviewAction,
