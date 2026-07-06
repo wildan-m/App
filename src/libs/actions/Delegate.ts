@@ -228,6 +228,9 @@ function connect({email, delegatedAccess, credentials, session, activePolicyID, 
                     return openApp()
                         .then(() => requestPusherReinitialize({accountID: response.accountID, email: response.email}))
                         .then(() => {
+                            // The cleared account key is repopulated by openApp, but multifactorAuthenticationPublicKeyIDs
+                            // is only fetched by OpenSecuritySettingsPage, so re-fetch it to keep biometrics status accurate after the switch.
+                            openSecuritySettingsPage();
                             if (!CONFIG.IS_HYBRID_APP || !policyID) {
                                 return true;
                             }
@@ -335,6 +338,9 @@ function disconnect({stashedCredentials, stashedSession}: DisconnectParams) {
                     openApp()
                         .then(() => requestPusherReinitialize({accountID: response.requesterID, email: requesterEmail}))
                         .then(() => {
+                            // The cleared account key is repopulated by openApp, but multifactorAuthenticationPublicKeyIDs
+                            // is only fetched by OpenSecuritySettingsPage, so re-fetch it to keep biometrics status accurate after the switch.
+                            openSecuritySettingsPage();
                             if (!CONFIG.IS_HYBRID_APP) {
                                 return;
                             }
