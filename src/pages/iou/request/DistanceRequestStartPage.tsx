@@ -112,7 +112,6 @@ function DistanceRequestStartPage({
             accessVariants={[CONST.IOU.ACCESS_VARIANTS.CREATE]}
         >
             <ScreenWrapper
-                shouldEnableKeyboardAvoidingView={selectedTab === CONST.TAB_REQUEST.DISTANCE_ODOMETER}
                 shouldEnableMinHeight={canUseTouchScreen()}
                 testID="DistanceRequestStartPage"
                 focusTrapSettings={{containerElements: focusTrapContainerElements}}
