@@ -7,7 +7,7 @@ import {useOpenSearchReportSubmitToPopover} from '@components/ReportSubmitToPopo
 import {useSearchQueryContext, useSearchResultsContext, useSearchSelectionActions, useSearchSelectionContext} from '@components/Search/SearchContext';
 import type {BulkPaySelectionData, PaymentData, SearchColumnType, SearchFilterKey, SearchQueryJSON, SelectedReports, SelectedTransactions} from '@components/Search/types';
 
-import {exportReportsToPDF} from '@libs/actions/Export';
+import {exportReceiptsAsZip, exportReportsToPDF} from '@libs/actions/Export';
 import {unholdRequest} from '@libs/actions/IOU/Hold';
 import {payInvoice, payMoneyRequest} from '@libs/actions/IOU/PayMoneyRequest';
 import {approveMoneyRequest} from '@libs/actions/IOU/ReportWorkflow';
@@ -1917,6 +1917,26 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                         return;
                     }
                     const exportID = exportReportsToPDF(selectedReportIDs);
+                    trackExport(exportID);
+                },
+            });
+        }
+
+        const isExpenseSearch = queryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE;
+        const shouldShowDownloadReceipts = (isExpenseReportSearch && selectedReportIDs.length > 0) || (isExpenseSearch && selectedTransactionsKeys.length > 0);
+
+        if (shouldShowDownloadReceipts) {
+            options.push({
+                icon: expensifyIcons.Download,
+                text: translate('common.downloadReceipts'),
+                value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_RECEIPTS,
+                shouldCloseModalOnSelect: true,
+                onSelected: () => {
+                    if (isOffline) {
+                        setIsOfflineModalVisible(true);
+                        return;
+                    }
+                    const exportID = isExpenseReportSearch ? exportReceiptsAsZip({reportIDs: selectedReportIDs}) : exportReceiptsAsZip({transactionIDs: selectedTransactionsKeys});
                     trackExport(exportID);
                 },
             });

@@ -103,4 +103,41 @@ function exportReportsToPDF(reportIDs: string[]): string {
     return exportID;
 }
 
-export {sendExportFileFromConcierge, clearExportDownload, clearStaleExportDownloads, exportReportsToPDF};
+/**
+ * Kicks off a receipts zip export for the given selection and returns an exportID to track it.
+ * Pass reportIDs on the Reports page or transactionIDs on the Expenses page.
+ */
+function exportReceiptsAsZip({reportIDs, transactionIDs}: {reportIDs?: string[]; transactionIDs?: string[]}): string {
+    const exportID = rand64();
+    const onyxKey = `${ONYXKEYS.COLLECTION.EXPORT_DOWNLOAD}${exportID}` as const;
+
+    const optimisticData: AnyOnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: onyxKey,
+            value: {state: CONST.EXPORT_DOWNLOAD.STATE.PREPARING, exportType: CONST.EXPORT_DOWNLOAD.TYPE.RECEIPTS},
+        },
+    ];
+
+    const failureData: AnyOnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: onyxKey,
+            value: {state: CONST.EXPORT_DOWNLOAD.STATE.FAILED, exportType: CONST.EXPORT_DOWNLOAD.TYPE.RECEIPTS},
+        },
+    ];
+
+    write(
+        WRITE_COMMANDS.EXPORT_RECEIPTS_TO_ZIP,
+        {
+            ...(reportIDs ? {reportIDs: JSON.stringify(reportIDs)} : {}),
+            ...(transactionIDs ? {transactionIDs: JSON.stringify(transactionIDs)} : {}),
+            exportID,
+        },
+        {optimisticData, failureData},
+    );
+
+    return exportID;
+}
+
+export {sendExportFileFromConcierge, clearExportDownload, clearStaleExportDownloads, exportReportsToPDF, exportReceiptsAsZip};

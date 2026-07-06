@@ -484,6 +484,7 @@ const CONST = {
         TYPE: {
             CSV: 'csv',
             PDF: 'pdf',
+            RECEIPTS: 'receipts',
         },
     },
 
@@ -6471,6 +6472,7 @@ const CONST = {
             EDIT: 'edit',
             EXPORT: 'export',
             DOWNLOAD_PDF: 'downloadPDF',
+            DOWNLOAD_RECEIPTS: 'downloadReceipts',
             APPROVE: 'approve',
             CHANGE_APPROVER: 'changeApprover',
             PAY: 'pay',
