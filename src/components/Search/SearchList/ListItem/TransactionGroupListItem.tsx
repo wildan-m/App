@@ -187,7 +187,13 @@ function TransactionGroupListItem<TItem extends ListItem>({
 
     // Currently only the transaction report groups have transactions where the empty view makes sense
     const shouldDisplayEmptyView = isEmpty && isExpenseReportType;
-    const isDisabledOrEmpty = isEmpty || isDisabled;
+
+    // A lazy (non-expense-report) group is not truly empty just because its transactions have not been
+    // loaded yet: it still has a pending transactionsQueryJSON, or an already-loaded snapshot. Mirror the
+    // web GroupHeader so the header checkbox stays enabled and tapping it selects the group.
+    const hasSnapshotTransactions =
+        !isExpenseReportType && !!transactionsSnapshot?.data && Object.keys(transactionsSnapshot.data).some((key) => key.startsWith(ONYXKEYS.COLLECTION.TRANSACTION));
+    const isDisabledOrEmpty = (isEmpty && !hasSnapshotTransactions && !groupItem.transactionsQueryJSON) || isDisabled;
 
     const refreshTransactions = () => {
         if (!groupItem.transactionsQueryJSON) {
