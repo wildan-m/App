@@ -75,7 +75,10 @@ freeTextFilter = _ (identifier / ",") _ { autocomplete = null; }
 
 autocompleteKey "key"
   = @(
-      in
+      submitterUserID
+      / submitterPayrollID
+      / orderDealNumbers
+      / in
       / currency
       / groupCurrency
       / total

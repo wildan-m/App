@@ -48,7 +48,10 @@ function SearchAdvancedFiltersContent({filterKey, values, policyIDQuery, ready, 
         filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID ||
         filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD ||
         filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE ||
-        filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID
+        filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID ||
+        filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_USER_ID ||
+        filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_PAYROLL_ID ||
+        filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.ORDER_DEAL_NUMBERS
     ) {
         return (
             <TextFilter

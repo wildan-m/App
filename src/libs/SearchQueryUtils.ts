@@ -907,7 +907,14 @@ function buildQueryStringFromFilterFormValues(filterValues: Partial<SearchAdvanc
                     return `${prefix}${CONST.SEARCH.SYNTAX_FILTER_KEYS[keyInCorrectForm]}:${sanitizeSearchValue(filterValue as string)}`;
                 }
             }
-            if ((filterKey === FILTER_KEYS.REPORT_ID || filterKey === FILTER_KEYS.WITHDRAWAL_ID) && filterValue) {
+            if (
+                (filterKey === FILTER_KEYS.REPORT_ID ||
+                    filterKey === FILTER_KEYS.WITHDRAWAL_ID ||
+                    filterKey === FILTER_KEYS.SUBMITTER_USER_ID ||
+                    filterKey === FILTER_KEYS.SUBMITTER_PAYROLL_ID ||
+                    filterKey === FILTER_KEYS.ORDER_DEAL_NUMBERS) &&
+                filterValue
+            ) {
                 const reportIDs = (filterValue as string)
                     .split(',')
                     .map((id) => sanitizeSearchValue(id.trim()))
@@ -1137,7 +1144,13 @@ function buildFilterFormValuesFromQuery(
         const isNegated = filterList.some((item) => item.operator === CONST.SEARCH.SYNTAX_OPERATORS.NOT_EQUAL_TO);
         const key = isNegated ? (`${filterKey}${CONST.SEARCH.NOT_MODIFIER}` as const) : filterKey;
 
-        if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID || filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID) {
+        if (
+            filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID ||
+            filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID ||
+            filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_USER_ID ||
+            filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_PAYROLL_ID ||
+            filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.ORDER_DEAL_NUMBERS
+        ) {
             filtersForm[key as typeof filterKey] = filterValues.join(',');
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT || filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION || filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE) {

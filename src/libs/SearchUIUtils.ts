@@ -5219,6 +5219,18 @@ const FILTER_VIEW_MAP = {
         labelKey: 'common.withdrawalID',
         icon: 'Fingerprint',
     },
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_USER_ID]: {
+        labelKey: 'workspace.common.customField1',
+        icon: 'Fingerprint',
+    },
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_PAYROLL_ID]: {
+        labelKey: 'workspace.common.customField2',
+        icon: 'Fingerprint',
+    },
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.ORDER_DEAL_NUMBERS]: {
+        labelKey: 'common.internationalReimbursementIDs',
+        icon: 'Fingerprint',
+    },
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE]: {
         labelKey: 'search.withdrawalType',
         icon: 'Cash',

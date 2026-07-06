@@ -19,7 +19,10 @@ type TextInputFilterContentProps = {
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID;
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_USER_ID
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTER_PAYROLL_ID
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ORDER_DEAL_NUMBERS;
     value: string | undefined;
     largeButton?: boolean;
     autoFocus?: boolean;

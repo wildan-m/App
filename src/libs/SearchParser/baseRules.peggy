@@ -58,6 +58,15 @@ withdrawalStatus
 withdrawalID
   = "withdrawalID"i
   / "withdrawal-id"i { return "withdrawalID"; }
+submitterUserID
+  = "submitterUserID"i
+  / "submitter-user-id"i { return "submitterUserID"; }
+submitterPayrollID
+  = "submitterPayrollID"i
+  / "submitter-payroll-id"i { return "submitterPayrollID"; }
+orderDealNumbers
+  = "orderDealNumbers"i
+  / "international-reimbursement-ids"i { return "orderDealNumbers"; }
 billable = "billable"i { return "billable"; }
 reimbursable = "reimbursable"i { return "reimbursable"; }
 type = "type"i { return "type"; }

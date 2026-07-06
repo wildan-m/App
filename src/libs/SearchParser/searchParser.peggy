@@ -267,6 +267,9 @@ key "key"
       / merchant
       / description
       / reportID
+      / submitterUserID
+      / submitterPayrollID
+      / orderDealNumbers
       / keyword
       / in
       / currency
