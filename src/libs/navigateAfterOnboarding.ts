@@ -13,6 +13,7 @@ import Onyx from 'react-native-onyx';
 import {setDisableDismissOnEscape} from './actions/Modal';
 import SidePanelActions from './actions/SidePanel';
 import {setOnboardingRHPVariant} from './actions/Welcome';
+import {didArriveFromConciergeDeepLink, setArrivedFromConciergeDeepLink} from './ConciergeDeepLink';
 import shouldOpenOnAdminRoom from './Navigation/helpers/shouldOpenOnAdminRoom';
 import Navigation from './Navigation/Navigation';
 import {findLastAccessedReport, isConciergeChatReport, isSelfDM} from './ReportUtils';
@@ -97,8 +98,16 @@ function navigateAfterOnboarding(
         onboardingAdminsChatReportID,
         shouldPreventOpenAdminRoom,
     );
+    // Consume the Concierge deep-link intent once, clearing it unconditionally so it can never leak into a later navigation.
+    const shouldNavigateToConciergeFromDeepLink = didArriveFromConciergeDeepLink();
+    setArrivedFromConciergeDeepLink(false);
+
     if (reportID) {
         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
+    } else if (shouldNavigateToConciergeFromDeepLink && conciergeReportID) {
+        // Honor a Concierge deep link captured before a fresh sign-up: openReportFromDeepLink drops it during onboarding,
+        // and the plain HOME fallback below would otherwise strand the user on the homepage.
+        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeReportID));
     } else {
         // Navigate to home to trigger guard evaluation
         Navigation.navigate(ROUTES.HOME);

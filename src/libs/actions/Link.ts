@@ -2,6 +2,7 @@ import * as API from '@libs/API';
 import type {GenerateSpotnanaTokenParams} from '@libs/API/parameters';
 import {SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
 import asyncOpenURL from '@libs/asyncOpenURL';
+import {setArrivedFromConciergeDeepLink} from '@libs/ConciergeDeepLink';
 import * as Environment from '@libs/Environment/Environment';
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
 import isPublicScreenRoute from '@libs/isPublicScreenRoute';
@@ -279,6 +280,11 @@ function openReportFromDeepLink(
     if (normalizePath(route) === `/${SCREENS.HOME}`) {
         route = '';
     }
+
+    // Remember when an unauthenticated user arrives via the Concierge deep link so navigateAfterOnboarding can honor it
+    // after a fresh sign-up (the deep link itself is dropped during onboarding, see #91437). Set on every deep link so
+    // it resets for non-Concierge routes.
+    setArrivedFromConciergeDeepLink(!isAuthenticated && route === ROUTES.CONCIERGE);
 
     // If we are not authenticated and are navigating to a public screen, we don't want to navigate again to the screen after sign-in/sign-up
     if (!isAuthenticated && isPublicScreenRoute(route)) {
