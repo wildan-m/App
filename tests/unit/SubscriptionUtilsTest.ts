@@ -127,6 +127,17 @@ describe('SubscriptionUtils', () => {
     });
 
     describe('calculateRemainingFreeTrialDays', () => {
+        // Freeze the clock so the fixtures and the function under test read the same instant
+        // (see the note in the isUserOnFreeTrial suite) and the boundary math is deterministic.
+        beforeAll(() => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-01-15T12:30:30.500Z'));
+        });
+
+        afterAll(() => {
+            jest.useRealTimers();
+        });
+
         afterEach(async () => {
             await Onyx.clear();
             await Onyx.multiSet({
@@ -157,6 +168,20 @@ describe('SubscriptionUtils', () => {
     });
 
     describe('isUserOnFreeTrial', () => {
+        // Freeze the clock so the fixtures and the function under test read the same instant.
+        // The fixtures capture `new Date()` truncated to whole seconds (FNS_DATE_TIME_FORMAT_STRING),
+        // while isUserOnFreeTrial re-reads `new Date()`; freezing to a mid-second instant keeps the
+        // re-read strictly after the truncated fixture, so the "same start date" case stays truthy
+        // deterministically instead of depending on real-clock drift between the two reads.
+        beforeAll(() => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-01-15T12:30:30.500Z'));
+        });
+
+        afterAll(() => {
+            jest.useRealTimers();
+        });
+
         afterEach(async () => {
             await Onyx.clear();
             await Onyx.multiSet({
@@ -224,6 +249,17 @@ describe('SubscriptionUtils', () => {
     });
 
     describe('hasUserFreeTrialEnded', () => {
+        // Freeze the clock so the fixtures and the function under test read the same instant
+        // (see the note in the isUserOnFreeTrial suite) and the boundary comparison is deterministic.
+        beforeAll(() => {
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2025-01-15T12:30:30.500Z'));
+        });
+
+        afterAll(() => {
+            jest.useRealTimers();
+        });
+
         afterEach(async () => {
             await Onyx.clear();
             await Onyx.multiSet({
