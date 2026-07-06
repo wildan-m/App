@@ -4,13 +4,16 @@ import useIsScrollLikelyLayoutTriggered from '@hooks/useIsScrollLikelyLayoutTrig
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
+import useReportTransactions from '@hooks/useReportTransactions';
 
 import {setIsComposerFullSize} from '@libs/actions/Report';
 import FS from '@libs/Fullstory';
 import {
+    canAddTransaction as canAddTransactionReportUtils,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     chatIncludesChronos,
     chatIncludesConcierge,
+    isExpenseReport as isExpenseReportReportUtils,
     isMoneyRequestReport,
     isReportTransactionThread,
 } from '@libs/ReportUtils';
@@ -67,18 +70,21 @@ function ComposerInput() {
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const isReportArchived = useReportIsArchived(report?.reportID);
+    const reportTransactions = useReportTransactions(reportID);
 
     const includesConcierge = chatIncludesConcierge({participants: report?.participants});
     const isGroupPolicyReport = !!report?.policyID && report.policyID !== CONST.POLICY.ID_FAKE;
     const isExpenseRelatedReport = isReportTransactionThread(report) || isMoneyRequestReport(report);
     const isEnglishLocale = (preferredLocale ?? CONST.LOCALES.DEFAULT) === CONST.LOCALES.EN;
     const canUserPerformWriteAction = !!canUserPerformWriteActionReportUtils(report, isReportArchived);
+    // An empty expense report the member can add to — the primary action here is "Add an expense".
+    const isEmptyExpenseReport = isExpenseReportReportUtils(report) && canAddTransactionReportUtils(report, isReportArchived) && reportTransactions.length === 0;
 
     let inputPlaceholder = translate('reportActionCompose.writeSomething');
     if (includesConcierge && userBlockedFromConcierge) {
         inputPlaceholder = translate('reportActionCompose.blockedFromConcierge');
     } else if (isExpenseRelatedReport && canUserPerformWriteAction && isEnglishLocale) {
-        inputPlaceholder = getRandomPlaceholder(translate);
+        inputPlaceholder = isEmptyExpenseReport ? translate('reportActionCompose.askConciergeToAddExpense') : getRandomPlaceholder(translate);
     }
     const fsClass = report ? FS.getChatFSClass(report) : undefined;
 

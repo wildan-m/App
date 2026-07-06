@@ -753,6 +753,7 @@ const translations: TranslationDeepObject<typeof en> = {
         blockedFromConcierge: 'Comunicación no permitida',
         askConciergeToUpdate: 'Prueba "Actualizar un gasto"...',
         askConciergeToCorrect: 'Prueba "Corregir un gasto"...',
+        askConciergeToAddExpense: 'Prueba "Añadir un gasto"...',
         askConciergeForHelp: 'Pide ayuda a Concierge AI...',
         fileUploadFailed: 'Subida fallida. El archivo no es compatible.',
         localTime: (user, time) => `Son las ${time} para ${user}`,

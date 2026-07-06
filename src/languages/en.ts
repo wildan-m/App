@@ -847,6 +847,7 @@ const translations = {
         blockedFromConcierge: 'Communication is barred',
         askConciergeToUpdate: 'Try "Update an expense"...',
         askConciergeToCorrect: 'Try "Correct an expense"...',
+        askConciergeToAddExpense: 'Try "Add an expense"...',
         askConciergeForHelp: 'Ask Concierge AI for help...',
         fileUploadFailed: 'Upload failed. File is not supported.',
         localTime: (user: string, time: string) => `It's ${time} for ${user}`,
