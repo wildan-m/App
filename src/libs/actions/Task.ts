@@ -1202,6 +1202,7 @@ function deleteTask(
     conciergeReportID: string | undefined,
     delegateEmail: string | undefined,
     ancestors: ReportUtils.Ancestor[] = [],
+    shouldNavigateBack = true,
 ) {
     if (!report) {
         return;
@@ -1328,7 +1329,12 @@ function deleteTask(
 
     const urlToNavigateBack = getNavigationUrlOnTaskDelete(report, conciergeReportID);
     if (urlToNavigateBack) {
-        Navigation.goBack();
+        // The caller may have already navigated back (e.g. the report details page dismisses the whole
+        // RHP when the task was opened from the Search results). In that case an extra goBack() would
+        // overshoot the previous screen, so callers can opt out of the built-in navigation.
+        if (shouldNavigateBack) {
+            Navigation.goBack();
+        }
         return urlToNavigateBack;
     }
 }

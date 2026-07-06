@@ -929,81 +929,85 @@ function DynamicReportDetailsPage({policy, report, route, reportMetadata, report
         </OfflineWithFeedback>
     );
 
-    const deleteTransaction = useCallback(() => {
-        if (caseID === CASES.DEFAULT) {
-            deleteTask(
-                report,
-                parentReport,
-                isReportArchived,
-                currentUserPersonalDetails.accountID,
-                hasOutstandingChildTask,
-                parentReportAction,
-                conciergeReportID,
-                delegateEmail,
-                ancestors,
-            );
-            return;
-        }
-
-        if (!requestParentReportAction) {
-            return;
-        }
-
-        const isTrackExpense = isTrackExpenseAction(requestParentReportAction);
-        const {isExpenseSplit: isSelfDMExpenseSplit} = getOriginalTransactionWithSplitInfo(iouTransaction, iouOriginalTransaction);
-
-        if (isTrackExpense && !isSelfDMExpenseSplit) {
-            deleteTrackExpense({
-                chatReportID: moneyRequestReport?.reportID,
-                chatReport: moneyRequestReport,
-                transactionID: iouTransactionID,
-                reportAction: requestParentReportAction,
-                iouReport,
-                chatIOUReport,
-                transactions: duplicateTransactions,
-                violations: duplicateTransactionViolations,
-                isSingleTransactionView,
-                isChatReportArchived: isMoneyRequestReportArchived,
-                isChatIOUReportArchived,
-                allTransactionViolationsParam: allTransactionViolations,
-                currentUserAccountID: currentUserPersonalDetails.accountID,
-                currentUserEmail: currentUserPersonalDetails.email ?? '',
-            });
-        } else if (iouTransactionID) {
-            const deleteResult = deleteTransactions([iouTransactionID], duplicateTransactions, duplicateTransactionViolations, undefined, isSingleTransactionView);
-            if (deleteResult.action === 'redirected') {
+    const deleteTransaction = useCallback(
+        (shouldTaskNavigateBack = true) => {
+            if (caseID === CASES.DEFAULT) {
+                deleteTask(
+                    report,
+                    parentReport,
+                    isReportArchived,
+                    currentUserPersonalDetails.accountID,
+                    hasOutstandingChildTask,
+                    parentReportAction,
+                    conciergeReportID,
+                    delegateEmail,
+                    ancestors,
+                    shouldTaskNavigateBack,
+                );
                 return;
             }
-            removeTransaction(iouTransactionID);
-        }
-    }, [
-        caseID,
-        requestParentReportAction,
-        iouTransaction,
-        iouOriginalTransaction,
-        iouTransactionID,
-        report,
-        parentReport,
-        isReportArchived,
-        currentUserPersonalDetails.accountID,
-        currentUserPersonalDetails.email,
-        hasOutstandingChildTask,
-        parentReportAction,
-        conciergeReportID,
-        delegateEmail,
-        ancestors,
-        moneyRequestReport,
-        iouReport,
-        chatIOUReport,
-        duplicateTransactions,
-        duplicateTransactionViolations,
-        isSingleTransactionView,
-        isMoneyRequestReportArchived,
-        isChatIOUReportArchived,
-        allTransactionViolations,
-        deleteTransactions,
-        removeTransaction,
-    ]);
+
+            if (!requestParentReportAction) {
+                return;
+            }
+
+            const isTrackExpense = isTrackExpenseAction(requestParentReportAction);
+            const {isExpenseSplit: isSelfDMExpenseSplit} = getOriginalTransactionWithSplitInfo(iouTransaction, iouOriginalTransaction);
+
+            if (isTrackExpense && !isSelfDMExpenseSplit) {
+                deleteTrackExpense({
+                    chatReportID: moneyRequestReport?.reportID,
+                    chatReport: moneyRequestReport,
+                    transactionID: iouTransactionID,
+                    reportAction: requestParentReportAction,
+                    iouReport,
+                    chatIOUReport,
+                    transactions: duplicateTransactions,
+                    violations: duplicateTransactionViolations,
+                    isSingleTransactionView,
+                    isChatReportArchived: isMoneyRequestReportArchived,
+                    isChatIOUReportArchived,
+                    allTransactionViolationsParam: allTransactionViolations,
+                    currentUserAccountID: currentUserPersonalDetails.accountID,
+                    currentUserEmail: currentUserPersonalDetails.email ?? '',
+                });
+            } else if (iouTransactionID) {
+                const deleteResult = deleteTransactions([iouTransactionID], duplicateTransactions, duplicateTransactionViolations, undefined, isSingleTransactionView);
+                if (deleteResult.action === 'redirected') {
+                    return;
+                }
+                removeTransaction(iouTransactionID);
+            }
+        },
+        [
+            caseID,
+            requestParentReportAction,
+            iouTransaction,
+            iouOriginalTransaction,
+            iouTransactionID,
+            report,
+            parentReport,
+            isReportArchived,
+            currentUserPersonalDetails.accountID,
+            currentUserPersonalDetails.email,
+            hasOutstandingChildTask,
+            parentReportAction,
+            conciergeReportID,
+            delegateEmail,
+            ancestors,
+            moneyRequestReport,
+            iouReport,
+            chatIOUReport,
+            duplicateTransactions,
+            duplicateTransactionViolations,
+            isSingleTransactionView,
+            isMoneyRequestReportArchived,
+            isChatIOUReportArchived,
+            allTransactionViolations,
+            deleteTransactions,
+            removeTransaction,
+        ],
+    );
 
     // Where to navigate back to after deleting the transaction and its report.
     const navigateToTargetUrl = useCallback(() => {
@@ -1084,6 +1088,21 @@ function DynamicReportDetailsPage({policy, report, route, reportMetadata, report
         requestParentReportActionChildReport,
     ]);
 
+    // A task opened from the Search results is displayed inside the RHP, stacked on the SEARCH_REPORT route.
+    // When it is deleted, navigateToTargetUrl() dismisses the whole RHP back to the search list, so deleteTask()
+    // must not additionally goBack() — that extra pop would overshoot the list and land the user on the Inbox.
+    const isTaskOpenedFromSearchRHP = useCallback(() => {
+        if (caseID !== CASES.DEFAULT) {
+            return false;
+        }
+        const rhpRoutes = navigationRef.getRootState().routes.at(-1)?.state?.routes ?? [];
+        const previousRoute = rhpRoutes.at(-2);
+        return (
+            previousRoute?.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT &&
+            (previousRoute.params as RightModalNavigatorParamList[typeof SCREENS.RIGHT_MODAL.SEARCH_REPORT])?.reportID === route.params.reportID
+        );
+    }, [caseID, route.params.reportID]);
+
     const showDeleteModal = useCallback(async () => {
         const {action} = await showConfirmModal({
             title: caseID === CASES.DEFAULT ? translate('task.deleteTask') : translate('iou.deleteExpense', {count: 1}),
@@ -1103,12 +1122,14 @@ function DynamicReportDetailsPage({policy, report, route, reportMetadata, report
                 return;
             }
 
+            // Capture this before navigateToTargetUrl() runs, since dismissing the RHP mutates the navigation state.
+            const shouldTaskNavigateBack = !isTaskOpenedFromSearchRHP();
             navigateToTargetUrl();
             // Delay deletion until the RHP close animation finishes to prevent a brief
             // "Not Found" flash inside the animating-out panel on slower devices.
-            TransitionTracker.runAfterTransitions({callback: deleteTransaction, waitForUpcomingTransition: true});
+            TransitionTracker.runAfterTransitions({callback: () => deleteTransaction(shouldTaskNavigateBack), waitForUpcomingTransition: true});
         });
-    }, [showConfirmModal, translate, caseID, iouTransactionID, shouldOpenSplitExpenseEditFlowOnDelete, navigateToTargetUrl, deleteTransaction]);
+    }, [showConfirmModal, translate, caseID, iouTransactionID, shouldOpenSplitExpenseEditFlowOnDelete, navigateToTargetUrl, deleteTransaction, isTaskOpenedFromSearchRHP]);
 
     const mentionReportContextValue = useMemo(() => ({currentReportID: report.reportID, exactlyMatch: true}), [report.reportID]);
 
@@ -1192,7 +1213,7 @@ function DynamicReportDetailsPage({policy, report, route, reportMetadata, report
                             key={CONST.REPORT_DETAILS_MENU_ITEM.DELETE}
                             icon={shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan}
                             title={deleteMenuItemTitle}
-                            onPress={shouldShowEditSplitOnDeleteAction ? deleteTransaction : showDeleteModal}
+                            onPress={shouldShowEditSplitOnDeleteAction ? () => deleteTransaction() : showDeleteModal}
                         />
                     )}
                 </ScrollView>
