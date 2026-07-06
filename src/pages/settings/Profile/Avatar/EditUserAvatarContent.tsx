@@ -17,7 +17,7 @@ import {USER_AVATARS} from '@libs/Avatars/UserAvatarCatalog';
 import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types';
 import Navigation from '@libs/Navigation/Navigation';
 
-import {updateAvatar} from '@userActions/PersonalDetails';
+import {deleteAvatar, updateAvatar} from '@userActions/PersonalDetails';
 
 import type {TranslationPaths} from '@src/languages/types';
 
@@ -36,6 +36,7 @@ function EditUserAvatarContent() {
     const [isAvatarCropModalOpen, setIsAvatarCropModalOpen] = useState(false);
 
     const [selected, setSelected] = useState<string | undefined>();
+    const [isRemoved, setIsRemoved] = useState(false);
     const avatarCaptureRef = useRef<AvatarCaptureHandle>(null);
 
     const styles = useThemeStyles();
@@ -44,7 +45,7 @@ function EditUserAvatarContent() {
     const [cropImageData, setCropImageData] = useState<ImageData>({...EMPTY_FILE});
     const [imageData, setImageData] = useState<ImageData>({...EMPTY_FILE});
 
-    const isDirty = imageData.uri !== '' || !!selected;
+    const isDirty = imageData.uri !== '' || !!selected || isRemoved;
 
     const {notifySaving} = useDiscardChangesConfirmation({
         getHasUnsavedChanges: () => isDirty,
@@ -61,6 +62,7 @@ function EditUserAvatarContent() {
 
     const onImageSelected = (file: File | CustomRNImageManipulatorResult) => {
         setSelected(undefined);
+        setIsRemoved(false);
         setImageData({
             uri: file?.uri ?? '',
             name: file?.name,
@@ -70,8 +72,23 @@ function EditUserAvatarContent() {
         setIsAvatarCropModalOpen(false);
     };
 
+    // Removing the photo is a pending change committed only when the user taps Save, mirroring how uploads and preset
+    // avatars work. This keeps Save enabled and shows the default avatar locally, so the flow works while offline too.
+    const onImageRemoved = () => {
+        setSelected(undefined);
+        setImageData({...EMPTY_FILE});
+        setIsRemoved(true);
+    };
+
     const onPress = () => {
         notifySaving();
+
+        if (isRemoved) {
+            deleteAvatar(currentUserPersonalDetails);
+            setIsRemoved(false);
+            Navigation.dismissModal();
+            return;
+        }
 
         if (imageData.file) {
             updateAvatar(imageData.file, {
@@ -136,14 +153,14 @@ function EditUserAvatarContent() {
             {!isInLandscapeMode && (
                 <AvatarPreview
                     selected={selected}
-                    setSelected={setSelected}
                     avatarCaptureRef={avatarCaptureRef}
                     imageData={imageData}
-                    setImageData={setImageData}
                     setError={setError}
                     setCropImageData={setCropImageData}
                     setIsAvatarCropModalOpen={setIsAvatarCropModalOpen}
                     isAvatarCropModalOpen={isAvatarCropModalOpen}
+                    isRemoved={isRemoved}
+                    onImageRemoved={onImageRemoved}
                 />
             )}
 
@@ -155,14 +172,14 @@ function EditUserAvatarContent() {
                 {isInLandscapeMode && (
                     <AvatarPreview
                         selected={selected}
-                        setSelected={setSelected}
                         avatarCaptureRef={avatarCaptureRef}
                         imageData={imageData}
-                        setImageData={setImageData}
                         setError={setError}
                         setCropImageData={setCropImageData}
                         setIsAvatarCropModalOpen={setIsAvatarCropModalOpen}
                         isAvatarCropModalOpen={isAvatarCropModalOpen}
+                        isRemoved={isRemoved}
+                        onImageRemoved={onImageRemoved}
                     />
                 )}
                 <View style={[styles.ph5, styles.pb5, styles.flexColumn, styles.flex1, styles.gap3]}>
@@ -172,6 +189,7 @@ function EditUserAvatarContent() {
                         selectedID={selected}
                         onSelect={(id) => {
                             setImageData({...EMPTY_FILE});
+                            setIsRemoved(false);
                             setSelected(id);
                         }}
                     />

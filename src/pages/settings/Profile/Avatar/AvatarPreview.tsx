@@ -16,8 +16,6 @@ import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types
 import type {AvatarSource} from '@libs/UserAvatarUtils';
 import {isCatalogAvatar, isGeneratedLetterAvatarURL, isLetterAvatar} from '@libs/UserAvatarUtils';
 
-import {deleteAvatar} from '@userActions/PersonalDetails';
-
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type {FileObject} from '@src/types/utils/Attachment';
@@ -32,14 +30,10 @@ import AvatarCapture from './AvatarCapture';
 type AvatarPreviewProps = {
     /** The selected avatar ID */
     selected: string | undefined;
-    /** The function to set the selected avatar ID */
-    setSelected: (selected: string | undefined) => void;
     /** The ref to the avatar capture component */
     avatarCaptureRef: React.RefObject<AvatarCaptureHandle | null>;
     /** The image data */
     imageData: ImageData;
-    /** The function to set the image data */
-    setImageData: (imageData: ImageData) => void;
     /** The function to set the error */
     setError: (error: TranslationPaths | null, phraseParam: Record<string, unknown>) => void;
     /** The function to set the crop image data */
@@ -48,6 +42,10 @@ type AvatarPreviewProps = {
     isAvatarCropModalOpen: boolean;
     /** The function to set whether the avatar crop modal is open */
     setIsAvatarCropModalOpen: (isAvatarCropModalOpen: boolean) => void;
+    /** Whether the user has removed the photo (pending change committed on Save) */
+    isRemoved: boolean;
+    /** Callback when avatar is removed */
+    onImageRemoved: () => void;
 };
 
 type ImageData = {
@@ -57,9 +55,7 @@ type ImageData = {
     file: File | CustomRNImageManipulatorResult | null;
 };
 
-const EMPTY_FILE = {uri: '', name: '', type: '', file: null};
-
-function AvatarPreview({selected, avatarCaptureRef, setSelected, isAvatarCropModalOpen, setIsAvatarCropModalOpen, imageData, setImageData, setError, setCropImageData}: AvatarPreviewProps) {
+function AvatarPreview({selected, avatarCaptureRef, isAvatarCropModalOpen, setIsAvatarCropModalOpen, imageData, setError, setCropImageData, isRemoved, onImageRemoved}: AvatarPreviewProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Upload']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -78,11 +74,16 @@ function AvatarPreview({selected, avatarCaptureRef, setSelected, isAvatarCropMod
         avatarURL = avatars[selected];
     } else if (imageData.uri) {
         avatarURL = imageData.uri;
+    } else if (isRemoved) {
+        // Photo removal is pending Save: render the local default avatar placeholder rather than the current
+        // avatar. Using an empty source lets the Avatar component show its bundled default, which works offline.
+        avatarURL = '';
     } else {
         avatarURL = currentUserPersonalDetails?.avatar ?? '';
     }
     // Whether avatar view & edit options should be hidden. False if user uploaded their own avatar.
     const shouldHideAvatarEdit =
+        isRemoved ||
         (!imageData.uri &&
             (isCatalogAvatar(currentUserPersonalDetails?.avatar) ||
                 isGeneratedLetterAvatarURL(currentUserPersonalDetails?.avatar) ||
@@ -114,12 +115,6 @@ function AvatarPreview({selected, avatarCaptureRef, setSelected, isAvatarCropMod
             });
     };
 
-    const onImageRemoved = () => {
-        deleteAvatar(currentUserPersonalDetails);
-        setSelected(undefined);
-        setImageData({...EMPTY_FILE});
-    };
-
     const clearError = () => {
         setError(null, {});
     };
@@ -145,7 +140,7 @@ function AvatarPreview({selected, avatarCaptureRef, setSelected, isAvatarCropMod
                     imageStyles={avatarStyle}
                     source={avatarURL}
                     avatarID={accountID}
-                    fallbackIcon={currentUserPersonalDetails?.fallbackIcon}
+                    fallbackIcon={isRemoved ? undefined : currentUserPersonalDetails?.fallbackIcon}
                     size={CONST.AVATAR_SIZE.X_LARGE}
                     type={CONST.ICON_TYPE_AVATAR}
                 />
