@@ -17,6 +17,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
+import {hasCompletedGuidedSetupFlowSelector} from '@selectors/Onboarding';
 import React, {useEffect, useMemo, useRef} from 'react';
 
 import type {SignInPageRef} from './SignInPage';
@@ -29,6 +30,7 @@ function SignInModal() {
     const signinPageRef = useRef<SignInPageRef | null>(null);
     const session = useSession();
     const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
+    const [isOnboardingCompleted] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasCompletedGuidedSetupFlowSelector});
     const hasSignedInRef = useRef(false);
     // Use of SignInPageWrapped (with shouldEnableMaxHeight prop in SignInPageWrapper) is a workaround for Safari not supporting interactive-widget=resizes-content.
     // This allows better scrolling experience after keyboard shows for modals with input, that are larger than remaining screen height.
@@ -64,8 +66,15 @@ function SignInModal() {
         }
 
         Navigation.dismissModal();
-        Navigation.navigate(ROUTES.HOME);
-    }, [isLoadingApp]);
+
+        // Only navigate to Home when the signed-in user still needs onboarding. Firing this navigation action
+        // is what lets OnboardingGuard redirect brand-new users into the onboarding flow. For a user whose
+        // onboarding is already complete (e.g. an existing account signing in from a public room), skip it so
+        // dismissModal reveals the route that was underneath the sign-in modal (the public room they opened).
+        if (!isOnboardingCompleted) {
+            Navigation.navigate(ROUTES.HOME);
+        }
+    }, [isLoadingApp, isOnboardingCompleted]);
 
     return (
         <ScreenWrapper
