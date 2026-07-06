@@ -94,7 +94,14 @@ function RateField({
         : '';
 
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
-    const isRateInteractive = !!rate && !isReadOnly && iouType !== CONST.IOU.TYPE.SPLIT;
+    // The rate row should only be interactive when tapping it leads to a meaningful action:
+    // - a policy expense chat can always edit the rate,
+    // - a non-policy, non-track expense taps into the upgrade nudge,
+    // - a track expense is actionable only when it routes to the upgrade or select-workspace path.
+    // A self-tracked distance expense that already has a workspace and default rate has nothing to
+    // change here, so keep it read-only instead of showing a chevron and responding to taps.
+    const isRateChangeable = isPolicyExpenseChat || (isTrackExpense ? shouldNavigateToUpgradePath || shouldSelectPolicy : true);
+    const isRateInteractive = !!rate && !isReadOnly && iouType !== CONST.IOU.TYPE.SPLIT && isRateChangeable;
 
     const {isSearchRouterDisplayed} = useSearchRouterState();
 
