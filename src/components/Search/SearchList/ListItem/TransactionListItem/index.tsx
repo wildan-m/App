@@ -257,6 +257,7 @@ function TransactionListItemInner<TItem extends ListItem>({
         policyTagLists,
         nonPersonalAndWorkspaceCards,
         isAttendeesEnabledForMovingPolicy,
+        chatReport: parentChatReport,
     };
 
     if (!isLargeScreenWidth) {

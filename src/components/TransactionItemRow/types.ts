@@ -56,6 +56,8 @@ type TransactionWithOptionalSearchFields = TransactionWithOptionalHighlight & {
 type TransactionItemRowProps = {
     transactionItem: TransactionWithOptionalSearchFields;
     report?: Report;
+    /** The parent chat report of the transaction's report. Required so the Pay action's settlement callback can resolve the invoice room. */
+    chatReport?: Report;
     policy?: Policy;
     policyCategories?: PolicyCategories;
     policyTagLists?: PolicyTagLists;
