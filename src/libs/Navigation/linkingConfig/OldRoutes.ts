@@ -79,6 +79,13 @@ const oldRoutes: Record<string, string> = {
     '/workspaces/*/company-cards/*/refresh-card-feed-connection': '/workspaces/$1/company-cards/$2/refresh-card-feed-connection',
     '/workspaces/*/company-cards/*/work-email': '/workspaces/$1/company-cards/$2/work-email',
     '/workspaces/*/company-cards/*/verify-work-email': '/workspaces/$1/company-cards/$2/verify-work-email',
+    // The catch-all below migrates the deprecated card-details URL (company-cards/:feed/:cardID) to its new
+    // company-card-details/:feed/:cardID path. It would also swallow current two-segment routes whose first
+    // segment is a reserved name (select-feed, settings, add-card-feed), so keep those as pass-throughs. They
+    // are longer patterns than the catch-all, and getMatchingNewRoute prefers the longest matching pattern.
+    '/workspaces/*/company-cards/select-feed/*': '/workspaces/$1/company-cards/select-feed/$2',
+    '/workspaces/*/company-cards/settings/*': '/workspaces/$1/company-cards/settings/$2',
+    '/workspaces/*/company-cards/add-card-feed/*': '/workspaces/$1/company-cards/add-card-feed/$2',
     '/workspaces/*/company-cards/*/*': '/workspaces/$1/company-cards/company-card-details/$2/$3',
     '/workspace/confirmation/currency': '/workspaces/workspace/confirmation/currency',
     '/workspace/confirmation': '/workspaces/workspace/confirmation',

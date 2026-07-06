@@ -313,4 +313,22 @@ describe('getBestMatchingPath', () => {
             getMatchingNewRoute('/workspaces/D56D50B841F69B0E/company-cards/company-card-details/assign-card/oauth.mockbank.com%2322298108/Mock%20Credit%20Card%20-%201234/assignee'),
         ).toBe('/workspaces/D56D50B841F69B0E/company-cards/assign-card/oauth.mockbank.com%2322298108/Mock%20Credit%20Card%20-%201234/assignee');
     });
+
+    it('does not rewrite the add-card-feed route reached from the feed selector', () => {
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/select-feed/add-card-feed')).toBe('/workspaces/p123/company-cards/select-feed/add-card-feed');
+    });
+
+    it('does not rewrite company-cards settings sub-routes', () => {
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/settings/feed-name')).toBe('/workspaces/p123/company-cards/settings/feed-name');
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/settings/statement-close-date')).toBe('/workspaces/p123/company-cards/settings/statement-close-date');
+    });
+
+    it('does not rewrite add-card-feed import and layout sub-routes', () => {
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/add-card-feed/import')).toBe('/workspaces/p123/company-cards/add-card-feed/import');
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/add-card-feed/layout-name')).toBe('/workspaces/p123/company-cards/add-card-feed/layout-name');
+    });
+
+    it('still migrates the deprecated card-details path to its new company-card-details path', () => {
+        expect(getMatchingNewRoute('/workspaces/p123/company-cards/oauth.chase%2099999/456')).toBe('/workspaces/p123/company-cards/company-card-details/oauth.chase%2099999/456');
+    });
 });
