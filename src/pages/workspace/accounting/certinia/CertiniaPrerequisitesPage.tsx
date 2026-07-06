@@ -77,7 +77,7 @@ function CertiniaPrerequisitesPage({route}: CertiniaPrerequisitesPageProps) {
             onBackButtonPress={handleBackButtonPress}
             shouldBeBlocked={shouldBeBlocked}
             shouldLoadForEmptyConnection
-            shouldUseScrollView={false}
+            shouldUseScrollView
         >
             <View style={[styles.ph5, styles.mb3, styles.mt3, {height: CONST.BANK_ACCOUNT.STEPS_HEADER_HEIGHT}]}>
                 <InteractiveStepSubPageHeader
