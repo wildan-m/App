@@ -140,6 +140,10 @@ function SuggestionEmoji({
 
                 if (suggestionsExist) {
                     resetSuggestions();
+
+                    // Remember that the user deliberately dismissed the suggestions so the next
+                    // focus-driven recalculation (e.g. after closing the FAB menu) does not reopen them.
+                    shouldBlockCalc.current = true;
                 }
 
                 return true;
