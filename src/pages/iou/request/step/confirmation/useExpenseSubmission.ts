@@ -361,7 +361,17 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
             return;
         }
 
-        const optimisticChatReportID = generateReportID();
+        // When a brand-new P2P recipient is picked on the confirmation page (global create), #94755 assigns a
+        // freshly generated optimistic reportID onto the transaction draft, and the page subscribes to — and
+        // derives its post-create destination from — that same ID. Reuse it here so the optimistic chat report is
+        // created at exactly the ID the page is watching. Generating a new one instead lands the chat at a
+        // divergent ID, leaving the page waiting on a report that never materializes (the app freezes). Fall back
+        // to a fresh ID for existing chats (where `report` is already resolved) and self-DM/track (UNREPORTED).
+        const preAssignedChatReportID = transaction?.reportID;
+        const optimisticChatReportID =
+            !report && getIsFromGlobalCreate(transaction) && !!preAssignedChatReportID && preAssignedChatReportID !== CONST.REPORT.UNREPORTED_REPORT_ID
+                ? preAssignedChatReportID
+                : generateReportID();
         const optimisticCreatedReportActionID = rand64();
         const optimisticReportPreviewActionID = rand64();
         let existingIOUReport: Report | undefined;
