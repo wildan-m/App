@@ -18,7 +18,7 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import {useIsFocused} from '@react-navigation/core';
 import {willAlertModalBecomeVisibleSelector} from '@selectors/Modal';
 import React, {useRef, useState} from 'react';
-import {View} from 'react-native';
+import {Keyboard, View} from 'react-native';
 
 type PopoverComponentProps = {
     isExpanded: boolean;
@@ -88,6 +88,10 @@ function FilterPopupButton({viewportOffsetTop, popoverWidth, wrapperStyle, popov
     };
 
     const calculatePopoverPositionAndToggleOverlay = () => {
+        // Dismiss any open keyboard (e.g. from a focused search field) before opening the popover.
+        // On small screens the popover renders as a bottom-docked modal with keyboard avoidance, so a
+        // lingering keyboard pushes it up and it appears detached/floating instead of anchored to the bottom.
+        Keyboard.dismiss();
         calculatePopoverPosition(anchorRef, popoverAnchorAlignment).then((position) => {
             setPopoverTriggerPosition({...position, vertical: position.vertical});
             toggleOverlay();
