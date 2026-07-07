@@ -62,6 +62,9 @@ type PaymentMethodItem = PaymentMethod & {
     isMissingPersonalInfo?: boolean;
     /** Whether to show the "Add details" CTA row below a virtual Expensify Card when personal details are missing */
     shouldShowMissingPersonalDetailsAction?: boolean;
+
+    /** Card ID the "Add details" CTA should target — set for combo domain cards so it points at the virtual half rather than the physical group representative */
+    missingPersonalDetailsCardID?: number;
 } & BankIcon;
 
 type PaymentMethodListItemProps = {
@@ -133,6 +136,9 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
     const isInLockedState = isBusinessBankAccountLocked(item);
     const showThreeDotsMenu = item.shouldShowThreeDotsMenu !== false && !!threeDotsMenuItems && !isInLockedState;
     const isNeedingAction = isAccountNeedingAction(item);
+
+    // For combo domain cards the CTA targets the folded-in virtual card; otherwise it falls back to the row's own card.
+    const missingPersonalDetailsCardID = item.missingPersonalDetailsCardID ?? item.cardID;
 
     // Check if this is a Chase personal bank account connected via Plaid
     const isChaseAccountConnectedViaPlaid =
@@ -255,7 +261,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                 brickRoadIndicator={item.brickRoadIndicator}
                 success={item.isMethodActive}
             />
-            {!!item.shouldShowMissingPersonalDetailsAction && !!item.cardID && (
+            {!!item.shouldShowMissingPersonalDetailsAction && !!missingPersonalDetailsCardID && (
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.pv3, shouldUseNarrowLayout ? styles.ph5 : styles.ph8]}>
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1, styles.mr2]}>
                         <Icon
@@ -269,7 +275,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                         small
                         success
                         text={translate('walletPage.addVirtualCardPersonalDetails.cta')}
-                        onPress={() => Navigation.navigate(ROUTES.MISSING_PERSONAL_DETAILS.getRoute(String(item.cardID)))}
+                        onPress={() => Navigation.navigate(ROUTES.MISSING_PERSONAL_DETAILS.getRoute(String(missingPersonalDetailsCardID)))}
                     />
                 </View>
             )}

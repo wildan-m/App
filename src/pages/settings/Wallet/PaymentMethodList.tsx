@@ -350,6 +350,15 @@ function PaymentMethodList({
                         ) {
                             assignedCardsGroupedItem.brickRoadIndicator = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
                         }
+
+                        // A combo domain card is represented by its physical half (sorted first), so the
+                        // "add personal details" prompt computed at push time is false for the group. When the
+                        // virtual half is folded in here, propagate its actionable state to the group row and
+                        // remember the virtual card ID so the CTA targets it (not the physical card's PIN flow).
+                        if (!isActingAsDelegate && isActionableVirtualExpensifyCard(card) && hasMissingPersonalDetails) {
+                            assignedCardsGroupedItem.shouldShowMissingPersonalDetailsAction = true;
+                            assignedCardsGroupedItem.missingPersonalDetailsCardID = card.cardID;
+                        }
                     }
                     continue;
                 }
