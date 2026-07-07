@@ -3031,6 +3031,8 @@ ${amount} dla ${merchant} - ${date}`,
         accounting: {
             title: 'Czy korzystasz z jakiegoś oprogramowania księgowego?',
             none: 'Brak',
+            otherLabel: 'Z jakiego oprogramowania księgowego korzystasz?',
+            otherPlaceholder: 'Nazwa oprogramowania księgowego',
         },
         interestedFeatures: {
             title: 'Jakie funkcje Cię interesują?',

@@ -3031,6 +3031,8 @@ ${amount} para ${merchant} - ${date}`,
         accounting: {
             title: 'Você usa algum software de contabilidade?',
             none: 'Nenhum',
+            otherLabel: 'Qual software de contabilidade você usa?',
+            otherPlaceholder: 'Nome do software de contabilidade',
         },
         interestedFeatures: {
             title: 'Em quais recursos você tem interesse?',

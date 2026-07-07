@@ -3048,6 +3048,8 @@ ${amount} für ${merchant} – ${date}`,
         accounting: {
             title: 'Verwendest du eine Buchhaltungssoftware?',
             none: 'Keine',
+            otherLabel: 'Welche Buchhaltungssoftware verwendest du?',
+            otherPlaceholder: 'Name der Buchhaltungssoftware',
         },
         interestedFeatures: {
             title: 'An welchen Funktionen bist du interessiert?',
