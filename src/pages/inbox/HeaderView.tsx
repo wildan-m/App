@@ -259,7 +259,9 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
     const [onboardingPurposeSelected] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
     const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurposeSelected);
     const shouldShowRegisterForWebinar =
-        (introSelected?.companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO || introSelected?.companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL) &&
+        (introSelected?.companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO ||
+            introSelected?.companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL ||
+            introSelected?.companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM) &&
         (isChatUsedForOnboarding || (isAdminRoom(report) && !isChatThread)) &&
         !isInSidePanel;
     const shouldShowOnBoardingHelpDropdownButton = (shouldShowRegisterForWebinar || shouldShowGuideBooking) && !isReportArchived && !isInSidePanel;
