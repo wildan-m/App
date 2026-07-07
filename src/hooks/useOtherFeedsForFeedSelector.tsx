@@ -58,6 +58,10 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
         const otherPolicyFeeds: CardFeedListItem[] = [];
         // `policyID` is stable for this hook invocation, so uppercase it once instead of per feed/linked-policy evaluation.
         const upperPolicyID = policyID.toUpperCase();
+        // `visibleFeeds` are deduped with a fund-scoped key (`${fundID}_${feed}`) upstream, so the same physical feed
+        // reachable through more than one fund the admin can see arrives here once per fund. Collapse those to a single
+        // row by tracking feed identity (bank/key + displayed name), keeping the first-encountered entry's value.
+        const seenFeedIdentities = new Set<string>();
         for (const feed of visibleFeeds) {
             // Feeds linked to the active policy are shown as available feeds, not under "From other workspaces".
             // Linked policy IDs can differ in casing, so compare case-insensitively (matches the Expensify-card path).
@@ -72,6 +76,14 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
                 continue;
             }
             const feedName = feed.feed;
+            // Identity that is stable for the *same* feed but still distinguishes *different* feeds: the feed bank/key
+            // combined with the displayed name. Same identity from a different fund is a duplicate row — skip it.
+            const text = getCustomOrFormattedFeedName(translate, feedName, feed.name);
+            const feedIdentity = `${feedName}::${text}`;
+            if (seenFeedIdentities.has(feedIdentity)) {
+                continue;
+            }
+            seenFeedIdentities.add(feedIdentity);
             const plaidUrl = getPlaidInstitutionIconUrl(feedName);
             // Use the same fundID-aware domain lookup as the visibility logic (`getVisibleCompanyCardFeedsForSelector`)
             // so the domain email resolves even when the domains collection isn't keyed by fundID.
@@ -88,7 +100,7 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
                 fundID: Number(feed.fundID),
                 country: feed?.country,
                 alternateText: domainName ?? linkedPolicy?.name ?? firstLinkedPolicyID,
-                text: getCustomOrFormattedFeedName(translate, feedName, feed.name),
+                text,
                 keyForList: feed.id,
                 isSelected: feed.id === selectedFeedName,
                 brickRoadIndicator: shouldShowRBR ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
