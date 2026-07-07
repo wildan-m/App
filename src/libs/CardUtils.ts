@@ -1004,7 +1004,7 @@ function getFilteredCardList(
     feedName?: CompanyCardFeedWithDomainID,
 ): UnassignedCard[] {
     const {cardList: customFeedCardsToAssign, ...cards} = list ?? {};
-    const assignedCards = new Set(Object.values(cards).map((card) => card.cardName));
+    const assignedCards = new Set(Object.values(cards).map((card) => normalizeCardName(card.cardName ?? '')));
 
     // Get cards assigned across all workspaces
     const allWorkspaceAssignedCards = new Set<string>();
@@ -1017,14 +1017,14 @@ function getFilteredCardList(
             if (!card?.cardName) {
                 continue;
             }
-            allWorkspaceAssignedCards.add(card.cardName);
+            allWorkspaceAssignedCards.add(normalizeCardName(card.cardName));
         }
     }
 
     // For direct feeds (Plaid/OAuth): displayName === cardIdentifier
     if (accountList) {
         return filterAmexDirectParentCard(accountList, feedName)
-            .filter((cardName) => !assignedCards.has(cardName) && !allWorkspaceAssignedCards.has(cardName))
+            .filter((cardName) => !assignedCards.has(normalizeCardName(cardName)) && !allWorkspaceAssignedCards.has(normalizeCardName(cardName)))
             .map((cardName) => ({
                 cardName,
                 cardID: cardName,
@@ -1033,7 +1033,7 @@ function getFilteredCardList(
 
     // For commercial feeds: displayName is the key, cardIdentifier is the encrypted value
     return Object.entries(customFeedCardsToAssign ?? {})
-        .filter(([cardName]) => !assignedCards.has(cardName) && !allWorkspaceAssignedCards.has(cardName))
+        .filter(([cardName]) => !assignedCards.has(normalizeCardName(cardName)) && !allWorkspaceAssignedCards.has(normalizeCardName(cardName)))
         .map(([cardName, encryptedCardNumber]) => ({
             cardName,
             cardID: encryptedCardNumber,
