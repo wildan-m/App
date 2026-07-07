@@ -429,6 +429,13 @@ function isValidLegalName(name: string): boolean {
 }
 
 /**
+ * Checks that the provided card name only contains letters, digits and spaces
+ */
+function isValidCardName(name: string): boolean {
+    return CONST.REGEX.ALPHANUMERIC_AND_LATIN_CHARS.test(name);
+}
+
+/**
  * Checks that the provided name doesn't contain special characters or numbers
  */
 function isValidPersonName(value: string) {
@@ -914,6 +921,7 @@ export {
     isValidCompanyName,
     isValidDisplayName,
     isValidLegalName,
+    isValidCardName,
     doesContainReservedWord,
     isNumeric,
     isValidAccountRoute,
