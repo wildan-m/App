@@ -13,6 +13,7 @@ import {
     isValidEmailWithTLD,
     isValidExpirationDate,
     isValidInputLength,
+    isValidCardName,
     isValidLegalName,
     isValidNANPPhone,
     isValidPastDate,
@@ -378,6 +379,26 @@ describe('ValidationUtils', () => {
         test('Invalid legal name', () => {
             expect(isValidLegalName(`a hyphenated-name`)).toBe(false);
             expect(isValidLegalName('άλφα')).toBe(false);
+        });
+    });
+
+    describe('isValidCardName', () => {
+        test('allows letters, digits and spaces', () => {
+            expect(isValidCardName('John Doe')).toBe(true);
+            expect(isValidCardName('John Doe 2')).toBe(true);
+            expect(isValidCardName('Card 123')).toBe(true);
+        });
+
+        test('rejects special characters', () => {
+            expect(isValidCardName('a hyphenated-name')).toBe(false);
+            expect(isValidCardName('John@Doe')).toBe(false);
+        });
+
+        test('accepts a name with digits that legal-name validation rejects', () => {
+            // The card-name field must accept alphanumeric names (matching Expensify Classic),
+            // whereas legal-name validation stays strict and rejects digits.
+            expect(isValidLegalName('John Doe 2')).toBe(false);
+            expect(isValidCardName('John Doe 2')).toBe(true);
         });
     });
 
