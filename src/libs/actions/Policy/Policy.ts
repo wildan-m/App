@@ -1300,7 +1300,11 @@ function setWorkspaceReimbursement({
         });
     }
 
-    const params: SetWorkspaceReimbursementParams = {policyID, reimbursementChoice, bankAccountID};
+    // When disabling reimbursement we must not send the bankAccountID: doing so makes the backend touch the
+    // bank-account association, an admin/owner-only operation that fails for the Payments admin role and shows a
+    // generic error. Turning reimbursement off does not need to re-link the bank account, so we omit it here.
+    const isDisablingReimbursement = reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO;
+    const params: SetWorkspaceReimbursementParams = {policyID, reimbursementChoice, bankAccountID: isDisablingReimbursement ? undefined : bankAccountID};
 
     API.write(WRITE_COMMANDS.SET_WORKSPACE_REIMBURSEMENT, params, {optimisticData, failureData, successData});
 }
