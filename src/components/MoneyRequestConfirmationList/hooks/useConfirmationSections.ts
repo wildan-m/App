@@ -104,7 +104,9 @@ function useConfirmationSections({
                   ];
 
         options.push({
-            title: selectedParticipants.length > 0 ? translate('common.to') : undefined,
+            // The "To" label is intentionally omitted here to save vertical space in the expense form;
+            // the recipient row itself already reads clearly as who the expense is sent to.
+            title: undefined,
             data: participantRows,
             sectionIndex: 0,
         });

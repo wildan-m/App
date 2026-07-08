@@ -131,7 +131,12 @@ function ReceiptSection({
                 }
                 Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, Navigation.getActiveRoute()));
             }}
-            style={[compact.isCompactMode ? undefined : styles.mv3, compact.isCompactMode && compact.compactReceiptStyle ? compact.compactReceiptStyle : styles.moneyRequestViewImage]}
+            style={[
+                compact.isCompactMode ? undefined : styles.mv3,
+                compact.isCompactMode && compact.compactReceiptStyle ? compact.compactReceiptStyle : styles.moneyRequestViewImage,
+                // Shrink the empty state so the expense form fits more fields above the fold.
+                !compact.isCompactMode && styles.moneyRequestViewImageEmptyState,
+            ]}
         />
     );
 }

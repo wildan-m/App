@@ -4887,6 +4887,13 @@ const staticStyles = (theme: ThemeColors) =>
             maxWidth: '100%',
         },
 
+        // A shorter receipt area used only for the empty (no receipt attached) state, so the
+        // expense form takes up less vertical space and more fields are visible without scrolling.
+        // Once a receipt is attached the full-height moneyRequestViewImage is used instead.
+        moneyRequestViewImageEmptyState: {
+            height: 100,
+        },
+
         expenseViewImage: {
             maxWidth: 360,
             aspectRatio: 16 / 9,
