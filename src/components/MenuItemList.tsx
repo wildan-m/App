@@ -5,6 +5,7 @@ import mergeRefs from '@libs/mergeRefs';
 import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxCommon from '@src/types/onyx/OnyxCommon';
 import type IconAsset from '@src/types/utils/IconAsset';
 
@@ -12,6 +13,7 @@ import type {GestureResponderEvent, StyleProp, View, ViewStyle} from 'react-nati
 
 import {useIsFocused} from '@react-navigation/native';
 import React, {useRef} from 'react';
+import {useOnyx} from 'react-native-onyx';
 
 import type {MenuItemProps} from './MenuItem';
 
@@ -64,6 +66,12 @@ function MenuItemList({menuItems = [], shouldUseSingleExecution = false, wrapper
     const popoverAnchor = useRef<View>(null);
     const {isExecuting, singleExecution} = useSingleExecution();
     const isFocused = useIsFocused();
+    const [modal] = useOnyx(ONYXKEYS.MODAL, {canBeMissing: true});
+
+    // A covering alert modal (e.g. a delete confirmation) is drawn on top of the current screen without changing the
+    // navigation route, so the screen keeps its navigation focus. Treat such a modal as a loss of focus so each row's
+    // hover highlight is cleared while it is covered. Popover/bottom-docked menus are excluded so ordinary menus don't wipe hover.
+    const isCoveredByAlertModal = !!modal?.willAlertModalBecomeVisible && !modal?.isPopover;
 
     /**
      * Handle the secondary interaction for a menu item.
@@ -114,7 +122,7 @@ function MenuItemList({menuItems = [], shouldUseSingleExecution = false, wrapper
                     {...menuItemProps}
                     disabled={!!menuItemProps.disabled || isExecuting}
                     onPress={shouldUseSingleExecution ? singleExecution(menuItemProps.onPress) : menuItemProps.onPress}
-                    isFocused={isFocused}
+                    isFocused={isFocused && !isCoveredByAlertModal}
                 />
             </OfflineWithFeedback>
         ))
