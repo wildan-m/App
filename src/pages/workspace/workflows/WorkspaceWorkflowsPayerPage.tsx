@@ -237,10 +237,12 @@ function WorkspaceWorkflowsPayerPage({route, policy, personalDetails, isLoadingR
         }
         const isAccountAlreadySharedWithCurrentUser =
             bankAccountInfo?.accountData?.sharees && currentUserPersonalDetails?.login ? bankAccountInfo?.accountData?.sharees.includes(currentUserPersonalDetails?.login) : false;
-        const isOwner = policy?.owner === currentUserPersonalDetails?.login;
+        const canCurrentUserManagePayments = currentUserPersonalDetails?.login
+            ? canMemberWrite(policy, currentUserPersonalDetails.login, CONST.POLICY.POLICY_FEATURE.WORKFLOWS_PAYMENTS)
+            : false;
 
-        // Current user has no right to share (not owner and not a sharee) — show error
-        if (!isOwner && !isAccountAlreadyShared && !isAccountAlreadySharedWithCurrentUser) {
+        // Current user has no right to share (cannot manage payments and not a sharee) — show error
+        if (!canCurrentUserManagePayments && !isAccountAlreadyShared && !isAccountAlreadySharedWithCurrentUser) {
             setShowErrorModal(true);
             return;
         }
