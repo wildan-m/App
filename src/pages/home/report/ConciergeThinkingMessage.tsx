@@ -29,7 +29,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 
 import React, {useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
-import Animated, {Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming} from 'react-native-reanimated';
+import Animated, {Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withDelay, withRepeat, withSequence, withTiming} from 'react-native-reanimated';
 
 type ConciergeThinkingMessageProps = {
     /** The report for this thinking message */
@@ -75,6 +75,50 @@ function ConciergeThinkingBubble({reportID, agentAccountID}: {reportID: string; 
             reasoningHistory={reasoningHistory}
             statusLabel={statusLabel}
         />
+    );
+}
+
+/**
+ * A single pulsing dot used by the branded thinking indicator. Each dot fades in and out on a
+ * staggered delay so the group reads as a continuous "still working" signal.
+ */
+function useThinkingDotStyle(delay: number) {
+    const opacity = useSharedValue(0.3);
+
+    useEffect(() => {
+        opacity.set(
+            withDelay(
+                delay,
+                withRepeat(withSequence(withTiming(1, {duration: 400, easing: Easing.inOut(Easing.ease)}), withTiming(0.3, {duration: 400, easing: Easing.inOut(Easing.ease)})), -1, false),
+            ),
+        );
+    }, [opacity, delay]);
+
+    return useAnimatedStyle(() => ({opacity: opacity.get()}));
+}
+
+/**
+ * Branded "thinking" indicator shown next to the status label while a Concierge/agent response is
+ * in progress. This is the wiring/placement for the animation the issue asks for: it only mounts
+ * while the parent bubble is visible (gated on `isProcessing`), so it stays through streaming
+ * pauses and disappears once the reply completes. It is intentionally self-contained (no external
+ * asset) so the front-end wiring can land before the branded design asset is provided — swap this
+ * for a finite (`loop={false}`) `Lottie` animation from `LottieAnimations` once the asset exists.
+ */
+function ConciergeThinkingDots() {
+    const styles = useThemeStyles();
+    const theme = useTheme();
+    const dot1Style = useThinkingDotStyle(0);
+    const dot2Style = useThinkingDotStyle(150);
+    const dot3Style = useThinkingDotStyle(300);
+    const dotStyle = {width: 4, height: 4, borderRadius: 2, backgroundColor: theme.icon, marginRight: 3};
+
+    return (
+        <View style={[styles.flexRow, styles.alignItemsCenter, styles.mr2]}>
+            <Animated.View style={[dotStyle, dot1Style]} />
+            <Animated.View style={[dotStyle, dot2Style]} />
+            <Animated.View style={[dotStyle, dot3Style]} />
+        </View>
     );
 }
 
@@ -199,6 +243,7 @@ function ConciergeThinkingMessageContent({accountID, reasoningHistory, statusLab
                     accessible
                 >
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                        <ConciergeThinkingDots />
                         <Animated.Text style={[styles.chatItemMessage, styles.colorMuted, statusLabelAnimatedStyle]}>{statusLabel}</Animated.Text>
 
                         {!!historyLength && (
