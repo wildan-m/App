@@ -168,7 +168,15 @@ function useReconcileSelectionWithData({
                 const hasIndividualSelectedInGroup = transactionGroup.transactions.some(
                     (transaction) => (!!transaction.keyForList && transaction.keyForList in selectedTransactions) || transaction.transactionID in selectedTransactions,
                 );
-                const propagateSelectionToAllRows = (isExpenseReportType && (wasReportSelected || hasIndividualSelectedInGroup)) || (wasReportSelected && !isExpenseReportType);
+                // In the Reports-grouped view a selected report is stored as its child transactions, each tagged with a groupKey
+                // pointing back to the report (never as a single report-keyed entry). Detect that group selection so new
+                // transactions added to the report keep propagating into the selection instead of being dropped.
+                const wasReportGroupSelected = transactionGroup.transactions.some((transaction) => {
+                    const entry = (transaction.keyForList ? selectedTransactions[transaction.keyForList] : undefined) ?? selectedTransactions[transaction.transactionID];
+                    return entry?.groupKey === reportKey;
+                });
+                const propagateSelectionToAllRows =
+                    (isExpenseReportType && (wasReportSelected || hasIndividualSelectedInGroup)) || ((wasReportSelected || wasReportGroupSelected) && !isExpenseReportType);
 
                 for (const transactionItem of transactionGroup.transactions) {
                     const listKey = transactionItem.keyForList ?? transactionItem.transactionID;
