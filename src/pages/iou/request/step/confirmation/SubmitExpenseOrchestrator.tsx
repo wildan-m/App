@@ -1,10 +1,12 @@
 import LocationPermissionModal from '@components/LocationPermissionModal';
 
+import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 
 import DateUtils from '@libs/DateUtils';
 import {cancelDeferredWrite, flushDeferredWrite, reserveDeferredWriteChannel} from '@libs/deferredLayoutWrite';
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
+import Growl from '@libs/Growl';
 import Log from '@libs/Log';
 import isReportOpenInRHP from '@libs/Navigation/helpers/isReportOpenInRHP';
 import isReportOpenInSuperWideRHP from '@libs/Navigation/helpers/isReportOpenInSuperWideRHP';
@@ -143,6 +145,7 @@ function SubmitExpenseOrchestrator({
     isFromFloatingActionButtonOnTransaction,
     children,
 }: SubmitExpenseOrchestratorProps) {
+    const {translate} = useLocalize();
     const [destinationReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${destinationReportID}`);
     const [isConfirming, setIsConfirming] = useState(false);
     const [startLocationPermissionFlow, setStartLocationPermissionFlow] = useState(false);
@@ -457,6 +460,15 @@ function SubmitExpenseOrchestrator({
     // frequently from Onyx subscriptions anyway, and wrapping this properly would require
     // memoizing every handler + all their captured props for no measurable gain.
     const onConfirm = () => {
+        // Backstop: creating a scan expense without a receipt file always yields a $0 receiptless expense,
+        // because the amount only ever arrives from SmartScanning an uploaded image. Refuse it and tell the
+        // user, rather than letting an upstream validation gap turn into silent data loss.
+        if (requestType === CONST.IOU.REQUEST_TYPE.SCAN && !Object.values(receiptFiles).some((receipt) => !!receipt)) {
+            Log.alert('[SubmitExpense] Blocked scan expense submission with no receipt file', {iouType, destinationReportID});
+            Growl.error(translate('receipt.cameraErrorMessage'));
+            return;
+        }
+
         setIsConfirming(true);
 
         if (gpsRequired) {

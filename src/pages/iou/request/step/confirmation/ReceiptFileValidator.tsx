@@ -1,6 +1,10 @@
+import useLocalize from '@hooks/useLocalize';
+
 import {isLocalFile as isLocalFileFileUtils} from '@libs/fileDownload/FileUtils';
 import validateReceiptFile from '@libs/fileDownload/validateReceiptFile';
+import Growl from '@libs/Growl';
 import {navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
+import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 
 import {setMoneyRequestReceipt} from '@userActions/IOU/Receipt';
@@ -56,6 +60,8 @@ function ReceiptFileValidator({
     isReceiptReady,
     onReceiptFilesChange,
 }: ReceiptFileValidatorProps) {
+    const {translate} = useLocalize();
+
     // When the component mounts, if there is a receipt, see if the image can be read from the disk. If not, redirect the user to the starting step of the flow.
     // This is because until the request is saved, the receipt file is only stored in the browsers memory as a blob:// and if the browser is refreshed, then
     // the image ceases to exist. The best way for the user to recover from this is to start over from the start of the request process.
@@ -78,13 +84,6 @@ function ReceiptFileValidator({
                 const itemReceiptPath = item.receipt?.source;
                 const itemReceiptType = item.receipt?.type;
                 const isLocalFile = isLocalFileFileUtils(itemReceiptPath);
-
-                if (!isLocalFile) {
-                    if (item.receipt) {
-                        newReceiptFiles = {...newReceiptFiles, [item.transactionID]: item.receipt};
-                    }
-                    return Promise.resolve();
-                }
 
                 const onSuccess = (file: File) => {
                     const receipt: Receipt = file;
@@ -110,6 +109,26 @@ function ReceiptFileValidator({
                     }
                 };
 
+                // A scan expense whose receipt has no source was never uploaded, so it can only produce a $0
+                // receiptless expense. Treat it as a read failure instead of falling through to the branch below,
+                // which reads a sourceless receipt as one that already lives on the server.
+                if (!itemReceiptPath && requestType === CONST.IOU.REQUEST_TYPE.SCAN) {
+                    Log.warn('[ReceiptValidation] Scan transaction has no receipt source', {
+                        transactionID: item.transactionID,
+                        hasReceipt: !!item.receipt,
+                        hasFilename: !!itemReceiptFilename,
+                    });
+                    onFailure();
+                    return Promise.resolve();
+                }
+
+                if (!isLocalFile) {
+                    if (item.receipt) {
+                        newReceiptFiles = {...newReceiptFiles, [item.transactionID]: item.receipt};
+                    }
+                    return Promise.resolve();
+                }
+
                 return validateReceiptFile(itemReceiptFilename, itemReceiptPath, itemReceiptType, onSuccess, onFailure) ?? Promise.resolve();
             }),
         ).then(() => {
@@ -117,13 +136,21 @@ function ReceiptFileValidator({
             if (ignore) {
                 return;
             }
-            if (resetInitialTransactionReceipt) {
-                setMoneyRequestReceipt(initialTransactionID, '', '', true, '');
-            }
             if (isScanFilesCanBeRead) {
                 onReceiptFilesChange(newReceiptFiles);
                 return;
             }
+
+            // Reset only once we know the flow is being sent back to the scan step. Resetting before the
+            // success check would leave a sourceless receipt behind for the next validation pass to read.
+            if (resetInitialTransactionReceipt) {
+                setMoneyRequestReceipt(initialTransactionID, '', '', true, '');
+            }
+
+            // The receipt is gone. Say so, rather than silently resetting the flow and letting the user
+            // walk into a $0 receiptless expense.
+            Growl.error(translate('receipt.cameraErrorMessage'));
+
             if (requestType === CONST.IOU.REQUEST_TYPE.MANUAL) {
                 Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(CONST.IOU.ACTION.CREATE, iouType, initialTransactionID, reportID, Navigation.getActiveRouteWithoutParams()));
                 return;
@@ -138,7 +165,7 @@ function ReceiptFileValidator({
             ignore = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- draftTransactionIDs is intentionally excluded to avoid re-running on draft changes
-    }, [requestType, iouType, initialTransactionID, reportID, action, backToReport, report, transactions, participants, isReceiptReady, onReceiptFilesChange]);
+    }, [requestType, iouType, initialTransactionID, reportID, action, backToReport, report, transactions, participants, isReceiptReady, onReceiptFilesChange, translate]);
 
     return null;
 }

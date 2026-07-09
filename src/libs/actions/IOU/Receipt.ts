@@ -4,6 +4,7 @@ import {WRITE_COMMANDS} from '@libs/API/types';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import {readFileAsync} from '@libs/fileDownload/FileUtils';
 import {navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
+import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 import {hasDependentTags, isGroupPolicy} from '@libs/PolicyUtils';
 import {buildOptimisticDetachReceipt, isInvoiceReport as isInvoiceReportReportUtils} from '@libs/ReportUtils';
@@ -334,10 +335,6 @@ function navigateToStartStepIfScanFileCannotBeRead(
     receiptType: string | undefined,
     onFailureCallback?: () => void,
 ) {
-    if (!receiptFilename || !receiptPath) {
-        return;
-    }
-
     const onFailure = () => {
         setMoneyRequestReceipt(transactionID, '', '', true, '');
         if (requestType === CONST.IOU.REQUEST_TYPE.MANUAL) {
@@ -350,6 +347,19 @@ function navigateToStartStepIfScanFileCannotBeRead(
         }
         navigateToStartMoneyRequestStep(requestType, iouType, transactionID, reportID);
     };
+
+    if (!receiptFilename || !receiptPath) {
+        // A scan expense without a receipt path or filename has no image to upload, so it can only ever
+        // become a $0 receiptless expense. checkIfLocalFileIsAccessible below treats the same condition as a
+        // failure; send the user back to the scan step here too, rather than returning as if there were
+        // nothing to validate.
+        if (requestType === CONST.IOU.REQUEST_TYPE.SCAN) {
+            Log.warn('[ReceiptValidation] Scan transaction is missing a receipt path or filename', {transactionID, hasFilename: !!receiptFilename, hasPath: !!receiptPath});
+            onFailure();
+        }
+        return;
+    }
+
     readFileAsync(receiptPath.toString(), receiptFilename, onSuccess, onFailure, receiptType);
 }
 

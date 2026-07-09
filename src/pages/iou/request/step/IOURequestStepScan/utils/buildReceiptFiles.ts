@@ -1,3 +1,4 @@
+import Log from '@libs/Log';
 import {shouldReuseInitialTransaction} from '@libs/TransactionUtils';
 
 import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types';
@@ -68,6 +69,12 @@ function buildReceiptFiles({
         const transactionID = transaction?.transactionID ?? initialTransactionID;
         receiptFiles.push({file, source, transactionID});
         setMoneyRequestReceipt(transactionID, source, file.name ?? '', true, file.type);
+        Log.info('[ReceiptCapture] Attached captured receipt to draft transaction', false, {
+            transactionID,
+            hasFilename: !!file.name,
+            sourceScheme: source.split(':').at(0),
+            type: file.type,
+        });
     }
 
     return receiptFiles;
