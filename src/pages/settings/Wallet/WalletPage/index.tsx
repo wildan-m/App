@@ -56,6 +56,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
+import type PaymentMethod from '@src/types/onyx/PaymentMethod';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {ForwardedRef, RefObject} from 'react';
@@ -298,10 +299,14 @@ function WalletPage() {
     const deletePaymentMethod = useCallback(() => {
         const bankAccountID = paymentMethod.selectedPaymentMethod.bankAccountID;
         const fundID = paymentMethod.selectedPaymentMethod.fundID;
+        let deletedPaymentMethod: PaymentMethod | undefined;
+        let newDefaultMethod: PaymentMethod | undefined;
         let newBankAccountID: number | undefined;
         if (paymentMethod.isSelectedPaymentMethodDefault) {
             const paymentCardList = fundList ?? {};
             const allPaymentMethods = formatPaymentMethods(bankAccountList ?? {}, paymentCardList, styles, translate);
+
+            deletedPaymentMethod = allPaymentMethods.find((method) => method.methodID === paymentMethod.methodID);
 
             const remainingPaymentMethods = allPaymentMethods
                 .filter(
@@ -328,7 +333,7 @@ function WalletPage() {
                 });
 
             if (remainingPaymentMethods.length > 0) {
-                const newDefaultMethod = remainingPaymentMethods.at(0);
+                newDefaultMethod = remainingPaymentMethods.at(0);
                 newBankAccountID =
                     newDefaultMethod?.accountType === CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT ? (newDefaultMethod?.accountData?.bankAccountID ?? CONST.DEFAULT_NUMBER_ID) : undefined;
             }
@@ -336,7 +341,13 @@ function WalletPage() {
 
         if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT && bankAccountID) {
             const bankAccount = bankAccountList?.[paymentMethod.methodID] ?? {};
-            deletePaymentBankAccount(bankAccountID, personalPolicyID, lastUsedPaymentMethods, bankAccount, newBankAccountID);
+            deletePaymentBankAccount(bankAccountID, personalPolicyID, lastUsedPaymentMethods, bankAccount);
+
+            // Electing a replacement default only in Onyx would leave the wallet pointing at the deleted account on the
+            // backend, so persist the election with the same command the "Make default" action uses.
+            if (newBankAccountID) {
+                makeDefaultPaymentMethodPaymentMethods(newBankAccountID, 0, deletedPaymentMethod, newDefaultMethod);
+            }
         } else if (paymentMethod.selectedPaymentMethodType === CONST.PAYMENT_METHODS.DEBIT_CARD && fundID) {
             deletePaymentCard(fundID);
         }
