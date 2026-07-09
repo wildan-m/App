@@ -347,6 +347,7 @@ function shouldDisplayReportInLHN({
         !!report.isPinned ||
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         requiresAttention ||
+        (isAdminRoom(report) && !isReportArchived) ||
         (report.isOwnPolicyExpenseChat && !isReportArchived);
 
     if (isHidden && !shouldOverrideHidden) {
