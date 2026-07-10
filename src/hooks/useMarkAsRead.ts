@@ -183,6 +183,23 @@ function useMarkAsRead({reportID, report, transactionThreadReport, sortedVisible
         markNewestActionAsRead();
     };
 
+    // Complete a deferred mark-as-read once the list is back at the newest message while the app is visible/focused.
+    // When a message arrives while the user is viewing the conversation, the newest action can arrive during a transient
+    // scroll away from the end, so handleReportChangeMarkAsRead defers the read (readActionSkippedRef). That deferred read
+    // is otherwise only completed when an unread marker scrolls into view — which never happens here, because the user is
+    // already sitting at the bottom, so no not-yet-visible unread action scrolls into view. Completing it when the list
+    // returns to the end advances lastReadTime, keeping the report read in the LHN and preventing the "new message" marker
+    // from re-appearing on reopen. A genuinely scrolled-up report keeps its deferred read (isScrolledToEnd stays false).
+    const completeSkippedMarkAsReadOnScrolledToEnd = useEffectEvent(() => {
+        completeSkippedMarkAsRead();
+    });
+    useEffect(() => {
+        if (!isScrolledToEnd) {
+            return;
+        }
+        completeSkippedMarkAsReadOnScrolledToEnd();
+    }, [isScrolledToEnd]);
+
     return {markNewestActionAsRead, completeSkippedMarkAsRead};
 }
 
