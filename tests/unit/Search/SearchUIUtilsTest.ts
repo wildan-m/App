@@ -2711,6 +2711,36 @@ describe('SearchUIUtils', () => {
             expect(Object.keys(distanceTransaction ?? {}).length).toBe(expectedPropertyCount);
         });
 
+        it('should decode HTML entities in reportName for expense report list items', () => {
+            const testSearchResults = {
+                ...searchResults,
+                data: {
+                    ...searchResults.data,
+                    [`report_${reportID}`]: {
+                        ...searchResults.data[`report_${reportID}`],
+                        reportName: 'Ben &amp; Jerry&#39;s &quot;Q3&quot;',
+                    },
+                },
+            };
+
+            const [sections] = SearchUIUtils.getSections({
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
+                data: testSearchResults.data,
+                currentAccountID: adminAccountID,
+                currentUserEmail: adminEmail,
+                translate: translateLocal,
+                formatPhoneNumber,
+                bankAccountList: {},
+                conciergeReportID: undefined,
+                convertToDisplayString,
+                reportAttributesDerivedValue: {},
+            });
+
+            const reportGroup = sections.find((group) => 'reportID' in group && group.reportID === reportID);
+
+            expect(reportGroup).toHaveProperty('reportName', `Ben & Jerry's "Q3"`);
+        });
+
         it('should return getReportSections result when type is EXPENSE REPORT', async () => {
             // canApproveIOU reads the Onyx session accountID, not getSections' currentAccountID; merge admin so
             // this test matches the fixture when run in isolation (without earlier getAction tests that set session).
