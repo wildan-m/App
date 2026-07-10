@@ -593,6 +593,8 @@ const translations: TranslationDeepObject<typeof en> = {
         unsupportedFileType: (fileType: string) => `Les fichiers ${fileType} ne sont pas pris en charge. Seuls les types de fichiers pris en charge seront téléchargés.`,
         learnMoreAboutSupportedFiles: 'En savoir plus sur les formats pris en charge.',
         passwordProtected: 'Les fichiers PDF protégés par mot de passe ne sont pas pris en charge. Seuls les fichiers pris en charge seront téléversés.',
+        heicConversionFailed: 'Cette image HEIC n’a pas pu être convertie. Veuillez la convertir en JPEG ou PNG, puis réessayer.',
+        heicConversionFailedMultiple: 'Certaines images HEIC n’ont pas pu être converties et ne seront pas téléchargées. Veuillez les convertir en JPEG ou PNG et réessayer.',
     },
     dropzone: {
         addAttachments: 'Ajouter des pièces jointes',

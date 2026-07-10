@@ -592,6 +592,8 @@ const translations: TranslationDeepObject<typeof en> = {
         unsupportedFileType: (fileType: string) => `Pliki typu ${fileType} nie są obsługiwane. Zostaną przesłane tylko obsługiwane typy plików.`,
         learnMoreAboutSupportedFiles: 'Dowiedz się więcej o obsługiwanych formatach.',
         passwordProtected: 'Pliki PDF zabezpieczone hasłem nie są obsługiwane. Zostaną przesłane tylko obsługiwane pliki.',
+        heicConversionFailed: 'Nie udało się przekonwertować tego obrazu HEIC. Przekonwertuj go na JPEG lub PNG i spróbuj ponownie.',
+        heicConversionFailedMultiple: 'Niektórych obrazów HEIC nie udało się przekonwertować i nie zostaną przesłane. Przekonwertuj je na JPEG lub PNG i spróbuj ponownie.',
     },
     dropzone: {
         addAttachments: 'Dodaj załączniki',

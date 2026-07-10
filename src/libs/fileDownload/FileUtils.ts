@@ -799,6 +799,11 @@ const getFileValidationErrorText = (
                     title: translate('attachmentPicker.someFilesCantBeUploaded'),
                     reason: translate('attachmentPicker.maxFileLimitExceeded'),
                 };
+            case CONST.FILE_VALIDATION_ERRORS.HEIC_CONVERSION_FAILED:
+                return {
+                    title: translate('attachmentPicker.someFilesCantBeUploaded'),
+                    reason: translate('attachmentPicker.heicConversionFailedMultiple'),
+                };
             default:
                 break;
         }
@@ -834,6 +839,11 @@ const getFileValidationErrorText = (
             return {
                 title: translate('attachmentPicker.attachmentError'),
                 reason: translate('attachmentPicker.imageDimensionsTooLarge'),
+            };
+        case CONST.FILE_VALIDATION_ERRORS.HEIC_CONVERSION_FAILED:
+            return {
+                title: translate('attachmentPicker.attachmentError'),
+                reason: translate('attachmentPicker.heicConversionFailed'),
             };
         default:
             break;

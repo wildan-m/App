@@ -593,6 +593,9 @@ const translations: TranslationDeepObject<typeof en> = {
         unsupportedFileType: (fileType: string) => `${fileType}-Dateien werden nicht unterstützt. Es werden nur unterstützte Dateitypen hochgeladen.`,
         learnMoreAboutSupportedFiles: 'Erfahren Sie mehr über unterstützte Formate.',
         passwordProtected: 'Passwortgeschützte PDFs werden nicht unterstützt. Es werden nur unterstützte Dateien hochgeladen.',
+        heicConversionFailed: 'Dieses HEIC-Bild konnte nicht konvertiert werden. Bitte konvertieren Sie es in JPEG oder PNG und versuchen Sie es erneut.',
+        heicConversionFailedMultiple:
+            'Einige HEIC-Bilder konnten nicht konvertiert werden und werden nicht hochgeladen. Bitte konvertieren Sie sie in JPEG oder PNG und versuchen Sie es erneut.',
     },
     dropzone: {
         addAttachments: 'Anhänge hinzufügen',

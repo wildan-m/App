@@ -595,6 +595,8 @@ const translations: TranslationDeepObject<typeof en> = {
         unsupportedFileType: (fileType: string) => `${fileType} ファイルはサポートされていません。サポートされているファイルタイプのみアップロードされます。`,
         learnMoreAboutSupportedFiles: '対応している形式の詳細を確認する',
         passwordProtected: 'パスワードで保護されたPDFはサポートされていません。サポートされているファイルのみアップロードされます。',
+        heicConversionFailed: 'この HEIC 画像を変換できませんでした。JPEG または PNG に変換してから、もう一度お試しください。',
+        heicConversionFailedMultiple: '一部の HEIC 画像は変換できなかったため、アップロードされません。JPEG または PNG に変換してから、もう一度お試しください。',
     },
     dropzone: {
         addAttachments: '添付ファイルを追加',

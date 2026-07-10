@@ -590,6 +590,8 @@ const translations: TranslationDeepObject<typeof en> = {
         unsupportedFileType: (fileType: string) => `不支持 ${fileType} 文件。只有受支持的文件类型会被上传。`,
         learnMoreAboutSupportedFiles: '了解支持的格式详情。',
         passwordProtected: '不支持受密码保护的 PDF。只有受支持的文件会被上传。',
+        heicConversionFailed: '无法转换此 HEIC 图像。请将其转换为 JPEG 或 PNG 后重试。',
+        heicConversionFailedMultiple: '某些 HEIC 图片无法转换，因而不会被上传。请将它们转换为 JPEG 或 PNG 后重试。',
     },
     dropzone: {
         addAttachments: '添加附件',

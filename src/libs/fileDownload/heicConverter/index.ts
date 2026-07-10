@@ -22,18 +22,12 @@ const getHeicConverter = () => {
  * @param callbacks - Object containing callback functions for different stages of conversion
  */
 const convertHeicImage: HeicConverterFunction = (file, {onSuccess = () => {}, onError = () => {}, onStart = () => {}, onFinish = () => {}} = {}) => {
-    if (!file.uri || !hasHeicOrHeifExtension(file)) {
+    if (!hasHeicOrHeifExtension(file)) {
         onSuccess(file);
         return;
     }
 
     onStart();
-
-    if (!file.uri) {
-        onError(new Error('File URI is undefined'), file);
-        onFinish();
-        return;
-    }
 
     // Start loading the conversion library in parallel with fetching the file
     const libraryPromise = getHeicConverter().catch((importError) => {
@@ -42,7 +36,18 @@ const convertHeicImage: HeicConverterFunction = (file, {onSuccess = () => {}, on
         throw new Error('HEIC conversion library unavailable');
     });
 
-    const fetchBlobPromise = fetch(file.uri).then((response) => response.blob());
+    const getBlob = (): Promise<Blob> => {
+        if (file.uri) {
+            return fetch(file.uri).then((response) => response.blob());
+        }
+        // A file picked from disk is already a Blob, so it only has to be fetched when it is referenced by uri.
+        if (file instanceof Blob) {
+            return Promise.resolve(file);
+        }
+        return Promise.reject(new Error('HEIC file has neither a uri nor blob data'));
+    };
+
+    const fetchBlobPromise = getBlob();
 
     Promise.all([libraryPromise, fetchBlobPromise])
         .then(([heicConverter, blob]) => {
