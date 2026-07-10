@@ -108,21 +108,26 @@ function MapView({
                 return;
             }
 
-            shouldInitializeCurrentPosition.current = false;
-
             if (!shouldPanMapToCurrentPosition()) {
+                shouldInitializeCurrentPosition.current = false;
                 setCurrentPositionToInitialState();
                 return;
             }
 
             // Only read the device location when permission is ALREADY granted. We never request it here,
             // so opening the map cannot trigger an OS permission prompt without a prior explicit user action.
+            //
+            // The one-shot latch above is consumed only once the read has settled, never before it starts.
+            // The cleanup below cancels a read that is still in flight, so consuming the latch up front would
+            // discard that read for good and strand the map on initialState. Leaving it untouched lets the
+            // next run of this effect start the read over.
             let ignore = false;
             getForegroundPermissionsAsync().then(({granted}) => {
                 if (ignore) {
                     return;
                 }
                 if (!granted) {
+                    shouldInitializeCurrentPosition.current = false;
                     // Pass the permission-denied error so any stale cached location is cleared and the map falls back to initialState.
                     setCurrentPositionToInitialState({
                         code: GeolocationErrorCode.PERMISSION_DENIED,
@@ -131,16 +136,26 @@ function MapView({
                     return;
                 }
 
-                getCurrentPosition((params) => {
-                    if (ignore) {
-                        return;
-                    }
-                    const currentCoords = {
-                        longitude: params.coords.longitude,
-                        latitude: params.coords.latitude,
-                    };
-                    setUserLocation(currentCoords);
-                }, setCurrentPositionToInitialState);
+                getCurrentPosition(
+                    (params) => {
+                        if (ignore) {
+                            return;
+                        }
+                        shouldInitializeCurrentPosition.current = false;
+                        const currentCoords = {
+                            longitude: params.coords.longitude,
+                            latitude: params.coords.latitude,
+                        };
+                        setUserLocation(currentCoords);
+                    },
+                    (error) => {
+                        if (ignore) {
+                            return;
+                        }
+                        shouldInitializeCurrentPosition.current = false;
+                        setCurrentPositionToInitialState(error);
+                    },
+                );
             });
 
             return () => {
