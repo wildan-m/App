@@ -1480,7 +1480,21 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
             const exportOptions: PopoverMenuItem[] = [];
 
-            const connectedIntegration = getConnectedIntegration(policy);
+            // A selection can span several policies (e.g. the Awaiting export view is not workspace-scoped), so resolve the
+            // integration from the selected reports. Only a selection that resolves to a single connection name can be
+            // offered, because the export actions dispatch one connection name for the whole batch of report IDs.
+            const getSelectedReportsConnectedIntegration = () => {
+                const connections = selectedReports.map((report) => getConnectedIntegration(policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`]));
+                const firstConnection = connections.at(0);
+
+                if (!firstConnection || !connections.every((connection) => connection === firstConnection)) {
+                    return undefined;
+                }
+
+                return firstConnection;
+            };
+
+            const connectedIntegration = getSelectedReportsConnectedIntegration() ?? getConnectedIntegration(policy);
             const isReportsTab = isExpenseReportType;
             const includesGroupExport = Object.entries(selectedTransactions).some(
                 ([key, selectedTransaction]) => key.startsWith(CONST.SEARCH.GROUP_PREFIX) && !selectedTransaction?.transaction,
