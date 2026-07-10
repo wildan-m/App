@@ -177,9 +177,11 @@ function SubmitDetailsPage({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reportOrAccountID, policy, personalPolicy, report, parentReport, currentDate, currentUserPersonalDetails, hasOnlyPersonalPolicies]);
 
-    const sharedFileSource = currentAttachment?.content ?? fileUri;
-    const sharedFileName = getFileName(currentAttachment?.content ?? '') || fileName;
-    const sharedFileType = currentAttachment?.mimeType ?? fileType;
+    // Use the pre-validated file when the share needs validation (e.g. HEIC converted to JPEG), otherwise the raw attachment.
+    // fileUri/fileName/fileType already encode that decision, so reading them directly keeps the Submit tab in sync with the converted file — mirroring ShareDetailsPage.
+    const sharedFileSource = fileUri;
+    const sharedFileName = fileName;
+    const sharedFileType = fileType;
 
     // Seed the draft so isScanRequest() returns true (enables compact mode + receipt rendering).
     useEffect(() => {
@@ -389,7 +391,8 @@ function SubmitDetailsPage({
 
     // Separate helper so the permission-modal callbacks don't re-enter onConfirm (deadlocked when OS permission was pre-granted).
     const performUpload = (locationPermissionGranted: boolean) => {
-        if (formHasBeenSubmitted.current || !currentAttachment) {
+        // Bail out if the file still needs validation but the converted result is not in Onyx yet, so we never upload an empty/raw source. Mirrors ShareDetailsPage's handleShare guard.
+        if (formHasBeenSubmitted.current || !currentAttachment || (shouldUsePreValidatedFile && !validFilesToUpload)) {
             setIsConfirming(false);
             return;
         }
