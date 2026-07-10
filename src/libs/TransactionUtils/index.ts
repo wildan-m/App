@@ -2363,9 +2363,14 @@ function getWorkspaceTaxesSettingsName(policy: OnyxEntry<Policy>, taxCode: strin
 
 /**
  * Gets the name corresponding to the taxCode that is displayed to the user
+ *
+ * @param shouldFallbackToDefaultTaxCode - Only the flows that are about to write the workspace default onto the
+ * expense (money request confirmation, tax rate selection) may substitute it for a missing taxCode. Displaying an
+ * existing expense must not, or an expense whose taxCode has not loaded yet renders the default rate's name as if
+ * it were its own.
  */
-function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>, shouldFallbackToValue = false) {
-    const defaultTaxCode = getDefaultTaxCode(policy, transaction);
+function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>, shouldFallbackToValue = false, shouldFallbackToDefaultTaxCode = false) {
+    const defaultTaxCode = shouldFallbackToDefaultTaxCode ? getDefaultTaxCode(policy, transaction) : undefined;
 
     // Only fall back to the default tax code when tax tracking is enabled on the policy.
     // When taxes are disabled and the user deletes a tax, taxCode becomes undefined (the API returns null, which Onyx strips).
@@ -2373,7 +2378,17 @@ function getTaxName(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transactio
     // We use || instead of ?? because taxCode may be an empty string, which should also trigger the fallback.
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const effectiveTaxCode = transaction?.taxCode || (policy?.tax?.trackingEnabled ? defaultTaxCode : undefined);
-    const taxRate = effectiveTaxCode ? Object.values(transformedTaxRates(policy, transaction)).find((rate) => rate.code === effectiveTaxCode) : undefined;
+    const transformedRates = transformedTaxRates(policy, transaction);
+    let taxRate = effectiveTaxCode ? Object.values(transformedRates).find((rate) => rate.code === effectiveTaxCode) : undefined;
+
+    // The expense carries its tax value but not its tax code, which happens while the full transaction is still
+    // loading. Resolve the rate from the value so the expense's own rate shows, but only when the value identifies
+    // a single rate — otherwise we would be guessing between rates that share a value.
+    const transactionTaxValue = transaction?.taxValue;
+    if (!taxRate && !transaction?.taxCode && transactionTaxValue) {
+        const ratesMatchingValue = Object.values(transformedRates).filter((rate) => rate.value === transactionTaxValue);
+        taxRate = ratesMatchingValue.length === 1 ? ratesMatchingValue.at(0) : undefined;
+    }
 
     if (shouldFallbackToValue && transaction?.taxValue !== undefined && taxRate?.value !== transaction?.taxValue) {
         return transaction?.taxValue;
@@ -2405,19 +2420,21 @@ function hasTaxRateWithMatchingValue(policy: OnyxEntry<Policy>, transaction: Ony
  * Gets the tax rate title for display, handling the case when moving expenses from track to submit
  */
 function getTaxRateTitle(policy: OnyxEntry<Policy>, transaction: OnyxEntry<Transaction>, isMovingFromTrackExpense: boolean, policyForMovingExpenses?: OnyxEntry<Policy>): string {
-    const currentTaxName = getTaxName(policy, transaction);
+    // These are the confirmation and selection flows, where the workspace default is the rate that will be written
+    // onto the expense on save, so substituting it for a missing taxCode is what the user is about to get.
+    const currentTaxName = getTaxName(policy, transaction, false, true);
 
     if (currentTaxName) {
         // If moving from track expense show the tax name from the moving policy
         if (isMovingFromTrackExpense && !hasTaxRateWithMatchingValue(policy, transaction)) {
-            return getTaxName(policyForMovingExpenses, transaction) ?? '';
+            return getTaxName(policyForMovingExpenses, transaction, false, true) ?? '';
         }
-        return getTaxName(policy, transaction, true) ?? '';
+        return getTaxName(policy, transaction, true, true) ?? '';
     }
 
     // If no tax name on current policy but moving from track expense, use the moving policy
     if (isMovingFromTrackExpense) {
-        return getTaxName(policyForMovingExpenses, transaction, true) ?? '';
+        return getTaxName(policyForMovingExpenses, transaction, true, true) ?? '';
     }
 
     return '';

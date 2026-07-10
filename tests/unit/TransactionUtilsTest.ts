@@ -2255,6 +2255,65 @@ describe('TransactionUtils', () => {
         });
     });
 
+    describe('getTaxName', () => {
+        const policy: Policy = {
+            ...createRandomPolicy(0),
+            tax: {trackingEnabled: true},
+            taxRates: CONST.DEFAULT_TAX,
+        };
+
+        it('should not display the workspace default tax rate for an expense that has no tax code', () => {
+            const transaction = generateTransaction({taxCode: undefined, taxValue: undefined});
+
+            const result = TransactionUtils.getTaxName(policy, transaction);
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should still substitute the workspace default tax rate when the caller opts in', () => {
+            const transaction = generateTransaction({taxCode: undefined, taxValue: undefined});
+
+            const result = TransactionUtils.getTaxName(policy, transaction, false, true);
+
+            expect(result).toBe('Tax exempt (0%) • Default');
+        });
+
+        it('should resolve the rate from the tax value when the expense has no tax code', () => {
+            const transaction = generateTransaction({taxCode: undefined, taxValue: '5%'});
+
+            const result = TransactionUtils.getTaxName(policy, transaction);
+
+            expect(result).toBe('Tax Rate 1 (5%)');
+        });
+
+        it('should not guess a rate when several rates share the tax value', () => {
+            const policyWithAmbiguousRates: Policy = {
+                ...policy,
+                taxRates: {
+                    ...CONST.DEFAULT_TAX,
+                    taxes: {
+                        ...CONST.DEFAULT_TAX.taxes,
+                        // eslint-disable-next-line @typescript-eslint/naming-convention
+                        id_TAX_RATE_2: {name: 'Tax Rate 2', value: '5%'},
+                    },
+                },
+            };
+            const transaction = generateTransaction({taxCode: undefined, taxValue: '5%'});
+
+            const result = TransactionUtils.getTaxName(policyWithAmbiguousRates, transaction);
+
+            expect(result).toBeUndefined();
+        });
+
+        it('should display the rate assigned to the expense when it has a tax code', () => {
+            const transaction = generateTransaction({taxCode: 'id_TAX_RATE_1', taxValue: '5%'});
+
+            const result = TransactionUtils.getTaxName(policy, transaction);
+
+            expect(result).toBe('Tax Rate 1 (5%)');
+        });
+    });
+
     describe('getTaxRateTitle', () => {
         const policy: Policy = {
             ...createRandomPolicy(0),
