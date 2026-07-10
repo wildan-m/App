@@ -260,9 +260,11 @@ function AttachmentPicker({
                                                 checkAllProcessed();
                                             })
                                             .catch((error: Error) => {
-                                                Log.warn('Failed to convert HEIC image, falling back to original', {error: error.message});
-                                                const fallbackAsset = processAssetWithFallbacks(asset);
-                                                processedAssets.push(fallbackAsset);
+                                                // Do not fall back to the original HEIC asset: its uri still points at the
+                                                // untranscoded HEIC, which the backend rejects. Surface the failure the same
+                                                // way the sibling verifyFileFormat catch does, and drop the asset.
+                                                Log.warn('Failed to convert HEIC image', {error: error.message});
+                                                showGeneralAlert(error.message ?? 'An unknown error occurred');
                                                 checkAllProcessed();
                                             });
                                     } else {

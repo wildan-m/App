@@ -217,6 +217,11 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
                         new Promise<void>((resolve) => {
                             convertHeicImage(file, {
                                 onSuccess: (convertedFile) => {
+                                    // Preserve the original selection order: the converted file inherits the order
+                                    // index of the file it came from, so ordering stays correct even when some
+                                    // conversions are diverted to resizing or fail entirely.
+                                    updateFileOrderMapping(file, convertedFile);
+
                                     if (validationState.isValidatingReceipts && convertedFile.size && convertedFile.size > CONST.API_ATTACHMENT_VALIDATIONS.RECEIPT_MAX_SIZE) {
                                         convertedFilesToResize.push(convertedFile);
                                         resolve();
@@ -236,8 +241,14 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
                                     resolve();
                                 },
                                 onError: () => {
-                                    Log.warn('HEIC conversion failed, falling back to original file', {fileName: file.name});
-                                    convertedFiles.push(file);
+                                    // A failed conversion must never fall back to uploading the raw HEIC file:
+                                    // the backend rejects `image/heic`, leaving a receipt-less expense with no
+                                    // signal to the user. Surface a corrupted-file error and drop the file instead.
+                                    Log.warn('HEIC conversion failed, the file will not be uploaded', {fileName: file.name});
+                                    collectedErrors.current.push({
+                                        error: CONST.FILE_VALIDATION_ERRORS.FILE_CORRUPTED,
+                                        isValidatingMultipleFiles: validationState.isValidatingMultipleFiles,
+                                    });
                                     resolve();
                                 },
                             });
@@ -247,10 +258,6 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
 
             filesToResize.push(...convertedFilesToResize);
             validNonPdfFiles.push(...convertedFiles);
-
-            for (const [index, convertedFile] of convertedFiles.entries()) {
-                updateFileOrderMapping(filesToConvert.at(index), convertedFile);
-            }
         }
 
         if (filesToResize.length > 0) {
@@ -272,6 +279,23 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
                     }
                 }
             }
+        }
+
+        // Defense in depth: guarantee no HEIC/HEIF file ever reaches the upload flow, even if a future
+        // conversion path forgets to handle the converter's `onError`. The backend rejects `image/heic`,
+        // so any lingering HEIC is surfaced as a wrong-file-type error rather than silently uploaded.
+        for (let i = validNonPdfFiles.length - 1; i >= 0; i--) {
+            const file = validNonPdfFiles.at(i);
+            const isHeic = !!file && (file.type === 'image/heic' || file.type === 'image/heif' || !!hasHeicOrHeifExtension(file));
+            if (!file || !isHeic) {
+                continue;
+            }
+            validNonPdfFiles.splice(i, 1);
+            collectedErrors.current.push({
+                error: CONST.FILE_VALIDATION_ERRORS.WRONG_FILE_TYPE,
+                isValidatingMultipleFiles: validationState.isValidatingMultipleFiles,
+                fileType: splitExtensionFromFileName(file.name ?? '').fileExtension,
+            });
         }
 
         const handleNext = () => {

@@ -29,10 +29,20 @@ const convertImageWithManipulator = (
         onFinish?: () => void;
     } = {},
 ) => {
-    const imageManipulatorContext = ImageManipulator.manipulate(sourceUri);
-    imageManipulatorContext
-        .renderAsync()
-        .then((manipulatedImage) => manipulatedImage.saveAsync({format: SaveFormat.JPEG}))
+    // Each attempt builds its own ImageManipulator context. `Image context has been lost` is a
+    // transient, per-context failure under memory pressure, so a fresh context is required to retry.
+    const renderAndSave = () =>
+        ImageManipulator.manipulate(sourceUri)
+            .renderAsync()
+            .then((manipulatedImage) => manipulatedImage.saveAsync({format: SaveFormat.JPEG}));
+
+    renderAndSave()
+        .catch((err) => {
+            // Retry exactly once with a fresh context before reporting failure — this is why the
+            // issue's "retry the upload" workaround succeeds. A genuinely corrupt file still fails fast.
+            Log.warn('HEIC/HEIF conversion failed, retrying once', {error: err instanceof Error ? err.message : String(err)});
+            return renderAndSave();
+        })
         .then((manipulationResult) => {
             const convertedFile = {
                 uri: manipulationResult.uri,
