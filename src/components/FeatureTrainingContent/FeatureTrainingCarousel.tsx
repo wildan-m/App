@@ -113,6 +113,17 @@ function FeatureTrainingCarousel({
         onPageChangeRef.current?.(entry.index);
     };
 
+    // Each page is exactly `carouselViewportWidth` wide, so a page's scroll offset is `index * carouselViewportWidth`.
+    // When the device rotates, `carouselViewportWidth` changes but the list keeps its old pixel offset, which no longer
+    // lands on a page boundary — leaving the modal stuck between pages. Re-anchor the list to the current page whenever
+    // the width changes so it stays aligned across orientation changes.
+    useEffect(() => {
+        if (carouselViewportWidth <= 0) {
+            return;
+        }
+        horizontalListRef.current?.scrollToOffset({offset: lastReportedPage.current * carouselViewportWidth, animated: false});
+    }, [carouselViewportWidth]);
+
     const advanceCarousel = () => {
         horizontalListRef.current?.scrollToIndex({index: Math.min(currentPage + 1, pages.length - 1), animated: true});
     };
