@@ -19,6 +19,13 @@ type ShouldHideForYouSectionParams = {
 
     /** Whether the onboarding NVP has loaded. Until then `isOnboardingCompleted` defaults to "completed" and is unreliable. */
     isOnboardingStatusKnown: boolean;
+
+    /**
+     * Whether the account has a NewDot onboarding record (a non-empty `nvp_onboarding`). Genuine NewDot sign-ups have
+     * one; old/migrated accounts have an empty object. Used to classify a user who has no free-trial date yet (they
+     * finished onboarding but haven't created a workspace, so the trial hasn't started) as a new user.
+     */
+    isNewDotUser: boolean;
 };
 
 /**
@@ -35,6 +42,7 @@ function shouldHideForYouSection({
     cutoffDate,
     isOnboardingCompleted,
     isOnboardingStatusKnown,
+    isNewDotUser,
 }: ShouldHideForYouSectionParams): boolean {
     // Keep the section visible (even during initial load) once a to-do exists or ever has.
     if (hasAnyTodos || hasSeenTodo) {
@@ -52,7 +60,10 @@ function shouldHideForYouSection({
     }
 
     if (!firstDayFreeTrial) {
-        return false;
+        // No free-trial date means the trial hasn't started yet: a brand-new user can finish onboarding without
+        // creating a workspace, so the `nvp_private_firstDayFreeTrial` NVP is still absent. Treat these new users as
+        // new (hide the empty section) while keeping it visible for old/migrated accounts, which never had a record.
+        return isNewDotUser;
     }
 
     const trialStartMs = new Date(firstDayFreeTrial).getTime();
