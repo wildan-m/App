@@ -19,6 +19,8 @@ import {
     canMemberWrite,
     getAccountIDForSubmitManagerEmail,
     getSubmitReportManagerAccountID,
+    getSubmitToAccountID,
+    getSubmitToEmail,
     hasDynamicExternalWorkflow,
     isPaidGroupPolicy,
     isSubmitAndClose,
@@ -1381,6 +1383,13 @@ function submitReport({
     const resolvedManagerAccountIDFromEmail = managerAccountIDFromPopover ?? managerAccountIDFromEmail;
     const submitReportManagerAccountID = getSubmitReportManagerAccountID(policy, expenseReport, submitterLogin);
     const managerID = trimmedManagerEmail ? (resolvedManagerAccountIDFromEmail ?? managerIDFromChain ?? expenseReport.managerID) : submitReportManagerAccountID;
+    // When no manager email was manually chosen, the manager is resolved from the workspace approval
+    // config. Its accountID can be a placeholder generated from the approver's email (getAccountIDsByLogins
+    // hashes unknown logins) when the approver's personal details are not cached locally. In that case send
+    // the resolved email alongside it so the backend can map it to the real member instead of rejecting the
+    // submission. Only attach it when managerID actually came from the policy route, so the email matches.
+    const submitToEmail = trimmedManagerEmail ? undefined : getSubmitToEmail(policy, expenseReport, submitterLogin);
+    const resolvedManagerEmail = submitToEmail && managerID === getSubmitToAccountID(policy, expenseReport, submitterLogin) ? submitToEmail : undefined;
     const optimisticNextStepApproverID = !isSubmitAndClosePolicy && managerID !== undefined && isValidAccountRoute(managerID) ? managerID : undefined;
     const isCurrentUserManager = currentUserAccountIDParam === managerID;
     const optimisticSubmittedReportAction = buildOptimisticSubmittedReportAction(
@@ -1635,7 +1644,11 @@ function submitReport({
             ? {
                   managerEmail: trimmedManagerEmail,
               }
-            : {}),
+            : resolvedManagerEmail
+              ? {
+                    managerEmail: resolvedManagerEmail,
+                }
+              : {}),
     };
 
     onSubmitted?.();
