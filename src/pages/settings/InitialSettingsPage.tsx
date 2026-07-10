@@ -406,7 +406,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         });
     }
 
-    if (subscriptionPlan || (amountOwed ?? 0) > 0) {
+    if (isAgentAccount || subscriptionPlan || (amountOwed ?? 0) > 0) {
         accountItems.splice(1, 0, {
             translationKey: 'allSettingsScreen.subscription',
             icon: icons.CreditCard,

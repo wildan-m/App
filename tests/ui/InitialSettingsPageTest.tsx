@@ -226,6 +226,28 @@ describe('InitialSettingsPage - agent account', () => {
         });
     });
 
+    it('shows Subscription for agent account without a subscription plan or amount owed', async () => {
+        await setupUser('agent_123@expensify.ai');
+
+        renderPage();
+        await waitForBatchedUpdatesWithAct();
+
+        await waitFor(() => {
+            expect(screen.getByTestId('menu-item-Subscription')).toBeDefined();
+        });
+    });
+
+    it('hides Subscription for non-agent account without a subscription plan or amount owed', async () => {
+        await setupUser('user@expensify.com');
+
+        renderPage();
+        await waitForBatchedUpdatesWithAct();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('menu-item-Subscription')).toBeNull();
+        });
+    });
+
     it('hides Agents for agent account when CUSTOM_AGENT beta is enabled', async () => {
         mockUsePermissions.mockReturnValue({isBetaEnabled: (beta: string) => beta === CONST.BETAS.CUSTOM_AGENT});
         await setupUser('agent_123@expensify.ai');
