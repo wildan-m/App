@@ -1,4 +1,4 @@
-import {getActiveScreenInRoute, isNavigatingToReportActionWithinSameReport, isSwitchingTabsWithinTabNavigator, shouldChangeToMatchingFullScreen} from '@libs/Navigation/helpers/linkTo';
+import {getActiveScreenInRoute, isSwitchingTabsWithinTabNavigator, shouldChangeToMatchingFullScreen} from '@libs/Navigation/helpers/linkTo';
 import type {NavigationPartialRoute, RootNavigatorParamList} from '@libs/Navigation/types';
 
 import NAVIGATORS from '@src/NAVIGATORS';
@@ -175,82 +175,5 @@ describe('shouldChangeToMatchingFullScreen', () => {
     it('returns false when both TAB_NAVIGATOR without state (both active screens undefined)', () => {
         const result = shouldChangeToMatchingFullScreen({name: 'SomeRHPScreen', key: 'k1'}, {name: NAVIGATORS.TAB_NAVIGATOR}, {name: NAVIGATORS.TAB_NAVIGATOR});
         expect(result).toBe(false);
-    });
-});
-
-describe('isNavigatingToReportActionWithinSameReport', () => {
-    it('returns true when linking from a report to one of its report actions', () => {
-        const currentRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-            },
-        };
-        const newRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 222,
-            },
-        };
-
-        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(true);
-    });
-
-    it('returns true when linking between report actions in the same report', () => {
-        const currentRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 222,
-            },
-        };
-        const newRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 333,
-            },
-        };
-
-        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(true);
-    });
-
-    it('returns false when linking to the same report action', () => {
-        const currentRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 333,
-            },
-        };
-        const newRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 333,
-            },
-        };
-
-        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(false);
-    });
-
-    it('returns false when screens change', () => {
-        const currentRoute: NavigationPartialRoute = {
-            name: SCREENS.REPORT,
-            params: {
-                reportID: 111,
-                reportActionID: 333,
-            },
-        };
-        const newRoute: NavigationPartialRoute = {
-            name: SCREENS.HOME,
-            params: {
-                reportID: 111,
-                reportActionID: 444,
-            },
-        };
-
-        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(false);
     });
 });
