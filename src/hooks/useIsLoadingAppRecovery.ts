@@ -48,10 +48,13 @@ function useIsLoadingAppRecovery() {
         openApp();
     }, [hasLoadedApp, isLoadingApp, isOffline, sessionAccountID, isLoadingAppMetadata]);
 
-    // Recovery: if isLoadingApp stays `true` while the app is loaded and online with no reconnect-family
-    // request pending, the clearing finallyData was lost — re-open the app.
+    // Recovery: if isLoadingApp stays `true` while online with no reconnect-family request pending, the
+    // clearing finallyData was lost — re-open the app. This must not require hasLoadedApp, because
+    // HAS_LOADED_APP also rides the same queue flush and can itself never resolve (see #95899); gating on
+    // it would skip recovery in exactly that case. sessionAccountID keeps this to authenticated sessions,
+    // which is the "app is loaded" signal hasLoadedApp used to stand in for.
     useEffect(() => {
-        if (hasHandledStrandedIsLoadingAppRef.current || !hasLoadedApp || isLoadingApp !== true || isOffline || isLoadingOnyxValue(isLoadingAppMetadata)) {
+        if (hasHandledStrandedIsLoadingAppRef.current || !sessionAccountID || isLoadingApp !== true || isOffline || isLoadingOnyxValue(isLoadingAppMetadata)) {
             return;
         }
 
