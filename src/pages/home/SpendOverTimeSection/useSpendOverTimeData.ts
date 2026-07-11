@@ -61,13 +61,16 @@ function useSpendOverTimeData() {
     const {convertToDisplayString} = useCurrencyListActions();
     const {accountID, login} = useCurrentUserPersonalDetails();
     const [searchResults] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${queryJSON?.hash}`);
-    const isSearchLoading = !!searchResults?.search?.isLoading;
 
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
 
     const onConfigChanged = useEffectEvent(() => {
-        if (!queryJSON || isSearchLoading || isOffline) {
+        // Do not gate the fetch on the persisted `search.isLoading` snapshot flag: on iOS the app can be killed
+        // mid-request, leaving `isLoading: true` persisted with no in-flight request, which would deadlock the
+        // widget in an infinite spinner. Concurrent-request dedup is handled inside `search()` itself via its
+        // session-scoped `inFlightSearchRequests` set.
+        if (!queryJSON || isOffline) {
             return;
         }
 
