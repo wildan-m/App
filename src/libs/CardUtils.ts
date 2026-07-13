@@ -170,6 +170,42 @@ function getAssignedCardSortKey(card: Card): number {
 }
 
 /**
+ * Collects the cardIDs of the virtual halves of combo cards.
+ *
+ * A combo card is a physical Expensify card paired with a single virtual counterpart in the same domain, and it is
+ * displayed as the physical card alone. Every other active virtual card is standalone and has to be displayed on its
+ * own, including the ones that were not issued through NewDot and therefore carry no `issuedBy` name-value pair.
+ *
+ * @param cards - the assigned cards to inspect
+ * @returns the cardIDs of the virtual cards that are represented by their physical counterpart
+ */
+function getComboVirtualCardIDs(cards: Card[]): Set<number> {
+    const domainsWithPhysicalCard = new Set(cards.filter((card) => isExpensifyCard(card) && !card.nameValuePairs?.isVirtual && !!card.domainName).map((card) => card.domainName));
+
+    const comboVirtualCardIDs = new Set<number>();
+    const pairedDomains = new Set<string>();
+
+    for (const card of lodashSortBy(cards, getAssignedCardSortKey)) {
+        const domainName = card.domainName;
+        const isVirtualCard = !!card.nameValuePairs?.isVirtual;
+
+        // Admin-issued virtual cards are always standalone, and a virtual card can only be paired with a physical card
+        // of the same domain that has not been paired yet.
+        if (!isExpensifyCard(card) || !isVirtualCard || !!card.nameValuePairs?.issuedBy || !domainName) {
+            continue;
+        }
+        if (!domainsWithPhysicalCard.has(domainName) || pairedDomains.has(domainName)) {
+            continue;
+        }
+
+        pairedDomains.add(domainName);
+        comboVirtualCardIDs.add(card.cardID);
+    }
+
+    return comboVirtualCardIDs;
+}
+
+/**
  * Checks if the card is an Expensify card.
  * @param card - The card to check.
  * @returns boolean
@@ -1827,18 +1863,21 @@ function getDisplayableExpensifyCards(cardList: CardList | undefined): Card[] {
     );
 
     const sortedCards = lodashSortBy(activeExpensifyCards, getAssignedCardSortKey);
+    const comboVirtualCardIDs = getComboVirtualCardIDs(activeExpensifyCards);
     const seenDomains = new Set<string>();
 
     return sortedCards.filter((card) => {
-        const isAdminIssuedVirtualCard = !!card.nameValuePairs?.issuedBy && !!card.nameValuePairs?.isVirtual;
-        const isComboCard = !!card.domainName && !isAdminIssuedVirtualCard;
+        // The virtual half of a combo card is represented by its physical half, which sorts first.
+        if (comboVirtualCardIDs.has(card.cardID)) {
+            return false;
+        }
 
-        // Always show non-combo cards (admin-issued virtual or cards without domain)
-        if (!isComboCard) {
+        // Always show standalone virtual cards and cards without a domain.
+        if (!!card.nameValuePairs?.isVirtual || !card.domainName) {
             return true;
         }
 
-        // For combo cards, only show the first one per domain (physical card comes first due to sorting)
+        // For domain cards, only show the first one per domain.
         if (seenDomains.has(card.domainName)) {
             return false;
         }
@@ -2000,6 +2039,7 @@ function resolveTransactionCardFields<T extends Transaction>(transactions: T[], 
 
 export {
     getAssignedCardSortKey,
+    getComboVirtualCardIDs,
     getCardFeedBackgroundColor,
     getCardFeedTextColor,
     getDefaultExpensifyCardLimitType,

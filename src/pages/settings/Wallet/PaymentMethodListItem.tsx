@@ -44,6 +44,9 @@ type PaymentMethodItem = PaymentMethod & {
     description: string;
     onPress?: (e: GestureResponderEvent | KeyboardEvent | undefined) => void;
     isGroupedCardDomain?: boolean;
+
+    /** The raw domain of the grouped card, used to match other cards of the same domain into this group */
+    groupedCardDomainName?: string;
     canDismissError?: boolean;
     disabled?: boolean;
     shouldShowRightIcon?: boolean;

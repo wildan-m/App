@@ -17,6 +17,7 @@ import {
     getAssignedCardSortKey,
     getCardFeedIcon,
     getCardFeedWithDomainID,
+    getComboVirtualCardIDs,
     getPlaidInstitutionIconUrl,
     isActionableVirtualExpensifyCard,
     isCardConnectionBroken,
@@ -234,6 +235,7 @@ function PaymentMethodList({
                 );
 
             const assignedCardsSorted = lodashSortBy(assignedCards, getAssignedCardSortKey);
+            const comboVirtualCardIDs = getComboVirtualCardIDs(assignedCards);
             const companyCardsGrouped: PaymentMethodItem[] = [];
             const personalCardsGrouped: PaymentMethodItem[] = [];
             const hasMissingPersonalDetails = areAddressAndPersonalDetailsMissing(privatePersonalDetails);
@@ -330,7 +332,12 @@ function PaymentMethodList({
                     continue;
                 }
 
-                const isAdminIssuedVirtualCard = !!card?.nameValuePairs?.issuedBy && !!card?.nameValuePairs?.isVirtual;
+                const isVirtualCard = !!card?.nameValuePairs?.isVirtual;
+
+                // Only the virtual half of a combo card is folded into the domain group. Every other virtual card is
+                // standalone and gets its own entry, so it stays visible and tappable in the Wallet.
+                const isComboVirtualCard = comboVirtualCardIDs.has(card.cardID);
+                const shouldBeGroupedToDomain = !isVirtualCard || isComboVirtualCard;
 
                 // Travel cards are handled by the dedicated travelCardGrouped section below
                 if (isTravelCard(card)) {
@@ -338,8 +345,8 @@ function PaymentMethodList({
                 }
 
                 // The card should be grouped to a specific domain and such domain already exists in a assignedCardsGrouped
-                if (assignedCardsGrouped.some((item) => item.isGroupedCardDomain && item.description === card.domainName) && !isAdminIssuedVirtualCard) {
-                    const domainGroupIndex = assignedCardsGrouped.findIndex((item) => item.isGroupedCardDomain && item.description === card.domainName);
+                if (shouldBeGroupedToDomain && assignedCardsGrouped.some((item) => item.isGroupedCardDomain && item.groupedCardDomainName === card.domainName)) {
+                    const domainGroupIndex = assignedCardsGrouped.findIndex((item) => item.isGroupedCardDomain && item.groupedCardDomainName === card.domainName);
                     const assignedCardsGroupedItem = assignedCardsGrouped.at(domainGroupIndex);
                     if (domainGroupIndex >= 0 && assignedCardsGroupedItem) {
                         assignedCardsGroupedItem.errors = {...assignedCardsGrouped.at(domainGroupIndex)?.errors, ...card.errors};
@@ -380,7 +387,8 @@ function PaymentMethodList({
                             cardID: card.cardID,
                         }),
                     cardID: card.cardID,
-                    isGroupedCardDomain: !isAdminIssuedVirtualCard,
+                    isGroupedCardDomain: !isVirtualCard,
+                    groupedCardDomainName: card.domainName,
                     shouldShowRightIcon: true,
                     interactive: !isDisabled,
                     disabled: isDisabled,
