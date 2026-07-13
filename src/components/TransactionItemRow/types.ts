@@ -91,6 +91,9 @@ type TransactionItemRowProps = {
     onArrowRightPress?: (event?: ModifiedMouseEvent) => void;
     isHover?: boolean;
     shouldShowArrowRightOnNarrowLayout?: boolean;
+    /** Whether the hovered receipt preview should open to the left of the thumbnail when it fits. Set by surfaces that
+     * sit next to an expanded sidebar, so the preview covers the sidebar rather than the row's own data. */
+    shouldPreferLeftReceiptPreview?: boolean;
     reportActions?: ReportAction[];
     /** Precomputed transaction-thread report ID. When provided, skips the per-row report-actions scan used to derive it
      * (lets callers that already know the thread mapping avoid O(transactions × actions) work). */

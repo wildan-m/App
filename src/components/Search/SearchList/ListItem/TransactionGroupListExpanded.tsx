@@ -1,5 +1,6 @@
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
+import {useSearchSidebarCollapse} from '@components/Navigation/SearchSidebarCollapseStore';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {PressableWithFeedback} from '@components/Pressable';
 import ScrollView from '@components/ScrollView';
@@ -75,6 +76,9 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {windowWidth} = useWindowDimensions();
+    // With the sidebar expanded there is free space to its side, so the receipt preview opens over the sidebar
+    // instead of covering the expense data the row is showing.
+    const {isVisuallyCollapsed: isSidebarVisuallyCollapsed} = useSearchSidebarCollapse();
     const currentUserDetails = useCurrentUserPersonalDetails();
     const {translate} = useLocalize();
     const [isMobileSelectionModeEnabled] = useOnyx(ONYXKEYS.RAM_ONLY_MOBILE_SELECTION_MODE);
@@ -383,6 +387,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                                     nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                                     isActionColumnWide={isActionColumnWide}
                                     isHover={hovered}
+                                    shouldPreferLeftReceiptPreview={!isSidebarVisuallyCollapsed}
                                 />
                             )}
                         </PressableWithFeedback>

@@ -1,4 +1,5 @@
 import {getButtonRole} from '@components/Button/utils';
+import {useSearchSidebarCollapse} from '@components/Navigation/SearchSidebarCollapseStore';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import type {TransactionListItemType} from '@components/Search/SearchList/ListItem/types';
@@ -52,6 +53,9 @@ function TransactionListItemWide<TItem extends ListItem>({
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
+    // With the sidebar expanded there is free space to its side, so the receipt preview opens over the sidebar
+    // instead of covering the expense data the row is showing.
+    const {isVisuallyCollapsed: isSidebarVisuallyCollapsed} = useSearchSidebarCollapse();
     const pressableRef = useRef<View>(null);
     useSyncFocus(pressableRef, !!isFocused, shouldSyncFocus);
 
@@ -205,6 +209,7 @@ function TransactionListItemWide<TItem extends ListItem>({
                         violations={transactionViolations}
                         onArrowRightPress={isDeletedTransaction ? undefined : (event) => onSelectRow(item, transactionPreviewData, event)}
                         isHover={hovered}
+                        shouldPreferLeftReceiptPreview={!isSidebarVisuallyCollapsed}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         reportActions={exportedReportActions}
                         isAttendeesEnabledForMovingPolicy={isAttendeesEnabledForMovingPolicy}

@@ -28,6 +28,7 @@ function ReceiptCell({
     style,
     shouldUseNarrowLayout,
     shouldShowPreview = true,
+    shouldPreferLeftPreview = false,
 }: {
     transactionItem: Transaction;
     isSelected: boolean;
@@ -35,6 +36,8 @@ function ReceiptCell({
     shouldUseNarrowLayout?: boolean;
     /** Whether the hovered receipt preview may be shown. Set to false to dismiss it (e.g. when the screen is no longer focused). */
     shouldShowPreview?: boolean;
+    /** Whether the hovered receipt preview should open to the left of the thumbnail when it fits, instead of the default right side. */
+    shouldPreferLeftPreview?: boolean;
 }) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -111,6 +114,7 @@ function ReceiptCell({
                     isEReceipt={!!isEReceipt}
                     transactionItem={transactionItem}
                     anchorPosition={previewAnchor}
+                    shouldPreferLeftPosition={shouldPreferLeftPreview}
                 />
             )}
         </View>

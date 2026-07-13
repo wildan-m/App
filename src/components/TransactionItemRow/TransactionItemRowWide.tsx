@@ -96,6 +96,7 @@ function TransactionItemRowWide({
     shouldShowBottomBorder,
     onArrowRightPress,
     isHover = false,
+    shouldPreferLeftReceiptPreview = false,
     reportActions,
     checkboxSentryLabel,
     isActionColumnWide: isActionColumnWideProp,
@@ -172,6 +173,7 @@ function TransactionItemRowWide({
                             transactionItem={transactionItem}
                             isSelected={isSelected}
                             shouldUseNarrowLayout={false}
+                            shouldPreferLeftPreview={shouldPreferLeftReceiptPreview}
                         />
                     </View>
                 );

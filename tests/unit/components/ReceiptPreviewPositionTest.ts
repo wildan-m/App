@@ -91,4 +91,52 @@ describe('getAnchoredPreviewPosition', () => {
 
         expect(getAnchoredPreviewPosition(anchor, WINDOW_WIDTH, WINDOW_HEIGHT, previewHeight)?.top).toBe(RECEIPT_PREVIEW_EDGE_MARGIN);
     });
+
+    describe('when the caller prefers the left side (expanded sidebar)', () => {
+        // The receipt column sits ~456px from the left edge while the Search sidebar is expanded, which leaves
+        // room for the preview to open over the sidebar instead of over the row's own data.
+        const anchorBesideExpandedSidebar = {top: 300, left: 456, width: 28, height: 32};
+        // Collapsing the sidebar pulls the same column left, and the preview no longer fits beside it.
+        const anchorBesideCollapsedSidebar = {top: 300, left: 212, width: 28, height: 32};
+
+        it('places the preview to the left of the thumbnail when it fits there', () => {
+            const position = getAnchoredPreviewPosition(anchorBesideExpandedSidebar, WINDOW_WIDTH, WINDOW_HEIGHT, 200, true);
+
+            expect(position?.left).toBe(anchorBesideExpandedSidebar.left - RECEIPT_PREVIEW_WIDTH - RECEIPT_PREVIEW_GAP);
+            // The preview ends before the thumbnail starts, so it never covers the row it belongs to.
+            expect((position?.left ?? 0) + RECEIPT_PREVIEW_WIDTH).toBeLessThanOrEqual(anchorBesideExpandedSidebar.left);
+            expect(position?.left).toBeGreaterThanOrEqual(RECEIPT_PREVIEW_EDGE_MARGIN);
+        });
+
+        it('falls back to the right of the thumbnail when the left placement would run past the viewport edge', () => {
+            const position = getAnchoredPreviewPosition(anchorBesideCollapsedSidebar, WINDOW_WIDTH, WINDOW_HEIGHT, 200, true);
+
+            expect(position?.left).toBe(anchorBesideCollapsedSidebar.left + anchorBesideCollapsedSidebar.width + RECEIPT_PREVIEW_GAP);
+        });
+
+        it('keeps opening to the right when the caller does not prefer the left (Home page, collapsed sidebar)', () => {
+            const position = getAnchoredPreviewPosition(anchorBesideExpandedSidebar, WINDOW_WIDTH, WINDOW_HEIGHT, 200, false);
+
+            expect(position?.left).toBe(anchorBesideExpandedSidebar.left + anchorBesideExpandedSidebar.width + RECEIPT_PREVIEW_GAP);
+        });
+
+        it('still flips left for a thumbnail hugging the right edge, preferred or not', () => {
+            const anchor = {top: 300, left: WINDOW_WIDTH - 80, width: 68, height: 64};
+
+            const preferred = getAnchoredPreviewPosition(anchor, WINDOW_WIDTH, WINDOW_HEIGHT, 200, true);
+            const notPreferred = getAnchoredPreviewPosition(anchor, WINDOW_WIDTH, WINDOW_HEIGHT, 200, false);
+
+            expect(preferred?.left).toBe(anchor.left - RECEIPT_PREVIEW_WIDTH - RECEIPT_PREVIEW_GAP);
+            expect(notPreferred?.left).toBe(preferred?.left);
+        });
+
+        it('leaves the vertical placement untouched', () => {
+            const previewHeight = 200;
+
+            const preferred = getAnchoredPreviewPosition(anchorBesideExpandedSidebar, WINDOW_WIDTH, WINDOW_HEIGHT, previewHeight, true);
+            const notPreferred = getAnchoredPreviewPosition(anchorBesideExpandedSidebar, WINDOW_WIDTH, WINDOW_HEIGHT, previewHeight, false);
+
+            expect(preferred?.top).toBe(notPreferred?.top);
+        });
+    });
 });

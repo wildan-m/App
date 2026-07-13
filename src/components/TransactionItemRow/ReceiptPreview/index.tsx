@@ -43,9 +43,12 @@ type ReceiptPreviewProps = {
 
     /** Window position of the hovered cell. When set, the preview is anchored to the right of the row instead of the fixed upper-left corner. */
     anchorPosition?: AnchorPosition;
+
+    /** Whether to open the preview to the left of the thumbnail when it fits there, instead of the default right side. */
+    shouldPreferLeftPosition?: boolean;
 };
 
-function ReceiptPreview({source, hovered, isEReceipt = false, transactionItem, anchorPosition}: ReceiptPreviewProps) {
+function ReceiptPreview({source, hovered, isEReceipt = false, transactionItem, anchorPosition, shouldPreferLeftPosition = false}: ReceiptPreviewProps) {
     const isDistanceEReceipt = isDistanceRequest(transactionItem) && !isManualDistanceRequest(transactionItem);
     const isPerDiemEReceipt = isPerDiemRequest(transactionItem) && !hasReceiptSource(transactionItem) && !!transactionItem.transactionID;
     const styles = useThemeStyles();
@@ -124,7 +127,7 @@ function ReceiptPreview({source, hovered, isEReceipt = false, transactionItem, a
     const shouldShowDistanceEReceipt = isDistanceEReceipt && !isEReceipt && !isPerDiemEReceipt;
     const sourceObject = typeof source === 'string' ? {uri: source} : source;
 
-    const anchoredPositionStyle = getAnchoredPreviewPosition(anchorPosition, windowWidth, windowHeight, previewHeight);
+    const anchoredPositionStyle = getAnchoredPreviewPosition(anchorPosition, windowWidth, windowHeight, previewHeight, shouldPreferLeftPosition);
 
     return ReactDOM.createPortal(
         <Animated.View
