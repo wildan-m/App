@@ -471,7 +471,8 @@ function isReceivedPaymentAction(report: Report, reportTransactions: Transaction
         return true;
     }
 
-    if (policy?.role === CONST.POLICY.ROLE.ADMIN) {
+    // Admins are excluded because they can settle the report themselves with the Pay action, which requires payments to be enabled on the policy.
+    if (policy?.role === CONST.POLICY.ROLE.ADMIN && arePaymentsEnabledUtils(policy)) {
         return false;
     }
 
