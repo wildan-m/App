@@ -23,6 +23,7 @@ const WRITE_COMMANDS = {
     DISABLE_POLICY_APPROVALS: 'DisablePolicyApprovals',
     SET_WORKSPACE_PAYER: 'SetWorkspacePayer',
     SET_WORKSPACE_REIMBURSEMENT: 'SetWorkspaceReimbursement',
+    SET_REIMBURSEMENT_COUNTRIES: 'SetReimbursementCountries',
     SET_POLICY_DEFAULT_REPORT_TITLE: 'SetPolicyDefaultReportTitle',
     SET_POLICY_PREVENT_MEMBER_CREATED_TITLE: 'SetPolicyPreventMemberCreatedTitle',
     SET_POLICY_PREVENT_SELF_APPROVAL: 'SetPolicyPreventSelfApproval',
@@ -899,6 +900,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.DISABLE_POLICY_APPROVALS]: Parameters.DisablePolicyApprovalsParams;
     [WRITE_COMMANDS.SET_WORKSPACE_PAYER]: Parameters.SetWorkspacePayerParams;
     [WRITE_COMMANDS.SET_WORKSPACE_REIMBURSEMENT]: Parameters.SetWorkspaceReimbursementParams;
+    [WRITE_COMMANDS.SET_REIMBURSEMENT_COUNTRIES]: Parameters.SetReimbursementCountriesParams;
     [WRITE_COMMANDS.SET_POLICY_DEFAULT_REPORT_TITLE]: Parameters.SetPolicyDefaultReportTitleParams;
     [WRITE_COMMANDS.SET_POLICY_PREVENT_MEMBER_CREATED_TITLE]: Parameters.SetPolicyPreventMemberCreatedTitleParams;
     [WRITE_COMMANDS.SET_POLICY_PREVENT_SELF_APPROVAL]: Parameters.SetPolicyPreventSelfApprovalParams;

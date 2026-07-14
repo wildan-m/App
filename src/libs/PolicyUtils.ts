@@ -18,7 +18,7 @@ import type {
     Transaction,
     TravelSettings,
 } from '@src/types/onyx';
-import type {ErrorFields, PendingAction, PendingFields} from '@src/types/onyx/OnyxCommon';
+import type {ErrorFields, Errors, PendingAction, PendingFields} from '@src/types/onyx/OnyxCommon';
 import type {
     ApprovalRule,
     ConnectionLastSync,
@@ -32,6 +32,7 @@ import type {
     PolicyConnectionSyncProgress,
     PolicyFeatureName,
     Rate,
+    ReimbursementCountries,
     Tenant,
     Vendor,
 } from '@src/types/onyx/Policy';
@@ -305,6 +306,29 @@ function shouldShowPolicyError(policy: OnyxEntry<Policy>): boolean {
  */
 function shouldShowCustomUnitsError(policy: OnyxEntry<Policy>): boolean {
     return isPolicyAdmin(policy) && Object.keys(policy?.customUnits?.errors ?? {}).length > 0;
+}
+
+/**
+ * The reimbursement countries record is keyed by country ISO code but also carries a reserved `errors` entry, so the
+ * country codes are every key except that one.
+ */
+function getReimbursementCountryISOs(countries: ReimbursementCountries | undefined): string[] {
+    return Object.keys(countries ?? {}).filter((key) => key !== CONST.POLICY.REIMBURSEMENT_COUNTRIES_ERRORS_KEY);
+}
+
+/**
+ * The errors from the last reimbursement countries update, kept alongside the country entries under the reserved
+ * `errors` key of the same record (the arrangement `customUnits` uses).
+ */
+function getReimbursementCountriesErrors(policy: OnyxEntry<Policy>): Errors | undefined {
+    return policy?.reimbursement?.countries?.errors;
+}
+
+/**
+ * Checks if we have any errors stored within the policy reimbursement countries.
+ */
+function shouldShowReimbursementCountriesError(policy: OnyxEntry<Policy>): boolean {
+    return isPolicyAdmin(policy) && Object.keys(getReimbursementCountriesErrors(policy) ?? {}).length > 0;
 }
 
 function getNumericValue(value: number | string, toLocaleDigit: (arg: string) => string): number | string {
@@ -606,6 +630,7 @@ function getPolicyBrickRoadIndicatorStatus(policy: OnyxEntry<Policy>, isConnecti
     if (
         shouldShowEmployeeListError(policy) ||
         shouldShowCustomUnitsError(policy) ||
+        shouldShowReimbursementCountriesError(policy) ||
         shouldShowPolicyErrorFields(policy) ||
         shouldShowSyncError(policy, isConnectionInProgress, getAccountingConnectionNames()) ||
         shouldShowQBOReimbursableExportDestinationAccountError(policy) ||
@@ -2812,6 +2837,9 @@ export {
     hasAccountingConnections,
     shouldShowSyncError,
     shouldShowCustomUnitsError,
+    shouldShowReimbursementCountriesError,
+    getReimbursementCountriesErrors,
+    getReimbursementCountryISOs,
     shouldShowEmployeeListError,
     hasIntegrationAutoSync,
     hasPolicyCategoriesError,

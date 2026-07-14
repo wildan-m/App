@@ -529,6 +529,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_INVITE_MESSAGE_ROLE]: () => require<ReactComponentModule>('../../../../pages/workspace/DynamicWorkspaceInviteMessageRolePage').default,
     [SCREENS.WORKSPACE.INVITE_MESSAGE_APPROVER]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceInviteMessageApproverPage').default,
     [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceWorkflowsPayerPage').default,
+    [SCREENS.WORKSPACE.REIMBURSEMENT_COUNTRY_SELECTOR]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceReimbursementCountrySelectorPage').default,
     [SCREENS.WORKSPACE.NAME]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceNamePage').default,
     [SCREENS.WORKSPACE.DESCRIPTION]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceOverviewDescriptionPage').default,
     [SCREENS.WORKSPACE.CLIENT_ID]: () => require<ReactComponentModule>('../../../../pages/workspace/WorkspaceOverviewClientIDPage').default,

@@ -254,6 +254,7 @@ export type {default as SetWorkspaceApprovalModeParams} from './SetWorkspaceAppr
 export type {default as DisablePolicyApprovalsParams} from './DisablePolicyApprovalsParams';
 export type {default as SetWorkspacePayerParams} from './SetWorkspacePayerParams';
 export type {default as SetWorkspaceReimbursementParams} from './SetWorkspaceReimbursementParams';
+export type {default as SetReimbursementCountriesParams} from './SetReimbursementCountriesParams';
 export type {default as SetWorkspaceDefaultSpendCategoryParams} from './SetWorkspaceDefaultSpendCategoryParams';
 export type {default as SetPolicyRequiresTag} from './SetPolicyRequiresTag';
 export type {default as SetPolicyTagsRequired} from './SetPolicyTagsRequired';

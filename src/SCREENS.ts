@@ -794,6 +794,7 @@ const SCREENS = {
         DYNAMIC_WORKSPACE_OVERVIEW_PLAN: 'Dynamic_Workspace_Overview_Plan_Type',
         WORKFLOWS: 'Workspace_Workflows',
         WORKFLOWS_PAYER: 'Workspace_Workflows_Payer',
+        REIMBURSEMENT_COUNTRY_SELECTOR: 'Workspace_Reimbursement_Country_Selector',
         WORKFLOWS_APPROVALS_NEW: 'Workspace_Approvals_New',
         WORKFLOWS_APPROVALS_EDIT: 'Workspace_Approvals_Edit',
         DYNAMIC_WORKFLOWS_APPROVALS_EXPENSES_FROM: 'Dynamic_Workspace_Workflows_Approvals_Expenses_From',

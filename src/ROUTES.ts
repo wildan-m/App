@@ -2478,6 +2478,10 @@ const ROUTES = {
         route: 'workspaces/:policyID/workflows/payer',
         getRoute: (policyId: string) => `workspaces/${policyId}/workflows/payer` as const,
     },
+    WORKSPACE_REIMBURSEMENT_COUNTRY_SELECTOR: {
+        route: 'workspaces/:policyID/workflows/reimbursement-countries',
+        getRoute: (policyID: string) => `workspaces/${policyID}/workflows/reimbursement-countries` as const,
+    },
     WORKSPACE_WORKFLOWS_AUTOREPORTING_FREQUENCY: {
         route: 'workspaces/:policyID/workflows/auto-reporting-frequency',
         getRoute: (policyID: string | undefined) => {

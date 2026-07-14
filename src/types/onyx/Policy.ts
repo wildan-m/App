@@ -86,6 +86,27 @@ type Attributes = {
     taxEnabled?: boolean;
 };
 
+/**
+ * A country the policy collects employee bank details for.
+ *
+ * Keyed by the country ISO code inside `policy.reimbursement.countries`. The record also holds a sibling `errors`
+ * entry populated when a `SetReimbursementCountries` request fails, which is why `errors` lives on this type — the
+ * same arrangement `customUnits` uses.
+ */
+type ReimbursementCountry = OnyxCommon.OnyxValueWithOfflineFeedback<{
+    /** Whether the policy collects employee bank details for this country */
+    enabled?: boolean;
+}>;
+
+/**
+ * The reimbursement countries of a policy: an entry per country ISO code, plus a reserved `errors` entry populated
+ * when a `SetReimbursementCountries` request fails.
+ */
+type ReimbursementCountries = Record<string, ReimbursementCountry | undefined> & {
+    /** Error messages to show in UI */
+    errors?: OnyxCommon.Errors;
+};
+
 /** Policy custom unit */
 type CustomUnit = OnyxCommon.OnyxValueWithOfflineFeedback<
     {
@@ -2505,6 +2526,15 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The reimbursement choice for policy */
         reimbursementChoice?: ValueOf<typeof CONST.POLICY.REIMBURSEMENT_CHOICES>;
 
+        /** Reimbursement settings for the policy */
+        reimbursement?: {
+            /** Whether reimbursements (payments) are enabled for the policy */
+            enabled?: boolean;
+
+            /** The countries the policy collects employee bank details for, keyed by country ISO code */
+            countries?: ReimbursementCountries;
+        };
+
         /** The set reimburser for the policy */
         reimburser?: string;
 
@@ -2815,6 +2845,8 @@ export type {
     PolicyReportFieldType,
     Unit,
     CustomUnit,
+    ReimbursementCountries,
+    ReimbursementCountry,
     Attributes,
     Rate,
     TaxRateAttributes,

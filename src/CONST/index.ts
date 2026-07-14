@@ -4133,6 +4133,7 @@ const CONST = {
             DUPLICATE_SUBSCRIPTION: 'duplicateSubscription',
             FAILED_TO_CLEAR_BALANCE: 'failedToClearBalance',
         },
+        REIMBURSEMENT_COUNTRIES_ERRORS_KEY: 'errors',
         COLLECTION_KEYS: {
             DESCRIPTION: 'description',
             REIMBURSER: 'reimburser',
@@ -7857,6 +7858,7 @@ const CONST = {
         HAS_PAYMENT_METHOD_ERROR: 'hasPaymentMethodError',
         HAS_POLICY_ERRORS: 'hasPolicyError',
         HAS_CUSTOM_UNITS_ERROR: 'hasCustomUnitsError',
+        HAS_REIMBURSEMENT_COUNTRIES_ERROR: 'hasReimbursementCountriesError',
         HAS_EMPLOYEE_LIST_ERROR: 'hasEmployeeListError',
         HAS_QBO_EXPORT_ERROR: 'hasQBOExportError',
         HAS_SYNC_ERRORS: 'hasSyncError',

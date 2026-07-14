@@ -193,6 +193,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: {
         policyID: string;
     };
+    [SCREENS.WORKSPACE.REIMBURSEMENT_COUNTRY_SELECTOR]: {
+        policyID: string;
+    };
     [SCREENS.SETTINGS.WALLET.TRANSFER_BALANCE]: undefined;
     [SCREENS.SETTINGS.WALLET.CHOOSE_TRANSFER_ACCOUNT]: undefined;
     [SCREENS.SETTINGS.WALLET.IMPORT_TRANSACTIONS]: undefined;

@@ -57,6 +57,7 @@ import type {
     SetWorkspaceAutoReportingFrequencyParams,
     SetWorkspaceAutoReportingMonthlyOffsetParams,
     SetWorkspacePayerParams,
+    SetReimbursementCountriesParams,
     SetWorkspaceReimbursementParams,
     TogglePolicyReceiptPartnersParams,
     TogglePolicyUberAutoInvitePageParams,
@@ -91,7 +92,14 @@ import Permissions from '@libs/Permissions';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
 import * as PhoneNumber from '@libs/PhoneNumber';
 import * as PolicyUtils from '@libs/PolicyUtils';
-import {getCustomUnitsForDuplication, getMemberAccountIDsForWorkspace, goBackWhenEnableFeature, isControlPolicy, navigateToExpensifyCardPage} from '@libs/PolicyUtils';
+import {
+    getCustomUnitsForDuplication,
+    getMemberAccountIDsForWorkspace,
+    getReimbursementCountryISOs,
+    goBackWhenEnableFeature,
+    isControlPolicy,
+    navigateToExpensifyCardPage,
+} from '@libs/PolicyUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import {getNegatedAmountTransaction} from '@libs/TransactionUtils';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
@@ -143,6 +151,8 @@ import type {
     PolicyReportField,
     ProhibitedExpenses,
     Rate,
+    ReimbursementCountries,
+    ReimbursementCountry,
     TaxRate,
     UberReceiptPartner,
 } from '@src/types/onyx/Policy';
@@ -1310,6 +1320,102 @@ function setWorkspaceReimbursement({
     };
 
     API.write(WRITE_COMMANDS.SET_WORKSPACE_REIMBURSEMENT, params, {optimisticData, failureData, successData});
+}
+
+/**
+ * Set the countries the policy collects employee bank details for.
+ *
+ * `selectedCountryISOs` is the full resulting selection, not a delta — it is diffed against what the policy holds
+ * today so a country the admin removed can stay in Onyx with a DELETE pending action (it must remain visible with
+ * strikethrough text until the request comes back) instead of disappearing the moment Save is pressed.
+ */
+function setReimbursementCountries(policyID: string, selectedCountryISOs: string[], currentCountries: ReimbursementCountries = {}) {
+    const currentCountryISOs = getReimbursementCountryISOs(currentCountries);
+    const addedCountryISOs = selectedCountryISOs.filter((countryISO) => !currentCountryISOs.includes(countryISO));
+    const removedCountryISOs = currentCountryISOs.filter((countryISO) => !selectedCountryISOs.includes(countryISO));
+
+    const optimisticCountries: Record<string, ReimbursementCountry | null> = {};
+    const successCountries: Record<string, ReimbursementCountry | null> = {};
+    const failureCountries: Record<string, ReimbursementCountry | null> = {};
+
+    for (const countryISO of addedCountryISOs) {
+        optimisticCountries[countryISO] = {enabled: true, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD};
+        successCountries[countryISO] = {enabled: true, pendingAction: null};
+        // The country was not on the policy before this call, so rolling back means removing it entirely.
+        failureCountries[countryISO] = null;
+    }
+
+    for (const countryISO of removedCountryISOs) {
+        optimisticCountries[countryISO] = {...currentCountries[countryISO], pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE};
+        // Only once the backend confirms the removal do we actually drop the country from Onyx.
+        successCountries[countryISO] = null;
+        failureCountries[countryISO] = {...currentCountries[countryISO], pendingAction: null};
+    }
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                reimbursement: {
+                    countries: {
+                        ...optimisticCountries,
+                        errors: null,
+                    },
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                reimbursement: {
+                    countries: {
+                        ...successCountries,
+                        errors: null,
+                    },
+                },
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                reimbursement: {
+                    countries: {
+                        ...failureCountries,
+                        errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workflowsPage.reimbursementCountriesErrorMessage'),
+                    },
+                },
+            },
+        },
+    ];
+
+    const params: SetReimbursementCountriesParams = {
+        policyID,
+        countryISOList: selectedCountryISOs.join(','),
+    };
+
+    API.write(WRITE_COMMANDS.SET_REIMBURSEMENT_COUNTRIES, params, {optimisticData, successData, failureData});
+}
+
+/**
+ * Dismiss the error shown on the policy's reimbursement countries.
+ */
+function clearReimbursementCountriesErrors(policyID: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
+        reimbursement: {
+            countries: {
+                errors: null,
+            },
+        },
+    });
 }
 
 function leaveWorkspace(currentUserAccountID: number, currentUserEmail: string, policy: OnyxEntry<Policy>) {
@@ -7719,6 +7825,8 @@ export {
     updateWorkspaceDescription,
     updateWorkspaceClientID,
     setWorkspacePayer,
+    clearReimbursementCountriesErrors,
+    setReimbursementCountries,
     setWorkspaceReimbursement,
     openPolicyWorkflowsPage,
     enableCompanyCards,

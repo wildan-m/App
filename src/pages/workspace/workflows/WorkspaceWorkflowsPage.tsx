@@ -33,6 +33,7 @@ import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 
 import {
     clearPolicyErrorField,
+    clearReimbursementCountriesErrors,
     isCurrencySupportedForDirectReimbursement,
     isCurrencySupportedForGlobalReimbursement,
     openPolicyWorkflowsPage,
@@ -54,9 +55,12 @@ import {
     canAccessSubmitWorkspaceFeatures,
     canMemberRead,
     getCorrectedAutoReportingFrequency,
+    getReimbursementCountriesErrors,
+    getReimbursementCountryISOs,
     hasDynamicExternalWorkflow,
     isControlPolicy,
     isGroupPolicy as isGroupPolicyUtil,
+    shouldShowReimbursementCountriesError,
 } from '@libs/PolicyUtils';
 import {hasInProgressVBBA} from '@libs/ReimbursementAccountUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
@@ -94,6 +98,9 @@ import ToggleSettingOptionRow from './ToggleSettingsOptionRow';
 import {getAutoReportingFrequencyDisplayNames} from './WorkspaceAutoReportingFrequencyPage';
 
 type WorkspaceWorkflowsPageProps = WithPolicyProps & PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.WORKFLOWS>;
+
+// Widened so a country ISO read back from Onyx can be looked up without asserting it is a known key.
+const COUNTRY_NAMES_BY_ISO: Record<string, string> = CONST.ALL_COUNTRIES;
 type CurrencyType = TupleToUnion<typeof CONST.DIRECT_REIMBURSEMENT_CURRENCIES>;
 
 function WorkflowNoResultsView({message, shouldShow, searchValue}: {message: string; shouldShow: boolean; searchValue: string}) {
@@ -346,6 +353,18 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const [workflowSearchInput, setWorkflowSearchInput, searchFilteredWorkflows] = useSearchResults(filteredApprovalWorkflows, filterWorkflow);
     const [isWorkflowListExpanded, setIsWorkflowListExpanded] = useState(false);
 
+    const reimbursementCountries = policy?.reimbursement?.countries;
+    const reimbursementCountryISOs = getReimbursementCountryISOs(reimbursementCountries);
+    const policyBankAccountID = policy?.achAccount?.bankAccountID;
+    // The policy's ACH account does not store its country, so it is resolved through the bank account list.
+    const primaryBankAccountCountry = policyBankAccountID ? bankAccountList?.[policyBankAccountID]?.accountData?.additionalData?.country : undefined;
+    const hasNonPrimaryReimbursementCountry = reimbursementCountryISOs.some((countryISO) => countryISO !== primaryBankAccountCountry);
+
+    // The toggle has no persisted flag of its own: it is on whenever the policy already collects bank details for a
+    // country other than its own bank account's. Local state only matters until the admin picks that first country.
+    const [isCollectEmployeeBankDetailsToggledLocally, setIsCollectEmployeeBankDetailsToggledLocally] = useState<boolean | undefined>(undefined);
+    const isCollectEmployeeBankDetailsEnabled = isCollectEmployeeBankDetailsToggledLocally ?? hasNonPrimaryReimbursementCountry;
+
     useEffect(() => {
         if (filteredApprovalWorkflows.length > CONST.SEARCH_BAR_THRESHOLD) {
             return;
@@ -414,6 +433,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         });
 
         const hasReimburserError = !!policy?.errorFields?.reimburser;
+        const hasReimbursementCountriesError = shouldShowReimbursementCountriesError(policy);
         const hasApprovalError = !!policy?.errorFields?.approvalMode;
         const hasDelayedSubmissionError = !!(policy?.errorFields?.autoReporting ?? policy?.errorFields?.autoReportingFrequency);
 
@@ -813,6 +833,64 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                           />
                                       </OfflineWithFeedback>
                                   )}
+                                  <ToggleSettingOptionRow
+                                      title={translate('workflowsPage.collectEmployeeBankDetails')}
+                                      subtitle={translate('workflowsPage.collectEmployeeBankDetailsDescription')}
+                                      switchAccessibilityLabel={translate('workflowsPage.collectEmployeeBankDetails')}
+                                      shouldPlaceSubtitleBelowSwitch
+                                      wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt5]}
+                                      isActive={isCollectEmployeeBankDetailsEnabled}
+                                      onToggle={(isEnabled: boolean) => {
+                                          if (!canWritePayments) {
+                                              showReadOnlyModal();
+                                              return;
+                                          }
+                                          setIsCollectEmployeeBankDetailsToggledLocally(isEnabled);
+                                      }}
+                                      disabled={!canWritePayments}
+                                      disabledAction={withPaymentsReadOnlyFallback()}
+                                      showLockIcon={!canWritePayments}
+                                      subMenuItems={
+                                          isCollectEmployeeBankDetailsEnabled ? (
+                                              <OfflineWithFeedback
+                                                  errors={getReimbursementCountriesErrors(policy)}
+                                                  onClose={() => clearReimbursementCountriesErrors(route.params.policyID)}
+                                                  errorRowStyles={[styles.ml7]}
+                                              >
+                                                  <MenuItemWithTopDescription
+                                                      titleComponent={
+                                                          <Text style={[styles.textNormalThemeText]}>
+                                                              {reimbursementCountryISOs.map((countryISO, index) => {
+                                                                  const pendingAction = reimbursementCountries?.[countryISO]?.pendingAction;
+                                                                  const isPendingDelete = pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+                                                                  return (
+                                                                      <Text
+                                                                          key={countryISO}
+                                                                          style={[!!pendingAction && styles.colorMuted, isPendingDelete && styles.offlineFeedbackDeleted]}
+                                                                      >
+                                                                          {index > 0 ? ', ' : ''}
+                                                                          {COUNTRY_NAMES_BY_ISO[countryISO]}
+                                                                      </Text>
+                                                                  );
+                                                              })}
+                                                          </Text>
+                                                      }
+                                                      descriptionTextStyle={styles.textLabelSupportingNormal}
+                                                      description={translate('workflowsPage.businessBankAccountCountries')}
+                                                      onPress={
+                                                          canWritePayments
+                                                              ? () => Navigation.navigate(ROUTES.WORKSPACE_REIMBURSEMENT_COUNTRY_SELECTOR.getRoute(route.params.policyID))
+                                                              : undefined
+                                                      }
+                                                      shouldShowRightIcon={canWritePayments}
+                                                      interactive={canWritePayments}
+                                                      wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt3, styles.mbn3]}
+                                                      brickRoadIndicator={hasReimbursementCountriesError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                                  />
+                                              </OfflineWithFeedback>
+                                          ) : undefined
+                                      }
+                                  />
                               </>
                           ),
                           isEndOptionRow: true,
@@ -832,6 +910,9 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         bankAccountList,
         styles,
         translate,
+        isCollectEmployeeBankDetailsEnabled,
+        reimbursementCountries,
+        reimbursementCountryISOs,
         onPressAutoReportingFrequency,
         isSmartLimitEnabled,
         isHRConnected,

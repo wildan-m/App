@@ -2763,6 +2763,10 @@ const translations = {
     workflowsPage: {
         workflowTitle: 'Spend',
         workflowDescription: 'Configure a workflow from the moment spend occurs, including approval and payment.',
+        collectEmployeeBankDetails: 'Collect employee bank details',
+        collectEmployeeBankDetailsDescription: 'Collect bank details from employees so you can reimburse them in more than one country.',
+        businessBankAccountCountries: 'Business bank account countries',
+        reimbursementCountriesErrorMessage: 'Your reimbursement countries update failed. Please try again.',
         submissionFrequency: 'Submissions',
         submissionFrequencyDescription: 'Choose a custom schedule for submitting expenses.',
         submissionFrequencyDateOfMonth: 'Date of month',

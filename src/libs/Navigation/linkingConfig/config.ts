@@ -1014,6 +1014,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.WORKFLOWS_PAYER]: {
                             path: ROUTES.WORKSPACE_WORKFLOWS_PAYER.route,
                         },
+                        [SCREENS.WORKSPACE.REIMBURSEMENT_COUNTRY_SELECTOR]: {
+                            path: ROUTES.WORKSPACE_REIMBURSEMENT_COUNTRY_SELECTOR.route,
+                        },
                         [SCREENS.WORKSPACE.MEMBER_DETAILS]: {
                             path: ROUTES.WORKSPACE_MEMBER_DETAILS.route,
                         },

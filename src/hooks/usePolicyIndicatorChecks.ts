@@ -7,6 +7,7 @@ import {
     isPolicyAdmin,
     shouldShowCustomUnitsError,
     shouldShowEmployeeListError,
+    shouldShowReimbursementCountriesError,
     shouldShowPolicyError,
     shouldShowSyncError,
 } from '@libs/PolicyUtils';
@@ -42,6 +43,7 @@ function usePolicyIndicatorChecks(): PolicyIndicatorChecksResult {
     const policyErrorChecks: Array<[IndicatorStatus, Policy | undefined]> = [
         [CONST.INDICATOR_STATUS.HAS_POLICY_ERRORS, cleanPolicies.find(shouldShowPolicyError)],
         [CONST.INDICATOR_STATUS.HAS_CUSTOM_UNITS_ERROR, cleanPolicies.find(shouldShowCustomUnitsError)],
+        [CONST.INDICATOR_STATUS.HAS_REIMBURSEMENT_COUNTRIES_ERROR, cleanPolicies.find(shouldShowReimbursementCountriesError)],
         [CONST.INDICATOR_STATUS.HAS_EMPLOYEE_LIST_ERROR, cleanPolicies.find(shouldShowEmployeeListError)],
         [
             CONST.INDICATOR_STATUS.HAS_SYNC_ERRORS,

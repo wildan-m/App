@@ -46,6 +46,7 @@ import {
     isPolicyAdmin,
     isTimeTrackingEnabled,
     shouldShowEmployeeListError,
+    shouldShowReimbursementCountriesError,
     shouldShowSyncError,
     shouldShowTaxRateError,
 } from '@libs/PolicyUtils';
@@ -374,7 +375,8 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
                 action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS.getRoute(policyID)))),
                 screenName: SCREENS.WORKSPACE.WORKFLOWS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.WORKFLOWS,
-                brickRoadIndicator: !isEmptyObject(policy?.errorFields?.reimburser ?? {}) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                brickRoadIndicator:
+                    !isEmptyObject(policy?.errorFields?.reimburser ?? {}) || shouldShowReimbursementCountriesError(policy) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
                 highlighted: highlightedFeature === CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED,
             });
         }
