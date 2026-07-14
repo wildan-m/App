@@ -1,5 +1,6 @@
 import {clearAllRelatedReportActionErrors} from '@libs/actions/ClearReportActionErrors';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportActions} from '@src/types/onyx';
 
@@ -15,6 +16,7 @@ const CHILD_REPORT_ID = '3';
 const REPORT_ACTION_ID = '100';
 const PARENT_REPORT_ACTION_ID = '200';
 const CHILD_REPORT_ACTION_ID = '300';
+const REJECT_ACTION_ID = '400';
 
 function getReportActionsFromOnyx(reportID: string): Promise<ReportActions | undefined> {
     return new Promise((resolve) => {
@@ -138,6 +140,59 @@ describe('ClearReportActionErrors', () => {
             // Then the entire report action should be deleted (not just errors cleared)
             const reportActions = await getReportActionsFromOnyx(REPORT_ID);
             expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+        });
+
+        it('should delete an orphaned optimistic reject action from the same report', async () => {
+            // Given a failed optimistic action with errors, alongside an orphaned optimistic reject action that has no errors
+            const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {
+                errors: {error1: 'Error message'},
+                isOptimisticAction: true,
+            });
+            const rejectAction = getFakeReportAction(Number(REJECT_ACTION_ID), {
+                actionName: CONST.REPORT.ACTIONS.TYPE.REJECTED,
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, {
+                [REPORT_ACTION_ID]: reportAction,
+                [REJECT_ACTION_ID]: rejectAction,
+            });
+            await waitForBatchedUpdates();
+
+            // When the error is dismissed on the failed optimistic action
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            await waitForBatchedUpdates();
+
+            // Then both the failed action and the orphaned reject action should be deleted
+            const reportActions = await getReportActionsFromOnyx(REPORT_ID);
+            expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+            expect(reportActions?.[REJECT_ACTION_ID]).toBeUndefined();
+        });
+
+        it('should keep a reject action from the same report when it has its own errors', async () => {
+            // Given a failed optimistic action and a reject action that carries its own errors
+            const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {
+                errors: {error1: 'Error message'},
+                isOptimisticAction: true,
+            });
+            const rejectAction = getFakeReportAction(Number(REJECT_ACTION_ID), {
+                actionName: CONST.REPORT.ACTIONS.TYPE.REJECTED,
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                errors: {rejectError: 'Reject error message'},
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, {
+                [REPORT_ACTION_ID]: reportAction,
+                [REJECT_ACTION_ID]: rejectAction,
+            });
+            await waitForBatchedUpdates();
+
+            // When the error is dismissed on the failed optimistic action
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            await waitForBatchedUpdates();
+
+            // Then the reject action should survive because it is not orphaned
+            const reportActions = await getReportActionsFromOnyx(REPORT_ID);
+            expect(reportActions?.[REPORT_ACTION_ID]).toBeUndefined();
+            expect(reportActions?.[REJECT_ACTION_ID]).toBeDefined();
         });
 
         it('should clear errors on parent report action when matching error keys exist', async () => {

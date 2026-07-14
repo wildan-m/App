@@ -1,4 +1,4 @@
-import {getLinkedTransactionID, getReportAction, getReportActionMessage, isCreatedTaskReportAction, isRejectedAction} from '@libs/ReportActionsUtils';
+import {getAllReportActions, getLinkedTransactionID, getReportAction, getReportActionMessage, isCreatedTaskReportAction, isRejectedAction} from '@libs/ReportActionsUtils';
 import {getOriginalReportID} from '@libs/ReportUtils';
 import {buildOptimisticSnapshotData} from '@libs/SearchQueryUtils';
 
@@ -15,13 +15,6 @@ import Onyx from 'react-native-onyx';
 import deleteReport from './Report/DeleteReport';
 
 type IgnoreDirection = 'parent' | 'child';
-
-let allReportActions: OnyxCollection<OnyxTypes.ReportActions>;
-Onyx.connectWithoutView({
-    key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
-    waitForCollectionCallback: true,
-    callback: (value) => (allReportActions = value),
-});
 
 let allReports: OnyxCollection<OnyxTypes.Report>;
 Onyx.connectWithoutView({
@@ -51,17 +44,15 @@ function clearReportActionErrors(reportAction: ReportAction, originalReportID: s
         // Also clean up any orphaned optimistic reject actions (REJECTED/REJECTED_TO_SUBMITTER)
         // from the same report. When a rejection fails, the comment action gets the error but the
         // corresponding reject action remains with pendingAction ADD and no errors.
-        const siblingActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${originalReportID}`];
-        if (siblingActions) {
-            for (const [actionID, siblingAction] of Object.entries(siblingActions)) {
-                if (
-                    actionID !== reportAction.reportActionID &&
-                    siblingAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD &&
-                    isRejectedAction(siblingAction) &&
-                    !siblingAction.errors
-                ) {
-                    actionsToDelete[actionID] = null;
-                }
+        const siblingActions = getAllReportActions(originalReportID);
+        for (const [actionID, siblingAction] of Object.entries(siblingActions)) {
+            if (
+                actionID !== reportAction.reportActionID &&
+                siblingAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD &&
+                isRejectedAction(siblingAction) &&
+                !siblingAction.errors
+            ) {
+                actionsToDelete[actionID] = null;
             }
         }
 
@@ -138,14 +129,14 @@ function clearAllRelatedReportActionErrors(
     if (report?.parentReportID && report?.parentReportActionID && ignore !== 'parent') {
         const parentReportAction = getReportAction(report.parentReportID, report.parentReportActionID);
         const parentErrorKeys = Object.keys(parentReportAction?.errors ?? {}).filter((err) => errorKeys.includes(err));
-        const parentReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.parentReportID}`] ?? {};
+        const parentReportActions = getAllReportActions(report.parentReportID);
         const parentOriginalReportID = getOriginalReportID(report.parentReportID, parentReportAction, parentReportActions);
 
         clearAllRelatedReportActionErrors(report.parentReportID, parentReportAction, parentOriginalReportID, 'child', parentErrorKeys);
     }
 
     if (reportAction.childReportID && ignore !== 'child') {
-        const childActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportAction.childReportID}`] ?? {};
+        const childActions = getAllReportActions(reportAction.childReportID);
         for (const action of Object.values(childActions)) {
             const childErrorKeys = Object.keys(action.errors ?? {}).filter((err) => errorKeys.includes(err));
             const childOriginalReportID = getOriginalReportID(reportAction.childReportID, action, childActions);
