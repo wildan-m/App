@@ -25,7 +25,7 @@ import type SCREENS from '@src/SCREENS';
 import {hasFilterBarsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Animated from 'react-native-reanimated';
 
 import SearchPageNarrow from './SearchPageNarrow';
@@ -71,11 +71,25 @@ function SearchPage({route}: SearchPageProps) {
 
     const [isSorting, setIsSorting] = useState(false);
 
+    // Sorting changes the query hash, so the snapshot for the new hash is empty until the server responds. We keep
+    // showing the previous rows meanwhile, but they are only rendered if the snapshot matches the query being
+    // displayed: `isSearchDataLoaded` compares the snapshot hash against the current one, and Search treats a
+    // mismatch as "no data", which renders the empty-results view. Stamping the substituted snapshot with the
+    // current hash lets Search re-sort the rows it already has with the new sortBy/sortOrder until the response
+    // for the new hash replaces them. Memoized so the projection downstream keeps a stable reference.
+    const sortingFallbackSearchResults = useMemo(() => {
+        if (!lastNonEmptySearchResults || currentSearchQueryJSON?.hash === undefined) {
+            return lastNonEmptySearchResults;
+        }
+
+        return {...lastNonEmptySearchResults, search: {...lastNonEmptySearchResults.search, hash: currentSearchQueryJSON.hash}};
+    }, [lastNonEmptySearchResults, currentSearchQueryJSON?.hash]);
+
     let searchResults: SearchResults | undefined;
     if (currentSearchResults?.data != null || currentSearchResults?.errors) {
         searchResults = currentSearchResults;
     } else if (isSorting) {
-        searchResults = lastNonEmptySearchResults;
+        searchResults = sortingFallbackSearchResults;
     }
 
     const metadata = searchResults?.search;
