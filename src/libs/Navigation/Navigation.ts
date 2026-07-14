@@ -16,7 +16,7 @@ import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS, {PROTECTED_SCREENS} from '@src/SCREENS';
 import type {SidePanel} from '@src/types/onyx';
 
@@ -221,6 +221,17 @@ function closeSidePanelOnNarrowScreen(route: Route) {
     // If the user is navigating to an attachment route (previewing or adding), keep the side panel open
     // so they still have access to the chat.
     if (isAddingAttachment || isPreviewingAttachment) {
+        return;
+    }
+
+    // Opening the report's profile or details page from the side panel report header is a drill-down into
+    // the same chat, so keep the side panel open (like attachments) — the profile/details RHP stacks on top
+    // and going back reveals the chat again.
+    const profileRoutePrefix = ROUTES.PROFILE.path.split(':accountID').at(0) ?? '';
+    const isProfileRoute = typeof route === 'string' && !!profileRoutePrefix && route.startsWith(profileRoutePrefix);
+    const reportDetailsSuffix = DYNAMIC_ROUTES.REPORT_DETAILS.path;
+    const isReportDetailsRoute = typeof route === 'string' && (route === reportDetailsSuffix || route.endsWith(`/${reportDetailsSuffix}`));
+    if (isProfileRoute || isReportDetailsRoute) {
         return;
     }
 
