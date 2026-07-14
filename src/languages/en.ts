@@ -3804,11 +3804,18 @@ const translations = {
     addPersonalBankAccount: {
         countrySelectionStepHeader: "Where's your bank account located?",
         accountDetailsStepHeader: 'What are your account details?',
+        internationalBankAccountDetailsStepHeader: 'What are your international bank account details?',
+        internationalBankAccountDetailsStepSubHeader: 'We need these details so your workspace admin can send payments to your bank across borders.',
+        iban: 'IBAN',
+        swiftCode: 'SWIFT/BIC code',
         accountTypeStepHeader: 'What type of account is this?',
         bankInformationStepHeader: 'What are your bank details?',
         accountHolderInformationStepHeader: 'What are the account holder details?',
         howDoWeProtectYourData: 'How do we protect your data?',
         currencyHeader: "What's your bank account's currency?",
+        error: {
+            invalidSwiftCodeOrIban: 'Please enter a valid Swift code/IBAN',
+        },
         confirmationStepHeader: 'Check your info.',
         confirmationStepSubHeader: 'Double check the details below, and check the terms box to confirm.',
         toGetStarted: 'Add a personal bank account to receive reimbursements, pay invoices, or enable the Expensify Wallet.',

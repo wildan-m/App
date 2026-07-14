@@ -3676,6 +3676,11 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
         updateSuccessTitle: '銀行口座が更新されました!',
         updateSuccessHeader: '銀行口座が更新されました',
         updateSuccessMessage: 'おめでとうございます。銀行口座の設定が完了し、精算の受け取りができるようになりました。',
+        internationalBankAccountDetailsStepHeader: '国際銀行口座の詳細を教えてください。',
+        internationalBankAccountDetailsStepSubHeader: '国境を越えて銀行口座に支払いを送金できるようにするために、ワークスペース管理者にはこれらの詳細が必要です。',
+        iban: 'IBAN',
+        swiftCode: 'SWIFT/BIC コード',
+        error: {invalidSwiftCodeOrIban: '有効なSWIFTコード／IBANを入力してください'},
     },
     addPersonalBankAccountPage: {
         enterPassword: 'Expensify のパスワードを入力',

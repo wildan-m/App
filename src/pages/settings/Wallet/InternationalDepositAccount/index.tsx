@@ -21,6 +21,7 @@ import InternationalDepositAccountContent from './InternationalDepositAccountCon
 type InternationalDepositAccountProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.ADD_BANK_ACCOUNT>;
 
 const isLoadingPersonalBankAccountSelector = (personalBankAccount: OnyxEntry<PersonalBankAccount>) => personalBankAccount?.isLoading;
+const personalBankAccountPolicyIDSelector = (personalBankAccount: OnyxEntry<PersonalBankAccount>) => personalBankAccount?.policyID;
 
 function InternationalDepositAccount({route}: InternationalDepositAccountProps) {
     const [privatePersonalDetails, privatePersonalDetailsMetadata] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
@@ -29,6 +30,8 @@ function InternationalDepositAccount({route}: InternationalDepositAccountProps) 
     const [draftValues, draftValuesMetadata] = useOnyx(ONYXKEYS.FORMS.INTERNATIONAL_BANK_ACCOUNT_FORM_DRAFT);
     const [country, countryMetadata] = useOnyx(ONYXKEYS.COUNTRY);
     const [isAccountLoading, isLoadingMetadata] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {selector: isLoadingPersonalBankAccountSelector});
+    const [personalBankAccountPolicyID] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {selector: personalBankAccountPolicyIDSelector});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${personalBankAccountPolicyID}`);
     const backTo = route.params?.backTo;
 
     const isLoading = isLoadingOnyxValue(privatePersonalDetailsMetadata, corpayFieldsMetadata, bankAccountListMetadata, draftValuesMetadata, countryMetadata, isLoadingMetadata);
@@ -46,6 +49,7 @@ function InternationalDepositAccount({route}: InternationalDepositAccountProps) 
             draftValues={draftValues}
             country={country}
             isAccountLoading={isAccountLoading ?? false}
+            reimbursementCountries={policy?.reimbursement?.countries}
             backTo={backTo}
         />
     );

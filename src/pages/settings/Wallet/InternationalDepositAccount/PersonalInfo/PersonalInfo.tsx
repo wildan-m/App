@@ -19,13 +19,14 @@ import React, {useEffect, useRef} from 'react';
 
 import Address from './substeps/AddressStep';
 import Confirmation from './substeps/ConfirmationStep';
+import InternationalBankAccountDetails from './substeps/InternationalBankAccountDetailsStep';
 import LegalName from './substeps/LegalNameStep';
 import ManualBankAccountDetails from './substeps/ManualBankAccountDetailsStep';
 import PhoneNumber from './substeps/PhoneNumberStep';
 import PlaidBankAccount from './substeps/PlaidBankAccountStep';
 import getSkippedStepsPersonalInfo from './utils/getSkippedStepsPersonalInfo';
 
-const bodyContentInfoSet: Array<React.ComponentType<SubStepProps>> = [LegalName, Address, PhoneNumber, Confirmation];
+const bodyContentInfoSet: Array<React.ComponentType<SubStepProps>> = [InternationalBankAccountDetails, LegalName, Address, PhoneNumber, Confirmation];
 const bodyContentWithPlaid: Array<React.ComponentType<SubStepProps>> = [PlaidBankAccount, ...bodyContentInfoSet];
 const bodyContentWithManualSetup: Array<React.ComponentType<SubStepProps>> = [ManualBankAccountDetails, ...bodyContentInfoSet];
 
@@ -45,6 +46,9 @@ function PersonalInfoPage() {
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
 
     const [plaidData] = useOnyx(ONYXKEYS.PLAID_DATA);
+    const [personalBankAccountPolicyID] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {selector: (account) => account?.policyID});
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${personalBankAccountPolicyID}`);
+    const [selectedBankCountry] = useOnyx(ONYXKEYS.COUNTRY);
 
     const submitBankAccountForm = () => {
         const bankAccounts = plaidData?.bankAccounts ?? [];
@@ -69,7 +73,7 @@ function PersonalInfoPage() {
         addPersonalBankAccount(accountData, personalPolicyID);
     };
 
-    const skipSteps = getSkippedStepsPersonalInfo(privatePersonalDetails);
+    const skipSteps = getSkippedStepsPersonalInfo(privatePersonalDetails, personalBankAccount, selectedBankCountry, policy?.reimbursement?.countries);
 
     const {
         componentToRender: SubStep,

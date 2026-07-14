@@ -121,6 +121,21 @@ function Confirmation({onNext, onMove, formValues, fieldsMap}: CustomSubPageProp
         });
     }
 
+    for (const inputID of [CONST.INTERNATIONAL_BANK_ACCOUNT_DETAILS.IBAN, CONST.INTERNATIONAL_BANK_ACCOUNT_DETAILS.SWIFT_CODE]) {
+        // Corpay may already ask for one of these on the account details step, in which case the loop above rendered it.
+        if (!formValues[inputID] || inputID in (fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_DETAILS] ?? {})) {
+            continue;
+        }
+        summaryItems.push({
+            description: translate(`addPersonalBankAccount.${inputID}` as TranslationPaths),
+            title: formValues[inputID],
+            shouldShowRightIcon: true,
+            onPress: () => {
+                onMove(STEP_INDEXES.INTERNATIONAL_ACCOUNT_DETAILS);
+            },
+        });
+    }
+
     for (const [fieldName, field] of Object.entries(fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_TYPE] ?? {})) {
         summaryItems.push({
             description: field.label + (field.isRequired ? '' : ` (${translate('common.optional')})`),

@@ -16,6 +16,14 @@ import type {ValueOf} from 'type-fest';
 
 import lodashSortBy from 'lodash/sortBy';
 
+type InternationalBankAccountDetailsValues = {
+    /** The IBAN of the bank account */
+    iban?: string;
+
+    /** The SWIFT/BIC code of the bank account */
+    swiftCode?: string;
+};
+
 function getFieldsMap(corpayFields: OnyxEntry<CorpayFields>): Record<ValueOf<typeof CONST.CORPAY_FIELDS.PAGE_NAME>, CorpayFieldsMap> {
     return (corpayFields?.formFields ?? []).reduce(
         (acc, field) => {
@@ -114,12 +122,67 @@ function testValidation(values: InternationalBankAccountForm, fieldsMap: CorpayF
     return true;
 }
 
-function getInitialSubstep(values: InternationalBankAccountForm, fieldsMap: Record<ValueOf<typeof CONST.CORPAY_FIELDS.PAGE_NAME>, CorpayFieldsMap>) {
+/**
+ * The international bank account details are only collected when the bank country is outside the countries the policy can
+ * reimburse directly, and the account details the user already gave us don't cover them.
+ *
+ * Both arguments describing what we already have must come from the account details step only. Reading back the values this
+ * step itself writes would make the step skip itself as soon as it is filled in, which would hide it from the back button.
+ */
+function shouldShowInternationalBankAccountDetails(
+    reimbursementCountries: string[] | undefined,
+    bankCountry: string | undefined,
+    isAccountNumberAnIban: boolean,
+    swiftCodeFromAccountDetails: string | undefined,
+) {
+    if (!bankCountry || (reimbursementCountries ?? []).length === 0 || reimbursementCountries?.includes(bankCountry)) {
+        return false;
+    }
+    return !isAccountNumberAnIban || !swiftCodeFromAccountDetails;
+}
+
+/**
+ * Whether any of the account details the Corpay rules asked for holds a value that is already an IBAN.
+ */
+function hasIbanInAccountDetails(values: InternationalBankAccountForm, accountDetailsFieldsMap: CorpayFieldsMap = {}) {
+    return Object.keys(accountDetailsFieldsMap).some((fieldName) => CONST.BANK_ACCOUNT.REGEX.IBAN.test(values[fieldName] ?? ''));
+}
+
+/**
+ * The SWIFT/BIC code the Corpay rules already collected on the account details step, if they asked for it at all.
+ */
+function getSwiftCodeFromAccountDetails(values: InternationalBankAccountForm, accountDetailsFieldsMap: CorpayFieldsMap = {}) {
+    return CONST.INTERNATIONAL_BANK_ACCOUNT_DETAILS.SWIFT_CODE in accountDetailsFieldsMap ? values[CONST.INTERNATIONAL_BANK_ACCOUNT_DETAILS.SWIFT_CODE] : undefined;
+}
+
+function hasValidInternationalBankAccountDetails(values: InternationalBankAccountDetailsValues) {
+    return CONST.BANK_ACCOUNT.REGEX.IBAN.test(values.iban ?? '') && CONST.BANK_ACCOUNT.REGEX.SWIFT_CODE.test(values.swiftCode ?? '');
+}
+
+function getInternationalBankAccountDetailsErrors(values: InternationalBankAccountDetailsValues, translate: LocaleContextProps['translate']) {
+    const errors: InternationalBankAccountDetailsValues = {};
+    if (!CONST.BANK_ACCOUNT.REGEX.IBAN.test(values.iban ?? '')) {
+        errors.iban = translate('addPersonalBankAccount.error.invalidSwiftCodeOrIban');
+    }
+    if (!CONST.BANK_ACCOUNT.REGEX.SWIFT_CODE.test(values.swiftCode ?? '')) {
+        errors.swiftCode = translate('addPersonalBankAccount.error.invalidSwiftCodeOrIban');
+    }
+    return errors;
+}
+
+function getInitialSubstep(
+    values: InternationalBankAccountForm,
+    fieldsMap: Record<ValueOf<typeof CONST.CORPAY_FIELDS.PAGE_NAME>, CorpayFieldsMap>,
+    shouldCollectInternationalBankAccountDetails = false,
+) {
     if (values.bankCountry === '' || isEmptyObject(fieldsMap)) {
         return CONST.CORPAY_FIELDS.INDEXES.MAPPING.COUNTRY_SELECTOR;
     }
     if (values.bankCurrency === '' || !testValidation(values, fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_DETAILS])) {
         return CONST.CORPAY_FIELDS.INDEXES.MAPPING.BANK_ACCOUNT_DETAILS;
+    }
+    if (shouldCollectInternationalBankAccountDetails && !hasValidInternationalBankAccountDetails({iban: values.iban, swiftCode: values.swiftCode})) {
+        return CONST.CORPAY_FIELDS.INDEXES.MAPPING.INTERNATIONAL_ACCOUNT_DETAILS;
     }
     if (!testValidation(values, fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_TYPE])) {
         return CONST.CORPAY_FIELDS.INDEXES.MAPPING.ACCOUNT_TYPE;
@@ -150,4 +213,17 @@ function getValidationErrors(values: FormOnyxValues<typeof ONYXKEYS.FORMS.INTERN
     return errors;
 }
 
-export {getFieldsMap, getSubstepValues, getInitialPersonalDetailsValues, getInitialSubstep, testValidation, getValidationErrors};
+export {
+    getFieldsMap,
+    getSubstepValues,
+    getInitialPersonalDetailsValues,
+    getInitialSubstep,
+    testValidation,
+    getValidationErrors,
+    shouldShowInternationalBankAccountDetails,
+    hasIbanInAccountDetails,
+    getSwiftCodeFromAccountDetails,
+    hasValidInternationalBankAccountDetails,
+    getInternationalBankAccountDetailsErrors,
+};
+export type {InternationalBankAccountDetailsValues};

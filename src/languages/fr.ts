@@ -3731,6 +3731,12 @@ ${amount} pour ${merchant} - ${date}`,
         updateSuccessTitle: 'Compte bancaire mis à jour !',
         updateSuccessHeader: 'Compte bancaire mis à jour',
         updateSuccessMessage: 'Félicitations, votre compte bancaire est configuré et prêt à recevoir des remboursements.',
+        internationalBankAccountDetailsStepHeader: 'Quelles sont vos coordonnées bancaires internationales ?',
+        internationalBankAccountDetailsStepSubHeader:
+            'Nous avons besoin de ces informations pour que l’administrateur de votre espace de travail puisse envoyer des paiements vers votre banque à l’international.',
+        iban: 'IBAN',
+        swiftCode: 'Code SWIFT/BIC',
+        error: {invalidSwiftCodeOrIban: 'Veuillez saisir un code Swift/IBAN valide'},
     },
     addPersonalBankAccountPage: {
         enterPassword: 'Saisissez le mot de passe Expensify',

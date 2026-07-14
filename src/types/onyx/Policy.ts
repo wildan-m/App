@@ -2505,6 +2505,12 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The reimbursement choice for policy */
         reimbursementChoice?: ValueOf<typeof CONST.POLICY.REIMBURSEMENT_CHOICES>;
 
+        /** Reimbursement settings for the policy */
+        reimbursement?: {
+            /** The countries in which the policy is able to reimburse an employee directly */
+            countries?: string[];
+        };
+
         /** The set reimburser for the policy */
         reimburser?: string;
 

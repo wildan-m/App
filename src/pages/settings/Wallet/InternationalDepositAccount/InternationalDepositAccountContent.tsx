@@ -39,8 +39,18 @@ import BankAccountDetails from './subPages/BankAccountDetails';
 import BankInformation from './subPages/BankInformation';
 import Confirmation from './subPages/Confirmation';
 import CountrySelection from './subPages/CountrySelection';
+import InternationalBankAccountDetails from './subPages/InternationalBankAccountDetails';
 import Success from './subPages/Success';
-import {getFieldsMap, getInitialPersonalDetailsValues, getInitialSubstep, getSubstepValues, testValidation} from './utils';
+import {
+    getFieldsMap,
+    getInitialPersonalDetailsValues,
+    getInitialSubstep,
+    getSubstepValues,
+    getSwiftCodeFromAccountDetails,
+    hasIbanInAccountDetails,
+    shouldShowInternationalBankAccountDetails,
+    testValidation,
+} from './utils';
 
 type InternationalDepositAccountContentProps = {
     privatePersonalDetails: OnyxEntry<PrivatePersonalDetails>;
@@ -49,12 +59,14 @@ type InternationalDepositAccountContentProps = {
     draftValues: OnyxEntry<InternationalBankAccountForm>;
     country: OnyxEntry<string>;
     isAccountLoading: boolean;
+    reimbursementCountries: string[] | undefined;
     backTo?: Route;
 };
 
 const pages = [
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.COUNTRY, component: CountrySelection},
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_DETAILS, component: BankAccountDetails},
+    {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.INTERNATIONAL_ACCOUNT_DETAILS, component: InternationalBankAccountDetails},
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_TYPE, component: AccountType},
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.BANK_INFORMATION, component: BankInformation},
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_HOLDER_DETAILS, component: AccountHolderInformation},
@@ -62,8 +74,11 @@ const pages = [
     {pageName: CONST.CORPAY_FIELDS.PAGE_NAME.SUCCESS, component: Success},
 ];
 
-function getSkippedPages(skipAccountTypeStep: boolean, skipAccountHolderInformationStep: boolean) {
+function getSkippedPages(skipAccountTypeStep: boolean, skipAccountHolderInformationStep: boolean, skipInternationalBankAccountDetailsStep: boolean) {
     const skippedSteps = [];
+    if (skipInternationalBankAccountDetailsStep) {
+        skippedSteps.push(CONST.CORPAY_FIELDS.PAGE_NAME.INTERNATIONAL_ACCOUNT_DETAILS);
+    }
     if (skipAccountTypeStep) {
         skippedSteps.push(CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_TYPE);
     }
@@ -80,6 +95,7 @@ function InternationalDepositAccountContent({
     draftValues,
     country,
     isAccountLoading,
+    reimbursementCountries,
     backTo,
 }: InternationalDepositAccountContentProps) {
     const {translate} = useLocalize();
@@ -90,13 +106,22 @@ function InternationalDepositAccountContent({
 
     const initialAccountHolderDetailsValues = getInitialPersonalDetailsValues(privatePersonalDetails);
 
-    const startFrom = getInitialSubstep(values, fieldsMap);
+    const accountDetailsFieldsMap = fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_DETAILS];
+
+    const shouldCollectInternationalBankAccountDetails = shouldShowInternationalBankAccountDetails(
+        reimbursementCountries,
+        values.bankCountry,
+        hasIbanInAccountDetails(values, accountDetailsFieldsMap),
+        getSwiftCodeFromAccountDetails(values, accountDetailsFieldsMap),
+    );
+
+    const startFrom = getInitialSubstep(values, fieldsMap, shouldCollectInternationalBankAccountDetails);
 
     const skipAccountTypeStep = isEmptyObject(fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_TYPE]);
 
     const skipAccountHolderInformationStep = testValidation(initialAccountHolderDetailsValues, fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_HOLDER_DETAILS]);
 
-    const skippedPages = getSkippedPages(skipAccountTypeStep, skipAccountHolderInformationStep);
+    const skippedPages = getSkippedPages(skipAccountTypeStep, skipAccountHolderInformationStep, !shouldCollectInternationalBankAccountDetails);
 
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.ADD_BANK_ACCOUNT>>();
     const topmostFullScreenRoute = useRootNavigationState((state) => state?.routes.findLast((r) => isFullScreenName(r.name)));
