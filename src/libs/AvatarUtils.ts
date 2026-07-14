@@ -95,18 +95,26 @@ async function validateAvatarImage(image: FileObject): Promise<ValidationResult>
         };
     }
 
-    const validResolution = await isValidResolution(image);
-    if (!validResolution) {
-        return {
-            isValid: false,
-            errorKey: 'avatarWithImagePicker.resolutionConstraints',
-            errorParams: {
-                minHeightInPx: CONST.AVATAR_MIN_HEIGHT_PX,
-                minWidthInPx: CONST.AVATAR_MIN_WIDTH_PX,
-                maxHeightInPx: CONST.AVATAR_MAX_HEIGHT_PX,
-                maxWidthInPx: CONST.AVATAR_MAX_WIDTH_PX,
-            },
-        };
+    // SVG is a scalable vector format with no fixed pixel resolution, so the min/max pixel-dimension
+    // constraint is not meaningful for it (and cannot be reliably measured on native, where the
+    // document picker does not provide dimensions for SVGs). Skip the resolution check for SVG.
+    const {fileExtension} = splitExtensionFromFileName(image?.name ?? '');
+    const isSvg = fileExtension.toLowerCase() === 'svg';
+
+    if (!isSvg) {
+        const validResolution = await isValidResolution(image);
+        if (!validResolution) {
+            return {
+                isValid: false,
+                errorKey: 'avatarWithImagePicker.resolutionConstraints',
+                errorParams: {
+                    minHeightInPx: CONST.AVATAR_MIN_HEIGHT_PX,
+                    minWidthInPx: CONST.AVATAR_MIN_WIDTH_PX,
+                    maxHeightInPx: CONST.AVATAR_MAX_HEIGHT_PX,
+                    maxWidthInPx: CONST.AVATAR_MAX_WIDTH_PX,
+                },
+            };
+        }
     }
 
     return {isValid: true};
