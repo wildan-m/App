@@ -6,32 +6,57 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, ReportAttributesDerivedValue, Transaction} from '@src/types/onyx';
 
 import type {OnyxCollection} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 
 import {createRandomReport} from '../utils/collections/reports';
 import createRandomTransaction from '../utils/collections/transaction';
 
 type ReportAttributesConfig = typeof reportAttributesModuleDefault;
 
+type MockReportAttributes = {
+    hasAnyViolations: boolean;
+    requiresAttention: boolean;
+    reportErrors: Record<string, string>;
+    oneTransactionThreadReportID: string | undefined;
+    actionBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
+    actionTargetReportActionID: string | undefined;
+};
+
+// Per-report overrides for the mocked modules below, keyed by reportID. Reports with no entry fall back to
+// the neutral defaults. jest.mock factories may only reference out-of-scope variables whose names start with
+// "mock", hence the prefix.
+const mockReportAttributesByReportID: Record<string, MockReportAttributes> = {};
+const mockRedBrickRoadByReportID: Record<string, {reason: ValueOf<typeof CONST.RBR_REASONS>; reportAction?: {reportActionID: string}}> = {};
+const mockPolicyExpenseChatType: string = CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT;
+
 jest.mock('@libs/ReportUtils', () => ({
-    generateReportAttributes: jest.fn(() => ({
-        hasAnyViolations: false,
-        requiresAttention: false,
-        reportErrors: {},
-        oneTransactionThreadReportID: undefined,
-        actionBadge: undefined,
-        actionTargetReportActionID: undefined,
-    })),
+    generateReportAttributes: jest.fn(
+        ({report}: {report?: {reportID?: string}}) =>
+            (report?.reportID ? mockReportAttributesByReportID[report.reportID] : undefined) ?? {
+                hasAnyViolations: false,
+                requiresAttention: false,
+                reportErrors: {},
+                oneTransactionThreadReportID: undefined,
+                actionBadge: undefined,
+                actionTargetReportActionID: undefined,
+            },
+    ),
     generateIsEmptyReport: jest.fn(() => false),
     hasVisibleReportFieldViolations: jest.fn(() => false),
     isArchivedReport: jest.fn(() => false),
     isValidReport: jest.fn(() => true),
     parseReportRouteParams: jest.fn(() => ({reportID: ''})),
+    hasViolations: jest.fn(() => false),
+    isOpenReport: jest.fn(() => true),
+    isProcessingReport: jest.fn(() => false),
+    isPolicyAdmin: jest.fn(() => false),
+    isPolicyExpenseChat: jest.fn((report?: {chatType?: string}) => report?.chatType === mockPolicyExpenseChatType),
 }));
 
 jest.mock('@libs/SidebarUtils', () => ({
     __esModule: true,
     default: {
-        getReasonAndReportActionThatHasRedBrickRoad: jest.fn(() => undefined),
+        getReasonAndReportActionThatHasRedBrickRoad: jest.fn((report?: {reportID?: string}) => (report?.reportID ? mockRedBrickRoadByReportID[report.reportID] : undefined)),
     },
 }));
 
@@ -369,5 +394,77 @@ describe('reportAttributes compute — policy change code flow', () => {
         // so both pick up the recomputed name instead of keeping their stale seeded value.
         expect(result?.reports.expense1?.reportName).toBe('Test Report');
         expect(result?.reports.chat1?.reportName).toBe('Test Report');
+    });
+
+    describe('submit-ready expense that failed to reach the server', () => {
+        const failedExpenseReport: Report = {
+            ...createRandomReport(20, undefined),
+            reportID: 'expenseWithError',
+            policyID: 'policy1',
+            chatReportID: 'wsChat',
+            type: CONST.REPORT.TYPE.EXPENSE,
+        };
+
+        const workspaceChat: Report = {
+            ...createRandomReport(21, CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+            reportID: 'wsChat',
+            policyID: 'policy1',
+            chatReportID: undefined,
+            isOwnPolicyExpenseChat: true,
+        };
+
+        const reportsWithFailedExpense: OnyxCollection<Report> = {
+            [`${ONYXKEYS.COLLECTION.REPORT}expenseWithError`]: failedExpenseReport,
+            [`${ONYXKEYS.COLLECTION.REPORT}wsChat`]: workspaceChat,
+        };
+
+        // A just-created expense is still open and owned by the user, so it is "ready to submit" and gets the
+        // green Submit badge — while its report actions carry the errors from the request that failed.
+        const setUpSubmitReadyExpense = (reason: ValueOf<typeof CONST.RBR_REASONS>) => {
+            mockReportAttributesByReportID.expenseWithError = {
+                hasAnyViolations: reason !== CONST.RBR_REASONS.HAS_ERRORS,
+                requiresAttention: true,
+                reportErrors: reason === CONST.RBR_REASONS.HAS_ERRORS ? {error1: 'Request failed'} : {},
+                oneTransactionThreadReportID: undefined,
+                actionBadge: CONST.REPORT.ACTION_BADGE.SUBMIT,
+                actionTargetReportActionID: 'previewAction',
+            };
+            mockRedBrickRoadByReportID.expenseWithError = {reason, reportAction: {reportActionID: 'erroredAction'}};
+        };
+
+        const computeWithFailedExpense = () =>
+            config.compute(buildArgs(undefined, reportsWithFailedExpense), {
+                currentValue: undefined,
+                sourceValues: {[ONYXKEYS.COLLECTION.POLICY]: policies},
+            });
+
+        afterEach(() => {
+            delete mockReportAttributesByReportID.expenseWithError;
+            delete mockRedBrickRoadByReportID.expenseWithError;
+        });
+
+        it('marks the workspace chat with the Fix badge when a submit-ready expense has request errors', () => {
+            setUpSubmitReadyExpense(CONST.RBR_REASONS.HAS_ERRORS);
+
+            const result = computeWithFailedExpense();
+
+            // The expense never reached the server, so the user cannot submit past it: the workspace chat must
+            // surface Fix (pointing at the expense that needs attention) rather than the green Submit badge.
+            expect(result?.reports.expenseWithError?.needsParentChatErrorPropagation).toBe(true);
+            expect(result?.reports.wsChat?.brickRoadStatus).toBe(CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR);
+            expect(result?.reports.wsChat?.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.FIX);
+        });
+
+        it('keeps the green Submit badge when a submit-ready expense only has violations', () => {
+            setUpSubmitReadyExpense(CONST.RBR_REASONS.HAS_VIOLATIONS);
+
+            const result = computeWithFailedExpense();
+
+            // A violation can still be submitted past, so the green Submit badge keeps winning and the chat is
+            // not blocked with Fix — the behaviour the green-Submit override exists for.
+            expect(result?.reports.expenseWithError?.needsParentChatErrorPropagation).toBe(false);
+            expect(result?.reports.expenseWithError?.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.SUBMIT);
+            expect(result?.reports.wsChat?.actionBadge).not.toBe(CONST.REPORT.ACTION_BADGE.FIX);
+        });
     });
 });
