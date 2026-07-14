@@ -1,10 +1,10 @@
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
 import {canEditFieldOfMoneyRequest, canHoldUnholdReportAction, canRejectReportAction, getReimbursableTotal, isMoneyRequestReport, isOneTransactionReport} from '@libs/ReportUtils';
 import {isTransactionListItemType, isTransactionReportGroupListItemType} from '@libs/SearchUIUtils';
-import {getOriginalTransactionWithSplitInfo, hasValidModifiedAmount, isExpenseUnreported, isOnHold} from '@libs/TransactionUtils';
+import {getOriginalTransactionWithSplitInfo, hasValidModifiedAmount, isExpenseUnreported, isOnHold, isUnreportedManagedCardTransaction} from '@libs/TransactionUtils';
 
 import CONST from '@src/CONST';
-import type {OutstandingReportsByPolicyIDDerivedValue, Report, ReportNameValuePairs, Transaction} from '@src/types/onyx';
+import type {CardList, OutstandingReportsByPolicyIDDerivedValue, Report, ReportNameValuePairs, Transaction} from '@src/types/onyx';
 
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 
@@ -44,7 +44,25 @@ type MapTransactionItemToSelectedEntryParams = {
 
     /** The row's parent report, used for split eligibility */
     parentReport: OnyxEntry<Report> | undefined;
+
+    /** All non-personal and workspace cards, used to resolve the cardholder of an unreported card expense */
+    allCards: CardList | undefined;
 };
+
+/**
+ * Resolves who owns an unreported managed card expense.
+ *
+ * An unreported expense belongs to no report, so it has no IOU report action to read the owner from. The card that
+ * produced the expense does know its cardholder, so look the owner up there instead. Returns `undefined` for anything
+ * that is not an unreported card expense — those resolve their owner from the report action.
+ */
+function getCardholderAccountID(item: TransactionListItemType, allCards: CardList | undefined): number | undefined {
+    if (!isUnreportedManagedCardTransaction(item) || !item.cardID) {
+        return undefined;
+    }
+
+    return allCards?.[`${item.cardID}`]?.accountID;
+}
 
 /**
  * Builds the `[keyForList, SelectedTransactionInfo]` entry for a single transaction row, precomputing the
@@ -63,6 +81,7 @@ function mapTransactionItemToSelectedEntry({
     isProduction,
     allowNegativeAmount,
     parentReport,
+    allCards,
 }: MapTransactionItemToSelectedEntryParams): [string, SelectedTransactionInfo] {
     const {canHoldRequest, canUnholdRequest} = canHoldUnholdReportAction(item.report, item.reportAction, item.holdReportAction, item, item.policy, currentUserAccountID);
     const canRejectRequest = item.report ? canRejectReportAction(currentUserLogin, item.report) : false;
@@ -100,7 +119,7 @@ function mapTransactionItemToSelectedEntry({
             groupAmount: item.groupAmount,
             currency: item.currency,
             isFromOneTransactionReport: isOneTransactionReport(item.report),
-            ownerAccountID: item.reportAction?.actorAccountID,
+            ownerAccountID: item.reportAction?.actorAccountID ?? getCardholderAccountID(item, allCards),
             reportAction: item.reportAction,
             report: item.report,
         },
@@ -189,6 +208,9 @@ type PrepareTransactionsListParams = {
 
     /** The row's parent report, used for split eligibility */
     parentReport: OnyxEntry<Report> | undefined;
+
+    /** All non-personal and workspace cards, used to resolve the cardholder of an unreported card expense */
+    allCards: CardList | undefined;
 };
 
 /**
@@ -207,6 +229,7 @@ function prepareTransactionsList({
     selfDMReport,
     isProduction,
     parentReport,
+    allCards,
 }: PrepareTransactionsListParams) {
     if (selectedTransactions[item.keyForList]?.isSelected) {
         const {[item.keyForList]: omittedTransaction, ...transactions} = selectedTransactions;
@@ -226,6 +249,7 @@ function prepareTransactionsList({
         isProduction,
         allowNegativeAmount: false,
         parentReport,
+        allCards,
     });
 
     return {

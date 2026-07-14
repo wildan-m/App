@@ -11,7 +11,7 @@ import {isTransactionPendingDelete} from '@libs/TransactionUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {OutstandingReportsByPolicyIDDerivedValue, Report, ReportNameValuePairs, SearchResults, Transaction} from '@src/types/onyx';
+import type {CardList, OutstandingReportsByPolicyIDDerivedValue, Report, ReportNameValuePairs, SearchResults, Transaction} from '@src/types/onyx';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
@@ -102,6 +102,9 @@ type ReconcileSelectionParams = {
 
     /** Derived outstanding reports per policy, used for the change-report eligibility check */
     outstandingReportsByPolicyID: OutstandingReportsByPolicyIDDerivedValue | undefined;
+
+    /** All non-personal and workspace cards, used to resolve the cardholder of an unreported card expense */
+    allCards: CardList | undefined;
 };
 
 /**
@@ -126,6 +129,7 @@ function useReconcileSelectionWithData({
     isProduction,
     reportNameValuePairs,
     outstandingReportsByPolicyID,
+    allCards,
 }: ReconcileSelectionParams) {
     const {selectedTransactions, areAllMatchingItemsSelected} = useSearchSelectionContext();
     const {applySelection} = useSearchSelectionActions();
@@ -201,6 +205,7 @@ function useReconcileSelectionWithData({
                         isProduction,
                         allowNegativeAmount: true,
                         parentReport: itemParentReport,
+                        allCards,
                     });
 
                     newTransactionList[listKey] = {
@@ -239,6 +244,7 @@ function useReconcileSelectionWithData({
                     isProduction,
                     allowNegativeAmount: true,
                     parentReport: itemParentReport,
+                    allCards,
                 });
 
                 newTransactionList[listKey] = {
@@ -348,6 +354,7 @@ function SearchWriteActionsProvider({
     const selfDMReport = useSelfDMReport();
     const [reportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS);
     const [outstandingReportsByPolicyID] = useOnyx(ONYXKEYS.DERIVED.OUTSTANDING_REPORTS_BY_POLICY_ID);
+    const [nonPersonalAndWorkspaceCards] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST);
     const {applySelection} = useSearchSelectionActions();
 
     const searchResultsData = searchResults?.data;
@@ -380,6 +387,7 @@ function SearchWriteActionsProvider({
                         selfDMReport,
                         isProduction,
                         parentReport: itemParentReport,
+                        allCards: nonPersonalAndWorkspaceCards,
                     });
 
                     // Tag individual transactions with their parent group key so export filtering can derive the group when needed.
@@ -450,6 +458,7 @@ function SearchWriteActionsProvider({
                                     isProduction,
                                     allowNegativeAmount: true,
                                     parentReport: itemParentReport,
+                                    allCards: nonPersonalAndWorkspaceCards,
                                 });
                                 return [key, {...entry, groupKey: item.keyForList}];
                             }),
@@ -495,6 +504,7 @@ function SearchWriteActionsProvider({
                                 isProduction,
                                 allowNegativeAmount: true,
                                 parentReport: itemParentReport,
+                                allCards: nonPersonalAndWorkspaceCards,
                             });
                             entries.push([key, {...entry, groupKey: item.keyForList}]);
                         }
@@ -528,6 +538,7 @@ function SearchWriteActionsProvider({
                             isProduction,
                             allowNegativeAmount: true,
                             parentReport: itemParentReport,
+                            allCards: nonPersonalAndWorkspaceCards,
                         }),
                     );
                 }
@@ -552,6 +563,7 @@ function SearchWriteActionsProvider({
         isProduction,
         reportNameValuePairs,
         outstandingReportsByPolicyID,
+        allCards: nonPersonalAndWorkspaceCards,
     });
     useTurnOffSelectionModeWhenEmpty({isFocused, isMobileSelectionModeEnabled});
     useSyncMobileSelectionModeWithScreenSize({isFocused, isMobileSelectionModeEnabled, isSearchResultsEmpty});
