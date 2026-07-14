@@ -1065,10 +1065,17 @@ describe('actions/IOU', () => {
                     .then(
                         () =>
                             new Promise<void>((resolve) => {
-                                if (iouReportID) {
-                                    clearAllRelatedReportActionErrors(iouReportID, iouAction ?? null, iouReportID);
-                                }
-                                resolve();
+                                const connection = Onyx.connect({
+                                    key: ONYXKEYS.COLLECTION.REPORT,
+                                    waitForCollectionCallback: true,
+                                    callback: (allReports) => {
+                                        Onyx.disconnect(connection);
+                                        if (iouReportID) {
+                                            clearAllRelatedReportActionErrors(iouReportID, iouAction ?? null, iouReportID, allReports);
+                                        }
+                                        resolve();
+                                    },
+                                });
                             }),
                     )
 

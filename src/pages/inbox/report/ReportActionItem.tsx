@@ -62,7 +62,7 @@ import shouldBreakAccessibilityGrouping from '@libs/shouldBreakAccessibilityGrou
 import {ReactionListContext} from '@pages/inbox/ReactionListContext';
 import AttachmentModalContext from '@pages/media/AttachmentModalScreen/AttachmentModalContext';
 
-import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
+import {clearAllRelatedReportActionErrors, reportParentLinksSelector} from '@userActions/ClearReportActionErrors';
 import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
 import {expandURLPreview} from '@userActions/Report';
 import {clearError} from '@userActions/Transaction';
@@ -188,6 +188,7 @@ function ReportActionItem({
     const originalReportID = useOriginalReportID(report?.reportID, action);
     const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getIOUReportIDFromReportActionPreview(action)}`, {selector: getStableReportSelector});
     const [iouPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${iouReport?.policyID}`);
+    const [reportParentLinks] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: reportParentLinksSelector});
 
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
     const transactionsOnIOUReport = useReportTransactions(iouReport?.reportID);
@@ -265,7 +266,7 @@ function ReportActionItem({
         if (transactionIDToDismiss) {
             clearError(transactionIDToDismiss);
         }
-        clearAllRelatedReportActionErrors(reportID, action, originalReportID);
+        clearAllRelatedReportActionErrors(reportID, action, originalReportID, reportParentLinks);
     };
 
     const showDismissReceiptErrorModal = async () => {

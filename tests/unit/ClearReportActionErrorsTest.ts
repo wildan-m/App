@@ -1,7 +1,10 @@
-import {clearAllRelatedReportActionErrors} from '@libs/actions/ClearReportActionErrors';
+import type {ReportParentLinks} from '@libs/actions/ClearReportActionErrors';
+import {clearAllRelatedReportActionErrors, reportParentLinksSelector} from '@libs/actions/ClearReportActionErrors';
 
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {ReportActions} from '@src/types/onyx';
+import type {Report, ReportActions} from '@src/types/onyx';
+
+import type {OnyxCollection} from 'react-native-onyx';
 
 import Onyx from 'react-native-onyx';
 
@@ -15,6 +18,15 @@ const CHILD_REPORT_ID = '3';
 const REPORT_ACTION_ID = '100';
 const PARENT_REPORT_ACTION_ID = '200';
 const CHILD_REPORT_ACTION_ID = '300';
+
+/** Builds the report collection the caller is now responsible for handing to clearAllRelatedReportActionErrors. */
+function buildReports(reportsByID: Record<string, Report>): OnyxCollection<ReportParentLinks> {
+    const reports: OnyxCollection<Report> = {};
+    for (const [reportID, report] of Object.entries(reportsByID)) {
+        reports[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] = report;
+    }
+    return reportParentLinksSelector(reports);
+}
 
 function getReportActionsFromOnyx(reportID: string): Promise<ReportActions | undefined> {
     return new Promise((resolve) => {
@@ -53,7 +65,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called with null reportAction
-            clearAllRelatedReportActionErrors(REPORT_ID, null, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, null, REPORT_ID, buildReports({[REPORT_ID]: report}));
             await waitForBatchedUpdates();
 
             // Then no report actions should be created or modified
@@ -65,7 +77,7 @@ describe('ClearReportActionErrors', () => {
             // Given no initial state
 
             // When clearAllRelatedReportActionErrors is called with undefined reportAction
-            clearAllRelatedReportActionErrors(REPORT_ID, undefined, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, undefined, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then no report actions should be created or modified
@@ -78,7 +90,7 @@ describe('ClearReportActionErrors', () => {
             const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {errors: undefined});
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then no report actions should be created or modified
@@ -91,7 +103,7 @@ describe('ClearReportActionErrors', () => {
             const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {errors: {error1: 'Error message'}});
 
             // When clearAllRelatedReportActionErrors is called with undefined reportID
-            clearAllRelatedReportActionErrors(undefined, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(undefined, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then no report actions should be created or modified
@@ -110,7 +122,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called with specific keys to clear
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, undefined, ['error1', 'error2']);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {}, undefined, ['error1', 'error2']);
             await waitForBatchedUpdates();
 
             // Then only the specified errors should be cleared, leaving error3
@@ -132,7 +144,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then the entire report action should be deleted (not just errors cleared)
@@ -153,6 +165,36 @@ describe('ClearReportActionErrors', () => {
                 errors: {sharedError: 'Parent error message'},
             });
 
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, {
+                [REPORT_ACTION_ID]: reportAction,
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PARENT_REPORT_ID}`, {
+                [PARENT_REPORT_ACTION_ID]: parentReportAction,
+            });
+            await waitForBatchedUpdates();
+
+            // When clearAllRelatedReportActionErrors is called on the child action with the report supplied by the caller
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: report}));
+            await waitForBatchedUpdates();
+
+            // Then the parent action's matching error should also be cleared
+            const parentReportActions = await getReportActionsFromOnyx(PARENT_REPORT_ID);
+            expect(parentReportActions?.[PARENT_REPORT_ACTION_ID]?.errors).toEqual({});
+        });
+
+        it('should not walk up to the parent when the caller supplies no report data', async () => {
+            // Given a child report whose parent link is only present in Onyx, and is not handed to the function
+            const report = createMockReport({
+                parentReportID: PARENT_REPORT_ID,
+                parentReportActionID: PARENT_REPORT_ACTION_ID,
+            });
+            const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {
+                errors: {sharedError: 'Error message'},
+            });
+            const parentReportAction = getFakeReportAction(Number(PARENT_REPORT_ACTION_ID), {
+                errors: {sharedError: 'Parent error message'},
+            });
+
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, {
                 [REPORT_ACTION_ID]: reportAction,
@@ -162,13 +204,51 @@ describe('ClearReportActionErrors', () => {
             });
             await waitForBatchedUpdates();
 
-            // When clearAllRelatedReportActionErrors is called on the child action
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            // When clearAllRelatedReportActionErrors is called with an empty report collection
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
-            // Then the parent action's matching error should also be cleared
+            // Then the parent error remains, proving the report data comes from the caller and not from a module-level Onyx subscription
             const parentReportActions = await getReportActionsFromOnyx(PARENT_REPORT_ID);
+            expect(parentReportActions?.[PARENT_REPORT_ACTION_ID]?.errors).toEqual({sharedError: 'Parent error message'});
+        });
+
+        it('should clear errors up the whole ancestor chain using the supplied report data', async () => {
+            // Given a transaction thread whose parent is an expense report that itself has a parent chat, all sharing an error key
+            const grandParentReportID = '4';
+            const grandParentReportActionID = '400';
+            const report = createMockReport({
+                parentReportID: PARENT_REPORT_ID,
+                parentReportActionID: PARENT_REPORT_ACTION_ID,
+            });
+            const parentReport = createMockReport({
+                parentReportID: grandParentReportID,
+                parentReportActionID: grandParentReportActionID,
+            });
+            const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {errors: {sharedError: 'Error message'}});
+            const parentReportAction = getFakeReportAction(Number(PARENT_REPORT_ACTION_ID), {errors: {sharedError: 'Parent error message'}});
+            const grandParentReportAction = getFakeReportAction(Number(grandParentReportActionID), {errors: {sharedError: 'Grandparent error message'}});
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${REPORT_ID}`, {
+                [REPORT_ACTION_ID]: reportAction,
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${PARENT_REPORT_ID}`, {
+                [PARENT_REPORT_ACTION_ID]: parentReportAction,
+            });
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${grandParentReportID}`, {
+                [grandParentReportActionID]: grandParentReportAction,
+            });
+            await waitForBatchedUpdates();
+
+            // When clearAllRelatedReportActionErrors is called with the full chain supplied by the caller
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: report, [PARENT_REPORT_ID]: parentReport}));
+            await waitForBatchedUpdates();
+
+            // Then the matching errors are cleared at every level of the chain
+            const parentReportActions = await getReportActionsFromOnyx(PARENT_REPORT_ID);
+            const grandParentReportActions = await getReportActionsFromOnyx(grandParentReportID);
             expect(parentReportActions?.[PARENT_REPORT_ACTION_ID]?.errors).toEqual({});
+            expect(grandParentReportActions?.[grandParentReportActionID]?.errors).toEqual({});
         });
 
         it('should not clear parent errors when ignore is set to parent', async () => {
@@ -194,7 +274,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called with ignore='parent'
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, 'parent');
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: report}), 'parent');
             await waitForBatchedUpdates();
 
             // Then the parent action's error should remain unchanged
@@ -222,7 +302,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called with ignore='child'
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, 'child');
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: createMockReport()}), 'child');
             await waitForBatchedUpdates();
 
             // Then the child action's error should remain unchanged
@@ -253,7 +333,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: report}));
             await waitForBatchedUpdates();
 
             // Then the parent action's error should remain because the keys don't match
@@ -272,7 +352,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called with different reportID and originalReportID
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, originalReportID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, originalReportID, {});
             await waitForBatchedUpdates();
 
             // Then the errors should be cleared from the originalReportID location
@@ -285,7 +365,7 @@ describe('ClearReportActionErrors', () => {
             const reportAction = getFakeReportAction(Number(REPORT_ACTION_ID), {errors: {}});
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then no report actions should be created or modified (early return)
@@ -303,7 +383,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, {});
             await waitForBatchedUpdates();
 
             // Then the report action should remain unchanged (early return due to missing reportActionID)
@@ -339,7 +419,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: createMockReport()}));
             await waitForBatchedUpdates();
 
             // Then all child actions with matching error keys should have their errors cleared
@@ -368,7 +448,7 @@ describe('ClearReportActionErrors', () => {
             await waitForBatchedUpdates();
 
             // When clearAllRelatedReportActionErrors is called
-            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID);
+            clearAllRelatedReportActionErrors(REPORT_ID, reportAction, REPORT_ID, buildReports({[REPORT_ID]: createMockReport()}));
             await waitForBatchedUpdates();
 
             // Then only matching errors should be cleared, leaving non-matching errors intact

@@ -147,8 +147,15 @@ describe('ClearReportActionErrors UI', () => {
             const dismissButton = screen.getByLabelText('Dismiss');
             fireEvent.press(dismissButton);
 
-            // Then clearAllRelatedReportActionErrors should be called with correct arguments
-            expect(spy).toHaveBeenCalledWith(REPORT_ID, expect.objectContaining({reportActionID: REPORT_ACTION_ID}), REPORT_ID);
+            // Then clearAllRelatedReportActionErrors should be called with correct arguments, including the report data supplied by the component
+            expect(spy).toHaveBeenCalledWith(
+                REPORT_ID,
+                expect.objectContaining({reportActionID: REPORT_ACTION_ID}),
+                REPORT_ID,
+                expect.objectContaining({
+                    [`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`]: {parentReportID: report.parentReportID, parentReportActionID: report.parentReportActionID},
+                }),
+            );
             spy.mockRestore();
         });
 
