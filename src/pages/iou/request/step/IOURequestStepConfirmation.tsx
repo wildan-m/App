@@ -905,12 +905,12 @@ function IOURequestStepConfirmation({
                             ) : null}
                         </HeaderWithBackButton>
                     )}
-                    {(isLoading || (isScanRequest(transaction) && !Object.values(receiptFiles).length)) && (
+                    {(isLoading || (isScanRequest(transaction) && !Object.values(receiptFiles).length && !receiptPath)) && (
                         <FullScreenLoadingIndicator
                             reasonAttributes={{
                                 context: 'IOURequestStepConfirmation',
                                 isLoading,
-                                isScanRequestWithNoReceipts: isScanRequest(transaction) && !Object.values(receiptFiles).length,
+                                isScanRequestWithNoReceipts: isScanRequest(transaction) && !Object.values(receiptFiles).length && !receiptPath,
                             }}
                         />
                     )}
