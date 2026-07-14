@@ -136,9 +136,18 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
         );
     }, [styles.fullScreenLoading, styles.w100]);
 
-    // This callback is used to register the focus trap container element of each available tab screen
-    const setTabFocusTrapContainerElement = (tabName: string, containerElement: HTMLElement | null) => {
+    // This callback is used to register the focus trap container element of each available tab screen.
+    // It must keep a stable identity across renders: it is the value of TabFocusTrapContext, and every tab
+    // screen registers its container element through a ref that depends on it. A new identity on each render
+    // re-runs those refs, which calls back into here, which re-renders this navigator — an infinite loop.
+    const setTabFocusTrapContainerElement = useCallback((tabName: string, containerElement: HTMLElement | null) => {
         setFocusTrapContainerElementMapping((prevMapping) => {
+            // Bail out when the element for this tab is already what we're being handed, so a repeated
+            // registration of the same element can't schedule an endless chain of re-renders.
+            const hasTab = tabName in prevMapping;
+            if (containerElement ? prevMapping[tabName] === containerElement : !hasTab) {
+                return prevMapping;
+            }
             const resultMapping = {...prevMapping};
             if (containerElement) {
                 resultMapping[tabName] = containerElement;
@@ -147,7 +156,7 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
             }
             return resultMapping;
         });
-    };
+    }, []);
 
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
@@ -155,7 +164,9 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
     const guardsRef = useRef<Map<string, TabSwitchGuard>>(new Map());
     const isDiscardModalOpenRef = useRef(false);
 
-    const registerTabGuard: RegisterTabSwitchGuard = (guard) => {
+    // Like setTabFocusTrapContainerElement, this is a context value consumed by the tab screens, so it has to
+    // stay referentially stable across renders.
+    const registerTabGuard = useCallback<RegisterTabSwitchGuard>((guard) => {
         guardsRef.current.set(guard.tabName, guard);
         return () => {
             // Only clear if this exact guard is still registered, so a re-registration from another mount isn't wiped.
@@ -164,7 +175,7 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
             }
             guardsRef.current.delete(guard.tabName);
         };
-    };
+    }, []);
 
     const handleTabPress = (navigation: NavigationProp<ParamListBase>, event: EventArg<'tabPress', true, undefined>) => {
         if (isDiscardModalOpenRef.current) {
