@@ -13,6 +13,7 @@ import {unlinkLogin} from '@userActions/Session';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
 import React, {useEffect} from 'react';
@@ -37,7 +38,11 @@ function UnlinkLoginPage({route}: UnlinkLoginPageProps) {
             return;
         }
 
-        Navigation.goBack();
+        // The page is opened as a deep link from the validation email, so it can be the only screen in the stack.
+        // Passing a fallback route makes leaving the screen work even when there is nothing to pop back to.
+        Navigation.isNavigationReady().then(() => {
+            Navigation.goBack(ROUTES.HOME);
+        });
     }, [prevIsLoading, account?.isLoading]);
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
