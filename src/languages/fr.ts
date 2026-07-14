@@ -999,6 +999,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 cta: 'Ajouter des détails',
             },
             enterSignerInfo: {title: 'Informations du signataire requises', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `Compte bancaire ${bankAccountLastFour}`},
+            addDepositAccount: {title: 'Ajouter un compte de dépôt', subtitle: 'Obtenez le remboursement de vos dépenses.'},
         },
         announcements: 'Annonces',
         discoverSection: {

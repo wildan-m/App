@@ -979,6 +979,7 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             addVirtualCardPersonalDetails: {title: 'Expensify カードを表示して利用を開始するには、ご自身の情報を追加してください。', subtitle: 'Expensify カード', cta: '詳細を追加'},
             enterSignerInfo: {title: '署名者情報が必要です', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `銀行口座 ${bankAccountLastFour}`},
+            addDepositAccount: {title: '入金口座を追加', subtitle: '経費の精算を受けましょう。'},
         },
         announcements: 'お知らせ',
         discoverSection: {

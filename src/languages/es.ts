@@ -953,6 +953,7 @@ const translations: TranslationDeepObject<typeof en> = {
                 personalSubtitle: 'Billetera',
             },
             enterSignerInfo: {title: 'Se necesita la información del firmante', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `Cuenta bancaria ${bankAccountLastFour}`},
+            addDepositAccount: {title: 'Añadir una cuenta de depósito', subtitle: 'Obtén el reembolso de tus gastos.'},
         },
         freeTrialSection: {
             title: ({days}: {days: number}) => `Prueba gratuita: ${days} ${days === 1 ? 'día' : 'días'} restantes!`,
