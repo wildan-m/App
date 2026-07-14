@@ -487,7 +487,9 @@ export default createOnyxDerivedValueConfig({
 
                 // When the report is ready to submit, always show the green Submit badge
                 // regardless of violations — the user can submit without fix.
-                const willShowGreenSubmit = requiresAttention && actionGreenBadge === CONST.REPORT.ACTION_BADGE.SUBMIT;
+                // Errors are the exception: the user can't submit past them, so they must still get the Fix badge.
+                const hasErrors = reasonAndReportAction?.reason === CONST.RBR_REASONS.HAS_ERRORS;
+                const willShowGreenSubmit = requiresAttention && actionGreenBadge === CONST.REPORT.ACTION_BADGE.SUBMIT && !hasErrors;
 
                 // if report has errors or violations, show red dot
                 // Also skip setting ERROR when we'll show the green Submit badge — let the user submit without fix.
