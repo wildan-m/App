@@ -85,7 +85,8 @@ function USDVerifiedBankAccountFlowPage({route}: USDVerifiedBankAccountFlowPageP
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
 
     const bankAccountConnectedToWorkspace = policyID ? Object.values(bankAccountList ?? {}).find((bankAccount) => bankAccount?.accountData?.policyIDs?.includes(policyID)) : undefined;
-    const bankAccountState = bankAccountConnectedToWorkspace?.accountData?.state ?? '';
+    // The account being set up isn't linked to the policy in bankAccountList until the backend confirms it, so fall back to the in-flight setup state.
+    const bankAccountState = bankAccountConnectedToWorkspace?.accountData?.state ?? reimbursementAccount?.achData?.state ?? '';
 
     const requestorStepRef = useRef<View>(null);
     const isOnfidoSetupComplete = reimbursementAccount?.achData?.isOnfidoSetupComplete;

@@ -65,7 +65,8 @@ function ConnectBankAccount({onBackButtonPress, setShouldShowConnectedVerifiedBa
 
     const handleNavigateToConciergeChat = () => navigateToConciergeChat(conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, true);
     const bankAccountConnectedToWorkspace = policyID ? Object.values(bankAccountList ?? {}).find((bankAccount) => bankAccount?.accountData?.policyIDs?.includes(policyID)) : undefined;
-    const bankAccountState = bankAccountConnectedToWorkspace?.accountData?.state ?? '';
+    // The account being set up isn't linked to the policy in bankAccountList until the backend confirms it, so fall back to the in-flight setup state.
+    const bankAccountState = bankAccountConnectedToWorkspace?.accountData?.state ?? reimbursementAccount?.achData?.state ?? '';
     const pendingAction = reimbursementAccount?.pendingAction;
 
     // After a disconnect, wait for the reset API to finish before navigating to the entry point.
@@ -118,6 +119,11 @@ function ConnectBankAccount({onBackButtonPress, setShouldShowConnectedVerifiedBa
     const isBankAccountVerifying = !maxAttemptsReached && bankAccountState === CONST.BANK_ACCOUNT.STATE.VERIFYING;
     const isBankAccountPending = bankAccountState === CONST.BANK_ACCOUNT.STATE.PENDING;
     const requiresTwoFactorAuth = account?.requiresTwoFactorAuth ?? false;
+
+    // Every render branch below is keyed off the bank account state, so an unknown state would leave the screen with a header and no body.
+    if (!maxAttemptsReached && !isBankAccountVerifying && !isBankAccountPending) {
+        return <ReimbursementAccountLoadingIndicator onBackButtonPress={onBackButtonPress} />;
+    }
 
     return (
         <ScreenWrapper
