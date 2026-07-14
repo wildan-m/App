@@ -1,7 +1,7 @@
 import {hasSynchronizationErrorMessage, isConnectionUnverified} from '@libs/actions/connections';
 import {getDisplayNameForWorkspace} from '@libs/actions/Policy/Policy';
 // eslint-disable-next-line no-restricted-imports -- isPaidGroupPolicy is intentional: copy-settings targets are billing/paid-only (Collect/Control), so free group plans like Submit must be excluded (see createCopySettingsEligibleTargetsSelector).
-import {getActiveAdminWorkspaces, getOwnedPaidPolicies, isPaidGroupPolicy, isPendingDeletePolicy, isPolicyAdmin, shouldShowPolicy} from '@libs/PolicyUtils';
+import {getActiveAdminWorkspaces, getActivePolicies, getOwnedPaidPolicies, isPaidGroupPolicy, isPendingDeletePolicy, isPolicyAdmin, shouldShowPolicy} from '@libs/PolicyUtils';
 import {getDefaultAvatarURL} from '@libs/UserAvatarUtils';
 
 import CONST from '@src/CONST';
@@ -129,6 +129,10 @@ const createWorkspaceListPoliciesSelector =
 const activeAdminPoliciesSelector = (policies: OnyxCollection<Policy>, currentUserAccountLogin: string) => getActiveAdminWorkspaces(policies, currentUserAccountLogin);
 
 const hasActiveAdminPoliciesSelector = (policies: OnyxCollection<Policy>, currentUserAccountLogin: string) => !!activeAdminPoliciesSelector(policies, currentUserAccountLogin).length;
+
+/** Whether the user belongs to any active policy that has reimbursements enabled, regardless of their role in it */
+const hasReimbursementEnabledPolicySelector = (policies: OnyxCollection<Policy>, currentUserAccountLogin: string | undefined) =>
+    getActivePolicies(policies, currentUserAccountLogin).some((policy) => !!policy.reimbursement?.enabled);
 
 /**
  * Creates a selector that aggregates all non-formula policy report fields from all policies,
@@ -376,6 +380,7 @@ export {
     createWorkspaceListPoliciesSelector,
     activeAdminPoliciesSelector,
     hasActiveAdminPoliciesSelector,
+    hasReimbursementEnabledPolicySelector,
     createPoliciesForDomainCardsSelector,
     policyTimeTrackingSelector,
     iouRequestPolicyCollectionSelector,

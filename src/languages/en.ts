@@ -1026,6 +1026,10 @@ const translations = {
                 subtitle: 'Account > Subscription',
                 cta: 'Add',
             },
+            addDepositAccount: {
+                title: 'Add a deposit account',
+                subtitle: 'Get reimbursed for your expenses.',
+            },
             activateCard: {
                 title: 'Activate your Expensify Card',
                 subtitle: 'Validate your card and start spending.',

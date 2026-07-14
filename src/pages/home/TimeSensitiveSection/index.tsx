@@ -29,12 +29,14 @@ import React, {useCallback, useState} from 'react';
 import {View} from 'react-native';
 
 import useBrokenDirectCompanyCardFeedsForAdmin from './hooks/useBrokenDirectCompanyCardFeedsForAdmin';
+import useTimeSensitiveAddDepositAccount from './hooks/useTimeSensitiveAddDepositAccount';
 import useTimeSensitiveAddPaymentCard from './hooks/useTimeSensitiveAddPaymentCard';
 import useTimeSensitiveBilling from './hooks/useTimeSensitiveBilling';
 import useTimeSensitiveCards from './hooks/useTimeSensitiveCards';
 import useTimeSensitiveLockedBankAccount from './hooks/useTimeSensitiveLockedBankAccount';
 import useTimeSensitiveSignerInfo from './hooks/useTimeSensitiveSignerInfo';
 import ActivateCard from './items/ActivateCard';
+import AddDepositAccount from './items/AddDepositAccount';
 import AddPaymentCard from './items/AddPaymentCard';
 import AddShippingAddress from './items/AddShippingAddress';
 import AddVirtualCardPersonalDetails from './items/AddVirtualCardPersonalDetails';
@@ -93,6 +95,7 @@ function TimeSensitiveSection() {
         virtualCardsNeedingPersonalDetails,
     } = useTimeSensitiveCards();
     const {shouldShowFixFailedBilling} = useTimeSensitiveBilling();
+    const {shouldShowAddDepositAccount} = useTimeSensitiveAddDepositAccount();
 
     // Selector for filtering admin policies (Release 4)
     const adminPoliciesSelectorWrapper = useCallback((policies: OnyxCollection<Policy>) => activeAdminPoliciesSelector(policies, login ?? ''), [login]);
@@ -172,7 +175,8 @@ function TimeSensitiveSection() {
         hasBrokenPolicyConnections ||
         shouldShowAddShippingAddress ||
         shouldShowActivateCard ||
-        shouldShowAddVirtualCardPersonalDetails;
+        shouldShowAddVirtualCardPersonalDetails ||
+        shouldShowAddDepositAccount;
 
     if (!hasAnyTimeSensitiveContent) {
         return null;
@@ -191,6 +195,7 @@ function TimeSensitiveSection() {
     // 10. Expensify card shipping
     // 11. Expensify card activation
     // 12. Virtual Expensify card needs personal details
+    // 13. Add a deposit account (member of a reimbursing workspace with no personal bank account)
     const items: React.ReactNode[] = [];
 
     // Priority 1: Validate account
@@ -312,6 +317,11 @@ function TimeSensitiveSection() {
                 />,
             );
         }
+    }
+
+    // Priority 13: Add a deposit account so the member can be reimbursed
+    if (shouldShowAddDepositAccount) {
+        items.push(<AddDepositAccount key="add-deposit-account" />);
     }
 
     const hiddenCount = Math.max(0, items.length - CONST.HOME.SECTION_VISIBLE_LIMIT);
