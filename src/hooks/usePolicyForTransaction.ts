@@ -46,7 +46,11 @@ function usePolicyForTransaction({transaction, reportPolicyID, action, iouType, 
     const isUnreportedExpense = isExpenseUnreported(transaction);
     const isCreatingTrackExpense = action === CONST.IOU.ACTION.CREATE && iouType === CONST.IOU.TYPE.TRACK;
 
-    const policyForSelfDMExpense = isPerDiemRequest ? customUnitPolicy : policyForMovingExpenses;
+    // Fall back to the draft policy so a freshly created draft Submit workspace (e.g. "Submit to my employer" with no
+    // existing workspace) is used when there's no existing moving-expenses policy. Mirrors the `reportPolicy ?? policyDraft`
+    // fallback on the other branch below; without it `policy` is undefined and group-policy-gated UI (like the receipt
+    // empty state) is wrongly hidden on the confirm page.
+    const policyForSelfDMExpense = isPerDiemRequest ? customUnitPolicy : (policyForMovingExpenses ?? policyDraft);
     const policy = isUnreportedExpense || isCreatingTrackExpense ? policyForSelfDMExpense : (reportPolicy ?? policyDraft);
 
     return {policy};
