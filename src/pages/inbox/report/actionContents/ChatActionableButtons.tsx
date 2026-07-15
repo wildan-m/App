@@ -32,6 +32,7 @@ import type {CreateDraftTransactionParams} from '@libs/ReportUtils';
 import {createDraftTransactionAndNavigateToParticipantSelector} from '@libs/ReportUtils';
 import shouldRenderAddPaymentCard from '@libs/shouldRenderAppPaymentCard';
 import {doesUserHavePaymentCardAdded} from '@libs/SubscriptionUtils';
+import {isPerDiemRequest} from '@libs/TransactionUtils';
 
 import {dismissTrackExpenseActionableWhisper, resolveConciergeCategoryOptions, resolveConciergeDescriptionOptions} from '@userActions/Report';
 
@@ -232,17 +233,21 @@ function ChatActionableButtons({action, originalReportID, reportID, hasPendingFo
                     });
                 },
             });
-            const submitButtons: ActionableItem[] = canUseSubmit2026
-                ? [
-                      prepareSubmitDestinationButton(CONST.IOU.SUBMIT_DESTINATION.FRIEND, 'submitToFriend'),
-                      prepareSubmitDestinationButton(CONST.IOU.SUBMIT_DESTINATION.EMPLOYER, 'submitToEmployer'),
-                  ]
-                : [
-                      prepareTrackExpenseButton('submit', {
-                          isRestrictedToPreferredPolicy,
-                          preferredPolicyID,
-                      }),
-                  ];
+            // Per diem is a Control-plan-only feature, so it can't be routed to a Submit (submit2026) workspace.
+            // Skip the "Submit to my employer" split for per diem tracked expenses and fall back to the standard
+            // submit button, which opens the participant picker instead of auto-creating a Submit-plan workspace.
+            const submitButtons: ActionableItem[] =
+                canUseSubmit2026 && !isPerDiemRequest(trackExpenseTransaction)
+                    ? [
+                          prepareSubmitDestinationButton(CONST.IOU.SUBMIT_DESTINATION.FRIEND, 'submitToFriend'),
+                          prepareSubmitDestinationButton(CONST.IOU.SUBMIT_DESTINATION.EMPLOYER, 'submitToEmployer'),
+                      ]
+                    : [
+                          prepareTrackExpenseButton('submit', {
+                              isRestrictedToPreferredPolicy,
+                              preferredPolicyID,
+                          }),
+                      ];
             const options = [...submitButtons];
 
             if (Permissions.canUseTrackFlows()) {
