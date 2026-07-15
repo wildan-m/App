@@ -45,6 +45,7 @@ type AutocompleteItemData = {
     text: string;
     autocompleteID?: string;
     mapKey?: SearchFilterKey;
+    subtitle?: string;
 };
 
 type UseAutocompleteSuggestionsParams = {
@@ -309,6 +310,7 @@ function useAutocompleteSuggestions({
                 text: chat.text ?? '',
                 autocompleteID: chat.reportID,
                 mapKey: CONST.SEARCH.SYNTAX_FILTER_KEYS.IN,
+                subtitle: chat.subtitle,
             }));
         }
         case CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE: {

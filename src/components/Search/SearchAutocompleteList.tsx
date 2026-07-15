@@ -566,9 +566,10 @@ function SearchAutocompleteList({
         }
 
         if (autocompleteSuggestions.length > 0) {
-            const autocompleteData: AutocompleteListItem[] = autocompleteSuggestions.map(({filterKey, text, autocompleteID, mapKey}) => {
+            const autocompleteData: AutocompleteListItem[] = autocompleteSuggestions.map(({filterKey, text, autocompleteID, mapKey, subtitle}) => {
                 return {
                     text: getAutocompleteDisplayText(filterKey, text),
+                    alternateText: subtitle || undefined,
                     mapKey: mapKey ? getSubstitutionMapKey(mapKey, text) : undefined,
                     singleIcon: expensifyIcons.MagnifyingGlass,
                     searchQuery: text,
