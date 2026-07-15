@@ -91,7 +91,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         'CompanyCard',
         'Workflows',
         'InvoiceBlue',
-        'Rules',
+        'Flash',
         'Tag',
         'PerDiem',
         'HandCard',
@@ -469,7 +469,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Rules}
+                            icon={illustrations.Flash}
                             title={translate('workspace.moreFeatures.rules.title')}
                             subtitle={translate('workspace.moreFeatures.rules.subtitle')}
                             isActive={arePolicyRulesEnabled(policy, policyCategories)}
