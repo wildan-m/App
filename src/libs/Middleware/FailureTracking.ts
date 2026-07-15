@@ -1,6 +1,5 @@
 import {recordFailure, recordSuccess} from '@libs/FailureTracker';
-
-import CONST from '@src/CONST';
+import isConnectivityError from '@libs/isConnectivityError';
 
 import type Middleware from './types';
 
@@ -19,9 +18,7 @@ const FailureTracking: Middleware = (response) =>
             return data;
         })
         .catch((error: Error) => {
-            const isConnectivityError = error.message === CONST.ERROR.FAILED_TO_FETCH || error.message === CONST.ERROR.EXPENSIFY_SERVICE_INTERRUPTED;
-
-            if (isConnectivityError) {
+            if (isConnectivityError(error)) {
                 recordFailure();
             }
 

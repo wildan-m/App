@@ -17,6 +17,7 @@ import updateSessionAuthTokens from './actions/Session/updateSessionAuthTokens';
 import redirectToSignIn from './actions/SignInRedirect';
 import HttpsError from './Errors/HttpsError';
 import {getAuthenticateErrorMessage, getErrorMessage} from './ErrorUtils';
+import isConnectivityError from './isConnectivityError';
 import Log from './Log';
 import {post} from './Network';
 import {getCredentials, hasReadRequiredDataFromStorage, setAuthToken, setIsAuthenticating} from './Network/NetworkStore';
@@ -141,7 +142,7 @@ function shouldRetryAuthenticateError(error: unknown): boolean {
     // Only retry transient connectivity/service issues. Real HTTP auth failures,
     // and auth throttling, should fall through to the normal sign-out path so we
     // do not spin on Authenticate before redirecting to sign in.
-    return error.message === CONST.ERROR.FAILED_TO_FETCH || error.message === CONST.ERROR.EXPENSIFY_SERVICE_INTERRUPTED;
+    return isConnectivityError(error);
 }
 
 function getAuthenticationErrorResponse(error: HttpsError): Response<OnyxKey> {

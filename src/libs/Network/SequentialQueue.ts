@@ -13,8 +13,10 @@ import {
     update as updatePersistedRequest,
 } from '@libs/actions/PersistedRequests';
 import {flushQueue, isEmpty} from '@libs/actions/QueuedOnyxUpdates';
+import {reconnect} from '@libs/actions/Reconnect';
 import {isClientTheLeader} from '@libs/ActiveClientManager';
 import {WRITE_COMMANDS} from '@libs/API/types';
+import isConnectivityError from '@libs/isConnectivityError';
 import Log from '@libs/Log';
 import {getIsOffline as isOfflineNetwork} from '@libs/NetworkState';
 import {processWithMiddleware} from '@libs/Request';
@@ -288,12 +290,28 @@ function process(): Promise<void> {
                     Log.info('[SequentialQueue] Request failed too many times, giving up', false, {
                         command: requestToProcess.command,
                         errorMessage: error.message,
+                        isConnectivityError: isConnectivityError(error),
                     });
-                    Onyx.update(requestToProcess.failureData ?? []);
+
+                    // Reaching this branch means the request was retried the maximum number of times and never succeeded.
+                    // A connectivity error means the client never received a definitive response, so it cannot know whether
+                    // the server committed the write. Applying failureData here would assert a failure the client can't
+                    // confirm — reverting optimistic data and stamping a user-facing error even when the write actually
+                    // succeeded server-side (the reported PayMoneyRequest case, where paid reports snap back to "Not paid"
+                    // with an error). Instead, run only finallyData and reconcile the true state from the server, so a
+                    // report whose pay committed stays paid and one whose pay never landed reverts through server truth
+                    // rather than through a guess. The request is still removed from the queue (as below), and the resync
+                    // is a data fetch — it does not re-fire the write, so an already-committed pay can't be double-applied.
+                    const isIndeterminateFailure = isConnectivityError(error);
+
+                    Onyx.update((isIndeterminateFailure ? requestToProcess.finallyData : requestToProcess.failureData) ?? []);
                     endPersistedRequestAndRemoveFromQueue(requestToProcess);
                     sequentialQueueRequestThrottle.clear();
                     if (requestToProcess.command === WRITE_COMMANDS.OPEN_APP) {
                         setIsOpenAppFailureModalOpen(true);
+                    }
+                    if (isIndeterminateFailure) {
+                        reconnect();
                     }
                     return process();
                 });
