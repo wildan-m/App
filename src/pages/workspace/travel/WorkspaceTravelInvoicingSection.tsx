@@ -32,6 +32,7 @@ import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/crea
 import Navigation from '@libs/Navigation/Navigation';
 import {areTravelPersonalDetailsMissing} from '@libs/PersonalDetailsUtils';
 import {hasInProgressUSDVBBA} from '@libs/ReimbursementAccountUtils';
+import {buildQueryStringFromFilterFormValues} from '@libs/SearchQueryUtils';
 import {
     getIsTravelInvoicingEnabled,
     getTravelInvoicingCardSettingsKey,
@@ -170,6 +171,26 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const handleConfirmPayBalance = () => {
         setIsPayBalanceModalVisible(false);
         payTravelInvoicingSpend(workspaceAccountID, travelSpend);
+    };
+
+    /**
+     * Opens the Spend page pre-filtered to this workspace's Consolidated Travel Billing spend,
+     * grouped by withdrawal, so admins can reconcile their travel spend from the itemized expenses.
+     */
+    const handleViewTravelSpend = () => {
+        const query = buildQueryStringFromFilterFormValues(
+            {
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                withdrawalType: CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING,
+                groupBy: CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID,
+                view: CONST.SEARCH.VIEW.TABLE,
+            },
+            {
+                sortBy: CONST.SEARCH.TABLE_COLUMNS.GROUP_WITHDRAWN,
+                sortOrder: CONST.SEARCH.SORT_ORDER.DESC,
+            },
+        );
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query}));
     };
 
     const continueToggleFlow = () => {
@@ -320,10 +341,11 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                     <MenuItemWithTopDescription
                         description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelSpendLabel')}
                         title={formattedSpend}
+                        onPress={handleViewTravelSpend}
                         wrapperStyle={[styles.sectionMenuItemTopDescription, hasPendingSettlement && styles.pb1]}
                         titleStyle={[styles.textNormalThemeText, styles.headerAnonymousFooter]}
                         descriptionTextStyle={styles.textLabelSupportingNormal}
-                        interactive={false}
+                        shouldShowRightIcon
                     />
                     {hasPendingSettlement && (
                         <Text style={[styles.textLabelSupporting, styles.pb3]}>
