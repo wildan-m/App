@@ -70,6 +70,39 @@ import useAskConcierge from './useAskConcierge';
 
 const privateIsArchivedSelector = (nvp: {private_isArchived?: string} | undefined): boolean | undefined => !!nvp?.private_isArchived;
 
+/**
+ * Derives the room-type, autocomplete ID and search value used to build a contextual "search in this room" query
+ * from the report option the user is currently viewing. Shared by the contextual suggestion in the autocomplete
+ * list and by the default query that seeds the input when the SearchRouter is opened from a room.
+ */
+function getContextualSuggestionData(reportForContextualSearch: SearchOption<Report> | OptionData): {
+    searchQuery: string;
+    roomType: ValueOf<typeof CONST.SEARCH.DATA_TYPES>;
+    autocompleteID: string | undefined;
+    policyID: string | undefined;
+} {
+    const searchQuery = reportForContextualSearch.text ?? reportForContextualSearch.alternateText ?? reportForContextualSearch.reportID;
+
+    let roomType: ValueOf<typeof CONST.SEARCH.DATA_TYPES> = CONST.SEARCH.DATA_TYPES.CHAT;
+    let autocompleteID: string | undefined = reportForContextualSearch.reportID;
+
+    if (reportForContextualSearch.isInvoiceRoom) {
+        roomType = CONST.SEARCH.DATA_TYPES.INVOICE;
+        const report = reportForContextualSearch as SearchOption<Report>;
+        if (report.item?.invoiceReceiver && report.item.invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL) {
+            autocompleteID = report.item.invoiceReceiver.accountID.toString();
+        } else {
+            autocompleteID = '';
+        }
+    }
+    if (reportForContextualSearch.isPolicyExpenseChat) {
+        roomType = CONST.SEARCH.DATA_TYPES.EXPENSE;
+        autocompleteID = reportForContextualSearch.policyID ? reportForContextualSearch.policyID : '';
+    }
+
+    return {searchQuery, roomType, autocompleteID, policyID: reportForContextualSearch.policyID};
+}
+
 type SearchRouterProps = {
     onRouterClose: () => void;
     shouldHideInputCaret?: TextInputProps['caretHidden'];
@@ -106,61 +139,6 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const feedKeysWithCards = useFeedKeysWithAssignedCards();
     const reportAttributes = useReportAttributes();
 
-    // Seed the input on open. When the SearchRouter is opened from the search button on the search page
-    // and `shouldShowSearchQuery` is true, we build a user-readable query string from the current search
-    // query (showing names instead of IDs) along with the substitutions map needed to map those names
-    // back to IDs when submitting. Otherwise we fall back to the explicit pending query (e.g. from
-    // ExpenseReportSearchHandler). Computed once via a lazy initializer so the query string and its
-    // substitutions stay consistent.
-    const [[initialQuery, initialSubstitutions]] = useState<[string, SubstitutionMap]>(() => {
-        if (!currentSearchQueryJSON || !isFromSearchPageSearchButton || !searchContext?.shouldShowSearchQuery) {
-            return [pendingInitialQuery, {}];
-        }
-
-        const taxRates = getAllTaxRates(policies);
-        const query = buildUserReadableQueryString({
-            queryJSON: currentSearchQueryJSON,
-            PersonalDetails: personalDetails,
-            reports,
-            taxRates,
-            cardList: personalAndWorkspaceCards,
-            cardFeeds: allFeeds,
-            policies,
-            currentUserAccountID,
-            autoCompleteWithSpace: false,
-            translate,
-            feedKeysWithCards,
-            reportAttributes,
-            bankAccountList,
-        });
-        const substitutions = buildSubstitutionsMap(
-            currentSearchQueryJSON.inputQuery,
-            personalDetails,
-            reports,
-            taxRates,
-            personalAndWorkspaceCards,
-            allFeeds,
-            policies,
-            currentUserAccountID,
-            translate,
-            reportAttributes,
-            bankAccountList,
-        );
-        return [query, substitutions];
-    });
-
-    // The actual input text that the user sees
-    const [textInputValue, , setTextInputValue] = useDebouncedState(initialQuery, 500);
-    // The input text that was last used for autocomplete; needed for the SearchAutocompleteList when browsing list via arrow keys
-    const [autocompleteQueryValue, setAutocompleteQueryValue] = useState(initialQuery);
-    const [selection, setSelection] = useState({start: initialQuery.length, end: initialQuery.length});
-
-    useEffect(() => {
-        clearPendingRouterState();
-    }, []);
-    const [autocompleteSubstitutions, setAutocompleteSubstitutions] = useState<SubstitutionMap>(initialSubstitutions);
-    const textInputRef = useRef<AnimatedTextInputRef>(null);
-
     const {contextualReportID, isSearchRouterScreen} = useRootNavigationState(getContextualReportData);
 
     const contextualReport = useReportOrReportDraft(contextualReportID);
@@ -184,6 +162,86 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
         const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${contextualReportID}`;
         return {[reportKey]: contextualReport};
     })();
+
+    // Seed the input on open. When the SearchRouter is opened from the search button on the search page
+    // and `shouldShowSearchQuery` is true, we build a user-readable query string from the current search
+    // query (showing names instead of IDs) along with the substitutions map needed to map those names
+    // back to IDs when submitting. When it is opened while viewing a room (a contextual report exists) and
+    // no explicit query was passed, we default the search to the current room (`type:chat in:<room>`) by
+    // reusing the same query + substitution the contextual "search in this room" suggestion would produce.
+    // Otherwise we fall back to the explicit pending query (e.g. from ExpenseReportSearchHandler). Computed
+    // once via a lazy initializer so the query string and its substitutions stay consistent.
+    const [[initialQuery, initialSubstitutions]] = useState<[string, SubstitutionMap]>(() => {
+        if (currentSearchQueryJSON && isFromSearchPageSearchButton && searchContext?.shouldShowSearchQuery) {
+            const taxRates = getAllTaxRates(policies);
+            const query = buildUserReadableQueryString({
+                queryJSON: currentSearchQueryJSON,
+                PersonalDetails: personalDetails,
+                reports,
+                taxRates,
+                cardList: personalAndWorkspaceCards,
+                cardFeeds: allFeeds,
+                policies,
+                currentUserAccountID,
+                autoCompleteWithSpace: false,
+                translate,
+                feedKeysWithCards,
+                reportAttributes,
+                bankAccountList,
+            });
+            const substitutions = buildSubstitutionsMap(
+                currentSearchQueryJSON.inputQuery,
+                personalDetails,
+                reports,
+                taxRates,
+                personalAndWorkspaceCards,
+                allFeeds,
+                policies,
+                currentUserAccountID,
+                translate,
+                reportAttributes,
+                bankAccountList,
+            );
+            return [query, substitutions];
+        }
+
+        // Default the search to the current room when the router is opened from a room and no explicit query was provided.
+        if (!pendingInitialQuery && contextualReportID && contextualReport && !isHiddenForCurrentUser(contextualReport)) {
+            const reportForContextualSearch = createOptionFromReport(
+                contextualReport,
+                personalDetails,
+                contextualReportNVP,
+                contextualReportPolicy,
+                sortedActions,
+                undefined,
+                {
+                    showPersonalDetails: true,
+                },
+                undefined,
+                undefined,
+                isTrackIntentUser,
+            );
+            const contextualItem = getContextualSuggestionData(reportForContextualSearch);
+            const query = `${getContextualSearchQuery(contextualItem, contextualPoliciesMap, contextualReportsMap)} `;
+            const autocompleteKey = getContextualSearchAutocompleteKey(contextualItem, contextualPoliciesMap, contextualReportsMap);
+            const substitutions = autocompleteKey && contextualItem.autocompleteID ? {[autocompleteKey]: contextualItem.autocompleteID} : {};
+            return [query, substitutions];
+        }
+
+        return [pendingInitialQuery, {}];
+    });
+
+    // The actual input text that the user sees
+    const [textInputValue, , setTextInputValue] = useDebouncedState(initialQuery, 500);
+    // The input text that was last used for autocomplete; needed for the SearchAutocompleteList when browsing list via arrow keys
+    const [autocompleteQueryValue, setAutocompleteQueryValue] = useState(initialQuery);
+    const [selection, setSelection] = useState({start: initialQuery.length, end: initialQuery.length});
+
+    useEffect(() => {
+        clearPendingRouterState();
+    }, []);
+    const [autocompleteSubstitutions, setAutocompleteSubstitutions] = useState<SubstitutionMap>(initialSubstitutions);
+    const textInputRef = useRef<AnimatedTextInputRef>(null);
 
     const getAdditionalSections: GetAdditionalSectionsCallback = useCallback(
         ({recentReports}, sectionIndex) => {
@@ -225,28 +283,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                 reportForContextualSearch = option;
             }
 
-            const reportQueryValue = reportForContextualSearch.text ?? reportForContextualSearch.alternateText ?? reportForContextualSearch.reportID;
-
-            let roomType: ValueOf<typeof CONST.SEARCH.DATA_TYPES> = CONST.SEARCH.DATA_TYPES.CHAT;
-            let autocompleteID: string | undefined = reportForContextualSearch.reportID;
-
-            if (reportForContextualSearch.isInvoiceRoom) {
-                roomType = CONST.SEARCH.DATA_TYPES.INVOICE;
-                const report = reportForContextualSearch as SearchOption<Report>;
-                if (report.item?.invoiceReceiver && report.item.invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL) {
-                    autocompleteID = report.item.invoiceReceiver.accountID.toString();
-                } else {
-                    autocompleteID = '';
-                }
-            }
-            if (reportForContextualSearch.isPolicyExpenseChat) {
-                roomType = CONST.SEARCH.DATA_TYPES.EXPENSE;
-                if (reportForContextualSearch.policyID) {
-                    autocompleteID = reportForContextualSearch.policyID;
-                } else {
-                    autocompleteID = '';
-                }
-            }
+            const {searchQuery: reportQueryValue, roomType, autocompleteID} = getContextualSuggestionData(reportForContextualSearch);
 
             return [
                 {

@@ -56,7 +56,9 @@ function getContextualReportData(state: NavigationState | undefined): Contextual
     return {contextualReportID: undefined, isSearchRouterScreen};
 }
 
-function getContextualSearchAutocompleteKey(item: SearchQueryItem, policies: OnyxCollection<OnyxTypes.Policy>, reports?: OnyxCollection<OnyxTypes.Report>) {
+type ContextualSearchItem = Pick<SearchQueryItem, 'roomType' | 'searchQuery' | 'autocompleteID' | 'policyID'>;
+
+function getContextualSearchAutocompleteKey(item: ContextualSearchItem, policies: OnyxCollection<OnyxTypes.Policy>, reports?: OnyxCollection<OnyxTypes.Report>) {
     if (item.roomType === CONST.SEARCH.DATA_TYPES.INVOICE) {
         return `${CONST.SEARCH.SYNTAX_FILTER_KEYS.TO}:${item.searchQuery}`;
     }
@@ -68,7 +70,7 @@ function getContextualSearchAutocompleteKey(item: SearchQueryItem, policies: Ony
     }
 }
 
-function getContextualSearchQuery(item: SearchQueryItem, policies: OnyxCollection<OnyxTypes.Policy>, reports?: OnyxCollection<OnyxTypes.Report>) {
+function getContextualSearchQuery(item: ContextualSearchItem, policies: OnyxCollection<OnyxTypes.Policy>, reports?: OnyxCollection<OnyxTypes.Report>) {
     const baseQuery = `${CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TYPE}:${item.roomType}`;
     let additionalQuery = '';
 
