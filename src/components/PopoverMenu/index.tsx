@@ -8,6 +8,7 @@ import type BaseModalProps from '@components/Modal/types';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import ScrollView from '@components/ScrollView';
+import SearchBar from '@components/SearchBar';
 import Text from '@components/Text';
 
 import useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
@@ -159,6 +160,9 @@ type PopoverMenuProps = Partial<ModalAnimationProps> & {
 
     /** Whether to show a radio button on each item to indicate which one is currently selected */
     shouldShowRadioButton?: boolean;
+
+    /** Whether to show a search input above the menu list to filter items by their text/description */
+    shouldShowSearchInput?: boolean;
 
     /** The style of content container which wraps all child views */
     containerStyles?: StyleProp<ViewStyle>;
@@ -328,6 +332,7 @@ function BasePopoverMenu({
     shouldEnableNewFocusManagement,
     restoreFocusType,
     shouldShowRadioButton = false,
+    shouldShowSearchInput = false,
     containerStyles,
     badgeStyle,
     headerStyles,
@@ -351,13 +356,28 @@ function BasePopoverMenu({
     const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const {windowHeight} = useWindowDimensions();
     const [currentMenuItems, setCurrentMenuItems] = useState(menuItems);
-    const currentMenuItemsFocusedIndex = getSelectedItemIndex(currentMenuItems);
     const [enteredSubMenuIndexes, setEnteredSubMenuIndexes] = useState<readonly number[]>(CONST.EMPTY_ARRAY);
+    const [searchValue, setSearchValue] = useState('');
+
+    // When a search input is enabled, filter the items shown by their text/description.
+    // Filtering only applies at the root level; sub-menus are shown in full.
+    const filteredMenuItems = useMemo(() => {
+        const trimmedSearch = searchValue.trim().toLowerCase();
+        if (!shouldShowSearchInput || !trimmedSearch || enteredSubMenuIndexes.length !== 0) {
+            return currentMenuItems;
+        }
+        return currentMenuItems.filter((item) => {
+            const label = typeof item.text === 'string' ? item.text.toLowerCase() : '';
+            const description = typeof item.description === 'string' ? item.description.toLowerCase() : '';
+            return label.includes(trimmedSearch) || description.includes(trimmedSearch);
+        });
+    }, [currentMenuItems, searchValue, shouldShowSearchInput, enteredSubMenuIndexes.length]);
+    const currentMenuItemsFocusedIndex = getSelectedItemIndex(filteredMenuItems);
     const platform = getPlatform();
     const isWeb = platform === CONST.PLATFORM.WEB;
     const [focusedIndex, setFocusedIndex] = useArrowKeyFocusManager({
         initialFocusedIndex: currentMenuItemsFocusedIndex,
-        maxIndex: currentMenuItems.length - 1,
+        maxIndex: filteredMenuItems.length - 1,
         isActive: isVisible,
     });
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
@@ -402,7 +422,7 @@ function BasePopoverMenu({
     }, [isVisible, isRadioButtonMode]);
 
     const selectItem = (index: number, event?: GestureResponderEvent | KeyboardEvent) => {
-        const selectedItem = currentMenuItems.at(index);
+        const selectedItem = filteredMenuItems.at(index);
         if (!selectedItem) {
             return;
         }
@@ -464,7 +484,7 @@ function BasePopoverMenu({
         );
     };
 
-    const renderedMenuItems = currentMenuItems.map((item, menuIndex) => {
+    const renderedMenuItems = filteredMenuItems.map((item, menuIndex) => {
         const {
             text,
             onSelected,
@@ -514,7 +534,7 @@ function BasePopoverMenu({
                                 theme.activeComponentBG,
                                 theme.hoverComponentBG,
                             ),
-                            shouldUseScrollView && !shouldUseModalPaddingStyle && StyleUtils.getOptionMargin(menuIndex, currentMenuItems.length - 1),
+                            shouldUseScrollView && !shouldUseModalPaddingStyle && StyleUtils.getOptionMargin(menuIndex, filteredMenuItems.length - 1),
                         ]}
                         shouldRemoveHoverBackground={item.isSelected}
                         titleStyle={StyleSheet.flatten([styles.flex1, item.titleStyle])}
@@ -542,6 +562,20 @@ function BasePopoverMenu({
             >
                 {headerText}
             </Text>
+        );
+    };
+
+    const renderSearchInput = () => {
+        if (!shouldShowSearchInput || enteredSubMenuIndexes.length !== 0) {
+            return;
+        }
+        return (
+            <SearchBar
+                label={translate('common.search')}
+                inputValue={searchValue}
+                onChangeText={setSearchValue}
+                shouldShowEmptyState={filteredMenuItems.length === 0}
+            />
         );
     };
 
@@ -684,6 +718,7 @@ function BasePopoverMenu({
             onClose={() => {
                 setCurrentMenuItems(menuItems);
                 setEnteredSubMenuIndexes(CONST.EMPTY_ARRAY);
+                setSearchValue('');
                 onClose();
             }}
             isVisible={isVisible}
@@ -722,6 +757,7 @@ function BasePopoverMenu({
                             addBottomSafeAreaPadding={enableEdgeToEdgeBottomSafeAreaPadding}
                         >
                             {renderHeaderText()}
+                            {renderSearchInput()}
                             {enteredSubMenuIndexes.length > 0 && renderBackButtonItem()}
                             {renderedMenuItems}
                         </PopoverMenuContent>

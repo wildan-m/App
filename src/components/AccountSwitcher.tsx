@@ -228,6 +228,8 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
         clearDelegatorErrors({delegatedAccess: account?.delegatedAccess});
     };
 
+    const accountMenuItems = menuItems();
+
     return (
         <>
             <TooltipToRender {...tooltipProps}>
@@ -307,7 +309,7 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
                         horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
                         vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
                     }}
-                    menuItems={menuItems()}
+                    menuItems={accountMenuItems}
                     headerText={translate('delegate.switchAccount')}
                     containerStyles={[{maxHeight: windowHeight / 2}, styles.mw100, shouldUseNarrowLayout ? {} : styles.wFitContent]}
                     headerStyles={styles.pt0}
@@ -316,6 +318,7 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
                     shouldUpdateFocusedIndex={false}
                     enableEdgeToEdgeBottomSafeAreaPadding
                     shouldShowRadioButton
+                    shouldShowSearchInput={accountMenuItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
                 />
             )}
         </>
