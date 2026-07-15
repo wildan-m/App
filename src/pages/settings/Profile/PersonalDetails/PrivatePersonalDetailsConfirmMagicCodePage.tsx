@@ -57,6 +57,17 @@ function PrivatePersonalDetailsConfirmMagicCodePage() {
         wasLoading.current = false;
     }, [privatePersonalDetails?.isLoading, hasErrors]);
 
+    // Discard the unvalidated edit whenever this page is dismissed without a successful validation.
+    // This covers every exit route (Back button, swipe-back, hardware back, navigating away), not just the
+    // explicit onClose handler. On the success path the draft has already been submitted and cleared by the
+    // effect above, so re-clearing here is a harmless no-op.
+    useEffect(
+        () => () => {
+            clearDraftValues(ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM);
+        },
+        [],
+    );
+
     const values = normalizeCountryCode(getPrivatePersonalDetailsFormValues(privatePersonalDetails, draftValues)) as PersonalDetailsForm;
 
     const handleSubmitForm = (validateCode: string) => {
