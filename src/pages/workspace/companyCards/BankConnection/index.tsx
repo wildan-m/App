@@ -34,7 +34,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import openBankConnection from './openBankConnection';
 
@@ -73,6 +73,17 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
 
     const url = getCompanyCardBankConnection(policyID, bankName, feed);
     const isFeedExpired = feed ? isSelectedFeedExpired(cardFeeds?.[feed]) : false;
+
+    // A feed needs the user to log into their bank again when its token expired *or* when the card
+    // scrape connection broke for some other reason (bank-side invalidation, changed password).
+    // A broken feed usually still has an expiration in the future, so gating on expiry alone never
+    // opens the bank window for it.
+    const shouldConnectToBank = isFeedExpired || isFeedConnectionBroken;
+
+    // Remembers that we entered this flow to repair a broken connection, so that once the
+    // reconnection clears the broken status we run the completion step below instead of dropping
+    // the user into the assign card flow.
+    const isRepairingBrokenConnection = useRef(false);
     const headerTitleAddCards = translate('workspace.companyCards.addCards');
     const headerTitle = feed ? translate('workspace.companyCards.assignCard') : headerTitleAddCards;
     const isNewFeedHasError = !!(newFeed && cardFeeds?.[newFeed]?.errors);
@@ -122,26 +133,31 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
 
         // Handle assign card flow
         if (feed) {
-            if (!isFeedExpired) {
-                customWindow?.close();
-                if (isFeedConnectionBroken) {
-                    updateBrokenConnection();
-                    Navigation.closeRHPFlow();
+            if (shouldConnectToBank) {
+                isRepairingBrokenConnection.current = isFeedConnectionBroken;
+                if (isPlaid) {
                     return;
                 }
-                setAssignCardStepAndData({
-                    currentStep: assignCard?.cardToAssign?.dateOption ? CONST.COMPANY_CARD.STEP.CONFIRMATION : CONST.COMPANY_CARD.STEP.ASSIGNEE,
-                    isEditing: false,
-                });
+                if (url) {
+                    customWindow = openBankConnection(url);
+                }
                 return;
             }
-            if (isPlaid) {
+            customWindow?.close();
+
+            // The connection is no longer broken, which means the bank reauthentication succeeded,
+            // so sync the cards that were broken when we entered the flow and close the RHP.
+            if (isRepairingBrokenConnection.current) {
+                isRepairingBrokenConnection.current = false;
+                updateBrokenConnection();
+                Navigation.closeRHPFlow();
                 return;
             }
-            if (url) {
-                customWindow = openBankConnection(url);
-                return;
-            }
+            setAssignCardStepAndData({
+                currentStep: assignCard?.cardToAssign?.dateOption ? CONST.COMPANY_CARD.STEP.CONFIRMATION : CONST.COMPANY_CARD.STEP.ASSIGNEE,
+                isEditing: false,
+            });
+            return;
         }
 
         // Handle add new card flow
@@ -179,7 +195,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
         policyID,
         url,
         feed,
-        isFeedExpired,
+        shouldConnectToBank,
         isOffline,
         assignCard?.cardToAssign?.dateOption,
         isPlaid,

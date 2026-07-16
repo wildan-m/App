@@ -72,6 +72,17 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
     const headerTitle = feed ? translate('workspace.companyCards.assignCard') : headerTitleAddCards;
     const onImportPlaidAccounts = useImportPlaidAccounts(policyID);
     const {updateBrokenConnection, isFeedConnectionBroken} = useUpdateFeedBrokenConnection({policyID, feed});
+
+    // A feed needs the user to log into their bank again when its token expired *or* when the card
+    // scrape connection broke for some other reason (bank-side invalidation, changed password).
+    // A broken feed usually still has an expiration in the future, so gating on expiry alone never
+    // lets the WebView load the bank login page for it.
+    const shouldConnectToBank = isFeedExpired || isFeedConnectionBroken;
+
+    // Remembers that we entered this flow to repair a broken connection, so that once the
+    // reconnection clears the broken status we run the completion step below instead of dropping
+    // the user into the assign card flow.
+    const isRepairingBrokenConnection = useRef(false);
     const isNewFeedHasError = !!(newFeed && cardFeeds?.[newFeed]?.errors);
     const {isBlockedToAddNewFeeds, isAllFeedsResultLoading} = useIsBlockedToAddFeed(policyID);
     const {checkForDuplicateFeed} = useDuplicateFeedDetection({policyID, isPlaid});
@@ -120,8 +131,11 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
         }
 
         // Handle assign card flow
-        if (feed && !isFeedExpired) {
-            if (isFeedConnectionBroken) {
+        if (feed && !shouldConnectToBank) {
+            // The connection is no longer broken, which means the bank reauthentication succeeded,
+            // so sync the cards that were broken when we entered the flow and head back.
+            if (isRepairingBrokenConnection.current) {
+                isRepairingBrokenConnection.current = false;
                 updateBrokenConnection();
                 Navigation.goBack(ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(policyID));
                 return;
@@ -131,6 +145,11 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
                 isEditing: false,
             });
             return;
+        }
+
+        if (feed) {
+            // The feed needs a bank login, so leave the WebView below on screen to load it.
+            isRepairingBrokenConnection.current = isFeedConnectionBroken;
         }
 
         // Handle add new card flow
@@ -156,7 +175,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
         policyID,
         url,
         feed,
-        isFeedExpired,
+        shouldConnectToBank,
         assignCard?.cardToAssign?.dateOption,
         isPlaid,
         onImportPlaidAccounts,

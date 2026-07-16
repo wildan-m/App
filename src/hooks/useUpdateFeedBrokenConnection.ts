@@ -3,9 +3,10 @@ import {getCardFeedWithDomainID, getCompanyCardFeed, getCompanyFeeds, getDomainO
 import {updateWorkspaceCompanyCard} from '@userActions/CompanyCards';
 
 import CONST from '@src/CONST';
-import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
+import type {Card, CompanyCardFeedWithDomainID} from '@src/types/onyx';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
-import {useCallback} from 'react';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import useCardFeedErrors from './useCardFeedErrors';
 import useCardFeeds from './useCardFeeds';
@@ -21,18 +22,33 @@ export default function useUpdateFeedBrokenConnection({policyID, feed}: {policyI
 
     const isFeedConnectionBroken = feed ? !!cardFeedErrors[feed]?.isFeedConnectionBroken : false;
 
+    const brokenCards = useMemo(() => {
+        if (!feed) {
+            return {};
+        }
+        return Object.fromEntries(Object.entries(cardsWithBrokenFeedConnection).filter(([, card]) => !!card.fundID && getCardFeedWithDomainID(card.bank, card.fundID) === feed));
+    }, [cardsWithBrokenFeedConnection, feed]);
+
+    // Once the bank connection is repaired, these cards drop out of the derived map and their
+    // pre-repair lastScrapeResult is gone. updateBrokenConnection runs *after* that flip, so hold
+    // on to the last known broken cards to keep driving the follow-up sync from them.
+    const brokenCardsRef = useRef<Record<string, Card>>(brokenCards);
+    useEffect(() => {
+        if (isEmptyObject(brokenCards)) {
+            return;
+        }
+        brokenCardsRef.current = brokenCards;
+    }, [brokenCards]);
+
     const updateBrokenConnection = useCallback(() => {
         if (!feed) {
             return;
         }
         const bankName = getCompanyCardFeed(feed);
-        for (const [brokenCardId, card] of Object.entries(cardsWithBrokenFeedConnection)) {
-            if (!card.fundID || getCardFeedWithDomainID(card.bank, card.fundID) !== feed) {
-                continue;
-            }
+        for (const [brokenCardId, card] of Object.entries(brokenCardsRef.current)) {
             updateWorkspaceCompanyCard(domainOrWorkspaceAccountID, brokenCardId, bankName, card.lastScrapeResult);
         }
-    }, [cardsWithBrokenFeedConnection, domainOrWorkspaceAccountID, feed]);
+    }, [domainOrWorkspaceAccountID, feed]);
 
     return {updateBrokenConnection, isFeedConnectionBroken};
 }
