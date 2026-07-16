@@ -10,6 +10,8 @@ import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
 
 import type {OnyxCollection} from 'react-native-onyx';
 
+import {defaultExpensifyCardSelector} from '@selectors/Card';
+
 import useFeedKeysWithAssignedCards from './useFeedKeysWithAssignedCards';
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
@@ -28,14 +30,22 @@ function getDefaultCardFeed(
     activePolicyID: string | undefined,
     cardFeedsByPolicy: Record<string, CardFeedForDisplay[]>,
     localeCompare: (a: string, b: string) => number,
+    expensifyCardFeed?: CardFeedForDisplay,
+    policies?: OnyxCollection<Policy>,
 ): CardFeedForDisplay | undefined {
     const eligiblePoliciesIDs = new Set(eligiblePoliciesIDsArray);
 
-    // Prioritize the active policy if eligible
-    if (activePolicyID && eligiblePoliciesIDs.has(activePolicyID)) {
-        const policyCardFeeds = cardFeedsByPolicy[activePolicyID];
-        if (policyCardFeeds?.length) {
-            return [...policyCardFeeds].sort((a, b) => localeCompare(a.name, b.name)).at(0);
+    // Prioritize the active policy. Its Expensify Card feed is a peer of its company feeds here: `cardFeedsByPolicy`
+    // only ever holds company feeds, and `eligiblePoliciesIDs` gates company cards alone, so neither may hide the
+    // active workspace's own Expensify Card feed. A feed belongs to the workspace whose policyAccountID is its fundID.
+    if (activePolicyID) {
+        const activePolicyCompanyFeeds = eligiblePoliciesIDs.has(activePolicyID) ? (cardFeedsByPolicy[activePolicyID] ?? []) : [];
+        const activePolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`];
+        const activePolicyExpensifyCardFeed = expensifyCardFeed && activePolicy?.policyAccountID === Number(expensifyCardFeed.fundID) ? expensifyCardFeed : undefined;
+        const activePolicyCardFeeds = activePolicyExpensifyCardFeed ? [...activePolicyCompanyFeeds, activePolicyExpensifyCardFeed] : activePolicyCompanyFeeds;
+
+        if (activePolicyCardFeeds.length) {
+            return [...activePolicyCardFeeds].sort((a, b) => localeCompare(a.name, b.name)).at(0);
         }
     }
 
@@ -52,7 +62,8 @@ function getDefaultCardFeed(
         .flat()
         .filter((feed) => !isCustomFeed(feed.name as CardFeedWithNumber));
 
-    return commercialFeeds.sort((a, b) => localeCompare(a.name, b.name)).at(0);
+    // The Expensify Card feed stays the last resort, so accounts without any company card feed keep defaulting to it.
+    return commercialFeeds.sort((a, b) => localeCompare(a.name, b.name)).at(0) ?? expensifyCardFeed;
 }
 
 const useCardFeedsForDisplay = () => {
@@ -61,11 +72,12 @@ const useCardFeedsForDisplay = () => {
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const feedKeysWithCards = useFeedKeysWithAssignedCards();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
+    const [defaultExpensifyCard] = useOnyx(ONYXKEYS.DERIVED.NON_PERSONAL_AND_WORKSPACE_CARD_LIST, {selector: defaultExpensifyCardSelector});
     const eligiblePoliciesIDsArray = eligiblePoliciesSelector(allPolicies);
 
     const cardFeedsByPolicy = getCardFeedsForDisplayPerPolicy(allFeeds, translate, feedKeysWithCards, allPolicies);
 
-    const defaultCardFeed = getDefaultCardFeed(eligiblePoliciesIDsArray, activePolicyID, cardFeedsByPolicy, localeCompare);
+    const defaultCardFeed = getDefaultCardFeed(eligiblePoliciesIDsArray, activePolicyID, cardFeedsByPolicy, localeCompare, defaultExpensifyCard, allPolicies);
 
     return {defaultCardFeed, cardFeedsByPolicy};
 };
