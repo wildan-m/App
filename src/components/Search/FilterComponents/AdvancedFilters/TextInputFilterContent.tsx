@@ -5,6 +5,7 @@ import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
 import useAutoFocusInput from '@hooks/useAutoFocusInput';
 import useLocalize from '@hooks/useLocalize';
+import useMaxAutoGrowHeight from '@hooks/useMaxAutoGrowHeight';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {FILTER_VIEW_MAP} from '@libs/SearchUIUtils';
@@ -43,25 +44,33 @@ function TextInputFilterContent({filterKey, value: initialValue, autoFocus, larg
     const label = translate(FILTER_VIEW_MAP[filterKey].labelKey);
     const {inputCallbackRef} = useAutoFocusInput();
     const error = useTextFilterValidation(filterKey, value);
+    const {maxAutoGrowHeight, onLayout} = useMaxAutoGrowHeight();
 
     return (
         <View style={[styles.flex1, styles.justifyContentBetween, style]}>
-            <TextInput
-                ref={(ref) => {
-                    if (!autoFocus || !isTextInput(ref)) {
-                        return;
-                    }
-                    inputCallbackRef(ref);
-                }}
-                placeholder={label}
-                value={value}
-                errorText={error}
-                hasError={!!error}
-                onChangeText={setValue}
-                accessibilityLabel={label}
-                role={CONST.ROLE.PRESENTATION}
-                containerStyles={[styles.ph5]}
-            />
+            <View
+                style={styles.flex1}
+                onLayout={onLayout}
+            >
+                <TextInput
+                    ref={(ref) => {
+                        if (!autoFocus || !isTextInput(ref)) {
+                            return;
+                        }
+                        inputCallbackRef(ref);
+                    }}
+                    placeholder={label}
+                    value={value}
+                    errorText={error}
+                    hasError={!!error}
+                    onChangeText={setValue}
+                    accessibilityLabel={label}
+                    role={CONST.ROLE.PRESENTATION}
+                    containerStyles={[styles.ph5]}
+                    autoGrowHeight
+                    maxAutoGrowHeight={maxAutoGrowHeight}
+                />
+            </View>
             <Button
                 style={[styles.ph5, styles.pb5]}
                 success

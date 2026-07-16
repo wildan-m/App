@@ -8,6 +8,7 @@ import TextInput from '@components/TextInput';
 
 import useAutoFocusInput from '@hooks/useAutoFocusInput';
 import useLocalize from '@hooks/useLocalize';
+import useMaxAutoGrowHeight from '@hooks/useMaxAutoGrowHeight';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import Navigation from '@libs/Navigation/Navigation';
@@ -34,6 +35,7 @@ function RejectReasonFormView({backTo, validate, onSubmit}: RejectReasonFormView
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
+    const {maxAutoGrowHeight, onLayout} = useMaxAutoGrowHeight();
 
     return (
         <ScreenWrapper
@@ -54,11 +56,15 @@ function RejectReasonFormView({backTo, validate, onSubmit}: RejectReasonFormView
                 enabledWhenOffline
                 shouldHideFixErrorsAlert
                 isSubmitActionDangerous
+                submitFlexEnabled={false}
             >
                 <View style={styles.mb6}>
                     <Text>{translate('iou.reject.reasonPageDescription')}</Text>
                 </View>
-                <View>
+                <View
+                    style={styles.flex1}
+                    onLayout={onLayout}
+                >
                     <InputWrapper
                         InputComponent={TextInput}
                         inputID={INPUT_IDS.COMMENT}
@@ -68,6 +74,8 @@ function RejectReasonFormView({backTo, validate, onSubmit}: RejectReasonFormView
                         label={translate('iou.reject.rejectReason')}
                         accessibilityLabel={translate('iou.reject.rejectReason')}
                         ref={inputCallbackRef}
+                        autoGrowHeight
+                        maxAutoGrowHeight={maxAutoGrowHeight}
                     />
                 </View>
             </FormProvider>
