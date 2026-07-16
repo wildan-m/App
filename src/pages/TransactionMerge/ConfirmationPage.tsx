@@ -116,11 +116,6 @@ function ConfirmationPage({route}: ConfirmationPageProps) {
             return;
         }
 
-        if (reportIDToDismiss && reportID !== targetTransaction.reportID) {
-            Navigation.dismissModalWithReport({reportID: reportIDToDismiss});
-            return;
-        }
-
         Navigation.dismissToSuperWideRHP();
     };
 
