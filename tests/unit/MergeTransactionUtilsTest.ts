@@ -22,6 +22,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import Onyx from 'react-native-onyx';
 
 import createRandomMergeTransaction from '../utils/collections/mergeTransaction';
+import createRandomPolicy from '../utils/collections/policies';
 import {createRandomReport} from '../utils/collections/reports';
 import createRandomTransaction, {createRandomDistanceRequestTransaction} from '../utils/collections/transaction';
 import {translateLocal} from '../utils/TestHelper';
@@ -600,6 +601,61 @@ describe('MergeTransactionUtils', () => {
 
             expect(result.conflictFields).not.toContain('taxValue');
             expect(result.conflictFields).toContain('merchant');
+        });
+
+        it("should not merge taxValue when the target transaction's policy has tax tracking disabled", () => {
+            const targetTransaction = {
+                ...createRandomTransaction(20),
+                amount: 1000,
+                currency: CONST.CURRENCY.USD,
+                taxCode: undefined,
+                taxValue: undefined,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const sourceTransaction = {
+                ...createRandomTransaction(21),
+                amount: 1000,
+                currency: CONST.CURRENCY.USD,
+                taxCode: 'id_TAX_RATE_1',
+                taxValue: '10%',
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const targetTransactionPolicy = {
+                ...createRandomPolicy(20),
+                tax: {trackingEnabled: false},
+            };
+
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare, mockGetCurrencyDecimals, [], targetTransactionPolicy);
+
+            expect(result.conflictFields).not.toContain('taxValue');
+            expect(result.mergeableData).not.toHaveProperty('taxValue');
+        });
+
+        it("should merge taxValue when the target transaction's policy has tax tracking enabled", () => {
+            const targetTransaction = {
+                ...createRandomTransaction(22),
+                amount: 1000,
+                currency: CONST.CURRENCY.USD,
+                taxCode: undefined,
+                taxValue: undefined,
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const sourceTransaction = {
+                ...createRandomTransaction(23),
+                amount: 1000,
+                currency: CONST.CURRENCY.USD,
+                taxCode: 'id_TAX_RATE_1',
+                taxValue: '10%',
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+            };
+            const targetTransactionPolicy = {
+                ...createRandomPolicy(21),
+                tax: {trackingEnabled: true},
+            };
+
+            const result = getMergeableDataAndConflictFields(targetTransaction, sourceTransaction, mockLocaleCompare, mockGetCurrencyDecimals, [], targetTransactionPolicy);
+
+            expect(result.mergeableData).toHaveProperty('taxValue', '10%');
         });
 
         it('auto-merges reportID and populates reportName when reportIDs match', () => {
