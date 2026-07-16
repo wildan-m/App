@@ -602,6 +602,18 @@ function openReportFromDeepLink(
                                 callback: (report) => {
                                     if (report?.errorFields?.notFound || report?.reportID || (report === undefined && CONST.REGEX.NON_NUMERIC.test(reportID))) {
                                         Onyx.disconnect(reportConnection);
+
+                                        // The user can navigate away (sign in, open a thread) while we wait for the report data.
+                                        // Their navigation has to win over this deferred one, so only honor the deep link while
+                                        // they are still on the screen it opened. Compare the focused route rather than the
+                                        // topmost report: the sign-in modal is presented over the report, so the report would
+                                        // still be topmost there.
+                                        const focusedRoute = findFocusedRoute(navigationRef.getRootState());
+                                        const isStillOnDeepLinkedReport = focusedRoute?.name === SCREENS.REPORT && getReportRouteParamValues(focusedRoute.params)?.reportID === reportID;
+                                        if (!isStillOnDeepLinkedReport) {
+                                            return;
+                                        }
+
                                         navigateHandler(report);
                                     }
                                 },
