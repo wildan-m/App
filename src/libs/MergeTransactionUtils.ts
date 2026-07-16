@@ -18,7 +18,7 @@ import type {TransactionDetails} from './ReportUtils';
 import {getDecodedLeafCategoryName} from './CategoryUtils';
 import {convertToBackendAmount} from './CurrencyUtils';
 import Parser from './Parser';
-import {getCommaSeparatedTagNameWithSanitizedColons} from './PolicyUtils';
+import {getCommaSeparatedTagNameWithSanitizedColons, isTaxTrackingEnabled} from './PolicyUtils';
 import {constructReceiptSourceFromFilename} from './ReceiptUtils';
 import {getIOUActionForReportID} from './ReportActionsUtils';
 import {getReportName} from './ReportNameUtils';
@@ -173,13 +173,18 @@ function getMergeFieldTranslationKey(field: MergeFieldKey) {
     return MERGE_FIELD_TRANSLATION_KEYS[field];
 }
 
-function getMergeFields(targetTransaction: OnyxEntry<Transaction>) {
+function getMergeFields(targetTransaction: OnyxEntry<Transaction>, targetTransactionPolicy?: OnyxEntry<Policy>) {
     const excludeFields: MergeFieldKey[] = [];
 
     // Distance request's amount/currency/receipt depend on merchant selection
     // Distance request's tax depends on distance rate
     if (isDistanceRequest(targetTransaction)) {
         excludeFields.push('amount', 'taxValue');
+    }
+
+    // The merged expense stays on the target transaction's policy, so its tax can't be merged when that policy doesn't track tax
+    if (targetTransactionPolicy && !isTaxTrackingEnabled(true, targetTransactionPolicy, isDistanceRequest(targetTransaction))) {
+        excludeFields.push('taxValue');
     }
 
     return MERGE_FIELDS.filter((field) => !excludeFields.includes(field));
@@ -232,7 +237,7 @@ function getMergeableDataAndConflictFields(
     const targetTransactionDetails = getTransactionDetails(targetTransaction);
     const sourceTransactionDetails = getTransactionDetails(sourceTransaction);
 
-    for (const field of getMergeFields(targetTransaction)) {
+    for (const field of getMergeFields(targetTransaction, targetTransactionPolicy)) {
         const targetValue = getMergeFieldValue(targetTransactionDetails, targetTransaction, field);
         const sourceValue = getMergeFieldValue(sourceTransactionDetails, sourceTransaction, field);
 
