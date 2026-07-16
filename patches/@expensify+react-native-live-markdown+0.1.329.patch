@@ -1,0 +1,110 @@
+diff --git a/node_modules/@expensify/react-native-live-markdown/lib/commonjs/web/utils/cursorUtils.js b/node_modules/@expensify/react-native-live-markdown/lib/commonjs/web/utils/cursorUtils.js
+index e6f6308..16c3b38 100644
+--- a/node_modules/@expensify/react-native-live-markdown/lib/commonjs/web/utils/cursorUtils.js
++++ b/node_modules/@expensify/react-native-live-markdown/lib/commonjs/web/utils/cursorUtils.js
+@@ -10,6 +10,13 @@ exports.scrollIntoView = scrollIntoView;
+ exports.setCursorPosition = setCursorPosition;
+ var _blockUtils = require("./blockUtils.js");
+ var _treeUtils = require("./treeUtils.js");
++// The tree metadata can be momentarily out of sync with the rendered DOM (e.g. when the input is
++// blurred and then programmatically re-focused), so an offset derived from the tree may exceed the
++// real bounds of the node it is applied to. Range.setStart/setEnd throw IndexSizeError in that case.
++function clampOffsetToNode(node, offset) {
++  const maxOffset = node.nodeType === Node.TEXT_NODE ? node.length : node.childNodes.length;
++  return Math.max(0, Math.min(offset, maxOffset));
++}
+ function setCursorPosition(target, startIndex, endIndex = null, shouldScrollIntoView = false) {
+   // We don't want to move the cursor if the target is not focused
+   if (!target.tree || target !== document.activeElement) {
+@@ -32,13 +39,15 @@ function setCursorPosition(target, startIndex, endIndex = null, shouldScrollInto
+     range.setStartBefore(startTreeNode.element);
+   } else {
+     const startElement = startTreeNode.element;
+-    range.setStart(startElement.childNodes[0] || startElement, start - startTreeNode.start);
++    const startContainer = startElement.childNodes[0] || startElement;
++    range.setStart(startContainer, clampOffsetToNode(startContainer, start - startTreeNode.start));
+   }
+   if (endTreeNode.type === 'br') {
+     range.setEndBefore(endTreeNode.element);
+   } else {
+     const endElement = endTreeNode.element;
+-    range.setEnd(endElement.childNodes[0] || endElement, (end || start) - endTreeNode.start);
++    const endContainer = endElement.childNodes[0] || endElement;
++    range.setEnd(endContainer, clampOffsetToNode(endContainer, (end || start) - endTreeNode.start));
+   }
+   if (!end) {
+     range.collapse(true);
+diff --git a/node_modules/@expensify/react-native-live-markdown/lib/module/web/utils/cursorUtils.js b/node_modules/@expensify/react-native-live-markdown/lib/module/web/utils/cursorUtils.js
+index 7bafaf7..eef23a1 100644
+--- a/node_modules/@expensify/react-native-live-markdown/lib/module/web/utils/cursorUtils.js
++++ b/node_modules/@expensify/react-native-live-markdown/lib/module/web/utils/cursorUtils.js
+@@ -2,6 +2,13 @@
+ 
+ import { isChildOfMultilineMarkdownElement } from "./blockUtils.js";
+ import { findHTMLElementInTree, getTreeNodeByIndex } from "./treeUtils.js";
++// The tree metadata can be momentarily out of sync with the rendered DOM (e.g. when the input is
++// blurred and then programmatically re-focused), so an offset derived from the tree may exceed the
++// real bounds of the node it is applied to. Range.setStart/setEnd throw IndexSizeError in that case.
++function clampOffsetToNode(node, offset) {
++  const maxOffset = node.nodeType === Node.TEXT_NODE ? node.length : node.childNodes.length;
++  return Math.max(0, Math.min(offset, maxOffset));
++}
+ function setCursorPosition(target, startIndex, endIndex = null, shouldScrollIntoView = false) {
+   // We don't want to move the cursor if the target is not focused
+   if (!target.tree || target !== document.activeElement) {
+@@ -24,13 +31,15 @@ function setCursorPosition(target, startIndex, endIndex = null, shouldScrollInto
+     range.setStartBefore(startTreeNode.element);
+   } else {
+     const startElement = startTreeNode.element;
+-    range.setStart(startElement.childNodes[0] || startElement, start - startTreeNode.start);
++    const startContainer = startElement.childNodes[0] || startElement;
++    range.setStart(startContainer, clampOffsetToNode(startContainer, start - startTreeNode.start));
+   }
+   if (endTreeNode.type === 'br') {
+     range.setEndBefore(endTreeNode.element);
+   } else {
+     const endElement = endTreeNode.element;
+-    range.setEnd(endElement.childNodes[0] || endElement, (end || start) - endTreeNode.start);
++    const endContainer = endElement.childNodes[0] || endElement;
++    range.setEnd(endContainer, clampOffsetToNode(endContainer, (end || start) - endTreeNode.start));
+   }
+   if (!end) {
+     range.collapse(true);
+diff --git a/node_modules/@expensify/react-native-live-markdown/src/web/utils/cursorUtils.ts b/node_modules/@expensify/react-native-live-markdown/src/web/utils/cursorUtils.ts
+index 82eebc7..1df5429 100644
+--- a/node_modules/@expensify/react-native-live-markdown/src/web/utils/cursorUtils.ts
++++ b/node_modules/@expensify/react-native-live-markdown/src/web/utils/cursorUtils.ts
+@@ -3,6 +3,14 @@ import {isChildOfMultilineMarkdownElement} from './blockUtils';
+ import {findHTMLElementInTree, getTreeNodeByIndex} from './treeUtils';
+ import type {TreeNode} from './treeUtils';
+ 
++// The tree metadata can be momentarily out of sync with the rendered DOM (e.g. when the input is
++// blurred and then programmatically re-focused), so an offset derived from the tree may exceed the
++// real bounds of the node it is applied to. Range.setStart/setEnd throw IndexSizeError in that case.
++function clampOffsetToNode(node: ChildNode, offset: number) {
++  const maxOffset = node.nodeType === Node.TEXT_NODE ? (node as Text).length : node.childNodes.length;
++  return Math.max(0, Math.min(offset, maxOffset));
++}
++
+ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number, endIndex: number | null = null, shouldScrollIntoView = false) {
+   // We don't want to move the cursor if the target is not focused
+   if (!target.tree || target !== document.activeElement) {
+@@ -29,14 +37,16 @@ function setCursorPosition(target: MarkdownTextInputElement, startIndex: number,
+     range.setStartBefore(startTreeNode.element);
+   } else {
+     const startElement = startTreeNode.element;
+-    range.setStart((startElement.childNodes[0] || startElement) as ChildNode, start - startTreeNode.start);
++    const startContainer = (startElement.childNodes[0] || startElement) as ChildNode;
++    range.setStart(startContainer, clampOffsetToNode(startContainer, start - startTreeNode.start));
+   }
+ 
+   if (endTreeNode.type === 'br') {
+     range.setEndBefore(endTreeNode.element);
+   } else {
+     const endElement = endTreeNode.element;
+-    range.setEnd((endElement.childNodes[0] || endElement) as ChildNode, (end || start) - endTreeNode.start);
++    const endContainer = (endElement.childNodes[0] || endElement) as ChildNode;
++    range.setEnd(endContainer, clampOffsetToNode(endContainer, (end || start) - endTreeNode.start));
+   }
+ 
+   if (!end) {
