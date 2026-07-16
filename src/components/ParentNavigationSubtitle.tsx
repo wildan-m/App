@@ -118,7 +118,10 @@ function ParentNavigationSubtitle({
     const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS);
     const isReportArchived = useReportIsArchived(report?.reportID);
     const canUserPerformWriteAction = canUserPerformWriteActionReportUtils(report, isReportArchived);
-    const hasAccessToParentReport = currentReport?.hasParentAccess !== false;
+    // The backend only sends hasParentAccess once the report is fetched with a full read, so it can be missing on a
+    // report that arrived while the app was already open. Fall back to whether the parent report is in Onyx: without it
+    // the name shown here was synthesized locally and there is nothing the user can navigate to.
+    const hasAccessToParentReport = currentReport?.hasParentAccess ?? !!report;
     const {currentFullScreenRoute, currentFocusedNavigator} = useRootNavigationState((state) => {
         // Find the tab navigator, which wraps all full-screen navigators
         const tabNavigatorRoute = state?.routes?.findLast((route) => route.name === NAVIGATORS.TAB_NAVIGATOR);
