@@ -21,6 +21,7 @@ jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
         setParams: (...args: unknown[]) => mockSetParams(...args),
+        getActiveRoute: jest.fn(() => ''),
         getActiveRouteWithoutParams: jest.fn(() => ''),
         isNavigationReady: () => mockIsNavigationReady(),
     },
@@ -66,9 +67,11 @@ jest.mock('@hooks/useResponsiveLayout', () => ({
     default: () => ({shouldUseNarrowLayout: false}),
 }));
 
+let mockIsReportActionVisible: boolean;
+
 jest.mock('@libs/ReportActionsUtils', () => ({
     ...jest.requireActual('@libs/ReportActionsUtils'),
-    isReportActionVisible: () => true,
+    isReportActionVisible: () => mockIsReportActionVisible,
     isWhisperAction: () => false,
 }));
 
@@ -112,7 +115,7 @@ function createReportAction(overrides: Partial<ReportAction> = {}): ReportAction
 }
 
 function TestChildren() {
-    return <View />;
+    return <View testID="test-children" />;
 }
 
 describe('LinkedActionNotFoundGuard', () => {
@@ -124,6 +127,7 @@ describe('LinkedActionNotFoundGuard', () => {
         mockRouteParams.reportActionID = REPORT_ACTION_ID;
         mockLinkedAction = createReportAction();
         mockIsLoadingInitialReportActions = false;
+        mockIsReportActionVisible = true;
     });
 
     it('renders children when linked action exists', () => {
@@ -198,6 +202,22 @@ describe('LinkedActionNotFoundGuard', () => {
         expect(mockSetParams).toHaveBeenCalledTimes(1);
         // Verify route.key is the second argument (needed for split navigator targeting)
         expect(mockSetParams).toHaveBeenCalledWith({reportActionID: undefined}, ROUTE_KEY, NAVIGATOR_KEY);
+    });
+
+    it('keeps the not found page up for a deeplinked action that is already deleted', () => {
+        // The action is in Onyx but deleted, so the guard shows the not found page on the first render.
+        mockIsReportActionVisible = false;
+
+        const {queryByTestId} = render(
+            <LinkedActionNotFoundGuard>
+                <TestChildren />
+            </LinkedActionNotFoundGuard>,
+        );
+
+        // Nothing may strip reportActionID on its own here — that would flip the guard back to the
+        // report and dismiss the page the user was meant to land on.
+        expect(queryByTestId('test-children')).toBeNull();
+        expect(mockSetParams).not.toHaveBeenCalled();
     });
 
     it('renders children without guard when no reportActionID in route', () => {
