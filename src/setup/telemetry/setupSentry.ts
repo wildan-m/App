@@ -10,6 +10,10 @@ import * as Sentry from '@sentry/react-native';
 import pkg from '../../../package.json';
 import makeDebugTransport from './debugTransport';
 
+// Browser extensions injected into the page throw unhandled rejections that the global handlers capture and report as if they came from us.
+// The event filters integration matches these against the URL of the frame that threw, which for an injected content script is the extension itself.
+const BROWSER_EXTENSION_DENY_URLS = [/^safari-web-extension:\/\//i, /^safari-extension:\/\//i, /^chrome-extension:\/\//i, /^moz-extension:\/\//i, /extensions\//i];
+
 function setupSentry(): void {
     const integrations = [navigationIntegration, tracingIntegration, browserProfilingIntegration, breadcrumbsIntegration, consoleIntegration, reportingObserverIntegration].filter(
         (integration): integration is NonNullable<typeof integration> => integration !== undefined,
@@ -30,6 +34,7 @@ function setupSentry(): void {
         release: `${pkg.name}@${pkg.version}`,
         // UPDATE_REQUIRED is not a real error and makes our errors in Spotnana spike and get rate limited when we bump the app min version, so ignore it
         ignoreErrors: [CONST.ERROR.UPDATE_REQUIRED],
+        denyUrls: BROWSER_EXTENSION_DENY_URLS,
         beforeSendTransaction: processBeforeSendTransactions,
         enableLogs: true,
         beforeSendLog: processBeforeSendLogs,
