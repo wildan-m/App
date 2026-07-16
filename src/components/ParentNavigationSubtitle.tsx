@@ -317,7 +317,16 @@ function ParentNavigationSubtitle({
                                 {reportName}
                             </TextLink>
                         ) : (
-                            <Text style={[styles.optionAlternateText, styles.textLabelSupporting, textStyles]}>{reportName}</Text>
+                            // Without a press handler this text is not a press target, so the tap falls through to the
+                            // header pressable in AvatarWithDisplayName and opens the details page. Absorbing the press
+                            // here keeps the unlinked subtitle inert while leaving the rest of the header pressable.
+                            <Text
+                                style={[styles.optionAlternateText, styles.textLabelSupporting, textStyles]}
+                                onPress={(event) => event?.stopPropagation?.()}
+                                suppressHighlighting
+                            >
+                                {reportName}
+                            </Text>
                         )}
                     </>
                 )}
