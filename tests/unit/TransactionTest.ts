@@ -1549,8 +1549,87 @@ describe('Transaction', () => {
             expect(updatedViolations?.some((violation) => violation.name === CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE)).toBe(false);
         });
 
-        it('should auto-select a valid distance rate when moving a distance expense with an invalid P2P rate to a workspace', async () => {
+        it('should auto-select a valid distance rate when moving a distance expense with an invalid workspace rate to a workspace', async () => {
             const policyID = '100';
+            const validRateID = 'valid_rate_1';
+            const transaction = generateTransaction({
+                reportID: FAKE_OLD_REPORT_ID,
+                amount: -500,
+                currency: 'USD',
+                iouRequestType: CONST.IOU.REQUEST_TYPE.DISTANCE,
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        customUnitRateID: 'rate_from_another_workspace',
+                        distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES,
+                        quantity: 10,
+                    },
+                },
+            });
+            const oldIOUAction = createIOUAction(transaction);
+
+            const newExpenseReport = {
+                ...createExpenseReport(Number(FAKE_NEW_REPORT_ID)),
+                reportID: FAKE_NEW_REPORT_ID,
+                policyID,
+                ownerAccountID: CURRENT_USER_ID,
+                currency: 'USD',
+            };
+            const policy = {
+                ...createRandomPolicy(Number(policyID), CONST.POLICY.TYPE.TEAM),
+                id: policyID,
+                outputCurrency: 'USD',
+                customUnits: {
+                    distanceUnit: {
+                        attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
+                        customUnitID: 'distanceUnit',
+                        defaultCategory: '',
+                        enabled: true,
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        rates: {
+                            [validRateID]: {
+                                currency: 'USD',
+                                customUnitRateID: validRateID,
+                                enabled: true,
+                                name: 'Default Rate',
+                                rate: 6550,
+                            },
+                        },
+                    },
+                },
+            };
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${FAKE_NEW_REPORT_ID}`, newExpenseReport);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${FAKE_OLD_REPORT_ID}`, {[oldIOUAction.reportActionID]: oldIOUAction});
+
+            const allTransactions = {
+                [`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`]: transaction,
+            };
+
+            changeTransactionsReport({
+                transactionIDs: [transaction.transactionID],
+                isASAPSubmitBetaEnabled: false,
+                accountID: CURRENT_USER_ID,
+                email: 'test@example.com',
+                newReport: newExpenseReport,
+                policy,
+                allTransactions,
+                policyTagList: undefined,
+                transactionViolations: {},
+                allReports: undefined,
+                isTrackIntentUser: false,
+            });
+            await waitForBatchedUpdates();
+
+            const updatedTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`);
+            expect(updatedTransaction?.comment?.customUnit?.customUnitRateID).toBe(validRateID);
+            expect(updatedTransaction?.comment?.customUnit?.defaultP2PRate).toBeUndefined();
+        });
+
+        it('should keep the P2P rate and raise CUSTOM_UNIT_OUT_OF_POLICY when moving a tracked distance expense to a workspace', async () => {
+            const policyID = '104';
             const validRateID = 'valid_rate_1';
             const transaction = generateTransaction({
                 reportID: FAKE_OLD_REPORT_ID,
@@ -1623,9 +1702,15 @@ describe('Transaction', () => {
             });
             await waitForBatchedUpdates();
 
+            // The P2P rate must survive the move so the user is prompted to pick a workspace rate,
+            // instead of the amount being silently recalculated from the workspace default rate.
             const updatedTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`);
-            expect(updatedTransaction?.comment?.customUnit?.customUnitRateID).toBe(validRateID);
-            expect(updatedTransaction?.comment?.customUnit?.defaultP2PRate).toBeUndefined();
+            expect(updatedTransaction?.comment?.customUnit?.customUnitRateID).toBe(CONST.CUSTOM_UNITS.FAKE_P2P_ID);
+            expect(updatedTransaction?.amount).toBe(-500);
+
+            const updatedViolations = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`);
+            const customUnitViolations = updatedViolations?.filter((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY) ?? [];
+            expect(customUnitViolations).toHaveLength(1);
         });
 
         it('should auto-select a valid distance rate when the current rate is disabled on the destination workspace', async () => {
@@ -1726,7 +1811,7 @@ describe('Transaction', () => {
                     type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
                     customUnit: {
                         name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
-                        customUnitRateID: CONST.CUSTOM_UNITS.FAKE_P2P_ID,
+                        customUnitRateID: 'rate_from_another_workspace',
                         distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES,
                         quantity: 10,
                     },

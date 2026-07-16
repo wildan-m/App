@@ -464,6 +464,7 @@ const ViolationsUtils = {
         hasDependentTags,
         isInvoiceTransaction,
         isSelfDM,
+        isPolicyExpenseChat,
         iouReport,
         isFromExpenseReport,
         shouldRemoveRejectedExpenseViolation,
@@ -477,6 +478,12 @@ const ViolationsUtils = {
         hasDependentTags: boolean;
         isInvoiceTransaction: boolean;
         isSelfDM?: boolean;
+        /**
+         * Whether the transaction is bound to a policy expense chat. Callers that move a transaction onto a workspace
+         * know this from the destination report, and the transaction's own `participants` are not updated by the move,
+         * so it cannot always be derived from the transaction itself.
+         */
+        isPolicyExpenseChat?: boolean;
         iouReport?: OnyxEntry<Report>;
         isFromExpenseReport?: boolean;
         shouldRemoveRejectedExpenseViolation?: boolean;
@@ -610,7 +617,7 @@ const ViolationsUtils = {
             // arrives). We must NOT clear it when the transaction is still bound to a policy expense chat, because a
             // track expense moved onto a workspace intentionally keeps FAKE_P2P_ID until the user picks a workspace
             // rate, and the violation is what prompts them to do so — so that case falls through to the rate check below.
-            const isTransactionOnPolicyExpenseChat = updatedTransaction.participants?.some((participant) => participant?.isPolicyExpenseChat);
+            const isTransactionOnPolicyExpenseChat = isPolicyExpenseChat ?? updatedTransaction.participants?.some((participant) => participant?.isPolicyExpenseChat);
             if (TransactionUtils.isCustomUnitRateIDForP2P(updatedTransaction) && !isTransactionOnPolicyExpenseChat) {
                 newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY});
             } else {

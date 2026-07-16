@@ -49,6 +49,7 @@ import {
     getDistanceInMeters,
     hasPendingRTERViolation,
     hasSubmissionBlockingViolationInList,
+    isCustomUnitRateIDForP2P,
     isDeletedTransaction,
     isDistanceRequest,
     isFetchingWaypointsFromServer,
@@ -1202,7 +1203,12 @@ function changeTransactionsReport({
         if (isGroupPolicy(policy) && policy?.id && isDistanceRequest(transaction)) {
             const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
             const currentRate = currentRateID ? getDistanceRateCustomUnitRate(policy, currentRateID) : undefined;
-            if (!currentRateID || !currentRate || currentRate.enabled === false) {
+            // A P2P rate (FAKE_P2P_ID) belongs to no workspace, so it always looks invalid here. It must be left alone
+            // rather than replaced: a track expense moved onto a workspace keeps FAKE_P2P_ID until the user picks a
+            // workspace rate, and the CUSTOM_UNIT_OUT_OF_POLICY violation raised in ViolationsUtils is what prompts
+            // them to do so. Auto-selecting the default here would pre-empt that prompt and silently change the amount.
+            const isP2PRate = isCustomUnitRateIDForP2P(transaction);
+            if (!isP2PRate && (!currentRateID || !currentRate || currentRate.enabled === false)) {
                 const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
                 if (defaultRate?.customUnitRateID) {
                     transactionIDToUpdatedCustomUnitRateID[transaction.transactionID] = defaultRate.customUnitRateID;
@@ -1308,6 +1314,9 @@ function changeTransactionsReport({
                 policyCategories: policyCategories ?? {},
                 hasDependentTags: policyHasDependentTags,
                 isInvoiceTransaction: false,
+                // The transaction is being moved onto this workspace's expense report, so it is on a policy expense
+                // chat regardless of the participants it was created with in the Self DM / person chat.
+                isPolicyExpenseChat: isExpenseReport(newReport),
                 shouldRemoveRejectedExpenseViolation: true,
             });
             optimisticData.push(violationData);
