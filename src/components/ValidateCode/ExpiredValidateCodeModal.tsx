@@ -15,6 +15,7 @@ import variables from '@styles/variables';
 import {beginSignIn} from '@userActions/Session';
 
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 
 import React from 'react';
 import {View} from 'react-native';
@@ -45,7 +46,7 @@ function ExpiredValidateCodeModal() {
                             <TextLink
                                 onPress={() => {
                                     beginSignIn(credentials?.login ?? '');
-                                    Navigation.setNavigationActionToMicrotaskQueue(Navigation.goBack);
+                                    Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.goBack(ROUTES.HOME));
                                 }}
                             >
                                 {translate('validateCodeModal.requestOneHere')}
