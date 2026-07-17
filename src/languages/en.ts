@@ -158,6 +158,7 @@ const translations = {
         signInWith: 'Sign in with',
         continue: 'Continue',
         tryAgain: 'Try again',
+        retry: 'Retry',
         firstName: 'First name',
         lastName: 'Last name',
         scanning: 'Scanning',

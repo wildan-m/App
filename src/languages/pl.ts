@@ -524,6 +524,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unableToDisplayChart: 'Nie można wyświetlić wykresu',
         webGLNotSupported: 'Twoja przeglądarka nie obsługuje WebGL. Włącz ją albo zmień przeglądarkę.',
         apiKey: 'Klucz API',
+        retry: 'Ponów próbę',
     },
     socials: {
         podcast: 'Śledź nas na Podcast',

@@ -1,3 +1,4 @@
+import Button from '@components/ButtonComposed';
 import Icon from '@components/Icon';
 import Lottie from '@components/Lottie';
 import type DotLottieAnimation from '@components/LottieAnimations/types';
@@ -12,6 +13,7 @@ import useAbsentPageSpan from '@libs/telemetry/useAbsentPageSpan';
 
 import variables from '@styles/variables';
 
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 
 import type {ImageContentFit} from 'expo-image';
@@ -50,6 +52,12 @@ type BaseBlockingViewProps = {
 
     /** Whether we should embed the link with subtitle */
     shouldEmbedLinkWithSubtitle?: boolean;
+
+    /** Text of the call-to-action button displayed below the subtitle. The button only renders when this and onButtonPress are both provided */
+    buttonText?: string;
+
+    /** Function to call when pressing the call-to-action button */
+    onButtonPress?: () => void;
 
     /** Render custom subtitle */
     CustomSubtitle?: React.ReactElement;
@@ -114,6 +122,8 @@ function BlockingView({
     iconHeight = variables.iconSizeSuperLarge,
     onLinkPress = () => Navigation.dismissModal(),
     shouldEmbedLinkWithSubtitle = false,
+    buttonText,
+    onButtonPress,
     animationStyles = [],
     titleStyles = [],
     animationWebStyle = {},
@@ -183,6 +193,17 @@ function BlockingView({
                             />
                         )}
                     </SubtitleWrapper>
+                )}
+
+                {!!buttonText && !!onButtonPress && (
+                    <View style={[styles.alignItemsCenter, styles.mt5]}>
+                        <Button
+                            variant={CONST.BUTTON_VARIANT.SUCCESS}
+                            onPress={onButtonPress}
+                        >
+                            <Button.Text>{buttonText}</Button.Text>
+                        </Button>
+                    </View>
                 )}
             </View>
         </ScrollView>

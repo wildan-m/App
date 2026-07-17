@@ -524,6 +524,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unableToDisplayChart: 'Grafiek kan niet worden weergegeven',
         webGLNotSupported: 'Je browser ondersteunt WebGL niet. Schakel het in of gebruik een andere browser.',
         apiKey: 'API-sleutel',
+        retry: 'Opnieuw proberen',
     },
     socials: {
         podcast: 'Volg ons op Podcast',

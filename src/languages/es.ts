@@ -474,6 +474,7 @@ const translations: TranslationDeepObject<typeof en> = {
         tagGLCode: 'Etiquetar código GL',
         off: 'Desactivado',
         noResultsFoundSubtitle: 'Sin resultados. Intenta ajustar tus filtros o la búsqueda.',
+        retry: 'Reintentar',
     },
     socials: {
         podcast: 'Síguenos en Podcast',

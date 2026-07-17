@@ -523,6 +523,7 @@ const translations: TranslationDeepObject<typeof en> = {
         unableToDisplayChart: 'Não foi possível exibir o gráfico',
         webGLNotSupported: 'Seu navegador não é compatível com WebGL. Ative-o ou mude de navegador.',
         apiKey: 'Chave de API',
+        retry: 'Tentar novamente',
     },
     socials: {
         podcast: 'Siga-nos no Podcast',

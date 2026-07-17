@@ -66,7 +66,9 @@ function useSpendOverTimeData() {
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
 
-    const onConfigChanged = useEffectEvent(() => {
+    // Re-issuing the request is enough to recover from the error state: the search action's optimistic data clears the
+    // snapshot errors, which moves the section back to loading before the response decides the next state.
+    const runSearch = () => {
         if (!queryJSON || isSearchLoading || isOffline) {
             return;
         }
@@ -79,6 +81,10 @@ function useSpendOverTimeData() {
             isLoading: false,
             shouldUpdateLastSearchParams: false,
         });
+    };
+
+    const onConfigChanged = useEffectEvent(() => {
+        runSearch();
     });
 
     useEffect(() => {
@@ -123,6 +129,7 @@ function useSpendOverTimeData() {
         view,
         sortedData,
         state,
+        retry: runSearch,
     };
 }
 
