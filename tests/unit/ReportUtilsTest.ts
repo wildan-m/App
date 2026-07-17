@@ -19613,6 +19613,37 @@ describe('ReportUtils', () => {
 
             expect(result).toBe('Invoice #42');
         });
+
+        it('should resolve an invoice transaction thread to the parent invoice report name', async () => {
+            const invoiceReportID = 'invoice-report-791';
+            const invoiceChatID = 'invoice-chat-125';
+            // The parent invoice report (OldDot-style stored name so getInvoiceReportName returns it directly).
+            const invoiceReport: Report = {
+                reportID: invoiceReportID,
+                type: CONST.REPORT.TYPE.INVOICE,
+                parentReportID: invoiceChatID,
+                reportName: 'Amina owes $13.00',
+                currency: 'USD',
+            };
+            // A message sent inside the invoice's single-expense detail view belongs to the transaction
+            // thread, a chat thread whose parent is the invoice report — not the invoice report itself.
+            const transactionThread: Report = {
+                reportID: 'invoice-thread-1',
+                type: CONST.REPORT.TYPE.CHAT,
+                parentReportID: invoiceReportID,
+                parentReportActionID: 'thread-parent-action-1',
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${invoiceReportID}`, invoiceReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${transactionThread.reportID}`, transactionThread);
+            await waitForBatchedUpdates();
+
+            // The Search backend supplies action.reportName (e.g. "$13.00 expense"); without resolving the
+            // thread to its parent invoice report the header would fall through to this value.
+            const action = {...createRandomReportAction(7), reportName: '$13.00 expense'};
+            const result = getChatListItemReportName(action, transactionThread, undefined, translateLocal);
+
+            expect(result).toBe('Amina owes $13.00');
+        });
     });
     describe('buildOptimisticApprovedReportAction', () => {
         it('should set actorAccountID to the provided currentUserAccountID', () => {
