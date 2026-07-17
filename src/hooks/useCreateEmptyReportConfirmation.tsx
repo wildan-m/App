@@ -9,7 +9,7 @@ import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import useConfirmModal from './useConfirmModal';
@@ -69,42 +69,53 @@ export default function useCreateEmptyReportConfirmation({
     const {showConfirmModal, closeModal} = useConfirmModal();
     const workspaceDisplayName = policyName?.trim().length ? policyName : translate('report.newReport.genericWorkspaceName');
 
-    const onConfirmRef = useRef(onConfirm);
-    const onCancelRef = useRef(onCancel);
+    // Keep the latest values in a ref so `openCreateReportConfirmation` can stay referentially stable.
+    // `showConfirmModal`/`closeModal` come from the modal context, whose value is recreated on every
+    // modal-stack change; without this indirection the returned callback would change identity on every
+    // render and any caller that lists it in a useEffect dependency array would re-open the modal in an
+    // infinite loop ("Maximum update depth exceeded").
+    const latestValuesRef = useRef({onConfirm, onCancel, showConfirmModal, closeModal, translate, workspaceDisplayName, shouldHandleNavigationBack});
     useEffect(() => {
-        onConfirmRef.current = onConfirm;
-        onCancelRef.current = onCancel;
-    }, [onConfirm, onCancel]);
+        latestValuesRef.current = {onConfirm, onCancel, showConfirmModal, closeModal, translate, workspaceDisplayName, shouldHandleNavigationBack};
+    }, [onConfirm, onCancel, showConfirmModal, closeModal, translate, workspaceDisplayName, shouldHandleNavigationBack]);
 
-    const openCreateReportConfirmation = () => {
+    const openCreateReportConfirmation = useCallback(() => {
+        const {
+            showConfirmModal: showConfirmModalFn,
+            closeModal: closeModalFn,
+            translate: translateFn,
+            workspaceDisplayName: workspaceName,
+            shouldHandleNavigationBack: handleNavigationBack,
+        } = latestValuesRef.current;
+
         const checkboxRef = {current: false};
 
         const handleLinkPress = () => {
-            closeModal();
+            closeModalFn();
             Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT})}));
         };
 
-        showConfirmModal({
+        showConfirmModalFn({
             // Adding a space at the end because of this bug in react-native: https://github.com/facebook/react-native/issues/53286
-            title: `${translate('report.newReport.emptyReportConfirmationTitle')} `,
-            confirmText: translate('report.newReport.createReport'),
-            cancelText: translate('common.cancel'),
-            shouldHandleNavigationBack,
+            title: `${translateFn('report.newReport.emptyReportConfirmationTitle')} `,
+            confirmText: translateFn('report.newReport.createReport'),
+            cancelText: translateFn('common.cancel'),
+            shouldHandleNavigationBack: handleNavigationBack,
             prompt: (
                 <ConfirmationPrompt
-                    workspaceName={workspaceDisplayName}
+                    workspaceName={workspaceName}
                     checkboxRef={checkboxRef}
                     onLinkPress={handleLinkPress}
                 />
             ),
         }).then((result) => {
             if (result.action === ModalActions.CONFIRM) {
-                onConfirmRef.current(checkboxRef.current);
+                latestValuesRef.current.onConfirm(checkboxRef.current);
             } else {
-                onCancelRef.current?.();
+                latestValuesRef.current.onCancel?.();
             }
         });
-    };
+    }, []);
 
     return {
         openCreateReportConfirmation,
