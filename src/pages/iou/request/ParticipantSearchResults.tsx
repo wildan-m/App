@@ -138,7 +138,6 @@ function ParticipantSearchResults({
     onRestrictedParticipantSelected,
     onCloseParticipantPicker,
 }: ParticipantSearchResultsProps) {
-    const getParticipantOptionKey = (option: Partial<Participant>) => option.reportID ?? option.accountID?.toString() ?? option.login ?? option.phoneNumber ?? '';
     const isIOUSplit = iouType === CONST.IOU.TYPE.SPLIT;
     const isCategorizeOrShareAction = action === CONST.IOU.ACTION.CATEGORIZE || action === CONST.IOU.ACTION.SHARE;
     const isAllowedToSplit =
@@ -292,7 +291,27 @@ function ParticipantSearchResults({
     const sections: Array<Section<OptionWithKey>> = [];
     let header = '';
     if (areOptionsInitialized && didScreenTransitionEnd) {
-        const selectedParticipantKeys = new Set(participants.map((participant) => getParticipantOptionKey(participant)).filter(Boolean));
+        // Mirror useSearchSelector's doOptionsMatch so the dedup filter and the selection tagger agree on what "the same
+        // participant" is. Matching on a single best-of-many key let a user picked from Contacts (accountID/login only, no
+        // reportID yet) slip past the filter when the same user also had a recent report, whose row is keyed on reportID.
+        const selectedAccountIDs = new Set<number>();
+        const selectedReportIDs = new Set<string>();
+        const selectedLogins = new Set<string>();
+        for (const participant of participants) {
+            if (participant.accountID) {
+                selectedAccountIDs.add(participant.accountID);
+            }
+            if (participant.reportID && participant.reportID !== '-1') {
+                selectedReportIDs.add(participant.reportID);
+            }
+            if (participant.login) {
+                selectedLogins.add(participant.login);
+            }
+        }
+        const isParticipantAlreadySelected = (option: Partial<Participant>) =>
+            (!!option.accountID && selectedAccountIDs.has(option.accountID)) ||
+            (!!option.reportID && option.reportID !== '-1' && selectedReportIDs.has(option.reportID)) ||
+            (!!option.login && selectedLogins.has(option.login));
         const formatResults = formatSectionsFromSearchTerm(
             searchTerm,
             participants.map((participant) => ({...participant, reportID: participant.reportID})) as OptionData[],
@@ -310,7 +329,7 @@ function ParticipantSearchResults({
         );
         sections.push({...formatResults.section, sectionIndex: 0});
 
-        const workspaceChats = (availableOptions.workspaceChats ?? []).filter((option) => !selectedParticipantKeys.has(getParticipantOptionKey(option)));
+        const workspaceChats = (availableOptions.workspaceChats ?? []).filter((option) => !isParticipantAlreadySelected(option));
         if (workspaceChats.length > 0) {
             sections.push({
                 title: translate('workspace.common.workspace'),
@@ -334,7 +353,7 @@ function ParticipantSearchResults({
             if (recentReports.length > 0) {
                 sections.push({
                     title: translate('common.recents'),
-                    data: recentReports.filter((option) => !selectedParticipantKeys.has(getParticipantOptionKey(option))),
+                    data: recentReports.filter((option) => !isParticipantAlreadySelected(option)),
                     sectionIndex: 3,
                 });
             }
@@ -342,7 +361,7 @@ function ParticipantSearchResults({
             if (availableOptions.personalDetails.length > 0 && !isPerDiemRequest && !isTimeRequest) {
                 sections.push({
                     title: translate('common.contacts'),
-                    data: availableOptions.personalDetails.filter((option) => !selectedParticipantKeys.has(getParticipantOptionKey(option))),
+                    data: availableOptions.personalDetails.filter((option) => !isParticipantAlreadySelected(option)),
                     sectionIndex: 4,
                 });
             }
