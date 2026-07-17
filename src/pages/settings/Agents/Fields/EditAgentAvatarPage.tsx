@@ -2,6 +2,7 @@ import AttachmentPicker from '@components/AttachmentPicker';
 import Avatar from '@components/Avatar';
 import AvatarPageFooter from '@components/AvatarPageFooter';
 import Button from '@components/Button';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {PressableWithFeedback} from '@components/Pressable';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -60,6 +61,8 @@ type EditAgentAvatarContentProps = {
 function EditAgentAvatarContent({accountID, fallbackRoute, onSave, initialPresetID}: EditAgentAvatarContentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const icons = useMemoizedLazyExpensifyIcons(['Upload']);
 
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
@@ -117,6 +120,10 @@ function EditAgentAvatarContent({accountID, fallbackRoute, onSave, initialPreset
 
     const handleSave = () => {
         if (!isDirty) {
+            return;
+        }
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
             return;
         }
         suppressDiscardPrompt();

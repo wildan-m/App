@@ -1,3 +1,4 @@
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
@@ -27,10 +28,16 @@ type EditNamePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, ty
 function EditNamePage({route}: EditNamePageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const accountID = route.params.accountID;
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
 
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM>) => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
         updateAgentName(accountID, values[INPUT_IDS.FIRST_NAME].trim(), personalDetails?.displayName ?? '');
         Navigation.goBack(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
     };

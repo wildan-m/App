@@ -1,4 +1,5 @@
 import AvatarButtonWithIcon from '@components/AvatarButtonWithIcon';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
@@ -42,6 +43,8 @@ function EditAgentPage({route}: EditAgentPageProps) {
     const [personalDetails, personalDetailsMetadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const {showConfirmModal} = useConfirmModal();
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const chatWithAgent = useChatWithAgent();
     const switchToDelegator = useSwitchToDelegator();
     const isOnyxLoaded = agentMetadata.status === 'loaded' && personalDetailsMetadata.status === 'loaded';
@@ -49,10 +52,32 @@ function EditAgentPage({route}: EditAgentPageProps) {
 
     const agentLogin = personalDetails?.login ?? '';
     const handleBackPress = () => Navigation.goBack();
-    const handleEditAvatarPress = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_AVATAR.getRoute(accountID));
-    const handleEditNamePress = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_NAME.getRoute(accountID));
-    const handleEditPromptPress = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_PROMPT.getRoute(accountID));
+    const handleEditAvatarPress = () => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_AVATAR.getRoute(accountID));
+    };
+    const handleEditNamePress = () => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_NAME.getRoute(accountID));
+    };
+    const handleEditPromptPress = () => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_PROMPT.getRoute(accountID));
+    };
     const handleDeletePress = async () => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
         const result = await showConfirmModal({
             title: translate('editAgentPage.deleteAgentTitle'),
             prompt: translate('editAgentPage.deleteAgentMessage'),

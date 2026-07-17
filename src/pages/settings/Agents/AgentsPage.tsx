@@ -1,6 +1,7 @@
 import Button from '@components/ButtonComposed';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
+import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -50,6 +51,8 @@ function AgentsPage() {
     const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Trashcan']);
     const chatWithAgent = useChatWithAgent();
     const switchToDelegator = useSwitchToDelegator();
+    const {isActingAsDelegate} = useDelegateNoAccessState();
+    const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const {isBetaEnabled} = usePermissions();
     const isCustomAgentEnabled = isBetaEnabled(CONST.BETAS.CUSTOM_AGENT);
     const {showConfirmModal} = useConfirmModal();
@@ -173,10 +176,18 @@ function AgentsPage() {
     const shouldShowBulkActionsButton = shouldUseNarrowLayout ? canSelectMultiple : selectedAgentKeys.length > 0;
     const selectionModeHeader = isMobileSelectionModeEnabled && shouldUseNarrowLayout;
 
+    const handleNewAgentPress = () => {
+        if (isActingAsDelegate) {
+            showDelegateNoAccessModal();
+            return;
+        }
+        Navigation.navigate(ROUTES.SETTINGS_AGENTS_ADD.getRoute());
+    };
+
     const newAgentButton = (
         <Button
             variant="success"
-            onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_ADD.getRoute())}
+            onPress={handleNewAgentPress}
         >
             <Button.Icon src={icons.Plus} />
             <Button.Text>{translate('agentsPage.newAgent')}</Button.Text>
