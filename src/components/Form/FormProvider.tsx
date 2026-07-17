@@ -389,7 +389,7 @@ function FormProvider({
         (inputID: keyof Form) => {
             const newErrors = {...errors};
             delete newErrors[inputID];
-            setFormErrors(formID, newErrors as Errors);
+            setFormErrors(formID, {[inputID]: null} as Errors);
             setErrors(newErrors);
         },
         [errors, formID],
