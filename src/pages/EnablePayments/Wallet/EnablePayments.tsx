@@ -133,14 +133,6 @@ function EnablePaymentsPage({route}: EnablePaymentsPageProps) {
         Navigation.navigate(ROUTES.SETTINGS_ENABLE_PAYMENTS.getRoute({page: canonicalPage}), {forceReplace: true});
     }, [canonicalPage, shouldWaitForWalletData, currentPage]);
 
-    if (shouldWaitForWalletData) {
-        const reasonAttributes: SkeletonSpanReasonAttributes = {
-            context: 'EnablePaymentsPage',
-            isUserWalletEmpty,
-        };
-        return <FullScreenLoadingIndicator reasonAttributes={reasonAttributes} />;
-    }
-
     if (userWallet?.errorCode === CONST.WALLET.ERROR.KYC) {
         return (
             <ScreenWrapper
@@ -155,6 +147,14 @@ function EnablePaymentsPage({route}: EnablePaymentsPageProps) {
                 <FailedKYC />
             </ScreenWrapper>
         );
+    }
+
+    if (shouldWaitForWalletData) {
+        const reasonAttributes: SkeletonSpanReasonAttributes = {
+            context: 'EnablePaymentsPage',
+            isUserWalletEmpty,
+        };
+        return <FullScreenLoadingIndicator reasonAttributes={reasonAttributes} />;
     }
 
     const currentEntry = pages.find((p) => p.pageName === currentPage) ?? pages.find((p) => p.pageName === canonicalPage);

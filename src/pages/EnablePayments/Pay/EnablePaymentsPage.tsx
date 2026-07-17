@@ -64,6 +64,23 @@ function EnablePaymentsPage() {
     }, [isOffline, isPendingOnfidoResult, hasFailedOnfido, hasFreshData]);
 
     const isUserWalletEmpty = isEmptyObject(userWallet);
+
+    if (userWallet?.errorCode === CONST.WALLET.ERROR.KYC) {
+        return (
+            <ScreenWrapper
+                shouldShowOfflineIndicator={userWallet?.currentStep !== CONST.WALLET.STEP.ONFIDO}
+                includeSafeAreaPaddingBottom
+                testID="EnablePaymentsPage"
+            >
+                <HeaderWithBackButton
+                    title={translate('additionalDetailsStep.headerTitle')}
+                    onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_WALLET)}
+                />
+                <FailedKYC />
+            </ScreenWrapper>
+        );
+    }
+
     if (isUserWalletEmpty || userWallet?.isLoading || (!hasFreshData && !isOffline)) {
         const reasonAttributes: SkeletonSpanReasonAttributes = {
             context: 'EnablePaymentsPage',
@@ -79,18 +96,6 @@ function EnablePaymentsPage() {
             testID="EnablePaymentsPage"
         >
             {() => {
-                if (userWallet?.errorCode === CONST.WALLET.ERROR.KYC) {
-                    return (
-                        <>
-                            <HeaderWithBackButton
-                                title={translate('additionalDetailsStep.headerTitle')}
-                                onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_WALLET)}
-                            />
-                            <FailedKYC />
-                        </>
-                    );
-                }
-
                 const currentStep = userWallet?.currentStep || CONST.WALLET.STEP.ADDITIONAL_DETAILS;
 
                 switch (currentStep) {
