@@ -4739,7 +4739,7 @@ function isReportFieldDisabled(report: OnyxEntry<Report>, reportField: OnyxEntry
     }
 
     if (isTitleField) {
-        return !reportField?.deletable;
+        return !isAdmin && !reportField?.deletable;
     }
 
     return reportField?.type === CONST.REPORT_FIELD_TYPES.FORMULA;
