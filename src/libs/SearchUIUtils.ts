@@ -2862,7 +2862,12 @@ function getReportSections({
                 reportActions[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportItem.reportID}`] ?? Object.values(data[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportItem.reportID}`] ?? {});
 
             const isActionLoading = !!isActionLoadingSet?.has(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportItem.reportID}`);
-            const shouldShow = !isActionLoading && currentQueryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE ? isEligibleForStatus(currentQueryJSON, reportItem) : true;
+            const isEligible = !isActionLoading && currentQueryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE ? isEligibleForStatus(currentQueryJSON, reportItem) : true;
+
+            // A draft report that was never submitted has no `submitted` timestamp, so it can never legitimately fall inside a `submitted` date filter range.
+            // The status filter alone defaults to `all` (which matches every report), so exclude such draft reports whenever a `submitted` date filter is active.
+            const hasSubmittedDateFilter = !!currentQueryJSON?.flatFilters?.some((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTED);
+            const shouldShow = isEligible && !(hasSubmittedDateFilter && !reportItem.submitted);
 
             if (shouldShow) {
                 const reportPendingAction =
