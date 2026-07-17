@@ -6350,6 +6350,8 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 one: '1 label',
                 other: (count: number) => `${count} tags`,
             }),
+            showTagGLCode: 'Toon tag Grootboekcodes',
+            showTagGLCodeSubtitle: 'Geef de grootboekcode van elke tag naast de naam weer wanneer je een tag selecteert.',
         },
         taxes: {
             subtitle: 'Belastingnamen en -tarieven toevoegen en standaarden instellen.',

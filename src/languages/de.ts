@@ -6380,6 +6380,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 one: '1 Tag',
                 other: (count: number) => `${count} Tags`,
             }),
+            showTagGLCode: 'Tag-Kontenplan-Codes anzeigen',
+            showTagGLCodeSubtitle: 'Zeigen Sie beim Auswählen eines Tags den Kontenplan-Code jedes Tags zusammen mit seinem Namen an.',
         },
         taxes: {
             subtitle: 'Steuernamen und -sätze hinzufügen und Standardwerte festlegen.',

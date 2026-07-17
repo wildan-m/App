@@ -6162,6 +6162,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 one: '1 天',
                 other: (count: number) => `${count} 个标签`,
             }),
+            showTagGLCode: '显示标签分类代码',
+            showTagGLCodeSubtitle: '在选择标签时，将每个标签的总账科目代码与其名称一同显示。',
         },
         taxes: {
             subtitle: '添加税种名称、税率，并设置默认值。',

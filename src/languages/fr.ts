@@ -6407,6 +6407,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                 one: '1 tag',
                 other: (count: number) => `${count} tags`,
             }),
+            showTagGLCode: 'Afficher les codes GL des tags',
+            showTagGLCodeSubtitle: 'Afficher le code GL de chaque tag à côté de son nom lors de la sélection d’un tag.',
         },
         taxes: {
             subtitle: 'Ajoutez des noms de taxes, des taux et définissez des valeurs par défaut.',

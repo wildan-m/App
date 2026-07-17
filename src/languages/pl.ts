@@ -6331,6 +6331,8 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 one: '1 dzień',
                 other: (count: number) => `${count} tagi`,
             }),
+            showTagGLCode: 'Pokaż kody GL tagów',
+            showTagGLCodeSubtitle: 'Wyświetlaj kod konta księgowego każdego tagu obok jego nazwy podczas wybierania tagu.',
         },
         taxes: {
             subtitle: 'Dodaj nazwy podatków, stawki i ustaw domyślne.',

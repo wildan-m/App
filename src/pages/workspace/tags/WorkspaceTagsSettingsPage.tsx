@@ -14,12 +14,12 @@ import usePolicyData from '@hooks/usePolicyData';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {getBillableExpensesPendingAction, toggleBillableExpenses} from '@libs/actions/Policy/Policy';
-import {clearPolicyTagListErrors, setPolicyRequiresTag} from '@libs/actions/Policy/Tag';
+import {clearPolicyTagListErrors, setPolicyRequiresTag, setPolicyShouldShowTagGLCode} from '@libs/actions/Policy/Tag';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import {hasEnabledOptions as hasEnabledOptionsUtil} from '@libs/OptionsListUtils';
-import {getTagLists as getTagListsUtil, isMultiLevelTags as isMultiLevelTagsUtil} from '@libs/PolicyUtils';
+import {getTagLists as getTagListsUtil, isControlPolicy as isControlPolicyUtil, isMultiLevelTags as isMultiLevelTagsUtil} from '@libs/PolicyUtils';
 
 import type {SettingsNavigatorParamList} from '@navigation/types';
 
@@ -54,6 +54,12 @@ function WorkspaceTagsSettingsPage({route}: WorkspaceTagsSettingsPageProps) {
     const updateWorkspaceRequiresTag = useCallback(
         (value: boolean) => {
             setPolicyRequiresTag(policyData, value);
+        },
+        [policyData],
+    );
+    const updateShouldShowTagGLCode = useCallback(
+        (value: boolean) => {
+            setPolicyShouldShowTagGLCode(policyData, value);
         },
         [policyData],
     );
@@ -113,6 +119,38 @@ function WorkspaceTagsSettingsPage({route}: WorkspaceTagsSettingsPageProps) {
                             />
                         </View>
                     </OfflineWithFeedback>
+                    {isControlPolicyUtil(policy) && (
+                        <OfflineWithFeedback
+                            errors={policy?.errorFields?.shouldShowTagGLCode}
+                            pendingAction={policy?.pendingFields?.shouldShowTagGLCode}
+                            errorRowStyles={styles.mh5}
+                        >
+                            <View style={[styles.flexRow, styles.mh5, styles.mv4, styles.alignItemsCenter, styles.justifyContentBetween]}>
+                                <View style={[styles.flex1, styles.mr2]}>
+                                    <Text
+                                        style={[styles.textNormal]}
+                                        accessible={false}
+                                        aria-hidden
+                                    >
+                                        {translate('workspace.tags.showTagGLCode')}
+                                    </Text>
+                                    <Text
+                                        style={[styles.textLabel, styles.textSupporting]}
+                                        accessible={false}
+                                        aria-hidden
+                                    >
+                                        {translate('workspace.tags.showTagGLCodeSubtitle')}
+                                    </Text>
+                                </View>
+                                <Switch
+                                    isOn={policy?.shouldShowTagGLCode ?? false}
+                                    accessibilityLabel={translate('workspace.tags.showTagGLCode')}
+                                    onToggle={updateShouldShowTagGLCode}
+                                    disabled={!policy?.areTagsEnabled}
+                                />
+                            </View>
+                        </OfflineWithFeedback>
+                    )}
                     <OfflineWithFeedback pendingAction={getBillableExpensesPendingAction(policy)}>
                         <View style={[styles.flexRow, styles.mh5, styles.mv4, styles.alignItemsCenter, styles.justifyContentBetween]}>
                             <Text

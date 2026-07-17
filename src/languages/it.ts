@@ -6367,6 +6367,8 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 one: '1 giorno',
                 other: (count: number) => `${count} tag`,
             }),
+            showTagGLCode: 'Mostra i codici GL delle etichette',
+            showTagGLCodeSubtitle: 'Mostra il codice GL di ogni etichetta accanto al suo nome quando selezioni un’etichetta.',
         },
         taxes: {
             subtitle: 'Aggiungi nomi e aliquote delle imposte e imposta i valori predefiniti.',

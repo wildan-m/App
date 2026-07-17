@@ -957,4 +957,52 @@ describe('TagsOptionsListUtils', () => {
             expect(result).toEqual([]);
         });
     });
+
+    describe('tag GL codes', () => {
+        const glCodeTags: PolicyTags = {
+            'Sunshine Project': {name: 'Sunshine Project', enabled: true, 'GL Code': 'SP4100'},
+            'Moonlight Project': {name: 'Moonlight Project', enabled: true, 'GL Code': ''},
+            Rainbow: {name: 'Rainbow', enabled: true},
+        };
+
+        it('leaves the tag name untouched when the policy has not opted in', () => {
+            const sections = getTagListSections({tags: glCodeTags, localeCompare, translate: translateLocal});
+
+            expect(sections.at(0)?.data.map((option) => option.text)).toStrictEqual(['Moonlight Project', 'Rainbow', 'Sunshine Project']);
+        });
+
+        it('appends the GL code to the tag name only when the tag has one', () => {
+            const sections = getTagListSections({tags: glCodeTags, localeCompare, translate: translateLocal, shouldShowTagGLCode: true});
+            const options = sections.at(0)?.data ?? [];
+
+            expect(options.map((option) => option.text)).toStrictEqual(['Moonlight Project', 'Rainbow', 'Sunshine Project (SP4100)']);
+            expect(options.map((option) => option.tooltipText)).toStrictEqual(['Moonlight Project', 'Rainbow', 'Sunshine Project (SP4100)']);
+        });
+
+        it('keeps keyForList and searchText as the raw tag name so selection identity is preserved', () => {
+            const sections = getTagListSections({tags: glCodeTags, localeCompare, translate: translateLocal, shouldShowTagGLCode: true});
+            const decoratedOption = sections.at(0)?.data.find((option) => option.text === 'Sunshine Project (SP4100)');
+
+            expect(decoratedOption?.keyForList).toBe('Sunshine Project');
+            expect(decoratedOption?.searchText).toBe('Sunshine Project');
+        });
+
+        it('matches a tag by its GL code when the policy has opted in', () => {
+            const sections = getTagListSections({tags: glCodeTags, searchValue: 'SP41', localeCompare, translate: translateLocal, shouldShowTagGLCode: true});
+
+            expect(sections.at(0)?.data.map((option) => option.text)).toStrictEqual(['Sunshine Project (SP4100)']);
+        });
+
+        it('does not match a tag by its GL code when the policy has not opted in', () => {
+            const sections = getTagListSections({tags: glCodeTags, searchValue: 'SP41', localeCompare, translate: translateLocal});
+
+            expect(sections.at(0)?.data).toStrictEqual([]);
+        });
+
+        it('still matches a tag by its name when GL codes are shown', () => {
+            const sections = getTagListSections({tags: glCodeTags, searchValue: 'Sunshine', localeCompare, translate: translateLocal, shouldShowTagGLCode: true});
+
+            expect(sections.at(0)?.data.map((option) => option.text)).toStrictEqual(['Sunshine Project (SP4100)']);
+        });
+    });
 });

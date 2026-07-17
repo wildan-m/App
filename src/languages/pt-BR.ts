@@ -6343,6 +6343,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 one: '1 etiqueta',
                 other: (count: number) => `${count} Tags`,
             }),
+            showTagGLCode: 'Mostrar códigos GL da tag',
+            showTagGLCodeSubtitle: 'Exibir o código contábil de cada tag ao lado do nome ao selecionar uma tag.',
         },
         taxes: {
             subtitle: 'Adicione nomes de impostos, taxas e defina padrões.',

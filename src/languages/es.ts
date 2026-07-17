@@ -6205,6 +6205,8 @@ ${amount} para ${merchant} - ${date}`,
                 one: '1 etiqueta',
                 other: (count: number) => `${count} etiquetas`,
             }),
+            showTagGLCode: 'Mostrar códigos GL de etiquetas',
+            showTagGLCodeSubtitle: 'Muestra el código de contabilidad de cada etiqueta junto a su nombre al seleccionar una etiqueta.',
         },
         taxes: {
             subtitle: 'Añade nombres, tasas y establezca valores por defecto para los impuestos.',
