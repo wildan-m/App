@@ -6433,7 +6433,7 @@ function navigateBackOnDeleteTransaction(backRoute: Route | undefined) {
     }
     Navigation.dismissToSuperWideRHP();
     Navigation.isNavigationReady().then(() => {
-        Navigation.goBack(backRoute);
+        Navigation.goBack(backRoute, {compareParams: false});
     });
 }
 
