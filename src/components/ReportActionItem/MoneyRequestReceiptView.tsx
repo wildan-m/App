@@ -525,6 +525,26 @@ function MoneyRequestReceiptView({
         }
     };
 
+    const deleteExpenseFromReceiptError = () => {
+        if (!report?.reportID || !parentReportAction) {
+            return;
+        }
+        const backToRoute = routeBackTo ?? Navigation.getActiveRoute();
+        setDeleteTransactionNavigateBackUrl(backToRoute);
+        cleanUpMoneyRequest(
+            transaction?.transactionID ?? linkedTransactionID,
+            parentReportAction,
+            report.reportID,
+            parentReportActionChildReport,
+            iouReport,
+            chatIOUReport,
+            isChatIOUReportArchived,
+            originalReportID,
+            true,
+            policy,
+        );
+    };
+
     let receiptStyle: StyleProp<ViewStyle>;
 
     if (fillSpace && shouldShowReceiptEmptyState) {
@@ -641,6 +661,7 @@ function MoneyRequestReceiptView({
                         });
                     }}
                     dismissError={dismissReceiptError}
+                    onDeleteExpense={deleteExpenseFromReceiptError}
                     style={[shouldShowAuditMessage ? styles.mt3 : styles.mv3, !showReceiptErrorWithEmptyState && styles.flex1]}
                     contentContainerStyle={styles.flex1}
                 >

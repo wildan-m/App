@@ -46,9 +46,12 @@ type DotIndicatorMessageProps = {
 
     /** A function to dismiss error */
     dismissError?: () => void;
+
+    /** A function to delete the expense tied to a receipt-upload error */
+    onDeleteExpense?: () => void;
 };
 
-function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissError = () => {}}: DotIndicatorMessageProps) {
+function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissError = () => {}, onDeleteExpense}: DotIndicatorMessageProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -150,7 +153,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
                     small
                     danger
                     text={translate('iou.deleteExpense', {count: 1})}
-                    onPress={dismissError}
+                    onPress={onDeleteExpense ?? dismissError}
                 />
             </View>
         );
