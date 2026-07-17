@@ -6392,7 +6392,7 @@ function navigateToDetailsPage(report: OnyxEntry<Report>) {
     }
 
     if (report?.reportID) {
-        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REPORT_DETAILS.path));
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REPORT_DETAILS.path, ROUTES.REPORT_WITH_ID.getRoute(report.reportID)));
     }
 }
 
