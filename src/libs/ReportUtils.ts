@@ -2877,7 +2877,7 @@ function isPayer(
     }
 
     // Personal workspaces and IOU reports fall back to admin or report manager.
-    return isAdmin || (isMoneyRequestReport(iouReport) && isManager);
+    return (isAdmin && !isIOUReport(iouReport)) || (isMoneyRequestReport(iouReport) && isManager);
 }
 
 /**
