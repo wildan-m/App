@@ -2473,6 +2473,18 @@ function findLastAccessedReport(
     // If we have no visit data we'll return most recent report owned by user.
     if (isEmptyObject(allReportLastVisitTimes)) {
         const visibleReports = reportsValues.filter((report) => !!report?.isPinned || !isHiddenForCurrentUser(report) || (isPublicRoom(report) && isAnonymousUserSession()));
+        // Pick the most recently read report across all visible reports so a DM the user was just in
+        // (which has the freshest lastReadTime) is restored, rather than a report the current user
+        // happens to own (e.g. Concierge or the self DM). This mirrors what getMostRecentlyVisitedReport
+        // returns once the visit-times map has loaded, so the reload result is consistent either way.
+        const mostRecentlyReadVisibleReport = lodashMaxBy(
+            visibleReports.filter((report) => !!report?.lastReadTime),
+            (a) => a?.lastReadTime ?? '',
+        );
+        if (mostRecentlyReadVisibleReport) {
+            return mostRecentlyReadVisibleReport;
+        }
+        // No visible report has a lastReadTime — fall back to the most recent report owned by the user.
         const ownedReports = visibleReports.filter((report) => report?.ownerAccountID === deprecatedCurrentUserAccountID);
         if (ownedReports.length > 0) {
             return lodashMaxBy(ownedReports, (a) => a?.lastReadTime ?? '');
