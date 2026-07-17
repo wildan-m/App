@@ -20,14 +20,15 @@ import {
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Policy, Report, ReportAction, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {Policy, Report, ReportAction, SearchResults, Transaction, TransactionViolations} from '@src/types/onyx';
 import type {SplitExpense} from '@src/types/onyx/IOU';
 
-import type {OnyxCollection} from 'react-native-onyx';
+import type {OnyxCollection, OnyxKey, OnyxUpdate} from 'react-native-onyx';
 
 import {isTrackIntentUserSelector} from '@selectors/Onboarding';
 import passthroughPolicyTagListSelector from '@selectors/PolicyTagList';
 import {useCallback} from 'react';
+import Onyx from 'react-native-onyx';
 
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useDelegateAccountID from './useDelegateAccountID';
@@ -57,6 +58,55 @@ type DeleteTransactionsResult =
           action: 'deleted';
           deletedTransactionThreadReportIDs: string[];
       };
+
+/**
+ * Builds the Onyx cleanup for original ("parent") split transactions whose last remaining split children are being
+ * deleted. When every child split of an original is removed, the original is left stranded at
+ * `reportID = CONST.REPORT.SPLIT_REPORT_ID` with no children referencing it and with its IOU action already gone from
+ * the split creation. Without this cleanup it resurfaces in the Expenses list as an orphaned "Unreported" expense that
+ * can neither be opened nor deleted. Here we remove that original from the transaction collection and from every search
+ * snapshot that still references it so it disappears alongside its deleted splits.
+ */
+function getOrphanedOriginalTransactionsCleanupOnyxData(
+    orphanedOriginalTransactionIDs: string[],
+    allTransactions: OnyxCollection<Transaction>,
+    allSnapshots: OnyxCollection<SearchResults>,
+): Array<OnyxUpdate<OnyxKey>> {
+    const optimisticData: Array<OnyxUpdate<OnyxKey>> = [];
+
+    for (const originalTransactionID of orphanedOriginalTransactionIDs) {
+        const originalTransactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}` as const;
+        const originalTransaction = allTransactions?.[originalTransactionKey];
+        if (!originalTransaction) {
+            continue;
+        }
+
+        // Remove the orphaned original from the transaction collection so it no longer surfaces in the Expenses list.
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: originalTransactionKey,
+            value: null,
+        });
+
+        // Drop the original from any search snapshots that still reference it, mirroring how the split flow prunes
+        // stale transactions from snapshots so search results don't show the deleted expense.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object.entries widens the snapshot collection key to `string`; it is a snapshot collection key here.
+        const snapshotEntries = Object.entries(allSnapshots ?? {}) as Array<[`${typeof ONYXKEYS.COLLECTION.SNAPSHOT}${string}`, SearchResults | undefined]>;
+        for (const [snapshotKey, snapshot] of snapshotEntries) {
+            const snapshotData = snapshot?.data;
+            if (!snapshotData || !Object.hasOwn(snapshotData, originalTransactionKey)) {
+                continue;
+            }
+            optimisticData.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: snapshotKey,
+                value: {data: {[originalTransactionKey]: null}},
+            });
+        }
+    }
+
+    return optimisticData;
+}
 
 function redistributeRemainingPerDiemSplitExpenses(splitExpenses: SplitExpense[], total: number, currency: string): SplitExpense[] {
     const lastSplitIndex = splitExpenses.length - 1;
@@ -209,6 +259,7 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
             }));
             const deletedTransactionIDs: string[] = [];
             const deletedTransactionThreadReportIDs = new Set<string>();
+            const orphanedOriginalTransactionIDs: string[] = [];
             const {splitTransactionsByOriginalTransactionID, nonSplitTransactions} = transactionsWithActions.reduce(
                 (acc, item) => {
                     const {transaction} = item;
@@ -244,6 +295,10 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
 
                 if (childTransactions.length === 0) {
                     nonSplitTransactions.push(...splitTransactionsByOriginalTransactionID[transactionID]);
+                    // All child splits of this original are being deleted, so the original parent transaction is left
+                    // orphaned at CONST.REPORT.SPLIT_REPORT_ID with no children and no IOU action. Record it so it is
+                    // cleaned up below instead of resurfacing as an undeletable "Unreported" expense.
+                    orphanedOriginalTransactionIDs.push(transactionID);
                     continue;
                 }
                 const originalTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
@@ -362,6 +417,13 @@ function useDeleteTransactions({report, reportActions, policy}: UseDeleteTransac
                 deletedTransactionIDs.push(transactionID);
                 if (action.childReportID) {
                     deletedTransactionThreadReportIDs.add(action.childReportID);
+                }
+            }
+
+            if (orphanedOriginalTransactionIDs.length > 0) {
+                const orphanedOriginalCleanupData = getOrphanedOriginalTransactionsCleanupOnyxData(orphanedOriginalTransactionIDs, allTransactions, allSnapshots);
+                if (orphanedOriginalCleanupData.length > 0) {
+                    Onyx.update(orphanedOriginalCleanupData);
                 }
             }
 
