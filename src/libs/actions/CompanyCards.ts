@@ -455,7 +455,7 @@ function assignWorkspaceCompanyCard(
     if (!policy?.id) {
         return;
     }
-    const {bankName, email = '', encryptedCardNumber = '', startDate = '', customCardName = ''} = data;
+    const {bankName, email = '', encryptedCardNumber = '', startDate = '', customCardName = '', cardName = ''} = data;
     const assigneeDetails = PersonalDetailsUtils.getPersonalDetailByEmail(email);
     const optimisticCardAssignedReportAction = ReportUtils.buildOptimisticCardAssignedReportAction(assigneeDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID, currentUserAccountID);
 
@@ -471,7 +471,11 @@ function assignWorkspaceCompanyCard(
     };
     const policyExpenseChat = ReportUtils.getPolicyExpenseChat(policy.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID, policy.id);
 
-    const onyxData: OnyxData<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.ASSIGN_CARD> = {
+    // The card identifier used by getFilteredCardList's cross-workspace de-duplication. For direct
+    // (Plaid/OAuth) feeds the assigned card's name equals the encrypted card number/identifier.
+    const assignedCardName = cardName || encryptedCardNumber;
+
+    const onyxData: OnyxData<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.ASSIGN_CARD | typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST> = {
         optimisticData: [
             {
                 onyxMethod: Onyx.METHOD.MERGE,
@@ -484,6 +488,21 @@ function assignWorkspaceCompanyCard(
                 onyxMethod: Onyx.METHOD.MERGE,
                 key: ONYXKEYS.ASSIGN_CARD,
                 value: {isAssigning: true},
+            },
+            // Optimistically add the just-assigned card to the source workspace's card list so
+            // getFilteredCardList immediately treats it as assigned and filters it out when the same
+            // feed is opened for a second workspace (mirrors what unassignWorkspaceCompanyCard does in
+            // reverse). Keyed by the card identifier until the server refresh replaces it with the real card.
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainOrWorkspaceAccountID}_${bankName}`,
+                value: {
+                    [assignedCardName]: {
+                        cardName: assignedCardName,
+                        bank: bankName,
+                        pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                    },
+                },
             },
         ],
         successData: [
@@ -511,6 +530,14 @@ function assignWorkspaceCompanyCard(
                         pendingAction: null,
                         errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
                     },
+                },
+            },
+            // Roll back the optimistic assigned-card entry if the assignment request fails.
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainOrWorkspaceAccountID}_${bankName}`,
+                value: {
+                    [assignedCardName]: null,
                 },
             },
         ],
