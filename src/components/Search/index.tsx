@@ -436,6 +436,45 @@ function Search({
         });
     }, [filteredDataLength, handleSearch, offset, queryJSON, currentSearchKey, searchResults?.search?.count, searchResults?.search?.isLoading, shouldCalculateTotals, validGroupBy]);
 
+    // Saving an ad-hoc search flips `shouldCalculateTotals` to true while the Search page is unfocused
+    // (the Save screen is on top), so the totals effect above hits its `!isFocused` early return and
+    // never requests the server-computed count/total. `isFocused` is intentionally excluded from that
+    // effect's deps, so returning to the Search page won't re-run it. Re-request the totals on focus
+    // when they're still needed but missing, so the footer's count/Total spend appear without having to
+    // navigate away and back. Guarded on `count === undefined` so it fires at most once and does nothing
+    // on ordinary focus changes; the in-flight dedupe in `search()` covers any overlap.
+    useFocusEffect(
+        useCallback(() => {
+            if (isOffline || shouldUseLiveData || !isDataLoaded || hasErrors) {
+                return;
+            }
+            if (searchResults?.search?.isLoading || !shouldCalculateTotals || searchResults?.search?.count !== undefined) {
+                return;
+            }
+            handleSearch({
+                queryJSON,
+                searchKey: currentSearchKey,
+                offset,
+                shouldCalculateTotals: true,
+                prevReportsLength: filteredDataLength,
+                isLoading: false,
+            });
+        }, [
+            isOffline,
+            shouldUseLiveData,
+            isDataLoaded,
+            hasErrors,
+            searchResults?.search?.isLoading,
+            searchResults?.search?.count,
+            shouldCalculateTotals,
+            handleSearch,
+            queryJSON,
+            currentSearchKey,
+            offset,
+            filteredDataLength,
+        ]),
+    );
+
     useEffect(() => {
         if (!isSearchResultsEmpty || prevIsSearchResultEmpty) {
             return;
