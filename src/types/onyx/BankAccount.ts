@@ -40,6 +40,12 @@ type BankAccountAdditionalData = {
         achAuthorizationForm?: FileObject[];
     };
 
+    /** Statuses of the verifications performed on the bank account */
+    verifications?: {
+        /** Whether the bank account is enabled for Corpay global reimbursements */
+        corpay?: boolean;
+    };
+
     /** First name of the bank account owner (OldDot field name) */
     firstName?: string;
 
