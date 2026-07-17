@@ -8,6 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSubmitToDestinationVisible from '@hooks/useSubmitToDestinationVisible';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useViewportOffsetBottom from '@hooks/useViewportOffsetBottom';
 import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
 
 import {removeFailedReport} from '@libs/actions/Report';
@@ -78,6 +79,7 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     const {isInNarrowPaneModal} = useResponsiveLayout();
     const {currentReportID: currentReportIDValue} = useCurrentReportIDState();
     const viewportOffsetTop = useViewportOffsetTop();
+    const viewportOffsetBottom = useViewportOffsetBottom();
     const isTopMostReportId = currentReportIDValue === reportIDFromRoute;
     const screenWrapperStyle: ViewStyle[] = [styles.appContent, styles.flex1, {marginTop: viewportOffsetTop}];
 
@@ -148,7 +150,7 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                                                 <AgentZeroStatusProvider reportID={reportIDFromRoute}>
                                                     <ConciergeDraftProvider reportID={reportIDFromRoute}>
                                                         <View
-                                                            style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
+                                                            style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden, {paddingBottom: viewportOffsetBottom}]}
                                                             testID="report-actions-view-wrapper"
                                                         >
                                                             <ReportActions />
