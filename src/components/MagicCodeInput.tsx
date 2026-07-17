@@ -195,12 +195,14 @@ function MagicCodeInput({
     }, [value]);
 
     useEffect(() => {
-        // Reset wasSubmitted when code becomes incomplete to allow retry attempts and fix issue where wasSubmitted didn't update on Android
-        if (value.length >= maxLength) {
+        // Reset wasSubmitted when code becomes incomplete to allow retry attempts and fix issue where wasSubmitted didn't update on Android.
+        // Empty cells are stored as a space (MAGIC_CODE_EMPTY_CHAR), so value.length stays at maxLength even after a cell is cleared.
+        // Count the actually-filled numeric cells instead, so editing an already-complete code re-arms auto-submit.
+        if (decomposeString(value, maxLength).filter((n) => isNumeric(n)).length >= maxLength) {
             return;
         }
         setWasSubmitted(false);
-    }, [value.length, maxLength]);
+    }, [value, maxLength]);
 
     const blurMagicCodeInput = () => {
         inputRef.current?.blur();
