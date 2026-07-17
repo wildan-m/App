@@ -8,7 +8,7 @@ import useCardsLists from '@hooks/useCardsLists';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
-import {areCardsCustomExportInErrorFields, getCardsCustomExportPendingAction, getCardsUsingCustomExportCount} from '@libs/CardFeedUtils';
+import {areCardsCustomExportInErrorFields, findMatchingCards, getCardsCustomExportPendingAction, getCardsUsingCustomExportCount} from '@libs/CardFeedUtils';
 import {getCardFeedWithDomainID, getCustomOrFormattedFeedName} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
 
@@ -32,6 +32,7 @@ function RilletCardAccount({policy}: WithPolicyConnectionsProps) {
     const creditCardAccountCode = rilletConfig?.export?.creditCardAccountCode;
     const cardProgramsUsingCustomAccounts = rilletConfig?.export?.cardProgramAccounts;
     const cardsUsingCustomAccountsCount = getCardsUsingCustomExportCount(cardFeeds ?? {}, cardLists, CONST.COMPANY_CARDS.EXPORT_CARD_TYPES.NVP_RILLET_EXPORT_ACCOUNT);
+    const feedsWithAssignedCards = Object.values(cardFeeds ?? {}).filter((cardFeed) => findMatchingCards(cardFeeds ?? {}, cardLists, cardFeed.feed).length > 0);
 
     return (
         <ConnectionLayout
@@ -48,7 +49,7 @@ function RilletCardAccount({policy}: WithPolicyConnectionsProps) {
             <View>
                 <Text style={[styles.ph5, styles.pb5]}>{translate('workspace.rillet.cardAccount.description')}</Text>
             </View>
-            {Object.values(cardFeeds ?? {}).map((cardFeed) => {
+            {feedsWithAssignedCards.map((cardFeed) => {
                 const feedKey = cardFeed.feed;
                 const feedName = getCustomOrFormattedFeedName(translate, feedKey, cardFeed.customFeedName, false);
                 const feedDomainID = cardFeed.domainID ?? CONST.DEFAULT_MISSING_ID;
