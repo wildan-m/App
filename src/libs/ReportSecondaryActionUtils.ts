@@ -16,6 +16,8 @@ import type {
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
+import {fromZonedTime} from 'date-fns-tz';
+
 import {areTransactionsEligibleForMerge} from './MergeTransactionUtils';
 import {
     arePaymentsEnabled as arePaymentsEnabledUtils,
@@ -448,7 +450,7 @@ function isCancelPaymentAction(
 
     const hasDailyNachaCutoffPassed = payActions.some((action) => {
         const now = new Date();
-        const paymentDatetime = new Date(action.created);
+        const paymentDatetime = fromZonedTime(action.created, 'UTC');
         const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()));
         const cutoffTimeUTC = new Date(Date.UTC(paymentDatetime.getUTCFullYear(), paymentDatetime.getUTCMonth(), paymentDatetime.getUTCDate(), 23, 45, 0));
         return nowUTC.getTime() > cutoffTimeUTC.getTime();
