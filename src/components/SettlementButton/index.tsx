@@ -667,6 +667,12 @@ function SettlementButton({
     const shouldLimitWidth = shouldUseShortForm && shouldUseSplitButton && !paymentButtonOptions.length;
     const popoverUseScrollView = shouldPopoverUseScrollView(paymentButtonOptions);
 
+    // An empty options array means there is no payment this button can dispatch, so pressing it is a silent no-op.
+    // This happens on a fresh Search Reports-list load before the live REPORT/POLICY/BANK_ACCOUNT_LIST collections
+    // hydrate: every branch that builds an option collapses to false, so the button paints as an enabled "Pay" that
+    // does nothing when clicked. Disable it until at least one option resolves so a click can never land in the dead window.
+    const hasNoPaymentOptions = paymentButtonOptions.length === 0;
+
     return (
         <KYCWall
             ref={kycWallRef}
@@ -691,7 +697,7 @@ function SettlementButton({
                     customText={customText}
                     menuHeaderText={isInvoiceReport ? translate('workspace.invoices.paymentMethods.chooseInvoiceMethod') : undefined}
                     isSplitButton={shouldUseSplitButton}
-                    isDisabled={isDisabled}
+                    isDisabled={isDisabled || hasNoPaymentOptions}
                     stayNormalOnDisable={stayNormalOnDisable}
                     isLoading={isLoading}
                     defaultSelectedIndex={defaultSelectedIndex !== -1 ? defaultSelectedIndex : 0}
