@@ -1052,6 +1052,17 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
         );
     }
 
+    // Mirror the successData reset above: on failure the new chat's metadata must also leave the optimistic state. Otherwise isOptimisticReport stays true, fetchReport keeps early-returning for the chat, and the report is stuck on the loading skeleton instead of surfacing the createChat error.
+    if (isNewChatReport && !isSelfDMSplit) {
+        onyxData.failureData?.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT_METADATA}${chat.report?.reportID}`,
+            value: {
+                isOptimisticReport: false,
+            },
+        });
+    }
+
     if (shouldGenerateTransactionThreadReport) {
         onyxData.failureData?.push({
             onyxMethod: Onyx.METHOD.MERGE,
