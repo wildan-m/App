@@ -95,11 +95,19 @@ function startOnboardingFlow(startOnboardingFlowParams: GetOnboardingInitialPath
     }
     const rootState = navigationRef.getRootState();
     const rootStateRouteNamesSet = new Set(rootState.routes.map((route) => route.name));
+    const routes = [...rootState.routes, ...(adaptedState?.routes.filter((route) => !rootStateRouteNamesSet.has(route.name)) ?? [])];
+
+    // The index spread from adaptedState addresses adaptedState.routes, not the merged array above, so it only
+    // focuses the onboarding navigator when rootState happens to hold exactly adaptedState.index routes.
+    const targetRouteName = adaptedState?.routes.at(adaptedState?.index ?? -1)?.name;
+    const targetIndex = routes.findIndex((route) => route.name === targetRouteName);
+
     navigationRef.resetRoot({
         ...rootState,
         ...adaptedState,
         stale: true,
-        routes: [...rootState.routes, ...(adaptedState?.routes.filter((route) => !rootStateRouteNamesSet.has(route.name)) ?? [])],
+        routes,
+        index: targetIndex === -1 ? routes.length - 1 : targetIndex,
     } as PartialState<NavigationState>);
 }
 
