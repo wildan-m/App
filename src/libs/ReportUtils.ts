@@ -5917,10 +5917,12 @@ function getModifiedExpenseOriginalMessage(
         originalMessage.tag = transactionChanges?.tag;
     }
 
-    // We only want to display a tax rate update system message when tax rate is updated by user.
-    // Tax rate can change as a result of currency update. In such cases, we want to skip displaying a system message, as discussed.
+    // We only want to display a tax rate update system message when the tax rate actually changes.
+    // A currency update switches the tax code to the policy's default for the new currency, which can reset the
+    // rate, so that change is surfaced too. A change that keeps the same tax code produces no redundant message.
     const didTaxCodeChange = 'taxCode' in transactionChanges;
-    if (didTaxCodeChange && !didAmountOrCurrencyChange) {
+    const didTaxRateChange = didTaxCodeChange && (transactionChanges?.taxCode ?? '') !== getTaxCode(oldTransaction);
+    if (didTaxRateChange) {
         originalMessage.oldTaxRate = policy?.taxRates?.taxes[getTaxCode(oldTransaction)]?.value;
         originalMessage.taxRate = transactionChanges?.taxCode && policy?.taxRates?.taxes[transactionChanges?.taxCode]?.value;
     }
