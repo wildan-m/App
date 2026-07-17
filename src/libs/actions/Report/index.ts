@@ -162,6 +162,7 @@ import {
     isReportManuallyReimbursed,
     isReportNotFound,
     isSelfDM,
+    isTaskReport as isTaskReportReportUtils,
     isValidReportIDFromPath,
     prepareOnboardingOnyxData,
 } from '@libs/ReportUtils';
@@ -4890,6 +4891,10 @@ function leaveRoom(
 ) {
     const reportID = report.reportID;
     const isChatThread = isChatThreadReportUtils(report);
+    // A task report is a thread but has type TASK (not CHAT), so isChatThread is false for it.
+    // Treat it like a chat thread so leaving only hides the report instead of nulling it out,
+    // which otherwise leaves the report screen showing the "Not here" not-found page.
+    const isTaskReport = isTaskReportReportUtils(report);
     const activeRoute = Navigation.getActiveRoute();
 
     // Pusher's leavingStatus should be sent earlier.
@@ -4905,7 +4910,7 @@ function leaveRoom(
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
             value:
-                isWorkspaceMemberLeavingWorkspaceRoom || isChatThread
+                isWorkspaceMemberLeavingWorkspaceRoom || isChatThread || isTaskReport
                     ? {
                           participants: {
                               [currentUserAccountID]: {
@@ -4927,7 +4932,7 @@ function leaveRoom(
     ];
 
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [];
-    if (isWorkspaceMemberLeavingWorkspaceRoom || isChatThread) {
+    if (isWorkspaceMemberLeavingWorkspaceRoom || isChatThread || isTaskReport) {
         successData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
