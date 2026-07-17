@@ -79,6 +79,11 @@ function BaseOnboardingWorkEmailValidation({shouldUseNativeStyles}: BaseOnboardi
     };
 
     const validateAccountAndMerge = (validateCode: string) => {
+        // A merge rotates the auth token, so a second request sent with the old token gets the user logged out by the auth middleware.
+        // The Verify button is already blocked while the request is in flight, but the magic code auto-submit can reach this directly.
+        if (isValidateCodeFormSubmitting) {
+            return;
+        }
         setOnboardingErrorMessage(null);
         MergeIntoAccountAndLogin(workEmail, validateCode, session?.accountID);
     };

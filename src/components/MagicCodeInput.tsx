@@ -176,7 +176,9 @@ function MagicCodeInput({
     const [input, setInput] = useState(TEXT_INPUT_EMPTY_STATE);
     const [focusedIndex, setFocusedIndex] = useState<number | undefined>(autoFocus ? 0 : undefined);
     const editIndex = useRef(0);
-    const [wasSubmitted, setWasSubmitted] = useState(false);
+    // This is a ref rather than state so that it updates synchronously: two value changes can land before a state update commits,
+    // which would let the same code be submitted twice.
+    const wasSubmitted = useRef(false);
     const shouldFocusLast = useRef(false);
     const inputWidth = useRef(0);
     const lastFocusedIndex = useRef(0);
@@ -199,7 +201,7 @@ function MagicCodeInput({
         if (value.length >= maxLength) {
             return;
         }
-        setWasSubmitted(false);
+        wasSubmitted.current = false;
     }, [value.length, maxLength]);
 
     const blurMagicCodeInput = () => {
@@ -249,12 +251,10 @@ function MagicCodeInput({
     const validateAndSubmit = () => {
         const numbers = decomposeString(value, maxLength);
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        if (wasSubmitted || !shouldSubmitOnComplete || numbers.filter((n) => isNumeric(n)).length !== maxLength || isOffline) {
+        if (wasSubmitted.current || !shouldSubmitOnComplete || numbers.filter((n) => isNumeric(n)).length !== maxLength || isOffline) {
             return;
         }
-        if (!wasSubmitted) {
-            setWasSubmitted(true);
-        }
+        wasSubmitted.current = true;
         // Blurs the input and removes focus from the last input and, if it should submit
         // on complete, it will call the onFulfill callback.
         blurMagicCodeInput();
