@@ -41,6 +41,26 @@ function mergePolicyWithSearchSnapshot(onyxPolicy: OnyxEntry<Policy>, snapshotPo
     };
 }
 
+// Both Onyx and snapshot data can be stale, merging them to maintain freshness.
+// The search snapshot copy of a CSV-imported card can carry a `bank` that is not 'upload' (a known
+// search snapshot inconsistency), which makes isFromCreditCardImport misclassify it as a real card. Keep
+// the authoritative `bank` from the live Onyx transaction so the CSV import is still recognized.
+function mergeTransactionWithSearchSnapshot(onyxTransaction: OnyxEntry<Transaction>, snapshotTransaction: OnyxEntry<Transaction>) {
+    if (!snapshotTransaction) {
+        return onyxTransaction;
+    }
+
+    if (!onyxTransaction) {
+        return snapshotTransaction;
+    }
+
+    return {
+        ...onyxTransaction,
+        ...snapshotTransaction,
+        bank: onyxTransaction.bank ?? snapshotTransaction.bank,
+    };
+}
+
 function getTransaction(
     mergeTransaction: MergeTransaction | undefined,
     transactionID: string | undefined,
@@ -56,7 +76,8 @@ function getTransaction(
         return transaction;
     }
 
-    return currentSearchResults?.data[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`] ?? onyxTransaction;
+    const snapshotTransaction = currentSearchResults?.data[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+    return mergeTransactionWithSearchSnapshot(onyxTransaction, snapshotTransaction);
 }
 
 function useMergeTransactions({mergeTransaction}: UseMergeTransactionsProps): UseMergeTransactionsReturn {
