@@ -29,8 +29,9 @@ function setSpreadsheetData(
         return Promise.reject(new Error('Invalid data format: first row is empty or not an array'));
     }
 
-    // Require at least 2 rows (header + data) for most imports
-    if (data.length < 2) {
+    // Require at least 2 rows (header + data) for most imports.
+    // The multi-level tags import can legitimately parse to a single row, so skip this check for it.
+    if (!isImportingMultiLevelTags && data.length < 2) {
         return Promise.reject(new Error('Invalid data format: file must contain at least 2 rows'));
     }
 
