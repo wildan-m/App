@@ -33,11 +33,12 @@ import {requestMoney, trackExpense} from '@libs/actions/IOU/TrackExpense';
 import type {GPSPoint as GpsPoint} from '@libs/actions/IOU/types/TrackExpenseTransactionParams';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
-import {getFileName, readFileAsync} from '@libs/fileDownload/FileUtils';
+import {cleanFileName, getFileName, readFileAsync} from '@libs/fileDownload/FileUtils';
 import getCurrentPosition from '@libs/getCurrentPosition';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getExistingTransactionID, resolveReportForMoneyRequest} from '@libs/IOUUtils';
 import Log from '@libs/Log';
+import moveReceiptToDurableStorage from '@libs/moveReceiptToDurableStorage';
 import cleanupAndNavigateAfterExpenseCreate from '@libs/Navigation/helpers/cleanupAndNavigateAfterExpenseCreate';
 import Navigation from '@libs/Navigation/Navigation';
 import type {ShareNavigatorParamList} from '@libs/Navigation/types';
@@ -69,6 +70,32 @@ import {View} from 'react-native';
 
 import {showErrorAlert} from './ShareRootPage';
 import useShareFileSizeValidation from './useShareFileSizeValidation';
+
+/**
+ * Moves a receipt into durable storage and returns the URI to record on the expense, so it keeps resolving
+ * once the share extension erases its folder — which it does at the start of every new share.
+ *
+ * The extension reports its file:// URIs percent-encoded, but the move works on on-disk paths, so the URI is
+ * decoded first; without that the move silently fails for any name holding an encoded character and we would
+ * keep the doomed path. The durable copy is given a sanitized name — the one the upload uses anyway — so the
+ * URI handed back stays safe to read without re-encoding. When the move can't happen the original URI comes
+ * back untouched, which is today's behavior.
+ */
+function getDurableReceiptSource(sourceUri: string, fileName: string): Promise<string> {
+    let decodedSource: string;
+    try {
+        decodedSource = decodeURIComponent(sourceUri);
+    } catch {
+        decodedSource = sourceUri;
+    }
+
+    return moveReceiptToDurableStorage(decodedSource, cleanFileName(fileName))
+        .then((durableSource) => (durableSource === decodedSource ? sourceUri : durableSource))
+        .catch((error: unknown) => {
+            Log.warn('[SubmitDetailsPage] Failed to move receipt to durable storage, using original URI', {error});
+            return sourceUri;
+        });
+}
 
 type ShareDetailsPageProps = StackScreenProps<ShareNavigatorParamList, typeof SCREENS.SHARE.SUBMIT_DETAILS>;
 function SubmitDetailsPage({
@@ -414,17 +441,23 @@ function SubmitDetailsPage({
             return;
         }
         formHasBeenSubmitted.current = true;
-        readFileAsync(
-            currentReceiptSource,
-            currentReceiptName,
-            (file) => onSuccess(file, locationPermissionGranted),
-            () => {
-                // Allow retry after a file-read failure.
-                formHasBeenSubmitted.current = false;
-                setIsConfirming(false);
-            },
-            currentReceiptType,
-        );
+
+        // readFileAsync stamps the path it reads onto the receipt as `source`/`uri`, and that is what the created
+        // expense keeps pointing at, so the receipt has to be in durable storage before it is read — otherwise it
+        // still lives in the share extension's folder, which the next share erases.
+        getDurableReceiptSource(currentReceiptSource, currentReceiptName).then((durableSource) => {
+            readFileAsync(
+                durableSource,
+                currentReceiptName,
+                (file) => onSuccess(file, locationPermissionGranted),
+                () => {
+                    // Allow retry after a file-read failure.
+                    formHasBeenSubmitted.current = false;
+                    setIsConfirming(false);
+                },
+                currentReceiptType,
+            );
+        });
     };
 
     const onConfirm = (gpsRequired?: boolean) => {
