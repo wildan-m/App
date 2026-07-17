@@ -201,7 +201,7 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
             return;
         }
 
-        if (isEnded && currentTime >= duration) {
+        if (isEnded || (duration > 0 && currentTime >= duration)) {
             allowSharedAutoPlayRef.current = true;
             replayVideo();
             return;
