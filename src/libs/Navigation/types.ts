@@ -2431,6 +2431,9 @@ type SplitDetailsNavigatorParamList = {
     [SCREENS.SPLIT_DETAILS.DYNAMIC_ROOT]: {
         reportID: string;
         reportActionID: string;
+
+        /** The ID of the report that owns the split action, used when it differs from the viewed report (e.g. merged single-transaction reports) */
+        actionReportID?: string;
     };
     [SCREENS.SPLIT_DETAILS.EDIT_REQUEST]: {
         field: string;

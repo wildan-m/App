@@ -49,11 +49,16 @@ type WithReportOrNotFoundImplProps<TProps extends WithReportAndReportActionOrNot
 function WithReportOrNotFoundImpl<TProps extends WithReportAndReportActionOrNotFoundProps>({WrappedComponent, ...props}: WithReportOrNotFoundImplProps<TProps>) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${props.route.params.reportID}`);
 
+    // When the split action is looked up from a merged single-transaction report, the action is stored under a
+    // different report than the one being viewed. `actionReportID` (when provided) points at the report that owns
+    // the action so it can be resolved; it defaults to the viewed report so all other flows are unchanged.
+    const actionReportID = ('actionReportID' in props.route.params ? props.route.params.actionReportID : undefined) ?? props.route.params.reportID;
+
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [reportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${props.route.params.reportID}`);
     const [isLoadingReportData] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${props.route.params.reportID}`);
+    const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${actionReportID}`);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
 
     const parentReportAction = useParentReportAction(report);

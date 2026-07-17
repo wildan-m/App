@@ -1052,7 +1052,7 @@ const DYNAMIC_ROUTES = {
     SPLIT_BILL_DETAILS: {
         path: 'split/:reportActionID',
         entryScreens: [SCREENS.REPORT, SCREENS.RIGHT_MODAL.SEARCH_REPORT, SCREENS.RIGHT_MODAL.EXPENSE_REPORT, SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT],
-        getRoute: (reportActionID: string) => `split/${reportActionID}` as const,
+        getRoute: (reportActionID: string, actionReportID?: string) => `split/${reportActionID}${actionReportID ? `?actionReportID=${actionReportID}` : ''}` as const,
     },
     TASK_ASSIGNEE: {
         path: 'assignee',

@@ -29,6 +29,9 @@ type ChatTransactionPreviewProps = {
     /** The ID of the current report where the preview is rendered */
     reportID: string | undefined;
 
+    /** The ID of the report that owns this action (differs from reportID when reportActions are merged, e.g. a single-transaction report) */
+    actionOwnerReportID: string | undefined;
+
     /** The chat report that owns the transaction */
     chatReport: OnyxEntry<OnyxTypes.Report>;
 
@@ -42,7 +45,7 @@ type ChatTransactionPreviewProps = {
     transactionID: string | undefined;
 };
 
-function ChatTransactionPreview({action, reportID, chatReport, iouReport, shouldShowSplitPreview, transactionID}: ChatTransactionPreviewProps) {
+function ChatTransactionPreview({action, reportID, actionOwnerReportID, chatReport, iouReport, shouldShowSplitPreview, transactionID}: ChatTransactionPreviewProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -65,7 +68,11 @@ function ChatTransactionPreview({action, reportID, chatReport, iouReport, should
                 transactionPreviewWidth={reportPreviewStyles.transactionPreviewStandaloneStyle.width}
                 onPreviewPressed={() => {
                     if (shouldShowSplitPreview) {
-                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.getRoute(action.reportActionID)));
+                        // When the split action is owned by a different report than the one being viewed (merged
+                        // single-transaction reports), pass that owner report ID so the split details screen looks
+                        // the action up in the correct report instead of showing the Not Found page.
+                        const splitActionReportID = actionOwnerReportID && actionOwnerReportID !== reportID ? actionOwnerReportID : undefined;
+                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.getRoute(action.reportActionID, splitActionReportID)));
                         return;
                     }
 
