@@ -185,6 +185,18 @@ function isOdometerDistanceRequest(transaction: OnyxEntry<Transaction>): boolean
 }
 
 /**
+ * Returns the manually entered odometer start/end readings for an odometer distance expense, or `undefined`
+ * for any other transaction. Passed to `getDistanceMerchant` so a client-side merchant rebuild keeps the
+ * readings instead of collapsing the merchant to just "<distance> @ <rate>".
+ */
+function getOdometerReadings(transaction: OnyxEntry<Transaction>): {start?: number; end?: number} | undefined {
+    if (!isOdometerDistanceRequest(transaction)) {
+        return undefined;
+    }
+    return {start: transaction?.comment?.odometerStart, end: transaction?.comment?.odometerEnd};
+}
+
+/**
  * Whether a distance expense's receipt is a map/route receipt (as opposed to an odometer photo or a
  * pure manual entry that has no route). Used to decide whether the full distance e-receipt (map +
  * amount + waypoints) should be shown. A merged distance expense can be typed `distance-manual` yet
@@ -688,6 +700,7 @@ function getUpdatedTransaction({
                 (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
                 getCurrencySymbol,
                 isManualDistanceRequest(transaction),
+                getOdometerReadings(updatedTransaction),
             );
 
             updatedTransaction.amount = updatedAmount;
@@ -754,6 +767,7 @@ function getUpdatedTransaction({
                 (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
                 getCurrencySymbol,
                 isManualDistanceRequest(transaction),
+                getOdometerReadings(updatedTransaction),
             );
 
             updatedTransaction.amount = updatedAmount;
@@ -850,6 +864,7 @@ function getUpdatedTransaction({
             (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
             getCurrencySymbol,
             isManualDistanceRequest(transaction),
+            getOdometerReadings(updatedTransaction),
         );
 
         // No locally resolvable rate (e.g. track expense without policy loaded) → scale the previous
@@ -3197,6 +3212,7 @@ export {
     isGPSDistanceRequest,
     isManualDistanceRequest,
     isOdometerDistanceRequest,
+    getOdometerReadings,
     isDistanceExpenseType,
     isFetchingWaypointsFromServer,
     hasPendingDistanceReceiptRegeneration,

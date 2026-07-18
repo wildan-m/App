@@ -244,6 +244,20 @@ function getDistanceForDisplayLabel(distanceInMeters: number, unit: Unit): strin
 }
 
 /**
+ * Build the trailing "(odometer start: X, odometer end: Y)" portion that the server appends to an
+ * odometer expense's merchant string. Returns an empty string unless both readings are present, so
+ * non-odometer callers and odometer transactions with missing readings keep the plain merchant.
+ */
+function getOdometerReadingsSuffix(odometerReadings?: {start?: number; end?: number}): string {
+    const start = odometerReadings?.start;
+    const end = odometerReadings?.end;
+    if (typeof start !== 'number' || typeof end !== 'number' || Number.isNaN(start) || Number.isNaN(end)) {
+        return '';
+    }
+    return ` (odometer start: ${start}, odometer end: ${end})`;
+}
+
+/**
  * @param hasRoute Whether the route exists for the distance expense
  * @param distanceInMeters Distance traveled
  * @param unit Unit that should be used to display the distance
@@ -251,6 +265,7 @@ function getDistanceForDisplayLabel(distanceInMeters: number, unit: Unit): strin
  * @param currency The currency associated with the rate
  * @param translate Translate function
  * @param toLocaleDigit Function to convert to localized digit
+ * @param odometerReadings Manually entered odometer start/end readings; when provided they are appended so a client-side merchant rebuild keeps them
  * @returns A string that describes the distance traveled and the rate used for expense calculation
  */
 function getDistanceMerchant(
@@ -263,6 +278,7 @@ function getDistanceMerchant(
     toLocaleDigit: LocaleContextProps['toLocaleDigit'],
     getCurrencySymbol: CurrencyListActionsContextType['getCurrencySymbol'],
     isZeroDistanceAllowed?: boolean,
+    odometerReadings?: {start?: number; end?: number},
 ): string {
     if (!hasRoute || !rate) {
         return translate('iou.fieldPending');
@@ -275,7 +291,7 @@ function getDistanceMerchant(
     const distanceInUnits = getDistanceForDisplay(hasRoute, distanceInMeters, unit, rate, translate, true, isZeroDistanceAllowed);
     const ratePerUnit = getFormattedRateValue(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, undefined, true);
 
-    return `${distanceInUnits} ${CONST.DISTANCE_MERCHANT_SEPARATOR} ${ratePerUnit}`;
+    return `${distanceInUnits} ${CONST.DISTANCE_MERCHANT_SEPARATOR} ${ratePerUnit}${getOdometerReadingsSuffix(odometerReadings)}`;
 }
 
 /**

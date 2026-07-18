@@ -8,7 +8,7 @@ import {clearMoneyRequestRateAutoUpdated, setCustomUnitRateID, setMoneyRequestAm
 import {setSplitShares} from '@libs/actions/IOU/Split';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import type {MileageRate} from '@libs/DistanceRequestUtils';
-import {getCreated} from '@libs/TransactionUtils';
+import {getCreated, getOdometerReadings} from '@libs/TransactionUtils';
 
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -237,6 +237,7 @@ function DistanceRequestController({
             toLocaleDigit,
             getCurrencySymbol,
             isManualDistanceRequest,
+            getOdometerReadings(transaction),
         );
         setMoneyRequestMerchant(transactionID, distanceMerchant, true);
     }, [

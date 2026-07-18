@@ -47,6 +47,7 @@ import {
 } from '@libs/ReportUtils';
 import {
     getDistanceInMeters,
+    getOdometerReadings,
     hasPendingRTERViolation,
     hasSubmissionBlockingViolationInList,
     isDeletedTransaction,
@@ -1264,6 +1265,7 @@ function getChangeTransactionsReportOnyxData({
                             (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
                             getCurrencySymbol,
                             isManualDistanceRequest(transaction),
+                            getOdometerReadings(updatedTransaction),
                         );
 
                         optimisticValue.amount = updatedAmount;
