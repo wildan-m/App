@@ -1153,6 +1153,12 @@ const translations = {
             configureApprovals: 'Configure approval workflow',
             configureApprovalsSubText: 'Define report approvals',
             setupRules: 'Set up spend rules',
+            customizeSpendCategories: 'Customize spend categories',
+            customizeSpendCategoriesSubText: 'Organize and classify expenses',
+            createExpense: 'Create an expense',
+            createExpenseSubText: 'Scan, drag and drop, or manually enter an expense using the + button',
+            linkPersonalCard: 'Link personal card',
+            linkPersonalCardSubText: 'Import expenses automatically',
             setupRulesSubText: 'Require receipts, flag high spend, and more',
             needHelp: 'Need help?',
             talkToConcierge: 'Talk to Concierge',
@@ -1233,6 +1239,7 @@ const translations = {
 
             return added > 1 ? `${added} members have been added.` : '1 member has been added.';
         },
+        importMembersRolePermissionWarning: "You don't have permission to assign some member roles. Any affected new members were invited as members.",
         importTagsSuccessfulDescription: ({tags}: {tags: number}) => (tags > 1 ? `${tags} tags have been added.` : '1 tag has been added.'),
         importMultiLevelTagsSuccessfulDescription: 'Multi-level tags have been added.',
         importPerDiemRatesSuccessfulDescription: ({rates}: {rates: number}) => (rates > 1 ? `${rates} per diem rates have been added.` : '1 per diem rate has been added.'),
@@ -7271,8 +7278,10 @@ const translations = {
             updateToUSD: 'Update to USD',
             updateWorkspaceCurrency: 'Update workspace currency',
             workspaceCurrencyNotSupported: 'Workspace currency not supported',
+            notAllowedToAddBankAccount: 'Your workspace is set to an unsupported currency. Contact a workspace admin with permission to change it.',
             yourWorkspace: `Your workspace is set to an unsupported currency. View the <a href="${CONST.ENABLE_GLOBAL_REIMBURSEMENT_HELP_URL}">list of supported currencies</a>.`,
             chooseAnExisting: 'Choose an existing bank account to pay expenses or add a new one.',
+            changeBankAccount: 'Change bank account',
         },
         changeOwner: {
             changeOwnerPageTitle: 'Transfer owner',
@@ -7602,6 +7611,7 @@ const translations = {
                 expenseDefaults: 'Expense defaults',
                 requireFields: 'Require fields',
                 flagForReview: 'Flag for review',
+                agents: 'Agents',
             },
             bulkActions: {
                 deleteMultiple: () => ({
@@ -7786,11 +7796,13 @@ const translations = {
                 restrictCardSpend: 'Restrict card spend',
                 restrictCardSpendDescription: 'Block or limit spend at the point of sale',
                 flagForReview: 'Flag for review',
-                flagForReviewDescription: 'Notify approvers when expenses exceed category limits',
+                flagForReviewDescription: 'Notify when your conditions are met.',
                 requireFields: 'Require fields',
-                requireFieldsDescription: 'Make sure key fields are filled in before expenses are submitted',
+                requireFieldsDescription: 'Receipts, categories, etc, when submitting.',
                 applyExpenseDefaults: 'Apply expense defaults',
                 applyExpenseDefaultsDescription: 'Update fields without submitter doing anything',
+                createAgentRule: 'Agent rule',
+                createAgentRuleDescription: 'Describe flexible rules that run when you need.',
             },
             expenseDefaultsTable: {
                 tableColumnType: 'Type',
@@ -7849,6 +7861,11 @@ const translations = {
                 title: 'Surface expenses that need a closer look',
                 subtitle: 'Alert approvers when specific expenses are worth an extra review.',
                 cta: 'Create flag rule',
+            },
+            agentRulesEmptyState: {
+                title: 'No agent rules added',
+                subtitle: 'Create a rule to automate your workspace policies.',
+                cta: 'Add AI rule',
             },
             flagForReviewRule: {
                 title: 'Flag for review',
@@ -8038,19 +8055,24 @@ const translations = {
             agentRules: {
                 title: 'Agent rules',
                 subtitle: 'Set rules for how AI agents handle expenses on this workspace.',
+                revampSubtitle: 'Describe flexible rules that run when you need.',
                 enforcedBy: 'Agent rules are enforced by',
                 ruleBotName: 'RuleBot',
                 addRule: 'Add agent rule',
                 findRule: 'Find agent rule',
                 addRuleTitle: 'Add rule',
+                newRuleTitle: 'New rule',
                 editRuleTitle: 'Edit rule',
                 deleteRule: 'Delete rule',
                 deleteRuleConfirmation: 'Are you sure you want to delete this rule?',
                 describeRuleTitle: 'Describe the rule for your AI agent to follow',
+                describeRuleForConcierge: 'Describe your rule and Concierge will build it',
                 disclaimer: 'AI agents can make mistakes.',
+                createRule: 'Create rule',
                 agentCreatedTitle: 'RuleBot has been added to your workspace!',
                 agentCreatedDescription: (agentsRoute: string) =>
                     `<muted-text>To enforce your agent rules, we’ve created an agent for you and added it as an admin to your workspace.<br><br>Edit your agent’s details in <a href="${agentsRoute}">Account &gt; Agents</a>.</muted-text>`,
+                gotIt: 'Got it',
             },
         },
         planTypePage: {

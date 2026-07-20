@@ -76,6 +76,7 @@ function closeImportPage(): Promise<void> {
         columns: null,
         importFinalModalID: null,
         importFinalModal: null,
+        shouldShowMemberRolePermissionWarning: null,
         // Clear the import settings so the next import starts fresh
         importTransactionSettings: null,
     });
