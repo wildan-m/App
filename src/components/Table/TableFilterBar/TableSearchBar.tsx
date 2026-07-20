@@ -3,10 +3,8 @@ import TextInput from '@components/TextInput';
 import isTextInputFocused from '@components/TextInput/BaseTextInput/isTextInputFocused';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
-import useTheme from '@hooks/useTheme';
+import useCompactSearchInputStyles from '@hooks/useCompactSearchInputStyles';
 import useThemeStyles from '@hooks/useThemeStyles';
-
-import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 
@@ -21,7 +19,6 @@ type TableSearchBarProps = {
 };
 
 function TableSearchBar({label}: TableSearchBarProps) {
-    const theme = useTheme();
     const styles = useThemeStyles();
     const inputRef = useRef<BaseTextInputRef>(null);
     const [inputFocused, setInputFocused] = useState(false);
@@ -56,9 +53,7 @@ function TableSearchBar({label}: TableSearchBarProps) {
 
     const containerStyles = shouldUseNarrowTableLayout && styles.flex1;
 
-    const touchableInputWrapperStyle = [styles.mnw200, !shouldUseNarrowTableLayout ? styles.h8 : styles.h11];
-
-    const textInputContainerStyles = [styles.border, styles.borderRadiusComponentNormal, styles.appBG, styles.p2, inputFocused && styles.borderColorFocus];
+    const compactSearchInputStyles = useCompactSearchInputStyles(shouldUseNarrowTableLayout, inputFocused);
 
     return (
         <TextInput
@@ -71,15 +66,15 @@ function TableSearchBar({label}: TableSearchBarProps) {
             value={activeSearchString}
             role={CONST.ROLE.SEARCHBOX}
             inputMode={CONST.INPUT_MODE.TEXT}
-            placeholderTextColor={theme.textSupporting}
-            inputStyle={styles.textLabel}
+            placeholderTextColor={compactSearchInputStyles.placeholderTextColor}
+            inputStyle={compactSearchInputStyles.inputStyle}
             containerStyles={containerStyles}
-            textInputContainerStyles={textInputContainerStyles}
-            touchableInputWrapperStyle={touchableInputWrapperStyle}
+            textInputContainerStyles={compactSearchInputStyles.textInputContainerStyles}
+            touchableInputWrapperStyle={[styles.mnw200, compactSearchInputStyles.touchableInputWrapperStyle]}
             accessibilityLabel={label}
             shouldHideClearButton={false}
-            clearButtonStyle={shouldUseNarrowTableLayout ? undefined : styles.mr0}
-            clearButtonIconSize={shouldUseNarrowTableLayout ? undefined : variables.iconSizeSmall}
+            clearButtonStyle={compactSearchInputStyles.clearButtonStyle}
+            clearButtonIconSize={compactSearchInputStyles.clearButtonIconSize}
             onBlur={() => setInputFocused(false)}
             onFocus={() => setInputFocused(true)}
             onChangeText={handleSearchStringChange}

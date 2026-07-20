@@ -1,3 +1,4 @@
+import {CompactSearchInputContextProvider} from '@components/CompactSearchInputContext';
 import SafeTriangle from '@components/SafeTriangle';
 import FilterList from '@components/Search/FilterComponents/AdvancedFilters/FilterList';
 import SearchAdvancedFiltersContent from '@components/Search/FilterComponents/AdvancedFilters/SearchAdvancedFiltersContent';
@@ -53,18 +54,20 @@ function SearchAdvancedFiltersPopup({queryJSON}: SearchAdvancedFiltersPopupProps
                     ref={filterContentRef}
                     style={[styles.filterContentContainer]}
                 >
-                    <SearchAdvancedFiltersContent
-                        values={searchAdvancedFiltersForm}
-                        filterKey={selectedFilter}
-                        components={{
-                            Common: CommonFilterContentPopupWrapper,
-                            Text: TextInputFilterContentPopupWrapper,
-                            Amount: AmountFilterContentPopupWrapper,
-                            Date: DateFilterContentPopupWrapper,
-                            ReportField: ReportFieldFilterContentPopupWrapper,
-                        }}
-                        onChange={updateFilterQueryParams}
-                    />
+                    <CompactSearchInputContextProvider>
+                        <SearchAdvancedFiltersContent
+                            values={searchAdvancedFiltersForm}
+                            filterKey={selectedFilter}
+                            components={{
+                                Common: CommonFilterContentPopupWrapper,
+                                Text: TextInputFilterContentPopupWrapper,
+                                Amount: AmountFilterContentPopupWrapper,
+                                Date: DateFilterContentPopupWrapper,
+                                ReportField: ReportFieldFilterContentPopupWrapper,
+                            }}
+                            onChange={updateFilterQueryParams}
+                        />
+                    </CompactSearchInputContextProvider>
                 </View>
             </View>
         </SafeTriangle>

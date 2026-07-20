@@ -4,6 +4,7 @@ import EmojiPickerMenuItem from '@components/EmojiPicker/EmojiPickerMenuItem';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
 
+import useCompactSearchInputStyles from '@hooks/useCompactSearchInputStyles';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSafeAreaInsets from '@hooks/useSafeAreaInsets';
@@ -58,6 +59,8 @@ function EmojiPickerMenu({onEmojiSelected, activeEmoji, ref}: EmojiPickerMenuPro
     const headerRefs = useRef<Record<number, React.RefObject<View | null>>>({});
     const pendingHeaderFocusIndexRef = useRef<number | null>(null);
     const [selectedHeaderIndex, setSelectedHeaderIndex] = useState<number | null>(null);
+    const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
+    const compactSearchInputStyles = useCompactSearchInputStyles(shouldUseNarrowLayout, isSearchInputFocused);
 
     const getHeaderRef = useCallback((index: number) => {
         if (!headerRefs.current[index]) {
@@ -190,9 +193,16 @@ function EmojiPickerMenu({onEmojiSelected, activeEmoji, ref}: EmojiPickerMenuPro
         <View style={[styles.emojiPickerContainer, StyleUtils.getEmojiPickerStyle(shouldUseNarrowLayout)]}>
             <View style={[styles.p4, styles.pb3]}>
                 <TextInput
-                    label={translate('common.search')}
+                    placeholder={translate('common.search')}
                     accessibilityLabel={translate('common.search')}
                     role={CONST.ROLE.PRESENTATION}
+                    hideFocusedState
+                    placeholderTextColor={compactSearchInputStyles.placeholderTextColor}
+                    inputStyle={compactSearchInputStyles.inputStyle}
+                    textInputContainerStyles={compactSearchInputStyles.textInputContainerStyles}
+                    touchableInputWrapperStyle={compactSearchInputStyles.touchableInputWrapperStyle}
+                    onFocus={() => setIsSearchInputFocused(true)}
+                    onBlur={() => setIsSearchInputFocused(false)}
                     onChangeText={(text: string) => {
                         setSearchText(text);
                         filterEmojis(text);

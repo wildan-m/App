@@ -1,11 +1,14 @@
+import {useShouldUseCompactSearchInput} from '@components/CompactSearchInputContext';
 import type {TextInputOptions} from '@components/SelectionList/types';
 import Text from '@components/Text';
 import BaseTextInput from '@components/TextInput';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
+import useCompactSearchInputStyles from '@hooks/useCompactSearchInputStyles';
 import useDebouncedAccessibilityAnnouncement from '@hooks/useDebouncedAccessibilityAnnouncement';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useLocalize from '@hooks/useLocalize';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import Accessibility from '@libs/Accessibility';
@@ -16,7 +19,7 @@ import CONST from '@src/CONST';
 import type {TextInputKeyPressEvent} from 'react-native';
 
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useRef} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {View} from 'react-native';
 
 type TextInputProps = {
@@ -91,6 +94,13 @@ function TextInput({
     } = options ?? {};
 
     const isInLandscapeMode = useIsInLandscapeMode();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
+
+    // Search inputs inside popover menus use the smaller size, so the label is dropped in favour of a
+    // placeholder to keep the field short enough for the compact height.
+    const shouldUseCompactStyle = useShouldUseCompactSearchInput();
+    const [isFocused, setIsFocused] = useState(false);
+    const compactSearchInputStyles = useCompactSearchInputStyles(shouldUseNarrowLayout, isFocused);
 
     const noResultsFoundText = translate('common.noResultsFound');
     const isNoResultsFoundMessage = headerMessage === noResultsFoundText;
@@ -136,10 +146,12 @@ function TextInput({
     );
 
     const handleFocus = useCallback(() => {
+        setIsFocused(true);
         onFocusChange(true);
     }, [onFocusChange]);
 
     const handleBlur = useCallback(() => {
+        setIsFocused(false);
         onFocusChange(false);
     }, [onFocusChange]);
 
@@ -155,12 +167,12 @@ function TextInput({
                     onKeyPress={onKeyPress}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
-                    label={label}
-                    accessibilityLabel={accessibilityLabel}
+                    label={shouldUseCompactStyle ? undefined : label}
+                    accessibilityLabel={accessibilityLabel ?? label}
                     hint={hint}
                     role={CONST.ROLE.PRESENTATION}
                     value={value}
-                    placeholder={placeholder}
+                    placeholder={shouldUseCompactStyle ? (placeholder ?? label) : placeholder}
                     maxLength={maxLength}
                     onChangeText={handleTextInputChange}
                     inputMode={inputMode}
@@ -173,6 +185,11 @@ function TextInput({
                     errorText={errorText}
                     autoCorrect={!disableAutoCorrect}
                     shouldInterceptSwipe={shouldInterceptSwipe ?? false}
+                    hideFocusedState={shouldUseCompactStyle}
+                    placeholderTextColor={shouldUseCompactStyle ? compactSearchInputStyles.placeholderTextColor : undefined}
+                    inputStyle={shouldUseCompactStyle ? compactSearchInputStyles.inputStyle : undefined}
+                    textInputContainerStyles={shouldUseCompactStyle ? compactSearchInputStyles.textInputContainerStyles : undefined}
+                    touchableInputWrapperStyle={shouldUseCompactStyle ? compactSearchInputStyles.touchableInputWrapperStyle : undefined}
                 />
             </View>
             {shouldShowHeaderMessage && (

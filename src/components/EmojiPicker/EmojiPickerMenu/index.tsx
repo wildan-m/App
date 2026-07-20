@@ -5,6 +5,7 @@ import isTextInputFocused from '@components/TextInput/BaseTextInput/isTextInputF
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
 import useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
+import useCompactSearchInputStyles from '@hooks/useCompactSearchInputStyles';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -120,6 +121,7 @@ function EmojiPickerMenu({onEmojiSelected, activeEmoji, ref}: EmojiPickerMenuPro
     const [isUsingKeyboardMovement, setIsUsingKeyboardMovement] = useState(false);
     const [highlightEmoji, setHighlightEmoji] = useState(false);
     const [highlightFirstEmoji, setHighlightFirstEmoji] = useState(false);
+    const compactSearchInputStyles = useCompactSearchInputStyles(shouldUseNarrowLayout, isFocused);
 
     const mouseMoveHandler = useCallback(() => {
         if (!arePointerEventsDisabled) {
@@ -400,9 +402,14 @@ function EmojiPickerMenu({onEmojiSelected, activeEmoji, ref}: EmojiPickerMenuPro
         >
             <View style={[styles.p4, styles.pb3]}>
                 <TextInput
-                    label={translate('common.search')}
+                    placeholder={translate('common.search')}
                     accessibilityLabel={translate('common.search')}
                     role={CONST.ROLE.PRESENTATION}
+                    hideFocusedState
+                    placeholderTextColor={compactSearchInputStyles.placeholderTextColor}
+                    inputStyle={compactSearchInputStyles.inputStyle}
+                    textInputContainerStyles={compactSearchInputStyles.textInputContainerStyles}
+                    touchableInputWrapperStyle={compactSearchInputStyles.touchableInputWrapperStyle}
                     onChangeText={(text: string) => {
                         setSearchText(text);
                         filterEmojis(text);

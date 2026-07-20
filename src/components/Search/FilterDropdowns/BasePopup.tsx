@@ -1,3 +1,4 @@
+import {CompactSearchInputContextProvider} from '@components/CompactSearchInputContext';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Text from '@components/Text';
 
@@ -41,7 +42,7 @@ function BasePopup({children, label, applySentryLabel, resetSentryLabel, showLab
             ) : (
                 shouldDisplayLabel && <Text style={[styles.textLabel, styles.textSupporting, styles.ph5, styles.pv1, styles.mb2]}>{label}</Text>
             )}
-            {children}
+            <CompactSearchInputContextProvider>{children}</CompactSearchInputContextProvider>
             <ActionButtons
                 containerStyle={[styles.flexRow, styles.gap2, styles.ph5, styles.mt2]}
                 onReset={onReset}
