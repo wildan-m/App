@@ -172,7 +172,7 @@ function TransactionListItemInner<TItem extends ListItem>({
     const onyxViolations = (transactionViolationsForRow ?? []).filter(
         (violation: TransactionViolation) =>
             !isViolationDismissed(transactionItem, violation, currentUserDetails.email ?? '', currentUserDetails.accountID, reportForViolations, submitterLogin, policyForViolations) &&
-            shouldShowViolation(reportForViolations, policyForViolations, violation.name, currentUserDetails.email ?? '', false, transactionItem),
+            shouldShowViolation(reportForViolations, policyForViolations, violation.name, currentUserDetails.email ?? '', false, transactionItem, violation.data),
     );
 
     const isInvoice = isInvoiceReport(reportForViolations) || reportForViolations.type === CONST.REPORT.TYPE.INVOICE;

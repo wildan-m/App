@@ -194,7 +194,7 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
             const relevantViolations = (transaction.violations ?? []).filter(
                 (violation) =>
                     !isViolationDismissed(transaction, violation, currentUserDetails.email ?? '', currentUserDetails.accountID, reportForViolations, submitterLogin, policyForViolations) &&
-                    shouldShowViolation(reportForViolations, policyForViolations, violation.name, currentUserDetails.email ?? '', false, transaction),
+                    shouldShowViolation(reportForViolations, policyForViolations, violation.name, currentUserDetails.email ?? '', false, transaction, violation.data),
             );
 
             const violations = syncMissingAttendeesViolation(

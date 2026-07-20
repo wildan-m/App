@@ -547,6 +547,28 @@ function hasValidModifiedAmount(transaction: OnyxEntry<Transaction> | null): boo
 }
 
 /**
+ * Whether the modified amount really is larger than what was charged on the card.
+ *
+ * The audit behind the "Amount greater than card transaction" violation compares the two amounts
+ * with their signs, so for a card credit (a negative amount) every smaller portion compares as
+ * greater and the violation fires on splits that never exceed the card transaction. Only the
+ * magnitudes are meaningful here, so compare those.
+ */
+function isModifiedAmountOverCardAmount(transaction: OnyxEntry<Transaction>): boolean {
+    if (!transaction || !hasValidModifiedAmount(transaction)) {
+        return true;
+    }
+
+    const modifiedAmount = Number(transaction.modifiedAmount);
+    const amount = Number(transaction.amount);
+    if (Number.isNaN(modifiedAmount) || Number.isNaN(amount)) {
+        return true;
+    }
+
+    return Math.abs(modifiedAmount) > Math.abs(amount);
+}
+
+/**
  * Builds the optimistic transaction used when an IOU report is converted to an expense report.
  *
  * Expense reports store amounts with the opposite sign of IOU reports (see `getAmount`/`getConvertedAmount`),
@@ -1770,7 +1792,7 @@ function shouldShowBrokenConnectionViolationForMultipleTransactions(
                 return false;
             }
 
-            return shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction);
+            return shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction, violation.data);
         });
     });
 
@@ -1818,7 +1840,7 @@ function getVisibleTransactionViolations(
         transactionViolations.filter(
             (violation) =>
                 !isViolationDismissed(transaction, violation, currentUserEmail, currentUserAccountID, iouReport, iouReportOwnerLogin, policy) &&
-                shouldShowViolation(iouReport, policy, violation.name, currentUserEmail, shouldShowRterForSettledReport, transaction),
+                shouldShowViolation(iouReport, policy, violation.name, currentUserEmail, shouldShowRterForSettledReport, transaction, violation.data),
         ),
     );
 }
@@ -1833,6 +1855,7 @@ function shouldShowViolation(
     currentUserEmail: string,
     shouldShowRterForSettledReport = true,
     transaction?: OnyxEntry<Transaction>,
+    violationData?: TransactionViolation['data'],
 ): boolean {
     const isSubmitter = isCurrentUserSubmitter(iouReport);
     const isPolicyMember = isPolicyMemberPolicyUtils(policy, currentUserEmail);
@@ -1861,6 +1884,10 @@ function shouldShowViolation(
         return false;
     }
 
+    if (violationName === CONST.VIOLATIONS.MODIFIED_AMOUNT && violationData?.type === CONST.MODIFIED_AMOUNT_VIOLATION_DATA.CARD && !isModifiedAmountOverCardAmount(transaction)) {
+        return false;
+    }
+
     return true;
 }
 
@@ -1885,7 +1912,7 @@ function allHavePendingRTERViolation(
         const filteredTransactionViolations = getTransactionViolations(transaction, transactionViolations, currentUserEmail, currentUserAccountID, report, reportOwnerLogin, policy)?.filter(
             (violation) =>
                 // Further filter to only violations visible to the current user
-                shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction),
+                shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction, violation.data),
         );
         // Check if there is pending rter violation in the filtered violations
         return hasPendingRTERViolation(filteredTransactionViolations);

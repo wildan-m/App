@@ -2052,7 +2052,7 @@ function hasVisibleViolations(
                 }
             }
 
-            if (!hasUserVisible && shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction)) {
+            if (!hasUserVisible && shouldShowViolation(report, policy, violation.name, currentUserEmail, true, transaction, violation.data)) {
                 hasUserVisible = true;
             }
 
