@@ -17,6 +17,7 @@ import React, {useImperativeHandle, useRef} from 'react';
 import type {TableContextValue} from './TableContext';
 import type {TableData, TableHandle, TableMethods, TableProps, TableRow} from './types';
 
+import getGridTemplateColumns from './getGridTemplateColumns';
 import useFiltering from './middlewares/filtering';
 import useHighlighting from './middlewares/highlight';
 import useSearching from './middlewares/searching';
@@ -252,6 +253,9 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
     const originalDataLength = data?.length ?? 0;
     const isEmptyResult = processedData.length === 0 && originalDataLength > 0 && (hasActiveSearchString || hasActiveFilters);
 
+    // Computed once here (not per row) so the header and every virtualized row share identical grid tracks
+    const gridTemplateColumns = getGridTemplateColumns(columns, processedData);
+
     const handleMobileSelectionPress = () => {
         turnOnMobileSelectionMode();
 
@@ -269,6 +273,7 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
         processedData,
         originalDataLength,
         columns,
+        gridTemplateColumns,
         filterConfig: filters,
         activeFilters: currentFilters,
         activeSorting,

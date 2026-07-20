@@ -36,7 +36,10 @@ type TableContextValue<DataType extends TableData, ColumnKey extends string = st
     originalDataLength: number;
 
     /** Column configuration for the table. */
-    columns: Array<TableColumn<ColumnKey>>;
+    columns: Array<TableColumn<ColumnKey, DataType>>;
+
+    /** Shared CSS grid track list (one entry per column) consumed by the header and every row, so they always agree. */
+    gridTemplateColumns: string[];
 
     /** Filter configuration for dropdown filters. */
     filterConfig: FilterConfig<FilterKey> | undefined;
@@ -77,6 +80,7 @@ const defaultTableContextValue: TableContextValue<TableData, string> = {
     processedData: [],
     originalDataLength: 0,
     columns: [],
+    gridTemplateColumns: [],
     activeFilters: {},
     activeSorting: {
         columnKey: undefined,

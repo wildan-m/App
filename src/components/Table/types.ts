@@ -40,8 +40,9 @@ type TableColumnStyling = {
  * Defines the configuration for a single table column.
  *
  * @template ColumnKey - A string literal type representing the valid column keys.
+ * @template DataType - The type of items in the table's data array.
  */
-type TableColumn<ColumnKey extends string = string> = {
+type TableColumn<ColumnKey extends string = string, DataType extends TableData = TableData> = {
     /** Unique identifier for the column, used for sorting and data binding. */
     key: ColumnKey;
 
@@ -53,6 +54,21 @@ type TableColumn<ColumnKey extends string = string> = {
 
     /** Optional fixed width for the column */
     width?: number | string;
+
+    /**
+     * Returns the display text of this column's cell for a given row. When provided (and no fixed width is set),
+     * the column is sized to fit its widest cell content instead of taking an equal share of the free space.
+     */
+    getCellContent?: (item: DataType) => string;
+
+    /** Lower bound (px) for a content-sized column. */
+    minWidth?: number;
+
+    /** Upper bound (px) for a content-sized column, so a single extreme value can't starve the flexible columns. */
+    maxWidth?: number;
+
+    /** Fixed non-text space inside the cell (leading avatar/icon and gaps), added on top of the measured text width. */
+    contentInset?: number;
 
     /** Optional styling configuration for the column. */
     styling?: TableColumnStyling;
@@ -156,7 +172,7 @@ type TableProps<DataType extends TableData, ColumnKey extends string = string, F
         shouldEnableSelectionInNarrowPaneModal?: boolean;
 
         /** Column configuration defining what columns to display and how. */
-        columns: Array<TableColumn<ColumnKey>>;
+        columns: Array<TableColumn<ColumnKey, DataType>>;
 
         /** Optional filter configuration for dropdown filters. */
         filters?: FilterConfig<FilterKey>;

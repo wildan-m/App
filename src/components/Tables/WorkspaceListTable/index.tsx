@@ -70,7 +70,7 @@ export default function WorkspaceListTable({ref, workspaces, onDeleteWorkspace, 
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
 
-    const workspaceTableColumns: Array<TableColumn<WorkspaceTableColumnKey>> = [
+    const workspaceTableColumns: Array<TableColumn<WorkspaceTableColumnKey, WorkspaceRowData>> = [
         {
             sortable: true,
             key: 'workspaces',
@@ -80,11 +80,19 @@ export default function WorkspaceListTable({ref, workspaces, onDeleteWorkspace, 
             sortable: true,
             key: 'owner',
             label: translate('common.owner'),
+            getCellContent: (item) => item.ownerName ?? '',
+            // Leading Avatar (MID_SUBSCRIPT) + gap2 between the avatar and the name
+            contentInset: variables.avatarSizeMidSubscript + 8,
+            minWidth: variables.w102,
+            maxWidth: variables.w200,
         },
         {
             sortable: true,
             key: 'type',
             label: translate('workspace.common.workspaceType'),
+            getCellContent: (item) => getUserFriendlyWorkspaceType(item.type, translate),
+            minWidth: variables.w62,
+            maxWidth: variables.w184,
         },
         {
             sortable: false,
