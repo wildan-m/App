@@ -1,6 +1,7 @@
 import * as API from '@libs/API';
-import type {ConnectPolicyToNetSuiteParams} from '@libs/API/parameters';
-import {WRITE_COMMANDS} from '@libs/API/types';
+import type {ConnectPolicyToAccountingIntegrationParams, ConnectPolicyToNetSuiteParams} from '@libs/API/parameters';
+import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
+import {getCommandURL} from '@libs/ApiUtils';
 import * as ErrorUtils from '@libs/ErrorUtils';
 
 import CONST from '@src/CONST';
@@ -50,6 +51,15 @@ function connectPolicyToNetSuite(policyID: string, credentials: Omit<ConnectPoli
 
 function updateNetSuiteTokens(policyID: string, credentials: Omit<ConnectPolicyToNetSuiteParams, 'policyID'>) {
     writeNetSuiteCredentials(WRITE_COMMANDS.UPDATE_NETSUITE_TOKENS, policyID, credentials);
+}
+
+function getNetSuiteOAuthSetupLink(policyID: string) {
+    const params: ConnectPolicyToAccountingIntegrationParams = {policyID};
+    const commandURL = getCommandURL({
+        command: READ_COMMANDS.CONNECT_POLICY_TO_NETSUITE_OAUTH,
+        shouldSkipWebProxy: true,
+    });
+    return commandURL + new URLSearchParams(params).toString();
 }
 
 function createPendingFields<TSettingName extends keyof Connections['netsuite']['options']['config']>(
@@ -1087,6 +1097,7 @@ function updateNetSuiteTravelInvoicingJournalPostingPreference(
 
 export {
     connectPolicyToNetSuite,
+    getNetSuiteOAuthSetupLink,
     updateNetSuiteTokens,
     updateNetSuiteSubsidiary,
     updateNetSuiteSyncTaxConfiguration,

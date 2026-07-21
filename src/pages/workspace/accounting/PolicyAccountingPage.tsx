@@ -1,4 +1,5 @@
 import ActivityIndicator from '@components/ActivityIndicator';
+import Banner from '@components/Banner';
 import Button from '@components/Button';
 import CollapsibleSection from '@components/CollapsibleSection';
 import FormHelpMessage from '@components/FormHelpMessage';
@@ -36,6 +37,7 @@ import useWorkspaceAccountID from '@hooks/useWorkspaceAccountID';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 
 import {isAuthenticationError, isConnectionInProgress, isConnectionUnverified, removePolicyConnection, syncConnection} from '@libs/actions/connections';
+import {getNetSuiteOAuthSetupLink} from '@libs/actions/connections/NetSuiteCommands';
 import {shouldShowQBOReimbursableExportDestinationAccountError} from '@libs/actions/connections/QuickbooksOnline';
 import {isExpensifyCardFullySetUp} from '@libs/CardUtils';
 import {getOldDotURLFromEnvironment} from '@libs/Environment/Environment';
@@ -61,7 +63,7 @@ import Navigation from '@navigation/Navigation';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 
-import {openOldDotLink} from '@userActions/Link';
+import {openLink, openOldDotLink} from '@userActions/Link';
 import {openPolicyExpensifyCardsPage} from '@userActions/Policy/Policy';
 
 import CONST from '@src/CONST';
@@ -78,6 +80,7 @@ import type {MenuItemData, PolicyAccountingPageProps} from './types';
 
 import {AccountingContextProvider, useAccountingActions, useAccountingState} from './AccountingContext';
 import {isCertiniaSRPConnection} from './certinia/utils';
+import {getNetSuiteOAuthMigrationSeverity, shouldShowNetSuiteOAuthMigrationNudge} from './netsuite/utils';
 import {getAccountingIntegrationData, getSynchronizationErrorMessage} from './utils';
 
 type RouteParams = {
@@ -97,7 +100,7 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, datetimeToRelative: getDatetimeToRelative, getLocalDateFromDatetime} = useLocalize();
-    const {environment} = useEnvironment();
+    const {environment, environmentURL} = useEnvironment();
     const oldDotEnvironmentURL = getOldDotURLFromEnvironment(environment);
     const {isOffline} = useNetwork();
     const {isBetaEnabled} = usePermissions();
@@ -138,6 +141,8 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
     const connectedIntegration = getConnectedIntegration(policy, accountingIntegrations) ?? syncingAccountingIntegration;
     const hasAccountingConnection = hasAccountingConnections(policy);
     const {canWrite: canWriteAccounting, showReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.ACCOUNTING);
+    const shouldShowNetSuiteMigrationBanner = shouldShowNetSuiteOAuthMigrationNudge(policy);
+    const netSuiteMigrationSeverity = getNetSuiteOAuthMigrationSeverity();
     const synchronizationError = connectedIntegration && getSynchronizationErrorMessage(policy, connectedIntegration, isSyncInProgress, translate, styles);
 
     const isSageIntacct = connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT;
@@ -821,6 +826,22 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                             titleStyles={styles.accountSettingsSectionTitle}
                             childrenStyles={styles.pt5}
                         >
+                            {shouldShowNetSuiteMigrationBanner && !!policyID && (
+                                <Banner
+                                    shouldShowIcon
+                                    text={translate('workspace.accounting.netSuiteOAuthMigration.bannerText')}
+                                    containerStyles={[styles.mb3]}
+                                >
+                                    <Button
+                                        danger={netSuiteMigrationSeverity === CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY.DANGER}
+                                        success={netSuiteMigrationSeverity !== CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY.DANGER}
+                                        text={translate('workspace.accounting.netSuiteOAuthMigration.bannerButton')}
+                                        isDisabled={isOffline || !canWriteAccounting}
+                                        onPress={() => openLink(getNetSuiteOAuthSetupLink(policyID), environmentURL)}
+                                        style={[styles.ph3, styles.ml3]}
+                                    />
+                                </Banner>
+                            )}
                             {!hasUnsupportedNDIntegration &&
                                 connectionsMenuItems.map((menuItem) => (
                                     <OfflineWithFeedback

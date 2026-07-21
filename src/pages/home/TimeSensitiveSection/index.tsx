@@ -13,6 +13,7 @@ import {getConnectedHRProvider} from '@libs/HRUtils';
 import {expensifyLoginsSelector, isCurrentUserValidated} from '@libs/UserUtils';
 
 import HomeSectionExpandToggle from '@pages/home/HomeSectionExpandToggle';
+import {shouldShowNetSuiteOAuthMigrationNudge} from '@pages/workspace/accounting/netsuite/utils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -45,6 +46,7 @@ import FixPersonalCardConnection from './items/FixPersonalCardConnection';
 import FixPolicyConnection from './items/FixPolicyConnection';
 import ReviewCardFraud from './items/ReviewCardFraud';
 import UnlockBankAccount from './items/UnlockBankAccount';
+import UpgradeNetSuiteConnection from './items/UpgradeNetSuiteConnection';
 import ValidateAccount from './items/ValidateAccount';
 
 type BrokenPolicyConnection = {
@@ -140,6 +142,9 @@ function TimeSensitiveSection() {
         }
     }
 
+    // Find admin policies whose NetSuite connection still needs the OAuth 2.0 migration
+    const netSuiteMigrationPolicies = (adminPolicies ?? []).filter((policy) => shouldShowNetSuiteOAuthMigrationNudge(policy));
+
     // Get personal cards with broken connections
     const brokenPersonalCardConnections: BrokenPersonalCardConnection[] = [];
     const personalCardsWithBrokenConnection = cardFeedErrors.personalCardsWithBrokenConnection;
@@ -170,6 +175,7 @@ function TimeSensitiveSection() {
         hasBrokenCompanyCards ||
         hasBrokenPersonalCards ||
         hasBrokenPolicyConnections ||
+        netSuiteMigrationPolicies.length > 0 ||
         shouldShowAddShippingAddress ||
         shouldShowActivateCard ||
         shouldShowAddVirtualCardPersonalDetails;
@@ -188,9 +194,10 @@ function TimeSensitiveSection() {
     // 7. Locked bank accounts (workspace VBAs and personal)
     // 8. Enter signer info for global bank accounts
     // 9. Broken policy connections (accounting + HR)
-    // 10. Expensify card shipping
-    // 11. Expensify card activation
-    // 12. Virtual Expensify card needs personal details
+    // 10. NetSuite connections needing the OAuth 2.0 upgrade
+    // 11. Expensify card shipping
+    // 12. Expensify card activation
+    // 13. Virtual Expensify card needs personal details
     const items: React.ReactNode[] = [];
 
     // Priority 1: Validate account
@@ -280,7 +287,17 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 10: Expensify card shipping
+    // Priority 10: NetSuite connections needing the OAuth 2.0 upgrade
+    for (const policy of netSuiteMigrationPolicies) {
+        items.push(
+            <UpgradeNetSuiteConnection
+                key={`netsuite-oauth-migration-${policy.id}`}
+                policyID={policy.id}
+                policyName={policy.name}
+            />,
+        );
+    }
+    // Priority 11: Expensify card shipping
     if (shouldShowAddShippingAddress) {
         for (const card of cardsNeedingShippingAddress) {
             items.push(
@@ -291,7 +308,7 @@ function TimeSensitiveSection() {
             );
         }
     }
-    // Priority 11: Expensify card activation
+    // Priority 12: Expensify card activation
     if (shouldShowActivateCard) {
         for (const card of cardsNeedingActivation) {
             items.push(
@@ -302,7 +319,7 @@ function TimeSensitiveSection() {
             );
         }
     }
-    // Priority 11: Virtual Expensify card needs personal details before reveal
+    // Priority 13: Virtual Expensify card needs personal details before reveal
     if (shouldShowAddVirtualCardPersonalDetails) {
         for (const card of virtualCardsNeedingPersonalDetails) {
             items.push(

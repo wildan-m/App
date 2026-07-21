@@ -1016,6 +1016,11 @@ const translations = {
                 defaultSubtitle: 'Workspace',
                 subtitle: ({policyName}: {policyName: string}) => policyName,
             },
+            upgradeNetSuiteConnection: {
+                title: 'Upgrade NetSuite connection to OAuth 2.0',
+                defaultSubtitle: 'Workspace',
+                subtitle: ({policyName}: {policyName: string}) => policyName,
+            },
             addShippingAddress: {
                 title: 'We need your shipping address',
                 subtitle: 'Provide an address to receive your Expensify Card.',
@@ -6756,6 +6761,10 @@ const translations = {
             settings: 'settings',
             title: 'Connections',
             subtitle: 'Connect your accounting software for an automatic sync.',
+            netSuiteOAuthMigration: {
+                bannerText: 'NetSuite is retiring token-based authentication. Upgrade this connection to OAuth 2.0 before February 2027 to keep syncing.',
+                bannerButton: 'Upgrade',
+            },
             qbo: 'QuickBooks Online',
             qbd: 'QuickBooks Desktop',
             xero: 'Xero',

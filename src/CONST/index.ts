@@ -3307,6 +3307,23 @@ const CONST = {
         JOURNAL_ENTRY: 'journalEntry',
     },
 
+    NETSUITE_AUTH_TYPE: {
+        TBA: 'tba',
+        OAUTH2: 'oauth2',
+    },
+
+    NETSUITE_OAUTH_MIGRATION: {
+        // Final deadline for migrating token-based NetSuite connections to OAuth 2.0
+        DEADLINE: '2027-02-01',
+        WARNING_DAYS: 90,
+        DANGER_DAYS: 30,
+        SEVERITY: {
+            INFO: 'info',
+            WARNING: 'warning',
+            DANGER: 'danger',
+        },
+    },
+
     NETSUITE_INVOICE_ITEM_PREFERENCE: {
         CREATE: 'create',
         SELECT: 'select',

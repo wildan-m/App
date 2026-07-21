@@ -8,6 +8,8 @@ import type Policy from '@src/types/onyx/Policy';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
+import {differenceInCalendarDays} from 'date-fns';
+
 function shouldHideReimbursedReportsSection(config?: NetSuiteConnectionConfig) {
     return config?.reimbursableExpensesExportDestination === CONST.NETSUITE_EXPORT_DESTINATION.JOURNAL_ENTRY;
 }
@@ -83,7 +85,25 @@ function getInitialSubPageForNetsuiteTokenInput(policy: OnyxEntry<Policy>) {
     return hasAuthError ? CONST.NETSUITE_CONFIG.TOKEN_INPUT.PAGE_NAME.CREDENTIALS : CONST.NETSUITE_CONFIG.TOKEN_INPUT.PAGE_NAME.INSTALL;
 }
 
+function shouldShowNetSuiteOAuthMigrationNudge(policy: OnyxEntry<Policy>): boolean {
+    const netSuite = policy?.connections?.netsuite;
+    return !!netSuite?.verified && netSuite.authType !== CONST.NETSUITE_AUTH_TYPE.OAUTH2 && !!netSuite.tokenID && !!netSuite.tokenSecret;
+}
+
+function getNetSuiteOAuthMigrationSeverity(): ValueOf<typeof CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY> {
+    const daysUntilDeadline = differenceInCalendarDays(new Date(CONST.NETSUITE_OAUTH_MIGRATION.DEADLINE), new Date());
+    if (daysUntilDeadline <= CONST.NETSUITE_OAUTH_MIGRATION.DANGER_DAYS) {
+        return CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY.DANGER;
+    }
+    if (daysUntilDeadline <= CONST.NETSUITE_OAUTH_MIGRATION.WARNING_DAYS) {
+        return CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY.WARNING;
+    }
+    return CONST.NETSUITE_OAUTH_MIGRATION.SEVERITY.INFO;
+}
+
 export {
+    shouldShowNetSuiteOAuthMigrationNudge,
+    getNetSuiteOAuthMigrationSeverity,
     shouldHideReimbursedReportsSection,
     shouldHideReportsExportTo,
     shouldHideExportVendorBillsTo,

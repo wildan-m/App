@@ -1192,6 +1192,9 @@ type NetSuiteConnection = {
     /** Whether the sync connection has been successful */
     verified: boolean;
 
+    /** Authentication scheme the connection uses (legacy token-based auth or OAuth 2.0) */
+    authType?: ValueOf<typeof CONST.NETSUITE_AUTH_TYPE>;
+
     /** Date when the connection's last successful sync occurred */
     lastSyncDate: string;
 
