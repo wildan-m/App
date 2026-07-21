@@ -171,9 +171,12 @@ function SubmitPrimaryActionContent({reportID}: SubmitPrimaryActionProps) {
                     startSubmittingAnimation();
                     if (shouldExportToPDF) {
                         // If the user cancels while the PDF is still generating, discard the submission (retract it back
-                        // to draft) so they can resubmit — matching the pre-submit-via-PDF behavior.
+                        // to draft) so they can resubmit — matching the pre-submit-via-PDF behavior. Stop the submitting
+                        // animation too, otherwise the header keeps showing the "Submitted" button for a submission that
+                        // no longer exists until the animation times out on its own.
                         openPDFDownload({
-                            onCancel: () =>
+                            onCancel: () => {
+                                stopAnimation();
                                 retractReport(
                                     moneyRequestReport,
                                     chatReport,
@@ -185,7 +188,8 @@ function SubmitPrimaryActionContent({reportID}: SubmitPrimaryActionProps) {
                                     nextStep,
                                     delegateEmail,
                                     isTrackIntentUser,
-                                ),
+                                );
+                            },
                         });
                     }
                 },
