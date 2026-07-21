@@ -113,7 +113,7 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
     const hasRequestedNewBankAccountRef = useRef(false);
     const hasClearedStalePlaidErrorsRef = useRef(false);
     const isChangingBankAccountRef = useRef(isChangingBankAccount);
-    const hasShownConnectedBankAccountRef = useRef(false);
+    const hasShownBankAccountDataRef = useRef(false);
     const prevReimbursementAccount = usePrevious(reimbursementAccount);
     const prevIsOffline = usePrevious(isOffline);
     const achData = reimbursementAccount?.achData;
@@ -278,19 +278,20 @@ function ReimbursementAccountPage({route, policy, isLoadingPolicy}: Reimbursemen
     }, [isLoadingWorkspaceReimbursement, prevIsLoadingWorkspaceReimbursement]);
 
     // A pushed "change bank account" instance and its setup steps mutate the shared reimbursement account. When focus
-    // returns to this connected (non-changing) screen and the shared data has been clobbered, reload it so the
-    // "you're all set" page is shown again instead of the setup entry.
+    // returns to this (non-changing) screen and the shared data has been clobbered, reload it so the page that was
+    // displayed before — either "you're all set" or the in-progress setup — is shown again instead of the setup entry.
     useEffect(() => {
-        if (isConnectedVerifiedBankAccountData && !isChangingBankAccount) {
-            hasShownConnectedBankAccountRef.current = true;
+        const hasBankAccountData = isConnectedVerifiedBankAccountData || shouldShowContinueSetupButtonValue;
+        if (hasBankAccountData && !isChangingBankAccount) {
+            hasShownBankAccountDataRef.current = true;
             return;
         }
-        if (isFocused && !isChangingBankAccount && hasShownConnectedBankAccountRef.current && !isConnectedVerifiedBankAccountData) {
+        if (isFocused && !isChangingBankAccount && hasShownBankAccountDataRef.current && !hasBankAccountData) {
             fetchData();
         }
-        // fetchData is intentionally omitted; this must react to the connected data being clobbered, not to fetchData's identity.
+        // fetchData is intentionally omitted; this must react to the bank account data being clobbered, not to fetchData's identity.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFocused, isChangingBankAccount, isConnectedVerifiedBankAccountData]);
+    }, [isFocused, isChangingBankAccount, isConnectedVerifiedBankAccountData, shouldShowContinueSetupButtonValue]);
 
     useEffect(() => {
         // Consume this route intent only once so the response changing isPreviousPolicy does not trigger another request.
