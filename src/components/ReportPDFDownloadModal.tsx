@@ -104,7 +104,7 @@ function ReportPDFDownloadModal({reportID, isVisible, onClose, onModalHide, onCa
                     <View style={[styles.flexRow, styles.mb4]}>
                         <View style={[styles.flex1]}>
                             <View style={[styles.flexRow]}>
-                                <Header title={translate('reportDetailsPage.generatingPDF')} />
+                                <Header.Title title={translate('reportDetailsPage.generatingPDF')} />
                             </View>
                             <Text style={[styles.mt5, styles.textAlignLeft]}>{messagePDF}</Text>
                         </View>

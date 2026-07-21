@@ -38,7 +38,7 @@ function BaseOpenAppFailureModal({onRefreshAndTryAgainButtonPress}: BaseOpenAppF
             onClose={() => setIsOpenAppFailureModalOpen(false)}
         >
             <View style={[styles.p6]}>
-                <Header
+                <Header.Title
                     title={translate('openAppFailureModal.title')}
                     textStyles={[styles.mb2]}
                 />

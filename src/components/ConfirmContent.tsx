@@ -215,7 +215,7 @@ function ConfirmContent({
                         </View>
                     )}
                     <View style={[styles.flexRow, isTitleLoading ? styles.justifyContentBetween : {}, styles.alignItemsCenter, isCentered ? {} : styles.mb4, titleContainerStyles]}>
-                        <Header
+                        <Header.Title
                             title={title}
                             textStyles={titleStyles}
                         />

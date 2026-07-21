@@ -10,11 +10,11 @@ import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import React, {useMemo} from 'react';
 import {Linking, View} from 'react-native';
 
-import EnvironmentBadge from './EnvironmentBadge';
-import Text from './Text';
-import TextLink from './TextLink';
+import EnvironmentBadge from '../EnvironmentBadge';
+import Text from '../Text';
+import TextLink from '../TextLink';
 
-type HeaderProps = {
+type HeaderTitleProps = {
     /** Title of the Header */
     title?: ReactNode;
 
@@ -46,7 +46,7 @@ type HeaderProps = {
     shouldSkipFocusAfterTransition?: boolean;
 };
 
-function Header({
+function HeaderTitle({
     title = '',
     subtitle = '',
     textStyles = [],
@@ -57,7 +57,7 @@ function Header({
     numberOfTitleLines = 2,
     isScreenHeader = false,
     shouldSkipFocusAfterTransition = false,
-}: HeaderProps) {
+}: HeaderTitleProps) {
     const styles = useThemeStyles();
     const {isTransitionReady, claimInitialFocus, containerRef} = useDialogLabelRegistration(isScreenHeader ? title : '');
 
@@ -120,6 +120,6 @@ function Header({
     );
 }
 
-export default Header;
+export default HeaderTitle;
 
-export type {HeaderProps};
+export type {HeaderTitleProps};

@@ -49,7 +49,7 @@ function Breadcrumbs({breadcrumbs, style}: BreadcrumbsProps) {
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1, styles.w100, styles.breadcrumbsContainer, style]}>
             {isRootBreadcrumb ? (
                 <View style={styles.breadcrumbLogo}>
-                    <Header
+                    <Header.Title
                         title={
                             <ImageSVG
                                 contentFit="contain"

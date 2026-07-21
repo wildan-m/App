@@ -90,7 +90,7 @@ function DecisionModal({
             <ScrollView contentContainerStyle={styles.p5}>
                 <View>
                     <View style={[styles.flexRow, styles.mb5]}>
-                        <Header
+                        <Header.Title
                             title={title}
                             containerStyles={styles.alignItemsCenter}
                         />

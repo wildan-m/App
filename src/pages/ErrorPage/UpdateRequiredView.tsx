@@ -39,7 +39,7 @@ function UpdateRequiredView() {
     return (
         <View style={[styles.appBG, styles.h100, StyleUtils.getPlatformSafeAreaPadding(insets)]}>
             <View style={[styles.pt5, styles.ph5, styles.updateRequiredViewHeader]}>
-                <Header title={translate('updateRequiredView.updateRequired')} />
+                <Header.Title title={translate('updateRequiredView.updateRequired')} />
             </View>
             <View style={[styles.flex1, StyleUtils.getUpdateRequiredViewStyles(shouldUseNarrowLayout)]}>
                 {isReduceMotionEnabled ? (

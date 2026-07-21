@@ -11,7 +11,6 @@ import ThreeDotsMenu from '@components/ThreeDotsMenu';
 import Tooltip from '@components/Tooltip';
 
 import useDialogLabelRegistration from '@hooks/useDialogLabelRegistration';
-import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -26,12 +25,11 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
 
 import type {SvgProps} from 'react-native-svg';
 
 import React, {useMemo} from 'react';
-import {Keyboard, StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 
 import type HeaderWithBackButtonProps from './types';
 
@@ -90,13 +88,12 @@ function HeaderWithBackButton({
     // Avatar-header routes skip Header, so register the dialog label here.
     useDialogLabelRegistration(shouldShowReportAvatarWithDisplay ? (report?.reportName ?? '') : '');
 
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'Rotate', 'BackArrow', 'Close']);
+    const icons = useMemoizedLazyExpensifyIcons(['Download', 'Rotate']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const [isDownloadButtonActive, temporarilyDisableDownloadButton] = useThrottledButtonState();
     const {translate} = useLocalize();
-    const isInLandscapeMode = useIsInLandscapeMode();
 
     const downloadReasonAttributes = useMemo<SkeletonSpanReasonAttributes>(
         () => ({
@@ -118,26 +115,10 @@ function HeaderWithBackButton({
         if (progressBarPercentage) {
             const progressBarLabel = stepCounter ? `${translate('common.progressBarLabel')}, ${translate('stepCounter', stepCounter)}` : undefined;
             return (
-                <>
-                    {/* Reserves as much space for the middleContent as possible */}
-                    <View style={styles.flexGrow1} />
-                    {/* Uses absolute positioning so that it's always centered instead of being affected by the
-                    presence or absence of back/close buttons to the left/right of it */}
-                    <View style={styles.headerProgressBarContainer}>
-                        <View
-                            style={styles.headerProgressBar}
-                            accessible={!!progressBarLabel}
-                            accessibilityLabel={progressBarLabel}
-                            role={CONST.ROLE.PROGRESSBAR}
-                            aria-valuetext={progressBarLabel}
-                        >
-                            <View
-                                aria-hidden
-                                style={[{width: `${progressBarPercentage}%`}, styles.headerProgressBarFill]}
-                            />
-                        </View>
-                    </View>
-                </>
+                <Header.ProgressBar
+                    percentage={progressBarPercentage}
+                    accessibilityLabel={progressBarLabel}
+                />
             );
         }
         if (shouldShowReportAvatarWithDisplay) {
@@ -152,7 +133,7 @@ function HeaderWithBackButton({
         }
 
         return (
-            <Header
+            <Header.Title
                 title={title}
                 subtitle={stepCounter ? translate('stepCounter', stepCounter) : subtitle}
                 textStyles={[titleColor ? StyleUtils.getTextColorStyle(titleColor) : {}, shouldUseHeadlineHeader && styles.textHeadlineH2]}
@@ -171,10 +152,6 @@ function HeaderWithBackButton({
         shouldEnableDetailPageNavigation,
         shouldShowReportAvatarWithDisplay,
         stepCounter,
-        styles.flexGrow1,
-        styles.headerProgressBar,
-        styles.headerProgressBarContainer,
-        styles.headerProgressBarFill,
         styles.textHeadlineH2,
         subtitle,
         title,
@@ -233,149 +210,110 @@ function HeaderWithBackButton({
     ]);
 
     return (
-        <View
+        <Header
+            shouldShowBorderBottom={shouldShowBorderBottom}
+            shouldUseHeadlineHeader={shouldUseHeadlineHeader}
+            shouldOverlay={shouldOverlay}
+            iconFill={iconFill}
             style={[
-                styles.headerBar,
-                shouldUseHeadlineHeader && styles.headerBarHeight,
-                shouldShowBorderBottom && styles.borderBottom,
                 // progressBarPercentage can be 0 which would
                 // be falsy, hence using !== undefined explicitly
                 progressBarPercentage !== undefined && styles.pl0,
-                shouldShowBackButton && [styles.pl2],
-                shouldOverlay && StyleSheet.absoluteFill,
+                shouldShowBackButton && styles.pl2,
                 style,
             ]}
-            onTouchStart={isInLandscapeMode ? () => Keyboard.dismiss() : undefined}
         >
-            <View style={[styles.dFlex, styles.flexRow, styles.alignItemsCenter, styles.flexGrow1, styles.justifyContentBetween, styles.overflowHidden, styles.mr3]}>
-                {shouldShowBackButton && (
-                    <Tooltip text={translate('common.back')}>
-                        <PressableWithoutFeedback
-                            onPress={() => {
-                                if (Keyboard.isVisible()) {
-                                    Keyboard.dismiss();
-                                }
-                                const topmostReportId = Navigation.getTopmostReportId();
-                                if (shouldNavigateToTopMostReport && topmostReportId) {
-                                    Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(topmostReportId));
-                                } else {
-                                    onBackButtonPress();
-                                }
-                            }}
-                            style={[styles.touchableButtonImage]}
-                            role={CONST.ROLE.BUTTON}
-                            accessibilityLabel={translate('common.back')}
-                            id={CONST.BACK_BUTTON_NATIVE_ID}
-                            sentryLabel={CONST.SENTRY_LABEL.HEADER.BACK_BUTTON}
-                        >
-                            <Icon
-                                src={icons.BackArrow}
-                                fill={iconFill ?? theme.icon}
-                            />
-                        </PressableWithoutFeedback>
-                    </Tooltip>
-                )}
-                {!!icon && (
-                    <Icon
-                        src={icon}
-                        width={iconWidth ?? variables.iconHeader}
-                        height={iconHeight ?? variables.iconHeader}
-                        additionalStyles={[styles.mr2, iconStyles]}
-                        fill={iconFill}
-                    />
-                )}
-                {!!policyAvatar && (
-                    <Avatar
-                        containerStyles={[StyleUtils.getWidthAndHeightStyle(StyleUtils.getAvatarSize(CONST.AVATAR_SIZE.DEFAULT)), styles.mr3]}
-                        source={policyAvatar?.source}
-                        name={policyAvatar?.name}
-                        avatarID={policyAvatar?.id}
-                        type={policyAvatar?.type}
-                    />
-                )}
-                {middleContent}
-                <View style={[styles.reportOptions, styles.flexRow, styles.alignItemsCenter]}>
-                    <View style={[styles.pr2, styles.flexRow, styles.alignItemsCenter]}>
-                        {children}
-                        {shouldShowDownloadButton &&
-                            (!isDownloading ? (
-                                <Tooltip text={translate('common.download')}>
-                                    <PressableWithoutFeedback
-                                        onPress={(event) => {
-                                            // Blur the pressable in case this button triggers a Growl notification
-                                            // We do not want to overlap Growl with the Tooltip (#15271)
-                                            (event?.currentTarget as HTMLElement)?.blur();
+            {shouldShowBackButton && (
+                <Header.BackButton
+                    onPress={onBackButtonPress}
+                    shouldNavigateToTopMostReport={shouldNavigateToTopMostReport}
+                />
+            )}
+            {!!icon && (
+                <Icon
+                    src={icon}
+                    width={iconWidth ?? variables.iconHeader}
+                    height={iconHeight ?? variables.iconHeader}
+                    additionalStyles={[styles.mr2, iconStyles]}
+                    fill={iconFill}
+                />
+            )}
+            {!!policyAvatar && (
+                <Avatar
+                    containerStyles={[StyleUtils.getWidthAndHeightStyle(StyleUtils.getAvatarSize(CONST.AVATAR_SIZE.DEFAULT)), styles.mr3]}
+                    source={policyAvatar?.source}
+                    name={policyAvatar?.name}
+                    avatarID={policyAvatar?.id}
+                    type={policyAvatar?.type}
+                />
+            )}
+            {middleContent}
+            <View style={[styles.reportOptions, styles.flexRow, styles.alignItemsCenter]}>
+                <View style={[styles.pr2, styles.flexRow, styles.alignItemsCenter]}>
+                    {children}
+                    {shouldShowDownloadButton &&
+                        (!isDownloading ? (
+                            <Tooltip text={translate('common.download')}>
+                                <PressableWithoutFeedback
+                                    onPress={(event) => {
+                                        // Blur the pressable in case this button triggers a Growl notification
+                                        // We do not want to overlap Growl with the Tooltip (#15271)
+                                        (event?.currentTarget as HTMLElement)?.blur();
 
-                                            if (!isDownloadButtonActive) {
-                                                return;
-                                            }
+                                        if (!isDownloadButtonActive) {
+                                            return;
+                                        }
 
-                                            onDownloadButtonPress();
-                                            temporarilyDisableDownloadButton();
-                                        }}
-                                        style={[styles.touchableButtonImage]}
-                                        role="button"
-                                        accessibilityLabel={translate('common.download')}
-                                        sentryLabel={CONST.SENTRY_LABEL.HEADER.DOWNLOAD_BUTTON}
-                                    >
-                                        <Icon
-                                            src={icons.Download}
-                                            fill={iconFill ?? StyleUtils.getIconFillColor(getButtonState(false, false, !isDownloadButtonActive))}
-                                        />
-                                    </PressableWithoutFeedback>
-                                </Tooltip>
-                            ) : (
-                                <ActivityIndicator
+                                        onDownloadButtonPress();
+                                        temporarilyDisableDownloadButton();
+                                    }}
                                     style={[styles.touchableButtonImage]}
-                                    reasonAttributes={downloadReasonAttributes}
-                                />
-                            ))}
-                        {shouldShowRotateButton &&
-                            (!isRotating ? (
-                                <Tooltip text={translate('common.rotate')}>
-                                    <PressableWithoutFeedback
-                                        onPress={onRotateButtonPress}
-                                        style={[styles.touchableButtonImage]}
-                                        role="button"
-                                        accessibilityLabel={translate('common.rotate')}
-                                        sentryLabel={CONST.SENTRY_LABEL.HEADER.ROTATE_BUTTON}
-                                    >
-                                        <Icon
-                                            src={icons.Rotate}
-                                            fill={iconFill ?? theme.icon}
-                                        />
-                                    </PressableWithoutFeedback>
-                                </Tooltip>
-                            ) : (
-                                <ActivityIndicator
-                                    style={[styles.touchableButtonImage]}
-                                    reasonAttributes={rotateReasonAttributes}
-                                />
-                            ))}
-                        {shouldShowPinButton && !!report && <PinButton report={report} />}
-                    </View>
-                    {ThreeDotMenuButton}
-                    {shouldShowCloseButton && (
-                        <Tooltip text={translate('common.close')}>
-                            <PressableWithoutFeedback
-                                onPress={onCloseButtonPress}
+                                    role="button"
+                                    accessibilityLabel={translate('common.download')}
+                                    sentryLabel={CONST.SENTRY_LABEL.HEADER.DOWNLOAD_BUTTON}
+                                >
+                                    <Icon
+                                        src={icons.Download}
+                                        fill={iconFill ?? StyleUtils.getIconFillColor(getButtonState(false, false, !isDownloadButtonActive))}
+                                    />
+                                </PressableWithoutFeedback>
+                            </Tooltip>
+                        ) : (
+                            <ActivityIndicator
                                 style={[styles.touchableButtonImage]}
-                                role={CONST.ROLE.BUTTON}
-                                accessibilityLabel={translate('common.close')}
-                                sentryLabel={CONST.SENTRY_LABEL.HEADER.CLOSE_BUTTON}
-                            >
-                                <Icon
-                                    src={icons.Close}
-                                    fill={iconFill ?? theme.icon}
-                                />
-                            </PressableWithoutFeedback>
-                        </Tooltip>
-                    )}
+                                reasonAttributes={downloadReasonAttributes}
+                            />
+                        ))}
+                    {shouldShowRotateButton &&
+                        (!isRotating ? (
+                            <Tooltip text={translate('common.rotate')}>
+                                <PressableWithoutFeedback
+                                    onPress={onRotateButtonPress}
+                                    style={[styles.touchableButtonImage]}
+                                    role="button"
+                                    accessibilityLabel={translate('common.rotate')}
+                                    sentryLabel={CONST.SENTRY_LABEL.HEADER.ROTATE_BUTTON}
+                                >
+                                    <Icon
+                                        src={icons.Rotate}
+                                        fill={iconFill ?? theme.icon}
+                                    />
+                                </PressableWithoutFeedback>
+                            </Tooltip>
+                        ) : (
+                            <ActivityIndicator
+                                style={[styles.touchableButtonImage]}
+                                reasonAttributes={rotateReasonAttributes}
+                            />
+                        ))}
+                    {shouldShowPinButton && !!report && <PinButton report={report} />}
                 </View>
-                {shouldDisplaySearchRouter && <SearchButton />}
-                {shouldDisplayHelpButton && <SidePanelButton />}
+                {ThreeDotMenuButton}
+                {shouldShowCloseButton && <Header.CloseButton onPress={onCloseButtonPress} />}
             </View>
-        </View>
+            {shouldDisplaySearchRouter && <SearchButton />}
+            {shouldDisplayHelpButton && <SidePanelButton />}
+        </Header>
     );
 }
 

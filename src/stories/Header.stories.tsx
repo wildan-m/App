@@ -1,24 +1,24 @@
-import type {HeaderProps} from '@components/Header';
+import type {HeaderTitleProps} from '@components/Header';
 import Header from '@components/Header';
 
 import type {Meta, StoryFn} from 'storybook-react-rsbuild';
 
 import React from 'react';
 
-type HeaderStory = StoryFn<typeof Header>;
+type HeaderStory = StoryFn<typeof Header.Title>;
 
 /**
  * We use the Component Story Format for writing stories. Follow the docs here:
  *
  * https://storybook.js.org/docs/react/writing-stories/introduction#component-story-format
  */
-const story: Meta<typeof Header> = {
+const story: Meta<typeof Header.Title> = {
     title: 'Components/Header',
-    component: Header,
+    component: Header.Title,
 };
 
-function Template(props: HeaderProps) {
-    return <Header {...props} />;
+function Template(props: HeaderTitleProps) {
+    return <Header.Title {...props} />;
 }
 
 // Arguments can be passed to the component by binding
