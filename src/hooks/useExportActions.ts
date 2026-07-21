@@ -2,6 +2,7 @@ import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchSelectionActions} from '@components/Search/SearchContext';
 
+import {exportReceiptsAsZip} from '@libs/actions/Export';
 import {openOldDotLink} from '@libs/actions/Link';
 import {exportReportToCSV, exportReportToPDF, exportToIntegration, markAsManuallyExported} from '@libs/actions/Report';
 import {getExportTemplates, queueExportSearchWithTemplate} from '@libs/actions/Search';
@@ -242,6 +243,23 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
                 }
                 onPDFModalOpen?.();
                 exportReportToPDF({reportID: moneyRequestReport.reportID});
+            },
+        },
+        [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS]: {
+            value: CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS,
+            text: translate('common.downloadReceipts'),
+            icon: expensifyIcons.Download,
+            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DOWNLOAD_RECEIPTS,
+            onSelected: () => {
+                if (isOffline) {
+                    showOfflineModal();
+                    return;
+                }
+                if (!moneyRequestReport?.reportID) {
+                    return;
+                }
+                const exportID = exportReceiptsAsZip({reportIDs: [moneyRequestReport.reportID]});
+                trackExport(exportID);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.PRINT]: {
