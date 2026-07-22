@@ -163,6 +163,32 @@ function getCategoryListSections({
             return true;
         });
 
+        // Step 3.5: Re-introduce the backing ancestor categories of any matched subcategory.
+        // A subcategory (e.g. "Lunch: Sushi") matches "sushi", but its parent ("Lunch") does not, so it was
+        // dropped by tokenizedSearch. Without the standalone parent category, the parent row rendered by
+        // getCategoryOptionTree is only a structural header and never receives its own GL code. Adding the real
+        // parent category back (it already carries its GL code from withGLCode) lets the parent row show it,
+        // matching how the non-search "All" section behaves.
+        const categoriesForSearchByName = new Map(categoriesForSearch.map((category) => [category.name, category]));
+        for (const category of [...searchCategories]) {
+            const segments = processCategoryNameSegments(category.name);
+            for (let index = 1; index < segments.length; index++) {
+                const ancestorName = segments.slice(0, index).join(CONST.PARENT_CHILD_SEPARATOR);
+                if (seen.has(ancestorName)) {
+                    continue;
+                }
+                const ancestorCategory = categoriesForSearchByName.get(ancestorName);
+                if (!ancestorCategory) {
+                    continue;
+                }
+                seen.add(ancestorName);
+                searchCategories.push({
+                    ...ancestorCategory,
+                    wasSelected: selectedOptions.some((selectedOption) => selectedOption.name === ancestorName),
+                });
+            }
+        }
+
         // Step 4: Re-sort to restore hierarchical grouping
         // Convert back to Record format expected by sortCategories
         const categoriesRecord: Record<string, Category> = {};
