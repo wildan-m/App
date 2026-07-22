@@ -1,7 +1,8 @@
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getDistanceRateCustomUnitRate} from '@libs/PolicyUtils';
+import {isInvoiceReport} from '@libs/ReportUtils';
 import {getVisibleTransactionViolations, isDistanceRequest} from '@libs/TransactionUtils';
-import {syncCustomUnitRateOutOfDateRangeViolation} from '@libs/Violations/ViolationsUtils';
+import {syncCustomUnitRateOutOfDateRangeViolation, syncFutureDateViolation} from '@libs/Violations/ViolationsUtils';
 
 import ONYXKEYS from '@src/ONYXKEYS';
 import {personalDetailsLoginSelector} from '@src/selectors/PersonalDetails';
@@ -29,7 +30,12 @@ function useTransactionViolations(transactionID?: string, shouldShowRterForSettl
     const currentUserDetails = useCurrentUserPersonalDetails();
 
     return useMemo(() => {
-        const syncedViolations = syncCustomUnitRateOutOfDateRangeViolation(transactionViolations, transaction, policy);
+        const syncedViolations = syncFutureDateViolation(
+            syncCustomUnitRateOutOfDateRangeViolation(transactionViolations, transaction, policy),
+            transaction,
+            policy,
+            isInvoiceReport(iouReport),
+        );
 
         return getVisibleTransactionViolations(
             transaction,

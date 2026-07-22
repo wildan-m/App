@@ -397,6 +397,32 @@ function isHardViolationOrRateDateWarning(violation: TransactionViolation): bool
 }
 
 /**
+ * Re-asserts the futureDate violation, which only ever exists client-side.
+ *
+ * The server does not evaluate a future-date rule, so any server violations payload for the transaction
+ * (e.g. the response to creating the expense) replaces the stored list with one that omits futureDate.
+ * Deriving it at read time keeps it visible regardless of what the server last wrote.
+ *
+ * This only ever adds the violation. Removal stays with `getViolationsOnyxData`, which already drops it
+ * when the date is edited back to today or earlier — so this can never hide a violation the server sent.
+ */
+function syncFutureDateViolation(violations: TransactionViolation[], transaction: OnyxEntry<Transaction>, policy: OnyxEntry<Policy>, isInvoiceTransaction: boolean): TransactionViolation[] {
+    if (!transaction || isInvoiceTransaction || policy?.type !== CONST.POLICY.TYPE.CORPORATE) {
+        return violations;
+    }
+
+    if (violations.some((violation) => violation.name === CONST.VIOLATIONS.FUTURE_DATE)) {
+        return violations;
+    }
+
+    if (!DateUtils.isFutureDay(new Date(transaction.modifiedCreated ?? transaction.created))) {
+        return violations;
+    }
+
+    return [...violations, {name: CONST.VIOLATIONS.FUTURE_DATE, type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true}];
+}
+
+/**
  * Syncs the customUnitRateOutOfDateRange violation with the current transaction rate and expense date.
  * Adds, removes, or updates the violation so the rate field reflects the selected rate's date bounds.
  */
@@ -1190,6 +1216,6 @@ const ViolationsUtils = {
     },
 };
 
-export {getIsViolationFixed, isHardViolationOrRateDateWarning, syncCustomUnitRateOutOfDateRangeViolation};
+export {getIsViolationFixed, isHardViolationOrRateDateWarning, syncCustomUnitRateOutOfDateRangeViolation, syncFutureDateViolation};
 export default ViolationsUtils;
 export {filterReceiptViolations};
