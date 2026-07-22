@@ -48,11 +48,16 @@ function AddDelegatePage() {
     });
 
     const handleSelectRow = (option: OptionData) => {
+        // A copilot is always identified by a login, and the access level route requires it as a path parameter.
+        // Without one the generated path matches no screen and the user lands on the not-found page.
+        if (!option.login) {
+            return;
+        }
         // toggleSelection would deselect an already-selected row on re-tap, so only select when it isn't selected yet
         if (!option.isSelected) {
             toggleSelection(option);
         }
-        Navigation.navigate(ROUTES.SETTINGS_DELEGATE_ROLE.getRoute(option.login ?? ''));
+        Navigation.navigate(ROUTES.SETTINGS_DELEGATE_ROLE.getRoute(option.login));
     };
 
     const sectionsList = (() => {
@@ -65,11 +70,14 @@ function AddDelegatePage() {
             });
         }
 
-        if (availableOptions.recentOptions?.length) {
+        // A recent report can outlive the contact method that backed it (for example after a secondary contact
+        // method is removed), leaving an option with no login that cannot be invited as a copilot.
+        const recentOptionsWithLogin = availableOptions.recentOptions?.filter((option) => !!option.login);
+        if (recentOptionsWithLogin?.length) {
             list.push({
                 title: translate('common.recents'),
                 sectionIndex: 1,
-                data: availableOptions.recentOptions,
+                data: recentOptionsWithLogin,
             });
         }
 
