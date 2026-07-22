@@ -1330,4 +1330,47 @@ describe('CategoryOptionListUtils', () => {
             {name: 'Normal:Category', enabled: true, pendingAction: undefined},
         ]);
     });
+
+    it('shows the parent category GL code when searching for a subcategory', () => {
+        // Both the parent "Lunch" and the subcategory "Lunch: Sushi" carry a GL code. Searching for the
+        // subcategory ("sushi") must still render the parent header with its own GL code, matching the
+        // unfiltered "All" section.
+        const categories: PolicyCategories = {
+            Lunch: {
+                enabled: true,
+                name: 'Lunch',
+                unencodedName: 'Lunch',
+                areCommentsRequired: false,
+                'GL Code': 'GL-PARENT',
+                externalID: '',
+                origin: '',
+                pendingAction: undefined,
+            },
+            'Lunch: Sushi': {
+                enabled: true,
+                name: 'Lunch: Sushi',
+                unencodedName: 'Lunch: Sushi',
+                areCommentsRequired: false,
+                'GL Code': 'GL-CHILD',
+                externalID: '',
+                origin: '',
+                pendingAction: undefined,
+            },
+        };
+
+        const result = getCategoryListSections({
+            categories,
+            searchValue: 'sushi',
+            localeCompare,
+            translate: translateLocal,
+            shouldShowGLCode: true,
+        });
+
+        const rows = result.at(0)?.data ?? [];
+        const parentRow = rows.find((row) => row.searchText === 'Lunch');
+        const childRow = rows.find((row) => row.searchText === 'Lunch: Sushi');
+
+        expect(parentRow?.alternateText).toBe('GL-PARENT');
+        expect(childRow?.alternateText).toBe('GL-CHILD');
+    });
 });
