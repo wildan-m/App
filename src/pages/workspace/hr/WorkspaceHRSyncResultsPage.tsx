@@ -1,54 +1,56 @@
+import Button from '@components/ButtonComposed';
+import FixedFooter from '@components/FixedFooter';
+import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import Icon from '@components/Icon';
+import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
+import ScreenWrapper from '@components/ScreenWrapper';
+import ScrollView from '@components/ScrollView';
+import Text from '@components/Text';
+
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
-import type HrSyncResult from '@libs/API/HrSyncResult';
 import {getConnectedHRProvider} from '@libs/HRUtils';
+import Navigation from '@libs/Navigation/Navigation';
+import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
+
+import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type SCREENS from '@src/SCREENS';
 
 import React, {useState} from 'react';
 import {View} from 'react-native';
 
-import type {ModalProps} from './Modal/Global/ModalContext';
+type WorkspaceHRSyncResultsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.HR_SYNC_RESULTS>;
 
-import Button from './Button';
-import FixedFooter from './FixedFooter';
-import HeaderWithBackButton from './HeaderWithBackButton';
-import Icon from './Icon';
-import Modal from './Modal';
-import PressableWithoutFeedback from './Pressable/PressableWithoutFeedback';
-import ScrollView from './ScrollView';
-import Text from './Text';
-
-type HRSyncResultsModalProps = ModalProps & {
-    /** Sync result returned by the completed HR sync job */
-    result: HrSyncResult;
-
-    /** ID of the policy associated with this sync */
-    policyID: string;
-};
-
-function HRSyncResultsModal({result, policyID, closeModal}: HRSyncResultsModalProps) {
+function WorkspaceHRSyncResultsPage({
+    route: {
+        params: {policyID, connectionName},
+    },
+}: WorkspaceHRSyncResultsPageProps) {
     const {translate} = useLocalize();
     const theme = useTheme();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const illustrations = useMemoizedLazyIllustrations(['SyncUsers']);
     const [isSkippedSectionExpanded, setIsSkippedSectionExpanded] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
 
     const [providerDisplayName = ''] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
         selector: (policy) => getConnectedHRProvider(policy)?.displayName ?? '',
     });
-    const addedCount = result.addedEmployeesCount ?? 0;
-    const removedCount = result.removedEmployeesCount ?? 0;
-    const skippedCount = result.skippedEmployees?.length ?? 0;
+    const [result] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`, {
+        selector: (syncProgress) => (syncProgress?.connectionName === connectionName ? syncProgress?.result : undefined),
+    });
 
-    const hideModal = () => setIsVisible(false);
+    const addedCount = result?.addedEmployeesCount ?? 0;
+    const removedCount = result?.removedEmployeesCount ?? 0;
+    const skippedCount = result?.skippedEmployees?.length ?? 0;
 
     const renderResultSummary = (label: string, count: number) => (
         <View style={[styles.mb6]}>
@@ -58,22 +60,17 @@ function HRSyncResultsModal({result, policyID, closeModal}: HRSyncResultsModalPr
     );
 
     return (
-        <Modal
-            type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
-            isVisible={isVisible}
-            onClose={hideModal}
-            onModalHide={closeModal}
-            shouldHandleNavigationBack
-            enableEdgeToEdgeBottomSafeAreaPadding
+        <AccessOrNotFoundWrapper
+            accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
+            policyID={policyID}
+            featureName={CONST.POLICY.MORE_FEATURES.IS_HR_ENABLED}
         >
-            <View
-                testID="HRSyncResultsModal"
-                style={[styles.flex1, styles.appBG]}
+            <ScreenWrapper
+                enableEdgeToEdgeBottomSafeAreaPadding
+                shouldEnableMaxHeight
+                testID="WorkspaceHRSyncResultsPage"
             >
-                <HeaderWithBackButton
-                    title={translate('workspace.hr.syncResults.title', providerDisplayName)}
-                    onBackButtonPress={hideModal}
-                />
+                <HeaderWithBackButton title={translate('workspace.hr.syncResults.title', providerDisplayName)} />
                 <ScrollView
                     contentContainerStyle={[styles.flexGrow1, styles.ph5, styles.pb8]}
                     showsVerticalScrollIndicator={false}
@@ -90,7 +87,7 @@ function HRSyncResultsModal({result, policyID, closeModal}: HRSyncResultsModalPr
                     {renderResultSummary(translate('workspace.hr.syncResults.removed'), removedCount)}
                     <PressableWithoutFeedback
                         accessibilityLabel={translate('workspace.hr.syncResults.skipped')}
-                        sentryLabel="HRSyncResultsModal-SkippedEmployees"
+                        sentryLabel="WorkspaceHRSyncResultsPage-SkippedEmployees"
                         role={CONST.ROLE.BUTTON}
                         onPress={() => setIsSkippedSectionExpanded((isExpanded) => !isExpanded)}
                         style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsCenter]}
@@ -106,7 +103,7 @@ function HRSyncResultsModal({result, policyID, closeModal}: HRSyncResultsModalPr
                         />
                     </PressableWithoutFeedback>
                     {isSkippedSectionExpanded &&
-                        result.skippedEmployees?.map((employee) => (
+                        result?.skippedEmployees?.map((employee) => (
                             <View
                                 key={employee.id}
                                 style={[styles.mt4]}
@@ -118,15 +115,16 @@ function HRSyncResultsModal({result, policyID, closeModal}: HRSyncResultsModalPr
                 </ScrollView>
                 <FixedFooter addBottomSafeAreaPadding>
                     <Button
-                        large
-                        success
-                        text={translate('common.buttonConfirm')}
-                        onPress={hideModal}
-                    />
+                        size={CONST.BUTTON_SIZE.LARGE}
+                        variant={CONST.BUTTON_VARIANT.SUCCESS}
+                        onPress={() => Navigation.goBack()}
+                    >
+                        <Button.Text>{translate('common.buttonConfirm')}</Button.Text>
+                    </Button>
                 </FixedFooter>
-            </View>
-        </Modal>
+            </ScreenWrapper>
+        </AccessOrNotFoundWrapper>
     );
 }
 
-export default HRSyncResultsModal;
+export default WorkspaceHRSyncResultsPage;

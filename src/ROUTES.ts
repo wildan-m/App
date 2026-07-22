@@ -2745,6 +2745,15 @@ const ROUTES = {
         route: 'workspaces/:policyID/hr/merge/groups',
         getRoute: (policyID: string) => `workspaces/${policyID}/hr/merge/groups` as const,
     },
+    WORKSPACE_HR_SYNC_RESULTS: {
+        route: 'workspaces/:policyID/hr/:connectionName/sync-results',
+        getRoute: (policyID: string | undefined, connectionName: string) => {
+            if (!policyID) {
+                Log.warn('Invalid policyID is used to build the WORKSPACE_HR_SYNC_RESULTS route');
+            }
+            return `workspaces/${policyID}/hr/${connectionName}/sync-results` as const;
+        },
+    },
     WORKSPACE_TAGS: {
         route: 'workspaces/:policyID/tags',
         getRoute: (policyID: string | undefined) => {

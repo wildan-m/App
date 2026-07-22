@@ -697,6 +697,7 @@ const SCREENS = {
         HR_MERGE_APPROVAL_MODE: 'Workspace_HR_Merge_Approval_Mode',
         HR_MERGE_FINAL_APPROVER: 'Workspace_HR_Merge_Final_Approver',
         HR_MERGE_GROUPS: 'Workspace_HR_Merge_Groups',
+        HR_SYNC_RESULTS: 'Workspace_HR_Sync_Results',
         COMPANY_CARDS: 'Workspace_CompanyCards',
         COMPANY_CARDS_BROKEN_CARD_FEED_CONNECTION: 'Workspace_CompanyCards_BrokenCardFeedConnection',
         COMPANY_CARDS_REFRESH_CARD_FEED_CONNECTION: 'Workspace_CompanyCards_RefreshCardFeedConnection',

@@ -1,10 +1,9 @@
-import HRSyncResultsModal from '@components/HRSyncResultsModal';
-import {useModal} from '@components/Modal/Global/ModalContext';
-
+import Navigation from '@libs/Navigation/Navigation';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type {PolicyConnectionSyncProgress} from '@src/types/onyx/Policy';
 
 import type {OnyxEntry} from 'react-native-onyx';
@@ -16,11 +15,10 @@ import useOnyx from './useOnyx';
 import usePrevious from './usePrevious';
 
 /**
- * Watches an HR provider's sync progress and automatically opens the `HRSyncResultsModal`
+ * Watches an HR provider's sync progress and automatically opens the HR sync results screen
  * when the sync transitions to the `JOB_DONE` stage with a result payload.
  */
 function useHRSyncResultsModal(policyID: string, connectionSyncProgress: OnyxEntry<PolicyConnectionSyncProgress>, isFocused: boolean) {
-    const modal = useModal();
     const previousSyncProgress = usePrevious(connectionSyncProgress);
     const pendingSyncResultRef = useRef<Pick<PolicyConnectionSyncProgress, 'connectionName' | 'result'> | null>(null);
     const [isAnyModalActive] = useOnyx(ONYXKEYS.MODAL, {selector: isModalActiveSelector});
@@ -31,11 +29,7 @@ function useHRSyncResultsModal(policyID: string, connectionSyncProgress: OnyxEnt
             return;
         }
 
-        modal.showModal({
-            component: HRSyncResultsModal,
-            props: {result: syncResult, policyID},
-            id: `${syncConnectionName}-sync-results-${policyID}`,
-        });
+        Navigation.navigate(ROUTES.WORKSPACE_HR_SYNC_RESULTS.getRoute(policyID, syncConnectionName));
     });
 
     useEffect(() => {

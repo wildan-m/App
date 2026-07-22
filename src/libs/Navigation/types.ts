@@ -1547,6 +1547,10 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.HR_MERGE_GROUPS]: {
         policyID: string;
     };
+    [SCREENS.WORKSPACE.HR_SYNC_RESULTS]: {
+        policyID: string;
+        connectionName: ConnectionName;
+    };
     [SCREENS.WORKSPACE.RULES_PROHIBITED_DEFAULT]: {
         policyID: string;
     };
