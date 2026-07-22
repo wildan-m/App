@@ -5597,7 +5597,7 @@ function getSingleSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, trans
     return [];
 }
 
-function getMultiSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, type: SearchDataTypes, translate: LocalizedTranslate) {
+function getMultiSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, type: SearchDataTypes, translate: LocalizedTranslate, selectedValues: string[] = []) {
     if (filterKey === FILTER_KEYS.HAS) {
         return getHasOptions(translate, type);
     }
@@ -5614,7 +5614,18 @@ function getMultiSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, type: 
     }
 
     if (filterKey === FILTER_KEYS.RECEIPT_TYPE) {
-        return CONST.SEARCH.SELECTABLE_RECEIPT_TYPES.map((receiptType) => {
+        const receiptTypes: Array<ValueOf<typeof CONST.SEARCH.RECEIPT_TYPE>> = [...CONST.SEARCH.SELECTABLE_RECEIPT_TYPES];
+
+        // Some receipt types are valid in a query but are not offered as options by default. Keep them out of the
+        // default list, but surface the ones that are already applied so their label still renders in the filter.
+        Object.values(CONST.SEARCH.RECEIPT_TYPE).forEach((receiptType) => {
+            if (receiptTypes.includes(receiptType) || !selectedValues.includes(receiptType)) {
+                return;
+            }
+            receiptTypes.push(receiptType);
+        });
+
+        return receiptTypes.map((receiptType) => {
             const receiptTypeName = translate(getReceiptTypeTranslationKey(receiptType));
             return {text: receiptTypeName, value: receiptType};
         });
