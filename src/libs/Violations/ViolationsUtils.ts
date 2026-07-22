@@ -415,7 +415,9 @@ function syncFutureDateViolation(violations: TransactionViolation[], transaction
         return violations;
     }
 
-    if (!DateUtils.isFutureDay(new Date(transaction.modifiedCreated ?? transaction.created))) {
+    // `modifiedCreated` is an empty string (not undefined) on transactions returned by the server,
+    // so it has to be read through `getCreated` rather than a nullish check that would keep the ''.
+    if (!DateUtils.isFutureDay(new Date(TransactionUtils.getCreated(transaction)))) {
         return violations;
     }
 
