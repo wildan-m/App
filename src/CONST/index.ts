@@ -4627,7 +4627,8 @@ const CONST = {
             COPY_EXISTING: 'copy',
             CREATE_NEW: 'create',
         },
-        MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK: 'https://help.expensify.com/articles/new-expensify/expensify-card/Manage-Expensify-Cards',
+        MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK_US: 'https://help.expensify.com/articles/new-expensify/expensify-card/Set-Up-and-Manage-the-Expensify-Card-US',
+        MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK_UK_EU: 'https://help.expensify.com/articles/new-expensify/expensify-card/Set-Up-and-Manage-the-Expensify-Card-UK-EU',
         PIN: {
             LENGTH: 4,
             INVALID_PINS: [

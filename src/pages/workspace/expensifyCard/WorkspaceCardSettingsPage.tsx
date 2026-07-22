@@ -95,7 +95,9 @@ function WorkspaceCardSettingsPage({route}: WorkspaceCardSettingsPageProps) {
                                         <>
                                             {translate('workspace.expensifyCard.settlementFrequencyInfo')}{' '}
                                             <TextLink
-                                                href={CONST.EXPENSIFY_CARD.MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK}
+                                                href={
+                                                    isUSProgram ? CONST.EXPENSIFY_CARD.MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK_US : CONST.EXPENSIFY_CARD.MANAGE_EXPENSIFY_CARDS_ARTICLE_LINK_UK_EU
+                                                }
                                                 style={styles.label}
                                             >
                                                 {translate('common.learnMore')}
