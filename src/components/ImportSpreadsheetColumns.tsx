@@ -41,6 +41,10 @@ type ImportSpreadsheetColumnsProps = {
     // An optional boolean indicating whether the import button is in a loading state.
     isButtonLoading?: boolean;
 
+    // Whether completing this import requires a request to the server. Defaults to true, so every flow keeps the
+    // Import button disabled while offline unless the screen knows this particular import is handled locally.
+    doesImportRequireNetwork?: boolean;
+
     // Link to learn more about the file preparation for import.
     learnMoreLink?: string;
 
@@ -60,6 +64,7 @@ function ImportSpreadsheetColumns({
     errors,
     importFunction,
     isButtonLoading,
+    doesImportRequireNetwork = true,
     learnMoreLink,
     shouldShowColumnHeader = true,
     shouldShowDropdownMenu = true,
@@ -124,7 +129,7 @@ function ImportSpreadsheetColumns({
                         text={translate('common.import')}
                         onPress={importFunction}
                         isLoading={isButtonLoading}
-                        isDisabled={isOffline}
+                        isDisabled={isOffline && doesImportRequireNetwork}
                         pressOnEnter
                         success
                         large

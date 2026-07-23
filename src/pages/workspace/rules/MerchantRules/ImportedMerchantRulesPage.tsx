@@ -40,7 +40,7 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import type {OnyxEntry} from 'react-native-onyx';
 
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useState} from 'react';
 
 /** Column roles that update the matched expense; at least one must be mapped alongside a merchant filter */
 const ACTION_COLUMNS: string[] = [
@@ -196,13 +196,10 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
         Navigation.goBack(ROUTES.WORKSPACE_RULES.getRoute(policyID));
     };
 
-    const importRules = async () => {
-        setIsValidationEnabled(true);
-        const errors = validate();
-        if (Object.keys(errors).length > 0) {
-            return;
-        }
-
+    // Turning the mapped rows into rules only reads local data (the parsed spreadsheet, the policy's existing coding
+    // rules and its categories), so it's derived from the current mapping rather than computed on press. That lets the
+    // page tell up front whether importing would have anything to send to the server.
+    const {newRules, skippedDuplicateCount, invalidCategoryNames} = useMemo(() => {
         const columns = Object.values(spreadsheet?.columns ?? {});
         const merchantIsColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.MERCHANT_IS);
         const merchantContainsColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.MERCHANT_CONTAINS);
@@ -228,12 +225,12 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
                 .filter((rule) => rule.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && rule.filters?.right)
                 .map(getRuleContentKey),
         );
-        let skippedDuplicateCount = 0;
+        let duplicateCount = 0;
 
         const categoryLookup = buildImportedCategoryLookup(policyCategories);
-        const invalidCategoryNames = new Set<string>();
+        const unknownCategoryNames = new Set<string>();
 
-        const rules: Record<string, ImportedMerchantRule> = {};
+        const parsedRules: Array<Omit<ImportedMerchantRule, 'created'>> = [];
         for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
             // "Merchant is" wins when both filter columns have a value for the same row
             const merchantIsValue = getCellValue(merchantIsColumn, rowIndex);
@@ -249,7 +246,7 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
             const categoryCell = getCellValue(categoryColumn, rowIndex);
             const category = categoryCell ? (categoryLookup.get(categoryCell.toLowerCase()) ?? '') : '';
             if (categoryCell && !category) {
-                invalidCategoryNames.add(categoryCell.toLowerCase());
+                unknownCategoryNames.add(categoryCell.toLowerCase());
             }
             const tag = normalizeImportedTag(getCellValue(tagColumn, rowIndex), !!policy?.hasMultipleTagLists);
             const comment = getCellValue(commentColumn, rowIndex);
@@ -261,7 +258,7 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
                 continue;
             }
 
-            const rule: ImportedMerchantRule = {
+            const rule: Omit<ImportedMerchantRule, 'created'> = {
                 filters: {
                     left: 'merchant',
                     operator: merchantIsValue ? CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO : CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS,
@@ -273,17 +270,36 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
                 ...(comment && {comment: Parser.replace(comment)}),
                 ...(reimbursable !== undefined && {reimbursable}),
                 ...(billable !== undefined && {billable}),
-                created: new Date().toISOString(),
             };
 
             const ruleKey = getRuleContentKey(rule);
             if (seenRuleKeys.has(ruleKey)) {
-                skippedDuplicateCount++;
+                duplicateCount++;
                 continue;
             }
             seenRuleKeys.add(ruleKey);
 
-            rules[rand64()] = rule;
+            parsedRules.push(rule);
+        }
+
+        return {newRules: parsedRules, skippedDuplicateCount: duplicateCount, invalidCategoryNames: unknownCategoryNames};
+    }, [spreadsheet, containsHeader, policy?.rules?.codingRules, policy?.hasMultipleTagLists, policyCategories]);
+
+    // Every row was already covered by an existing rule (or dropped for an unknown category), so pressing Import
+    // resolves entirely from local data below and needs no connection
+    const doesImportRequireNetwork = newRules.length > 0 || (skippedDuplicateCount === 0 && invalidCategoryNames.size === 0);
+
+    const importRules = async () => {
+        setIsValidationEnabled(true);
+        const errors = validate();
+        if (Object.keys(errors).length > 0) {
+            return;
+        }
+
+        const created = new Date().toISOString();
+        const rules: Record<string, ImportedMerchantRule> = {};
+        for (const rule of newRules) {
+            rules[rand64()] = {...rule, created};
         }
 
         setIsImportingRules(true);
@@ -338,6 +354,7 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
                     errors={isValidationEnabled ? validate() : undefined}
                     columnRoles={columnRoles}
                     isButtonLoading={isImportingRules}
+                    doesImportRequireNetwork={doesImportRequireNetwork}
                     customHeaderText={translate('workspace.rules.merchantRules.importRulesSupportingText')}
                 />
             </ScreenWrapper>
