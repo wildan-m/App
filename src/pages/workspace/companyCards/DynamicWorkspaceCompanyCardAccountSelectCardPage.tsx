@@ -30,7 +30,8 @@ import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-import React, {useState} from 'react';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 
 import {getExportMenuItem} from './utils';
@@ -56,6 +57,18 @@ function DynamicWorkspaceCompanyCardAccountSelectCardPage({route}: DynamicWorksp
     const activeRoute = Navigation.getActiveRoute();
     const exportMenuItem = getExportMenuItem(connectedIntegration, policyID, translate, policy, card, activeRoute);
     const currentConnectionName = getCurrentConnectionName(policy);
+    const isFocused = useIsFocused();
+
+    // The export configuration can be changed from the accounting settings that this page links to, which can leave this page in the stack after the
+    // connection stops offering a per-card export account (e.g. QuickBooks Online switched to vendor bill). The card details page hides the row that
+    // leads here in that case, so the page must dismiss itself back to it instead of listing accounts that no longer apply.
+    useEffect(() => {
+        if (!isFocused || exportMenuItem?.shouldShowMenuItem) {
+            return;
+        }
+        Navigation.goBack(backPath);
+    }, [backPath, exportMenuItem?.shouldShowMenuItem, isFocused]);
+
     const shouldShowTextInput = (exportMenuItem?.data?.length ?? 0) >= CONST.STANDARD_LIST_ITEM_LIMIT;
     const defaultCard = translate('workspace.moreFeatures.companyCards.defaultCard');
     const defaultVendor = translate('workspace.accounting.defaultVendor');
