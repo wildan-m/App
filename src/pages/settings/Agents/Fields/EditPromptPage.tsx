@@ -16,6 +16,8 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 
+import variables from '@styles/variables';
+
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -99,11 +101,10 @@ function EditPromptPage({route}: EditPromptPageProps) {
                         accessibilityLabel={translate('editAgentPage.instructions')}
                         role={CONST.ROLE.PRESENTATION}
                         defaultValue={Str.htmlDecode(agentPrompt?.prompt ?? '')}
+                        type="markdown"
                         multiline
-                        containerStyles={[styles.flex1]}
-                        touchableInputWrapperStyle={[styles.flex1]}
-                        textInputContainerStyles={[styles.flex1]}
-                        inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                        autoGrowHeight
+                        maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}
                     />
                 </View>
             </FormProvider>

@@ -12,6 +12,8 @@ import useLocalize from '@hooks/useLocalize';
 import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import variables from '@styles/variables';
+
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/AddAgentRuleForm';
@@ -90,13 +92,12 @@ function AddAgentRuleWriteTab({onSave}: AddAgentRuleWriteTabProps) {
                         accessibilityLabel={describeRuleLabel}
                         role={CONST.ROLE.PRESENTATION}
                         onKeyPress={submitFormOnModEnter}
+                        type="markdown"
                         multiline
+                        autoGrowHeight
+                        maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}
                         shouldSaveDraft
                         shouldLabelStayOnSingleLine
-                        containerStyles={[styles.flex1]}
-                        touchableInputWrapperStyle={[styles.flex1]}
-                        textInputContainerStyles={[styles.flex1]}
-                        inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
                     />
                 </View>
                 <Text style={[styles.textMicroSupporting, styles.textAlignCenter, styles.mt2]}>{translate('workspace.rules.agentRules.disclaimer')}</Text>

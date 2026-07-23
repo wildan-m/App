@@ -24,6 +24,8 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
 
+import variables from '@styles/variables';
+
 import {clearNewAgentAvatarDraft, createAgent, setNewAgentAvatarPreset} from '@userActions/Agent';
 
 import CONST from '@src/CONST';
@@ -166,11 +168,10 @@ function AddAgentPage({route}: AddAgentPageProps) {
                             accessibilityLabel={translate('addAgentPage.instructions')}
                             role={CONST.ROLE.PRESENTATION}
                             defaultValue={defaultPrompt}
+                            type="markdown"
                             multiline
-                            containerStyles={[styles.flex1]}
-                            touchableInputWrapperStyle={[styles.flex1]}
-                            textInputContainerStyles={[styles.flex1]}
-                            inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                            autoGrowHeight
+                            maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}
                         />
                     </View>
                     <Text style={[styles.textLabelSupporting]}>{translate('addAgentPage.copilotNote')}</Text>
