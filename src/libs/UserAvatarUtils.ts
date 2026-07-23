@@ -243,9 +243,12 @@ function firstLetterAvatarCharacter(name: string): string {
             continue;
         }
         // Latin accents fold to their ASCII base letter; any other non-ASCII codepoint contributes no
-        // initial rather than substituting a later ASCII letter.
-        if (codePoint >= 0xc0 && codePoint <= 0x17f) {
-            const folded = LETTER_AVATAR_ACCENT_FOLD_TABLE.charAt(codePoint - 0xc0);
+        // initial rather than substituting a later ASCII letter. Uppercase letters outside the table
+        // are retried through their lowercase form so they fold the same way as the lowercase spelling
+        // of the same name (for example 'ẞ' U+1E9E folds like 'ß' U+00DF).
+        const foldableCodePoint = codePoint >= 0xc0 && codePoint <= 0x17f ? codePoint : (character.toLowerCase().codePointAt(0) ?? 0);
+        if (foldableCodePoint >= 0xc0 && foldableCodePoint <= 0x17f) {
+            const folded = LETTER_AVATAR_ACCENT_FOLD_TABLE.charAt(foldableCodePoint - 0xc0);
             return folded === '.' ? '' : folded;
         }
         return '';
@@ -266,6 +269,12 @@ function getLetterAvatarInitials(firstName: string, lastName: string, login: str
     const initials = firstLetterAvatarCharacter(firstName) + firstLetterAvatarCharacter(lastName);
     if (initials !== '') {
         return initials;
+    }
+    // A name that yields no initial is still a name, so the login must not seed the letter. Falling back
+    // here would show a letter taken from the email that has nothing to do with the displayed name; the
+    // illustrated default avatar is used instead.
+    if (firstName.trim() !== '' || lastName.trim() !== '') {
+        return '';
     }
     // The displayed login has the merge prefix stripped, so derive the initial from the
     // stripped form to match what users see. This is a no-op for non-merged logins.

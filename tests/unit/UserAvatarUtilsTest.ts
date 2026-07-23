@@ -586,6 +586,12 @@ describe('UserAvatarUtils', () => {
             ['SMS login and no name', '', '', '+15551234567@expensify.sms', ''],
             ['no usable characters', '!@#$%', '', '', ''],
             ['accented first letters', 'Élodie', 'Øyvind', 'elodie@example.com', 'EO'],
+            // cspell:disable-next-line
+            ['uppercase eszett folds like its lowercase form', 'ẞlaus', '', 'dave@example.com', 'S'],
+            // cspell:disable-next-line
+            ['lowercase eszett', 'ßlaus', '', 'dave@example.com', 'S'],
+            ['non-Latin name does not fall back to the login', '日本語', '', 'dave@example.com', ''],
+            ['punctuation-only name does not fall back to the login', '!@#$%', '', 'dave@example.com', ''],
         ])('%s → %s', (_, firstName, lastName, login, expected) => {
             expect(UserAvatarUtils.getLetterAvatarInitials(firstName, lastName, login)).toBe(expected);
         });
