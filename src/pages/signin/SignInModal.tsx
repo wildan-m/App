@@ -18,7 +18,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import type {SignInPageRef} from './SignInPage';
 
@@ -36,12 +36,24 @@ function SignInModal() {
     // More info https://github.com/Expensify/App/pull/62799#issuecomment-2943136220.
     const SignInPageBase = useMemo(() => (isMobileSafari() ? SignInPageWrapped : SignInPage), []);
 
-    // The SignInPage (child component of SignInModal) uses useAndroidBackButtonHandler, which adds a hardwareBackPress listener that remains active in the SignInModal.
-    // Use of useAndroidBackButtonHandler with a returning true callback disables the default SignInModal hardware Android button behaviour, leaving only SignInPage handling (https://github.com/Expensify/App/issues/69391).
-    // The SignInPage Android back button behavior needs to remain because it is a fix for issue (https://github.com/Expensify/App/issues/67883) that occurs in the SignInModal.
-    useAndroidBackButtonHandler(() => {
+    // Perform the same back navigation as the on-screen header back button: delegate to SignInPage
+    // once its ref is attached, otherwise dismiss the modal directly.
+    const handleBackButtonPress = useCallback(() => {
+        if (!signinPageRef.current) {
+            Navigation.goBack();
+            return;
+        }
+        signinPageRef.current.navigateBack();
+    }, []);
+
+    // The SignInPage (child component of SignInModal) also uses useAndroidBackButtonHandler, so its hardwareBackPress listener remains active in the SignInModal.
+    // Because BackHandler evaluates listeners in reverse registration order and SignInModal's listener is registered last, it is evaluated first and stops the dispatch.
+    // It must therefore perform the back navigation itself and return true, so the hardware back button mirrors the header back button (https://github.com/Expensify/App/issues/69391, https://github.com/Expensify/App/issues/67883).
+    const handleHardwareBackPress = useCallback(() => {
+        handleBackButtonPress();
         return true;
-    });
+    }, [handleBackButtonPress]);
+    useAndroidBackButtonHandler(handleHardwareBackPress);
 
     useEffect(() => {
         const isAnonymousUser = session?.authTokenType === CONST.AUTH_TOKEN_TYPES.ANONYMOUS;
@@ -79,15 +91,7 @@ function SignInModal() {
             shouldShowOfflineIndicator={false}
             testID="SignInModal"
         >
-            <HeaderWithBackButton
-                onBackButtonPress={() => {
-                    if (!signinPageRef.current) {
-                        Navigation.goBack();
-                        return;
-                    }
-                    signinPageRef.current?.navigateBack();
-                }}
-            />
+            <HeaderWithBackButton onBackButtonPress={handleBackButtonPress} />
             <SignInPageBase ref={signinPageRef} />
         </ScreenWrapper>
     );
