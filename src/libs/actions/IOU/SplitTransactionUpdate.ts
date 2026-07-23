@@ -47,6 +47,7 @@ import {isTracking, setPendingSubmitFollowUpAction} from '@libs/telemetry/submit
 import {getChildTransactions, isDistanceRequest as isDistanceRequestTransactionUtils, isOnHold, isPerDiemRequest as isPerDiemRequestTransactionUtils} from '@libs/TransactionUtils';
 
 import {setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
+import {mergeTransactionIdsHighlightOnSearchRoute} from '@userActions/Transaction';
 import {removeDraftSplitTransaction} from '@userActions/TransactionEdit';
 
 import CONST from '@src/CONST';
@@ -1934,11 +1935,20 @@ function updateSplitTransactionsFromSplitExpensesFlow(params: UpdateSplitTransac
     // and the last-transaction case (the report navigates away before the highlight renders).
     if (params.expenseReport?.reportID && !isReverseSplitOperation && !isLastTransactionInReport) {
         const existingChildTransactionIDs = new Set(allChildTransactions.map((tx) => tx?.transactionID).filter(Boolean));
+        const newSplitTransactionIDsToHighlightOnSearch: Record<string, boolean> = {};
         for (const splitExpense of splitExpenses) {
             if (!splitExpense.transactionID || existingChildTransactionIDs.has(splitExpense.transactionID)) {
                 continue;
             }
             addPendingNewTransactionIDs(targetReportID, splitExpense.transactionID);
+            newSplitTransactionIDsToHighlightOnSearch[splitExpense.transactionID] = true;
+        }
+
+        // On the Search page the list is not a MoneyRequestReport view, so the pendingNewTransactionIDs
+        // path above never reaches it. Register the new split IDs on the Search-route highlight key so
+        // useSearchHighlightAndScroll highlights them there too, mirroring the other expense creation flows.
+        if (isSearchPageTopmostFullScreenRoute && Object.keys(newSplitTransactionIDsToHighlightOnSearch).length > 0) {
+            mergeTransactionIdsHighlightOnSearchRoute(CONST.SEARCH.DATA_TYPES.EXPENSE, newSplitTransactionIDsToHighlightOnSearch);
         }
     }
 
