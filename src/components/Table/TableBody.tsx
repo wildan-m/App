@@ -5,6 +5,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {StyleProp, ViewProps, ViewStyle} from 'react-native';
 
+import {useIsFocused} from '@react-navigation/native';
 import {FlashList} from '@shopify/flash-list';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -52,6 +53,10 @@ type TableBodyProps = ViewProps & {
 function TableBody<DataType extends TableData>({contentContainerStyle, style, ...props}: TableBodyProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    // While the screen this table lives on is covered by an RHP (not focused), stop the list from being a
+    // scroll target. On web this turns the list container's overflow off, so arrow keys can't scroll the
+    // background list once an RHP is open.
+    const isFocused = useIsFocused();
     const {
         processedData: filteredAndSortedData,
         activeSearchString,
@@ -116,6 +121,7 @@ function TableBody<DataType extends TableData>({contentContainerStyle, style, ..
                 ListHeaderComponent={ListHeaderComponent}
                 ListEmptyComponent={ListEmptyComponent}
                 {...restListProps}
+                scrollEnabled={isFocused && (restListProps.scrollEnabled ?? true)}
             />
         </View>
     );
