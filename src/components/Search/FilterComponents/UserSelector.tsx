@@ -44,6 +44,15 @@ function UserSelector({value = [], selectionListTextInputStyle, selectionListSty
 
     const expensifyTeamExclusions = getExpensifyTeamExclusions(personalDetails, policies, currentUserPersonalDetails.email);
 
+    // Logins of everyone the current user shares a workspace with. Used to keep workspace members visible in the filter even
+    // when there's no shared report yet, while stale cached accounts (no shared report and no shared workspace) are dropped.
+    const relatedAccountLogins = Object.values(policies ?? {}).reduce<Set<string>>((acc, policy) => {
+        for (const email of Object.keys(policy?.employeeList ?? {})) {
+            acc.add(email.toLowerCase());
+        }
+        return acc;
+    }, new Set<string>());
+
     const {searchTerm, setSearchTerm, availableOptions, totalOptionsCount, toggleSelection, areOptionsInitialized} = usePersonalDetailSearchSelector({
         selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_MULTI,
         initialSelected: initialSelectedAccountIDs,
@@ -55,6 +64,8 @@ function UserSelector({value = [], selectionListTextInputStyle, selectionListSty
         shouldInitialize: ready,
         onSelectionChange: onChange,
         shouldKeepSelectedInAvailableOptions: true,
+        shouldOnlyIncludeRelatedAccounts: true,
+        relatedAccountLogins,
     });
 
     // Snapshot the pre-selected accountIDs from when the filter first opened so they can be floated to the

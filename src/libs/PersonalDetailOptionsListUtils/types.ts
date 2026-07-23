@@ -50,6 +50,15 @@ type GetOptionsConfig = {
     includeDomainEmail?: boolean;
     extraOptions?: OptionData[];
     shouldAcceptName?: boolean;
+
+    /**
+     * When true, personal-detail options are restricted to accounts the current user is actually related to (shares a report, or is in the same workspace).
+     * Accounts that only linger in the local personal-details cache are dropped. Selected options are always kept regardless of this flag.
+     */
+    shouldOnlyIncludeRelatedAccounts?: boolean;
+
+    /** Lower-cased logins the current user shares a workspace with. Combined with report relationships when shouldOnlyIncludeRelatedAccounts is on. */
+    relatedAccountLogins?: Set<string>;
 };
 
 type GetUserToInviteConfig = {

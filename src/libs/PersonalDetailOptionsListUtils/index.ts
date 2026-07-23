@@ -281,6 +281,8 @@ function getValidOptions(
         includeDomainEmail = false,
         extraOptions = [],
         shouldAcceptName = false,
+        shouldOnlyIncludeRelatedAccounts = false,
+        relatedAccountLogins,
     }: GetOptionsConfig = {},
 ) {
     // Gather shared configs:
@@ -404,6 +406,13 @@ function getValidOptions(
             return false;
         }
         if (loginsToExcludeFromSuggestions[personalDetail.login]) {
+            return false;
+        }
+
+        // Optionally drop accounts the current user has no relationship with. An account is considered related when it either
+        // shares a report (reportID is set on the option) or belongs to one of the current user's workspaces (relatedAccountLogins).
+        // Everything else is stale data left in the local personal-details cache. Selected accounts are always kept so filter chips never vanish.
+        if (shouldOnlyIncludeRelatedAccounts && !personalDetail.isSelected && !personalDetail.reportID && !relatedAccountLogins?.has(personalDetail.login.toLowerCase())) {
             return false;
         }
 

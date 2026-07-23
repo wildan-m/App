@@ -80,6 +80,15 @@ type UseSearchSelectorConfig = {
 
     /** Initial Search Phrase */
     initialSearchPhrase?: string;
+
+    /**
+     * When true, restrict personal-detail options to accounts the current user is related to (shares a report or workspace),
+     * hiding stale accounts left in the local cache. Selected accounts are always kept. Used by the Search From/To participant filters.
+     */
+    shouldOnlyIncludeRelatedAccounts?: boolean;
+
+    /** Lower-cased logins the current user shares a workspace with. Only used when shouldOnlyIncludeRelatedAccounts is true. */
+    relatedAccountLogins?: Set<string>;
 };
 
 type ContactState = {
@@ -172,6 +181,8 @@ function usePersonalDetailSearchSelectorBase({
     shouldKeepSelectedInAvailableOptions = false,
     shouldUpdateSelectedOptionsOnSingleSelect = false,
     initialSearchPhrase = '',
+    shouldOnlyIncludeRelatedAccounts = false,
+    relatedAccountLogins,
 }: UseSearchSelectorConfig): UseSearchSelectorReturn {
     const {translate, formatPhoneNumber} = useLocalize();
     const {options: defaultOptions, currentOption} = usePersonalDetailOptions({enabled: shouldInitialize});
@@ -228,6 +239,8 @@ function usePersonalDetailSearchSelectorBase({
               includeDomainEmail,
               extraOptions,
               shouldAcceptName: shouldAllowNameOnlyOptions,
+              shouldOnlyIncludeRelatedAccounts,
+              relatedAccountLogins,
           });
 
     const currentUserSearchTerms = [translate('common.you'), translate('common.me')];
