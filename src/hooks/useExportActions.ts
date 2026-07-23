@@ -120,7 +120,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
                 jsonQuery: '{}',
                 reportIDList: [moneyRequestReport.reportID],
                 transactionIDList,
-                policyID,
+                policyID: policyID ?? moneyRequestReport.policyID,
                 exportName,
             },
             true,
