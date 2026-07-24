@@ -1838,7 +1838,11 @@ function shouldShowViolation(
     const isPolicyMember = isPolicyMemberPolicyUtils(policy, currentUserEmail);
     const isReportOpen = isOpenExpenseReport(iouReport);
     if (violationName === CONST.VIOLATIONS.AUTO_REPORTED_REJECTED_EXPENSE) {
-        return isSubmitter || isPolicyAdmin(policy);
+        // Rejecting an expense detaches it from its report, so there is no report left to resolve the submitter or the
+        // policy from. An expense with no report is an unreported expense that belongs to the user viewing it, so the
+        // submitter condition is satisfied in that state.
+        const isDetachedFromReport = !!transaction && (!transaction.reportID || isExpenseUnreported(transaction));
+        return isSubmitter || isPolicyAdmin(policy) || isDetachedFromReport;
     }
 
     if (violationName === CONST.VIOLATIONS.OVER_AUTO_APPROVAL_LIMIT) {
