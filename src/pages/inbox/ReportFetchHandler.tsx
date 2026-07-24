@@ -155,6 +155,10 @@ function ReportFetchHandler() {
 
     const fetchReport = useEffectEvent(() => {
         if (reportMetadata.isOptimisticReport && report?.type === CONST.REPORT.TYPE.CHAT && !isPolicyExpenseChat(report)) {
+            // Nothing will ever be fetched for this report, so resolve the initial-actions loading flag here. Leaving it
+            // asserted claims a fetch is in flight that will never happen, which keeps the actions skeleton and the
+            // ReportNotFoundGuard stuck in their loading branch forever. See issue #96925.
+            updateLoadingInitialReportAction(reportIDFromRoute, false);
             return;
         }
 
