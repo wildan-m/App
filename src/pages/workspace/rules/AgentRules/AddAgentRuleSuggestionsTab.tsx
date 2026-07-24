@@ -149,6 +149,7 @@ function AddAgentRuleSuggestionsTab({onSelectSuggestion}: AddAgentRuleSuggestion
                 )}
             </ScrollView>
             <FixedFooter style={styles.pt5}>
+                <Text style={[styles.textMicroSupporting, styles.textAlignCenter, styles.mb2]}>{translate('workspace.rules.agentRules.disclaimer')}</Text>
                 <Button
                     variant="success"
                     size={CONST.BUTTON_SIZE.LARGE}
