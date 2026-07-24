@@ -5249,6 +5249,8 @@ const translations = {
             exportNonReimbursableExpenseReports: {
                 helperText: 'Expenses marked as non-reimbursable will be exported as Expense Reports made out to the employee.',
             },
+            // @context Shown as the value of the "Default vendor" row on the Certinia export settings page when no vendor has been selected yet.
+            notSet: 'Not set',
             noVendorsFound: 'No vendors found',
             noVendorsFoundDescription: 'Please sync the connection again after vendors are added in Certinia.',
             noCompaniesFound: 'No companies found',

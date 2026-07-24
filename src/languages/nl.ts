@@ -5166,6 +5166,7 @@ ${amount} voor ${merchant} - ${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: 'Taken',
                 },
             },
+            notSet: 'Niet ingesteld',
         },
         netsuite: {
             subsidiary: 'Dochteronderneming',

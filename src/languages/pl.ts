@@ -5152,6 +5152,7 @@ ${amount} dla ${merchant} - ${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: 'Przydziały',
                 },
             },
+            notSet: 'Nie ustawiono',
         },
         netsuite: {
             subsidiary: 'Spółka zależna',

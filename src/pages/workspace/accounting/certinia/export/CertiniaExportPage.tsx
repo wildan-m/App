@@ -36,7 +36,10 @@ function CertiniaExportPage({policy}: WithPolicyConnectionsProps) {
     const exportConfig = config?.export;
     const hasPSA = !!config?.hasPSA;
     const exportPath = policyID ? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_CERTINIA_EXPORT.path}` : undefined;
-    const selectedVendor = data?.vendors?.find((vendor) => vendor.id === exportConfig?.vendorAccount);
+    // The connection config is seeded with empty strings, so treat an empty exporter as unset and fall back to the workspace owner.
+    const exporter = exportConfig?.exporter || policyOwner;
+    const vendorAccount = exportConfig?.vendorAccount;
+    const selectedVendor = vendorAccount ? data?.vendors?.find((vendor) => vendor.id === vendorAccount) : undefined;
     const exportStatus = exportConfig?.exportStatus;
     const normalizedFFAExportStatus = getCertiniaFFAExportStatusValue(exportStatus);
     const normalizedReportExportStatus = getCertiniaReportExportStatusValue(exportStatus);
@@ -44,7 +47,7 @@ function CertiniaExportPage({policy}: WithPolicyConnectionsProps) {
 
     const preferredExporterRow: ExportRow = {
         description: translate('workspace.accounting.preferredExporter'),
-        title: exportConfig?.exporter ?? policyOwner,
+        title: exporter,
         onPress: !exportPath ? undefined : () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_CERTINIA_PREFERRED_EXPORTER.path, exportPath)),
         subscribedSettings: [CONST.CERTINIA_CONFIG.EXPORTER],
     };
@@ -102,7 +105,7 @@ function CertiniaExportPage({policy}: WithPolicyConnectionsProps) {
         },
         {
             description: translate('workspace.accounting.defaultVendor'),
-            title: selectedVendor?.name,
+            title: selectedVendor?.name ?? translate('workspace.certinia.notSet'),
             onPress: !exportPath ? undefined : () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_CERTINIA_DEFAULT_VENDOR.path, exportPath)),
             subscribedSettings: [CONST.CERTINIA_CONFIG.VENDOR_ACCOUNT],
         },

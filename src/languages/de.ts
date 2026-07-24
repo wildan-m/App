@@ -5193,6 +5193,7 @@ ${amount} für ${merchant} – ${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: 'Zuweisungen',
                 },
             },
+            notSet: 'Nicht festgelegt',
         },
         netsuite: {
             subsidiary: 'Tochtergesellschaft',

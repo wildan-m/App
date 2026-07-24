@@ -5157,6 +5157,7 @@ ${amount} para ${merchant} - ${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: 'Atribuições',
                 },
             },
+            notSet: 'Não definido',
         },
         netsuite: {
             subsidiary: 'Subsidiária',

@@ -5203,6 +5203,7 @@ ${amount} pour ${merchant} - ${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: 'Affectations',
                 },
             },
+            notSet: 'Non défini',
         },
         netsuite: {
             subsidiary: 'Filiale',

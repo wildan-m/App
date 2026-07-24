@@ -5002,6 +5002,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                     [CONST.CERTINIA_PARENT_TAG_MAPPING.PARENT_TAG_ASSIGNMENTS]: '任务',
                 },
             },
+            notSet: '未设置',
         },
         netsuite: {
             subsidiary: '子公司',
