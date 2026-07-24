@@ -467,8 +467,13 @@ function AttachmentPickerWithMenuItems({
                                                 }
                                                 onAddActionPressed();
 
-                                                // Drop focus to avoid blue focus ring.
-                                                actionButtonRef.current?.blur();
+                                                // Drop focus to avoid blue focus ring. Only do it when closing the menu: while opening, the
+                                                // popover's focus trap has to see this button as document.activeElement to record it as the
+                                                // launcher (so back navigation can return focus here), and the trap blurs it itself right
+                                                // after capturing it, so no focus ring is left visible.
+                                                if (isMenuVisible) {
+                                                    actionButtonRef.current?.blur();
+                                                }
                                                 setMenuVisibility(!isMenuVisible);
                                             }}
                                             style={styles.composerSizeButton}
