@@ -914,8 +914,15 @@ function createCorpayBankAccount(fields: ReimbursementAccountForm, policyID: str
     return API.write(WRITE_COMMANDS.BANK_ACCOUNT_CREATE_CORPAY, parameters, onyxData);
 }
 
-function getCorpayOnboardingFields(country: Country | '') {
-    return API.read(READ_COMMANDS.GET_CORPAY_ONBOARDING_FIELDS, {countryISO: country});
+function getCorpayOnboardingFields(country: Country | '' | undefined) {
+    // The country comes from Onyx data that is still undefined on the first render of the pages calling this,
+    // so without this guard we send an empty countryISO and the request fails with "Missing countryISO".
+    // Those call sites re-run this once the country resolves, so skipping the empty call loses nothing.
+    if (!country) {
+        return;
+    }
+
+    API.read(READ_COMMANDS.GET_CORPAY_ONBOARDING_FIELDS, {countryISO: country});
 }
 
 function saveCorpayOnboardingCompanyDetails(parameters: SaveCorpayOnboardingCompanyDetails, bankAccountID: number) {
