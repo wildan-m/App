@@ -137,6 +137,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const isReimburser =
         (policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES || policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL) &&
         policy?.achAccount?.reimburser === memberLogin;
+    const canChangeSelectedMemberRole = canManageSelectedMemberRole && !isSelectedMemberOwner && !isSelectedMemberCurrentUser && !isReimburser;
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
@@ -364,11 +365,10 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                 copyable
                             />
                             <MenuItemWithTopDescription
-                                disabled={isSelectedMemberOwner || isSelectedMemberCurrentUser || !canManageSelectedMemberRole}
                                 title={translate(`workspace.common.roleName`, member?.role)}
-                                interactive={!isReimburser && canManageSelectedMemberRole}
+                                interactive={canChangeSelectedMemberRole}
                                 description={translate('common.role')}
-                                shouldShowRightIcon={!isReimburser && canManageSelectedMemberRole}
+                                shouldShowRightIcon={canChangeSelectedMemberRole}
                                 pressableTestID="member-role-menu-item"
                                 onPress={() => {
                                     if (
