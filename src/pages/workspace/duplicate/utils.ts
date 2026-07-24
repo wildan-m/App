@@ -1,6 +1,6 @@
 import type {LocaleContextProps} from '@components/LocaleContextProvider';
 
-import {getCorrectedAutoReportingFrequency, getWorkflowApprovalsUnavailable} from '@libs/PolicyUtils';
+import {getCorrectedAutoReportingFrequency, getWorkflowApprovalsUnavailable, isAutoApprovalEnabled} from '@libs/PolicyUtils';
 
 import {getAutoReportingFrequencyDisplayNames} from '@pages/workspace/workflows/WorkspaceAutoReportingFrequencyPage';
 
@@ -42,7 +42,7 @@ function getWorkspaceRules(policy: Policy | undefined, translate: LocaleContextP
     if (policy?.preventSelfApproval && !workflowApprovalsUnavailable) {
         total.push(translate('workspace.rules.expenseReportRules.preventSelfApprovalsTitle'));
     }
-    if (policy?.shouldShowAutoApprovalOptions && !workflowApprovalsUnavailable) {
+    if (isAutoApprovalEnabled(policy) && !workflowApprovalsUnavailable) {
         total.push(translate('workspace.rules.expenseReportRules.autoApproveCompliantReportsTitle'));
     }
     if (policy?.shouldShowAutoReimbursementLimitOption && !autoPayApprovedReportsUnavailable) {

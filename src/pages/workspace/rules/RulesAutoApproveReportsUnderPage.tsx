@@ -15,7 +15,7 @@ import {convertToFrontendAmountAsString} from '@libs/CurrencyUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
-import {getWorkflowApprovalsUnavailable, isPolicyFeatureEnabled} from '@libs/PolicyUtils';
+import {getWorkflowApprovalsUnavailable, isAutoApprovalEnabled, isPolicyFeatureEnabled} from '@libs/PolicyUtils';
 
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 
@@ -50,7 +50,7 @@ function RulesAutoApproveReportsUnderPage({route}: RulesAutoApproveReportsUnderP
             featureName={CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED}
             policyFeature={CONST.POLICY.POLICY_FEATURE.WORKFLOWS_APPROVALS}
             policyFeatureAccess={CONST.POLICY.POLICY_FEATURE_ACCESS.WRITE}
-            shouldBeBlocked={isWorkflowsEnabled && (!policy?.shouldShowAutoApprovalOptions || workflowApprovalsUnavailable)}
+            shouldBeBlocked={isWorkflowsEnabled && (!isAutoApprovalEnabled(policy) || workflowApprovalsUnavailable)}
         >
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding

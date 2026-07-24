@@ -9,7 +9,7 @@ import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import Navigation from '@libs/Navigation/Navigation';
-import {getWorkflowApprovalsUnavailable, isControlPolicy} from '@libs/PolicyUtils';
+import {getWorkflowApprovalsUnavailable, isAutoApprovalEnabled, isControlPolicy} from '@libs/PolicyUtils';
 
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 
@@ -35,6 +35,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
     const policy = usePolicy(policyID);
     const {environmentURL} = useEnvironment();
     const workflowApprovalsUnavailable = getWorkflowApprovalsUnavailable(policy);
+    const autoApprovalEnabled = isAutoApprovalEnabled(policy);
     const autoPayApprovedReportsUnavailable =
         !policy?.areWorkflowsEnabled || policy?.reimbursementChoice !== CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES || !policy?.achAccount?.bankAccountID;
 
@@ -77,7 +78,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                 : translate('workspace.rules.expenseReportRules.autoApproveCompliantReportsSubtitle'),
             shouldParseSubtitle: workflowApprovalsUnavailable,
             switchAccessibilityLabel: translate('workspace.rules.expenseReportRules.autoApproveCompliantReportsTitle'),
-            isActive: policy?.shouldShowAutoApprovalOptions && !workflowApprovalsUnavailable,
+            isActive: autoApprovalEnabled && !workflowApprovalsUnavailable,
             disabled: workflowApprovalsUnavailable || !canWriteApprovals,
             disabledAction: withApprovalsReadOnlyFallback(),
             showLockIcon: workflowApprovalsUnavailable || !canWriteApprovals,
@@ -90,7 +91,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                     return;
                 }
 
-                enableAutoApprovalOptions(policyID, isEnabled, policy?.shouldShowAutoApprovalOptions, policy?.autoApproval?.limit, policy?.autoApproval?.auditRate);
+                enableAutoApprovalOptions(policyID, isEnabled, autoApprovalEnabled, policy?.autoApproval?.limit, policy?.autoApproval?.auditRate);
             },
             subMenuItems: [
                 <OfflineWithFeedback

@@ -2562,6 +2562,15 @@ function getWorkflowApprovalsUnavailable(policy: OnyxEntry<Policy>) {
     return policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL || !!policy?.errorFields?.approvalMode;
 }
 
+/**
+ * Auto approval can be turned on from Expensify Classic too, which only writes the auto approval limit and never sets the
+ * New Expensify only `shouldShowAutoApprovalOptions` display flag. Derive the state from the shared policy data as well so
+ * a limit configured outside of New Expensify is still reported as enabled.
+ */
+function isAutoApprovalEnabled(policy: OnyxEntry<Policy>) {
+    return !!policy?.shouldShowAutoApprovalOptions || !!policy?.autoApproval?.limit;
+}
+
 function getUserFriendlyWorkspaceType(workspaceType: ValueOf<typeof CONST.POLICY.TYPE>, translate: LocalizedTranslate) {
     switch (workspaceType) {
         case CONST.POLICY.TYPE.CORPORATE:
@@ -3039,6 +3048,7 @@ export {
     getDomainNameForPolicy,
     hasSupportedOnlyOnOldDotIntegration,
     getWorkflowApprovalsUnavailable,
+    isAutoApprovalEnabled,
     getNetSuiteImportCustomFieldLabel,
     getUserFriendlyWorkspaceType,
     isPolicyAccessible,
