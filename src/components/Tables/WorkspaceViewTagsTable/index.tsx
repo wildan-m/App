@@ -1,4 +1,4 @@
-import type {CompareItemsCallback, IsItemInSearchCallback, TableColumn} from '@components/Table';
+import type {CompareItemsCallback, FilterConfig, IsItemInFilterCallback, IsItemInSearchCallback, TableColumn} from '@components/Table';
 import Table from '@components/Table';
 import type {WorkspaceTagTableRowData} from '@components/Tables/WorkspaceTagsTable';
 import WorkspaceTagsTableRow from '@components/Tables/WorkspaceTagsTable/WorkspaceTagsTableRow';
@@ -10,11 +10,18 @@ import tokenizedSearch from '@libs/tokenizedSearch';
 
 import variables from '@styles/variables';
 
+import CONST from '@src/CONST';
+
 import type {ListRenderItemInfo} from '@shopify/flash-list';
 
 import React from 'react';
 
 type WorkspaceViewTagColumnKey = 'name' | 'enabled' | 'actions';
+
+const TAG_STATUS_FILTER_VALUES = {
+    ENABLED: 'enabled',
+    DISABLED: 'disabled',
+} as const;
 
 type WorkspaceViewTagsTableProps = {
     tags: WorkspaceTagTableRowData[];
@@ -74,6 +81,35 @@ export default function WorkspaceViewTagsTable({tags, hasDependentTags, selectio
         return results.length > 0;
     };
 
+    const isItemInFilter: IsItemInFilterCallback<WorkspaceTagTableRowData> = (item, filterValues) => {
+        if (filterValues.includes(TAG_STATUS_FILTER_VALUES.ENABLED) && item.enabled) {
+            return true;
+        }
+
+        return filterValues.includes(TAG_STATUS_FILTER_VALUES.DISABLED) && !item.enabled;
+    };
+
+    // The status filter is only offered when the Enabled column is shown. With dependent tags the enabled state is
+    // neither displayed nor editable, so filtering on it would be filtering by something the user cannot see.
+    const filterConfig: FilterConfig | undefined = shouldShowEnabledColumn
+        ? {
+              status: {
+                  label: translate('common.status'),
+                  filterType: CONST.TABLES.FILTER_TYPE.SINGLE_SELECT,
+                  options: [
+                      {
+                          label: translate('common.enabled'),
+                          value: TAG_STATUS_FILTER_VALUES.ENABLED,
+                      },
+                      {
+                          label: translate('common.disabled'),
+                          value: TAG_STATUS_FILTER_VALUES.DISABLED,
+                      },
+                  ],
+              },
+          }
+        : undefined;
+
     const renderItem = ({item, index}: ListRenderItemInfo<WorkspaceTagTableRowData>) => (
         <WorkspaceTagsTableRow
             item={item}
@@ -93,6 +129,7 @@ export default function WorkspaceViewTagsTable({tags, hasDependentTags, selectio
         <Table
             data={tags}
             columns={columns}
+            filters={filterConfig}
             selectionEnabled={selectionEnabled}
             shouldEnableSelectionInNarrowPaneModal
             selectedKeys={selectedKeys}
@@ -100,6 +137,7 @@ export default function WorkspaceViewTagsTable({tags, hasDependentTags, selectio
             title={translate('workspace.common.tags')}
             renderItem={renderItem}
             compareItems={compareItems}
+            isItemInFilter={isItemInFilter}
             isItemInSearch={isItemInSearch}
             keyExtractor={(item) => item.keyForList}
             onRowSelectionChange={onRowSelectionChange}

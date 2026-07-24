@@ -1,4 +1,4 @@
-import type {CompareItemsCallback, IsItemInSearchCallback, TableColumn, TableData} from '@components/Table';
+import type {CompareItemsCallback, FilterConfig, IsItemInFilterCallback, IsItemInSearchCallback, TableColumn, TableData} from '@components/Table';
 import Table from '@components/Table';
 import type {TableEmptyStateProps} from '@components/Table/TableEmptyStates/TableEmptyState';
 
@@ -11,6 +11,7 @@ import type {AvatarSource} from '@libs/UserAvatarUtils';
 
 import variables from '@styles/variables';
 
+import CONST from '@src/CONST';
 import type * as OnyxCommon from '@src/types/onyx/OnyxCommon';
 
 import type {ListRenderItemInfo} from '@shopify/flash-list';
@@ -20,6 +21,11 @@ import React from 'react';
 import WorkspaceTagsTableRow from './WorkspaceTagsTableRow';
 
 type WorkspaceTagTableColumnKey = 'name' | 'glCode' | 'approver' | 'tagCount' | 'enabled' | 'required' | 'actions';
+
+const TAG_STATUS_FILTER_VALUES = {
+    ENABLED: 'enabled',
+    DISABLED: 'disabled',
+} as const;
 
 type WorkspaceTagTableRowData = TableData & {
     value: string;
@@ -188,6 +194,35 @@ export default function WorkspaceTagsTable({
         return results.length > 0;
     };
 
+    const isItemInFilter: IsItemInFilterCallback<WorkspaceTagTableRowData> = (item, filterValues) => {
+        if (filterValues.includes(TAG_STATUS_FILTER_VALUES.ENABLED) && item.enabled) {
+            return true;
+        }
+
+        return filterValues.includes(TAG_STATUS_FILTER_VALUES.DISABLED) && !item.enabled;
+    };
+
+    // In multi-level mode every row is a whole tag level whose enabled flag is always true, so a status filter there
+    // would never exclude anything. It is only offered when the rows are individual tags carrying a real state.
+    const filterConfig: FilterConfig | undefined = shouldShowEnabledColumn
+        ? {
+              status: {
+                  label: translate('common.status'),
+                  filterType: CONST.TABLES.FILTER_TYPE.SINGLE_SELECT,
+                  options: [
+                      {
+                          label: translate('common.enabled'),
+                          value: TAG_STATUS_FILTER_VALUES.ENABLED,
+                      },
+                      {
+                          label: translate('common.disabled'),
+                          value: TAG_STATUS_FILTER_VALUES.DISABLED,
+                      },
+                  ],
+              },
+          }
+        : undefined;
+
     const renderTagItem = ({item, index}: ListRenderItemInfo<WorkspaceTagTableRowData>) => (
         <WorkspaceTagsTableRow
             item={item}
@@ -206,7 +241,9 @@ export default function WorkspaceTagsTable({
             selectionEnabled={selectionEnabled}
             title={translate('workspace.common.tags')}
             columns={tagTableColumns}
+            filters={filterConfig}
             compareItems={compareItems}
+            isItemInFilter={isItemInFilter}
             isItemInSearch={isItemInSearch}
             renderItem={renderTagItem}
             selectedKeys={selectedKeys}
