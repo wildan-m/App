@@ -118,8 +118,14 @@ function isCertiniaDimensionParam(dimension: string): dimension is CertiniaDimen
     return (CERTINIA_DIMENSION_PARAMS as readonly string[]).includes(dimension);
 }
 
-function isCertiniaSRPConnection(config: FinancialForceConnectionConfig | undefined): boolean {
-    return !!config?.hasPSA && config?.hasPSAOnly === false;
+/**
+ * Whether the connected Salesforce org has the FFA module, which is what the Accounting Company is scoped to.
+ * True for both SRP (PSA + FFA) and FFA-only connections, false only when the org has PSA and no FFA — which is
+ * exactly what `hasPSAOnly` marks. `hasPSA` is deliberately not consulted: it only says whether PSA happens to
+ * also be installed. The config-exists check keeps the company gates closed until the connection config loads.
+ */
+function hasCertiniaFFAModule(config: FinancialForceConnectionConfig | undefined): boolean {
+    return !!config && config.hasPSAOnly !== true;
 }
 
 export {
@@ -131,7 +137,7 @@ export {
     getDimensionLabel,
     getDisplayTypeLabel,
     getParentTagMappingLabel,
-    isCertiniaSRPConnection,
+    hasCertiniaFFAModule,
     isCertiniaDimensionParam,
     updateFinancialForceDimensionMapping,
 };

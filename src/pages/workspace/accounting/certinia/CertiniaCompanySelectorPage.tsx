@@ -21,7 +21,7 @@ import ROUTES from '@src/ROUTES';
 
 import React from 'react';
 
-import {isCertiniaSRPConnection} from './utils';
+import {hasCertiniaFFAModule} from './utils';
 
 type CompanyListItem = ListItem & {
     value: string;
@@ -66,7 +66,7 @@ function CertiniaCompanySelectorPage({policy}: WithPolicyConnectionsProps) {
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.PAID]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="CertiniaCompanySelectorPage"
-            shouldBeBlocked={!isCertiniaSRPConnection(config)}
+            shouldBeBlocked={!hasCertiniaFFAModule(config)}
             data={dataOptions}
             onSelectRow={selectCompany}
             shouldSingleExecuteRowSelect
