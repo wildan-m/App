@@ -137,7 +137,7 @@ function DynamicTravelTerms({route}: TravelTermsPageProps) {
                 if (response?.spotnanaToken) {
                     Navigation.closeRHPFlow();
                     cleanupTravelProvisioningSession();
-                    openTravelDotLink(policyID, undefined, response.spotnanaToken, response.isTestAccount ?? false);
+                    openTravelDotLink(policyID, undefined, response.spotnanaToken, response.isTestAccount);
                     return;
                 }
 

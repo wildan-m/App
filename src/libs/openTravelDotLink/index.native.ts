@@ -1,17 +1,17 @@
-import {getTravelDotLink} from '@libs/actions/Link';
+import {getTravelDotLink, isTravelTestAccountResolved} from '@libs/actions/Link';
 import Navigation from '@libs/Navigation/Navigation';
 
 import ROUTES from '@src/ROUTES';
 
 const openTravelDotLink = (activePolicyID?: string, postLoginPath?: string, spotnanaToken?: string, isTestAccount?: boolean) => {
     if (spotnanaToken) {
-        Navigation.navigate(ROUTES.TRAVEL_DOT_LINK_WEB_VIEW.getRoute(spotnanaToken, isTestAccount, postLoginPath));
+        Navigation.navigate(ROUTES.TRAVEL_DOT_LINK_WEB_VIEW.getRoute(spotnanaToken, isTravelTestAccountResolved(isTestAccount), postLoginPath));
         return;
     }
     getTravelDotLink(activePolicyID)
         ?.then((response) => {
             if (response.spotnanaToken) {
-                Navigation.navigate(ROUTES.TRAVEL_DOT_LINK_WEB_VIEW.getRoute(response.spotnanaToken, response.isTestAccount, postLoginPath));
+                Navigation.navigate(ROUTES.TRAVEL_DOT_LINK_WEB_VIEW.getRoute(response.spotnanaToken, isTravelTestAccountResolved(response.isTestAccount), postLoginPath));
                 return;
             }
             Navigation.navigate(ROUTES.TRAVEL_MY_TRIPS.getRoute(activePolicyID));

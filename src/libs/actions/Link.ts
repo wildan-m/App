@@ -52,6 +52,26 @@ Onyx.connectWithoutView({
     },
 });
 
+let isTravelTestAccount = false;
+// Use connectWithoutView since this is to open an external link and doesn't affect any UI
+Onyx.connectWithoutView({
+    key: ONYXKEYS.NVP_TRAVEL_SETTINGS,
+    callback: (value) => {
+        isTravelTestAccount = value?.testAccount ?? false;
+    },
+});
+
+/**
+ * Resolves which Spotnana environment the user belongs to.
+ *
+ * Prefer the flag the backend sent us, and only fall back to the stored travel settings NVP when the
+ * response didn't carry one. Defaulting an absent flag to `false` sends sandbox-provisioned accounts
+ * to production, where their auth code cannot be redeemed.
+ */
+function isTravelTestAccountResolved(isTestAccount?: boolean): boolean {
+    return isTestAccount ?? isTravelTestAccount;
+}
+
 function buildOldDotURL(url: string, shortLivedAuthToken?: string): Promise<string> {
     const hashIndex = url.lastIndexOf('#');
     const hasHashParams = hashIndex !== -1;
@@ -138,7 +158,7 @@ function openTravelDotLink(policyID: OnyxEntry<string>, postLoginPath?: string) 
                         reject(error);
                         throw error;
                     }
-                    const travelURL = buildTravelDotURL(response.spotnanaToken, response.isTestAccount ?? false, postLoginPath);
+                    const travelURL = buildTravelDotURL(response.spotnanaToken, isTravelTestAccountResolved(response.isTestAccount), postLoginPath);
                     resolve(undefined);
                     return travelURL;
                 })
@@ -666,6 +686,7 @@ export {
     openTravelDotLink,
     buildTravelDotURL,
     getTravelDotLink,
+    isTravelTestAccountResolved,
     buildOldDotURL,
     openReportFromDeepLink,
     getShortLivedAuthTokenURL,
