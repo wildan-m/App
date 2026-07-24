@@ -26,6 +26,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {isMobileChrome, isMobileSafari, isSafari} from '@libs/Browser';
 import {scrollToRight} from '@libs/InputUtils';
 import isInputAutoFilled from '@libs/isInputAutoFilled';
+import markProgrammaticFocus from '@libs/programmaticFocus';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 
 import variables from '@styles/variables';
@@ -140,7 +141,13 @@ function BaseTextInput({
             return;
         }
 
+        // Mount autofocus is app-driven, not the user moving focus. Marking it lets focus-tracking consumers
+        // (NavigationFocusReturn) keep the element the user actually activated as the back-navigation target.
+        const unmarkProgrammaticFocus = markProgrammaticFocus(input.current);
         input.current.focus();
+        if (document.activeElement !== input.current) {
+            unmarkProgrammaticFocus();
+        }
         // We only want this to run on mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

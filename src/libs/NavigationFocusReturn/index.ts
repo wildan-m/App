@@ -53,7 +53,9 @@ function captureTriggerForRoute(routeKey: string): void {
     let inner: HTMLElement | null;
     if (getHadTabNavigation()) {
         const active = document.activeElement;
-        const innerIsStale = lastInteractiveElement && active && active !== document.body && active !== lastInteractiveElement;
+        // A destination screen's mount autofocus lands before this capture runs (child effects precede the navigation
+        // container's own state effect), so an app-driven active element is not evidence the tracked trigger went stale.
+        const innerIsStale = lastInteractiveElement && active && active !== document.body && active !== lastInteractiveElement && !isProgrammaticFocus(active);
         inner = lastInteractiveElement && document.contains(lastInteractiveElement) && !innerIsStale ? lastInteractiveElement : null;
     } else {
         const isFresh = lastMouseTrigger !== null && performance.now() - lastMouseTriggerAt < MOUSE_TRIGGER_TTL_MS;
@@ -374,6 +376,11 @@ function setupNavigationFocusReturn(): void {
                 return;
             }
             if (!getHadTabNavigation()) {
+                return;
+            }
+            // Programmatic focus (e.g. a newly mounted screen's autofocus) is not the user moving focus — keeping the
+            // previous element preserves the trigger we must return to on backward navigation.
+            if (isProgrammaticFocus(e.target)) {
                 return;
             }
             lastInteractiveElement = e.target;
