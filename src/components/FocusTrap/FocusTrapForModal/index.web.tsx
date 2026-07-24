@@ -1,5 +1,5 @@
 import blurActiveElement from '@libs/Accessibility/blurActiveElement';
-import {markActivePopoverLauncherDeactivated, setActivePopoverLauncher} from '@libs/LauncherStack';
+import {markActivePopoverLauncherDeactivated, pickLauncher, setActivePopoverLauncher} from '@libs/LauncherStack';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import restoreFocusWithModality from '@libs/restoreFocusWithModality';
 import sharedTrapStack from '@libs/sharedTrapStack';
@@ -18,9 +18,13 @@ function FocusTrapForModal({children, active, initialFocus = false, shouldPreven
             focusTrapOptions={{
                 onActivate: () => {
                     // Capture for nav-back return — independent of shouldReturnFocus (which gates only focus-trap-react's same-screen return below).
-                    const launcher = document.activeElement;
+                    const active = document.activeElement;
                     blurActiveElement();
-                    if (launcher instanceof HTMLElement && launcher !== document.body) {
+                    // A trap opened straight out of a closing popover (3-dot menu → confirmation modal) activates once that
+                    // popover already blurred itself, so there is no active element left to capture. Inherit the popover's
+                    // launcher instead, so closing this trap returns focus to the control that started the flow.
+                    const launcher = active instanceof HTMLElement && active !== document.body ? active : pickLauncher();
+                    if (launcher) {
                         cachedLauncherRef.current = launcher;
                         setActivePopoverLauncher(launcher);
                     }
