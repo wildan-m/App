@@ -110,6 +110,7 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
             <TextWithTooltip
                 shouldShowTooltip={shouldShowTooltip}
                 text={localValue}
+                isSelectable
                 numberOfLines={1}
                 style={shouldUseNarrowLayout ? [styles.lh20, styles.pre, styles.justifyContentCenter, styles.flex1] : [styles.lineHeightXLarge]}
             />

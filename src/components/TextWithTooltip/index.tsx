@@ -1,6 +1,8 @@
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 
+import useThemeStyles from '@hooks/useThemeStyles';
+
 import React, {useState} from 'react';
 
 import type TextWithTooltipProps from './types';
@@ -9,7 +11,8 @@ type LayoutChangeEvent = {
     target: HTMLElement;
 };
 
-function TextWithTooltip({testID, text, shouldShowTooltip, style, numberOfLines = 1, forwardedFSClass}: TextWithTooltipProps) {
+function TextWithTooltip({testID, text, shouldShowTooltip, style, numberOfLines = 1, forwardedFSClass, isSelectable = false}: TextWithTooltipProps) {
+    const styles = useThemeStyles();
     const [showTooltip, setShowTooltip] = useState(false);
 
     return (
@@ -19,7 +22,7 @@ function TextWithTooltip({testID, text, shouldShowTooltip, style, numberOfLines 
         >
             <Text
                 testID={testID}
-                style={style}
+                style={[style, isSelectable && styles.userSelectText]}
                 numberOfLines={numberOfLines}
                 onLayout={(e) => {
                     const target = (e.nativeEvent as unknown as LayoutChangeEvent).target;

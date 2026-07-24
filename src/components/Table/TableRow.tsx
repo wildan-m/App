@@ -11,6 +11,8 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import isSelectableTextTarget from '@libs/isSelectableTextTarget';
+
 import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
@@ -209,6 +211,12 @@ export default function TableRow({
 
                     if (target.closest('[role="switch"]') || target.closest('[role="checkbox"]')) {
                         e.preventDefault();
+                        return;
+                    }
+
+                    // The row opts its subtree out of text selection, so cells that opt back in are the only
+                    // place a selection can start. Leave the event alone there so the drag actually begins.
+                    if (isSelectableTextTarget(target)) {
                         return;
                     }
 

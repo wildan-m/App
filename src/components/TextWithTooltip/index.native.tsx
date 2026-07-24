@@ -8,7 +8,7 @@ import React from 'react';
 
 import type TextWithTooltipProps from './types';
 
-function TextWithTooltip({testID, text, style, numberOfLines = 1, forwardedFSClass}: TextWithTooltipProps) {
+function TextWithTooltip({testID, text, style, numberOfLines = 1, forwardedFSClass, isSelectable = false}: TextWithTooltipProps) {
     const styles = useThemeStyles();
     const processedTextArray = splitTextWithEmojis(text);
 
@@ -16,6 +16,7 @@ function TextWithTooltip({testID, text, style, numberOfLines = 1, forwardedFSCla
         <Text
             testID={testID}
             style={style}
+            selectable={isSelectable}
             numberOfLines={numberOfLines}
             fsClass={forwardedFSClass}
         >

@@ -143,6 +143,7 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave, report,
         <TextWithTooltip
             shouldShowTooltip={shouldShowTooltip}
             text={amountToDisplay}
+            isSelectable
             style={[styles.optionDisplayName, styles.justifyContentCenter, styles.flexShrink1, styles.textAlignRight]}
         />
     );

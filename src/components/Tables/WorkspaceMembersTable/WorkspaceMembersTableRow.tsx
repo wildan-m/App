@@ -85,6 +85,7 @@ export default function WorkspaceMembersTableRow({item, rowIndex, shouldShowCust
                             />
                             <TextWithTooltip
                                 shouldShowTooltip
+                                isSelectable
                                 text={memberSubtitle}
                                 style={[styles.textLabelSupporting, styles.lh16, styles.pre]}
                                 numberOfLines={1}
@@ -97,6 +98,7 @@ export default function WorkspaceMembersTableRow({item, rowIndex, shouldShowCust
                             {!!item.employeeUserID && (
                                 <TextWithTooltip
                                     shouldShowTooltip
+                                    isSelectable
                                     numberOfLines={1}
                                     text={item.employeeUserID}
                                     style={[styles.lh16, styles.optionDisplayName, styles.pre]}
@@ -110,6 +112,7 @@ export default function WorkspaceMembersTableRow({item, rowIndex, shouldShowCust
                             {!!item.employeePayrollID && (
                                 <TextWithTooltip
                                     shouldShowTooltip
+                                    isSelectable
                                     numberOfLines={1}
                                     text={item.employeePayrollID}
                                     style={[styles.lh16, styles.optionDisplayName, styles.pre]}

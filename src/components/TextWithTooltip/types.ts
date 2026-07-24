@@ -15,6 +15,9 @@ type TextWithTooltipProps = ForwardedFSClassProps & {
     /** Custom number of lines for text wrapping */
     numberOfLines?: number;
 
+    /** Whether the text is a value the user should be able to select and copy */
+    isSelectable?: boolean;
+
     /** TestID of the Text component */
     testID?: string;
 };

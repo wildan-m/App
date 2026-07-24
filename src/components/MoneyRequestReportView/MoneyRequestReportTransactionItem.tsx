@@ -16,6 +16,7 @@ import useTransactionInlineEdit from '@hooks/useTransactionInlineEdit';
 
 import ControlSelection from '@libs/ControlSelection';
 import canUseTouchScreen from '@libs/DeviceCapabilities/canUseTouchScreen';
+import isSelectableTextTarget from '@libs/isSelectableTextTarget';
 import {hasFlexColumn} from '@libs/SearchUIUtils';
 import {getTransactionPendingAction, isTransactionPendingDelete} from '@libs/TransactionUtils';
 
@@ -177,7 +178,9 @@ function MoneyRequestReportTransactionItemBody({
     const handleMouseDown = (e?: React.MouseEvent) => {
         wasEditingOnMouseDownRef.current = isEditingCell;
 
-        if (!isEditingCell) {
+        // Let the mousedown through when the press starts on a copyable value, otherwise cancelling it
+        // would stop the browser from ever starting a text selection on that value.
+        if (!isEditingCell && !isSelectableTextTarget(e?.target)) {
             e?.preventDefault();
         }
     };

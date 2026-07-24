@@ -14,6 +14,8 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionInlineEdit from '@hooks/useTransactionInlineEdit';
 
+import isSelectableTextTarget from '@libs/isSelectableTextTarget';
+
 import CONST from '@src/CONST';
 
 import type {View} from 'react-native';
@@ -115,8 +117,9 @@ function TransactionListItemWide<TItem extends ListItem>({
     const handleOnMouseDown = (e?: React.MouseEvent) => {
         wasEditingOnMouseDownRef.current = isEditingCell;
 
-        // Skip preventDefault when editing so the browser naturally blurs the input (triggering save/cancel).
-        if (!isEditingCell) {
+        // Skip preventDefault when editing so the browser naturally blurs the input (triggering save/cancel),
+        // and when the press starts on a copyable value so the browser can begin a text selection.
+        if (!isEditingCell && !isSelectableTextTarget(e?.target)) {
             e?.preventDefault();
         }
     };
