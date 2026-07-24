@@ -5189,7 +5189,7 @@ describe('actions/Policy', () => {
 
             // When enablePolicyWorkflows is called to enable workflows
             mockFetch.pause();
-            Policy.enablePolicyWorkflows(policyID, true, undefined, undefined, undefined, undefined);
+            Policy.enablePolicyWorkflows(policyID, true, undefined, undefined, undefined, undefined, undefined);
             await waitForBatchedUpdates();
 
             // Then workflows should be enabled optimistically
@@ -5213,6 +5213,7 @@ describe('actions/Policy', () => {
                 areWorkflowsEnabled: true,
                 approvalMode: CONST.POLICY.APPROVAL_MODE.ADVANCED,
                 autoReporting: true,
+                autoReportingFrequency: CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY,
                 harvesting: {enabled: true, jobID: 123},
                 reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
             };
@@ -5221,7 +5222,15 @@ describe('actions/Policy', () => {
 
             // When enablePolicyWorkflows is called to disable workflows and fails
             mockFetch.fail();
-            Policy.enablePolicyWorkflows(policyID, false, fakePolicy.approvalMode, fakePolicy.autoReporting, fakePolicy.harvesting, fakePolicy.reimbursementChoice);
+            Policy.enablePolicyWorkflows(
+                policyID,
+                false,
+                fakePolicy.approvalMode,
+                fakePolicy.autoReporting,
+                fakePolicy.autoReportingFrequency,
+                fakePolicy.harvesting,
+                fakePolicy.reimbursementChoice,
+            );
             await waitForBatchedUpdates();
 
             // Then workflows should be reverted to enabled and other fields restored
@@ -5229,6 +5238,7 @@ describe('actions/Policy', () => {
             expect(updatedPolicy?.areWorkflowsEnabled).toBe(true);
             expect(updatedPolicy?.approvalMode).toBe(CONST.POLICY.APPROVAL_MODE.ADVANCED);
             expect(updatedPolicy?.autoReporting).toBe(true);
+            expect(updatedPolicy?.autoReportingFrequency).toBe(CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY);
             expect(updatedPolicy?.harvesting?.enabled).toBe(true);
             expect(updatedPolicy?.reimbursementChoice).toBe(CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES);
             expect(updatedPolicy?.pendingFields?.areWorkflowsEnabled).toBeUndefined();
