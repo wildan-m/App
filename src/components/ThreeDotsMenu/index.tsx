@@ -94,7 +94,9 @@ function ThreeDotsMenu({
             return;
         }
         hideProductTrainingTooltip?.();
-        buttonRef.current?.blur();
+        // Don't blur the button here: the popover's focus trap has to see it as document.activeElement to record it
+        // as the launcher (so back navigation can return focus here), and the trap blurs it itself right after
+        // capturing it, so no focus ring is left visible.
 
         // Dismiss the keyboard before opening the menu so the menu doesn't
         // render while the keyboard is still animating closed (which creates
