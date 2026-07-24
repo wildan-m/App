@@ -493,6 +493,10 @@ function BaseTextInput({
                                     input.current = element as HTMLInputElement | null;
                                 }}
                                 {...inputProps}
+                                // Focus on mount is managed by the effect above, which marks the focus as programmatic.
+                                // Letting React's own `autoFocus` through as well would focus the element during commit,
+                                // before that effect runs, producing an unattributable focus we can't tell from the user's.
+                                autoFocus={false}
                                 // Filter out role="presentation" so it doesn't strip the native
                                 // semantics of the <input>. Other roles (e.g. searchbox) are preserved.
                                 role={role === CONST.ROLE.PRESENTATION ? undefined : role}
