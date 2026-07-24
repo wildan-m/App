@@ -35,10 +35,11 @@ import type {ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 
 import {Str} from 'expensify-common';
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 
 import deferReceiptNavigation from './deferReceiptNavigation';
+import ReceiptImageOverlay from './ReceiptImageOverlay';
 import ReceiptPDFOverlay from './ReceiptPDFOverlay';
 
 type ReportActionItemImageProps = {
@@ -95,8 +96,11 @@ type ReportActionItemImageProps = {
     /** Whether to use the thumbnail image instead of the full image */
     shouldUseThumbnailImage?: boolean;
 
-    /** Whether the receipt can be hover-zoomed. When true, remote PDFs render the actual PDF on top of the thumbnail so magnification stays sharp (web only). */
+    /** Whether the receipt can be hover-zoomed. When true, remote receipts render the original file on top of the thumbnail so magnification stays sharp (web only). */
     canZoomReceipt?: boolean;
+
+    /** Whether the pointer is currently over the receipt. Defers fetching the full-resolution image until it is actually needed. */
+    isHovering?: boolean;
 
     /** Callback to be called when the image loads */
     onLoad?: (event?: {nativeEvent: {width: number; height: number}}) => void;
@@ -130,6 +134,7 @@ function ReportActionItemImage({
     report: reportProp,
     shouldUseThumbnailImage,
     canZoomReceipt = false,
+    isHovering = false,
     onLoad,
     onLoadFailure,
 }: ReportActionItemImageProps) {
@@ -138,6 +143,12 @@ function ReportActionItemImage({
     const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
     const {report: contextReport, transactionThreadReport} = useShowContextMenuState();
     const isMapDistanceRequest = !!transaction && isDistanceRequest(transaction) && !isManualDistanceRequest(transaction);
+    // The full-resolution overlay is only worth fetching for receipts the user actually inspects, so it waits for the
+    // first hover. It latches on afterwards so the original is downloaded once rather than on every hover.
+    const [hasBeenHovered, setHasBeenHovered] = useState(false);
+    if (isHovering && !hasBeenHovered) {
+        setHasBeenHovered(true);
+    }
     const hasErrors = !isEmptyObject(transaction?.errors) || !isEmptyObject(transaction?.errorFields?.route) || !isEmptyObject(transaction?.errorFields?.waypoints);
     // While the receipt is regenerating its stored URL is stale, so draw the live route from `routes.coordinates`
     // (via `ConfirmedRoute`) instead of loading the now-404'd image.
@@ -218,27 +229,45 @@ function ReportActionItemImage({
 
     propsObj.isPerDiemRequest = isPerDiemRequest(transaction);
 
-    // A remote PDF is shown as the server's low-resolution JPG thumbnail, which blurs when hover-zoomed.
-    // Where zooming is available (web only), render the actual PDF on top of the thumbnail so the magnified
-    // view stays sharp. The thumbnail stays underneath as an instant preview and as a fallback if the PDF fails.
-    // Map/route distance requests are excluded: their hover overlay is a DistanceEReceipt card, not the PDF.
+    // A remote receipt is shown as the server's low-resolution JPG thumbnail, which blurs when hover-zoomed.
+    // Where zooming is available (web only), render the actual uploaded file on top of the thumbnail so the magnified
+    // view stays sharp. The thumbnail stays underneath as an instant preview and as a fallback if the original fails.
+    // Map/route distance requests are excluded: their hover overlay is a DistanceEReceipt card, not the receipt file.
     // isMapBasedDistanceRequest covers map, GPS, and manual-typed transactions that still carry waypoints.
-    const pdfSourceURL = typeof originalImageSource === 'string' && !!originalImageSource ? originalImageSource : undefined;
-    const isRemotePDF = !!isPDF && !effectiveIsLocalFile && !isEReceipt && !isMapBasedDistanceRequest(transaction) && !!pdfSourceURL;
-    const shouldOverlayHighResPDF = canZoomReceipt && isRemotePDF && hasHoverSupport();
+    const originalSourceURL = typeof originalImageSource === 'string' && !!originalImageSource ? originalImageSource : undefined;
+    const isRemoteReceipt = !effectiveIsLocalFile && !isEReceipt && !isMapBasedDistanceRequest(transaction) && !!originalSourceURL;
+    const isRemotePDF = !!isPDF && isRemoteReceipt;
+    // Only the thumbnail branch renders the low-resolution derivative; without a thumbnail the original is already shown.
+    const isRemoteImage = !isPDF && !!effectiveThumbnail && isRemoteReceipt;
+    const canOverlayOriginal = canZoomReceipt && hasHoverSupport();
+
+    let highResOverlay: React.ReactNode = null;
+    if (originalSourceURL && canOverlayOriginal && isRemotePDF) {
+        highResOverlay = (
+            <ReceiptPDFOverlay
+                sourceURL={originalSourceURL}
+                onLoadFailure={onLoadFailure}
+            />
+        );
+    } else if (originalSourceURL && canOverlayOriginal && isRemoteImage && hasBeenHovered) {
+        highResOverlay = (
+            <ReceiptImageOverlay
+                sourceURL={originalSourceURL}
+                shouldUseFullHeight={shouldUseFullHeight}
+                shouldCenterImage={shouldUseThumbnailImage ?? true}
+            />
+        );
+    }
 
     const renderReceiptContent = (receiptImage: React.ReactNode) =>
-        shouldOverlayHighResPDF ? (
+        highResOverlay ? (
             <View style={[styles.w100, styles.h100]}>
                 {receiptImage}
                 <View
                     style={StyleSheet.absoluteFill}
                     pointerEvents="none"
                 >
-                    <ReceiptPDFOverlay
-                        sourceURL={pdfSourceURL}
-                        onLoadFailure={onLoadFailure}
-                    />
+                    {highResOverlay}
                 </View>
             </View>
         ) : (

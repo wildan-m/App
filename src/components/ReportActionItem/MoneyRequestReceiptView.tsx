@@ -678,6 +678,7 @@ function MoneyRequestReceiptView({
                                                 shouldUseThumbnailImage={!fillSpace}
                                                 shouldUseFullHeight={fillSpace}
                                                 canZoomReceipt={canZoomReceipt}
+                                                isHovering={isHovering}
                                                 thumbnail={receiptURIs?.thumbnail}
                                                 fileExtension={receiptURIs?.fileExtension}
                                                 isThumbnail={receiptURIs?.isThumbnail}
