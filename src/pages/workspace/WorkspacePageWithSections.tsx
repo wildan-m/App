@@ -32,7 +32,7 @@ import type {ReactNode} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 
 import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 
 import type {WithPolicyAndFullscreenLoadingProps} from './withPolicyAndFullscreenLoading';
@@ -177,11 +177,30 @@ function WorkspacePageWithSections({
     const isPendingDelete = isPendingDeletePolicy(policy);
     const prevIsPendingDelete = isPendingDeletePolicy(prevPolicy);
 
+    // Latch that this page saw the workspace it displays enter the pending delete state. Deleting a workspace is a
+    // two-phase Onyx update: the optimistic data only flags the policy as pending delete, and the success data removes
+    // the policy key entirely. Once the key is gone, the "policy is empty" check below returns true, so without
+    // remembering that we started the deletion, the not found view is painted for the frames between the removal and
+    // the screen being popped. The latch is cleared when the policy comes back (the request failed and the failure
+    // data restored it) so a genuine not found state can still render.
+    const [hasStartedDeletingPolicy, setHasStartedDeletingPolicy] = useState(false);
+    if (isPendingDelete && !hasStartedDeletingPolicy) {
+        setHasStartedDeletingPolicy(true);
+    } else if (hasStartedDeletingPolicy && !isPendingDelete && !isEmptyObject(policy)) {
+        setHasStartedDeletingPolicy(false);
+    }
+
     const shouldShow = useMemo(() => {
         // Suppress the not-found view when the user has moved away from the workspace flow (e.g. switched
         // to another tab and the workspace was deleted from another device) so the view doesn't bleed
         // through over the active tab. Stays true when an RHP is open on top of a workspace screen.
         if (!isWorkspacesTabFocused) {
+            return false;
+        }
+
+        // We are the ones deleting this workspace, so we are already navigating away from it. Showing the not found
+        // view here would only flash it for the remaining frames of the back transition.
+        if (hasStartedDeletingPolicy) {
             return false;
         }
 
@@ -196,7 +215,7 @@ function WorkspacePageWithSections({
         const shouldShowPolicyOrFeature = hasAccessToPolicyFeature ?? shouldShowPolicy;
         return (!isEmptyObject(policy) && !canShowPage) || (!shouldShowPolicyOrFeature && !(isPendingDelete && !prevIsPendingDelete));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUserLogin, hasAccessToPolicyFeature, isWorkspacesTabFocused, policy, shouldShowNonAdmin, shouldShowPolicy]);
+    }, [currentUserLogin, hasAccessToPolicyFeature, hasStartedDeletingPolicy, isWorkspacesTabFocused, policy, shouldShowNonAdmin, shouldShowPolicy]);
 
     const handleOnBackButtonPress = () => {
         if (shouldShow) {
