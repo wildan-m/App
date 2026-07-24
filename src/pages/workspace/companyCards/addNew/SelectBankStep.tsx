@@ -122,6 +122,10 @@ function SelectBankStep() {
                 onSelectRow={({value}) => {
                     setLocalBankSelected(value);
                     setHasError(false);
+                    // Persist the picked bank right away instead of waiting for Next, which is disabled while offline.
+                    // Otherwise the choice only lives in local state and is lost when this step remounts,
+                    // e.g. when reconnecting triggers a company cards feed refresh.
+                    setAddNewCompanyCardStepAndData({data: {selectedBank: value}});
                 }}
                 initiallyFocusedItemKey={bankSelected ?? undefined}
                 confirmButtonOptions={confirmButtonOptions}
