@@ -255,6 +255,14 @@ function AttachmentView({
         );
     }
 
+    // A stored distance receipt is a snapshot of the values the expense had when the file was generated, so it can
+    // disagree with the transaction's current distance and amount. Render the e-receipt from the transaction instead,
+    // which is the same source of truth the expense preview uses, so the two can never show different numbers. This
+    // has to run before the PDF branch below, because distance receipts are now generated as PDFs.
+    if (transaction && isDistanceRequest(transaction) && !isManualDistanceRequest(transaction) && !isOdometerDistanceRequest(transaction)) {
+        return <DistanceEReceipt transaction={transaction} />;
+    }
+
     // Check both source and file.name since PDFs dragged into the text field
     // will appear with a source that is a blob
     const isSourcePDF = typeof source === 'string' && Str.isPDF(source);
@@ -312,14 +320,6 @@ function AttachmentView({
                 />
             </View>
         );
-    }
-
-    if (isDistanceRequest(transaction) && !isManualDistanceRequest(transaction) && !isOdometerDistanceRequest(transaction) && transaction) {
-        // Distance eReceipts are now generated as a PDF, but to keep it backwards compatible we still show the old eReceipt view for image receipts
-        const isImageReceiptSource = checkIsFileImage(source, file?.name);
-        if (!hasReceiptSource(transaction) || isImageReceiptSource) {
-            return <DistanceEReceipt transaction={transaction} />;
-        }
     }
 
     // For this check we use both source and file.name since temporary file source is a blob
