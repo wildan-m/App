@@ -45,6 +45,7 @@ type RateFieldProps = {
     shouldNavigateToUpgradePath: boolean;
     shouldSelectPolicy: boolean;
     shouldShowRateAutoUpdatedTooltip?: boolean;
+    hasSelectableSplitRates: boolean;
 };
 
 function RateField({
@@ -68,6 +69,7 @@ function RateField({
     shouldNavigateToUpgradePath,
     shouldSelectPolicy,
     shouldShowRateAutoUpdatedTooltip,
+    hasSelectableSplitRates,
 }: RateFieldProps) {
     const styles = useThemeStyles();
     const {translate, toLocaleDigit} = useLocalize();
@@ -94,7 +96,10 @@ function RateField({
         : '';
 
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
-    const isRateInteractive = !!rate && !isReadOnly && iouType !== CONST.IOU.TYPE.SPLIT;
+    // A split only has to stay read-only while it has no workspace behind it, which leaves the P2P rate as the one
+    // and only thing to show. Once the split resolves a workspace that offers rates, let the user pick one — the
+    // same way every non-split distance expense already works.
+    const isRateInteractive = !!rate && !isReadOnly && (iouType !== CONST.IOU.TYPE.SPLIT || hasSelectableSplitRates);
 
     const {isSearchRouterDisplayed} = useSearchRouterState();
 
@@ -118,7 +123,9 @@ function RateField({
                     return;
                 }
 
-                if ((!isPolicyExpenseChat && !isTrackExpense) || (shouldNavigateToUpgradePath && isTrackExpense)) {
+                // A split that resolved a workspace already has rates to choose from, so it must reach the rate
+                // step rather than the upgrade wall — the user is on a paid workspace, there is nothing to upgrade.
+                if ((!isPolicyExpenseChat && !isTrackExpense && !hasSelectableSplitRates) || (shouldNavigateToUpgradePath && isTrackExpense)) {
                     Navigation.navigate(
                         ROUTES.MONEY_REQUEST_UPGRADE.getRoute({
                             action,

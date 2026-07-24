@@ -3,11 +3,14 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useLocalize from '@hooks/useLocalize';
 import {MouseProvider} from '@hooks/useMouseContext';
+import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import usePrevious from '@hooks/usePrevious';
+import useSplitDistanceFallbackPolicy from '@hooks/useSplitDistanceFallbackPolicy';
+import {findSplitPolicyForCustomUnit} from '@hooks/useSplitEffectivePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {isCategoryDescriptionRequired} from '@libs/CategoryUtils';
@@ -32,10 +35,12 @@ import {
 
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {OnyxEntry} from 'react-native-onyx';
 
@@ -274,10 +279,22 @@ function MoneyRequestConfirmationList({
     const subRates = transaction?.comment?.customUnit?.subRates ?? [];
     const prevSubRates = usePrevious(subRates);
 
+    // A distance split started from a DM has no report policy, so the workspace that owns the rate has to be
+    // resolved from the rate itself. Without it, a workspace rate the user picked resolves to no rate at all on
+    // this screen. The fallback workspace is only used to decide whether the Rate field is worth opening — it is
+    // deliberately kept out of the rate lookup, because a split still on the P2P placeholder must keep the rate
+    // stored on the transaction rather than take a workspace's output currency.
+    const isSplitType = iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.SPLIT_EXPENSE;
+    const shouldResolveSplitRatePolicy = isDistanceRequest && isSplitType && isEmptyObject(policy);
+    const [policyForSplitCustomUnit] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: (allPolicies) => findSplitPolicyForCustomUnit(allPolicies, transaction)});
+    const splitRateFallbackPolicy = useSplitDistanceFallbackPolicy(shouldResolveSplitRatePolicy && !policyForSplitCustomUnit);
+    const distanceRatePolicy = shouldResolveSplitRatePolicy ? policyForSplitCustomUnit : policy;
+    const hasSelectableSplitRates = isSplitType && !isEmptyObject(DistanceRequestUtils.getMileageRates(distanceRatePolicy ?? splitRateFallbackPolicy));
+
     const {defaultRate, mileageRate, unit, rate, currency, prevCurrency, distance, shouldCalculateDistanceAmount, hasRoute, isDistanceRequestWithPendingRoute, distanceRequestAmount} =
         useDistanceRequestState({
             transaction,
-            policy,
+            policy: distanceRatePolicy,
             policyID,
             policyForMovingExpenses,
             isMovingTransactionFromTrackExpense,
@@ -562,6 +579,7 @@ function MoneyRequestConfirmationList({
                     expenseDate: getCreated(transaction),
                     customUnitRateID,
                     shouldShowRateAutoUpdatedTooltip,
+                    hasSelectableSplitRates,
                 }}
                 amountDisplay={{amount: amountToBeUsed, formattedAmount, formattedAmountPerAttendee}}
                 requiredFlags={{isCategoryRequired, isMerchantRequired, isDescriptionRequired}}

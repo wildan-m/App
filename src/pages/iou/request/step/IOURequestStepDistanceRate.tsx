@@ -13,6 +13,7 @@ import usePermissions from '@hooks/usePermissions';
 import usePersonalPolicy from '@hooks/usePersonalPolicy';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
+import useSplitDistanceFallbackPolicy from '@hooks/useSplitDistanceFallbackPolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {
@@ -29,7 +30,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseUtil, shouldUseTransactionDraft} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getGroupPaidPolicies, isGroupPolicyByType, isTaxTrackingEnabled} from '@libs/PolicyUtils';
+import {isGroupPolicyByType, isTaxTrackingEnabled} from '@libs/PolicyUtils';
 import {getCurrency, getDistanceInMeters, getDistanceRateTaxUpdates, getRateID, isDistanceRequest as isDistanceRequestTransactionUtils, isExpenseUnreported} from '@libs/TransactionUtils';
 
 import CONST from '@src/CONST';
@@ -87,25 +88,29 @@ function IOURequestStepDistanceRate({
     const {translate, toLocaleDigit, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
     const isEditing = action === CONST.IOU.ACTION.EDIT;
-    const isEditingSplit = (iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.SPLIT_EXPENSE) && isEditing;
+    const isSplit = iouType === CONST.IOU.TYPE.SPLIT || iouType === CONST.IOU.TYPE.SPLIT_EXPENSE;
+    const isEditingSplit = isSplit && isEditing;
     const currentTransaction = isEditingSplit && !lodashIsEmpty(splitDraftTransaction) ? splitDraftTransaction : transaction;
 
-    // When editing a distance split from self-DM, policyForTransaction may be undefined because the self-DM
-    // report has no policyID. In that case, find the correct policy by searching for the one that contains
-    // the transaction's customUnitID. If customUnitID is not available (e.g. optimistic transaction before
-    // server response), fall back to searching by customUnitRateID.
-    // Skip both lookups when the rate is P2P — the expense has no workspace policy to resolve.
+    // A distance split from a DM or self-DM has no report policy, so policyForTransaction is undefined. In that
+    // case, find the correct policy by searching for the one that contains the transaction's customUnitID. If
+    // customUnitID is not available (e.g. optimistic transaction before server response), fall back to searching
+    // by customUnitRateID.
+    // Skip both lookups when the rate is P2P — there is no workspace rate to look the policy up by.
     const distanceCustomUnitID = currentTransaction?.comment?.customUnit?.customUnitID;
     const distanceCustomUnitRateID = currentTransaction?.comment?.customUnit?.customUnitRateID;
     const isP2PRate = distanceCustomUnitRateID === CONST.CUSTOM_UNITS.FAKE_P2P_ID;
     const policyByCustomUnitID =
-        isEditingSplit && !isP2PRate && distanceCustomUnitID ? (Object.values(allPolicies ?? {}).find((p) => p?.customUnits?.[distanceCustomUnitID]) ?? undefined) : undefined;
+        isSplit && !isP2PRate && distanceCustomUnitID ? (Object.values(allPolicies ?? {}).find((p) => p?.customUnits?.[distanceCustomUnitID]) ?? undefined) : undefined;
     const policyByCustomUnitRateID =
-        isEditingSplit && !policyByCustomUnitID && distanceCustomUnitRateID && distanceCustomUnitRateID !== CONST.CUSTOM_UNITS.FAKE_P2P_ID
+        isSplit && !policyByCustomUnitID && distanceCustomUnitRateID && distanceCustomUnitRateID !== CONST.CUSTOM_UNITS.FAKE_P2P_ID
             ? (Object.values(allPolicies ?? {}).find((p) => Object.values(p?.customUnits ?? {}).some((unit) => !!unit.rates?.[distanceCustomUnitRateID])) ?? undefined)
             : undefined;
-    const availablePaidPolicies = isEditingSplit ? getGroupPaidPolicies(allPolicies ?? {}) : [];
-    const fallbackAvailablePolicy = isEditingSplit && !isP2PRate && !policyForTransaction && !policyByCustomUnitID && !policyByCustomUnitRateID ? availablePaidPolicies.at(0) : undefined;
+    // While a split is being created its rate is still the P2P placeholder the DM defaulted to, so the P2P guard
+    // above can't be used to decide whether a workspace applies — the user simply hasn't picked a rate yet. Offer
+    // the paid workspace's rates in that case. When editing, a P2P rate is a real choice and is left alone.
+    const shouldUseFallbackPolicy = isSplit && !policyForTransaction && !policyByCustomUnitID && !policyByCustomUnitRateID && (isEditing ? !isP2PRate : true);
+    const fallbackAvailablePolicy = useSplitDistanceFallbackPolicy(shouldUseFallbackPolicy);
     const policy = policyForTransaction ?? policyByCustomUnitID ?? policyByCustomUnitRateID ?? fallbackAvailablePolicy;
     const isDistanceRequest = isDistanceRequestTransactionUtils(currentTransaction);
     const {getCurrencySymbol} = useCurrencyListActions();

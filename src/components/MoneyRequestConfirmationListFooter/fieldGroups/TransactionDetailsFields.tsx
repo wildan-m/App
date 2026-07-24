@@ -179,6 +179,7 @@ function TransactionDetailsFields({
                     shouldNavigateToUpgradePath={shouldNavigateToUpgradePath}
                     shouldSelectPolicy={shouldSelectPolicy}
                     shouldShowRateAutoUpdatedTooltip={distanceData.shouldShowRateAutoUpdatedTooltip}
+                    hasSelectableSplitRates={distanceData.hasSelectableSplitRates}
                 />
             )}
 

@@ -109,6 +109,7 @@ const renderMoneyRequestConfirmationListFooter = async (transaction: Transaction
             mileageRate: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES, currency: 'USD'},
             expenseDate: undefined,
             customUnitRateID: undefined,
+            hasSelectableSplitRates: false,
         },
         amountDisplay: {amount: 10000, formattedAmount: '100', formattedAmountPerAttendee: '50'},
         requiredFlags: {isCategoryRequired: false, isMerchantRequired: false, isDescriptionRequired: false},

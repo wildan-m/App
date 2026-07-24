@@ -22,6 +22,9 @@ type DistanceData = {
     expenseDate: string | undefined;
     customUnitRateID: string | undefined;
     shouldShowRateAutoUpdatedTooltip?: boolean;
+
+    /** Whether the split resolves a workspace that offers mileage rates to pick from */
+    hasSelectableSplitRates: boolean;
 };
 
 /** Distance-mode discriminators (manual / odometer / GPS) */
