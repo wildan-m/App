@@ -17,7 +17,7 @@ import WorkspaceUpgradePage from '@pages/workspace/upgrade/WorkspaceUpgradePage'
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Policy} from '@src/types/onyx';
 
@@ -223,7 +223,7 @@ describe('WorkspaceUpgrade', () => {
         await waitForBatchedUpdatesWithAct();
     });
 
-    it('should return to the backTo route after upgrading company cards instead of opening a new add-card flow', async () => {
+    it('should resume the add-card flow off the backTo route after upgrading company cards, replacing the upgrade route', async () => {
         // Given an already-upgraded (Corporate) policy so the confirmation screen is shown
         const policy: Policy = {...LHNTestUtils.getFakePolicy(), type: CONST.POLICY.TYPE.CORPORATE};
         await act(async () => {
@@ -233,7 +233,7 @@ describe('WorkspaceUpgrade', () => {
         const goBackSpy = jest.spyOn(Navigation, 'goBack').mockImplementation(() => {});
         const navigateSpy = jest.spyOn(Navigation, 'navigate').mockImplementation(() => {});
 
-        // And the company cards upgrade page is opened with the Select cards page as backTo
+        // And the company cards upgrade page is opened with the Company cards page as backTo
         const backTo = ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(policy.id);
         const {unmount} = renderPage(SCREENS.WORKSPACE.UPGRADE, {
             policyID: policy.id,
@@ -246,9 +246,13 @@ describe('WorkspaceUpgrade', () => {
         fireEvent.press(await screen.findByText(TestHelper.translateLocal('workspace.upgrade.completed.gotIt')));
         await waitForBatchedUpdatesWithAct();
 
-        // Then it goes back to the provided backTo route and does not push a new add-card flow
-        expect(goBackSpy).toHaveBeenCalledWith(backTo);
-        expect(navigateSpy).not.toHaveBeenCalled();
+        // Then the add-card flow resumes, built off backTo so the country step renders under the route the user came from
+        expect(navigateSpy).toHaveBeenCalledWith(`${backTo}/${DYNAMIC_ROUTES.WORKSPACE_COMPANY_CARDS_ADD_NEW.path}`, {forceReplace: true});
+
+        // And it replaces the upgrade route rather than pushing on top of it, so backing out of the resumed flow
+        // cannot land on the confirmation screen and re-open the flow
+        expect(navigateSpy.mock.calls.at(0)?.at(1)).toEqual(expect.objectContaining({forceReplace: true}));
+        expect(goBackSpy).not.toHaveBeenCalled();
 
         goBackSpy.mockRestore();
         navigateSpy.mockRestore();

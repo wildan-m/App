@@ -13,6 +13,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {updateQuickbooksOnlineSyncClasses, updateQuickbooksOnlineSyncCustomers, updateQuickbooksOnlineSyncLocations} from '@libs/actions/connections/QuickbooksOnline';
 import {updateXeroMappings} from '@libs/actions/connections/Xero';
 import {enablePolicyTravel} from '@libs/actions/Policy/Travel';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -51,7 +52,7 @@ import {
     upgradeToCorporate,
 } from '@src/libs/actions/Policy/Policy';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import {ownerPoliciesSelector} from '@src/selectors/Policy';
 import type {Policy} from '@src/types/onyx';
@@ -180,6 +181,23 @@ function WorkspaceUpgradePage({route}: WorkspaceUpgradePageProps) {
                 return route.params.backTo ? Navigation.goBack(route.params.backTo) : Navigation.goBack();
         }
     }, [feature, policyID, route.params?.backTo, route.params?.featureName, featureNameAlias]);
+
+    // The companyCards upgrade alias is only ever opened from the "add a new card feed" paths, so acknowledging the
+    // upgrade should resume that flow instead of dropping the user back on a list page. This replaces the upgrade route
+    // rather than pushing on top of it, so backing out of the resumed flow lands on backTo instead of returning to the
+    // confirmation screen and re-opening the flow.
+    // useCallback is needed here because this is passed as a prop to a child component;
+    // the rule flags it because the deps could be inlined, but removing useCallback would cause unnecessary re-renders.
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
+    const afterUpgradeAcknowledged = useCallback(() => {
+        if (feature?.id !== CONST.UPGRADE_FEATURE_INTRO_MAPPING.companyCards.id || !policyID) {
+            goBack();
+            return;
+        }
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_COMPANY_CARDS_ADD_NEW.path, route.params.backTo ?? ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(policyID)), {
+            forceReplace: true,
+        });
+    }, [feature?.id, policyID, route.params?.backTo, goBack]);
 
     const onUpgradeToCorporate = () => {
         if (!canPerformUpgrade || !policy) {
@@ -358,7 +376,7 @@ function WorkspaceUpgradePage({route}: WorkspaceUpgradePageProps) {
             <ScrollView contentContainerStyle={styles.flexGrow1}>
                 {!!policy && isUpgraded && (
                     <UpgradeConfirmation
-                        afterUpgradeAcknowledged={goBack}
+                        afterUpgradeAcknowledged={afterUpgradeAcknowledged}
                         policyName={policy.name}
                         planName={getUserFriendlyWorkspaceType(policy.type, translate)}
                     />
