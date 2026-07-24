@@ -1,3 +1,5 @@
+import type {SearchQueryJSON} from '@components/Search/types';
+
 import * as API from '@libs/API';
 import type {UpdateMoneyRequestParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
@@ -21,6 +23,7 @@ import {
     isTrackExpenseReport,
     shouldEnableNegative,
 } from '@libs/ReportUtils';
+import {buildSearchQueryJSON} from '@libs/SearchQueryUtils';
 import {
     getAmount,
     getClearedPendingFields,
@@ -56,8 +59,9 @@ import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxKey, OnyxUpdate} from '
 import lodashUnionBy from 'lodash/unionBy';
 import Onyx from 'react-native-onyx';
 
-import {getAllReports, getAllTransactions, getAllTransactionViolations, getRecentAttendees} from '.';
+import {getAllReports, getAllSnapshots, getAllTransactions, getAllTransactionViolations, getRecentAttendees, getSearchQueryByHash} from '.';
 import {getUpdatedMoneyRequestReportData, mergePolicyRecentlyUsedCategories, mergePolicyRecentlyUsedCurrencies} from './MoneyRequestBuilder';
+import {doesTransactionMatchSearchFilters} from './SearchUpdate';
 
 type UpdateMoneyRequestData<TKey extends OnyxKey> = {
     params: UpdateMoneyRequestParams;
@@ -104,11 +108,17 @@ type SearchSnapshotUpdateParams = {
     transaction: OnyxEntry<OnyxTypes.Transaction>;
     optimisticViolations?: OnyxEntry<OnyxTypes.TransactionViolations>;
     currentTransactionViolations?: OnyxEntry<OnyxTypes.TransactionViolations>;
+    /** Account the expense is listed under, used to keep a `groupBy:from` header consistent when the row leaves the results */
+    fromAccountID?: number;
 };
 
 /**
  * Builds Onyx writes for the Search snapshot.
  * Search result rows render from snapshot data, so TRANSACTION writes alone do not refresh the list.
+ *
+ * The edit can move the expense out of a search it currently sits in (e.g. editing the description while a
+ * `description:` filter is applied), so every snapshot is re-evaluated against its own query: a row that still
+ * matches is updated in place, one that no longer matches is removed instead of being left behind as a stale entry.
  */
 function getSearchSnapshotUpdates({
     hash,
@@ -119,39 +129,122 @@ function getSearchSnapshotUpdates({
     transaction,
     optimisticViolations,
     currentTransactionViolations,
+    fromAccountID,
 }: SearchSnapshotUpdateParams): SearchSnapshotOnyxData {
-    if (!hash || !transactionID) {
-        return {
-            optimisticData: [],
-            successData: [],
-            failureData: [],
-        };
+    const emptyUpdates: SearchSnapshotOnyxData = {
+        optimisticData: [],
+        successData: [],
+        failureData: [],
+    };
+
+    if (!transactionID) {
+        return emptyUpdates;
     }
 
-    const snapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` as const;
     const transactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}` as const;
     const violationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}` as const;
 
-    const optimisticSnapshotData: SearchResultDataType = {};
-    optimisticSnapshotData[transactionKey] = {...updatedTransaction, pendingFields};
-    if (optimisticViolations !== undefined) {
-        optimisticSnapshotData[violationsKey] = optimisticViolations;
-    }
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
 
-    const successSnapshotData: NullishDeep<SearchResultDataType> = {};
-    successSnapshotData[transactionKey] = {pendingFields: clearedPendingFields};
+    const allSnapshots = getAllSnapshots() ?? {};
+    const writtenHashes = new Set<string>();
 
-    const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
-    failureSnapshotData[transactionKey] = {...transaction, pendingFields: clearedPendingFields};
-    if (currentTransactionViolations !== undefined) {
-        failureSnapshotData[violationsKey] = currentTransactionViolations;
-    }
+    const writeForSnapshot = (snapshotHash: string | number, queryJSON: Readonly<SearchQueryJSON> | undefined) => {
+        if (writtenHashes.has(String(snapshotHash))) {
+            return;
+        }
+        writtenHashes.add(String(snapshotHash));
 
-    return {
-        optimisticData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticSnapshotData}}],
-        successData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: successSnapshotData}}],
-        failureData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureSnapshotData}}],
+        const snapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${snapshotHash}` as const;
+        const existingSnapshotData = allSnapshots[snapshotKey]?.data;
+        const previousTransaction = existingSnapshotData?.[transactionKey];
+
+        // A snapshot the expense isn't part of is only written to when it is the search the edit was made from,
+        // preserving the existing behaviour of seeding the active search.
+        if (!previousTransaction && snapshotHash !== hash) {
+            return;
+        }
+
+        // Without the query we cannot tell whether the expense still belongs here, so keep updating it in place.
+        const shouldRemoveRow = !!queryJSON && !doesTransactionMatchSearchFilters(queryJSON, updatedTransaction);
+
+        if (shouldRemoveRow) {
+            // Removing a row from a grouped result set would leave the group header counting an expense that is no
+            // longer under it. Only `groupBy:from` groups can be corrected from here, so other groupings keep the
+            // in-place update until the next Search response rebuilds them.
+            const groupKey = queryJSON.groupBy === CONST.SEARCH.GROUP_BY.FROM && fromAccountID !== undefined ? (`${CONST.SEARCH.GROUP_PREFIX}${fromAccountID}` as const) : undefined;
+            if (queryJSON.groupBy && !groupKey) {
+                return;
+            }
+
+            const optimisticRemovalData: NullishDeep<SearchResultDataType> = {};
+            optimisticRemovalData[transactionKey] = null;
+            optimisticRemovalData[violationsKey] = null;
+
+            const failureRestoreData: NullishDeep<SearchResultDataType> = {};
+            failureRestoreData[transactionKey] = previousTransaction ?? {...transaction, pendingFields: clearedPendingFields};
+            if (currentTransactionViolations !== undefined) {
+                failureRestoreData[violationsKey] = currentTransactionViolations;
+            }
+
+            if (groupKey) {
+                const existingGroup = existingSnapshotData?.[groupKey];
+                if (existingGroup && 'count' in existingGroup) {
+                    const removedAmount = previousTransaction?.amount ?? transaction?.amount ?? 0;
+                    optimisticRemovalData[groupKey] = {
+                        ...existingGroup,
+                        count: Math.max((existingGroup.count ?? 0) - 1, 0),
+                        total: (existingGroup.total ?? 0) - removedAmount,
+                    };
+                    failureRestoreData[groupKey] = existingGroup;
+                }
+            }
+
+            optimisticData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticRemovalData}});
+            // No success write: the row is gone, and merging the cleared pending fields back would re-create its key.
+            failureData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureRestoreData}});
+            return;
+        }
+
+        const optimisticSnapshotData: SearchResultDataType = {};
+        optimisticSnapshotData[transactionKey] = {...updatedTransaction, pendingFields};
+        if (optimisticViolations !== undefined) {
+            optimisticSnapshotData[violationsKey] = optimisticViolations;
+        }
+
+        const successSnapshotData: NullishDeep<SearchResultDataType> = {};
+        successSnapshotData[transactionKey] = {pendingFields: clearedPendingFields};
+
+        const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
+        failureSnapshotData[transactionKey] = {...transaction, pendingFields: clearedPendingFields};
+        if (currentTransactionViolations !== undefined) {
+            failureSnapshotData[violationsKey] = currentTransactionViolations;
+        }
+
+        optimisticData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticSnapshotData}});
+        successData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: successSnapshotData}});
+        failureData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureSnapshotData}});
     };
+
+    // The hash→query map lets us judge each loaded snapshot against its own query, so a saved search that is not
+    // currently on screen drops the expense too instead of still listing it when it is next opened.
+    const queryByHash = getSearchQueryByHash();
+
+    if (hash) {
+        const activeSearchQueryString = queryByHash[String(hash)];
+        writeForSnapshot(hash, activeSearchQueryString ? buildSearchQueryJSON(activeSearchQueryString) : undefined);
+    }
+
+    for (const [snapshotHash, queryString] of Object.entries(queryByHash)) {
+        if (!queryString) {
+            continue;
+        }
+        writeForSnapshot(snapshotHash, buildSearchQueryJSON(queryString));
+    }
+
+    return {optimisticData, successData, failureData};
 }
 
 function getRecalculatedDistanceRateIDForExpenseDate({
@@ -2061,22 +2154,22 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             value: currentTransactionViolations,
         });
 
-        if (hash) {
-            const snapshotUpdates = getSearchSnapshotUpdates({
-                hash,
-                transactionID,
-                updatedTransaction,
-                pendingFields,
-                clearedPendingFields,
-                transaction,
-                optimisticViolations: Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [],
-                currentTransactionViolations,
-            });
+        // Runs without a `hash` too: an edit made outside Search still has to reach the snapshots holding this expense.
+        const snapshotUpdates = getSearchSnapshotUpdates({
+            hash,
+            transactionID,
+            updatedTransaction,
+            pendingFields,
+            clearedPendingFields,
+            transaction,
+            optimisticViolations: Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [],
+            currentTransactionViolations,
+            fromAccountID: iouReport?.ownerAccountID,
+        });
 
-            optimisticData.push(...snapshotUpdates.optimisticData);
-            successData.push(...snapshotUpdates.successData);
-            failureData.push(...snapshotUpdates.failureData);
-        }
+        optimisticData.push(...snapshotUpdates.optimisticData);
+        successData.push(...snapshotUpdates.successData);
+        failureData.push(...snapshotUpdates.failureData);
 
         if (
             violationsOnyxData &&
@@ -2374,6 +2467,7 @@ function getUpdateTrackExpenseParams(
             transaction,
             optimisticViolations: syncedOptimisticViolations,
             currentTransactionViolations: currentTransactionViolationsForFailure,
+            fromAccountID: chatReport?.ownerAccountID,
         });
 
         optimisticData.push(...snapshotUpdates.optimisticData);

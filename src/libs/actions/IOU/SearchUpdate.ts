@@ -1,8 +1,9 @@
-import type {SearchQueryJSON} from '@components/Search/types';
+import type {SearchFilterKey, SearchQueryJSON} from '@components/Search/types';
 
 import {isExpenseReport, isOptimisticPersonalDetail} from '@libs/ReportUtils';
 import {buildSearchQueryJSON, buildSearchQueryString, getCurrentSearchQueryJSON, getFilterFromQuery} from '@libs/SearchQueryUtils';
 import {getSuggestedSearches, isEligibleForStatus} from '@libs/SearchUIUtils';
+import {getCategory, getDescription, getMerchant, getTag, getTagArrayFromName} from '@libs/TransactionUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -30,6 +31,64 @@ const expenseReportStatusFilterMapping: Record<string, ExpenseReportStatusPredic
     [CONST.SEARCH.STATUS.EXPENSE.UNREPORTED]: (expenseReport, transactionReportID) => !expenseReport && transactionReportID !== CONST.REPORT.TRASH_REPORT_ID,
     [CONST.SEARCH.STATUS.EXPENSE.DELETED]: (_expenseReport, transactionReportID) => transactionReportID === CONST.REPORT.TRASH_REPORT_ID,
 };
+
+/** Reads the value a search filter compares against, for the transaction fields we can evaluate without the backend. */
+const transactionFilterValueReaders: Partial<Record<SearchFilterKey, (transaction: OnyxTypes.Transaction) => string[]>> = {
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION]: (transaction) => [getDescription(transaction)],
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT]: (transaction) => [getMerchant(transaction)],
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY]: (transaction) => [getCategory(transaction)],
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG]: (transaction) => getTagArrayFromName(getTag(transaction)),
+};
+
+// `merchant` and `description` are free-text fields: the `:` (eq) operator is sent to the backend as `contains`,
+// so a partial match keeps the row in the results. See TEXT_SEARCH_FIELDS in SearchQueryUtils.
+const partialMatchFilterKeys = new Set<string>([CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT, CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION]);
+
+function doesFieldValueMatch(fieldValues: string[], filterValue: string, isPartialMatch: boolean) {
+    const normalizedFilterValue = filterValue.toLowerCase();
+    return fieldValues.some((fieldValue) => {
+        const normalizedFieldValue = fieldValue.toLowerCase();
+        return isPartialMatch ? normalizedFieldValue.includes(normalizedFilterValue) : normalizedFieldValue === normalizedFilterValue;
+    });
+}
+
+/**
+ * Whether `transaction` still belongs in the results of `queryJSON`.
+ *
+ * Only the filters we can evaluate locally are checked — anything else (and any operator we don't model, such as
+ * ranges) counts as a match, so an unrecognised filter can never drop a row that the backend would have kept.
+ */
+function doesTransactionMatchSearchFilters(queryJSON: Readonly<SearchQueryJSON>, transaction: OnyxEntry<OnyxTypes.Transaction>): boolean {
+    if (!transaction) {
+        return true;
+    }
+
+    return queryJSON.flatFilters.every(({key, filters}) => {
+        const readFieldValues = transactionFilterValueReaders[key];
+        if (!readFieldValues || filters.length === 0) {
+            return true;
+        }
+
+        const isPartialMatch = partialMatchFilterKeys.has(key);
+        const fieldValues = readFieldValues(transaction);
+        const isNegated = filters.at(0)?.operator === CONST.SEARCH.SYNTAX_OPERATORS.NOT_EQUAL_TO;
+        const comparableFilters = filters.filter(
+            (filter) =>
+                filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO ||
+                filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS ||
+                filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.NOT_EQUAL_TO,
+        );
+        if (comparableFilters.length !== filters.length) {
+            return true;
+        }
+
+        // Values of the same filter are OR'd (`category:a,b` matches either), except when negated,
+        // where the transaction has to match none of them.
+        return isNegated
+            ? comparableFilters.every((filter) => !doesFieldValueMatch(fieldValues, String(filter.value), isPartialMatch))
+            : comparableFilters.some((filter) => doesFieldValueMatch(fieldValues, String(filter.value), isPartialMatch));
+    });
+}
 
 type GetSearchOnyxUpdateParams = {
     transaction: OnyxTypes.Transaction;
@@ -299,4 +358,4 @@ function getSearchOnyxUpdate({
     };
 }
 
-export {getSearchOnyxUpdate, shouldOptimisticallyUpdateSearch};
+export {doesTransactionMatchSearchFilters, getSearchOnyxUpdate, shouldOptimisticallyUpdateSearch};
