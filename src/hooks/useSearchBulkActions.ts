@@ -698,6 +698,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 groupBy: getValidGroupBy(queryJSON?.groupBy),
                 shouldUseStrictDefaultExpenseColumns: currentSearchKey === CONST.SEARCH.SEARCH_KEYS.EXPENSES && !!queryJSON && isDefaultExpensesQuery(queryJSON),
                 fallbackPolicyID: policyForMovingExpensesID,
+                // The export must contain every column of the current view, even the ones no record has a value for.
+                shouldKeepEmptyColumns: true,
             });
 
             const exportColumnLabels: Partial<Record<SearchColumnType, string>> = {};

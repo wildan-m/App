@@ -5752,6 +5752,8 @@ function getPolicyTagsForPolicyID(policyTags: PolicyTagsLookup | undefined, poli
 /**
  * Determines what columns to show based on available data
  * @param isExpenseReportView: true when we are inside an expense report view, false if we're in the Reports page.
+ * @param shouldKeepEmptyColumns: true when the caller wants the view's configured columns even if no record carries a
+ * value for them. Hiding empty columns is a presentation choice for the table; the CSV export must still list them.
  * @returns An ordered array of visible column IDs
  */
 function getColumnsToShow({
@@ -5770,6 +5772,7 @@ function getColumnsToShow({
     shouldUseStrictDefaultExpenseColumns = false,
     isPolicyTaxEnabled = false,
     fallbackPolicyID,
+    shouldKeepEmptyColumns = false,
 }: {
     currentAccountID: number | undefined;
     data: OnyxTypes.SearchResults['data'] | OnyxTypes.Transaction[];
@@ -5786,6 +5789,7 @@ function getColumnsToShow({
     shouldUseStrictDefaultExpenseColumns?: boolean;
     isPolicyTaxEnabled?: boolean;
     fallbackPolicyID?: string;
+    shouldKeepEmptyColumns?: boolean;
 }): SearchColumnType[] {
     const reportCustomColumns = new Set<SearchColumnType>([
         CONST.SEARCH.TABLE_COLUMNS.SUBMITTER_USER_ID,
@@ -5830,7 +5834,7 @@ function getColumnsToShow({
             result.push(col);
         }
 
-        if (Array.isArray(data)) {
+        if (Array.isArray(data) || shouldKeepEmptyColumns) {
             return result;
         }
 
@@ -5978,6 +5982,17 @@ function getColumnsToShow({
     const filteredVisibleColumns = visibleColumns.filter((column) => allowedColumns.includes(column));
     const isDefaultExpenseColumnSelection = arraysEqual(Object.values(CONST.SEARCH.TYPE_DEFAULT_COLUMNS.EXPENSE), filteredVisibleColumns);
     const shouldUseCustomResult = !isDefaultExpenseColumnSelection && filteredVisibleColumns.length > 0;
+
+    // A caller exporting the current view needs every column the view is configured with — the user's own selection, or
+    // the type's defaults when they have not customised anything — even the ones no record carries a value for. Mark
+    // them visible up front so the data-presence pass below can only ever add to that set, never shrink it.
+    if (shouldKeepEmptyColumns) {
+        for (const column of filteredVisibleColumns.length ? filteredVisibleColumns : getCustomColumnDefault(type)) {
+            if (column in columns) {
+                columns[column] = true;
+            }
+        }
+    }
 
     let customResult: SearchColumnType[] | undefined;
 
