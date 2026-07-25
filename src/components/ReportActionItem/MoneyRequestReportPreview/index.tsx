@@ -30,7 +30,7 @@ import type {ListRenderItem} from '@shopify/flash-list';
 import type {LayoutChangeEvent} from 'react-native';
 
 import {useIsFocused} from '@react-navigation/core';
-import React, {useCallback, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import type {MoneyRequestReportPreviewProps} from './types';
 
@@ -140,7 +140,20 @@ function MoneyRequestReportPreview({
     const newTransactions = useNewTransactions(hasOnceLoadedReportActions, transactions, pendingNewTransactionIDs, chatReportID, isFocused);
     // Don't surface the highlight while the preview is covered — it'd animate the one-shot off-screen and be missed.
     const isReportVisible = shouldUseNarrowLayout ? isFocused : true;
-    const newTransactionIDs = new Set(isReportVisible ? newTransactions.map((transaction) => transaction.transactionID) : []);
+    // The diff-detected "new transactions" are sticky by design, while the visibility gate rebuilds the set on every
+    // focus change — without this latch the one-shot would re-arm and replay each time the chat is reopened.
+    const surfacedTransactionIDsRef = useRef(new Set<string>());
+    const newTransactionIDs = useMemo(
+        () =>
+            new Set(isReportVisible ? newTransactions.map((transaction) => transaction.transactionID).filter((transactionID) => !surfacedTransactionIDsRef.current.has(transactionID)) : []),
+        [isReportVisible, newTransactions],
+    );
+
+    useEffect(() => {
+        for (const transactionID of newTransactionIDs) {
+            surfacedTransactionIDsRef.current.add(transactionID);
+        }
+    }, [newTransactionIDs]);
 
     const transactionPreviewContainerStyles = [styles.h100, reportPreviewStyles.transactionPreviewCarouselStyle];
 

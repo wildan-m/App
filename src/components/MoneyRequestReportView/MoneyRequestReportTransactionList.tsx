@@ -505,7 +505,19 @@ function MoneyRequestReportTransactionList({
 
     const resolvedTransactions = useMemo(() => resolveTransactionCardFields(sortedTransactions, cardList, translate), [sortedTransactions, cardList, translate]);
 
-    const highlightedTransactionIDs = useMemo(() => new Set(newTransactions.map(({transactionID}) => transactionID)), [newTransactions]);
+    // The diff-detected "new transactions" are sticky by design, while `isReportVisible` rebuilds the set on every
+    // focus change — without this latch the one-shot would re-arm and replay each time the report is reopened.
+    const surfacedTransactionIDsRef = useRef(new Set<string>());
+    const highlightedTransactionIDs = useMemo(
+        () => new Set(isReportVisible ? newTransactions.map(({transactionID}) => transactionID).filter((transactionID) => !surfacedTransactionIDsRef.current.has(transactionID)) : []),
+        [isReportVisible, newTransactions],
+    );
+
+    useEffect(() => {
+        for (const transactionID of highlightedTransactionIDs) {
+            surfacedTransactionIDsRef.current.add(transactionID);
+        }
+    }, [highlightedTransactionIDs]);
 
     // Always use default columns for money request report view (don't use user-customized search columns)
     const isExpenseReportViewFromIOUReport = isIOUReport(report);
