@@ -537,6 +537,8 @@ export type {default as GetScimTokenParams} from './GetScimTokenParams';
 export type {default as SetSamlIdentityParams} from './SetSamlIdentityParams';
 export type {default as UpdateSamlEnabledParams} from './UpdateSamlEnabledParams';
 export type {default as AddAdminToDomainParams} from './AddAdminToDomainParams';
+export type {default as RequestDomainAdminshipParams} from './RequestDomainAdminshipParams';
+export type {default as CancelDomainAdminshipRequestParams} from './CancelDomainAdminshipRequestParams';
 export type {default as UpdateSamlRequiredParams} from './UpdateSamlRequiredParams';
 export type {default as AddMemberToDomainParams} from './AddMemberToDomainParams';
 export type {default as OpenSearchPageParams} from './OpenSearchPageParams';

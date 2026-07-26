@@ -4,12 +4,14 @@ import * as API from '@libs/API';
 import type {
     AddAdminToDomainParams,
     AddMemberToDomainParams,
+    CancelDomainAdminshipRequestParams,
     ChangeDomainSecurityGroupParams,
     CreateDomainSecurityGroupParams,
     DeleteDomainMemberParams,
     DeleteDomainParams,
     DeleteDomainSecurityGroupParams,
     RemoveDomainAdminParams,
+    RequestDomainAdminshipParams,
     ResetDomainMemberTwoFactorAuthParams,
     SetDefaultDomainSecurityGroupParams,
     SetTechnicalContactEmailParams,
@@ -562,7 +564,7 @@ function clearToggleConsolidatedDomainBillingErrors(domainAccountID: number) {
     });
 }
 
-function addAdminToDomain(domainAccountID: number, accountID: number, targetEmail: string, domainName: string, isOptimisticAccount: boolean) {
+function addAdminToDomain(domainAccountID: number, accountID: number, targetEmail: string, domainName: string, isOptimisticAccount: boolean, isAcceptingAdminshipRequest = false) {
     const PERMISSION_KEY = `${CONST.DOMAIN.EXPENSIFY_ADMIN_ACCESS_PREFIX}${accountID}`;
 
     const optimisticData: Array<
@@ -659,6 +661,7 @@ function addAdminToDomain(domainAccountID: number, accountID: number, targetEmai
 
     const failureData: Array<
         OnyxUpdate<
+            | typeof ONYXKEYS.COLLECTION.DOMAIN
             | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS
             | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS
             | typeof ONYXKEYS.PERSONAL_DETAILS_LIST
@@ -704,6 +707,27 @@ function addAdminToDomain(domainAccountID: number, accountID: number, targetEmai
         failureData.push(clearOptimisticPersonalDetails);
     }
 
+    if (isAcceptingAdminshipRequest) {
+        // The backend auto-unshares the domain_adminRequesters NVP when the requester becomes an admin,
+        // so optimistically drop them from the pending list and restore on failure.
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                domain_adminRequesters: {shared: {[accountID]: null}},
+            },
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                domain_adminRequesters: {shared: {[accountID]: 'read'}},
+            },
+        });
+    }
+
     const params: AddAdminToDomainParams = {
         domainName,
         targetEmail,
@@ -734,6 +758,89 @@ function clearAdminError(domainAccountID: number, accountID: number) {
         },
     });
 }
+
+/**
+ * Sends the current user's request to become an admin of the domain to the existing domain admins
+ */
+function requestDomainAdminship(domainAccountID: number, domainName: string) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST}${domainAccountID}`,
+            value: {
+                requested: true,
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                errors: null,
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST}${domainAccountID}`,
+            value: {
+                pendingAction: null,
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST}${domainAccountID}`,
+            value: {
+                requested: null,
+                pendingAction: null,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('domain.accessRestricted.requestAccessError'),
+            },
+        },
+    ];
+
+    const params: RequestDomainAdminshipParams = {domainName};
+
+    API.write(WRITE_COMMANDS.REQUEST_DOMAIN_ADMINSHIP, params, {optimisticData, successData, failureData});
+}
+
+/**
+ * Removes the error left by a failed adminship request
+ */
+function clearDomainAdminshipRequestError(domainAccountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST}${domainAccountID}`, {errors: null});
+}
+
+/**
+ * Declines (ignores) a member's pending request to become a domain admin.
+ * The declined member can request access again later.
+ */
+function declineDomainAdminshipRequest(domainAccountID: number, accountID: number, targetEmail: string, domainName: string) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                domain_adminRequesters: {shared: {[accountID]: null}},
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                domain_adminRequesters: {shared: {[accountID]: 'read'}},
+            },
+        },
+    ];
+
+    const params: CancelDomainAdminshipRequestParams = {domainName, targetEmail};
+
+    API.write(WRITE_COMMANDS.CANCEL_DOMAIN_ADMINSHIP_REQUEST, params, {optimisticData, failureData});
+}
+
 /**
  * Removes admin access for a domain member
  */
@@ -2384,6 +2491,9 @@ export {
     clearToggleConsolidatedDomainBillingErrors,
     addAdminToDomain,
     clearAdminError,
+    requestDomainAdminship,
+    clearDomainAdminshipRequestError,
+    declineDomainAdminshipRequest,
     revokeDomainAdminAccess,
     resetDomain,
     clearDomainErrors,

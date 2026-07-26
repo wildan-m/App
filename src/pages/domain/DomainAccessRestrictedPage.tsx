@@ -4,6 +4,7 @@ import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
 import {loadExpensifyIcon} from '@components/Icon/ExpensifyIconLoader';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import RenderHTML from '@components/RenderHTML';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -22,6 +23,8 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 
+import {clearDomainAdminshipRequestError, openDomainPage, requestDomainAdminship} from '@userActions/Domain';
+
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -30,7 +33,7 @@ import type SCREENS from '@src/SCREENS';
 import {domainNameSelector} from '@src/selectors/Domain';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 
 type DomainAccessRestrictedPageProps = PlatformStackScreenProps<WorkspacesDomainModalNavigatorParamList, typeof SCREENS.WORKSPACES_DOMAIN_ACCESS_RESTRICTED>;
@@ -50,6 +53,13 @@ function DomainAccessRestrictedPage({route}: DomainAccessRestrictedPageProps) {
 
     const {domainAccountID} = route.params;
     const [domainName, domainNameResults] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
+    const [adminshipRequest] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ADMINSHIP_REQUEST}${domainAccountID}`);
+    const hasRequestedAccess = !!adminshipRequest?.requested;
+
+    // Refresh the pending request state so a returning requester sees the current outcome
+    useEffect(() => {
+        openDomainPage(domainAccountID);
+    }, [domainAccountID]);
 
     const isDomainNameLoading = isLoadingOnyxValue(domainNameResults);
     if (isDomainNameLoading) {
@@ -94,9 +104,23 @@ function DomainAccessRestrictedPage({route}: DomainAccessRestrictedPageProps) {
                     ))}
                 </View>
             </ScrollView>
-            <FixedFooter>
+            <FixedFooter style={styles.gap3}>
+                <OfflineWithFeedback
+                    pendingAction={adminshipRequest?.pendingAction}
+                    errors={adminshipRequest?.errors}
+                    errorRowStyles={styles.mt2}
+                    onClose={() => clearDomainAdminshipRequestError(domainAccountID)}
+                >
+                    <Button
+                        variant={CONST.BUTTON_VARIANT.SUCCESS}
+                        size={CONST.BUTTON_SIZE.LARGE}
+                        isDisabled={hasRequestedAccess}
+                        onPress={() => requestDomainAdminship(domainAccountID, domainName)}
+                    >
+                        <Button.Text>{translate(hasRequestedAccess ? 'domain.accessRestricted.requestSent' : 'domain.accessRestricted.requestAccess')}</Button.Text>
+                    </Button>
+                </OfflineWithFeedback>
                 <Button
-                    variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACES_VERIFY_DOMAIN.getRoute(domainAccountID))}
                 >

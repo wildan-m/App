@@ -10486,6 +10486,9 @@ const translations = {
             accountCreationAndDeletion: 'Account creation and deletion',
             workspaceCreation: 'Workspace creation',
             samlSSO: 'SAML SSO',
+            requestAccess: 'Request access',
+            requestSent: 'Request sent',
+            requestAccessError: 'An error occurred while requesting access. Please try again.',
         },
         addDomain: {
             title: 'Add domain',
@@ -10507,6 +10510,11 @@ const translations = {
         admins: {
             title: 'Admins',
             findAdmin: 'Find admin',
+            pendingRequests: {
+                title: 'Pending access requests',
+                accept: 'Accept',
+                acceptAll: 'Accept all',
+            },
             primaryContact: 'Primary contact',
             addPrimaryContact: 'Add primary contact',
             setPrimaryContactError: 'Unable to set primary contact. Please try again later.',

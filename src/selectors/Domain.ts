@@ -60,6 +60,27 @@ function adminAccountIDsSelector(domain: OnyxEntry<Domain>): number[] {
     );
 }
 
+/**
+ * Extracts the accountIDs of members with a pending adminship request from the domain object.
+ * The pending list is the set of accounts the domain_adminRequesters NVP is shared with.
+ */
+function adminshipRequesterAccountIDsSelector(domain: OnyxEntry<Domain>): number[] {
+    const shared = domain?.domain_adminRequesters?.shared;
+    if (!shared) {
+        return getEmptyArray<number>();
+    }
+
+    return Object.entries(shared).reduce<number[]>((acc, [accountID, value]) => {
+        if (value === null || value === undefined) {
+            return acc;
+        }
+
+        acc.push(Number(accountID));
+
+        return acc;
+    }, []);
+}
+
 const technicalContactSettingsSelector = (domainMemberSharedNVP: OnyxEntry<CardFeeds>) => {
     return {
         technicalContactEmail: domainMemberSharedNVP?.settings?.technicalContactEmail,
@@ -243,6 +264,7 @@ export {
     domainNameSelector,
     metaIdentitySelector,
     adminAccountIDsSelector,
+    adminshipRequesterAccountIDsSelector,
     memberAccountIDsSelector,
     domainEmailSelector,
     adminPendingActionSelector,

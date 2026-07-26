@@ -49,6 +49,10 @@ type Domain = OnyxCommon.OnyxValueWithOfflineFeedback<{
     /** ID of the default security group for the domain */
     // eslint-disable-next-line @typescript-eslint/naming-convention
     domain_defaultSecurityGroupID: string;
+
+    /** The domain_adminRequesters NVP — its share map lists the accounts with a pending adminship request */
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    domain_adminRequesters?: AdminRequesters;
 }> &
     PrefixedRecord<typeof CONST.DOMAIN.EXPENSIFY_ADMIN_ACCESS_PREFIX, number> &
     PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup> &
@@ -100,6 +104,15 @@ type SamlMetadata = {
     samlMetadataError: OnyxCommon.Errors;
 };
 
+/** Model of the domain_adminRequesters NVP holding pending adminship requests */
+type AdminRequesters = {
+    /**
+     * A map of the accounts the NVP is shared with — each key is the accountID of a member
+     * with a pending request to become a domain admin
+     */
+    shared?: Record<string, 'read' | null>;
+};
+
 /** Model of Security Group data */
 type DomainSecurityGroup = SecurityGroup & {
     /**
@@ -132,6 +145,6 @@ type UserSecurityGroupData =
       }
     | undefined;
 
-export {type SamlMetadata, type DomainSecurityGroup, type UserSecurityGroupData, type SecurityGroupKey};
+export {type SamlMetadata, type AdminRequesters, type DomainSecurityGroup, type UserSecurityGroupData, type SecurityGroupKey};
 
 export default Domain;

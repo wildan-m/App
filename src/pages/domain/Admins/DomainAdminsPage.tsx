@@ -1,8 +1,10 @@
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import MenuItem from '@components/MenuItem';
 import ScreenWrapper from '@components/ScreenWrapper';
 import type {DomainAdminRowData} from '@components/Tables/DomainAdminsTable';
 import DomainAdminsTable from '@components/Tables/DomainAdminsTable';
+import Text from '@components/Text';
 
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDomainDocumentTitle from '@hooks/useDomainDocumentTitle';
@@ -25,7 +27,7 @@ import type {DomainSplitNavigatorParamList} from '@navigation/types';
 
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
 
-import {clearAdminError} from '@userActions/Domain';
+import {addAdminToDomain, clearAdminError, declineDomainAdminshipRequest} from '@userActions/Domain';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -33,7 +35,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
-import {adminAccountIDsSelector, adminPendingActionSelector, domainNameSelector, technicalContactSettingsSelector} from '@selectors/Domain';
+import {adminAccountIDsSelector, adminPendingActionSelector, adminshipRequesterAccountIDsSelector, domainNameSelector, technicalContactSettingsSelector} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
 
@@ -48,7 +50,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
     const theme = useTheme();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['UserShield']);
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator']);
+    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator', 'FallbackAvatar']);
 
     const [adminAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: adminAccountIDsSelector,
@@ -105,6 +107,41 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
             };
         });
 
+    const [requesterAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
+        selector: adminshipRequesterAccountIDsSelector,
+    });
+
+    const pendingRequesters = (requesterAccountIDs ?? [])
+        .map((accountID) => {
+            const details = personalDetails?.[accountID];
+
+            return {
+                accountID,
+                login: details?.login ?? '',
+                name: formatPhoneNumber(temporaryGetDisplayNameOrDefault({passedPersonalDetails: details, translate})),
+                avatar: details?.avatar,
+            };
+        })
+        .filter((requester) => !!requester.login);
+
+    const acceptAdminshipRequest = (accountID: number, login: string) => {
+        if (!domainName) {
+            return;
+        }
+        addAdminToDomain(domainAccountID, accountID, login, domainName, false, true);
+    };
+
+    const ignoreAdminshipRequest = (accountID: number, login: string) => {
+        if (!domainName) {
+            return;
+        }
+        declineDomainAdminshipRequest(domainAccountID, accountID, login, domainName);
+    };
+
+    const acceptAllAdminshipRequests = () => {
+        pendingRequesters.forEach((requester) => acceptAdminshipRequest(requester.accountID, requester.login));
+    };
+
     const hasSettingsErrors = hasDomainAdminsSettingsErrors(domainErrors);
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
@@ -149,6 +186,47 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
                     {!shouldDisplayButtonsInSeparateLine && headerContent}
                 </HeaderWithBackButton>
                 {shouldDisplayButtonsInSeparateLine && !!headerContent && <View style={[styles.ph5, styles.flexRow, styles.gap2]}>{headerContent}</View>}
+                {isAdmin && pendingRequesters.length > 0 && (
+                    <View style={styles.mb3}>
+                        <View style={[styles.ph5, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.mb2]}>
+                            <Text style={styles.textLabelSupporting}>{translate('domain.admins.pendingRequests.title')}</Text>
+                            {pendingRequesters.length > 1 && (
+                                <Button
+                                    small
+                                    text={translate('domain.admins.pendingRequests.acceptAll')}
+                                    onPress={acceptAllAdminshipRequests}
+                                />
+                            )}
+                        </View>
+                        {pendingRequesters.map((requester) => (
+                            <MenuItem
+                                key={requester.accountID}
+                                avatarID={requester.accountID}
+                                iconType={CONST.ICON_TYPE_AVATAR}
+                                icon={requester.avatar ?? icons.FallbackAvatar}
+                                title={requester.name}
+                                description={formatPhoneNumber(requester.login)}
+                                interactive={false}
+                                shouldShowRightComponent
+                                rightComponent={
+                                    <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter]}>
+                                        <Button
+                                            small
+                                            success
+                                            text={translate('domain.admins.pendingRequests.accept')}
+                                            onPress={() => acceptAdminshipRequest(requester.accountID, requester.login)}
+                                        />
+                                        <Button
+                                            small
+                                            text={translate('common.ignore')}
+                                            onPress={() => ignoreAdminshipRequest(requester.accountID, requester.login)}
+                                        />
+                                    </View>
+                                }
+                            />
+                        ))}
+                    </View>
+                )}
                 <DomainAdminsTable
                     domainAccountID={domainAccountID}
                     admins={admins}
