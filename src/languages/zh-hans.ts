@@ -7159,7 +7159,7 @@ ${reportName}`,
                 benefits: {
                     confirm: '你需要将每个工作区的“套餐类型”更改为“Collect”，才能锁定 Collect 费率。',
                     benefit1: 'NetSuite、Sage Intacct、QuickBooks Desktop、Oracle、Microsoft Dynamics',
-                    benefit2: 'Workday、Certinia',
+                    benefit2: 'Workday、Certinia、Gusto、TriNet',
                     benefit3: 'SSO/SAML',
                     benefit4: '智能报销规则、日津贴、多级审批、自定义报表和预算管理',
                     headsUp: '注意！',

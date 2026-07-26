@@ -7384,7 +7384,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                 benefits: {
                     confirm: 'Você precisará alterar o “Tipo de plano” de todos os espaços de trabalho para “Collect” para garantir a tarifa Collect.',
                     benefit1: 'NetSuite, Sage Intacct, QuickBooks Desktop, Oracle, Microsoft Dynamics',
-                    benefit2: 'Workday, Certinia',
+                    benefit2: 'Workday, Certinia, Gusto, TriNet',
                     benefit3: 'SSO/SAML',
                     benefit4: 'Regras inteligentes de despesas, diárias, aprovações em vários níveis, relatórios personalizados e orçamento',
                     headsUp: 'Atenção!',

@@ -7408,7 +7408,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 benefits: {
                     confirm: 'Dovrai cambiare il “Tipo di piano” di ogni spazio di lavoro in “Collect” per poter ottenere la tariffa Collect.',
                     benefit1: 'NetSuite, Sage Intacct, QuickBooks Desktop, Oracle, Microsoft Dynamics',
-                    benefit2: 'Workday, Certinia',
+                    benefit2: 'Workday, Certinia, Gusto, TriNet',
                     benefit3: 'SSO/SAML',
                     benefit4: 'Regole intelligenti per le spese, diarie, approvazioni multilivello, report personalizzati e budget',
                     headsUp: 'Attenzione!',

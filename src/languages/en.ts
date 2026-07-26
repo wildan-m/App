@@ -7615,7 +7615,7 @@ const translations = {
                     benefit1Label: 'ERP integrations',
                     benefit1: 'NetSuite, Sage Intacct, QuickBooks Desktop, Oracle, Microsoft Dynamics',
                     benefit2Label: 'HR integrations',
-                    benefit2: 'Workday, Certinia',
+                    benefit2: 'Workday, Certinia, Gusto, TriNet',
                     benefit3Label: 'Security',
                     benefit3: 'SSO/SAML',
                     benefit4Label: 'Advanced',
