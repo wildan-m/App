@@ -284,6 +284,14 @@ function MoneyRequestReportPreview({
                 return;
             }
 
+            // An expense deleted offline stays in the carousel (the offline filter above keeps it so the
+            // preview stays consistent), but its thread no longer leads anywhere — opening it would land on
+            // the not-found RHP. Open the parent report instead, matching the "View" button.
+            if (transaction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+                openReportFromPreview();
+                return;
+            }
+
             // A report with a single expense opens the report itself, not the lone expense — opening the
             // expense directly would skip the report the user expects to land on.
             if (transactions.length <= 1) {
