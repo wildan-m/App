@@ -20,7 +20,7 @@ import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 
 type LogOutPreviousUserPageProps = PlatformStackScreenProps<AuthScreensParamList, typeof SCREENS.TRANSITION_BETWEEN_APPS>;
 
@@ -32,8 +32,19 @@ function LogOutPreviousUserPage({route}: LogOutPreviousUserPageProps) {
     const {initialURL} = useInitialURLState();
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [isAuthenticatingWithShortLivedToken] = useOnyx(ONYXKEYS.RAM_ONLY_IS_AUTHENTICATING_WITH_SHORT_LIVED_TOKEN);
     const isAccountLoading = account?.isLoading;
     const {authTokenType, shortLivedAuthToken = '', exitTo} = route?.params ?? {};
+
+    // Set synchronously in the effect below, at the moment we kick off the re-authentication. The Onyx flags cannot be
+    // used for that: `account.isLoading` is only set once `Device.getDeviceInfoWithID()` resolves, and even the RAM-only
+    // in-flight key is propagated to this subscriber asynchronously, so both still read falsy while the token swap is
+    // starting. This ref is what lets the exitTo effect below know a re-authentication is pending on its first run.
+    const isReauthenticatingRef = useRef(false);
+
+    // Guards the exitTo navigation so it happens exactly once. Running it a second time (when the loading flags settle)
+    // closes and re-pushes the freshly opened RHP mid-enter-transition, which leaves the card stuck semi-transparent.
+    const hasNavigatedToExitToRef = useRef(false);
 
     useEffect(() => {
         const sessionEmail = session?.email;
@@ -69,6 +80,7 @@ function LogOutPreviousUserPage({route}: LogOutPreviousUserPageProps) {
 
         // Even if the user was already authenticated in NewDot, we need to reauthenticate them with shortLivedAuthToken,
         // because the old authToken stored in Onyx may be invalid.
+        isReauthenticatingRef.current = true;
         signInWithShortLivedAuthToken(shortLivedAuthToken);
 
         // We only want to run this effect once on mount (when the page first loads after transitioning from OldDot)
@@ -79,11 +91,20 @@ function LogOutPreviousUserPage({route}: LogOutPreviousUserPageProps) {
         const sessionEmail = session?.email;
         const transitionURL = CONFIG.IS_HYBRID_APP ? `${CONST.DEEPLINK_BASE_URL}${initialURL ?? ''}` : initialURL;
         const isLoggingInAsNewUser = isLoggingInAsNewUserSessionUtils(transitionURL ?? undefined, sessionEmail);
+
+        // Hold the navigation until the shortLivedAuthToken re-authentication started above has reported it finished.
+        // Navigating while the token swap is still in flight mounts the exitTo screen with a session that is about to be
+        // replaced, so the request it fires on mount (e.g. OpenReport) dies in the swap window and its loading state is
+        // never cleared, leaving the screen stuck on a skeleton. The RAM-only key is set to `false` by the same
+        // `finallyData` that clears `account.isLoading`, so it is only treated as settled once it is explicitly `false`.
+        const isReauthenticationPending = isReauthenticatingRef.current && isAuthenticatingWithShortLivedToken !== false;
+
         // We don't want to navigate to the exitTo route when creating a new workspace from a deep link,
         // because we already handle creating the optimistic policy and navigating to it in App.setUpPoliciesAndNavigate,
         // which is already called when AuthScreens mounts.
         // For HybridApp we have separate logic to handle transitions.
-        if (!CONFIG.IS_HYBRID_APP && exitTo !== ROUTES.WORKSPACE_NEW && !isAccountLoading && !isLoggingInAsNewUser) {
+        if (!CONFIG.IS_HYBRID_APP && exitTo !== ROUTES.WORKSPACE_NEW && !isAccountLoading && !isLoggingInAsNewUser && !isReauthenticationPending && !hasNavigatedToExitToRef.current) {
+            hasNavigatedToExitToRef.current = true;
             Navigation.isNavigationReady().then(() => {
                 // remove this screen and navigate to exit route
                 Navigation.goBack(ROUTES.HOME);
@@ -93,7 +114,7 @@ function LogOutPreviousUserPage({route}: LogOutPreviousUserPageProps) {
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialURL, isAccountLoading]);
+    }, [initialURL, isAccountLoading, isAuthenticatingWithShortLivedToken]);
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'LogOutPreviousUserPage',
