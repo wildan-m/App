@@ -1,4 +1,4 @@
-import {SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
+import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS} from '@libs/API/types';
 
 import CONST from '@src/CONST';
 import * as OnyxUpdates from '@src/libs/actions/OnyxUpdates';
@@ -232,6 +232,59 @@ describe('OnyxUpdatesTest', () => {
         await OnyxUpdates.apply(fullReconnectUpdates);
         const report = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
         expect(report).toStrictEqual(reportValue);
+    });
+
+    it('applies Search Onyx updates even if they appear old', async () => {
+        // Given the client watermark has already been advanced past the Search response, which happens whenever
+        // write requests (e.g. creating an expense) return updates while the Search request is in flight
+        const currentUpdateID = 100;
+        await Onyx.merge(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT, currentUpdateID);
+
+        // And we received the query snapshot from a Search request that carries an older lastUpdateID
+        const hash = 1234;
+        const snapshotValue = {
+            search: {hasMoreResults: false, hasResults: true, offset: 0, type: CONST.SEARCH.DATA_TYPES.EXPENSE},
+        };
+        const searchUpdates: OnyxUpdatesFromServer<typeof ONYXKEYS.COLLECTION.SNAPSHOT> = {
+            type: CONST.ONYX_UPDATE_TYPES.HTTPS,
+            request: {
+                command: READ_COMMANDS.SEARCH,
+                data: {hash},
+                successData: [
+                    {
+                        onyxMethod: 'merge',
+                        key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
+                        value: {search: {state: CONST.SEARCH.SNAPSHOT_STATE.LOADED, hash}},
+                    },
+                ],
+            },
+            response: {
+                jsonCode: 200,
+                onyxData: [
+                    {
+                        onyxMethod: 'merge',
+                        key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
+                        value: snapshotValue,
+                    },
+                ],
+            },
+            previousUpdateID: currentUpdateID - 2,
+            lastUpdateID: currentUpdateID - 1,
+        };
+
+        // When we apply the updates
+        await OnyxUpdates.apply(searchUpdates);
+        await waitForBatchedUpdates();
+
+        // Then the snapshot data from the response is written, because it only ever arrives in this response and is
+        // never replayed through the update stream — so the terminal state written by successData never lands on an
+        // empty snapshot, which is what made the search list render placeholder/empty content
+        const snapshot = await getOnyxValue(`${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`);
+        expect(snapshot?.search).toEqual(expect.objectContaining({...snapshotValue.search, state: CONST.SEARCH.SNAPSHOT_STATE.LOADED, hash}));
+
+        // And the watermark is untouched, since the response is still older than what the client already applied
+        const lastUpdateID = await getOnyxValue(ONYXKEYS.ONYX_UPDATES_LAST_UPDATE_ID_APPLIED_TO_CLIENT);
+        expect(lastUpdateID).toBe(currentUpdateID);
     });
 });
 

@@ -1,4 +1,4 @@
-import {SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
+import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import Log from '@libs/Log';
 import PusherUtils from '@libs/PusherUtils';
 import {trackExpenseApiError} from '@libs/telemetry/trackExpenseCreationError';
@@ -137,7 +137,12 @@ function apply<TKey extends OnyxKey>({lastUpdateID, type, request, response, upd
     const isOpenAppRequest = request?.command === WRITE_COMMANDS.OPEN_APP;
     const isFullReconnectRequest = request?.command === SIDE_EFFECT_REQUEST_COMMANDS.RECONNECT_APP && !request?.data?.updateIDFrom;
 
-    if (isUpdateOld && !isOpenAppRequest && !isFullReconnectRequest) {
+    // A Search response carries the query snapshot, which is scoped to that query and is never broadcast through the
+    // update stream. So the "the client already received this update" assumption behind the early return never holds
+    // for it, and skipping response.onyxData would leave the snapshot resolved (from successData) but without data.
+    const isSearchRequest = request?.command === READ_COMMANDS.SEARCH;
+
+    if (isUpdateOld && !isOpenAppRequest && !isFullReconnectRequest && !isSearchRequest) {
         Log.info('[OnyxUpdateManager] Update received was older than or the same as current state, returning without applying the updates other than successData and failureData', false, {
             lastUpdateID,
             lastUpdateIDAppliedToClient,
