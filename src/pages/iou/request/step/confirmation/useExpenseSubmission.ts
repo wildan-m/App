@@ -338,10 +338,6 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
         if (!allTransactionsCreated) {
             return;
         }
-        if (!shouldHandleNavigation) {
-            cleanupAfterExpenseCreate({draftTransactionIDs, linkedTrackedExpenseReportAction: lastTransaction?.linkedTrackedExpenseReportAction});
-            return;
-        }
         // requestMoney passes the chat it wrote to (iouReport.chatReportID) as preResolvedChatTarget; trackExpense is void so it still derives (self-DM case).
         const {report: resolvedReport, chatReportID} =
             preResolvedChatTarget ??
@@ -363,6 +359,9 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
             backToReport: navigateBackToReport,
             optimisticChatReportID: chatReportID,
             linkedTrackedExpenseReportAction: lastTransaction?.linkedTrackedExpenseReportAction,
+            // Dismiss-first fast paths already navigated, but they still need the transaction registered on the
+            // pending-new-transaction rail so the report preview carousel scrolls to the newly created expense.
+            shouldNavigate: shouldHandleNavigation,
         });
     }
 

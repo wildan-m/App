@@ -19,6 +19,10 @@ type CleanupAndNavigateAfterExpenseCreateParams = {
     isInvoice?: boolean;
     linkedTrackedExpenseReportAction?: OnyxEntry<ReportAction>;
     action: DeepValueOf<typeof CONST.IOU.ACTION>;
+    /** Pass false on dismiss-first fast paths, which already navigated before the transaction was created.
+     *  Cleanup and the pending-new-transaction registration still run so the report preview carousel can
+     *  scroll to the new expense. */
+    shouldNavigate?: boolean;
 };
 
 function cleanupAndNavigateAfterExpenseCreate({
@@ -31,11 +35,13 @@ function cleanupAndNavigateAfterExpenseCreate({
     isInvoice,
     linkedTrackedExpenseReportAction,
     action,
+    shouldNavigate = true,
 }: CleanupAndNavigateAfterExpenseCreateParams) {
     cleanupAfterExpenseCreate({
         draftTransactionIDs,
         linkedTrackedExpenseReportAction,
-        shouldWaitForUpcomingTransition: true,
+        // Only a navigating call has an upcoming transition to defer the draft cleanup past.
+        shouldWaitForUpcomingTransition: shouldNavigate,
     });
 
     const finalActiveReportID = backToReport ?? report?.reportID ?? optimisticChatReportID;
@@ -50,6 +56,7 @@ function cleanupAndNavigateAfterExpenseCreate({
         isInvoice,
         hasMultipleTransactions,
         shouldAddPendingNewTransactionIDs,
+        shouldNavigate,
     });
 }
 
