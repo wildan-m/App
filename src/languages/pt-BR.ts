@@ -9781,6 +9781,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
     },
     systemMessage: {
         mergedWithCashTransaction: 'correspondeu um recibo a esta transação',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'alteração' : 'alterações'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Autenticar cartão de pagamento',

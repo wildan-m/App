@@ -9982,6 +9982,7 @@ const translations = {
     },
     systemMessage: {
         mergedWithCashTransaction: 'matched a receipt to this transaction',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'change' : 'changes'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Authenticate payment card',

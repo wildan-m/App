@@ -9768,6 +9768,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
     },
     systemMessage: {
         mergedWithCashTransaction: 'dopasowano paragon do tej transakcji',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'zmiana' : 'zmiany'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Uwierzytelnij kartę płatniczą',

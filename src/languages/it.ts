@@ -9824,6 +9824,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
     },
     systemMessage: {
         mergedWithCashTransaction: 'ha associato una ricevuta a questa transazione',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'modifica' : 'modifiche'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Autentica carta di pagamento',

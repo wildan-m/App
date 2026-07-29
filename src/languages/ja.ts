@@ -9692,6 +9692,7 @@ ${reportName}`,
     },
     systemMessage: {
         mergedWithCashTransaction: 'この取引にレシートを照合しました',
+        collapsedChangesCount: ({count}: {count: number}) => `${count}件の変更`,
     },
     subscription: {
         authenticatePaymentCard: '支払カードを認証',

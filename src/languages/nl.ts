@@ -9794,6 +9794,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
     },
     systemMessage: {
         mergedWithCashTransaction: 'heeft een bonnetje aan deze transactie gekoppeld',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'wijziging' : 'wijzigingen'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Betalingskaart verifiëren',

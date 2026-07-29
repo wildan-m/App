@@ -9878,6 +9878,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
     },
     systemMessage: {
         mergedWithCashTransaction: 'a fait correspondre un reçu à cette transaction',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'modification' : 'modifications'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Authentifier la carte de paiement',

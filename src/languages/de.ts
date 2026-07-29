@@ -9842,6 +9842,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
     },
     systemMessage: {
         mergedWithCashTransaction: 'hat eine Quittung mit dieser Transaktion abgeglichen',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'Änderung' : 'Änderungen'}`,
     },
     subscription: {
         authenticatePaymentCard: 'Zahlungskarte authentifizieren',

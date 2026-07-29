@@ -9462,6 +9462,7 @@ ${reportName}`,
     },
     systemMessage: {
         mergedWithCashTransaction: '已将一张收据匹配到此交易',
+        collapsedChangesCount: ({count}: {count: number}) => `${count} 项更改`,
     },
     subscription: {
         authenticatePaymentCard: '验证支付卡',

@@ -995,6 +995,22 @@ function hasNextActionMadeBySameActor(reportActions: ReportAction[], actionIndex
     return canActionsBeGrouped(currentAction, nextAction);
 }
 
+/**
+ * Whether the action is a plain system message in the report audit trail ("submitted", "approved",
+ * "changed the category…", hold/unhold, policy changes, etc.). Chat comments, the created action,
+ * report previews and whispers (which carry interactive buttons or per-user visibility) are not
+ * system messages — they must never be collapsed or lose their avatar.
+ */
+function isAuditTrailSystemAction(reportAction: OnyxEntry<ReportAction>): boolean {
+    if (!reportAction) {
+        return false;
+    }
+    if (reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT || reportAction.actionName === CONST.REPORT.ACTIONS.TYPE.CREATED) {
+        return false;
+    }
+    return !isReportPreviewAction(reportAction) && !isWhisperAction(reportAction) && !isActionableWhisper(reportAction);
+}
+
 function getReportActionActorAccountID(
     reportAction: OnyxEntry<ReportAction>,
     iouReport: OnyxEntry<Report>,
@@ -4850,6 +4866,7 @@ export {
     isConsecutiveActionMadeByPreviousActor,
     isExportedToIntegrationAction,
     hasNextActionMadeBySameActor,
+    isAuditTrailSystemAction,
     isCreatedAction,
     isCurrentUserPendingAddAction,
     isCreatedTaskReportAction,

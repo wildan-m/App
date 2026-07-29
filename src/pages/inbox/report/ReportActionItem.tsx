@@ -161,6 +161,9 @@ type ReportActionItemProps = {
 
     /** Whether the action is the "Created" action of a harvest-created expense report */
     isHarvestCreatedExpenseReport?: boolean;
+
+    /** Hide the avatar column (system messages in the audit trail render without an avatar) */
+    shouldHideAvatar?: boolean;
 };
 
 function ReportActionItem({
@@ -183,6 +186,7 @@ function ReportActionItem({
     shouldShowBorder,
     shouldHighlight = false,
     isHarvestCreatedExpenseReport = false,
+    shouldHideAvatar = false,
 }: ReportActionItemProps) {
     const reportID = report?.reportID ?? action?.reportID;
     const originalReportID = useOriginalReportID(report?.reportID, action);
@@ -609,6 +613,7 @@ function ReportActionItem({
                                                             isOnSearch={isOnSearch}
                                                             hovered={isHoveredOrActive}
                                                             isActive={isReportActionActive && !isContextMenuActive}
+                                                            shouldHideAvatar={shouldHideAvatar}
                                                         >
                                                             <ActionContentRouter
                                                                 action={action}

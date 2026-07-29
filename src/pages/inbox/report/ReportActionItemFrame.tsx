@@ -40,6 +40,9 @@ type ReportActionItemFrameProps = {
 
     /** The IOU/Expense report we are paying */
     iouReport?: OnyxTypes.Report;
+
+    /** Hide the avatar column (system messages in the audit trail render without an avatar) */
+    shouldHideAvatar?: boolean;
 };
 
 function ReportActionItemFrame({
@@ -53,6 +56,7 @@ function ReportActionItemFrame({
     hovered,
     isActive,
     iouReport,
+    shouldHideAvatar = false,
 }: ReportActionItemFrameProps): React.JSX.Element {
     const styles = useThemeStyles();
 
@@ -65,6 +69,7 @@ function ReportActionItemFrame({
             <ReportActionItemSingle
                 action={action}
                 showHeader={!isEditingInline}
+                shouldHideAvatar={shouldHideAvatar}
                 wrapperStyle={{
                     ...(isOnSearch && styles.p0),
                     ...(isWhisper && styles.pt1),

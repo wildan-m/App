@@ -33,6 +33,7 @@ import {
     getFirstVisibleReportActionID,
     getOneTransactionThreadReportID,
     hasNextActionMadeBySameActor,
+    isAuditTrailSystemAction,
     isCurrentActionUnread,
     isDeletedParentAction,
     isIOUActionMatchingTransactionList,
@@ -72,6 +73,7 @@ import isEmpty from 'lodash/isEmpty';
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {DeviceEventEmitter, View} from 'react-native';
 
+import CollapsedSystemMessages from './CollapsedSystemMessages';
 import MoneyRequestReportTransactionList from './MoneyRequestReportTransactionList';
 import MoneyRequestViewReportFields from './MoneyRequestViewReportFields';
 import SearchMoneyRequestReportEmptyState from './SearchMoneyRequestReportEmptyState';
@@ -460,6 +462,70 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
         hasWindowFocus: Visibility.hasFocus(),
     });
 
+    // Runs of back-to-back system messages the user has manually expanded, keyed by the run's first action ID
+    const [expandedSystemMessageRunIDs, setExpandedSystemMessageRunIDs] = useState<Set<string>>(new Set());
+    const toggleSystemMessageRun = useCallback((anchorReportActionID: string) => {
+        setExpandedSystemMessageRunIDs((previouslyExpanded) => {
+            const expanded = new Set(previouslyExpanded);
+            if (expanded.has(anchorReportActionID)) {
+                expanded.delete(anchorReportActionID);
+            } else {
+                expanded.add(anchorReportActionID);
+            }
+            return expanded;
+        });
+    }, []);
+
+    // Collapse back-to-back runs of 2+ system messages into a single expandable "N changes" entry.
+    // While a run is collapsed only its first action (the anchor) stays in the display list, and
+    // renderReportAction renders the summary row in its place. Runs holding the unread marker or the
+    // deep-linked action are never collapsed so the new-message marker and comment linking keep working.
+    const {displayReportActions, systemMessageRuns} = useMemo(() => {
+        const runs = new Map<string, {actions: OnyxTypes.ReportAction[]; isExpanded: boolean}>();
+        const displayActions: OnyxTypes.ReportAction[] = [];
+        let index = 0;
+        while (index < visibleReportActions.length) {
+            const action = visibleReportActions.at(index);
+            if (!action) {
+                break;
+            }
+            if (!isAuditTrailSystemAction(action)) {
+                displayActions.push(action);
+                index++;
+                continue;
+            }
+            let runEnd = index + 1;
+            while (runEnd < visibleReportActions.length && isAuditTrailSystemAction(visibleReportActions.at(runEnd))) {
+                runEnd++;
+            }
+            const runActions = visibleReportActions.slice(index, runEnd);
+            const mustStayExpanded = runActions.some(
+                (runAction) => runAction.reportActionID === unreadMarkerReportActionID || (!!linkedReportActionID && runAction.reportActionID === linkedReportActionID),
+            );
+            if (runActions.length < 2 || mustStayExpanded) {
+                displayActions.push(...runActions);
+            } else {
+                const isExpanded = expandedSystemMessageRunIDs.has(action.reportActionID);
+                runs.set(action.reportActionID, {actions: runActions, isExpanded});
+                if (isExpanded) {
+                    displayActions.push(...runActions);
+                } else {
+                    displayActions.push(action);
+                }
+            }
+            index = runEnd;
+        }
+        return {displayReportActions: displayActions, systemMessageRuns: runs};
+    }, [visibleReportActions, expandedSystemMessageRunIDs, unreadMarkerReportActionID, linkedReportActionID]);
+
+    // The scroll-tracking hook compares the marker index against rendered-list indices, so remap it onto the display list.
+    const displayUnreadMarkerReportActionIndex = useMemo(() => {
+        if (!unreadMarkerReportActionID) {
+            return -1;
+        }
+        return displayReportActions.findIndex((action) => action.reportActionID === unreadMarkerReportActionID);
+    }, [displayReportActions, unreadMarkerReportActionID]);
+
     const {isFloatingMessageCounterVisible, setIsFloatingMessageCounterVisible, trackVerticalScrolling, onViewableItemsChanged} = useReportUnreadMessageScrollTracking({
         reportID: report?.reportID ?? reportIDFromRoute ?? '',
         currentVerticalScrollingOffsetRef: scrollingVerticalBottomOffset,
@@ -470,7 +536,7 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
             readActionSkipped.current = false;
             readNewestAction(report?.reportID, isReportActionsLoaded);
         },
-        unreadMarkerReportActionIndex,
+        unreadMarkerReportActionIndex: displayUnreadMarkerReportActionIndex,
         isInverted: false,
         hasNewerActions,
         onTrackScrolling: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -603,12 +669,15 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
 
     const renderReportAction = useCallback(
         (reportAction: OnyxTypes.ReportAction, indexWithinReportActions: number) => {
+            const isSystemMessage = isAuditTrailSystemAction(reportAction);
             const displayAsGroup =
-                !isConsecutiveChronosAutomaticTimerAction(visibleReportActions, indexWithinReportActions, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
-                hasNextActionMadeBySameActor(visibleReportActions, indexWithinReportActions, isOffline);
+                !isSystemMessage &&
+                !isConsecutiveChronosAutomaticTimerAction(displayReportActions, indexWithinReportActions, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
+                hasNextActionMadeBySameActor(displayReportActions, indexWithinReportActions, isOffline);
             const shouldDisableContextMenuForConciergeDraft = isDraftPendingCompletion && draftReportActionID === reportAction.reportActionID;
+            const systemMessageRun = systemMessageRuns.get(reportAction.reportActionID);
 
-            return (
+            const reportActionItem = (
                 <ReportActionIndexContext.Provider value={indexWithinReportActions}>
                     <ReportActionsListItemRenderer
                         reportAction={reportAction}
@@ -619,18 +688,38 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                         chatReport={chatReport}
                         displayAsGroup={displayAsGroup}
                         shouldDisplayNewMarker={reportAction.reportActionID === unreadMarkerReportActionID}
-                        shouldDisplayReplyDivider={visibleReportActions.length > 1}
+                        shouldDisplayReplyDivider={displayReportActions.length > 1}
                         isFirstVisibleReportAction={firstVisibleReportActionID === reportAction.reportActionID}
                         shouldHideThreadDividerLine
                         linkedReportActionID={linkedReportActionID}
                         isHarvestCreatedExpenseReport={shouldShowHarvestCreatedAction}
                         shouldDisableContextMenuForConciergeDraft={shouldDisableContextMenuForConciergeDraft}
+                        shouldHideAvatar={isSystemMessage}
                     />
                 </ReportActionIndexContext.Provider>
             );
+
+            if (!systemMessageRun) {
+                return reportActionItem;
+            }
+
+            // This action anchors a run of back-to-back system messages: render the "N changes" summary
+            // row, and the anchor's own message below it only while the run is expanded.
+            return (
+                <>
+                    <CollapsedSystemMessages
+                        count={systemMessageRun.actions.length}
+                        isExpanded={systemMessageRun.isExpanded}
+                        onToggle={() => toggleSystemMessageRun(reportAction.reportActionID)}
+                    />
+                    {systemMessageRun.isExpanded ? reportActionItem : null}
+                </>
+            );
         },
         [
-            visibleReportActions,
+            displayReportActions,
+            systemMessageRuns,
+            toggleSystemMessageRun,
             parentReportAction,
             reportStable,
             chatReport,
@@ -765,7 +854,7 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                         policy={policy}
                         hasComments={visibleReportActions.length > 0}
                         isLoadingInitialReportActions={showReportActionsLoadingState}
-                        visibleReportActions={visibleReportActions}
+                        visibleReportActions={displayReportActions}
                         renderReportAction={renderReportAction}
                         reportActionsExtraData={reportActionsExtraData}
                         linkedReportActionID={linkedReportActionID}

@@ -54,6 +54,9 @@ type ReportActionItemSingleProps = Partial<ChildrenProps> & {
     /** Show header for action */
     showHeader?: boolean;
 
+    /** Hide the avatar column (system messages in the audit trail render without an avatar) */
+    shouldHideAvatar?: boolean;
+
     /** If the action is being hovered */
     isHovered?: boolean;
 
@@ -77,6 +80,7 @@ function ReportActionItemSingle({
     children,
     wrapperStyle,
     showHeader = true,
+    shouldHideAvatar = false,
     report,
     iouReport: potentialIOUReport,
     isHovered = false,
@@ -151,34 +155,36 @@ function ReportActionItemSingle({
 
     return (
         <View style={[styles.chatItem, wrapperStyle]}>
-            <PressableWithoutFeedback
-                style={[styles.alignSelfStart, styles.mr3]}
-                onPressIn={ControlSelection.block}
-                onPressOut={ControlSelection.unblock}
-                onPress={showActorDetails}
-                disabled={shouldDisableDetailPage}
-                accessibilityLabel={details.actorHint}
-                role={CONST.ROLE.BUTTON}
-                sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_SINGLE_AVATAR_BUTTON}
-            >
-                <OfflineWithFeedback pendingAction={details.pendingFields?.avatar ?? undefined}>
-                    <ReportActionAvatars
-                        singleAvatarContainerStyle={[styles.actionAvatar]}
-                        subscriptAvatarBorderColor={getBackgroundColor()}
-                        noRightMarginOnSubscriptContainer
-                        isInReportAction
-                        shouldShowTooltip
-                        secondaryAvatarContainerStyle={[
-                            StyleUtils.getBackgroundAndBorderStyle(theme.appBG),
-                            isHovered ? StyleUtils.getBackgroundAndBorderStyle(theme.hoverComponentBG) : undefined,
-                        ]}
-                        reportID={iouReportID}
-                        chatReportID={source.iouReport?.chatReportID ?? reportID}
-                        action={action}
-                        shouldUseRealActor={isOnSearch}
-                    />
-                </OfflineWithFeedback>
-            </PressableWithoutFeedback>
+            {!shouldHideAvatar && (
+                <PressableWithoutFeedback
+                    style={[styles.alignSelfStart, styles.mr3]}
+                    onPressIn={ControlSelection.block}
+                    onPressOut={ControlSelection.unblock}
+                    onPress={showActorDetails}
+                    disabled={shouldDisableDetailPage}
+                    accessibilityLabel={details.actorHint}
+                    role={CONST.ROLE.BUTTON}
+                    sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_SINGLE_AVATAR_BUTTON}
+                >
+                    <OfflineWithFeedback pendingAction={details.pendingFields?.avatar ?? undefined}>
+                        <ReportActionAvatars
+                            singleAvatarContainerStyle={[styles.actionAvatar]}
+                            subscriptAvatarBorderColor={getBackgroundColor()}
+                            noRightMarginOnSubscriptContainer
+                            isInReportAction
+                            shouldShowTooltip
+                            secondaryAvatarContainerStyle={[
+                                StyleUtils.getBackgroundAndBorderStyle(theme.appBG),
+                                isHovered ? StyleUtils.getBackgroundAndBorderStyle(theme.hoverComponentBG) : undefined,
+                            ]}
+                            reportID={iouReportID}
+                            chatReportID={source.iouReport?.chatReportID ?? reportID}
+                            action={action}
+                            shouldUseRealActor={isOnSearch}
+                        />
+                    </OfflineWithFeedback>
+                </PressableWithoutFeedback>
+            )}
             <View style={[styles.chatItemRight]}>
                 {showHeader ? (
                     <View style={[styles.chatItemMessageHeader]}>
