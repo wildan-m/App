@@ -22,6 +22,8 @@ const isFromInternalDomainSelector = (account: OnyxEntry<Account>) => account?.i
 
 const canDowngradeSelector = (account: OnyxEntry<Account>) => !!account?.canDowngrade;
 
+const hasEmailDeliveryFailureSelector = (account: OnyxEntry<Account>) => !!account?.hasEmailDeliveryFailure;
+
 export {
     isActingAsDelegateSelector,
     delegateEmailSelector,
@@ -33,4 +35,5 @@ export {
     mfaCredentialIDsSelector,
     isFromInternalDomainSelector,
     canDowngradeSelector,
+    hasEmailDeliveryFailureSelector,
 };

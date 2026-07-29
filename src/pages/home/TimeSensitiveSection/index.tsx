@@ -22,7 +22,7 @@ import type {ConnectionName, PolicyConnectionName} from '@src/types/onyx/Policy'
 import type {OnyxCollection} from 'react-native-onyx';
 
 import {useFocusEffect} from '@react-navigation/native';
-import {isUserValidatedSelector} from '@selectors/Account';
+import {hasEmailDeliveryFailureSelector, isUserValidatedSelector} from '@selectors/Account';
 import {activeAdminPoliciesSelector} from '@selectors/Policy';
 import {emailSelector} from '@selectors/Session';
 import React, {useCallback, useState} from 'react';
@@ -40,6 +40,7 @@ import AddShippingAddress from './items/AddShippingAddress';
 import AddVirtualCardPersonalDetails from './items/AddVirtualCardPersonalDetails';
 import EnterSignerInfo from './items/EnterSignerInfo';
 import FixCompanyCardConnection from './items/FixCompanyCardConnection';
+import FixEmailDeliveryFailure from './items/FixEmailDeliveryFailure';
 import FixFailedBilling from './items/FixFailedBilling';
 import FixPersonalCardConnection from './items/FixPersonalCardConnection';
 import FixPolicyConnection from './items/FixPolicyConnection';
@@ -103,6 +104,9 @@ function TimeSensitiveSection() {
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {
         selector: isUserValidatedSelector,
     });
+    const [hasEmailDeliveryFailure] = useOnyx(ONYXKEYS.ACCOUNT, {
+        selector: hasEmailDeliveryFailureSelector,
+    });
     const [loginList] = useOnyx(ONYXKEYS.LOGINS, {selector: expensifyLoginsSelector});
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const {lockedBankAccounts} = useTimeSensitiveLockedBankAccount(adminPolicies);
@@ -156,6 +160,7 @@ function TimeSensitiveSection() {
     const hasBrokenPolicyConnections = brokenPolicyConnections.length > 0;
     const isCurrentLoginValidated = isCurrentUserValidated(loginList, sessionEmail ?? login);
     const shouldShowValidateAccount = isUserValidated === false && !isAnonymous && !isCurrentLoginValidated;
+    const shouldShowFixEmailDeliveryFailure = !!hasEmailDeliveryFailure && !isAnonymous;
 
     // This guard must exactly match the conditions used to render each widget below.
     // If a widget has additional conditions in the render (e.g. && !!discountInfo), those
@@ -164,6 +169,7 @@ function TimeSensitiveSection() {
         lockedBankAccounts.length > 0 ||
         shouldShowEnterSignerInfo ||
         shouldShowValidateAccount ||
+        shouldShowFixEmailDeliveryFailure ||
         shouldShowFixFailedBilling ||
         shouldShowReviewCardFraud ||
         shouldShowAddPaymentCard ||
@@ -180,28 +186,33 @@ function TimeSensitiveSection() {
 
     // Priority order:
     // 1. Validate account
-    // 2. Fix failed billing (existing customers with declined cards)
-    // 3. Potential card fraud
-    // 4. Add payment card (trial ended, no payment card)
-    // 5. Broken bank connections (company cards)
-    // 6. Broken bank connections (personal cards)
-    // 7. Locked bank accounts (workspace VBAs and personal)
-    // 8. Enter signer info for global bank accounts
-    // 9. Broken policy connections (accounting + HR)
-    // 10. Expensify card shipping
-    // 11. Expensify card activation
-    // 12. Virtual Expensify card needs personal details
+    // 2. Fix email delivery failure (email on the suppression list)
+    // 3. Fix failed billing (existing customers with declined cards)
+    // 4. Potential card fraud
+    // 5. Add payment card (trial ended, no payment card)
+    // 6. Broken bank connections (company cards)
+    // 7. Broken bank connections (personal cards)
+    // 8. Locked bank accounts (workspace VBAs and personal)
+    // 9. Enter signer info for global bank accounts
+    // 10. Broken policy connections (accounting + HR)
+    // 11. Expensify card shipping
+    // 12. Expensify card activation
+    // 13. Virtual Expensify card needs personal details
     const items: React.ReactNode[] = [];
 
     // Priority 1: Validate account
     if (shouldShowValidateAccount) {
         items.push(<ValidateAccount key="validate-account" />);
     }
-    // Priority 2: Failed billing for existing customers
+    // Priority 2: Email delivery failure (suppression list)
+    if (shouldShowFixEmailDeliveryFailure) {
+        items.push(<FixEmailDeliveryFailure key="fix-email-delivery-failure" />);
+    }
+    // Priority 3: Failed billing for existing customers
     if (shouldShowFixFailedBilling) {
         items.push(<FixFailedBilling key="fix-failed-billing" />);
     }
-    // Priority 3: Card fraud alerts
+    // Priority 4: Card fraud alerts
     if (shouldShowReviewCardFraud) {
         for (const card of cardsWithFraud) {
             if (!card.nameValuePairs?.possibleFraud) {
@@ -215,11 +226,11 @@ function TimeSensitiveSection() {
             );
         }
     }
-    // Priority 4: Add payment card (trial ended, no payment card)
+    // Priority 5: Add payment card (trial ended, no payment card)
     if (shouldShowAddPaymentCard) {
         items.push(<AddPaymentCard key="add-payment-card" />);
     }
-    // Priority 5: Broken company card connections
+    // Priority 6: Broken company card connections
     for (const connection of brokenCompanyCardConnections) {
         const card = cardFeedErrors.cardsWithBrokenFeedConnection[connection.cardID];
         if (!card) {
@@ -234,7 +245,7 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 6: Broken personal card connections
+    // Priority 7: Broken personal card connections
     for (const connection of brokenPersonalCardConnections) {
         const card = cardFeedErrors.personalCardsWithBrokenConnection[connection.cardID];
         if (!card) {
@@ -247,7 +258,7 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 7: Locked bank accounts
+    // Priority 8: Locked bank accounts
     for (const lockedBankAccount of lockedBankAccounts) {
         items.push(
             <UnlockBankAccount
@@ -257,7 +268,7 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 8: Enter signer info for global bank accounts
+    // Priority 9: Enter signer info for global bank accounts
     for (const item of pendingSignerInfo) {
         items.push(
             <EnterSignerInfo
@@ -268,7 +279,7 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 9: Broken policy connections (accounting + HR)
+    // Priority 10: Broken policy connections (accounting + HR)
     for (const connection of brokenPolicyConnections) {
         items.push(
             <FixPolicyConnection
@@ -280,7 +291,7 @@ function TimeSensitiveSection() {
             />,
         );
     }
-    // Priority 10: Expensify card shipping
+    // Priority 11: Expensify card shipping
     if (shouldShowAddShippingAddress) {
         for (const card of cardsNeedingShippingAddress) {
             items.push(
@@ -291,7 +302,7 @@ function TimeSensitiveSection() {
             );
         }
     }
-    // Priority 11: Expensify card activation
+    // Priority 12: Expensify card activation
     if (shouldShowActivateCard) {
         for (const card of cardsNeedingActivation) {
             items.push(
@@ -302,7 +313,7 @@ function TimeSensitiveSection() {
             );
         }
     }
-    // Priority 11: Virtual Expensify card needs personal details before reveal
+    // Priority 13: Virtual Expensify card needs personal details before reveal
     if (shouldShowAddVirtualCardPersonalDetails) {
         for (const card of virtualCardsNeedingPersonalDetails) {
             items.push(

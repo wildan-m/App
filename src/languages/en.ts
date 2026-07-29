@@ -1051,6 +1051,11 @@ const translations = {
                 subtitle: 'Account',
                 cta: 'Validate',
             },
+            fixEmailDeliveryFailure: {
+                title: "Your email isn't receiving messages from Expensify",
+                subtitle: 'Make sure your inbox can receive mail, then fix it here to resume Expensify emails.',
+                cta: 'Fix',
+            },
             fixFailedBilling: {
                 title: "We couldn't bill your card on file",
                 subtitle: 'Subscription',

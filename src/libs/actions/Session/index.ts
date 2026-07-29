@@ -12,6 +12,7 @@ import type {
     RequestNewValidateCodeParams,
     RequestUnlinkValidationLinkParams,
     ResendValidateCodeParams,
+    ResetEmailDeliveryFailureStatusParams,
     ResetSMSDeliveryFailureStatusParams,
     SignInUserWithLinkParams,
     SignUpUserParams,
@@ -1725,6 +1726,46 @@ function resetSMSDeliveryFailureStatus(login: string) {
     API.write(WRITE_COMMANDS.RESET_SMS_DELIVERY_FAILURE_STATUS, params, {optimisticData, successData, failureData});
 }
 
+/**
+ * To remove the user's email from the suppression list and clear the email delivery failure flag
+ */
+function resetEmailDeliveryFailureStatus(login: string) {
+    const params: ResetEmailDeliveryFailureStatusParams = {login};
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.ACCOUNT,
+            value: {
+                errors: null,
+                isLoading: true,
+            },
+        },
+    ];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.ACCOUNT,
+            value: {
+                isLoading: false,
+                hasEmailDeliveryFailure: false,
+            },
+        },
+    ];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.ACCOUNT>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.ACCOUNT,
+            value: {
+                errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                isLoading: false,
+            },
+        },
+    ];
+
+    API.write(WRITE_COMMANDS.RESET_EMAIL_DELIVERY_FAILURE_STATUS, params, {optimisticData, successData, failureData});
+}
+
 export {
     KEYS_TO_PRESERVE_SUPPORTAL,
     beginSignIn,
@@ -1769,6 +1810,7 @@ export {
     AddWorkEmail,
     MergeIntoAccountAndLogin,
     resetSMSDeliveryFailureStatus,
+    resetEmailDeliveryFailureStatus,
     clearDisableTwoFactorAuthErrors,
     isSupportalSession,
 };
