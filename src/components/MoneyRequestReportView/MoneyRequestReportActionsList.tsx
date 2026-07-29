@@ -670,8 +670,12 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
     const renderReportAction = useCallback(
         (reportAction: OnyxTypes.ReportAction, indexWithinReportActions: number) => {
             const isSystemMessage = isAuditTrailSystemAction(reportAction);
+            // A message never groups under a system message: system messages render header-less/avatar-less
+            // (and may be collapsed into a summary row), so a grouped comment would lose its attribution.
+            const previousDisplayAction = indexWithinReportActions > 0 ? displayReportActions.at(indexWithinReportActions - 1) : undefined;
             const displayAsGroup =
                 !isSystemMessage &&
+                !isAuditTrailSystemAction(previousDisplayAction) &&
                 !isConsecutiveChronosAutomaticTimerAction(displayReportActions, indexWithinReportActions, chatIncludesChronosWithID(reportAction?.reportID), isOffline) &&
                 hasNextActionMadeBySameActor(displayReportActions, indexWithinReportActions, isOffline);
             const shouldDisableContextMenuForConciergeDraft = isDraftPendingCompletion && draftReportActionID === reportAction.reportActionID;
