@@ -3,6 +3,7 @@ import {ModalActions} from '@components/Modal/Global/ModalContext';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 
+import setNavigationActionToMicrotaskQueue from '@libs/Navigation/helpers/setNavigationActionToMicrotaskQueue';
 import navigationRef from '@libs/Navigation/navigationRef';
 import {useRegisterTabSwitchGuard} from '@libs/Navigation/TabSwitchGuardContext';
 
@@ -64,9 +65,16 @@ function useDiscardChangesConfirmation({
                 }
                 isReplayingBlockedNavigation.current = false;
             };
-            runDiscardConfirmation(onConfirm, confirmNavigation, () => {
-                blockedNavigationAction.current = undefined;
-            });
+            // The promise resolves from inside the native modal's dismissal completion, so dispatching here would
+            // replay the pop while the confirm modal is still tearing down. Defer past that frame — the web variant
+            // already schedules its replay the same way.
+            runDiscardConfirmation(
+                onConfirm,
+                () => setNavigationActionToMicrotaskQueue(confirmNavigation),
+                () => {
+                    blockedNavigationAction.current = undefined;
+                },
+            );
         });
     };
 
