@@ -2198,6 +2198,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: '帮助客户成功完成设置',
             moreResources: '更多资源',
         },
+        signOutWarningPendingReceipt: {
+            title: '收据仍在上传中',
+            prompt: '有一张收据尚未上传完成。如果你现在退出登录，我们会先将其保存到你的照片中，方便你稍后重新提交。',
+            confirm: '保存并退出登录',
+            savedToGallery: '您未发送的收据已保存到您的照片中。',
+        },
     },
     closeAccountPage: {
         closeAccount: '关闭账户',

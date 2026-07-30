@@ -6,7 +6,11 @@ import {getIsOffline} from '@libs/NetworkState';
 import {rand64} from '@libs/NumberUtils';
 
 import CONST from '@src/CONST';
+import type {AnyRequest} from '@src/types/onyx/Request';
+import type {Receipt} from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
+
+import type {OnyxEntry} from 'react-native-onyx';
 
 /** Prefix on every receipt log line so we can filter the logs without parsing free text. */
 const RECEIPT_LOG_PREFIX = '[Receipt]';
@@ -24,6 +28,24 @@ type ReceiptCaptureSource = 'camera' | 'gallery' | 'file' | 'replace' | 'share';
 function getPickerCaptureSource(): ReceiptCaptureSource {
     return getPlatform() === CONST.PLATFORM.WEB ? 'file' : 'gallery';
 }
+
+/** A receipt that is still sitting in the write queue, so its image has not reached the server yet. */
+type PendingQueuedReceipt = {
+    /** Local file URI of the receipt image, when the receipt is still backed by a file on this device */
+    source: string | undefined;
+
+    /** User visible file name of the receipt */
+    fileName: string | undefined;
+
+    /** Transaction the receipt belongs to */
+    transactionID: string | undefined;
+
+    /** Correlation id stamped on the file at capture */
+    receiptTraceId: string | undefined;
+
+    /** Write command the receipt is queued under */
+    command: string;
+};
 
 /** Inputs for the enqueued milestone, taken when the receipt request reaches the write queue. */
 type ReceiptEnqueuedParams = {
@@ -179,6 +201,73 @@ function logReceiptDropped({
 }
 
 /**
+ * Whether a single queued request is still holding a captured receipt.
+ *
+ * SplitBill nests its receipt inside the splits JSON and SendMoney without an attachment has no receipt field, so a
+ * receipt-bearing command on its own is not enough: the receipt has to actually be at data.receipt.
+ */
+function isReceiptBearingRequest(request: OnyxEntry<AnyRequest>): boolean {
+    if (!request || !RECEIPT_BEARING_COMMANDS.has(request.command)) {
+        return false;
+    }
+
+    return !!(request.data as {receipt?: Receipt} | undefined)?.receipt;
+}
+
+/**
+ * Whether any request in the given slice of the write queue is still holding a captured receipt. Reads straight from
+ * Onyx values so a screen can subscribe to it, unlike getPendingQueuedReceipts which reads the in-memory queue.
+ */
+function hasReceiptBearingRequest(requests: OnyxEntry<AnyRequest[]> | OnyxEntry<AnyRequest>): boolean {
+    if (Array.isArray(requests)) {
+        return requests.some(isReceiptBearingRequest);
+    }
+
+    return isReceiptBearingRequest(requests);
+}
+
+/**
+ * Walks the write queue and returns every request that still owns a captured receipt. This is the single read that
+ * both the queue snapshot log and the sign-out gallery save go through, so the two can never disagree about which
+ * queued requests are holding a receipt that has not reached the server yet.
+ *
+ * Requests are returned in the order they will be sent, so the receipt closest to uploading comes first.
+ */
+function getPendingQueuedReceipts(): PendingQueuedReceipt[] {
+    // Include the ongoing request. Once processNextRequest moves a receipt into the ongoing slot it is the one
+    // actively uploading, but it no longer shows up in getAll.
+    const ongoingRequest = getOngoingRequest();
+    const requests = ongoingRequest ? [ongoingRequest, ...getAllPersistedRequests()] : getAllPersistedRequests();
+    const pendingReceipts: PendingQueuedReceipt[] = [];
+
+    for (const request of requests) {
+        if (!RECEIPT_BEARING_COMMANDS.has(request.command)) {
+            continue;
+        }
+
+        const data = (request.data ?? {}) as {transactionID?: string; receipt?: Receipt};
+        // Skip when there is no receipt at data.receipt. SplitBill nests it inside the splits JSON, and SendMoney with
+        // no attached receipt has no receipt field.
+        if (!data.receipt) {
+            continue;
+        }
+
+        const {source, name, filename, receiptTraceId} = data.receipt;
+        pendingReceipts.push({
+            // A remote receipt is addressed by a numeric id, and only a local file is at risk of being lost, so
+            // anything that is not a string path is reported without a source.
+            source: typeof source === 'string' ? source : undefined,
+            fileName: name ?? filename,
+            transactionID: data.transactionID,
+            receiptTraceId,
+            command: request.command,
+        });
+    }
+
+    return pendingReceipts;
+}
+
+/**
  * Logs one line per receipt still pending in the write queue, tagged with what triggered the snapshot. Stays quiet
  * when nothing is pending, so the normal case makes no noise. Sent right away so it survives a hard app kill from the
  * background.
@@ -188,25 +277,8 @@ function logReceiptQueueSnapshot(trigger: ReceiptSnapshotTrigger) {
     const now = Date.now();
     const pendingTransactionIDs = new Set<string>();
 
-    // Include the ongoing request. Once processNextRequest moves a receipt into the ongoing slot it is the one
-    // actively uploading, but it no longer shows up in getAll. Without this we would skip it here and then drop it
-    // from the timing map in the cleanup below.
-    const ongoingRequest = getOngoingRequest();
-    const requests = ongoingRequest ? [ongoingRequest, ...getAllPersistedRequests()] : getAllPersistedRequests();
-
-    for (const request of requests) {
-        if (!RECEIPT_BEARING_COMMANDS.has(request.command)) {
-            continue;
-        }
-
-        const data = (request.data ?? {}) as {transactionID?: string; receipt?: {receiptTraceId?: string}};
-        // Skip when there is no receipt at data.receipt. SplitBill nests it inside the splits JSON, and SendMoney with
-        // no attached receipt has no receipt field. A row without a trace id cannot be joined to the capture log, so
-        // it would only add noise to the snapshot.
-        if (!data.receipt) {
-            continue;
-        }
-        const transactionID = data.transactionID;
+    for (const pendingReceipt of getPendingQueuedReceipts()) {
+        const transactionID = pendingReceipt.transactionID;
         if (transactionID) {
             pendingTransactionIDs.add(transactionID);
         }
@@ -215,9 +287,9 @@ function logReceiptQueueSnapshot(trigger: ReceiptSnapshotTrigger) {
         Log.info(`${RECEIPT_LOG_PREFIX} queue snapshot`, true, {
             event: 'snapshot',
             trigger,
-            receiptTraceId: data.receipt.receiptTraceId,
+            receiptTraceId: pendingReceipt.receiptTraceId,
             transactionID,
-            command: request.command,
+            command: pendingReceipt.command,
             msSinceEnqueued: enqueuedAt !== undefined ? now - enqueuedAt : undefined,
             isOffline,
         });
@@ -239,7 +311,9 @@ export {
     logReceiptEnqueued,
     logReceiptDropped,
     logReceiptQueueSnapshot,
+    getPendingQueuedReceipts,
+    hasReceiptBearingRequest,
     getPickerCaptureSource,
     RECEIPT_BEARING_COMMANDS,
 };
-export type {ReceiptCaptureSource};
+export type {ReceiptCaptureSource, PendingQueuedReceipt};

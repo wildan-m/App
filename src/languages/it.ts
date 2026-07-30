@@ -2274,6 +2274,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Configura correttamente i clienti',
             moreResources: 'Altre risorse',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Ricevuta ancora in caricamento',
+            prompt: 'Una ricevuta non ha ancora finito di essere caricata. Se esci, la salveremo nelle tue foto così potrai inviarla di nuovo più tardi.',
+            confirm: 'Salva ed esci',
+            savedToGallery: 'La tua ricevuta non inviata è stata salvata nelle tue foto.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Chiudi account',

@@ -2162,6 +2162,12 @@ const translations: TranslationDeepObject<typeof en> = {
         accountSettings: 'Configuración de la cuenta',
         account: 'Cuenta',
         general: 'General',
+        signOutWarningPendingReceipt: {
+            title: 'El recibo sigue subiéndose',
+            prompt: 'Un recibo aún no ha terminado de subirse. Si cierras sesión, lo guardaremos en tus fotos para que puedas enviarlo de nuevo más tarde.',
+            confirm: 'Guardar y cerrar sesión',
+            savedToGallery: 'Tu recibo no enviado se ha guardado en tus fotos.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Cerrar cuenta',

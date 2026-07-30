@@ -2278,6 +2278,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Kund:innen erfolgreich einrichten',
             moreResources: 'Weitere Ressourcen',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Beleg wird noch hochgeladen',
+            prompt: 'Ein Beleg ist noch nicht vollständig hochgeladen. Wenn Sie sich abmelden, speichern wir ihn in Ihren Fotos, damit Sie ihn später erneut einreichen können.',
+            confirm: 'Speichern und abmelden',
+            savedToGallery: 'Ihr nicht gesendeter Beleg wurde in Ihren Fotos gespeichert.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Konto schließen',

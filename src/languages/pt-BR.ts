@@ -2263,6 +2263,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Configurar clientes com sucesso',
             moreResources: 'Mais recursos',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Recibo ainda sendo enviado',
+            prompt: 'Um recibo ainda não terminou de ser enviado. Se você sair, vamos salvá-lo nas suas fotos para que possa enviá-lo novamente depois.',
+            confirm: 'Salvar e sair',
+            savedToGallery: 'Seu recibo não enviado foi salvo nas suas fotos.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Encerrar conta',

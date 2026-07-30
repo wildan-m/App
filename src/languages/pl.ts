@@ -2266,6 +2266,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Skutecznie skonfiguruj klientów',
             moreResources: 'Więcej zasobów',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Paragon nadal się przesyła',
+            prompt: 'Paragon nie zakończył jeszcze przesyłania. Jeśli się wylogujesz, zapiszemy go w Twoich zdjęciach, żebyś mógł/mogła wysłać go ponownie później.',
+            confirm: 'Zapisz i wyloguj się',
+            savedToGallery: 'Twój niewysłany paragon został zapisany w zdjęciach.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Zamknij konto',

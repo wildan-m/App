@@ -2283,6 +2283,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Configurer les clients avec succès',
             moreResources: 'Plus de ressources',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Reçu toujours en cours de téléversement',
+            prompt: "Un reçu n'a pas encore terminé le téléversement. Si vous vous déconnectez, nous l'enregistrerons dans vos photos afin que vous puissiez le soumettre de nouveau plus tard.",
+            confirm: 'Enregistrer et se déconnecter',
+            savedToGallery: 'Votre reçu non envoyé a été enregistré dans vos photos.',
+        },
     },
     closeAccountPage: {
         closeAccount: 'Fermer le compte',

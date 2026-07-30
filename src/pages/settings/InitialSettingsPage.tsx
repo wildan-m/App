@@ -37,6 +37,7 @@ import useIsSidebarRouteActive from '@libs/Navigation/helpers/useIsSidebarRouteA
 import Navigation from '@libs/Navigation/Navigation';
 import {useIsAgentAccount} from '@libs/SessionUtils';
 import {getFreeTrialText, hasSubscriptionRedDotError} from '@libs/SubscriptionUtils';
+import {hasReceiptBearingRequest} from '@libs/telemetry/ReceiptObservability';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {shouldHideOldAppRedirect} from '@libs/TryNewDotUtils';
 import {expensifyLoginsSelector, getProfilePageBrickRoadIndicator, hasDeviceManagementError} from '@libs/UserUtils';
@@ -160,6 +161,8 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     const hasLockedBankAccount = bankAccountList ? Object.values(bankAccountList).some((bankAccount) => bankAccount.accountData?.state === CONST.BANK_ACCOUNT.STATE.LOCKED) : false;
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
     const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {selector: isTrackingSelector});
+    const [hasQueuedReceipt = false] = useOnyx(ONYXKEYS.PERSISTED_REQUESTS, {selector: hasReceiptBearingRequest});
+    const [hasOngoingReceipt = false] = useOnyx(ONYXKEYS.PERSISTED_ONGOING_REQUESTS, {selector: hasReceiptBearingRequest});
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL);
     const [unsharedBankAccount] = useOnyx(ONYXKEYS.UNSHARE_BANK_ACCOUNT);
     const [stashedCredentials] = useOnyx(ONYXKEYS.STASHED_CREDENTIALS);
@@ -212,9 +215,23 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     }, []);
 
     const {showConfirmModal} = useConfirmModal();
-    const confirmModalTitle = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.title') : translate('common.areYouSure');
-    const confirmModalPrompt = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.prompt') : translate('initialSettingsPage.signOutConfirmationText');
-    const confirmModalConfirmText = isTrackingGPS ? translate('gps.signOutWarningTripInProgress.confirm') : translate('initialSettingsPage.signOut');
+
+    // A receipt that has not finished uploading is lost when signing out clears the queue, so it is worth a warning
+    // even when the user is online and would otherwise be signed out without a prompt.
+    const hasPendingReceiptUpload = hasQueuedReceipt || hasOngoingReceipt;
+
+    let confirmModalTitle = translate('common.areYouSure');
+    let confirmModalPrompt = translate('initialSettingsPage.signOutConfirmationText');
+    let confirmModalConfirmText = translate('initialSettingsPage.signOut');
+    if (isTrackingGPS) {
+        confirmModalTitle = translate('gps.signOutWarningTripInProgress.title');
+        confirmModalPrompt = translate('gps.signOutWarningTripInProgress.prompt');
+        confirmModalConfirmText = translate('gps.signOutWarningTripInProgress.confirm');
+    } else if (hasPendingReceiptUpload) {
+        confirmModalTitle = translate('initialSettingsPage.signOutWarningPendingReceipt.title');
+        confirmModalPrompt = translate('initialSettingsPage.signOutWarningPendingReceipt.prompt');
+        confirmModalConfirmText = translate('initialSettingsPage.signOutWarningPendingReceipt.confirm');
+    }
 
     const showSignOutModal = () => {
         return showConfirmModal({
@@ -228,11 +245,12 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     };
 
     const signOut = async (shouldForceSignout = false) => {
-        if ((!network.isOffline && !isTrackingGPS) || shouldForceSignout) {
+        if ((!network.isOffline && !isTrackingGPS && !hasPendingReceiptUpload) || shouldForceSignout) {
             return signOutAndRedirectToSignIn();
         }
 
-        // When offline, warn the user that any actions they took while offline will be lost if they sign out
+        // Warn the user before we sign out and clear storage: offline changes are lost, a GPS trip is discarded, and
+        // a receipt that is still uploading gets saved to their gallery instead of disappearing with the queue.
         const result = await showSignOutModal();
         if (result.action !== ModalActions.CONFIRM) {
             return;

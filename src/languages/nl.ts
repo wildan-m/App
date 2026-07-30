@@ -2270,6 +2270,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'Klanten succesvol instellen',
             moreResources: 'Meer bronnen',
         },
+        signOutWarningPendingReceipt: {
+            title: 'Bon nog aan het uploaden',
+            prompt: 'Een bon is nog niet volledig geüpload. Als je je afmeldt, slaan we hem op in je foto’s zodat je hem later opnieuw kunt indienen.',
+            confirm: 'Opslaan en uitloggen',
+            savedToGallery: "Je niet-verzonden bonnetje is opgeslagen in je foto's.",
+        },
     },
     closeAccountPage: {
         closeAccount: 'Account sluiten',

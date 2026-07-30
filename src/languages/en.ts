@@ -2341,6 +2341,12 @@ const translations = {
         signOut: 'Sign out',
         restoreStashed: 'Restore stashed login',
         signOutConfirmationText: "You'll lose any offline changes if you sign out.",
+        signOutWarningPendingReceipt: {
+            title: 'Receipt still uploading',
+            prompt: "A receipt hasn't finished uploading yet. If you sign out, we'll save it to your photos so you can submit it again later.",
+            confirm: 'Save and sign out',
+            savedToGallery: 'Your unsent receipt was saved to your photos.',
+        },
         versionLetter: 'v',
         readTheTermsAndPrivacy: `Read the <a href="${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}">Terms of Service</a> and <a href="${CONST.OLD_DOT_PUBLIC_URLS.PRIVACY_URL}">Privacy</a>.`,
         help: 'Help',

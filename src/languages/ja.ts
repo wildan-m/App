@@ -2252,6 +2252,12 @@ const translations: TranslationDeepObject<typeof en> = {
             accountExecutiveDescription: 'クライアントの導入を成功させる',
             moreResources: 'その他のリソース',
         },
+        signOutWarningPendingReceipt: {
+            title: 'レシートをアップロード中です',
+            prompt: 'レシートのアップロードがまだ完了していません。サインアウトすると、後で再提出できるように写真に保存します。',
+            confirm: '保存してサインアウト',
+            savedToGallery: '送信されなかった領収書は、写真に保存されました。',
+        },
     },
     closeAccountPage: {
         closeAccount: 'アカウントを閉じる',
