@@ -179,6 +179,11 @@ function SearchPageNarrow({
     });
     const [isInteractive, setIsInteractive] = useState(!useStaticRendering);
     const [isHeaderInteractive, setIsHeaderInteractive] = useState(!useStaticRendering);
+    // The static header pulses to signal that it is a placeholder, so it must not pulse while the page
+    // is still hidden behind the RHP. Sitting there unfocused keeps the header static indefinitely, and
+    // an unbounded pulse on a hidden screen shows up as a blinking background as soon as an interactive
+    // dismissal gesture uncovers it.
+    const [hasBeenFocused, setHasBeenFocused] = useState(() => navigation.isFocused());
     const isHeaderInteractiveRef = useRef(isHeaderInteractive);
     const [, startTransition] = useTransition();
     useEffect(() => {
@@ -201,6 +206,8 @@ function SearchPageNarrow({
     // useFocusEffect avoids the extra re-renders that useIsFocused causes on every focus change.
     useFocusEffect(
         useCallback(() => {
+            // Setting the same value again bails out of rendering, so this costs a single re-render on the first focus.
+            setHasBeenFocused(true);
             if (isInteractive) {
                 return;
             }
@@ -264,7 +271,7 @@ function SearchPageNarrow({
                             <View style={[styles.flex1]}>
                                 <Animated.View style={[topBarAnimatedStyle, styles.narrowSearchRouterInactiveStyle, styles.flex1, styles.appBG, styles.searchTopBarZIndexStyle]}>
                                     <PulsingView
-                                        shouldPulse={!isHeaderInteractive}
+                                        shouldPulse={!isHeaderInteractive && hasBeenFocused}
                                         style={styles.flex1}
                                         wrapperStyle={[styles.flex1, styles.appBG]}
                                     >
