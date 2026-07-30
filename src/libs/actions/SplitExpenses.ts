@@ -95,7 +95,10 @@ function initSplitExpense(
     }
 
     if (isExpenseSplit && shouldShowSplitIndicator) {
-        const transactionDetails = getTransactionDetails(originalTransaction);
+        // While the split is open, the original transaction lives in the SPLIT_REPORT_ID placeholder report, which
+        // isn't an expense report in Onyx. Without allowNegativeAmount, getTransactionDetails would return the
+        // absolute amount and the draft total would lose the sign of a negative expense.
+        const transactionDetails = getTransactionDetails(originalTransaction, undefined, undefined, true);
         const splitExpenses = relatedTransactions.map((currentTransaction) => {
             const currentTransactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${currentTransaction?.reportID}`];
             const itemReportID = resolveSplitItemReportID({
