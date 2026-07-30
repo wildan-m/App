@@ -98,7 +98,8 @@ function AnchorRenderer({tnode, style, key}: AnchorRendererProps) {
             linkStyle = [styles.formError, styles.mb0, styles.link];
         }
 
-        if (tnode.classes.includes('no-style-link')) {
+        const isNoStyleLink = tnode.classes.includes('no-style-link');
+        if (isNoStyleLink) {
             // If the link has a class of a no-style-link, we don't apply any styles
             linkStyle = {...(style as TextStyle)};
             delete linkStyle.color;
@@ -112,7 +113,28 @@ function AnchorRenderer({tnode, style, key}: AnchorRendererProps) {
                 onPress={() => openLink(attrHref, environmentURL, isAttachment)}
                 suppressDefaultStyle
             >
-                <TNodeChildrenRenderer tnode={tnode} />
+                <TNodeChildrenRenderer
+                    tnode={tnode}
+                    renderChild={(props) => {
+                        // Android does not paint a text decoration declared on a wrapping Text for the nested text
+                        // runs inside it, so the high-contrast underline carried by linkStyle never reaches the
+                        // link's own words. Re-apply linkStyle to each plain text child so the decoration lands on
+                        // the run that actually renders them. Every other property in linkStyle is an inherited
+                        // text property, so this is a no-op on the platforms that already draw the wrapper's
+                        // decoration. no-style-link is excluded because it deliberately carries no link styling.
+                        if (!isNoStyleLink && props.childTnode.type === 'text' && props.childTnode.tagName !== 'code') {
+                            return (
+                                <Text
+                                    key={props.key}
+                                    style={linkStyle}
+                                >
+                                    {props.childTnode.data}
+                                </Text>
+                            );
+                        }
+                        return props.childElement;
+                    }}
+                />
             </TextLink>
         );
     }
