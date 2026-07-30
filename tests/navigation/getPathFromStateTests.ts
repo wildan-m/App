@@ -70,6 +70,7 @@ function realFindFocusedRoute(s: TestState | RouteEntry['state']): RouteEntry | 
 const staticBasePaths: Record<string, (params?: Record<string, unknown>) => string> = {
     WalletScreen: () => '/settings/wallet',
     ReportScreen: (params) => `/r/${(params?.reportID as string) ?? ''}`,
+    RootScreen: () => '/',
 };
 
 describe('getPathFromState', () => {
@@ -123,6 +124,24 @@ describe('getPathFromState', () => {
             const state = buildState([{name: 'WalletScreen'}, {name: 'VerifyAccountScreen'}]);
 
             expect(getPathFromState(state as PartialState<NavigationState>)).toBe('/settings/wallet/verify-account');
+        });
+
+        it('suffix on top of the root base path', () => {
+            const state = buildState([{name: 'RootScreen'}, {name: 'VerifyAccountScreen'}]);
+
+            expect(getPathFromState(state as PartialState<NavigationState>)).toBe('/verify-account');
+        });
+
+        it('two stacked suffixes on top of the root base path', () => {
+            const state = buildState([{name: 'RootScreen'}, {name: 'TestDynamicScreen'}, {name: 'VerifyAccountScreen'}]);
+
+            expect(getPathFromState(state as PartialState<NavigationState>)).toBe('/test-dynamic/verify-account');
+        });
+
+        it('suffix with query params on top of the root base path', () => {
+            const state = buildState([{name: 'RootScreen'}, {name: 'CountryScreen', params: {country: 'PL'}}]);
+
+            expect(getPathFromState(state as PartialState<NavigationState>)).toBe('/country?country=PL');
         });
 
         it('suffix with params', () => {

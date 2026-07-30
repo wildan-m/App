@@ -163,7 +163,11 @@ function getPathFromStateWithDynamicRoute(state: State): string {
     }
     const queryString = mergedParams.toString();
 
-    return `${basePathWithoutQuery}/${suffixPath}${queryString ? `?${queryString}` : ''}`;
+    // When the base path is the root, concatenating another separator would produce a path starting with "//",
+    // which browsers parse as a protocol-relative URL pointing at a different origin, so history.pushState throws.
+    const combinedPath = !basePathWithoutQuery || basePathWithoutQuery === '/' ? `/${suffixPath}` : `${basePathWithoutQuery}/${suffixPath}`;
+
+    return `${combinedPath}${queryString ? `?${queryString}` : ''}`;
 }
 
 function getPathFromState(state: State): string {
