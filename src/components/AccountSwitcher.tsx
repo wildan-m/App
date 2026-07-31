@@ -166,10 +166,10 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
               shouldHideOnScroll: true,
           }
         : {
+              // No manual shift or alignment override: those were tuned for the old full-row anchor and leave the
+              // tooltip overlapping the small Switch button. The defaults (centered above the anchor) match every
+              // other hover tooltip in the app.
               text: translate('delegate.copilotAccess'),
-              shiftVertical: 8,
-              shiftHorizontal: 8,
-              anchorAlignment: {horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT, vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM},
               shouldRender: canSwitchAccounts,
           };
 
