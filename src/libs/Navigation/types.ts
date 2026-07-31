@@ -3279,6 +3279,7 @@ type SearchReportActionsParamList = {
     };
     [SCREENS.SEARCH.CHANGE_APPROVER.ROOT]: undefined;
     [SCREENS.SEARCH.CHANGE_APPROVER.ADD_APPROVER]: undefined;
+    [SCREENS.SEARCH.REPORTS_CHANGE_WORKSPACE_SEARCH_RHP]: undefined;
 };
 
 type SearchFullscreenNavigatorParamList = {

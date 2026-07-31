@@ -6716,6 +6716,7 @@ const CONST = {
             DELETE: 'delete',
             REJECT: 'reject',
             CHANGE_REPORT: 'changeReport',
+            CHANGE_WORKSPACE: 'changeWorkspace',
             SPLIT: 'split',
             DUPLICATE: 'duplicate',
             DUPLICATE_REPORT: 'duplicateReport',

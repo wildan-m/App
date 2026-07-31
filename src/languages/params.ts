@@ -146,7 +146,13 @@ type EmptyViolationSnapshotResultsSubtitleParams = {
     formattedDate: string;
 };
 
+type MoveReportsToWorkspaceParams = {
+    count: number;
+    workspaceName: string;
+};
+
 export type {
+    MoveReportsToWorkspaceParams,
     MissingPropertyParams,
     InvalidPropertyParams,
     InvalidValueParams,

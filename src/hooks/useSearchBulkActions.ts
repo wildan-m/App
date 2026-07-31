@@ -43,7 +43,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import {getConnectedIntegration, isSubmitPolicy} from '@libs/PolicyUtils';
-import {getReportAccountingExportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
+import {getReportAccountingExportActions, isChangeWorkspaceAction, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditMultipleTransactions,
     getAllPolicyExpenseChatReportActions,
@@ -94,7 +94,19 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import {doesPersonalDetailExistSelector} from '@src/selectors/PersonalDetails';
-import type {BillingGraceEndPeriod, ExportTemplate, Policy, Report, ReportAction, ReportNameValuePairs, SearchResults, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {
+    BillingGraceEndPeriod,
+    ExportTemplate,
+    PersonalDetailsList,
+    Policy,
+    Report,
+    ReportAction,
+    ReportActions,
+    ReportNameValuePairs,
+    SearchResults,
+    Transaction,
+    TransactionViolations,
+} from '@src/types/onyx';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type DeepValueOf from '@src/types/utils/DeepValueOf';
 
@@ -234,6 +246,53 @@ type ShouldShowBulkDuplicateParams = {
     typeExpenseReport: boolean;
     searchData: Record<string, unknown> | undefined;
 };
+
+type CanChangeWorkspaceForSelectedReportsParams = {
+    selectedReports: SelectedReports[];
+    allPolicies: OnyxCollection<Policy>;
+    allReports: OnyxCollection<Report>;
+    allReportActions: OnyxCollection<ReportActions>;
+    personalDetails: OnyxEntry<PersonalDetailsList>;
+    searchData: SearchResults['data'] | undefined;
+    currentUserLogin: string | undefined;
+};
+
+/**
+ * Whether every selected report can be moved to another workspace, using the same eligibility rule
+ * the single-report "Change workspace" menu entry uses, so the bulk menu can never offer a move the
+ * per-report flow would refuse.
+ */
+function canChangeWorkspaceForSelectedReports({
+    selectedReports,
+    allPolicies,
+    allReports,
+    allReportActions,
+    personalDetails,
+    searchData,
+    currentUserLogin,
+}: CanChangeWorkspaceForSelectedReportsParams): boolean {
+    if (!currentUserLogin || selectedReports.length === 0) {
+        return false;
+    }
+
+    return selectedReports.every((selectedReport) => {
+        const reportID = selectedReport.reportID;
+        if (!reportID) {
+            return false;
+        }
+
+        // Rows selected in Search come from the search snapshot, which is the only place the report is
+        // guaranteed to exist until the destination page hydrates the selection into Onyx.
+        const report = (searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] as Report | undefined) ?? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
+        if (!report) {
+            return false;
+        }
+
+        const submitterLogin = personalDetails?.[report.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID]?.login;
+        const reportActions = Object.values(allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`] ?? {});
+        return isChangeWorkspaceAction(report, allPolicies, currentUserLogin, submitterLogin, reportActions);
+    });
+}
 
 function areIncludedSubmitPolicyTransactions(selectedTransactions: SelectedTransactions, selectedReports: SelectedReports[], allPolicies: OnyxCollection<Policy>): boolean {
     return selectedReports.length > 0
@@ -482,6 +541,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         'GustoSquare',
         'Pencil',
         'Workflows',
+        'Buildings',
         'Document',
     ]);
 
@@ -1948,6 +2008,29 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_APPROVER,
                 shouldCloseModalOnSelect: true,
                 onSelected: () => navigateToSearchRHP(ROUTES.CHANGE_APPROVER_SEARCH_RHP),
+            });
+        }
+
+        const shouldShowChangeWorkspaceOption =
+            queryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT &&
+            areSelectedTransactionsIncludedInReports &&
+            canChangeWorkspaceForSelectedReports({
+                selectedReports,
+                allPolicies: policies,
+                allReports,
+                allReportActions,
+                personalDetails,
+                searchData: searchResults?.data,
+                currentUserLogin,
+            });
+
+        if (shouldShowChangeWorkspaceOption) {
+            options.push({
+                icon: expensifyIcons.Buildings,
+                text: translate('iou.changeWorkspace'),
+                value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_WORKSPACE,
+                shouldCloseModalOnSelect: true,
+                onSelected: () => navigateToSearchRHP(ROUTES.MOVE_REPORTS_WORKSPACE_SEARCH_RHP),
             });
         }
 

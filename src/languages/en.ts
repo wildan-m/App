@@ -22,6 +22,7 @@ import type {
     DeleteConfirmationParams,
     EditActionParams,
     EmptyViolationSnapshotResultsSubtitleParams,
+    MoveReportsToWorkspaceParams,
     ExportAgainModalDescriptionParams,
     ExportIntegrationSelectedParams,
     IntacctMappingTitleParams,
@@ -9080,6 +9081,8 @@ const translations = {
             duplicateExpense: ({count}: {count: number}) => `Duplicate ${count === 1 ? 'expense' : 'expenses'}`,
             duplicateReport: ({count}: {count: number}) => `Duplicate ${count === 1 ? 'report' : 'reports'}`,
             undelete: 'Undelete',
+            moveReportsToWorkspaceConfirmation: ({count, workspaceName}: MoveReportsToWorkspaceParams) =>
+                `You are about to move ${count} ${count === 1 ? 'report' : 'reports'} to the ${workspaceName} workspace. These reports will become subject to the new workspace's policies, including categories, tags, approval workflows, and other workspace rules. Do you want to continue?`,
             noOptionsAvailable: 'No options available for the selected group of expenses.',
         },
         expensifyCardStatementPDF: {

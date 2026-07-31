@@ -1540,6 +1540,15 @@ const ROUTES = {
             return `search/move-transactions/search/${encodeURIComponent(backTo)}` as const;
         },
     },
+    MOVE_REPORTS_WORKSPACE_SEARCH_RHP: {
+        route: 'search/move-reports/workspace/:backTo?',
+        getRoute: (backTo?: string) => {
+            if (!backTo) {
+                return 'search/move-reports/workspace' as const;
+            }
+            return `search/move-reports/workspace/${encodeURIComponent(backTo)}` as const;
+        },
+    },
     CHANGE_APPROVER_SEARCH_RHP: {
         route: 'search/change-approver/search/:backTo?',
         getRoute: (backTo?: string) => {
