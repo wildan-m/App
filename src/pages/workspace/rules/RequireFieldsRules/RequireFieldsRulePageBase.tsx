@@ -244,7 +244,7 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
     // still sees areCommentsRequired / receipt overrides if the draft category is briefly missing.
     const categoryForRule = selectedCategory ?? category;
 
-    const errorMessage = getRequireFieldsRuleValidationError(form, categoryForRule, translate, isEditing, touchedFields, clearedFields);
+    const errorMessage = getRequireFieldsRuleValidationError(form, categoryForRule, translate, isEditing, touchedFields);
 
     const getFieldDisplaySetting = (fieldKey: RequireFieldsRuleSettingFieldKey): FieldRequirementsDirection | undefined =>
         getRequireFieldsDisplayedSetting({
@@ -348,9 +348,27 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
         const originalCategoryName = categoryName;
         const didChangeCategory = isEditing && !!originalCategoryName && !!savedCategory && savedCategory !== originalCategoryName;
 
-        if (isEditing && !didChangeCategory && !hasRequireFieldsRuleChanges(selectedCategory ?? category, formToSave, touchedFields, clearedFields)) {
-            clearDraftRequireFieldsRule();
+        const navigateBackAfterSave = () => {
+            if (!isEditing && isRulesRevampEnabled) {
+                const savedCategoryName = savedCategory ?? initialCategoryName;
+                if (initialCategoryName && savedCategoryName) {
+                    Navigation.goBack(categorySettingsBackPath ?? getWorkspaceCategorySettingsRoute(policyID, savedCategoryName));
+                    return;
+                }
+
+                Tab.setSelectedTab(CONST.TAB.RULES_TAB_TYPE, CONST.TAB.RULES.REQUIRE_FIELDS);
+                Navigation.goBack(ROUTES.WORKSPACE_RULES.getRoute(policyID));
+                return;
+            }
+
             Navigation.goBack();
+        };
+
+        // Selecting requirements the category already has writes nothing, in create mode as well as
+        // when editing. Close the page as a successful save would instead of erroring or re-sending.
+        if (!didChangeCategory && !hasRequireFieldsRuleChanges(selectedCategory ?? category, formToSave, touchedFields, clearedFields)) {
+            clearDraftRequireFieldsRule();
+            navigateBackAfterSave();
             return;
         }
 
@@ -364,19 +382,7 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
 
         clearDraftRequireFieldsRule();
 
-        if (!isEditing && isRulesRevampEnabled) {
-            const savedCategoryName = savedCategory ?? initialCategoryName;
-            if (initialCategoryName && savedCategoryName) {
-                Navigation.goBack(categorySettingsBackPath ?? getWorkspaceCategorySettingsRoute(policyID, savedCategoryName));
-                return;
-            }
-
-            Tab.setSelectedTab(CONST.TAB.RULES_TAB_TYPE, CONST.TAB.RULES.REQUIRE_FIELDS);
-            Navigation.goBack(ROUTES.WORKSPACE_RULES.getRoute(policyID));
-            return;
-        }
-
-        Navigation.goBack();
+        navigateBackAfterSave();
     };
 
     const handleSubmit = () => {

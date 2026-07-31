@@ -254,6 +254,28 @@ function hasRequireFieldsRuleChanges(
     return hasReceiptSettingsChanged(category, effectiveForm, initialForm, touchedFields, clearedFields);
 }
 
+/**
+ * Whether the create form holds at least one selection that could stand on its own as a rule.
+ * Require qualifies on any field; Don't require only qualifies on the receipt fields, where it is
+ * an explicit waive. Unlike hasRequireFieldsRuleChanges this ignores what the category already
+ * requires, so repeating a requirement the category happens to have is still a valid rule.
+ */
+function hasPersistableRequireFieldsSelection(effectiveForm: RequireFieldsRuleForm, touchedFields?: Set<RequireFieldsRuleSettingFieldKey>): boolean {
+    const settingFieldKeys = [INPUT_IDS.DESCRIPTION_SETTING, INPUT_IDS.ATTENDEES_SETTING, INPUT_IDS.RECEIPT_SETTING, INPUT_IDS.ITEMIZED_RECEIPT_SETTING] as const;
+
+    return settingFieldKeys.some((fieldKey) => {
+        if (!touchedFields?.has(fieldKey)) {
+            return false;
+        }
+
+        if (effectiveForm[fieldKey] === CONST.FIELD_REQUIREMENTS_DIRECTION.REQUIRE) {
+            return true;
+        }
+
+        return fieldKey === INPUT_IDS.RECEIPT_SETTING || fieldKey === INPUT_IDS.ITEMIZED_RECEIPT_SETTING;
+    });
+}
+
 type ReceiptOverrideTarget = number | undefined;
 
 function getReceiptOverrideTarget(currentValue: number | null | undefined, setting: FieldRequirementsDirection): ReceiptOverrideTarget {
@@ -515,7 +537,6 @@ function getRequireFieldsRuleValidationError(
     translate: LocaleContextProps['translate'],
     isEditing: boolean,
     touchedFields?: Set<RequireFieldsRuleSettingFieldKey>,
-    clearedFields?: Set<RequireFieldsRuleSettingFieldKey>,
 ): string {
     if (!form?.[INPUT_IDS.CATEGORY]) {
         return translate('workspace.rules.requireFieldsRule.confirmErrorCategory');
@@ -528,7 +549,7 @@ function getRequireFieldsRuleValidationError(
     // Description/attendees "Don't require" only clears a required flag and cannot create a
     // waive rule. Require a selection that would actually persist (Require, or a receipt waive).
     const effectiveForm = getEffectiveRequireFieldsRuleForm(category, form);
-    if (!hasRequireFieldsRuleChanges(category, effectiveForm, touchedFields, clearedFields)) {
+    if (!hasPersistableRequireFieldsSelection(effectiveForm, touchedFields)) {
         return translate('workspace.rules.requireFieldsRule.confirmErrorDoNotRequireField');
     }
 
