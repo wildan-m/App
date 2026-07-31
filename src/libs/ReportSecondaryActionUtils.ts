@@ -413,11 +413,6 @@ function isCancelPaymentAction(
     }
 
     const isAdmin = policy?.role === CONST.POLICY.ROLE.ADMIN;
-    const isPayer = isPayerUtils(currentAccountID, currentUserEmail, report, bankAccountList, policy, false);
-
-    if (!isAdmin || !isPayer) {
-        return false;
-    }
 
     // Get all report actions for this report and filter for pay actions
     // Pay actions are at the report level, not per transaction
@@ -433,6 +428,15 @@ function isCancelPaymentAction(
             const originalMessage = getOriginalMessage(action);
             return originalMessage && 'paymentType' in originalMessage && originalMessage.paymentType !== CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
         });
+
+    // Cancelling a payment should require the same rights as making it. A payment made elsewhere is gated
+    // by the pay-elsewhere semantics, which let any workspace admin act even when reimbursement is disabled,
+    // while cancelling an in-flight bank payment keeps requiring real reimburser/bank-account rights.
+    const isPayer = isPayerUtils(currentAccountID, currentUserEmail, report, bankAccountList, policy, !isPaidViaBankAccount);
+
+    if (!isAdmin || !isPayer) {
+        return false;
+    }
 
     // For reports marked as paid elsewhere or when we can't determine payment type, show cancel button
     if (report.stateNum === CONST.REPORT.STATE_NUM.APPROVED && report.statusNum === CONST.REPORT.STATUS_NUM.REIMBURSED && !isPaidViaBankAccount) {
