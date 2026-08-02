@@ -5,6 +5,7 @@ import RenderHTML from '@components/RenderHTML';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 
+import useDefaultFundID from '@hooks/useDefaultFundID';
 import useEnvironment from '@hooks/useEnvironment';
 import useExpensifyCardFeeds from '@hooks/useExpensifyCardFeeds';
 import useLocalize from '@hooks/useLocalize';
@@ -43,53 +44,39 @@ type CardReconciliationPageProps = WithPolicyConnectionsProps & PlatformStackScr
 
 type AccountingConnectionName = TupleToUnion<typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES>;
 
-type FullySetUpCardSetting = {
-    key: string;
-    cardSetting: ExpensifyCardSettings;
-};
-
 function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
-    const workspaceAccountID = policy?.policyAccountID ?? CONST.DEFAULT_NUMBER_ID;
     const policyID = policy?.id;
     const allCardSettings = useExpensifyCardFeeds(policyID);
+    const defaultFundID = useDefaultFundID(policyID);
     const {environmentURL} = useEnvironment();
 
     const fullySetUpCardSetting = useMemo(() => {
-        const entries = Object.entries(allCardSettings ?? {});
-        const initialValue: FullySetUpCardSetting = {
-            key: '',
-            cardSetting: {
-                monthlySettlementDate: new Date(),
-                isMonthlySettlementAllowed: false,
-                paymentBankAccountID: CONST.DEFAULT_NUMBER_ID,
-            },
+        const entries = Object.values(allCardSettings ?? {});
+        const initialValue: ExpensifyCardSettings = {
+            monthlySettlementDate: new Date(),
+            isMonthlySettlementAllowed: false,
+            paymentBankAccountID: CONST.DEFAULT_NUMBER_ID,
         };
 
-        return entries.reduce<FullySetUpCardSetting>((acc, [key, cardSetting]) => {
+        return entries.reduce<ExpensifyCardSettings>((acc, cardSetting) => {
             if (cardSetting && isExpensifyCardFullySetUp(policy, cardSetting)) {
-                return {
-                    key,
-                    cardSetting,
-                };
+                return cardSetting;
             }
             return acc;
         }, initialValue);
     }, [allCardSettings, policy]);
 
-    const domainID = fullySetUpCardSetting.key.split('_').at(-1);
-    const effectiveDomainID = Number(domainID ?? workspaceAccountID);
-
-    const [continuousReconciliation] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION}${effectiveDomainID}`, {
+    const [continuousReconciliation] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION}${defaultFundID}`, {
         selector: isExpensifyCardContinuousReconciliationEnabledSelector,
     });
-    const [continuousReconciliationPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION}${effectiveDomainID}`);
-    const [currentConnectionName] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_CONTINUOUS_RECONCILIATION_CONNECTION}${effectiveDomainID}`);
-    const [reconciliationBankAccountID] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID}${effectiveDomainID}`);
+    const [continuousReconciliationPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION}${defaultFundID}`);
+    const [currentConnectionName] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_CONTINUOUS_RECONCILIATION_CONNECTION}${defaultFundID}`);
+    const [reconciliationBankAccountID] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID}${defaultFundID}`);
 
-    const resolvedCardSettings = getCardSettings(fullySetUpCardSetting.cardSetting);
+    const resolvedCardSettings = getCardSettings(fullySetUpCardSetting);
     const paymentBankAccountID = resolvedCardSettings?.paymentBankAccountID ?? CONST.DEFAULT_NUMBER_ID;
 
     const {connection} = route.params;
@@ -101,7 +88,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
     const bankAccountTitle = connectionBankAccounts.find((account) => account.id === reconciliationBankAccountID)?.name ?? '';
 
     const handleToggleContinuousReconciliation = (value: boolean) => {
-        toggleContinuousReconciliation(effectiveDomainID, value, connectionName, currentConnectionName);
+        toggleContinuousReconciliation(defaultFundID, value, connectionName, currentConnectionName);
         if (value) {
             Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_ACCOUNTING_RECONCILIATION_ACCOUNT_SETTINGS.path));
         }

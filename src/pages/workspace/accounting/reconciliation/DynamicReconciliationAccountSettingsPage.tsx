@@ -123,7 +123,7 @@ function ReconciliationAccountSettingsLayout({
     );
 }
 
-function ExpensifyCardDynamicReconciliation({policyID, workspaceAccountID, domainName, bankAccountList, goBack, connectionName, connectionBankAccounts}: DynamicReconciliationProps) {
+function ExpensifyCardDynamicReconciliation({policyID, domainName, bankAccountList, goBack, connectionName, connectionBankAccounts}: DynamicReconciliationProps) {
     const {translate} = useLocalize();
     const defaultFundID = useDefaultFundID(policyID);
 
@@ -131,7 +131,7 @@ function ExpensifyCardDynamicReconciliation({policyID, workspaceAccountID, domai
     const programKey = getCardProgramKey(cardSettings);
     const settings = getCardSettings(cardSettings, programKey);
     const paymentBankAccountID = settings?.paymentBankAccountID;
-    const [reconciliationBankAccountID] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID}${workspaceAccountID}`);
+    const [reconciliationBankAccountID] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID}${defaultFundID}`);
 
     const selectedBankAccount = bankAccountList?.[paymentBankAccountID?.toString() ?? ''];
     const bankAccountNumber = selectedBankAccount?.accountData?.accountNumber ?? '';
@@ -143,7 +143,7 @@ function ExpensifyCardDynamicReconciliation({policyID, workspaceAccountID, domai
         if (!newBankAccountID) {
             return;
         }
-        setCardReconciliationAccount(workspaceAccountID, reconciliationDomainName, newBankAccountID, reconciliationBankAccountID);
+        setCardReconciliationAccount(defaultFundID, reconciliationDomainName, newBankAccountID, reconciliationBankAccountID);
         goBack();
     };
 
