@@ -4,6 +4,6 @@ import RNFetchBlob from 'react-native-blob-util';
 
 import type GetReceiptsUploadFolderPath from './types';
 
-const getReceiptsUploadFolderPath: GetReceiptsUploadFolderPath = () => `${RNFetchBlob.fs.dirs.DownloadDir}${CONST.RECEIPTS_UPLOAD_PATH}`;
+const getReceiptsUploadFolderPath: GetReceiptsUploadFolderPath = () => `${RNFetchBlob.fs.dirs.DocumentDir}${CONST.RECEIPTS_UPLOAD_PATH}`;
 
 export default getReceiptsUploadFolderPath;
