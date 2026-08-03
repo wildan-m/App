@@ -1276,6 +1276,64 @@ describe('ReportActionsUtils', () => {
         });
     });
 
+    describe('getMoneyRequestActionForThreadReportID', () => {
+        const expenseReportID = '7001';
+        const threadReportID = '7002';
+        const unrelatedThreadReportID = '7003';
+
+        const moneyRequestAction: ReportAction = {
+            ...LHNTestUtils.getFakeReportAction(),
+            reportActionID: '70021',
+            reportID: expenseReportID,
+            actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+            childReportID: threadReportID,
+            originalMessage: {
+                IOUTransactionID: '70022',
+                IOUReportID: expenseReportID,
+                amount: 4242,
+                currency: CONST.CURRENCY.USD,
+                type: CONST.IOU.REPORT_ACTION_TYPE.CREATE,
+            },
+        } as ReportAction;
+
+        const commentAction: ReportAction = {
+            ...LHNTestUtils.getFakeReportAction(),
+            reportActionID: '70023',
+            reportID: expenseReportID,
+            actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+            childReportID: unrelatedThreadReportID,
+        } as ReportAction;
+
+        beforeEach(() => {
+            const updates: ReportActionsCollectionDataSet = {
+                [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReportID}`]: {
+                    [moneyRequestAction.reportActionID]: moneyRequestAction,
+                    [commentAction.reportActionID]: commentAction,
+                },
+            };
+            return Onyx.multiSet(updates).then(waitForBatchedUpdates);
+        });
+
+        it('finds the money request action a transaction thread was opened from, without the thread report', () => {
+            const result = ReportActionsUtils.getMoneyRequestActionForThreadReportID(threadReportID);
+
+            expect(result?.reportActionID).toBe(moneyRequestAction.reportActionID);
+            expect(ReportActionsUtils.getLinkedTransactionID(result)).toBe('70022');
+        });
+
+        it('ignores actions that link to the thread but are not money request actions', () => {
+            expect(ReportActionsUtils.getMoneyRequestActionForThreadReportID(unrelatedThreadReportID)).toBeUndefined();
+        });
+
+        it('returns undefined when no cached action links to the thread', () => {
+            expect(ReportActionsUtils.getMoneyRequestActionForThreadReportID('9999')).toBeUndefined();
+        });
+
+        it('returns undefined without a thread report ID', () => {
+            expect(ReportActionsUtils.getMoneyRequestActionForThreadReportID(undefined)).toBeUndefined();
+        });
+    });
+
     describe('getLastVisibleAction', () => {
         it('should return the last visible action for a report', () => {
             const report: Report = {
