@@ -14,16 +14,34 @@ type ParentReportActionDeletionStatusParams = {
     shouldTreatMissingParentReportAsDeleted?: boolean;
 };
 
+/**
+ * Whether the report actions were actually fetched, which is the only acceptable evidence that something we cannot
+ * find was deleted rather than never loaded.
+ *
+ * Unlike `hasLoadedReportActions` this deliberately ignores the offline state: being offline only means we cannot
+ * fetch right now, so it can be used to stop waiting for data, but never to conclude that the data is gone.
+ */
+function hasConfirmedLoadedReportActions(reportLoadingState: OnyxInputOrEntry<ReportLoadingState>): boolean {
+    if (!reportLoadingState) {
+        return false;
+    }
+    return reportLoadingState?.hasOnceLoadedReportActions === true || reportLoadingState?.isLoadingInitialReportActions === false;
+}
+
+/**
+ * Whether we should stop waiting for the report actions, which is what the loading skeletons rely on. It tolerates
+ * the offline state so we don't sit on a skeleton that can never resolve while there is no connection.
+ */
 function hasLoadedReportActions(reportLoadingState: OnyxInputOrEntry<ReportLoadingState>, isOffline = false): boolean {
     if (!reportLoadingState) {
         return false;
     }
-    return reportLoadingState?.hasOnceLoadedReportActions === true || reportLoadingState?.isLoadingInitialReportActions === false || isOffline;
+    return hasConfirmedLoadedReportActions(reportLoadingState) || isOffline;
 }
 
-function isThreadReportDeleted(report: OnyxInputOrEntry<Report>, reportLoadingState: OnyxInputOrEntry<ReportLoadingState>, isOffline = false): boolean {
-    const hasLoadedThreadReportActions = hasLoadedReportActions(reportLoadingState, isOffline);
-    return (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasLoadedThreadReportActions && !report?.reportID);
+function isThreadReportDeleted(report: OnyxInputOrEntry<Report>, reportLoadingState: OnyxInputOrEntry<ReportLoadingState>): boolean {
+    const hasConfirmedLoadedThreadReportActions = hasConfirmedLoadedReportActions(reportLoadingState);
+    return (!report?.reportID && report?.statusNum === CONST.REPORT.STATUS_NUM.CLOSED) || (hasConfirmedLoadedThreadReportActions && !report?.reportID);
 }
 
 function decodeDeleteNavigateBackUrl(url: string): string {
@@ -60,8 +78,9 @@ function getParentReportActionDeletionStatus({
     shouldTreatMissingParentReportAsDeleted = false,
 }: ParentReportActionDeletionStatusParams) {
     const hasLoadedParentReportActionsValue = hasLoadedParentReportActions ?? hasLoadedReportActions(parentReportLoadingState, isOffline);
+    const hasConfirmedLoadedParentReportActionsValue = hasLoadedParentReportActions ?? hasConfirmedLoadedReportActions(parentReportLoadingState);
     const canUseParentActionIDForMissingCheck = !shouldRequireParentReportActionID || !!parentReportActionID;
-    const isParentActionMissingAfterLoad = !!parentReportID && canUseParentActionIDForMissingCheck && hasLoadedParentReportActionsValue && !parentReportAction;
+    const isParentActionMissingAfterLoad = !!parentReportID && canUseParentActionIDForMissingCheck && hasConfirmedLoadedParentReportActionsValue && !parentReportAction;
     const isParentActionDeleted = !!parentReportAction && (parentReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || isDeletedAction(parentReportAction));
     const isMissingParentReport = shouldTreatMissingParentReportAsDeleted && !parentReportID && !parentReportAction?.reportActionID;
     const wasParentActionDeleted = isParentActionDeleted || isParentActionMissingAfterLoad || isMissingParentReport;
@@ -74,6 +93,7 @@ export {
     doesDeleteNavigateBackUrlIncludeDuplicatesReview,
     doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview,
     getParentReportActionDeletionStatus,
+    hasConfirmedLoadedReportActions,
     hasLoadedReportActions,
     isThreadReportDeleted,
 };

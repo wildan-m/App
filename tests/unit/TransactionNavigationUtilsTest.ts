@@ -4,6 +4,7 @@ import {
     doesDeleteNavigateBackUrlIncludeDuplicatesReview,
     doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview,
     getParentReportActionDeletionStatus,
+    hasConfirmedLoadedReportActions,
     hasLoadedReportActions,
     isThreadReportDeleted,
 } from '@libs/TransactionNavigationUtils';
@@ -71,6 +72,24 @@ describe('TransactionNavigationUtils', () => {
 
         it('returns false while actions are not loaded yet', () => {
             expect(isThreadReportDeleted({} as Report, createReportMetadata())).toBe(false);
+        });
+    });
+
+    describe('hasConfirmedLoadedReportActions', () => {
+        it('returns false for missing metadata', () => {
+            expect(hasConfirmedLoadedReportActions(undefined)).toBe(false);
+        });
+
+        it('returns true when report actions have loaded once', () => {
+            expect(hasConfirmedLoadedReportActions(createReportMetadata({hasOnceLoadedReportActions: true}))).toBe(true);
+        });
+
+        it('returns true when initial report actions loading is complete', () => {
+            expect(hasConfirmedLoadedReportActions(createReportMetadata({isLoadingInitialReportActions: false}))).toBe(true);
+        });
+
+        it('returns false while the initial report actions are still loading', () => {
+            expect(hasConfirmedLoadedReportActions(createReportMetadata())).toBe(false);
         });
     });
 
@@ -173,7 +192,7 @@ describe('TransactionNavigationUtils', () => {
             expect(result.wasParentActionDeleted).toBe(false);
         });
 
-        it('uses offline fallback when checking parent report actions loaded state', () => {
+        it('uses offline fallback to stop waiting for parent report actions, but not to mark them as deleted', () => {
             const result = getParentReportActionDeletionStatus({
                 parentReportID: '123',
                 parentReportActionID: '456',
@@ -183,6 +202,19 @@ describe('TransactionNavigationUtils', () => {
             });
 
             expect(result.hasLoadedParentReportActions).toBe(true);
+            expect(result.isParentActionMissingAfterLoad).toBe(false);
+            expect(result.wasParentActionDeleted).toBe(false);
+        });
+
+        it('marks parent action missing after load as deleted while offline once the actions were actually fetched', () => {
+            const result = getParentReportActionDeletionStatus({
+                parentReportID: '123',
+                parentReportActionID: '456',
+                parentReportAction: undefined,
+                parentReportLoadingState: createReportMetadata({hasOnceLoadedReportActions: true}),
+                isOffline: true,
+            });
+
             expect(result.isParentActionMissingAfterLoad).toBe(true);
             expect(result.wasParentActionDeleted).toBe(true);
         });

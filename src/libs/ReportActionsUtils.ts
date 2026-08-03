@@ -1775,6 +1775,29 @@ function getReportAction(reportID: string | undefined, reportActionID: string | 
 }
 
 /**
+ * Find the money request action that a transaction thread was opened from, using only the thread report ID.
+ *
+ * This is the fallback for when the thread report itself isn't available in Onyx, for example when it has never been
+ * opened on this device and it cannot be fetched because we're offline. In that case the thread's parent report ID
+ * isn't known, so `getReportAction` can't be used, but the action that links to it may still be cached.
+ */
+function getMoneyRequestActionForThreadReportID(threadReportID: string | undefined): ReportAction | undefined {
+    if (!threadReportID) {
+        return undefined;
+    }
+
+    for (const reportActions of Object.values(allReportActions ?? {})) {
+        for (const reportAction of Object.values(reportActions ?? {})) {
+            if (reportAction?.childReportID === threadReportID && isMoneyRequestAction(reportAction)) {
+                return reportAction;
+            }
+        }
+    }
+
+    return undefined;
+}
+
+/**
  * Get the iouReportID for a given report action.
  */
 function getIOUReportIDFromReportActionPreview(reportAction: OnyxEntry<ReportAction>): string | undefined {
@@ -4833,6 +4856,7 @@ export {
     getLastVisibleMessage,
     getLatestReportActionFromOnyxData,
     getLinkedTransactionID,
+    getMoneyRequestActionForThreadReportID,
     getCrossBorderReimbursedMessage,
     getElsewherePaymentReportActionMessage,
     getMarkedReimbursedMessage,

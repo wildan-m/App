@@ -25,7 +25,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {TransactionDuplicateNavigatorParamList} from '@libs/Navigation/types';
 import {isTrackOnboardingChoice} from '@libs/OnboardingUtils';
-import {getLinkedTransactionID, getReportAction} from '@libs/ReportActionsUtils';
+import {getLinkedTransactionID, getMoneyRequestActionForThreadReportID, getReportAction} from '@libs/ReportActionsUtils';
 import {isReportIDApproved, isSettled} from '@libs/ReportUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {doesDeleteNavigateBackUrlIncludeSpecificDuplicatesReview, getParentReportActionDeletionStatus, hasLoadedReportActions, isThreadReportDeleted} from '@libs/TransactionNavigationUtils';
@@ -56,11 +56,17 @@ function DynamicReviewPage() {
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${route.params.reportID}`);
     const [hasReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${route.params.reportID}`, {selector: Boolean});
-    const [parentReportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${report?.parentReportID}`);
+
+    // The thread report is not always available, e.g. when it has never been opened on this device and we are offline,
+    // so fall back to looking the money request action up by the thread report ID it links to.
+    const reportAction = getReportAction(report?.parentReportID, report?.parentReportActionID) ?? getMoneyRequestActionForThreadReportID(route.params.reportID);
+    const parentReportID = report?.parentReportID ?? reportAction?.reportID;
+
+    const [parentReportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${parentReportID}`);
     const [deleteTransactionNavigateBackUrl] = useOnyx(ONYXKEYS.NVP_DELETE_TRANSACTION_NAVIGATE_BACK_URL);
     const [reportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${route.params.reportID}`);
-    const [expenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`);
-    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
+    const [expenseReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`);
+    const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID ?? expenseReport?.policyID}`);
     const [allTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION);
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [transactionIDsList = getEmptyArray<string>()] = useOnyx(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_TRANSACTION_IDS);
@@ -70,7 +76,6 @@ function DynamicReviewPage() {
     const originalTransactionIDsListRef = useRef<string[] | null>(null);
 
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
-    const reportAction = getReportAction(report?.parentReportID, report?.parentReportActionID);
     const transactionID = getLinkedTransactionID(reportAction);
     const transactionViolations = useTransactionViolations(transactionID);
     const duplicateTransactionIDs = transactionViolations?.find((violation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION)?.data?.duplicates ?? [];
@@ -96,9 +101,9 @@ function DynamicReviewPage() {
 
     const hasSettledOrApprovedTransaction = transactions.some((transaction) => isSettled(transaction?.reportID) || isReportIDApproved(transaction?.reportID));
     const hasLoadedThreadReportActions = hasLoadedReportActions(reportLoadingState, isOffline);
-    const isThreadReportDeletedForReview = isThreadReportDeleted(report, reportLoadingState, isOffline);
+    const isThreadReportDeletedForReview = isThreadReportDeleted(report, reportLoadingState);
     const {hasLoadedParentReportActions, wasParentActionDeleted} = getParentReportActionDeletionStatus({
-        parentReportID: report?.parentReportID,
+        parentReportID,
         parentReportActionID: report?.parentReportActionID,
         parentReportAction: reportAction,
         parentReportLoadingState,
