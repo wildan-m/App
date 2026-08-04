@@ -68,7 +68,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {SplitExpense} from '@src/types/onyx/IOU';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
@@ -110,7 +109,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const [draftTransaction, draftTransactionMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
     const isLoadingDraftTransaction = isLoadingOnyxValue(draftTransactionMetadata);
     const [allReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT);
-    const [allReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS);
     const draftTransactionReport = useReportOrReportDraft(draftTransaction?.reportID);
     const parentTransactionReport = useReportOrReportDraft(draftTransactionReport?.parentReportID);
     const expenseReport = draftTransactionReport?.type === CONST.REPORT.TYPE.EXPENSE ? draftTransactionReport : parentTransactionReport;
@@ -122,8 +120,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const transaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`];
     const originalTransaction = allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transaction?.comment?.originalTransactionID)}`];
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
-    const [allReportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS);
-    const [allSnapshots] = useOnyx(ONYXKEYS.COLLECTION.SNAPSHOT);
     const [selfDMReportID] = useOnyx(ONYXKEYS.SELF_DM_REPORT_ID);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
     const parentReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`];
@@ -214,9 +210,8 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
 
     // For selfDM expenses, the IOU action lives in the selfDM report, not in an expense report.
     const iouReportIDForActions = expenseReport?.reportID ?? (isSelfDM(draftTransactionReport) ? draftTransactionReport?.reportID : undefined);
-    const iouActions = getIOUActionForTransactions([originalTransactionID], allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReportIDForActions}`]).filter(
-        (action) => action.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-    );
+    const [iouReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(iouReportIDForActions)}`);
+    const iouActions = getIOUActionForTransactions([originalTransactionID], iouReportActions).filter((action) => action.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
     const {iouReport} = useGetIOUReportFromReportAction(iouActions.at(0));
     const [iouReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(iouReport?.reportID)}`);
 
@@ -236,9 +231,8 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     });
     const transactionReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`];
     const splitFieldDataFromOriginalTransaction = initSplitExpenseItemData(transaction, transactionReport, {isManuallyEdited: true});
-    const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
+    const [currentTransactionViolations = []] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${getNonEmptyStringOnyxID(transactionID)}`);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
-    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const icons = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'Plus']);
 
     const {isBetaEnabled} = usePermissions();
@@ -246,7 +240,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
     const isInitialSplit = childTransactions.length === 0;
 
     // Check if the transaction has customUnitOutOfPolicy violation (distance rate error)
-    const currentTransactionViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] ?? [];
     const hasCustomUnitOutOfPolicyViolation = currentTransactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY);
 
     let isUnitRateIDOutOfPolicy = false;
@@ -304,7 +297,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         evenlyDistributeSplitExpenseAmounts(draftTransaction, transaction, effectivePolicy, isDraftSelfDMContext, personalPolicy?.outputCurrency, getCurrencySymbol);
     };
 
-    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
 
     const onSaveSplitExpense = () => {
@@ -372,10 +364,6 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         updateSplitTransactionsFromSplitExpensesFlow({
             allTransactionsList: allTransactions,
             allReportsList: allReports,
-            allReportActionsList: allReportActions,
-            allReportNameValuePairsList: allReportNameValuePairs,
-            allSnapshots,
-            allPolicyTags,
             transactionData: {
                 reportID: draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID),
                 originalTransactionID: draftTransaction?.comment?.originalTransactionID ?? String(CONST.DEFAULT_NUMBER_ID),
@@ -391,12 +379,10 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             extraIOUActions: iouActions.slice(1),
             isASAPSubmitBetaEnabled: isBetaEnabled(CONST.BETAS.ASAP_SUBMIT),
             currentUserPersonalDetails,
-            transactionViolations,
             policyRecentlyUsedCurrencies: policyRecentlyUsedCurrencies ?? [],
             quickAction,
             iouReportNextStep,
             betas,
-            personalDetails,
             transactionReport: draftTransactionReport,
             expenseReport,
             isOffline,

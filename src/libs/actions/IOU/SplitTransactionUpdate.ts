@@ -78,20 +78,24 @@ import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams} fr
 import type {UpdateMoneyRequestDataKeys} from './UpdateMoneyRequest';
 
 import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
-import {getAllReports} from './index';
+import {getAllPersonalDetails, getAllReportActionsFromIOU, getAllReportNameValuePairs, getAllReports, getAllSnapshots, getAllTransactionViolations, getPolicyTags} from './index';
 import {getMoneyRequestParticipantsFromReport} from './MoneyRequest';
 import {getMoneyRequestInformation, getReportPreviewAction} from './MoneyRequestBuilder';
 import {addPendingNewTransactionIDs} from './PendingNewTransactions';
 import {getDeleteTrackExpenseInformation} from './TrackExpense';
 import {getUpdateMoneyRequestParams} from './UpdateMoneyRequest';
 
+// The collections below are only read by this flow, never rendered by the caller. They default to the
+// module-level Onyx caches in `IOU/index.ts` so that callers don't have to subscribe to whole collections
+// just to forward them here — subscribing to them from a component makes every optimistic write during the
+// save re-render that component. Callers may still pass them explicitly to override what the flow reads.
 type UpdateSplitTransactionsParams = {
     allTransactionsList: OnyxCollection<OnyxTypes.Transaction>;
     allReportsList: OnyxCollection<OnyxTypes.Report>;
-    allReportActionsList: OnyxCollection<OnyxTypes.ReportActions>;
-    allReportNameValuePairsList: OnyxCollection<OnyxTypes.ReportNameValuePairs>;
+    allReportActionsList?: OnyxCollection<OnyxTypes.ReportActions>;
+    allReportNameValuePairsList?: OnyxCollection<OnyxTypes.ReportNameValuePairs>;
     allSnapshots?: OnyxCollection<OnyxTypes.SearchResults>;
-    allPolicyTags: OnyxCollection<OnyxTypes.PolicyTagLists>;
+    allPolicyTags?: OnyxCollection<OnyxTypes.PolicyTagLists>;
     transactionData: {
         reportID: string;
         originalTransactionID: string;
@@ -107,13 +111,13 @@ type UpdateSplitTransactionsParams = {
     extraIOUActions?: OnyxTypes.ReportAction[];
     isASAPSubmitBetaEnabled: boolean;
     currentUserPersonalDetails: CurrentUserPersonalDetails;
-    transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
+    transactionViolations?: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     quickAction: OnyxEntry<OnyxTypes.QuickAction>;
     policyRecentlyUsedCurrencies: string[];
     iouReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     isFromSplitExpensesFlow?: boolean;
-    personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    personalDetails?: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     transactionReport: OnyxEntry<OnyxTypes.Report>;
     expenseReport: OnyxEntry<OnyxTypes.Report>;
     isOffline: boolean;
@@ -174,10 +178,10 @@ function rescaleSnapshotGroupAmount<T extends OnyxTypes.Transaction>(transaction
 function updateSplitTransactions({
     allTransactionsList,
     allReportsList,
-    allReportActionsList,
-    allReportNameValuePairsList,
-    allSnapshots,
-    allPolicyTags,
+    allReportActionsList = getAllReportActionsFromIOU(),
+    allReportNameValuePairsList = getAllReportNameValuePairs(),
+    allSnapshots = getAllSnapshots(),
+    allPolicyTags = getPolicyTags(),
     transactionData,
     searchContext,
     policyCategories,
@@ -188,13 +192,13 @@ function updateSplitTransactions({
     extraIOUActions = [],
     isASAPSubmitBetaEnabled,
     currentUserPersonalDetails,
-    transactionViolations,
+    transactionViolations = getAllTransactionViolations(),
     quickAction,
     policyRecentlyUsedCurrencies,
     iouReportNextStep,
     isFromSplitExpensesFlow,
     betas,
-    personalDetails,
+    personalDetails = getAllPersonalDetails(),
     transactionReport,
     expenseReport: expenseReportFromParams,
     isOffline,
