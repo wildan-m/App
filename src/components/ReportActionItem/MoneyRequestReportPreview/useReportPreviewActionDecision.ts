@@ -5,6 +5,7 @@ import useReportIsArchived from '@hooks/useReportIsArchived';
 import {getConnectedIntegration, hasDynamicExternalWorkflow} from '@libs/PolicyUtils';
 import {hasPendingDEWSubmit} from '@libs/ReportActionsUtils';
 import getReportPreviewAction from '@libs/ReportPreviewActionUtils';
+import {isTransactionPendingDelete} from '@libs/TransactionUtils';
 
 import {canIOUBePaid as canIOUBePaidIOUActions} from '@userActions/IOU/ReportWorkflow';
 
@@ -53,6 +54,10 @@ function useReportPreviewActionDecision({
     const isDEWSubmitPending = hasPendingDEWSubmit(iouReportMetadata, isDEWPolicy);
     const connectedIntegration = getConnectedIntegration(policy);
 
+    // The transaction list stays offline-inclusive for display purposes, so it can still contain transactions that are
+    // pending deletion. Action eligibility must ignore those, matching how useReportPrimaryAction computes it.
+    const nonPendingDeleteTransactions = transactions.filter((transaction) => !isTransactionPendingDelete(transaction));
+
     const canIOUBePaid = canIOUBePaidIOUActions(
         iouReport,
         chatReport,
@@ -60,7 +65,7 @@ function useReportPreviewActionDecision({
         bankAccountList,
         currentUserDetails.login ?? '',
         currentUserDetails.accountID,
-        transactions,
+        nonPendingDeleteTransactions,
         false,
         undefined,
         invoiceReceiverPolicy,
@@ -74,7 +79,7 @@ function useReportPreviewActionDecision({
             bankAccountList,
             currentUserDetails.login ?? '',
             currentUserDetails.accountID,
-            transactions,
+            nonPendingDeleteTransactions,
             true,
             undefined,
             invoiceReceiverPolicy,
@@ -87,7 +92,7 @@ function useReportPreviewActionDecision({
         currentUserLogin: currentUserDetails.login ?? '',
         report: iouReport,
         policy,
-        transactions,
+        transactions: nonPendingDeleteTransactions,
         bankAccountList,
         invoiceReceiverPolicy,
         isPaidAnimationRunning,
