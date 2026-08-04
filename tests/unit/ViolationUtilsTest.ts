@@ -287,6 +287,41 @@ describe('getViolationsOnyxData', () => {
 
             expect(result.value).toContainEqual(expect.objectContaining({name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY}));
         });
+
+        it('should not add the customUnitOutOfPolicy violation if the rate exists but is disabled and the violation was not already there', () => {
+            transactionViolations = [];
+            const customUnitRateID = 'rate_id';
+            policy.customUnits = {
+                unitId: {
+                    attributes: {unit: 'mi'},
+                    customUnitID: 'unitId',
+                    defaultCategory: 'Car',
+                    enabled: true,
+                    name: 'Distance',
+                    rates: {
+                        [customUnitRateID]: {
+                            currency: 'USD',
+                            customUnitRateID,
+                            enabled: false,
+                            name: 'Default Rate',
+                            rate: 65.5,
+                        },
+                    },
+                },
+            };
+            const result = ViolationsUtils.getViolationsOnyxData({
+                ownerLogin: undefined,
+                updatedTransaction: transaction,
+                transactionViolations,
+                policy,
+                policyTagList: policyTags,
+                policyCategories,
+                hasDependentTags: false,
+                isInvoiceTransaction: false,
+            });
+
+            expect(result.value).not.toContainEqual(expect.objectContaining({name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY}));
+        });
     });
 
     describe('distance rate out of date range validation', () => {
@@ -442,10 +477,10 @@ describe('getViolationsOnyxData', () => {
                     enabled: true,
                     name: 'Distance',
                     rates: {
-                        [customUnitRateID]: {
+                        another_rate_id: {
                             currency: 'USD',
-                            customUnitRateID,
-                            enabled: false,
+                            customUnitRateID: 'another_rate_id',
+                            enabled: true,
                             name: '2025 mileage',
                             rate: 65.5,
                             startDate: '2025-01-01',

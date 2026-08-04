@@ -667,6 +667,13 @@ const ViolationsUtils = {
                 } else if (isSelfDM && isDistanceRequestForCustomUnit) {
                     newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_RATE_OUT_OF_DATE_RANGE});
                     newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY});
+                } else if (customRate) {
+                    // The rate is still on the policy, it was only disabled after this expense had already been assigned to it, and the
+                    // expense keeps that rate. Synthesizing the violation here would make it flash on any unrelated recompute until the
+                    // response lands (e.g. an employee editing the distance right after an admin disables the rate), so preserve whatever
+                    // we were given instead. Flows where a disabled rate really is out of policy — moving an expense to a workspace that
+                    // has no valid rate to fall back on — add the violation themselves before calling this.
+                    newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_RATE_OUT_OF_DATE_RANGE});
                 } else {
                     newTransactionViolations = reject(newTransactionViolations, {name: CONST.VIOLATIONS.CUSTOM_UNIT_RATE_OUT_OF_DATE_RANGE});
                     newTransactionViolations.push({

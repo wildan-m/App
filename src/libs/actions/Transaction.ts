@@ -1266,11 +1266,13 @@ function getChangeTransactionsReportOnyxData({
         // Auto-select a valid default distance rate when moving to a workspace where the current rate is invalid,
         // and recalculate derived fields (amount, merchant, currency) to match the new rate.
         let transactionForViolations = transaction;
+        let hasUnresolvedDisabledRate = false;
         if (isGroupPolicy(policy) && policy?.id && isDistanceRequest(transaction)) {
             const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
             const currentRate = currentRateID ? getDistanceRateCustomUnitRate(policy, currentRateID) : undefined;
             if (!currentRateID || !currentRate || currentRate.enabled === false) {
                 const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
+                hasUnresolvedDisabledRate = !defaultRate?.customUnitRateID && currentRate?.enabled === false;
                 if (defaultRate?.customUnitRateID) {
                     transactionIDToUpdatedCustomUnitRateID[transaction.transactionID] = defaultRate.customUnitRateID;
                     // Build an updated transaction with the new rate so we can derive fields from it
@@ -1367,9 +1369,15 @@ function getChangeTransactionsReportOnyxData({
         let transactionReimbursable = transaction.reimbursable;
         // 2. Calculate transaction violations if moving transaction to a workspace
         if (isGroupPolicy(policy) && policy?.id) {
+            let violationsForTransaction = currentTransactionViolations[transaction.transactionID] ?? [];
+            // The expense is moving onto a workspace where its rate is disabled and there was no valid rate to swap it to, so it really is
+            // out of policy there. ViolationsUtils only preserves this violation for a disabled rate, it doesn't derive it, so add it here.
+            if (hasUnresolvedDisabledRate && !violationsForTransaction.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY)) {
+                violationsForTransaction = [...violationsForTransaction, {name: CONST.VIOLATIONS.CUSTOM_UNIT_OUT_OF_POLICY, type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true}];
+            }
             const violationData = ViolationsUtils.getViolationsOnyxData({
                 updatedTransaction: transactionForViolations,
-                transactionViolations: currentTransactionViolations[transaction.transactionID] ?? [],
+                transactionViolations: violationsForTransaction,
                 policy,
                 policyTagList: policyTagList ?? {},
                 policyCategories: policyCategories ?? {},
