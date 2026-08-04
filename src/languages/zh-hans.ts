@@ -9592,6 +9592,11 @@ ${reportName}`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `在 ${days > 0 ? `${days}天：` : ''}${hours} 小时 ${minutes} 分 ${seconds} 秒内认领`,
             },
         },
+        paymentHistory: {
+            title: '付款记录',
+            activeMembers: (count: number) => `${count} 位活跃成员`,
+            viewReceipts: '查看收据',
+        },
         cardSection: {
             title: '付款',
             subtitle: '添加一张银行卡来支付你的 Expensify 订阅费用。',

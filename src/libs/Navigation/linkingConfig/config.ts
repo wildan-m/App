@@ -512,6 +512,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.SETTINGS.SUBSCRIPTION.SETTINGS_DETAILS]: {
                             path: ROUTES.SETTINGS_SUBSCRIPTION_SETTINGS_DETAILS,
                         },
+                        [SCREENS.SETTINGS.SUBSCRIPTION.PAYMENT_HISTORY]: {
+                            path: ROUTES.SETTINGS_SUBSCRIPTION_PAYMENT_HISTORY,
+                        },
                         [SCREENS.SETTINGS.PROFILE.VACATION_DELEGATE]: {
                             path: ROUTES.SETTINGS_VACATION_DELEGATE,
                             exact: true,

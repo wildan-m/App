@@ -10023,6 +10023,11 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Réclamer dans ${days > 0 ? `${days}j :` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Historique des paiements',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'membre actif' : 'membres actifs'}`,
+            viewReceipts: 'Voir les reçus',
+        },
         cardSection: {
             title: 'Paiement',
             subtitle: 'Ajoutez une carte pour payer votre abonnement Expensify.',

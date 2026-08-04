@@ -9827,6 +9827,11 @@ ${reportName}`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `${days > 0 ? `${days}日：` : ''}${hours}時間以内に請求：${minutes}分：${seconds}秒`,
             },
         },
+        paymentHistory: {
+            title: '支払い履歴',
+            activeMembers: (count: number) => `${count}人のアクティブメンバー`,
+            viewReceipts: '領収書を表示',
+        },
         cardSection: {
             title: '支払い',
             subtitle: 'Expensify のサブスクリプション料金を支払うためのカードを追加してください。',

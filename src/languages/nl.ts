@@ -9934,6 +9934,11 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Dien in binnen ${days > 0 ? `${days}d :` : ''}${hours}u : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Betalingsgeschiedenis',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'actief lid' : 'actieve leden'}`,
+            viewReceipts: 'Bonnetjes bekijken',
+        },
         cardSection: {
             title: 'Betaling',
             subtitle: 'Voeg een kaart toe om je Expensify-abonnement te betalen.',

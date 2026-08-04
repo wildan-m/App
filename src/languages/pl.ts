@@ -9905,6 +9905,11 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Odbierz w ciągu ${days > 0 ? `${days}d :` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Historia płatności',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'aktywny członek' : 'aktywnych członków'}`,
+            viewReceipts: 'Zobacz paragony',
+        },
         cardSection: {
             title: 'Płatność',
             subtitle: 'Dodaj kartę, aby opłacić swoją subskrypcję Expensify.',

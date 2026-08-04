@@ -10152,6 +10152,11 @@ El plan Controlar empieza en 9 $ por miembro activo al mes.`,
                 subtitle: (days, hours, minutes, seconds) => `Solicítala en ${days > 0 ? `${days}d : ` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Historial de pagos',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'miembro activo' : 'miembros activos'}`,
+            viewReceipts: 'Ver recibos',
+        },
         cardSection: {
             title: 'Pago',
             subtitle: 'Añade una tarjeta para pagar tu suscripción a Expensify.',

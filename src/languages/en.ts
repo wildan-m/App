@@ -10128,6 +10128,11 @@ const translations = {
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Claim within ${days > 0 ? `${days}d : ` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Payment history',
+            activeMembers: (count: number) => `${count} active ${count === 1 ? 'member' : 'members'}`,
+            viewReceipts: 'View receipts',
+        },
         cardSection: {
             title: 'Payment',
             subtitle: 'Add a card to pay for your Expensify subscription.',

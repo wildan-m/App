@@ -9965,6 +9965,11 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Richiedi entro ${days > 0 ? `${days}g :` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Cronologia pagamenti',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'membro attivo' : 'membri attivi'}`,
+            viewReceipts: 'Visualizza ricevute',
+        },
         cardSection: {
             title: 'Pagamento',
             subtitle: 'Aggiungi una carta per pagare il tuo abbonamento Expensify.',

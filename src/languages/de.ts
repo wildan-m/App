@@ -9989,6 +9989,11 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                     `Fordere innerhalb von ${days > 0 ? `${days}T :` : ''}${hours}Std : ${minutes}Min : ${seconds}Sek an`,
             },
         },
+        paymentHistory: {
+            title: 'Zahlungsverlauf',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'aktives Mitglied' : 'aktive Mitglieder'}`,
+            viewReceipts: 'Belege anzeigen',
+        },
         cardSection: {
             title: 'Zahlung',
             subtitle: 'Füge eine Karte hinzu, um dein Expensify-Abonnement zu bezahlen.',

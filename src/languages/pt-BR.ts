@@ -9923,6 +9923,11 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Solicite em até ${days > 0 ? `${days}d :` : ''}${hours}h : ${minutes}m : ${seconds}s`,
             },
         },
+        paymentHistory: {
+            title: 'Histórico de pagamentos',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'membro ativo' : 'membros ativos'}`,
+            viewReceipts: 'Ver recibos',
+        },
         cardSection: {
             title: 'Pagamento',
             subtitle: 'Adicione um cartão para pagar sua assinatura do Expensify.',

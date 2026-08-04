@@ -10228,6 +10228,11 @@ ${reportName}`,
                 subtitle: (days: number, hours: number, minutes: number, seconds: number) => `Διεκδικήστε μέσα σε ${days > 0 ? `${days}η :` : ''}${hours}ώ : ${minutes}λ : ${seconds}δ`,
             },
         },
+        paymentHistory: {
+            title: 'Ιστορικό πληρωμών',
+            activeMembers: (count: number) => `${count} ${count === 1 ? 'ενεργό μέλος' : 'ενεργά μέλη'}`,
+            viewReceipts: 'Προβολή αποδείξεων',
+        },
         cardSection: {
             title: 'Πληρωμή',
             subtitle: 'Προσθέστε μια κάρτα για να πληρώσετε τη συνδρομή σας στο Expensify.',
