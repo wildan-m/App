@@ -246,7 +246,9 @@ function canIOUBePaid(
     const isSubmittedWithoutApprovalsEnabled = !isApprovalEnabled && isProcessing;
     const isApproved = isReportApproved({report: iouReport}) || isSubmittedWithoutApprovalsEnabled;
     const isClosed = isClosedReportUtil(iouReport);
-    const isReportFinished = (isApproved || isClosed) && !iouReport?.isWaitingOnBankAccount;
+    // A report that is waiting on a bank account has a payment pending, so we never offer to start another electronic
+    // payment for it. Marking it as paid manually is still allowed, matching what Expensify Classic offers.
+    const isReportFinished = (isApproved || isClosed) && (onlyShowPayElsewhere || !iouReport?.isWaitingOnBankAccount);
     const isIOU = isIOUReport(iouReport);
     const canShowMarkedAsPaidForNegativeAmount = onlyShowPayElsewhere && reimbursableSpend < 0;
     const isOnlyNonReimbursablePayElsewhere = onlyShowPayElsewhere && nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(iouReport?.reportID, transactions);

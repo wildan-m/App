@@ -236,7 +236,9 @@ function isPrimaryPayAction({
     const isApprovalEnabled = policy ? policy.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL : false;
     const isSubmittedWithoutApprovalsEnabled = !isApprovalEnabled && isProcessingReport;
 
-    const isReportFinished = (isReportApproved && !report.isWaitingOnBankAccount) || isSubmittedWithoutApprovalsEnabled || isReportClosed;
+    // An approved report that is waiting on a bank account still needs to be settled, so the pay button is shown for it.
+    // The button falls back to only offering "Mark as paid" in that state, so no second electronic payment can be started.
+    const isReportFinished = isReportApproved || isSubmittedWithoutApprovalsEnabled || isReportClosed;
     const {reimbursableSpend, nonReimbursableSpend} = getMoneyRequestSpendBreakdown(report);
 
     if (
