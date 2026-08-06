@@ -45,7 +45,9 @@ function RulesBillableDefaultPage({
     const isRevamp = isBetaEnabled(CONST.BETAS.RULES_REVAMP);
 
     const [draftBillable, setDraftBillable] = useState<boolean>();
-    const persistedBillable = policy?.defaultBillable ?? false;
+    const isBillableTrackingEnabled = policy?.disabledFields?.defaultBillable !== true;
+    // When billable tracking is disabled there is no active default, so nothing is pre-selected and any choice counts as a change.
+    const persistedBillable = isBillableTrackingEnabled ? (policy?.defaultBillable ?? false) : undefined;
     const selectedBillable = draftBillable ?? persistedBillable;
     const hasChanges = selectedBillable !== persistedBillable;
 
@@ -55,20 +57,23 @@ function RulesBillableDefaultPage({
             text: translate(`workspace.rules.individualExpenseRules.billable`),
             alternateText: translate(`workspace.rules.individualExpenseRules.billableDescription`),
             keyForList: CONST.POLICY_BILLABLE_MODES.BILLABLE,
-            isSelected: selectedBillable,
+            isSelected: selectedBillable === true,
         },
         {
             value: false,
             text: translate(`workspace.rules.individualExpenseRules.nonBillable`),
             alternateText: translate(`workspace.rules.individualExpenseRules.nonBillableDescription`),
             keyForList: CONST.POLICY_BILLABLE_MODES.NON_BILLABLE,
-            isSelected: !selectedBillable,
+            isSelected: selectedBillable === false,
         },
     ];
 
-    const initiallyFocusedOptionKey = selectedBillable ? CONST.POLICY_BILLABLE_MODES.BILLABLE : CONST.POLICY_BILLABLE_MODES.NON_BILLABLE;
+    const initiallyFocusedOptionKey = billableModes.find((mode) => mode.isSelected)?.keyForList;
 
     const saveAndGoBack = () => {
+        if (selectedBillable === undefined) {
+            return;
+        }
         setPolicyBillableMode(policyID, selectedBillable, policy?.defaultBillable, policy?.disabledFields?.defaultBillable);
         Navigation.setNavigationActionToMicrotaskQueue(Navigation.goBack);
     };
@@ -80,7 +85,6 @@ function RulesBillableDefaultPage({
         isDisabled: !hasChanges,
     };
 
-    const isBillableTrackingEnabled = policy?.disabledFields?.defaultBillable !== true;
     const isTrackBillableToggleDisabled = !policy?.areTagsEnabled;
     const shouldShowBillableModeList = !isRevamp || (isBillableTrackingEnabled && !isTrackBillableToggleDisabled);
 

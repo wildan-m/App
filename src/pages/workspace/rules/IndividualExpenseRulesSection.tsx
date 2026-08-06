@@ -111,7 +111,8 @@ function IndividualExpenseRulesSection({policyID, canWriteRules, withReadOnlyFal
 
     const reimbursableMode = getCashExpenseReimbursableMode(policy) ?? CONST.POLICY.CASH_EXPENSE_REIMBURSEMENT_CHOICES.REIMBURSABLE_DEFAULT;
     const reimbursableModeText = translate(`workspace.rules.individualExpenseRules.${reimbursableMode}`);
-    const billableModeText = translate(`workspace.rules.individualExpenseRules.${policy?.defaultBillable ? 'billable' : 'nonBillable'}`);
+    const isBillableTrackingEnabled = policy?.disabledFields?.defaultBillable !== true;
+    const billableModeText = isBillableTrackingEnabled ? translate(`workspace.rules.individualExpenseRules.${policy?.defaultBillable ? 'billable' : 'nonBillable'}`) : '';
 
     const prohibitedExpenses = useMemo(() => {
         // Otherwise return which expenses are prohibited comma separated
