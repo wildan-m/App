@@ -23,6 +23,7 @@ import {
     generateReportID,
     getChatByParticipants,
     getOutstandingChildRequest,
+    getOutstandingReportsForUser,
     getReimbursableTotal,
     getReportTransactions,
     getUnheldReimbursableTotal,
@@ -1366,9 +1367,36 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
 
     const isScanRequest = isScanRequestTransactionUtils(existingTransaction);
 
-    const shouldCreateNewMoneyRequestReport = isSplitExpense
+    let shouldCreateNewMoneyRequestReport = isSplitExpense
         ? false
         : shouldCreateNewMoneyRequestReportReportUtils(iouReport, chatReport, isScanRequest, betas, action, !!moneyRequestReportID);
+
+    // The chat report's iouReportID can point at a report that no longer accepts expenses. For example, when an approver
+    // approves only the unheld expense, the held expense is moved onto a new open report, but that retarget is applied
+    // optimistically on the approver's device only, so the submitter still points at the report that was just approved.
+    // Before falling back to a brand-new report, reuse a report the submitter already has outstanding on the policy,
+    // which is the same set of reports the confirmation page's report field offers as the destination.
+    if (shouldCreateNewMoneyRequestReport && isPolicyExpenseChat && !existingIOUReport && !moneyRequestReportID) {
+        // The most recently created outstanding report is the one the expense belongs on, and sorting keeps the
+        // destination stable no matter which order the reports happen to be stored in.
+        const outstandingReport = getOutstandingReportsForUser(chatReport.policyID, payeeAccountID, getAllReportNameValuePairs(), allReports, false)
+            .sort((firstReport, secondReport) => {
+                const firstCreated = firstReport?.created ?? '';
+                const secondCreated = secondReport?.created ?? '';
+                if (firstCreated === secondCreated) {
+                    return 0;
+                }
+                return firstCreated > secondCreated ? -1 : 1;
+            })
+            .at(0);
+
+        // Running the same check against the candidate keeps every other reason to start a new report intact, including
+        // the SmartScan request under the ASAP Submit beta, which must always start a new report.
+        if (outstandingReport && !shouldCreateNewMoneyRequestReportReportUtils(outstandingReport, chatReport, isScanRequest, betas, action, !!moneyRequestReportID)) {
+            iouReport = outstandingReport;
+            shouldCreateNewMoneyRequestReport = false;
+        }
+    }
 
     // Generate IDs upfront so we can pass them to buildOptimisticExpenseReport for formula computation
     const optimisticTransactionID = existingTransactionID ?? providedOptimisticTransactionID ?? rand64();

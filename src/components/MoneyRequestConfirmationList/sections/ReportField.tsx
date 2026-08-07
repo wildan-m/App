@@ -69,7 +69,7 @@ function ReportField({selectedParticipants, iouType, reportID, reportActionID, a
     const [transactionReportEntry] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionReportID}`);
     const [mainReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${participantReportID}`);
     const iouReportIDFromMain = mainReport?.iouReportID;
-    const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportIDFromMain}`);
+    const [iouReport, iouReportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportIDFromMain}`);
 
     const isUnreported = transactionReportID === CONST.REPORT.UNREPORTED_REPORT_ID;
 
@@ -85,7 +85,14 @@ function ReportField({selectedParticipants, iouType, reportID, reportActionID, a
         localeCompare(a?.reportName?.toLowerCase() ?? '', b?.reportName?.toLowerCase() ?? ''),
     );
 
-    const outstandingReportID = isPolicyExpenseChat ? (iouReportIDFromMain ?? availableOutstandingReports.at(0)?.reportID) : reportID;
+    /**
+     * The chat report's iouReportID can be stale, for example when the report it points at has just been approved. Only
+     * trust it while it still is an outstanding report, otherwise fall back to the first outstanding report so that the
+     * report shown here matches the report the expense is actually added to.
+     */
+    const shouldUseIOUReportFromMain = iouReportMetadata.status === 'loading' || (!!iouReport && isReportOutstanding(iouReport, policyID, reportNameValuePairs, false));
+
+    const outstandingReportID = isPolicyExpenseChat ? ((shouldUseIOUReportFromMain ? iouReportIDFromMain : undefined) ?? availableOutstandingReports.at(0)?.reportID) : reportID;
 
     const [selectedReportID, selectedReport] = (() => {
         const reportIDToUse = shouldUseTransactionReport ? transactionReportID : outstandingReportID;
