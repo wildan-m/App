@@ -40,6 +40,7 @@ import {
     subMinutes,
 } from 'date-fns';
 import {formatInTimeZone, fromZonedTime, toDate, toZonedTime, format as tzFormat} from 'date-fns-tz';
+import {enUS} from 'date-fns/locale/en-US';
 import throttle from 'lodash/throttle';
 
 import {setCurrentDate} from './actions/CurrentDate';
@@ -51,6 +52,14 @@ type CustomStatusTypes = ValueOf<typeof CONST.CUSTOM_STATUS_TYPES>;
 type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const TIMEZONE_UPDATE_THROTTLE_MINUTES = 5;
+
+/**
+ * The 12-hour time strings that are passed between the time pickers and the forms consuming them are an internal
+ * representation rather than display text, so their day period is always the English "AM"/"PM". Since the date-fns
+ * default locale is pinned to the current app language (see IntlStore), those calls have to opt out of it explicitly,
+ * otherwise a locale such as German formats the period as "nachm." and then fails to parse "PM" back.
+ */
+const INTERNAL_TIME_LOCALE_OPTIONS = {locale: enUS};
 
 function isDate(arg: unknown): arg is Date {
     return Object.prototype.toString.call(arg) === '[object Date]';
@@ -453,7 +462,7 @@ function extractTime12Hour(dateTimeString: string, isFullFormat = false): string
         return '';
     }
     const date = new Date(dateTimeString);
-    return format(date, isFullFormat ? 'hh:mm:ss.SSS a' : 'hh:mm a');
+    return format(date, isFullFormat ? 'hh:mm:ss.SSS a' : 'hh:mm a', INTERNAL_TIME_LOCALE_OPTIONS);
 }
 
 /**
@@ -465,7 +474,7 @@ function formatDateTimeTo12Hour(dateTimeString: string): string {
         return '';
     }
     const date = new Date(dateTimeString);
-    return format(date, 'yyyy-MM-dd hh:mm a');
+    return format(date, 'yyyy-MM-dd hh:mm a', INTERNAL_TIME_LOCALE_OPTIONS);
 }
 
 /**
@@ -562,7 +571,7 @@ const combineDateAndTime = (updatedTime: string, inputDateTime: string): string 
         }
     } else if (updatedTime.includes(':')) {
         // it's in "hh:mm a" format
-        const tempTime = parse(updatedTime, 'hh:mm a', new Date());
+        const tempTime = parse(updatedTime, 'hh:mm a', new Date(), INTERNAL_TIME_LOCALE_OPTIONS);
         if (isValid(tempTime)) {
             parsedTime = tempTime;
         }
@@ -614,13 +623,13 @@ function get12HourTimeObjectFromDate(dateTime: string, isFullFormat = false): {h
             period: 'PM',
         };
     }
-    const parsedTime = parse(dateTime, isFullFormat ? 'hh:mm:ss.SSS a' : 'hh:mm a', new Date());
+    const parsedTime = parse(dateTime, isFullFormat ? 'hh:mm:ss.SSS a' : 'hh:mm a', new Date(), INTERNAL_TIME_LOCALE_OPTIONS);
     return {
-        hour: format(parsedTime, 'hh'),
-        minute: format(parsedTime, 'mm'),
-        seconds: isFullFormat ? format(parsedTime, 'ss') : '00',
-        milliseconds: isFullFormat ? format(parsedTime, 'SSS') : '000',
-        period: format(parsedTime, 'a').toUpperCase(),
+        hour: format(parsedTime, 'hh', INTERNAL_TIME_LOCALE_OPTIONS),
+        minute: format(parsedTime, 'mm', INTERNAL_TIME_LOCALE_OPTIONS),
+        seconds: isFullFormat ? format(parsedTime, 'ss', INTERNAL_TIME_LOCALE_OPTIONS) : '00',
+        milliseconds: isFullFormat ? format(parsedTime, 'SSS', INTERNAL_TIME_LOCALE_OPTIONS) : '000',
+        period: format(parsedTime, 'a', INTERNAL_TIME_LOCALE_OPTIONS).toUpperCase(),
     };
 }
 
