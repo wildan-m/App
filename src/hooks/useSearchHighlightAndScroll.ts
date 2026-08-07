@@ -98,59 +98,64 @@ function useSearchHighlightAndScroll({
             return;
         }
 
-        const previousTransactionsIDsSet = new Set(previousTransactionIDsLocal);
-        const previousReportActionsIDsSet = new Set(previousReportActionsIDs);
-        const hasTransactionsIDsChange = transactionsIDs.length !== previousTransactionIDsLocal.length || transactionsIDs.some((id) => !previousTransactionsIDsSet.has(id));
-        const hasReportActionsIDsChange = reportActionsIDs.some((id) => !previousReportActionsIDsSet.has(id));
+        // Compare the relevant collection for this search type by its actual delta. Comparing the whole
+        // local collection against the current snapshot page would re-fire the API on every unrelated
+        // Onyx update, because locally-known items that don't belong to the current page always look
+        // "new" (and paginated rows never loaded locally always look "deleted").
+        const currentIDs = isChat ? reportActionsIDs : transactionsIDs;
+        const previousIDs = isChat ? previousReportActionsIDs : previousTransactionIDsLocal;
+        const previousIDsSet = new Set(previousIDs);
+        const currentIDsSet = new Set(currentIDs);
+        const addedIDs = currentIDs.filter((id) => !previousIDsSet.has(id));
+        const removedIDs = previousIDs.filter((id) => !currentIDsSet.has(id));
 
-        // Check if there is a change in the transactions or report actions list
-        if ((!isChat && hasTransactionsIDsChange) || hasReportActionsIDsChange || hasPendingSearchRef.current) {
-            // Skip if offline, or if the user has navigated to a different fullscreen page entirely.
-            // An RHP layered on top of Search makes `isFocused` false but keeps Search as the topmost
-            // fullscreen route, so we still want to refetch — otherwise the snapshot can't reflect
-            // entries the user creates from the RHP until they close it.
-            const isSearchStillActive = isFocused || isSearchTopmostFullScreenRoute();
-            if (!isSearchStillActive || isOffline) {
-                hasPendingSearchRef.current = true;
-                return;
-            }
-            hasPendingSearchRef.current = false;
-
-            const newIDs = isChat ? reportActionsIDs : transactionsIDs;
-            let currentSearchResultIDs: string[] = [];
-            if (searchResultsData) {
-                currentSearchResultIDs = isChat ? extractReportActionIDsFromSearchResults(searchResultsData) : extractTransactionIDsFromSearchResults(searchResultsData);
-            }
-            const existingSearchResultIDsSet = new Set(currentSearchResultIDs);
-            const hasAGenuinelyNewID = newIDs.some((id) => !existingSearchResultIDsSet.has(id));
-
-            // Only skip search if there are no new items AND search results aren't empty
-            // This ensures deletions that result in empty data still trigger search
-            if (!hasAGenuinelyNewID && currentSearchResultIDs.length > 0) {
-                const newIDsSet = new Set(newIDs);
-                const hasDeletedID = currentSearchResultIDs.some((id) => !newIDsSet.has(id));
-                if (!hasDeletedID) {
-                    return;
-                }
-            }
-            // We only want to highlight new items if the addition of transactions or report actions triggered the search.
-            // This is because, on deletion of items, the backend sometimes returns old items in place of the deleted ones.
-            // We don't want to highlight these old items, even if they appear new in the current search results.
-            hasNewItemsRef.current = isChat ? reportActionsIDs.length > previousReportActionsIDs.length : transactionsIDs.length > previousTransactionIDsLocal.length;
-
-            // Set the flag indicating the search is triggered by the hook
-            triggeredByHookRef.current = true;
-
-            // Trigger the search
-            TransitionTracker.runAfterTransitions({
-                callback: () => {
-                    search({queryJSON, searchKey, offset, shouldCalculateTotals, isLoading: !!searchResults?.search?.isLoading});
-                },
-            });
-
-            // Set the ref to prevent further triggers until reset
-            searchTriggeredRef.current = true;
+        if (addedIDs.length === 0 && removedIDs.length === 0 && !hasPendingSearchRef.current) {
+            return;
         }
+
+        let currentSearchResultIDs: string[] = [];
+        if (searchResultsData) {
+            currentSearchResultIDs = isChat ? extractReportActionIDsFromSearchResults(searchResultsData) : extractTransactionIDsFromSearchResults(searchResultsData);
+        }
+        const existingSearchResultIDsSet = new Set(currentSearchResultIDs);
+
+        // Refetch only when the change can affect the current results: an added item the snapshot
+        // doesn't contain yet, or a removed item the snapshot still shows (this also covers
+        // deletions that leave the results empty).
+        const hasRelevantNewID = addedIDs.some((id) => !existingSearchResultIDsSet.has(id));
+        const hasRelevantDeletedID = removedIDs.some((id) => existingSearchResultIDsSet.has(id));
+        if (!hasRelevantNewID && !hasRelevantDeletedID && !hasPendingSearchRef.current) {
+            return;
+        }
+
+        // Skip if offline, or if the user has navigated to a different fullscreen page entirely.
+        // An RHP layered on top of Search makes `isFocused` false but keeps Search as the topmost
+        // fullscreen route, so we still want to refetch — otherwise the snapshot can't reflect
+        // entries the user creates from the RHP until they close it.
+        const isSearchStillActive = isFocused || isSearchTopmostFullScreenRoute();
+        if (!isSearchStillActive || isOffline) {
+            hasPendingSearchRef.current = true;
+            return;
+        }
+        hasPendingSearchRef.current = false;
+
+        // We only want to highlight new items if the addition of transactions or report actions triggered the search.
+        // This is because, on deletion of items, the backend sometimes returns old items in place of the deleted ones.
+        // We don't want to highlight these old items, even if they appear new in the current search results.
+        hasNewItemsRef.current = addedIDs.length > 0;
+
+        // Set the flag indicating the search is triggered by the hook
+        triggeredByHookRef.current = true;
+
+        // Trigger the search
+        TransitionTracker.runAfterTransitions({
+            callback: () => {
+                search({queryJSON, searchKey, offset, shouldCalculateTotals, isLoading: !!searchResults?.search?.isLoading});
+            },
+        });
+
+        // Set the ref to prevent further triggers until reset
+        searchTriggeredRef.current = true;
     }, [
         isFocused,
         transactions,
