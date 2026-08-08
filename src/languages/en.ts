@@ -1063,11 +1063,26 @@ const translations = {
             menuItemDescription: 'See what Expensify can do in 2 min',
         },
         forYouSection: {
-            reviewExpenses: ({count}: {count: number}) => `Review ${count} ${count === 1 ? 'expense' : 'expenses'}`,
-            submit: ({count}: {count: number}) => `Submit ${count} ${count === 1 ? 'report' : 'reports'}`,
-            approve: ({count}: {count: number}) => `Approve ${count} ${count === 1 ? 'report' : 'reports'}`,
-            pay: ({count}: {count: number}) => `Pay ${count} ${count === 1 ? 'report' : 'reports'}`,
-            export: ({count}: {count: number}) => `Export ${count} ${count === 1 ? 'report' : 'reports'}`,
+            reviewExpenses: ({count}: {count: number}) => ({
+                one: 'Review 1 expense',
+                other: `Review ${count} expenses`,
+            }),
+            submit: ({count}: {count: number}) => ({
+                one: 'Submit 1 report',
+                other: `Submit ${count} reports`,
+            }),
+            approve: ({count}: {count: number}) => ({
+                one: 'Approve 1 report',
+                other: `Approve ${count} reports`,
+            }),
+            pay: ({count}: {count: number}) => ({
+                one: 'Pay 1 report',
+                other: `Pay ${count} reports`,
+            }),
+            export: ({count}: {count: number}) => ({
+                one: 'Export 1 report',
+                other: `Export ${count} reports`,
+            }),
             begin: 'Begin',
             emptyStateMessages: {
                 thumbsUpStarsTitle: "You're done!",
@@ -2304,14 +2319,18 @@ const translations = {
         signOutConfirmationText: "You'll lose any offline changes if you sign out.",
         saveReceiptsConfirmation: {
             title: 'Save your receipts?',
-            prompt: ({count}: {count: number}) =>
-                `You have ${count} ${count === 1 ? 'receipt' : 'receipts'} still uploading. Sign out now and we'll save ${count === 1 ? 'it' : 'them'} to your photos so you can add ${count === 1 ? 'it' : 'them'} to a new expense later.`,
+            prompt: ({count}: {count: number}) => ({
+                one: "You have 1 receipt still uploading. Sign out now and we'll save it to your photos so you can add it to a new expense later.",
+                other: `You have ${count} receipts still uploading. Sign out now and we'll save them to your photos so you can add them to a new expense later.`,
+            }),
             confirm: 'Save and sign out',
         },
         saveReceiptsAndSignOutConfirmation: {
             title: 'Save your receipts?',
-            prompt: ({count}: {count: number}) =>
-                `You have ${count} ${count === 1 ? 'receipt' : 'receipts'} still uploading. Sign out now and we'll save ${count === 1 ? 'it' : 'them'} to your photos so you can add ${count === 1 ? 'it' : 'them'} to a new expense later. You'll lose any other offline changes.`,
+            prompt: ({count}: {count: number}) => ({
+                one: "You have 1 receipt still uploading. Sign out now and we'll save it to your photos so you can add it to a new expense later. You'll lose any other offline changes.",
+                other: `You have ${count} receipts still uploading. Sign out now and we'll save them to your photos so you can add them to a new expense later. You'll lose any other offline changes.`,
+            }),
             confirm: 'Save and sign out',
         },
         versionLetter: 'v',
@@ -9113,8 +9132,14 @@ const translations = {
             hold: 'Hold',
             unhold: 'Remove hold',
             reject: 'Reject',
-            duplicateExpense: ({count}: {count: number}) => `Duplicate ${count === 1 ? 'expense' : 'expenses'}`,
-            duplicateReport: ({count}: {count: number}) => `Duplicate ${count === 1 ? 'report' : 'reports'}`,
+            duplicateExpense: () => ({
+                one: 'Duplicate expense',
+                other: 'Duplicate expenses',
+            }),
+            duplicateReport: () => ({
+                one: 'Duplicate report',
+                other: 'Duplicate reports',
+            }),
             undelete: 'Undelete',
             noOptionsAvailable: 'No options available for the selected group of expenses.',
         },
@@ -10754,7 +10779,10 @@ const translations = {
             }),
             moveToGroup: 'Move to group',
             domainGroup: 'Domain group',
-            chooseWhereToMove: ({count}: {count: number}) => `Choose where to move ${count} ${count === 1 ? 'member' : 'members'}.`,
+            chooseWhereToMove: ({count}: {count: number}) => ({
+                one: 'Choose where to move 1 member.',
+                other: `Choose where to move ${count} members.`,
+            }),
             chooseWhereToMoveName: ({name}: {name: string}) => `Choose where to move ${name}.`,
             error: {
                 addMember: 'Unable to add this member. Please try again.',
