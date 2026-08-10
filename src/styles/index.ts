@@ -6486,6 +6486,9 @@ const staticStyles = (theme: ThemeColors) =>
             height: 140,
             alignSelf: 'center',
         },
+        confirmContentFittedImageContainer: {
+            height: CONST.CONFIRM_CONTENT_SVG_SIZE.HEIGHT,
+        },
         helpStaticIllustration: {
             width: 174,
             height: 156,
