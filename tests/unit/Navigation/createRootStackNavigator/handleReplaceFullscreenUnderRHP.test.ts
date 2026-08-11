@@ -212,3 +212,110 @@ describe('handleReplaceFullscreenUnderRHP — WORKSPACE_NAVIGATOR seeding', () =
         expect(result).toBeNull();
     });
 });
+
+const SELF_DM_REPORT_ID = '111';
+const DESTINATION_REPORT_ID = '222';
+
+/** Builds the parsed state for a report destination: TAB_NAVIGATOR focused on REPORTS_SPLIT_NAVIGATOR showing that report. */
+function makeParsedReportState(nestedRoutes: PartialState<NavigationState>['routes']): PartialState<NavigationState> {
+    return {
+        routes: [
+            {
+                name: NAVIGATORS.TAB_NAVIGATOR,
+                state: {
+                    index: 0,
+                    routes: [
+                        {
+                            name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR,
+                            state: {index: nestedRoutes.length - 1, routes: nestedRoutes},
+                        },
+                    ],
+                },
+            },
+        ],
+    };
+}
+
+const INCOMING_REPORT_ONLY = [{name: SCREENS.REPORT, params: {reportID: DESTINATION_REPORT_ID}}] satisfies PartialState<NavigationState>['routes'];
+const INCOMING_REPORT_WITH_INBOX = [{name: SCREENS.INBOX}, {name: SCREENS.REPORT, params: {reportID: DESTINATION_REPORT_ID}}] satisfies PartialState<NavigationState>['routes'];
+
+/** The nested stack of a user sitting on the self DM: Inbox -> self DM. */
+const EXISTING_INBOX_AND_SELF_DM = [makeRoute(SCREENS.INBOX, undefined, undefined, 'inbox-key'), makeRoute(SCREENS.REPORT, {reportID: SELF_DM_REPORT_ID}, undefined, 'self-dm-key')];
+
+/**
+ * Builds the existing root state: [TAB_NAVIGATOR(tabRoutes), RHP], with `focusedTabIndex` selecting the visible tab.
+ * Defaults to a single reports tab, i.e. the reports tab is the focused one.
+ */
+function makeExistingReportState(reportsNestedRoutes: TestRoute[], otherTabRoutes: TestRoute[] = [], focusedTabIndex = 0): StackNavigationState<ParamListBase> {
+    const reportsTabRoute = makeRoute(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR, undefined, {index: reportsNestedRoutes.length - 1, routes: reportsNestedRoutes}, 'reports-nav-key');
+    const tabRoutes = [...otherTabRoutes, reportsTabRoute];
+    const tabNavRoute = makeRoute(NAVIGATORS.TAB_NAVIGATOR, undefined, {index: focusedTabIndex, routes: tabRoutes}, 'tab-nav-key');
+    return makeStackState([tabNavRoute, makeRHPRoute()]);
+}
+
+function makeReportAction(): ReplaceFullscreenUnderRHPActionType {
+    return {
+        type: CONST.NAVIGATION.ACTION_TYPE.REPLACE_FULLSCREEN_UNDER_RHP,
+        payload: {route: ROUTES.REPORT_WITH_ID.getRoute(DESTINATION_REPORT_ID)},
+    };
+}
+
+function getReportsNavInnerRoutes(result: StackNavigationState<ParamListBase> | null) {
+    const tabRoute = result?.routes.find((r) => r.name === NAVIGATORS.TAB_NAVIGATOR);
+    const reportsNav = tabRoute?.state?.routes.find((r) => r.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR);
+    const reportsNavState = reportsNav?.state;
+    return {
+        names: reportsNavState?.routes?.map((r) => r.name),
+        reportIDs: reportsNavState?.routes?.map((r) => (r.params as {reportID?: string} | undefined)?.reportID),
+        index: reportsNavState?.index,
+    };
+}
+
+describe('handleReplaceFullscreenUnderRHP — preserving the focused tab stack', () => {
+    it('layers the destination report on top of the existing stack so back returns to the screen the flow started from (#98106)', () => {
+        mockStubbedParsedState = makeParsedReportState(INCOMING_REPORT_ONLY);
+        const result = handleReplaceFullscreenUnderRHP(makeExistingReportState(EXISTING_INBOX_AND_SELF_DM), makeReportAction(), CONFIG_OPTIONS, stackRouter);
+
+        const {names, reportIDs, index} = getReportsNavInnerRoutes(result);
+        // Without this, the stack was reset to [Inbox, destination] and back landed on the Inbox.
+        expect(names).toEqual([SCREENS.INBOX, SCREENS.REPORT, SCREENS.REPORT]);
+        expect(reportIDs).toEqual([undefined, SELF_DM_REPORT_ID, DESTINATION_REPORT_ID]);
+        expect(index).toBe(2);
+        expect(result?.routes.at(-1)?.name).toBe(NAVIGATORS.RIGHT_MODAL_NAVIGATOR);
+    });
+
+    it('does not duplicate the sidebar when the incoming parsed state already starts with the Inbox', () => {
+        mockStubbedParsedState = makeParsedReportState(INCOMING_REPORT_WITH_INBOX);
+        const result = handleReplaceFullscreenUnderRHP(makeExistingReportState(EXISTING_INBOX_AND_SELF_DM), makeReportAction(), CONFIG_OPTIONS, stackRouter);
+
+        const {names, reportIDs, index} = getReportsNavInnerRoutes(result);
+        expect(names).toEqual([SCREENS.INBOX, SCREENS.REPORT, SCREENS.REPORT]);
+        expect(reportIDs).toEqual([undefined, SELF_DM_REPORT_ID, DESTINATION_REPORT_ID]);
+        expect(index).toBe(2);
+    });
+
+    it('still resets to [Inbox, destination] when the pre-insert switches tabs, since the target tab has no visible history to keep', () => {
+        mockStubbedParsedState = makeParsedReportState(INCOMING_REPORT_ONLY);
+        // The user is on the Search tab (index 0); the reports tab underneath is stale, not visible history.
+        const searchTabRoute = makeRoute(NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR, undefined, undefined, 'search-nav-key');
+        const existing = makeExistingReportState(EXISTING_INBOX_AND_SELF_DM, [searchTabRoute], 0);
+        const result = handleReplaceFullscreenUnderRHP(existing, makeReportAction(), CONFIG_OPTIONS, stackRouter);
+
+        const {names, reportIDs, index} = getReportsNavInnerRoutes(result);
+        expect(names).toEqual([SCREENS.INBOX, SCREENS.REPORT]);
+        expect(reportIDs).toEqual([undefined, DESTINATION_REPORT_ID]);
+        expect(index).toBe(1);
+    });
+
+    it('seeds [Inbox, destination] when the reports tab was never mounted', () => {
+        mockStubbedParsedState = makeParsedReportState(INCOMING_REPORT_ONLY);
+        const emptyReportsTab = makeRoute(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR, undefined, undefined, 'reports-nav-key');
+        const tabNavRoute = makeRoute(NAVIGATORS.TAB_NAVIGATOR, undefined, {index: 0, routes: [emptyReportsTab]}, 'tab-nav-key');
+        const result = handleReplaceFullscreenUnderRHP(makeStackState([tabNavRoute, makeRHPRoute()]), makeReportAction(), CONFIG_OPTIONS, stackRouter);
+
+        const {names, reportIDs, index} = getReportsNavInnerRoutes(result);
+        expect(names).toEqual([SCREENS.INBOX, SCREENS.REPORT]);
+        expect(reportIDs).toEqual([undefined, DESTINATION_REPORT_ID]);
+        expect(index).toBe(1);
+    });
+});

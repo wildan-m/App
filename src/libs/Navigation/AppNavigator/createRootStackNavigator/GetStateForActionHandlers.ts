@@ -204,7 +204,30 @@ function getFocusedRouteFromNavigatorState(navState: NavigationState | PartialSt
     return navState.routes[idx] as NavigationPartialRoute;
 }
 
-function getTargetTabRoute(existingTabRoute: TabRouteForReplacement | undefined, focusedTargetTab: NavigationPartialRoute): TabRouteForReplacement {
+/** Builds the replacement tab route carrying `nestedState`, reusing the existing route (and its key) when there is one. */
+function buildTargetTabRoute(
+    existingTabRoute: TabRouteForReplacement | undefined,
+    focusedTargetTab: NavigationPartialRoute,
+    nestedState: PartialState<NavigationState> | undefined,
+): TabRouteForReplacement {
+    if (!existingTabRoute) {
+        return {
+            name: focusedTargetTab.name,
+            ...(focusedTargetTab.params ? {params: focusedTargetTab.params} : {}),
+            ...(nestedState ? {state: nestedState} : {}),
+        };
+    }
+
+    // Strip any RN deep-link hint chain from `existingTabRoute.params`; otherwise RN would run a
+    // follow-up NAVIGATE from it and override the `state` we splice in.
+    const sanitizedRoute = withSanitizedDeepLinkParams(existingTabRoute, focusedTargetTab.params);
+    return {
+        ...sanitizedRoute,
+        ...(nestedState !== undefined ? {state: nestedState} : {}),
+    };
+}
+
+function getTargetTabRoute(existingTabRoute: TabRouteForReplacement | undefined, focusedTargetTab: NavigationPartialRoute, isTargetTabFocused = false): TabRouteForReplacement {
     // Prepend a back-target route beneath the incoming screen when the incoming state starts with a
     // different screen, so back navigation lands somewhere sensible: the existing sidebar/root route
     // (e.g. Inbox) for most tabs, or WORKSPACES_LIST for the workspace navigator. When the existing tab
@@ -216,6 +239,22 @@ function getTargetTabRoute(existingTabRoute: TabRouteForReplacement | undefined,
     const existingFirstRoute = existingNestedRoutes?.at(0);
     const newFirstRoute = newNestedRoutes?.at(0);
     const defaultSidebarRouteName = getSidebarRouteName(existingTabRoute?.name ?? focusedTargetTab.name);
+
+    // When the destination lives in the tab the user is already on, that tab's nested routes are the
+    // user's visible history (e.g. Inbox -> self DM). Layer the incoming screen on top of that history
+    // instead of resetting the tab to [sidebar, destination], which would silently drop every screen in
+    // between and send back navigation to the sidebar. This mirrors what the non-pre-insert path does:
+    // dismissing the modal and navigating to the report pushes it on top of the existing stack.
+    // WORKSPACE_NAVIGATOR is excluded on purpose - it reseeds a fresh keyless WORKSPACES_LIST to avoid
+    // flashing the list during the reveal (#90985), and its stale splits are meant to be dropped.
+    const shouldPreserveExistingStack = isTargetTabFocused && focusedTargetTab.name !== NAVIGATORS.WORKSPACE_NAVIGATOR && !!existingNestedRoutes?.length && !!newNestedRoutes?.length;
+    if (shouldPreserveExistingStack) {
+        // The incoming state may already start with the sidebar; the preserved stack provides it, so drop the duplicate.
+        const incomingRoutes = newFirstRoute && existingFirstRoute && newFirstRoute.name === existingFirstRoute.name ? newNestedRoutes.slice(1) : newNestedRoutes;
+        const preservedRoutes = [...existingNestedRoutes, ...incomingRoutes];
+        return buildTargetTabRoute(existingTabRoute, focusedTargetTab, {...focusedTargetTab.state, routes: preservedRoutes, index: preservedRoutes.length - 1});
+    }
+
     // The route prepended beneath the incoming screen so back navigation has a target. For most tabs this is
     // the sidebar/root route; for WORKSPACE_NAVIGATOR it is WORKSPACES_LIST (a list screen, not a sidebar).
     let backTargetRoute: NavigationPartialRoute | undefined;
@@ -236,21 +275,7 @@ function getTargetTabRoute(existingTabRoute: TabRouteForReplacement | undefined,
         mergedNestedState = {...focusedTargetTab.state, routes: prependedRoutes, index: prependedRoutes.length - 1};
     }
 
-    if (!existingTabRoute) {
-        return {
-            name: focusedTargetTab.name,
-            ...(focusedTargetTab.params ? {params: focusedTargetTab.params} : {}),
-            ...(mergedNestedState ? {state: mergedNestedState} : {}),
-        };
-    }
-
-    // Strip any RN deep-link hint chain from `existingTabRoute.params`; otherwise RN would run a
-    // follow-up NAVIGATE from it and override the `state` we splice below.
-    const sanitizedRoute = withSanitizedDeepLinkParams(existingTabRoute, focusedTargetTab.params);
-    return {
-        ...sanitizedRoute,
-        ...(mergedNestedState !== undefined ? {state: mergedNestedState} : {}),
-    };
+    return buildTargetTabRoute(existingTabRoute, focusedTargetTab, mergedNestedState);
 }
 
 function getTabStateWithExistingFocusedTarget(existingTabState: NavigationState, focusedTargetTab: NavigationPartialRoute): TabStateForReplacement | undefined {
@@ -260,11 +285,14 @@ function getTabStateWithExistingFocusedTarget(existingTabState: NavigationState,
         return undefined;
     }
 
+    // The target tab is the one the user is already looking at, so its nested routes are live history to keep.
+    const isTargetTabFocused = existingTabState.index === targetTabIndex;
+
     const updatedTabRoutes = existingTabState.routes.map((route, index) => {
         if (index !== targetTabIndex) {
             return route;
         }
-        return getTargetTabRoute(route, focusedTargetTab);
+        return getTargetTabRoute(route, focusedTargetTab, isTargetTabFocused);
     });
     return {...existingTabState, routes: updatedTabRoutes, index: targetTabIndex};
 }
