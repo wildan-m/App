@@ -6348,6 +6348,10 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             emptySubtitle: 'Dostawcy pojawią się tutaj po zakończeniu synchronizacji z księgowością.',
             findVendor: 'Znajdź dostawcę',
             managedInAccountingSoftware: 'Dostawcy są zarządzani w twoim',
+            enableVendor: 'Włącz dostawcę',
+            enableVendors: 'Włącz dostawców',
+            disableVendor: 'Wyłącz dostawcę',
+            disableVendors: 'Wyłącz dostawców',
         },
         tags: {
             tagName: 'Nazwa tagu',

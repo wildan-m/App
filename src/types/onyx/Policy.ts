@@ -3157,6 +3157,13 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
 
         /** Whether the policy requires purchases to be on a company card */
         requireCompanyCardsEnabled?: boolean;
+
+        /**
+         * Vendors disabled by an admin on the Workspaces > Vendors page, keyed by the vendor's external ID.
+         * Lives outside connections.*.data so accounting re-syncs never reset the admin's toggles;
+         * a vendor absent from this map is enabled (the default on import).
+         */
+        disabledVendors?: Record<string, boolean>;
     } & Partial<PendingJoinRequestPolicy>,
     'addWorkspaceRoom' | keyof ACHAccount | keyof Attributes | 'isHREnabled' | 'isTimeTrackingEnabled' | 'timeTrackingDefaultRate'
 >;

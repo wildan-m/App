@@ -2519,6 +2519,21 @@ function getMatchingVendors(policy: OnyxEntry<Policy>): Vendor[] {
 }
 
 /**
+ * The subset of `getMatchingVendors` an employee may actually pick when coding a company card
+ * transaction — vendors an admin disabled on the Workspaces > Vendors page are filtered out.
+ * Only the picker should use this; violation and display lookups keep using the full list so a
+ * disabled vendor's historical transactions render its name and never raise `inactiveVendor`
+ * violations (admin-disabled is not the same as removed from the accounting system).
+ */
+function getEnabledMatchingVendors(policy: OnyxEntry<Policy>): Vendor[] {
+    const disabledVendors = policy?.disabledVendors;
+    if (!disabledVendors) {
+        return getMatchingVendors(policy);
+    }
+    return getMatchingVendors(policy).filter((vendor) => !disabledVendors[vendor.id]);
+}
+
+/**
  * True only when the active vendor-matching integration's vendor list has been written to Onyx —
  * including the loaded-but-empty case. Lets callers distinguish "vendor not in list" (the
  * inactive-vendor case) from "vendor list hasn't synced yet" (a transient render before Onyx
@@ -3028,6 +3043,7 @@ export {
     getConnectionExporters,
     findVendorByID,
     getActiveVendorMatchingIntegration,
+    getEnabledMatchingVendors,
     getMatchingVendorByID,
     getMatchingVendors,
     getXeroSupplierByID,

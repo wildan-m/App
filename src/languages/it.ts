@@ -6382,6 +6382,10 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             emptySubtitle: 'I fornitori verranno visualizzati qui al termine della sincronizzazione contabile.',
             findVendor: 'Trova fornitore',
             managedInAccountingSoftware: 'I fornitori sono gestiti nel tuo',
+            enableVendor: 'Abilita fornitore',
+            enableVendors: 'Abilita fornitori',
+            disableVendor: 'Disattiva fornitore',
+            disableVendors: 'Disattiva fornitori',
         },
         tags: {
             tagName: 'Nome tag',

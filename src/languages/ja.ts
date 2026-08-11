@@ -6302,6 +6302,10 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             emptySubtitle: '会計システムとの同期が完了すると、ここに取引先が表示されます。',
             findVendor: '取引先を検索',
             managedInAccountingSoftware: '取引先は次の場所で管理されます：',
+            enableVendor: '取引先を有効にする',
+            enableVendors: '取引先を有効にする',
+            disableVendor: '取引先を無効にする',
+            disableVendors: '取引先を無効にする',
         },
         tags: {
             tagName: 'タグ名',

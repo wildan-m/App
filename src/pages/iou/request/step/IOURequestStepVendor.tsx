@@ -15,7 +15,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {updateMoneyRequestVendor} from '@libs/actions/IOU/UpdateMoneyRequest';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Navigation from '@libs/Navigation/Navigation';
-import {getMatchingVendors, hasVendorFeature, isXeroActiveMatchingSource} from '@libs/PolicyUtils';
+import {getEnabledMatchingVendors, hasVendorFeature, isXeroActiveMatchingSource} from '@libs/PolicyUtils';
 import {isPerDiemRequest} from '@libs/TransactionUtils';
 
 import {getQuickbooksOnlineIntegrationName} from '@pages/workspace/accounting/utils';
@@ -71,7 +71,7 @@ function IOURequestStepVendor({
     // Vendor is scoped to non-reimbursable expenses on a policy expense chat; block deep-link / stale-open access if the transaction is reimbursable or is an invoice (invoices are non-reimbursable but don't route through the vendor-matching flow).
     const isReimbursable = !!transaction?.reimbursable;
     const isInvoice = iouType === CONST.IOU.TYPE.INVOICE;
-    const vendors = getMatchingVendors(policy);
+    const vendors = getEnabledMatchingVendors(policy);
     const currentVendorID = transaction?.comment?.vendor?.externalID;
     const vendorLabel = isOnXero ? translate('common.supplier') : translate('common.vendor');
 
