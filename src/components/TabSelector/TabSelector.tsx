@@ -40,12 +40,17 @@ function TabSelector({
 
     const handleTabPress = (tabKey: string) => {
         const route = state.routes.find((candidateRoute) => candidateRoute.name === tabKey);
+        console.log(
+            '[98240] TabSelector press',
+            JSON.stringify({tabKey, index: state.index, routes: state.routes.map((r) => r.name), activeKey: state.routes[state.index]?.key, routeKey: route?.key}),
+        );
         if (!route) {
             return;
         }
 
         const isActive = route.key === state.routes[state.index]?.key;
         if (isActive) {
+            console.log('[98240] TabSelector NO-OP: pressed tab believed active');
             return;
         }
 

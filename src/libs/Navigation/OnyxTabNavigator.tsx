@@ -256,6 +256,7 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
                                 const state = event.data.state;
                                 const index = state.index;
                                 const routeNames = state.routeNames;
+                                console.log('[98240] OnyxTabNav state event', JSON.stringify({index, routeNames, selectedTab, newSelectedTab: routeNames.at(index)}));
                                 if (isFirstMountRef.current) {
                                     onTabSelect?.({index});
                                     isFirstMountRef.current = false;
