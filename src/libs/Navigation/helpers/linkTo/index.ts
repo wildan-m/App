@@ -235,7 +235,19 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
             const tabState = tabRoute ? getTabState(tabRoute as NavigationPartialRoute) : undefined;
             const tabNavigatorStateKey = tabRoute?.state?.key;
             const lastFullScreenRoute = tabState?.routes?.at(tabState.index ?? 0) as NavigationPartialRoute | undefined;
-            if (matchingFullScreenRoute && lastFullScreenRoute && shouldChangeToMatchingFullScreen(newFocusedRoute, matchingFullScreenRoute, lastFullScreenRoute)) {
+            // Tapping a link inside a report is not a deep link — the report is already a valid full screen route
+            // under the overlay. Switching the tab underneath the RHP strands the user on that other tab when they
+            // dismiss it, and returning to the report afterwards pushes a second TabNavigator, so the next link tap
+            // mutates an already duplicated state. Issue: https://github.com/Expensify/App/issues/98356
+            // The add payment card page is excluded because it must always open over the Subscription tab, no matter
+            // where it was opened from (see shouldChangeToMatchingFullScreen).
+            const isLinkOpenedFromReport = currentFocusedRoute.name === SCREENS.REPORT && newFocusedRoute.name !== SCREENS.SETTINGS.SUBSCRIPTION.ADD_PAYMENT_CARD;
+            if (
+                matchingFullScreenRoute &&
+                lastFullScreenRoute &&
+                !isLinkOpenedFromReport &&
+                shouldChangeToMatchingFullScreen(newFocusedRoute, matchingFullScreenRoute, lastFullScreenRoute)
+            ) {
                 const matchingFullScreenRouteInTabRootState = tabState?.routes?.find((route) => route.name === matchingFullScreenRoute.name);
                 if (matchingFullScreenRouteInTabRootState && matchingFullScreenRouteInTabRootState.state === undefined) {
                     // If matchingFullScreenRoute state is uninitialized (has never been visited)
