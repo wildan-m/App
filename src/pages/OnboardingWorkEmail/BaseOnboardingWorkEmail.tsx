@@ -1,11 +1,11 @@
 import AutoEmailLink from '@components/AutoEmailLink';
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/Button';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import OnboardingHeader from '@components/OnboardingHeader';
 import OnboardingMergingAccountBlockedView from '@components/OnboardingMergingAccountBlockedView';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
@@ -41,17 +41,18 @@ import {PUBLIC_DOMAINS_SET, Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 
-import type {BaseOnboardingWorkEmailProps} from './types';
-
 type Item = {
     icon: IconAsset;
     titleTranslationKey: TranslationPaths;
     shouldRenderEmail?: boolean;
 };
 
-function BaseOnboardingWorkEmail({shouldUseNativeStyles}: BaseOnboardingWorkEmailProps) {
+function BaseOnboardingWorkEmail() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    // This is the first step of the onboarding flow for public-domain users, so there is no back button
+    useBackCaretHeader(false);
     const illustrations = useMemoizedLazyIllustrations(['EnvelopeReceipt', 'Gears', 'Profile']);
     const [onboardingValues] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
     const hasCompletedGuidedSetupFlow = hasCompletedGuidedSetupFlowSelector(onboardingValues);
@@ -203,9 +204,8 @@ function BaseOnboardingWorkEmail({shouldUseNativeStyles}: BaseOnboardingWorkEmai
             shouldAvoidScrollOnVirtualViewport={!isMobileSafari()}
             includeSafeAreaPaddingBottom
             testID="BaseOnboardingWorkEmail"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader shouldShowBackButton={false} />
             {onboardingValues?.isMergingAccountBlocked ? (
                 <View style={[styles.flex1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                     <OnboardingMergingAccountBlockedView

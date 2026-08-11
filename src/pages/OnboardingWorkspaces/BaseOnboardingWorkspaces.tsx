@@ -1,7 +1,7 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/Button';
 import ButtonDisabledWhenOffline from '@components/Button/composed/ButtonDisabledWhenOffline';
 import LinkButton from '@components/Button/composed/LinkButton';
-import OnboardingHeader from '@components/OnboardingHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import BareUserListItem from '@components/SelectionList/ListItem/BareUserListItem';
@@ -38,7 +38,7 @@ import {View} from 'react-native';
 
 import type {BaseOnboardingWorkspacesProps} from './types';
 
-function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboardingWorkspacesProps) {
+function BaseOnboardingWorkspaces({route}: BaseOnboardingWorkspacesProps) {
     const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -76,6 +76,8 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
     const isEmployerWithSubmit = onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.EMPLOYER;
     const autoCreateSubmitWorkspace = useAutoCreateSubmitWorkspace();
     const shouldHideBackButton = onboardingValues?.shouldValidate === false && route.params?.backTo === ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute();
+
+    useBackCaretHeader(!shouldHideBackButton, () => Navigation.goBack());
 
     const handleJoinWorkspace = (policy: JoinablePolicy) => {
         const isJoiningSubmitPolicy = policy.policyType === CONST.POLICY.TYPE.SUBMIT;
@@ -171,13 +173,9 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
             includeSafeAreaPaddingBottom
             shouldEnableMaxHeight
             testID="BaseOnboardingWorkspaces"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
             shouldShowOfflineIndicator={isSmallScreenWidth}
         >
-            <OnboardingHeader
-                shouldShowBackButton={!shouldHideBackButton}
-                onBackButtonPress={() => Navigation.goBack()}
-            />
             <SelectionList
                 data={policyIDItems}
                 onSelectRow={() => {}}

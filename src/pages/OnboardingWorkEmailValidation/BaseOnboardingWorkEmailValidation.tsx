@@ -1,4 +1,4 @@
-import OnboardingHeader from '@components/OnboardingHeader';
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import OnboardingMergingAccountBlockedView from '@components/OnboardingMergingAccountBlockedView';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
@@ -25,9 +25,7 @@ import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
 
-import type {BaseOnboardingWorkEmailValidationProps} from './types';
-
-function BaseOnboardingWorkEmailValidation({shouldUseNativeStyles}: BaseOnboardingWorkEmailValidationProps) {
+function BaseOnboardingWorkEmailValidation() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
@@ -38,6 +36,10 @@ function BaseOnboardingWorkEmailValidation({shouldUseNativeStyles}: BaseOnboardi
 
     const {onboardingIsMediumOrLargerScreenWidth} = useResponsiveLayout();
     const [onboardingValues] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
+
+    useBackCaretHeader(!onboardingValues?.isMergingAccountBlocked, () => {
+        updateOnboardingValuesAndNavigation(onboardingValues);
+    });
     const isVsb = onboardingValues && 'signupQualifier' in onboardingValues && onboardingValues.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.VSB;
     const isSmb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.SMB;
     const [onboardingErrorMessage] = useOnyx(ONYXKEYS.ONBOARDING_ERROR_MESSAGE_TRANSLATION_KEY);
@@ -84,14 +86,8 @@ function BaseOnboardingWorkEmailValidation({shouldUseNativeStyles}: BaseOnboardi
         <ScreenWrapper
             includeSafeAreaPaddingBottom
             testID="BaseOnboardingWorkEmailValidation"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader
-                shouldShowBackButton={!onboardingValues?.isMergingAccountBlocked}
-                onBackButtonPress={() => {
-                    updateOnboardingValuesAndNavigation(onboardingValues);
-                }}
-            />
             {onboardingValues?.isMergingAccountBlocked ? (
                 <View style={[styles.flex1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                     <OnboardingMergingAccountBlockedView

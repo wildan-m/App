@@ -1,3 +1,5 @@
+import {StickyBackCaretHeader} from '@components/BackCaretHeader';
+import {BackCaretHeaderContextProvider} from '@components/BackCaretHeader/BackCaretHeaderContext';
 import NoDropZone from '@components/DragAndDrop/NoDropZone';
 import FocusTrapForScreens from '@components/FocusTrap/FocusTrapForScreen';
 
@@ -7,6 +9,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {isMobileSafari} from '@libs/Browser';
+import getPlatform from '@libs/getPlatform';
 import GoogleTagManager from '@libs/GoogleTagManager';
 import RHP_WEB_TRANSITION_SPEC from '@libs/Navigation/AppNavigator/RHPTransitionSpec';
 import useModalCardStyleInterpolator from '@libs/Navigation/AppNavigator/useModalCardStyleInterpolator';
@@ -48,6 +51,8 @@ let signUpEventPublishedForAccountID: number | undefined;
 
 function OnboardingModalNavigator() {
     const styles = useThemeStyles();
+    const platform = getPlatform();
+    const isNativePlatform = platform === CONST.PLATFORM.IOS || platform === CONST.PLATFORM.ANDROID;
     const {onboardingIsMediumOrLargerScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const outerViewRef = React.useRef<View>(null);
     const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
@@ -121,53 +126,59 @@ function OnboardingModalNavigator() {
             >
                 <FocusTrapForScreens>
                     <OnboardingModalNavigatorContentWrapper onboardingIsMediumOrLargerScreenWidth={onboardingIsMediumOrLargerScreenWidth}>
-                        <Stack.Navigator
-                            screenOptions={defaultScreenOptions}
-                            initialRouteName={initialRouteName}
-                        >
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.PURPOSE}
-                                component={OnboardingPurpose}
-                                options={{animationTypeForReplace: 'push'}}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.PERSONAL_DETAILS}
-                                component={OnboardingPersonalDetails}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.WORK_EMAIL}
-                                component={OnboardingWorkEmail}
-                                options={{animationTypeForReplace: 'push'}}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.WORK_EMAIL_VALIDATION}
-                                component={OnboardingWorkEmailValidation}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.PRIVATE_DOMAIN}
-                                component={OnboardingPrivateDomain}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.WORKSPACES}
-                                component={OnboardingWorkspaces}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.EMPLOYEES}
-                                component={OnboardingEmployees}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.ACCOUNTING}
-                                component={OnboardingAccounting}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.INTERESTED_FEATURES}
-                                component={OnboardingInterestedFeatures}
-                            />
-                            <Stack.Screen
-                                name={SCREENS.ONBOARDING.PERSONAL_TRACK_GOAL}
-                                component={OnboardingPersonalTrackGoal}
-                            />
-                        </Stack.Navigator>
+                        <BackCaretHeaderContextProvider>
+                            <View style={[styles.flex1, styles.defaultModalContainer, isNativePlatform && styles.pt8]}>
+                                {/* Mounted outside the Stack.Navigator so the back header never animates with screen transitions */}
+                                <StickyBackCaretHeader />
+                                <Stack.Navigator
+                                    screenOptions={defaultScreenOptions}
+                                    initialRouteName={initialRouteName}
+                                >
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.PURPOSE}
+                                        component={OnboardingPurpose}
+                                        options={{animationTypeForReplace: 'push'}}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.PERSONAL_DETAILS}
+                                        component={OnboardingPersonalDetails}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.WORK_EMAIL}
+                                        component={OnboardingWorkEmail}
+                                        options={{animationTypeForReplace: 'push'}}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.WORK_EMAIL_VALIDATION}
+                                        component={OnboardingWorkEmailValidation}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.PRIVATE_DOMAIN}
+                                        component={OnboardingPrivateDomain}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.WORKSPACES}
+                                        component={OnboardingWorkspaces}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.EMPLOYEES}
+                                        component={OnboardingEmployees}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.ACCOUNTING}
+                                        component={OnboardingAccounting}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.INTERESTED_FEATURES}
+                                        component={OnboardingInterestedFeatures}
+                                    />
+                                    <Stack.Screen
+                                        name={SCREENS.ONBOARDING.PERSONAL_TRACK_GOAL}
+                                        component={OnboardingPersonalTrackGoal}
+                                    />
+                                </Stack.Navigator>
+                            </View>
+                        </BackCaretHeaderContextProvider>
                     </OnboardingModalNavigatorContentWrapper>
                 </FocusTrapForScreens>
             </View>

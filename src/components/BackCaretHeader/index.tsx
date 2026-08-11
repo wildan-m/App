@@ -1,3 +1,7 @@
+import Icon from '@components/Icon';
+import {PressableWithoutFeedback} from '@components/Pressable';
+import Text from '@components/Text';
+
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
@@ -7,14 +11,12 @@ import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 
-import React from 'react';
+import React, {useContext} from 'react';
 import {View} from 'react-native';
 
-import Icon from './Icon';
-import {PressableWithoutFeedback} from './Pressable';
-import Text from './Text';
+import {BackCaretHeaderConfigContext} from './BackCaretHeaderContext';
 
-type OnboardingHeaderProps = {
+type BackCaretHeaderProps = {
     onBackButtonPress?: () => void;
 
     shouldShowBackButton?: boolean;
@@ -24,21 +26,21 @@ type OnboardingHeaderProps = {
  * Popover-style back link: caret + "Back" label.
  * Matches the submenu back row used by PopoverMenu.
  */
-function OnboardingHeader({onBackButtonPress, shouldShowBackButton = true}: OnboardingHeaderProps) {
+function BackCaretHeader({onBackButtonPress, shouldShowBackButton = true}: BackCaretHeaderProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const theme = useTheme();
     const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
 
     return (
-        <View style={[styles.onboardingHeaderContainer]}>
+        <View style={[styles.backCaretHeaderContainer]}>
             {shouldShowBackButton ? (
                 <PressableWithoutFeedback
                     onPress={onBackButtonPress}
                     style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}
                     role={CONST.ROLE.BUTTON}
                     accessibilityLabel={translate('common.back')}
-                    sentryLabel="OnboardingHeader-Back"
+                    sentryLabel="BackCaretHeader-Back"
                 >
                     <Icon
                         src={icons.BackArrow}
@@ -53,4 +55,21 @@ function OnboardingHeader({onBackButtonPress, shouldShowBackButton = true}: Onbo
     );
 }
 
-export default OnboardingHeader;
+/**
+ * Sticky variant that renders the configuration registered by the currently focused
+ * screen (via useBackCaretHeader). Mount it once, outside the animated screen cards,
+ * so the header never participates in screen transitions.
+ */
+function StickyBackCaretHeader() {
+    const config = useContext(BackCaretHeaderConfigContext);
+
+    return (
+        <BackCaretHeader
+            shouldShowBackButton={config.shouldShowBackButton}
+            onBackButtonPress={config.onBackButtonPress}
+        />
+    );
+}
+
+export default BackCaretHeader;
+export {StickyBackCaretHeader};

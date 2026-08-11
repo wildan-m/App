@@ -4,11 +4,9 @@ import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import {BackHandler} from 'react-native';
 
-import type {OnboardingWorkEmailProps} from './types';
-
 import BaseOnboardingWorkEmail from './BaseOnboardingWorkEmail';
 
-function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
+function OnboardingWorkEmail() {
     // To block android native back button behavior
     useFocusEffect(
         useCallback(() => {
@@ -23,12 +21,7 @@ function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
             return () => backHandler.remove();
         }, []),
     );
-    return (
-        <BaseOnboardingWorkEmail
-            shouldUseNativeStyles
-            {...props}
-        />
-    );
+    return <BaseOnboardingWorkEmail />;
 }
 
 export default OnboardingWorkEmail;
