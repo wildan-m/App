@@ -2,17 +2,12 @@ import OnboardingWrapper from '@components/OnboardingWrapper';
 
 import React from 'react';
 
-import type {OnboardingInterestedFeaturesProps} from './types';
-
 import BaseOnboardingInterestedFeatures from './BaseOnboardingInterestedFeatures';
 
-function OnboardingInterestedFeatures(props: OnboardingInterestedFeaturesProps) {
+function OnboardingInterestedFeatures() {
     return (
         <OnboardingWrapper>
-            <BaseOnboardingInterestedFeatures
-                shouldUseNativeStyles={false}
-                {...props}
-            />
+            <BaseOnboardingInterestedFeatures />
         </OnboardingWrapper>
     );
 }

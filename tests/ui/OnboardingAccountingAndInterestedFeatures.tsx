@@ -1,5 +1,7 @@
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react-native';
 
+import {StickyBackCaretHeader} from '@components/BackCaretHeader';
+import {BackCaretHeaderContextProvider} from '@components/BackCaretHeader/BackCaretHeaderContext';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
@@ -50,16 +52,15 @@ function renderInterestedFeaturesPage() {
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, CurrentReportIDContextProvider]}>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName={SCREENS.ONBOARDING.INTERESTED_FEATURES}>
-                    <Stack.Screen name={SCREENS.ONBOARDING.INTERESTED_FEATURES}>
-                        {(props) => (
-                            <BaseOnboardingInterestedFeatures
-                                {...props}
-                                shouldUseNativeStyles={false}
-                            />
-                        )}
-                    </Stack.Screen>
-                </Stack.Navigator>
+                <BackCaretHeaderContextProvider>
+                    <StickyBackCaretHeader />
+                    <Stack.Navigator initialRouteName={SCREENS.ONBOARDING.INTERESTED_FEATURES}>
+                        <Stack.Screen
+                            name={SCREENS.ONBOARDING.INTERESTED_FEATURES}
+                            component={BaseOnboardingInterestedFeatures}
+                        />
+                    </Stack.Navigator>
+                </BackCaretHeaderContextProvider>
             </NavigationContainer>
         </ComposeProviders>,
     );
@@ -69,16 +70,15 @@ function renderAccountingPage() {
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, CurrentReportIDContextProvider]}>
             <NavigationContainer>
-                <Stack.Navigator initialRouteName={SCREENS.ONBOARDING.ACCOUNTING}>
-                    <Stack.Screen name={SCREENS.ONBOARDING.ACCOUNTING}>
-                        {(props) => (
-                            <BaseOnboardingAccounting
-                                {...props}
-                                shouldUseNativeStyles={false}
-                            />
-                        )}
-                    </Stack.Screen>
-                </Stack.Navigator>
+                <BackCaretHeaderContextProvider>
+                    <StickyBackCaretHeader />
+                    <Stack.Navigator initialRouteName={SCREENS.ONBOARDING.ACCOUNTING}>
+                        <Stack.Screen
+                            name={SCREENS.ONBOARDING.ACCOUNTING}
+                            component={BaseOnboardingAccounting}
+                        />
+                    </Stack.Navigator>
+                </BackCaretHeaderContextProvider>
             </NavigationContainer>
         </ComposeProviders>,
     );

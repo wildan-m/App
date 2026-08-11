@@ -1,7 +1,7 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/ButtonComposed';
 import FormHelpMessage from '@components/FormHelpMessage';
 import MenuItem from '@components/MenuItem';
-import OnboardingHeader from '@components/OnboardingHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
@@ -31,9 +31,13 @@ import type {BaseOnboardingPersonalTrackGoalProps} from './types';
 
 const personalTrackGoalOptions = Object.values(CONST.ONBOARDING_PERSONAL_TRACK_GOALS);
 
-function BaseOnboardingPersonalTrackGoal({shouldUseNativeStyles, route}: BaseOnboardingPersonalTrackGoalProps) {
+function BaseOnboardingPersonalTrackGoal({route}: BaseOnboardingPersonalTrackGoalProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    useBackCaretHeader(true, () => {
+        Navigation.goBack(ROUTES.ONBOARDING_PURPOSE.getRoute(route.params?.backTo));
+    });
     const {onboardingIsMediumOrLargerScreenWidth} = useResponsiveLayout();
     const [selectedGoalOverride, setSelectedGoalOverride] = useState<string | null>(null);
     const [somethingElseTextOverride, setSomethingElseTextOverride] = useState<string | null>(null);
@@ -85,14 +89,8 @@ function BaseOnboardingPersonalTrackGoal({shouldUseNativeStyles, route}: BaseOnb
     return (
         <ScreenWrapper
             testID="BaseOnboardingPersonalTrackGoal"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader
-                shouldShowBackButton
-                onBackButtonPress={() => {
-                    Navigation.goBack(ROUTES.ONBOARDING_PURPOSE.getRoute(route.params?.backTo));
-                }}
-            />
             <ScrollView
                 style={[styles.flex1, styles.flexGrow1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, paddingHorizontal]}
                 keyboardShouldPersistTaps="handled"

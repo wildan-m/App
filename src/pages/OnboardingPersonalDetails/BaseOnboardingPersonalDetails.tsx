@@ -1,7 +1,7 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
-import OnboardingHeader from '@components/OnboardingHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
@@ -42,7 +42,7 @@ import {View} from 'react-native';
 
 import type {BaseOnboardingPersonalDetailsProps} from './types';
 
-function BaseOnboardingPersonalDetails({currentUserPersonalDetails, shouldUseNativeStyles, route}: BaseOnboardingPersonalDetailsProps) {
+function BaseOnboardingPersonalDetails({currentUserPersonalDetails, route}: BaseOnboardingPersonalDetailsProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     const [onboardingPurposeSelected] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
@@ -79,6 +79,21 @@ function BaseOnboardingPersonalDetails({currentUserPersonalDetails, shouldUseNat
 
     const isVsb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.VSB;
     const isSmb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.SMB;
+
+    useBackCaretHeader(!isPrivateDomainAndHasAccessiblePolicies, () => {
+        // Based on the `handleSubmit` function to reverse where to return
+        if (isPrivateDomainAndHasAccessiblePolicies) {
+            Navigation.goBack();
+            return;
+        }
+
+        if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+            Navigation.goBack(ROUTES.ONBOARDING_PERSONAL_TRACK_GOAL.getRoute(route.params?.backTo));
+            return;
+        }
+
+        Navigation.goBack(ROUTES.ONBOARDING_PURPOSE.getRoute(route.params?.backTo));
+    });
 
     useEffect(() => {
         setOnboardingErrorMessage(null);
@@ -241,25 +256,8 @@ function BaseOnboardingPersonalDetails({currentUserPersonalDetails, shouldUseNat
             shouldEnableMaxHeight
             includeSafeAreaPaddingBottom
             testID="BaseOnboardingPersonalDetails"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader
-                shouldShowBackButton={!isPrivateDomainAndHasAccessiblePolicies}
-                onBackButtonPress={() => {
-                    // Based on the `handleSubmit` function to reverse where to return
-                    if (isPrivateDomainAndHasAccessiblePolicies) {
-                        Navigation.goBack();
-                        return;
-                    }
-
-                    if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
-                        Navigation.goBack(ROUTES.ONBOARDING_PERSONAL_TRACK_GOAL.getRoute(route.params?.backTo));
-                        return;
-                    }
-
-                    Navigation.goBack(ROUTES.ONBOARDING_PURPOSE.getRoute(route.params?.backTo));
-                }}
-            />
             <FormProvider
                 style={[styles.flexGrow1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}
                 formID={ONYXKEYS.FORMS.ONBOARDING_PERSONAL_DETAILS_FORM}

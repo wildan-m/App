@@ -1,8 +1,8 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/ButtonComposed';
 import FixedFooter from '@components/FixedFooter';
 import FormHelpMessage from '@components/FormHelpMessage';
 import Icon from '@components/Icon';
-import OnboardingHeader from '@components/OnboardingHeader';
 import {PressableWithoutFeedback} from '@components/Pressable';
 import RadioButtonWithLabel from '@components/RadioButtonWithLabel';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -36,8 +36,6 @@ import type IconAsset from '@src/types/utils/IconAsset';
 
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
-
-import type {BaseOnboardingAccountingProps} from './types';
 
 type Integration = {
     key: keyof typeof CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY;
@@ -98,9 +96,11 @@ type OnboardingListItem = ListItem & {
     keyForList: AccountingOptionKey;
 };
 
-function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccountingProps) {
+function BaseOnboardingAccounting() {
     const styles = useThemeStyles();
     const theme = useTheme();
+
+    useBackCaretHeader(true, () => Navigation.goBack(ROUTES.ONBOARDING_INTERESTED_FEATURES.getRoute()));
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
@@ -229,10 +229,9 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
     return (
         <ScreenWrapper
             testID="BaseOnboardingAccounting"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
             shouldEnableMaxHeight
         >
-            <OnboardingHeader onBackButtonPress={() => Navigation.goBack(ROUTES.ONBOARDING_INTERESTED_FEATURES.getRoute())} />
             <View style={[onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                 <Text
                     style={[styles.textHeadlineH1, styles.mb5]}

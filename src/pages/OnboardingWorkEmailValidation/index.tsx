@@ -2,17 +2,12 @@ import OnboardingWrapper from '@components/OnboardingWrapper';
 
 import React from 'react';
 
-import type {OnboardingWorkEmailValidationProps} from './types';
-
 import BaseOnboardingWorkEmailValidation from './BaseOnboardingWorkEmailValidation';
 
-function OnboardingWorkEmailValidation(props: OnboardingWorkEmailValidationProps) {
+function OnboardingWorkEmailValidation() {
     return (
         <OnboardingWrapper>
-            <BaseOnboardingWorkEmailValidation
-                shouldUseNativeStyles={false}
-                {...props}
-            />
+            <BaseOnboardingWorkEmailValidation />
         </OnboardingWrapper>
     );
 }

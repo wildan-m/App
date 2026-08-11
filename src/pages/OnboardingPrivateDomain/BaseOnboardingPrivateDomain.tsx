@@ -1,4 +1,4 @@
-import OnboardingHeader from '@components/OnboardingHeader';
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
@@ -29,7 +29,7 @@ import {View} from 'react-native';
 
 import type {BaseOnboardingPrivateDomainProps} from './types';
 
-function BaseOnboardingPrivateDomain({shouldUseNativeStyles, route}: BaseOnboardingPrivateDomainProps) {
+function BaseOnboardingPrivateDomain({route}: BaseOnboardingPrivateDomainProps) {
     const [hasValidateCodeBeenSent, setHasValidateCodeBeenSent] = useState(false);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -75,6 +75,8 @@ function BaseOnboardingPrivateDomain({shouldUseNativeStyles, route}: BaseOnboard
         const routeToNavigate = (route.params?.backTo as Route) ?? ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute();
         Navigation.goBack(routeToNavigate);
     }, [route.params?.backTo, onboardingValues]);
+
+    useBackCaretHeader(true, handleBackButtonPress);
 
     const navigateToNextOnboardingStep = useCallback(
         (backTo: string | undefined, options?: {forceReplace?: boolean}) => {
@@ -132,12 +134,8 @@ function BaseOnboardingPrivateDomain({shouldUseNativeStyles, route}: BaseOnboard
             shouldEnableMaxHeight
             includeSafeAreaPaddingBottom
             testID="BaseOnboardingPrivateDomain"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader
-                shouldShowBackButton
-                onBackButtonPress={handleBackButtonPress}
-            />
             <ScrollView
                 style={[styles.w100, styles.h100, styles.flex1]}
                 contentContainerStyle={styles.flexGrow1}

@@ -1,7 +1,7 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import FormHelpMessage from '@components/FormHelpMessage';
 import type {MenuItemProps} from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
-import OnboardingHeader from '@components/OnboardingHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 
@@ -51,9 +51,12 @@ function getOnboardingChoices(customChoices: OnboardingPurpose[]) {
     return selectableOnboardingChoices.filter((choice) => customChoices.includes(choice));
 }
 
-function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, route}: BaseOnboardingPurposeProps) {
+function BaseOnboardingPurpose({shouldEnableMaxHeight, route}: BaseOnboardingPurposeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    // This is the first step of the onboarding flow, so there is no back button
+    useBackCaretHeader(false);
     const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'CalculatorMoney', 'ReceiptUpload', 'PiggyBank']);
 
     const menuIcons = useMemo(
@@ -181,12 +184,9 @@ function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, ro
         <ScreenWrapper
             includeSafeAreaPaddingBottom
             testID="BaseOnboardingPurpose"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
             shouldEnableMaxHeight={shouldEnableMaxHeight}
         >
-            <View style={onboardingIsMediumOrLargerScreenWidth && styles.mh3}>
-                <OnboardingHeader shouldShowBackButton={false} />
-            </View>
             <ScrollView style={[styles.flex1, styles.flexGrow1, onboardingIsMediumOrLargerScreenWidth && styles.mt5, paddingHorizontal]}>
                 <View style={styles.flex1}>
                     <View style={[onboardingIsMediumOrLargerScreenWidth ? styles.flexRow : styles.flexColumn, styles.mb5]}>

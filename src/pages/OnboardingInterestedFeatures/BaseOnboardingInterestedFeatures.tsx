@@ -1,8 +1,8 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/ButtonComposed';
 import Checkbox from '@components/Checkbox';
 import FixedFooter from '@components/FixedFooter';
 import Icon from '@components/Icon';
-import OnboardingHeader from '@components/OnboardingHeader';
 import {PressableWithoutFeedback} from '@components/Pressable';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -37,11 +37,13 @@ import ROUTES from '@src/ROUTES';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 
-import type {BaseOnboardingInterestedFeaturesProps, Feature, SectionObject} from './types';
+import type {Feature, SectionObject} from './types';
 
-function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardingInterestedFeaturesProps) {
+function BaseOnboardingInterestedFeatures() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+
+    useBackCaretHeader(true, () => Navigation.goBack(ROUTES.ONBOARDING_EMPLOYEES.getRoute()));
     const illustrations = useMemoizedLazyIllustrations(['FolderOpen', 'Accounting', 'CompanyCard', 'Workflows', 'Rules', 'Car', 'Tag', 'PerDiem', 'HandCard', 'Luggage', 'Clock']);
 
     // We need to use isSmallScreenWidth, see navigateAfterOnboarding function comment
@@ -238,10 +240,9 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
     return (
         <ScreenWrapper
             testID="BaseOnboardingInterestedFeatures"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
             shouldEnableMaxHeight
         >
-            <OnboardingHeader onBackButtonPress={() => Navigation.goBack(ROUTES.ONBOARDING_EMPLOYEES.getRoute())} />
             <View style={[onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}>
                 <Text
                     style={[styles.textHeadlineH1, styles.mb5]}

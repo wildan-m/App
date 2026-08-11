@@ -1,6 +1,6 @@
+import useBackCaretHeader from '@components/BackCaretHeader/useBackCaretHeader';
 import Button from '@components/ButtonComposed';
 import FormHelpMessage from '@components/FormHelpMessage';
-import OnboardingHeader from '@components/OnboardingHeader';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
@@ -34,7 +34,7 @@ import type {BaseOnboardingEmployeesProps} from './types';
 type OnboardingListItem = ListItem & {
     keyForList: OnboardingCompanySize;
 };
-function BaseOnboardingEmployees({shouldUseNativeStyles, route}: BaseOnboardingEmployeesProps) {
+function BaseOnboardingEmployees({route}: BaseOnboardingEmployeesProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [onboardingCompanySize] = useOnyx(ONYXKEYS.ONBOARDING_COMPANY_SIZE);
@@ -87,6 +87,8 @@ function BaseOnboardingEmployees({shouldUseNativeStyles, route}: BaseOnboardingE
 
         Navigation.goBack(ROUTES.ONBOARDING_PURPOSE.getRoute());
     }, [onboardingFlowContext, route.params?.backTo]);
+
+    useBackCaretHeader(!isEmployeesFirstStep, handleBackButtonPress);
 
     const companySizeOptions: OnboardingListItem[] = useMemo(() => {
         const isSmb = onboardingValues?.signupQualifier === CONST.ONBOARDING_SIGNUP_QUALIFIERS.SMB;
@@ -149,12 +151,8 @@ function BaseOnboardingEmployees({shouldUseNativeStyles, route}: BaseOnboardingE
     return (
         <ScreenWrapper
             testID="BaseOnboardingEmployees"
-            style={[styles.defaultModalContainer, shouldUseNativeStyles && styles.pt8]}
+            style={styles.defaultModalContainer}
         >
-            <OnboardingHeader
-                shouldShowBackButton={!isEmployeesFirstStep}
-                onBackButtonPress={handleBackButtonPress}
-            />
             <Text
                 style={[styles.textHeadlineH1, styles.mb5, onboardingIsMediumOrLargerScreenWidth && styles.mt5, onboardingIsMediumOrLargerScreenWidth ? styles.mh8 : styles.mh5]}
                 accessibilityRole={CONST.ROLE.HEADER}

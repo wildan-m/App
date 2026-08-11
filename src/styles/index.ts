@@ -2051,7 +2051,7 @@ const staticStyles = (theme: ThemeColors) =>
             fontFamily: FontUtils.fontFamily.platform.SYSTEM.fontFamily,
         },
 
-        onboardingHeaderContainer: {
+        backCaretHeaderContainer: {
             height: 52,
             paddingHorizontal: 20,
             paddingVertical: 16,

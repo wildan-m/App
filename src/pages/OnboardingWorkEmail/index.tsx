@@ -2,17 +2,12 @@ import OnboardingWrapper from '@components/OnboardingWrapper';
 
 import React from 'react';
 
-import type {OnboardingWorkEmailProps} from './types';
-
 import BaseOnboardingWorkEmail from './BaseOnboardingWorkEmail';
 
-function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
+function OnboardingWorkEmail() {
     return (
         <OnboardingWrapper>
-            <BaseOnboardingWorkEmail
-                shouldUseNativeStyles={false}
-                {...props}
-            />
+            <BaseOnboardingWorkEmail />
         </OnboardingWrapper>
     );
 }
