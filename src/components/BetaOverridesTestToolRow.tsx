@@ -73,8 +73,11 @@ function BetaOverridesTestToolRow() {
                     />
                     <ScrollView>
                         {betaList.map((beta) => {
-                            const isEnabled = Permissions.isBetaEnabled(beta, betas, betaConfiguration);
-                            const isOverridden = betasOverride?.[beta] !== undefined;
+                            // Compute the effective state from the subscribed values directly (rather than relying on
+                            // Permissions' own override subscription) so the switch reflects a toggle instantly.
+                            const override = betasOverride?.[beta];
+                            const isEnabled = override ?? Permissions.isBetaEnabled(beta, betas, betaConfiguration);
+                            const isOverridden = override !== undefined;
                             return (
                                 <TestToolRow
                                     key={beta}

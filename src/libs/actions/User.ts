@@ -1427,7 +1427,9 @@ function rebroadcastBetas(betas: OnyxEntry<Beta[]>) {
     if (!betas) {
         return;
     }
-    Onyx.set(ONYXKEYS.BETAS, betas, {skipCacheCheck: true});
+    // Spread into a new array so subscribers see a new reference — with the same reference React
+    // would bail out of re-rendering even though the broadcast fired.
+    Onyx.set(ONYXKEYS.BETAS, [...betas], {skipCacheCheck: true});
 }
 
 /**
