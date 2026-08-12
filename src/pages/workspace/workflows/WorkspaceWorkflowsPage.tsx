@@ -65,6 +65,7 @@ import {
     isControlPolicy,
     isGroupPolicy as isGroupPolicyUtil,
     isPolicyAdmin,
+    shouldHideDynamicExternalWorkflowPeople,
 } from '@libs/PolicyUtils';
 import {hasInProgressVBBA} from '@libs/ReimbursementAccountUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
@@ -464,6 +465,8 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
     const hiddenWorkflowsCount = searchFilteredWorkflows.length - displayedWorkflows.length;
 
     const isDEWEnabled = hasDynamicExternalWorkflow(policy);
+    // The DEW Manager can hide the approver table from the customer entirely. The info banner still explains why approvals are on.
+    const shouldHideApprovalWorkflows = shouldHideDynamicExternalWorkflowPeople(policy);
     const isHRConnected = isAnyHRConnected(policy);
     const approvalSubtitle = useMemo(() => {
         if (!isHRConnected) {
@@ -725,76 +728,80 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                                 </View>
                             </View>
                         )}
-                        {filteredApprovalWorkflows.length > CONST.SEARCH_BAR_THRESHOLD && (
-                            <SearchBar
-                                label={translate('workflowsPage.findWorkflow')}
-                                inputValue={workflowSearchInput}
-                                onChangeText={setWorkflowSearchInput}
-                                style={[styles.mt6, {marginHorizontal: 0}]}
-                            />
-                        )}
-                        <WorkflowNoResultsView
-                            message={translate('common.noResultsFoundMatching', workflowSearchInput)}
-                            shouldShow={searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0}
-                            searchValue={workflowSearchInput}
-                        />
-                        {displayedWorkflows.map((workflow) => {
-                            const firstApproverEmail = workflow.approvers.at(0)?.email ?? '';
-
-                            return (
-                                <OfflineWithFeedback
-                                    key={firstApproverEmail}
-                                    pendingAction={workflow.pendingAction}
-                                >
-                                    <ApprovalWorkflowSection
-                                        approvalWorkflow={workflow}
-                                        onPress={
-                                            shouldBlockApprovalWorkflowEditing || !canWriteApprovals
-                                                ? undefined
-                                                : () => {
-                                                      // Discard stale onyx edits or the Edit page's resume check would surface a prior abandoned session.
-                                                      clearApprovalWorkflow();
-                                                      Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EDIT.getRoute(route.params.policyID, firstApproverEmail));
-                                                  }
-                                        }
-                                        onShowAllMembersPress={
-                                            shouldBlockApprovalWorkflowEditing
-                                                ? undefined
-                                                : () => {
-                                                      selectApprovalWorkflowForEdit({
-                                                          workflow,
-                                                          defaultWorkflowMembers: availableMembers,
-                                                          usedApproverEmails,
-                                                      });
-                                                      Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EXPENSES_FROM.path));
-                                                  }
-                                        }
-                                        currency={policy?.outputCurrency}
-                                        isDisabled={shouldBlockApprovalWorkflowEditing || !canWriteApprovals}
-                                        hrProviderName={isHRConnected ? hrProviderName : undefined}
-                                        isHRAdvancedMode={isHRAdvancedModeEnabled}
-                                        hrFinalApproverEmail={isHRAdvancedModeEnabled ? hrFinalApproverEmail : undefined}
+                        {!shouldHideApprovalWorkflows && (
+                            <>
+                                {filteredApprovalWorkflows.length > CONST.SEARCH_BAR_THRESHOLD && (
+                                    <SearchBar
+                                        label={translate('workflowsPage.findWorkflow')}
+                                        inputValue={workflowSearchInput}
+                                        onChangeText={setWorkflowSearchInput}
+                                        style={[styles.mt6, {marginHorizontal: 0}]}
                                     />
-                                </OfflineWithFeedback>
-                            );
-                        })}
-                        {hiddenWorkflowsCount > 0 && (
-                            <WorkflowsLoadMoreCard
-                                count={hiddenWorkflowsCount}
-                                onPress={() => setIsWorkflowListExpanded(true)}
-                            />
-                        )}
-                        {!shouldBlockApprovalWorkflowEditing && canWriteApprovals && (
-                            <MenuItem
-                                title={translate('workflowsPage.addApprovalButton')}
-                                titleStyle={styles.textStrong}
-                                icon={expensifyIcons.Plus}
-                                iconHeight={20}
-                                iconWidth={20}
-                                style={[styles.sectionMenuItemTopDescription, styles.mt6, styles.mbn3]}
-                                onPress={addApprovalAction}
-                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.ADD_APPROVAL}
-                            />
+                                )}
+                                <WorkflowNoResultsView
+                                    message={translate('common.noResultsFoundMatching', workflowSearchInput)}
+                                    shouldShow={searchFilteredWorkflows.length === 0 && workflowSearchInput.length > 0}
+                                    searchValue={workflowSearchInput}
+                                />
+                                {displayedWorkflows.map((workflow) => {
+                                    const firstApproverEmail = workflow.approvers.at(0)?.email ?? '';
+
+                                    return (
+                                        <OfflineWithFeedback
+                                            key={firstApproverEmail}
+                                            pendingAction={workflow.pendingAction}
+                                        >
+                                            <ApprovalWorkflowSection
+                                                approvalWorkflow={workflow}
+                                                onPress={
+                                                    shouldBlockApprovalWorkflowEditing || !canWriteApprovals
+                                                        ? undefined
+                                                        : () => {
+                                                              // Discard stale onyx edits or the Edit page's resume check would surface a prior abandoned session.
+                                                              clearApprovalWorkflow();
+                                                              Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EDIT.getRoute(route.params.policyID, firstApproverEmail));
+                                                          }
+                                                }
+                                                onShowAllMembersPress={
+                                                    shouldBlockApprovalWorkflowEditing
+                                                        ? undefined
+                                                        : () => {
+                                                              selectApprovalWorkflowForEdit({
+                                                                  workflow,
+                                                                  defaultWorkflowMembers: availableMembers,
+                                                                  usedApproverEmails,
+                                                              });
+                                                              Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EXPENSES_FROM.path));
+                                                          }
+                                                }
+                                                currency={policy?.outputCurrency}
+                                                isDisabled={shouldBlockApprovalWorkflowEditing || !canWriteApprovals}
+                                                hrProviderName={isHRConnected ? hrProviderName : undefined}
+                                                isHRAdvancedMode={isHRAdvancedModeEnabled}
+                                                hrFinalApproverEmail={isHRAdvancedModeEnabled ? hrFinalApproverEmail : undefined}
+                                            />
+                                        </OfflineWithFeedback>
+                                    );
+                                })}
+                                {hiddenWorkflowsCount > 0 && (
+                                    <WorkflowsLoadMoreCard
+                                        count={hiddenWorkflowsCount}
+                                        onPress={() => setIsWorkflowListExpanded(true)}
+                                    />
+                                )}
+                                {!shouldBlockApprovalWorkflowEditing && canWriteApprovals && (
+                                    <MenuItem
+                                        title={translate('workflowsPage.addApprovalButton')}
+                                        titleStyle={styles.textStrong}
+                                        icon={expensifyIcons.Plus}
+                                        iconHeight={20}
+                                        iconWidth={20}
+                                        style={[styles.sectionMenuItemTopDescription, styles.mt6, styles.mbn3]}
+                                        onPress={addApprovalAction}
+                                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.ADD_APPROVAL}
+                                    />
+                                )}
+                            </>
                         )}
                     </>
                 ),
@@ -1025,6 +1032,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         navigateToSubmitWorkspaceApprovalsUpgrade,
         promptConfigureApprovalsInHR,
         isDEWEnabled,
+        shouldHideApprovalWorkflows,
         shouldUseNarrowLayout,
         expensifyIcons.DotIndicator,
         expensifyIcons.Info,

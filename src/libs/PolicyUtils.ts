@@ -1598,6 +1598,15 @@ function hasDynamicExternalWorkflow(policy: OnyxEntry<Policy>): boolean {
 }
 
 /**
+ * Checks if the approval workflow UI should be hidden because the "Hide People Table Columns" option is set in the DEW Manager.
+ * The flag is only meaningful while Dynamic External Workflow is enabled, so a stale flag on a policy that moved to another
+ * approval mode can never hide that policy's approvals UI.
+ */
+function shouldHideDynamicExternalWorkflowPeople(policy: OnyxEntry<Policy>): boolean {
+    return hasDynamicExternalWorkflow(policy) && !!policy?.dynamicExternalWorkflowHidePeople;
+}
+
+/**
  * Whether the policy has active accounting integration connections.
  * `getCurrentConnectionName` only returns connections supported in NewDot.
  * `hasSupportedOnlyOnOldDotIntegration` detects connections that are supported only on OldDot.
@@ -3213,6 +3222,7 @@ export {
     getGLCodeFromPolicyTag,
     isPolicyMemberWithoutPendingDelete,
     hasDynamicExternalWorkflow,
+    shouldHideDynamicExternalWorkflowPeople,
     getActivePoliciesWithExpenseChatAndPerDiemEnabled,
     isPerDiemEnabled,
     getTravelStep,

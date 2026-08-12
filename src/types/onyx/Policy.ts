@@ -2939,6 +2939,9 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The approval mode set up on this policy */
         approvalMode?: ValueOf<typeof CONST.POLICY.APPROVAL_MODE>;
 
+        /** Whether the approval workflow UI should be hidden from the customer on a Dynamic External Workflow policy. The back-end only returns this field when it is true. */
+        dynamicExternalWorkflowHidePeople?: boolean;
+
         /** Whether transactions should be billable by default */
         defaultBillable?: boolean;
 
