@@ -1,10 +1,8 @@
 import {act, fireEvent, render, screen} from '@testing-library/react-native';
 
-import July26PromoImage from '@assets/images/july26-promo.png';
-
 import ComposeProviders from '@components/ComposeProviders';
 import {CurrentUserPersonalDetailsProvider} from '@components/CurrentUserPersonalDetailsProvider';
-import Image from '@components/Image';
+import ImageSVG from '@components/ImageSVG';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import ProductMarketingWindowManager from '@components/ProductMarketingWindow/ProductMarketingWindowManager';
@@ -26,12 +24,15 @@ import CONST from '@src/CONST';
 import en from '@src/languages/en';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import type {Policy} from '@src/types/onyx';
+import type {Connections} from '@src/types/onyx/Policy';
 
 import React from 'react';
 import Onyx from 'react-native-onyx';
 
+import createMock from '../utils/createMock';
 import {buildPersonalDetails} from '../utils/TestHelper';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
@@ -70,11 +71,13 @@ const mockNavigate = jest.mocked(Navigation.navigate);
 const mockUseResponsiveLayout = jest.mocked(useResponsiveLayout);
 const mockUseSafeAreaPaddings = jest.mocked(useSafeAreaPaddings);
 
-const adminHeading = en.productMarketingWindow.roleTypes.admin.heading;
-const adminBody = en.productMarketingWindow.roleTypes.admin.body;
-const adminCtaLabel = en.productMarketingWindow.roleTypes.admin.cta;
+const adminHeading = en.productMarketingWindow.august2026.admin.heading;
+const adminBody = en.productMarketingWindow.august2026.admin.body;
+const ctaLabel = en.productMarketingWindow.august2026.cta;
+const memberHeading = en.productMarketingWindow.august2026.member.heading;
+const memberBody = en.productMarketingWindow.august2026.member.body;
 
-function buildAdminPolicy(policyID = POLICY_ID): Policy {
+function buildAdminPolicy(policyID = POLICY_ID, {hasVendorMatchingIntegration = false} = {}): Policy {
     return {
         id: policyID,
         name: 'Test Workspace',
@@ -89,6 +92,8 @@ function buildAdminPolicy(policyID = POLICY_ID): Policy {
                 role: CONST.POLICY.ROLE.ADMIN,
             },
         },
+        // A configured Xero connection is the simplest integration that turns vendor matching on for a workspace.
+        connections: hasVendorMatchingIntegration ? createMock<Connections>({[CONST.POLICY.CONNECTIONS.NAME.XERO]: {config: {isConfigured: true}}}) : undefined,
     } as Policy;
 }
 
@@ -103,15 +108,26 @@ const renderManager = (topmostRouteName?: string, theme: ThemePreferenceWithoutS
         </ThemeProvider>,
     );
 
-async function setupOnyxBaseline({isAdmin, activePolicyID = POLICY_ID}: {isAdmin: boolean; activePolicyID?: string}) {
+async function setupOnyxBaseline({
+    isAdmin,
+    activePolicyID = POLICY_ID,
+    hasVendorMatchingIntegration = false,
+    isVendorMatchingBetaEnabled = false,
+}: {
+    isAdmin: boolean;
+    activePolicyID?: string;
+    hasVendorMatchingIntegration?: boolean;
+    isVendorMatchingBetaEnabled?: boolean;
+}) {
     await Onyx.clear();
     await Onyx.set(ONYXKEYS.IS_LOADING_APP, false);
     await Onyx.set(ONYXKEYS.PERSONAL_DETAILS_LIST, {
         [USER_ACCOUNT_ID]: buildPersonalDetails(USER_EMAIL, USER_ACCOUNT_ID, 'User'),
     });
     await Onyx.merge(ONYXKEYS.SESSION, {email: USER_EMAIL, accountID: USER_ACCOUNT_ID});
+    await Onyx.set(ONYXKEYS.BETAS, isVendorMatchingBetaEnabled ? [CONST.BETAS.VENDOR_MATCHING] : []);
     if (isAdmin) {
-        await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, buildAdminPolicy());
+        await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, buildAdminPolicy(POLICY_ID, {hasVendorMatchingIntegration}));
         await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, activePolicyID);
     }
 }
@@ -140,7 +156,7 @@ describe('ProductMarketingWindowManager', () => {
         });
     });
 
-    it('renders nothing for a user without an admin role on any workspace', async () => {
+    it('shows the member variant for a user without an admin role on any workspace', async () => {
         await act(async () => {
             await setupOnyxBaseline({isAdmin: false});
             await waitForBatchedUpdatesWithAct();
@@ -149,7 +165,9 @@ describe('ProductMarketingWindowManager', () => {
         renderManager();
         await waitForBatchedUpdatesWithAct();
 
-        expect(screen.queryByTestId('ProductMarketingWindow')).toBeNull();
+        expect(screen.getByText(memberHeading)).toBeTruthy();
+        expect(screen.getByText(memberBody)).toBeTruthy();
+        expect(screen.queryByText(adminHeading)).toBeNull();
     });
 
     it('shows the admin variant when the user administers at least one active workspace', async () => {
@@ -163,7 +181,69 @@ describe('ProductMarketingWindowManager', () => {
 
         expect(screen.getByText(adminHeading)).toBeTruthy();
         expect(screen.getByText(adminBody)).toBeTruthy();
-        expect(screen.UNSAFE_getByType(Image).props.source).toBe(July26PromoImage);
+        expect(screen.queryByText(memberHeading)).toBeNull();
+        // Both August variants are illustration-backed, so the window renders an SVG rather than a bundled promo image.
+        expect(screen.UNSAFE_getByType(ImageSVG)).toBeTruthy();
+    });
+
+    it('sends the member CTA to the new agent flow', async () => {
+        await act(async () => {
+            await setupOnyxBaseline({isAdmin: false});
+            await waitForBatchedUpdatesWithAct();
+        });
+
+        renderManager();
+        await waitForBatchedUpdatesWithAct();
+
+        fireEvent.press(screen.getByText(ctaLabel));
+        await waitForBatchedUpdatesWithAct();
+
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SETTINGS_AGENTS_NEW.getRoute());
+    });
+
+    it('sends the admin CTA to More features when vendors is not available on the target workspace yet', async () => {
+        await act(async () => {
+            await setupOnyxBaseline({isAdmin: true, isVendorMatchingBetaEnabled: true});
+            await waitForBatchedUpdatesWithAct();
+        });
+
+        renderManager();
+        await waitForBatchedUpdatesWithAct();
+
+        fireEvent.press(screen.getByText(ctaLabel));
+        await waitForBatchedUpdatesWithAct();
+
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_MORE_FEATURES.getRoute(POLICY_ID));
+    });
+
+    it('sends the admin CTA straight to the vendors page when vendors is already available on the target workspace', async () => {
+        await act(async () => {
+            await setupOnyxBaseline({isAdmin: true, hasVendorMatchingIntegration: true, isVendorMatchingBetaEnabled: true});
+            await waitForBatchedUpdatesWithAct();
+        });
+
+        renderManager();
+        await waitForBatchedUpdatesWithAct();
+
+        fireEvent.press(screen.getByText(ctaLabel));
+        await waitForBatchedUpdatesWithAct();
+
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_VENDORS.getRoute(POLICY_ID));
+    });
+
+    it('sends the admin CTA to More features when the vendor matching beta is off, even with a configured integration', async () => {
+        await act(async () => {
+            await setupOnyxBaseline({isAdmin: true, hasVendorMatchingIntegration: true});
+            await waitForBatchedUpdatesWithAct();
+        });
+
+        renderManager();
+        await waitForBatchedUpdatesWithAct();
+
+        fireEvent.press(screen.getByText(ctaLabel));
+        await waitForBatchedUpdatesWithAct();
+
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_MORE_FEATURES.getRoute(POLICY_ID));
     });
 
     it('renders nothing on startup when the active update key was already dismissed', async () => {
@@ -491,13 +571,13 @@ describe('ProductMarketingWindowManager', () => {
         renderManager();
         await waitForBatchedUpdatesWithAct();
 
-        fireEvent.press(screen.getByText(adminCtaLabel));
+        fireEvent.press(screen.getByText(ctaLabel));
         await waitForBatchedUpdatesWithAct();
 
         expect(mockSetNameValuePair).toHaveBeenCalledTimes(1);
         expect(mockSetNameValuePair).toHaveBeenCalledWith(ONYXKEYS.NVP_LAST_DISMISSED_MARKETING_WINDOW, announcement.updateKey, OLDER_UPDATE_KEY);
         expect(mockNavigate).toHaveBeenCalledTimes(1);
-        expect(mockNavigate).toHaveBeenCalledWith(announcement.admin.getCtaRoute(POLICY_ID));
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_MORE_FEATURES.getRoute(POLICY_ID));
 
         const dismissCallOrder = mockSetNameValuePair.mock.invocationCallOrder.at(0) ?? Number.NaN;
         const navigateCallOrder = mockNavigate.mock.invocationCallOrder.at(0) ?? Number.NaN;
@@ -516,10 +596,10 @@ describe('ProductMarketingWindowManager', () => {
         renderManager();
         await waitForBatchedUpdatesWithAct();
 
-        fireEvent.press(screen.getByText(adminCtaLabel));
+        fireEvent.press(screen.getByText(ctaLabel));
         await waitForBatchedUpdatesWithAct();
 
-        expect(mockNavigate).toHaveBeenCalledWith(announcement.admin.getCtaRoute(SECOND_POLICY_ID));
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_MORE_FEATURES.getRoute(SECOND_POLICY_ID));
     });
 
     it('falls back to the first eligible admin workspace when the active workspace is not administered by the user', async () => {
@@ -531,10 +611,10 @@ describe('ProductMarketingWindowManager', () => {
         renderManager();
         await waitForBatchedUpdatesWithAct();
 
-        fireEvent.press(screen.getByText(adminCtaLabel));
+        fireEvent.press(screen.getByText(ctaLabel));
         await waitForBatchedUpdatesWithAct();
 
-        expect(mockNavigate).toHaveBeenCalledWith(announcement.admin.getCtaRoute(POLICY_ID));
+        expect(mockNavigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_MORE_FEATURES.getRoute(POLICY_ID));
     });
 
     it('shows the window again when a failed persistence request rolls the NVP back to its previous update key', async () => {

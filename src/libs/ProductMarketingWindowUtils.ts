@@ -1,13 +1,16 @@
-import July26PromoImage from '@assets/images/july26-promo.png';
-
 import type {IllustrationName} from '@components/Icon/IllustrationLoader';
 
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
+import type {Policy} from '@src/types/onyx';
+import type Beta from '@src/types/onyx/Beta';
 
 import type {ImageSourcePropType} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+
+import {hasVendorFeature} from './PolicyUtils';
 
 type ProductMarketingAnnouncementVisual =
     | {
@@ -18,6 +21,19 @@ type ProductMarketingAnnouncementVisual =
           type: 'illustration';
           name: IllustrationName;
       };
+
+/**
+ * Everything a variant's CTA is allowed to branch on when building its destination. Supplied by
+ * ProductMarketingWindowManager so each release can route on the user's situation (which workspace the CTA
+ * targets, whether the promoted feature is already available) without the manager knowing what is being promoted.
+ */
+type ProductMarketingAnnouncementCtaContext = {
+    /** The active workspace the user is an admin on, which admin CTAs target. Undefined for the member variant. */
+    adminPolicy?: Policy;
+
+    /** Beta check, so a CTA can go straight to a feature the user already has instead of to where they can turn it on. */
+    isBetaEnabled: (beta: Beta) => boolean;
+};
 
 /** One audience-specific content variant of a product marketing announcement. All content is authored by marketing per release. */
 type ProductMarketingAnnouncementVariant = {
@@ -33,8 +49,8 @@ type ProductMarketingAnnouncementVariant = {
     /** Label of the primary CTA button. */
     ctaLabel: TranslationPaths;
 
-    /** Builds the route the primary CTA navigates to. Admin announcements receive the target workspace ID. */
-    getCtaRoute: (adminPolicyID?: string) => Route;
+    /** Builds the route the primary CTA navigates to. */
+    getCtaRoute: (context: ProductMarketingAnnouncementCtaContext) => Route;
 };
 
 /** A single product marketing announcement with audience-targeted content variants. */
@@ -55,13 +71,25 @@ type ProductMarketingAnnouncement = {
  * announcement is dismissed, nothing is shown until a later release replaces it with a new update key.
  */
 const ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT: ProductMarketingAnnouncement | null = {
-    updateKey: 'productUpdateJuly2026',
+    updateKey: 'productUpdateAugust2026',
     admin: {
-        visual: {type: 'image', source: July26PromoImage},
-        heading: 'productMarketingWindow.roleTypes.admin.heading',
-        body: 'productMarketingWindow.roleTypes.admin.body',
-        ctaLabel: 'productMarketingWindow.roleTypes.admin.cta',
-        getCtaRoute: (adminPolicyID) => ROUTES.WORKSPACE_MEMBERS.getRoute(adminPolicyID),
+        visual: {type: 'illustration', name: 'Accounting'},
+        heading: 'productMarketingWindow.august2026.admin.heading',
+        body: 'productMarketingWindow.august2026.admin.body',
+        ctaLabel: 'productMarketingWindow.august2026.cta',
+        // Admins who already have vendor matching on this workspace go straight to their vendor list; everyone else
+        // lands on More features, where the Vendors toggle they need to turn on lives.
+        getCtaRoute: ({adminPolicy, isBetaEnabled}) =>
+            hasVendorFeature(adminPolicy, isBetaEnabled(CONST.BETAS.VENDOR_MATCHING))
+                ? ROUTES.WORKSPACE_VENDORS.getRoute(adminPolicy?.id)
+                : ROUTES.WORKSPACE_MORE_FEATURES.getRoute(adminPolicy?.id),
+    },
+    member: {
+        visual: {type: 'illustration', name: 'AgentsIceCream'},
+        heading: 'productMarketingWindow.august2026.member.heading',
+        body: 'productMarketingWindow.august2026.member.body',
+        ctaLabel: 'productMarketingWindow.august2026.cta',
+        getCtaRoute: () => ROUTES.SETTINGS_AGENTS_NEW.getRoute(),
     },
 };
 
@@ -86,4 +114,4 @@ function getProductMarketingAnnouncementVariant(
 }
 
 export {ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT, isProductMarketingAnnouncementDismissed, getProductMarketingAnnouncementVariant};
-export type {ProductMarketingAnnouncement, ProductMarketingAnnouncementVariant};
+export type {ProductMarketingAnnouncement, ProductMarketingAnnouncementCtaContext, ProductMarketingAnnouncementVariant};

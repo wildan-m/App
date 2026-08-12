@@ -10277,12 +10277,10 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         },
     },
     productMarketingWindow: {
-        roleTypes: {
-            admin: {
-                heading: 'Novos tipos de função para administradores',
-                body: 'Dê à sua equipe permissões mais granulares com novos papéis de administrador para cartões, pessoas e pagamentos.',
-                cta: 'Experimente',
-            },
+        august2026: {
+            cta: 'Experimente',
+            admin: {heading: 'Mapeamento de fornecedores aprimorado', body: 'Crie fornecedores e regras personalizadas para facilitar o mapeamento para os principais pacotes contábeis.'},
+            member: {heading: 'Agentes pré-configurados para você', body: 'Use agentes prontos ou personalizados para cadastrar, dividir e enviar despesas automaticamente em seu nome.'},
         },
     },
     productTrainingTooltip: {

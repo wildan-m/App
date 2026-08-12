@@ -10343,11 +10343,15 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         },
     },
     productMarketingWindow: {
-        roleTypes: {
+        august2026: {
+            cta: 'Probieren Sie es aus',
             admin: {
-                heading: 'Neue Rollentypen für Admins',
-                body: 'Geben Sie Ihrem Team detailliertere Berechtigungen mit neuen Administratorrollen für Karten, Personen und Zahlungen.',
-                cta: 'Ausprobieren',
+                heading: 'Verbesserte Lieferantenzuordnung',
+                body: 'Erstellen Sie Lieferanten und benutzerdefinierte Regeln für die einfache Zuordnung zu wichtigen Buchhaltungspaketen.',
+            },
+            member: {
+                heading: 'Vorgefertigte Agents für Sie',
+                body: 'Verwenden Sie vorgefertigte oder benutzerdefinierte Agents, um Ausgaben automatisch in Ihrem Namen zu codieren, aufzuteilen und einzureichen.',
             },
         },
     },

@@ -10496,11 +10496,15 @@ const translations = {
         },
     },
     productMarketingWindow: {
-        roleTypes: {
+        august2026: {
+            cta: 'Try it out',
             admin: {
-                heading: 'New role types for admins',
-                body: 'Give your team more granular permissions with new card, people, and payments admin roles.',
-                cta: 'Try it out',
+                heading: 'Enhanced vendor mapping',
+                body: 'Create vendors and custom rules for easy mapping to major accounting packages.',
+            },
+            member: {
+                heading: 'Pre-built agents for you',
+                body: 'Use pre-built or custom agents to code, split, and submit expenses automatically on your behalf.',
             },
         },
     },

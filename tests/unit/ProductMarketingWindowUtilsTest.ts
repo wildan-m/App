@@ -4,19 +4,19 @@ import type {ProductMarketingAnnouncement} from '@libs/ProductMarketingWindowUti
 import ROUTES from '@src/ROUTES';
 
 const activeAnnouncement: ProductMarketingAnnouncement = {
-    updateKey: 'productUpdateJuly2026',
+    updateKey: 'productUpdateAugust2026',
     admin: {
         visual: {type: 'illustration', name: 'Rules'},
-        heading: 'productMarketingWindow.roleTypes.admin.heading',
-        body: 'productMarketingWindow.roleTypes.admin.body',
-        ctaLabel: 'productMarketingWindow.roleTypes.admin.cta',
+        heading: 'productMarketingWindow.august2026.admin.heading',
+        body: 'productMarketingWindow.august2026.admin.body',
+        ctaLabel: 'productMarketingWindow.august2026.cta',
         getCtaRoute: () => ROUTES.WORKSPACES_LIST.getRoute(),
     },
     member: {
         visual: {type: 'illustration', name: 'MultiScan'},
-        heading: 'productMarketingWindow.roleTypes.admin.heading',
-        body: 'productMarketingWindow.roleTypes.admin.body',
-        ctaLabel: 'productMarketingWindow.roleTypes.admin.cta',
+        heading: 'productMarketingWindow.august2026.member.heading',
+        body: 'productMarketingWindow.august2026.member.body',
+        ctaLabel: 'productMarketingWindow.august2026.cta',
         getCtaRoute: () => ROUTES.HOME,
     },
 };

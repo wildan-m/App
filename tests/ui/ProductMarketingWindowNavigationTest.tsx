@@ -34,7 +34,7 @@ const announcement = ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT;
 if (!announcement) {
     throw new Error('These tests require an active product marketing announcement; update them if the active announcement is removed.');
 }
-const adminHeading = en.productMarketingWindow.roleTypes.admin.heading;
+const adminHeading = en.productMarketingWindow.august2026.admin.heading;
 
 function buildAdminPolicy(): Policy {
     return {
