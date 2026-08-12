@@ -79,7 +79,13 @@ function SkiaWebChart<TProps extends object>({getComponent, componentProps}: Ski
     );
 
     return (
-        <View ref={viewRef(containerRef)}>
+        // `display: contents` keeps this wrapper out of layout: it exists only to hold the surface-unavailable
+        // listener, and a box here would become the containing block the chart measures itself against, which
+        // stops it from scaling down to fit narrow message columns.
+        <View
+            style={styles.dContents}
+            ref={viewRef(containerRef)}
+        >
             <WithSkiaWeb
                 opts={{locateFile: (file: string) => `/${file}`}}
                 getComponent={getComponent}
