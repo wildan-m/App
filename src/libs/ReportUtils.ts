@@ -9566,7 +9566,29 @@ function getViolatingReportIDForRBRInLHN(report: OnyxEntry<Report>, transactionV
                 return false;
             }
 
-            const excludedNoticeNamesForLHN = isProcessingReport(potentialReport) ? [CONST.VIOLATIONS.MODIFIED_AMOUNT] : [];
+            const excludedViolationNamesForLHN = isProcessingReport(potentialReport) ? [CONST.VIOLATIONS.MODIFIED_AMOUNT] : [];
+            const hasViolationOfTypeForRBRInLHN = (
+                checkViolationType: (
+                    transaction: OnyxEntry<Transaction>,
+                    violations: TransactionViolation[],
+                    currentUserEmailParam: string,
+                    currentUserAccountIDParam: number,
+                    iouReport: OnyxEntry<Report>,
+                    iouReportOwnerLogin: string | undefined,
+                    policyParam: OnyxEntry<Policy>,
+                    showInReview?: boolean,
+                ) => boolean,
+            ) =>
+                hasViolationsForRBRInLHN(
+                    checkViolationType,
+                    transactionViolations,
+                    deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
+                    currentUserLogin,
+                    transactions,
+                    potentialReport,
+                    policy,
+                    excludedViolationNamesForLHN,
+                );
 
             return (
                 !isInvoiceReport(potentialReport) &&
@@ -9578,45 +9600,26 @@ function getViolatingReportIDForRBRInLHN(report: OnyxEntry<Report>, transactionV
                     policy,
                     transactions,
                 ) &&
-                (hasViolations(
-                    potentialReport.reportID,
-                    transactionViolations,
-                    deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
-                    currentUserLogin,
-                    true,
-                    transactions,
-                    potentialReport,
-                    // This path only runs for reports the current user submitted, so the report owner is the current user.
-                    currentUserLogin,
-                    policy,
-                ) ||
-                    hasWarningTypeViolations(
-                        potentialReport.reportID,
-                        transactionViolations,
-                        deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
-                        currentUserLogin,
-                        true,
-                        transactions,
-                        potentialReport,
-                        // This path only runs for reports the current user submitted, so the report owner is the current user.
-                        currentUserLogin,
-                        policy,
-                    ) ||
-                    hasNoticeTypeViolationsForRBRInLHN(
-                        transactionViolations,
-                        deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
-                        currentUserLogin,
-                        transactions,
-                        potentialReport,
-                        policy,
-                        excludedNoticeNamesForLHN,
-                    ))
+                (hasViolationOfTypeForRBRInLHN(hasViolation) || hasViolationOfTypeForRBRInLHN(hasWarningTypeViolation) || hasViolationOfTypeForRBRInLHN(hasNoticeTypeViolation))
             );
         });
     return violatingReport ? violatingReport.reportID : null;
 }
 
-function hasNoticeTypeViolationsForRBRInLHN(
+/**
+ * Runs a transaction-level violation check for the LHN RBR, ignoring the violations whose names are excluded for the report's current state.
+ */
+function hasViolationsForRBRInLHN(
+    checkViolationType: (
+        transaction: OnyxEntry<Transaction>,
+        violations: TransactionViolation[],
+        currentUserEmailParam: string,
+        currentUserAccountIDParam: number,
+        iouReport: OnyxEntry<Report>,
+        iouReportOwnerLogin: string | undefined,
+        policy: OnyxEntry<Policy>,
+        showInReview?: boolean,
+    ) => boolean,
     transactionViolations: OnyxCollection<TransactionViolation[]>,
     currentUserAccountIDParam: number,
     currentUserEmailParam: string,
@@ -9632,7 +9635,7 @@ function hasNoticeTypeViolationsForRBRInLHN(
         }
         const filteredViolations = excludedViolationNames.length > 0 ? rawViolations.filter((violation) => !excludedViolationNames.includes(violation.name)) : rawViolations;
         // This path only runs for reports the current user submitted, so the report owner is the current user.
-        return hasNoticeTypeViolation(transaction, filteredViolations, currentUserEmailParam, currentUserAccountIDParam, report, currentUserEmailParam, policy, true);
+        return checkViolationType(transaction, filteredViolations, currentUserEmailParam, currentUserAccountIDParam, report, currentUserEmailParam, policy, true);
     });
 }
 

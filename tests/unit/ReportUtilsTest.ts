@@ -15793,6 +15793,136 @@ describe('ReportUtils', () => {
 
             await Onyx.clear();
         });
+
+        /**
+         * Sets up a workspace chat holding a single expense report whose only violation is a `modifiedAmount` of the given type,
+         * so we can assert whether that violation surfaces an RBR in the LHN.
+         */
+        async function setUpModifiedAmountViolationScenario(scenarioID: string, seed: number, violationType: TransactionViolation['type'], isSubmitted: boolean) {
+            await Onyx.clear();
+
+            const policyID = `policy-${scenarioID}`;
+            const chatReportID = `chat-${scenarioID}`;
+            const expenseReportID = `expense-${scenarioID}`;
+            const transactionID = `transaction-${scenarioID}`;
+
+            const policyData: Policy = {
+                id: policyID,
+                name: 'Modified Amount Workspace',
+                type: CONST.POLICY.TYPE.TEAM,
+                role: CONST.POLICY.ROLE.ADMIN,
+                outputCurrency: CONST.CURRENCY.USD,
+                reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+                employeeList: {
+                    [currentUserEmail]: {
+                        role: CONST.POLICY.ROLE.ADMIN,
+                    },
+                },
+                owner: currentUserEmail,
+                isPolicyExpenseChatEnabled: true,
+            };
+
+            const chatReport: Report = {
+                ...createPolicyExpenseChat(seed),
+                reportID: chatReportID,
+                ownerAccountID: currentUserAccountID,
+                policyID,
+                iouReportID: expenseReportID,
+                ...(isSubmitted ? {} : {hasOutstandingChildRequest: true}),
+            };
+
+            const expenseReport: Report = {
+                ...createExpenseReport(seed + 1),
+                reportID: expenseReportID,
+                chatReportID,
+                ownerAccountID: currentUserAccountID,
+                managerID: 42,
+                policyID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                currency: CONST.CURRENCY.USD,
+                total: 5000,
+                stateNum: isSubmitted ? CONST.REPORT.STATE_NUM.SUBMITTED : CONST.REPORT.STATE_NUM.OPEN,
+                statusNum: isSubmitted ? CONST.REPORT.STATUS_NUM.SUBMITTED : CONST.REPORT.STATUS_NUM.OPEN,
+            };
+
+            const transaction: Transaction = {
+                ...createRandomTransaction(seed),
+                transactionID,
+                reportID: expenseReportID,
+                amount: 5000,
+                currency: CONST.CURRENCY.USD,
+                status: CONST.TRANSACTION.STATUS.POSTED,
+                reimbursable: true,
+            };
+
+            const transactionViolationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}` as OnyxKey;
+            const transactionViolationsCollection: OnyxCollection<TransactionViolation[]> = {
+                [transactionViolationsKey]: [
+                    {
+                        name: CONST.VIOLATIONS.MODIFIED_AMOUNT,
+                        type: violationType,
+                        showInReview: true,
+                    },
+                ],
+            };
+
+            await Onyx.merge(ONYXKEYS.SESSION, {accountID: currentUserAccountID, email: currentUserEmail});
+            await waitForBatchedUpdates();
+
+            await Promise.all([
+                Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, policyData),
+                Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${chatReport.reportID}`, chatReport),
+                Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport),
+                Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`, transaction),
+                Onyx.merge(transactionViolationsKey, transactionViolationsCollection[transactionViolationsKey]),
+            ]);
+            await waitForBatchedUpdates();
+
+            return {chatReport, expenseReportID, transactionViolationsCollection};
+        }
+
+        it('should return null for a processing (submitted) expense report whose only violation is a modifiedAmount VIOLATION', async () => {
+            const {chatReport, transactionViolationsCollection} = await setUpModifiedAmountViolationScenario(
+                'rbr-modified-amount-processing-violation',
+                824,
+                CONST.VIOLATION_TYPES.VIOLATION,
+                true,
+            );
+
+            const result = getViolatingReportIDForRBRInLHN(chatReport, transactionViolationsCollection);
+            expect(result).toBeNull();
+
+            await Onyx.clear();
+        });
+
+        it('should return null for a processing (submitted) expense report whose only violation is a modifiedAmount WARNING', async () => {
+            const {chatReport, transactionViolationsCollection} = await setUpModifiedAmountViolationScenario(
+                'rbr-modified-amount-processing-warning',
+                826,
+                CONST.VIOLATION_TYPES.WARNING,
+                true,
+            );
+
+            const result = getViolatingReportIDForRBRInLHN(chatReport, transactionViolationsCollection);
+            expect(result).toBeNull();
+
+            await Onyx.clear();
+        });
+
+        it('should still surface RBR for an open expense report whose only violation is a modifiedAmount VIOLATION', async () => {
+            const {chatReport, expenseReportID, transactionViolationsCollection} = await setUpModifiedAmountViolationScenario(
+                'rbr-modified-amount-open-violation',
+                828,
+                CONST.VIOLATION_TYPES.VIOLATION,
+                false,
+            );
+
+            const result = getViolatingReportIDForRBRInLHN(chatReport, transactionViolationsCollection);
+            expect(result).toBe(expenseReportID);
+
+            await Onyx.clear();
+        });
     });
 
     it('should surface a GBR for admin with held expenses requiring approval or payment and avoid showing an RBR', async () => {
