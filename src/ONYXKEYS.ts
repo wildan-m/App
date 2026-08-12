@@ -584,6 +584,10 @@ const ONYXKEYS = {
     // Stores last visited path
     LAST_VISITED_PATH: 'lastVisitedPath',
 
+    /** Last measured size of the local database in bytes (or 'unavailable' when it cannot be measured
+     *  reliably), persisted so telemetry can attach it to the startup span of the next session. */
+    LAST_DB_SIZE: 'lastDbSize',
+
     /** Map of reportID → DB-formatted timestamp for when the user last visited each report.
      *  Only consumed by `findLastAccessedReport` / `getMostRecentlyVisitedReport` for navigation fallbacks. */
     REPORT_LAST_VISIT_TIMES: 'reportLastVisitTimes',
@@ -1714,6 +1718,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS]: boolean;
     [ONYXKEYS.RAM_ONLY_IS_AUTHENTICATING_WITH_SHORT_LIVED_TOKEN]: boolean;
     [ONYXKEYS.LAST_VISITED_PATH]: string | undefined;
+    [ONYXKEYS.LAST_DB_SIZE]: number | string;
     [ONYXKEYS.REPORT_LAST_VISIT_TIMES]: OnyxTypes.ReportLastVisitTimes;
     [ONYXKEYS.RECENTLY_USED_REPORT_FIELDS]: OnyxTypes.RecentlyUsedReportFields;
     [ONYXKEYS.RAM_ONLY_UPDATE_REQUIRED]: boolean;

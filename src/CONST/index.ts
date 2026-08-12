@@ -2151,6 +2151,7 @@ const CONST = {
             POLICIES_COUNT: 'policies_count',
             REPORTS_COUNT: 'reports_count',
             PERSONAL_DETAILS_COUNT: 'personal_details_count',
+            TRANSACTIONS_COUNT: 'transactions_count',
             USER_ROLE: 'user_role',
             NUDGE_MIGRATION_COHORT: 'nudge_migration_cohort',
             AUTHENTICATION_FUNCTION: 'authentication_function',
@@ -2253,6 +2254,15 @@ const CONST = {
         ATTRIBUTE_MESSAGE_LENGTH: 'message_length',
         ATTRIBUTE_SEND_MESSAGE_SOURCE: 'send_message_source',
         ATTRIBUTE_REPORT_ACTION_COUNT: 'report_action_count',
+        // Account-size attributes stamped on every outgoing transaction and child span. Numeric (raw)
+        // values support range filters and aggregations in Sentry, unlike the bucketed string tags.
+        ATTRIBUTE_DB_SIZE_BYTES: 'db_size_bytes',
+        ATTRIBUTE_REPORTS_COUNT_RAW: 'reports_count_raw',
+        ATTRIBUTE_PERSONAL_DETAILS_COUNT_RAW: 'personal_details_count_raw',
+        ATTRIBUTE_POLICIES_COUNT_RAW: 'policies_count_raw',
+        ATTRIBUTE_TRANSACTIONS_COUNT_RAW: 'transactions_count_raw',
+        /** Reported as the db_size_bytes value when the database size cannot be measured reliably (non-Chromium web) */
+        DB_SIZE_UNAVAILABLE: 'unavailable',
         ATTRIBUTE_MONEY_REQUEST_PREVIEW_COUNT: 'money_request_preview_count',
         ATTRIBUTE_CANCELED: 'canceled',
         ATTRIBUTE_CANCELED_BY_SKELETON: 'canceled_by_skeleton',
@@ -2389,6 +2399,10 @@ const CONST = {
         },
         CONFIG: {
             MEMORY_TRACKING_INTERVAL: 2 * 60 * 1000,
+
+            // Data changes arrive in bursts (e.g. one Onyx update per report during reconnect), so
+            // database size re-measurement is debounced to at most one call per interval.
+            DB_SIZE_REMEASURE_DEBOUNCE_TIME: 30 * 1000,
 
             // Web Memory Thresholds (% of jsHeapSizeLimit)
             MEMORY_THRESHOLD_WEB_CRITICAL: 85,

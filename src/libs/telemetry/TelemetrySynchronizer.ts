@@ -15,7 +15,9 @@ import * as Sentry from '@sentry/react-native';
 import Onyx from 'react-native-onyx';
 
 import {cleanupCrashDiagnostics, initializeCrashDiagnostics} from './crashDiagnostics';
+import {initializeDatabaseSizeTelemetry, remeasureDatabaseSize} from './databaseSizeTelemetry';
 import {cleanupMemoryTracking, initializeMemoryTracking} from './sendMemoryContext';
+import {setSpanAttribute} from './spanAttributes';
 
 /**
  * Connect to Onyx to retrieve information about the user's active policies.
@@ -64,7 +66,10 @@ Onyx.connectWithoutView({
         if (!value) {
             return;
         }
-        sendReportsCountTag(Object.keys(value).length);
+        const reportsCount = Object.keys(value).length;
+        setSpanAttribute(CONST.TELEMETRY.ATTRIBUTE_REPORTS_COUNT_RAW, reportsCount);
+        sendReportsCountTag(reportsCount);
+        remeasureDatabaseSize();
     },
 });
 
@@ -74,7 +79,25 @@ Onyx.connectWithoutView({
         if (!value) {
             return;
         }
-        sendPersonalDetailsCountTag(Object.keys(value).length);
+        const personalDetailsCount = Object.keys(value).length;
+        setSpanAttribute(CONST.TELEMETRY.ATTRIBUTE_PERSONAL_DETAILS_COUNT_RAW, personalDetailsCount);
+        sendPersonalDetailsCountTag(personalDetailsCount);
+    },
+});
+
+// This connection powers the transactions_count Sentry tag and the transactions_count_raw span
+// attribute. Like the other connections in this file, it only forwards data to the external
+// telemetry provider and must stay outside the render loop, so useOnyx does not apply.
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.TRANSACTION,
+    callback: (value) => {
+        if (!value) {
+            return;
+        }
+        const transactionsCount = Object.keys(value).length;
+        setSpanAttribute(CONST.TELEMETRY.ATTRIBUTE_TRANSACTIONS_COUNT_RAW, transactionsCount);
+        sendTransactionsCountTag(transactionsCount);
+        remeasureDatabaseSize();
     },
 });
 
@@ -112,6 +135,30 @@ function bucketPolicyCount(count: number): string {
         return '501-1000';
     }
     return '1000+';
+}
+
+/**
+ * Buckets transaction count into cohorts for Sentry tagging. Labels carry an ordering prefix
+ * because Sentry sorts tag values alphabetically; borders are provisional and can be revised
+ * once the raw transactions_count_raw distribution has been collected.
+ */
+function bucketTransactionCount(count: number): string {
+    if (count <= 100) {
+        return '1_0-100';
+    }
+    if (count <= 1000) {
+        return '2_101-1000';
+    }
+    if (count <= 5000) {
+        return '3_1001-5000';
+    }
+    if (count <= 20000) {
+        return '4_5001-20000';
+    }
+    if (count <= 50000) {
+        return '5_20001-50000';
+    }
+    return '6_50000+';
 }
 
 /**
@@ -156,6 +203,7 @@ function sendPoliciesContext() {
         }
     }
 
+    setSpanAttribute(CONST.TELEMETRY.ATTRIBUTE_POLICIES_COUNT_RAW, activePolicies.length);
     const policiesCountBucket = bucketPolicyCount(activePolicies.length);
     Sentry.setTag(CONST.TELEMETRY.TAGS.ACTIVE_POLICY, activePolicyID);
     Sentry.setTag(CONST.TELEMETRY.TAGS.POLICIES_COUNT, policiesCountBucket);
@@ -181,9 +229,15 @@ function sendPersonalDetailsCountTag(personalDetailsCount: number) {
     Sentry.setTag(CONST.TELEMETRY.TAGS.PERSONAL_DETAILS_COUNT, personalDetailsCountBucket);
 }
 
+function sendTransactionsCountTag(transactionsCount: number) {
+    const transactionsCountBucket = bucketTransactionCount(transactionsCount);
+    Sentry.setTag(CONST.TELEMETRY.TAGS.TRANSACTIONS_COUNT, transactionsCountBucket);
+}
+
 function initializeTelemetryTrackers() {
     initializeMemoryTracking();
     initializeCrashDiagnostics();
+    initializeDatabaseSizeTelemetry();
 }
 
 function cleanupTelemetryTrackers() {
