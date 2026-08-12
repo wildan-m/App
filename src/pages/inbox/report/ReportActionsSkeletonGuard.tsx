@@ -40,6 +40,7 @@ function ReportActionsSkeletonGuard({reportID, children}: ReportActionsSkeletonG
         report,
         isConciergeMainDM,
         oldestUnreadReportAction,
+        newestExistingActionCreated,
         hasOnceLoadedReportActions,
         hasCachedReportActions,
         isMissingReportActions,
@@ -61,6 +62,7 @@ function ReportActionsSkeletonGuard({reportID, children}: ReportActionsSkeletonG
         oldestUnreadReportAction,
         hasOnceLoadedReportActions,
         hasCachedReportActions,
+        newestExistingActionCreated,
     });
 
     useMarkOpenReportEndOnSkeleton(report, shouldShowInitialSkeleton);

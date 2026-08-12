@@ -6,7 +6,7 @@ import type {ReportActionsReadinessSignals} from './useReportActionsListModel';
 
 import {useCurrentReportIDState} from './useCurrentReportID';
 
-type UseStartConciergeSessionParams = Pick<ReportActionsReadinessSignals, 'isConciergeMainDM' | 'oldestUnreadReportAction' | 'hasOnceLoadedReportActions'> & {
+type UseStartConciergeSessionParams = Pick<ReportActionsReadinessSignals, 'isConciergeMainDM' | 'oldestUnreadReportAction' | 'hasOnceLoadedReportActions' | 'newestExistingActionCreated'> & {
     /** The ID of the report to display actions for */
     reportID: string;
 
@@ -18,7 +18,14 @@ type UseStartConciergeSessionParams = Pick<ReportActionsReadinessSignals, 'isCon
  * Starts the Concierge main-DM session. Subscribes to currentReportID/startSession itself so the pipeline
  * doesn't carry them; currentReportID re-renders the guard but never the list.
  */
-function useStartConciergeSession({reportID, isConciergeMainDM, oldestUnreadReportAction, hasOnceLoadedReportActions, hasCachedReportActions}: UseStartConciergeSessionParams) {
+function useStartConciergeSession({
+    reportID,
+    isConciergeMainDM,
+    oldestUnreadReportAction,
+    hasOnceLoadedReportActions,
+    hasCachedReportActions,
+    newestExistingActionCreated,
+}: UseStartConciergeSessionParams) {
     const {currentReportID} = useCurrentReportIDState();
     const {startSession} = useConciergeSessionActions();
 
@@ -40,8 +47,12 @@ function useStartConciergeSession({reportID, isConciergeMainDM, oldestUnreadRepo
         // bumps to `now` when the report opens. Re-runs when oldestUnreadReportAction
         // resolves so a session that locked to `now` before the anchor loaded is
         // pulled back to keep the unread message visible.
-        startSession(oldestUnreadReportAction?.created);
-    }, [isConciergeMainDM, startSession, canStartConciergeSession, oldestUnreadReportAction?.created]);
+        //
+        // newestExistingActionCreated floors a brand-new boundary so the history already in the report is
+        // never classified as part of this session when the session's server-anchored time resolves behind
+        // the timestamps that history was stamped with.
+        startSession(oldestUnreadReportAction?.created, newestExistingActionCreated);
+    }, [isConciergeMainDM, startSession, canStartConciergeSession, oldestUnreadReportAction?.created, newestExistingActionCreated]);
 
     // On native the component stays mounted in the navigation stack, so the
     // effect above never re-fires (its isConciergeMainDM dep is always true).
@@ -51,8 +62,8 @@ function useStartConciergeSession({reportID, isConciergeMainDM, oldestUnreadRepo
         if (!isConciergeMainDM || !canStartConciergeSession || currentReportID !== reportID) {
             return;
         }
-        startSession(oldestUnreadReportAction?.created);
-    }, [currentReportID, reportID, isConciergeMainDM, canStartConciergeSession, startSession, oldestUnreadReportAction?.created]);
+        startSession(oldestUnreadReportAction?.created, newestExistingActionCreated);
+    }, [currentReportID, reportID, isConciergeMainDM, canStartConciergeSession, startSession, oldestUnreadReportAction?.created, newestExistingActionCreated]);
 }
 
 export default useStartConciergeSession;

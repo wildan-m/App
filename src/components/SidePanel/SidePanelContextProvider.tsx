@@ -5,6 +5,7 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 
 import SidePanelActions from '@libs/actions/SidePanel';
 import focusComposerWithDelay from '@libs/focusComposerWithDelay';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getServerAnchoredDBTime} from '@libs/NetworkState';
 import {canEditWorkspaceSettings, shouldShowPolicy} from '@libs/PolicyUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
@@ -13,7 +14,8 @@ import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {emailSelector} from '@src/selectors/Session';
+import {newestNonPendingActionCreatedSelector} from '@src/selectors/ReportAction';
+import {accountIDSelector, emailSelector} from '@src/selectors/Session';
 import type {SidePanel} from '@src/types/onyx';
 
 import type {PropsWithChildren, RefObject} from 'react';
@@ -93,6 +95,15 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
 
     const reportID = !sidePanelNVP?.forceConcierge && (isRHPAdminsRoom || isRHPHomePage) && isUserAdmin && isPolicyActive && adminsChatReportID ? adminsChatReportID : conciergeReportID;
 
+    // Floor for a brand-new session boundary: the newest action already in the chat the panel shows, excluding
+    // the current user's optimistic sends. The boundary is server-anchored while history keeps the timestamps
+    // the client stamped when it was sent, so without this floor a stale or inaccurate skew estimate can place
+    // the boundary before recent history and make that history render as part of this session.
+    const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
+    const [newestExistingActionCreated] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(reportID)}`, {
+        selector: newestNonPendingActionCreatedSelector(currentUserAccountID),
+    });
+
     const onCloseCompleteRef = useRef<(() => void) | undefined>(undefined);
     const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
     const [prevShouldHideSidePanel, setPrevShouldHideSidePanel] = useState(shouldHideSidePanel);
@@ -102,7 +113,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         if (shouldHideSidePanel) {
             setSessionStartTime(null);
         } else if (!sessionStartTime) {
-            setSessionStartTime(getServerAnchoredDBTime());
+            setSessionStartTime(getServerAnchoredDBTime('', newestExistingActionCreated));
         }
     }
 
@@ -149,7 +160,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     };
 
     const openSidePanel = (options?: {forceConcierge?: boolean}) => {
-        setSessionStartTime(getServerAnchoredDBTime());
+        setSessionStartTime(getServerAnchoredDBTime('', newestExistingActionCreated));
         SidePanelActions.openSidePanel(!isExtraLargeScreenWidth, options?.forceConcierge);
     };
 

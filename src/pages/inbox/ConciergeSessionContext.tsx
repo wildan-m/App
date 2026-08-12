@@ -16,7 +16,7 @@ type ConciergeSessionStateContextType = {
 };
 
 type ConciergeSessionActionsContextType = {
-    startSession: (unreadBoundary?: string | null) => void;
+    startSession: (unreadBoundary?: string | null, newestExistingActionCreated?: string) => void;
     setShowFullHistory: (show: boolean) => void;
     setHadMessagesAtSessionStart: (value: boolean) => void;
 };
@@ -73,7 +73,7 @@ function ConciergeSessionProvider({children}: PropsWithChildren) {
         }
     }
 
-    const startSession = useCallback((unreadBoundary?: string | null) => {
+    const startSession = useCallback((unreadBoundary?: string | null, newestExistingActionCreated?: string) => {
         let sessionExpired = false;
         setSessionStartTime((prev) => {
             if (prev && sessionCreatedAtRef.current) {
@@ -93,7 +93,13 @@ function ConciergeSessionProvider({children}: PropsWithChildren) {
                 sessionExpired = true;
             }
             sessionCreatedAtRef.current = Date.now();
-            const now = getServerAnchoredDBTime();
+            // Clamp a brand-new boundary past the newest action already in the report so everything that
+            // existed when the session started stays pre-session history. The boundary is server-anchored
+            // while history keeps the timestamps the client stamped when it was sent, so a stale or
+            // inaccurate skew estimate can otherwise place the new boundary before recent history and
+            // classify it as part of this session. The unread branch below is deliberately left unclamped:
+            // it reaches back on purpose so unread messages stay visible.
+            const now = getServerAnchoredDBTime('', newestExistingActionCreated);
             if (unreadBoundary && unreadBoundary < now) {
                 return unreadBoundary;
             }

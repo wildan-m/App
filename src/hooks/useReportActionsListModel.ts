@@ -1,4 +1,5 @@
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import {getNewestNonPendingActionCreated} from '@libs/ReportActionsUtils';
 import {canUserPerformWriteAction, isReportTransactionThread as isReportTransactionThreadUtil, shouldReportAlignToTop} from '@libs/ReportUtils';
 
 import type {ReportsSplitNavigatorParamList} from '@navigation/types';
@@ -8,6 +9,7 @@ import {useConciergeSessionActions, useConciergeSessionState} from '@pages/inbox
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 import {reportActionsListLoadingStateSelector} from '@src/selectors/ReportMetaData';
+import {accountIDSelector} from '@src/selectors/Session';
 
 import {useRoute} from '@react-navigation/native';
 
@@ -104,6 +106,11 @@ function useReportActionsListModel(reportID: string, isReportLoadPending: boolea
         setConciergeHadMessagesAtSessionStart,
     });
 
+    // Floor for a brand-new Concierge session boundary: the newest action already in the report, excluding
+    // the current user's optimistic sends so a question asked as the session starts stays in the session.
+    const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
+    const newestExistingActionCreated = isConciergeMainDM ? getNewestNonPendingActionCreated(allReportActions, currentUserAccountID) : undefined;
+
     const isMissingReportActions = sortedVisibleReportActions.length === 0;
     const isSingleExpenseReport = reportPreviewAction?.childMoneyRequestCount === 1;
     // allReportActions excludes the synthetic CREATED action always injected for Concierge, so this is
@@ -132,6 +139,7 @@ function useReportActionsListModel(reportID: string, isReportLoadPending: boolea
         hasOlderActions,
         hasNewerActions,
         oldestUnreadReportAction,
+        newestExistingActionCreated,
         isSingleExpenseReport,
         isMissingReportActions,
         isConciergeHiddenHistory,

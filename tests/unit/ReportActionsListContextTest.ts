@@ -47,6 +47,7 @@ function createReadinessSignals(overrides: Partial<ReportActionsReadinessSignals
         hasOlderActions: false,
         hasNewerActions: false,
         oldestUnreadReportAction: undefined,
+        newestExistingActionCreated: undefined,
         isSingleExpenseReport: false,
         isMissingReportActions: true,
         isConciergeHiddenHistory: false,

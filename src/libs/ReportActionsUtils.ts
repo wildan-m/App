@@ -195,6 +195,23 @@ function isCurrentUserPendingAddAction(reportAction: OnyxInputOrEntry<ReportActi
     return !!currentUserAccountID && reportAction?.actorAccountID === currentUserAccountID && reportAction?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
 }
 
+/**
+ * The `created` of the newest action already in the report, ignoring the synthetic CREATED action and the
+ * current user's optimistic sends. Used as a forward floor for a brand-new Concierge session boundary so that
+ * everything that already existed when the session started is classified as pre-session history, regardless of
+ * how accurate the network time skew estimate behind the boundary is. The current user's pending sends are
+ * excluded so a question asked in the same instant the session starts stays part of the session.
+ */
+function getNewestNonPendingActionCreated(reportActions: ReportAction[] | OnyxEntry<ReportActions>, currentUserAccountID?: number): string | undefined {
+    const actions = Array.isArray(reportActions) ? reportActions : Object.values(reportActions ?? {});
+    return actions.reduce<string | undefined>((newestCreated, action) => {
+        if (!action || isCreatedAction(action) || isCurrentUserPendingAddAction(action, currentUserAccountID)) {
+            return newestCreated;
+        }
+        return !newestCreated || action.created > newestCreated ? action.created : newestCreated;
+    }, undefined);
+}
+
 function isDeletedAction(reportAction: OnyxInputOrEntry<ReportAction | OptimisticIOUReportAction>): boolean {
     if (isInviteOrRemovedAction(reportAction) || isActionableMentionWhisper(reportAction) || isActionableCardFraudAlert(reportAction)) {
         return false;
@@ -4893,6 +4910,7 @@ export {
     getUpdateRoomDescriptionFragment,
     getReportActionMessageFragments,
     getMessageOfOldDotReportAction,
+    getNewestNonPendingActionCreated,
     getNumberOfMoneyRequests,
     getOneTransactionThreadReportAction,
     getOneTransactionThreadReportID,

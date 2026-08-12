@@ -1,4 +1,4 @@
-import {filterOutDeprecatedReportActions, getLinkedTransactionID, getSortedReportActions, isActionOfType} from '@libs/ReportActionsUtils';
+import {filterOutDeprecatedReportActions, getLinkedTransactionID, getNewestNonPendingActionCreated, getSortedReportActions, isActionOfType} from '@libs/ReportActionsUtils';
 
 import CONST from '@src/CONST';
 import type {ReportAction, ReportActions} from '@src/types/onyx';
@@ -17,6 +17,13 @@ type NewestReportAction = Pick<ReportAction, 'reportActionID' | 'actorAccountID'
  */
 const reportVisibleActionsSelector = (reportID: string | undefined) => (data: VisibleReportActionsDerivedValue | undefined) =>
     reportID && data?.[reportID] ? {[reportID]: data[reportID]} : undefined;
+
+/**
+ * Narrows a report's actions down to the `created` of the newest one already in the report, so a consumer that
+ * only needs that floor (the Concierge session boundary) doesn't re-render on every unrelated action change.
+ */
+const newestNonPendingActionCreatedSelector = (currentUserAccountID: number | undefined) => (reportActions: OnyxEntry<ReportActions>) =>
+    getNewestNonPendingActionCreated(reportActions, currentUserAccountID);
 
 function getParentReportActionSelector(parentReportActions: OnyxEntry<ReportActions>, parentReportActionID?: string): OnyxEntry<ReportAction> {
     if (!parentReportActions || !parentReportActionID) {
@@ -129,6 +136,7 @@ export {
     getParentReportActionSelector,
     getLastClosedReportAction,
     getNewestReportActionSelector,
+    newestNonPendingActionCreatedSelector,
     getReportActionByIDSelector,
     getReceiptScanFailedIOUActionDataSelector,
     reportVisibleActionsSelector,
