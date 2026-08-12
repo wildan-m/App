@@ -17,6 +17,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import React from 'react';
 import {Platform} from 'react-native';
 
+import BetaOverridesTestToolRow from './BetaOverridesTestToolRow';
 import BiometricsTestToolRow from './BiometricsTestToolRow';
 import Button from './Button';
 import SoftKillTestToolRow from './SoftKillTestToolRow';
@@ -109,6 +110,9 @@ function TestToolMenu() {
                             onPress={clearLHNCache}
                         />
                     </TestToolRow>
+
+                    {/* Force betas on or off locally, overriding the backend-provided betas. */}
+                    <BetaOverridesTestToolRow />
 
                     {/* Allows testing and revoking biometric multifactor authentication */}
                     {isAgentAccount === false && <BiometricsTestToolRow />}

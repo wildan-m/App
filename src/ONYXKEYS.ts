@@ -609,6 +609,9 @@ const ONYXKEYS = {
     /** Indicates whether the debug mode is currently enabled */
     IS_DEBUG_MODE_ENABLED: 'isDebugModeEnabled',
 
+    /** Local dev/staging-only per-beta overrides set from the Test Tool Menu. A beta present in the map is forced on/off regardless of the backend-provided betas */
+    BETAS_OVERRIDE: 'betasOverride',
+
     /** Indicates whether the git branch name should be shown in the browser tab title */
     SHOULD_SHOW_BRANCH_NAME_IN_TITLE: 'shouldShowBranchNameInTitle',
 
@@ -1591,6 +1594,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.USER_METADATA]: OnyxTypes.UserMetadata;
     [ONYXKEYS.STASHED_SESSION]: OnyxTypes.Session;
     [ONYXKEYS.BETAS]: OnyxTypes.Beta[];
+    [ONYXKEYS.BETAS_OVERRIDE]: Partial<Record<OnyxTypes.Beta, boolean>>;
     [ONYXKEYS.AGENT_RULE_SUGGESTIONS]: OnyxTypes.SuggestedAgentRule[];
     [ONYXKEYS.AGENT_TEMPLATES]: OnyxTypes.SuggestedAgent[];
     [ONYXKEYS.BETA_CONFIGURATION]: OnyxTypes.BetaConfiguration;

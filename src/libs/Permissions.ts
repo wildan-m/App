@@ -1,8 +1,22 @@
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type Beta from '@src/types/onyx/Beta';
 import type BetaConfiguration from '@src/types/onyx/BetaConfiguration';
 
 import type {OnyxEntry} from 'react-native-onyx';
+
+import Onyx from 'react-native-onyx';
+
+// Local dev/staging-only per-beta overrides set from the Test Tool Menu's Beta Overrides tool.
+// We use `connectWithoutView` because this is non-render logic and the override must apply to every
+// beta check in the app — threading it as a parameter through every call site is not practical.
+let betasOverride: OnyxEntry<Partial<Record<Beta, boolean>>>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.BETAS_OVERRIDE,
+    callback: (value) => {
+        betasOverride = value;
+    },
+});
 
 // eslint-disable-next-line rulesdir/no-beta-handler
 function canUseAllBetas(betas: OnyxEntry<Beta[]>): boolean {
@@ -17,6 +31,12 @@ function canUseLinkPreviews(): boolean {
 }
 
 function isBetaEnabled(beta: Beta, betas: OnyxEntry<Beta[]>, betaConfiguration?: OnyxEntry<BetaConfiguration>): boolean {
+    // A local override set from the Test Tool Menu always wins over whatever the backend provided
+    const override = betasOverride?.[beta];
+    if (override !== undefined) {
+        return override;
+    }
+
     const hasAllBetasEnabled = canUseAllBetas(betas);
     const isFeatureEnabled = !!betas?.includes(beta);
 

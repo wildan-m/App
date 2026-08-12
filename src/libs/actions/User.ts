@@ -49,6 +49,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {ExpenseRuleForm, FlagForReviewRuleForm, MerchantRuleForm, MerchantTypeRuleForm, RequireFieldsRuleForm, SpendRuleForm} from '@src/types/form';
 import type {AppReview, BlockedFromConcierge, CustomStatusDraft, ExpenseRule, NewLogin, ReportAttributesDerivedValue} from '@src/types/onyx';
+import type Beta from '@src/types/onyx/Beta';
 import type Login from '@src/types/onyx/Login';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {AnyOnyxServerUpdate, OnyxServerUpdate, OnyxUpdateEvent} from '@src/types/onyx/OnyxUpdatesFromServer';
@@ -1417,6 +1418,33 @@ function setIsDebugModeEnabled(isDebugModeEnabled: boolean) {
     Onyx.set(ONYXKEYS.IS_DEBUG_MODE_ENABLED, isDebugModeEnabled);
 }
 
+/**
+ * Re-broadcast the unchanged betas value so every mounted subscriber re-renders and re-evaluates its
+ * beta gates through the updated overrides. Onyx would otherwise skip the notification because the
+ * betas value itself did not change.
+ */
+function rebroadcastBetas(betas: OnyxEntry<Beta[]>) {
+    if (!betas) {
+        return;
+    }
+    Onyx.set(ONYXKEYS.BETAS, betas, {skipCacheCheck: true});
+}
+
+/**
+ * Force a beta on or off locally from the Test Tool Menu's Beta Overrides tool, regardless of the
+ * backend-provided betas. The current betas are passed in so subscribers can be re-notified.
+ */
+function setBetaOverride(beta: Beta, value: boolean, betas: OnyxEntry<Beta[]>) {
+    Onyx.merge(ONYXKEYS.BETAS_OVERRIDE, {[beta]: value}).then(() => rebroadcastBetas(betas));
+}
+
+/**
+ * Clear all local beta overrides so every beta falls back to the backend-provided state.
+ */
+function clearBetaOverrides(betas: OnyxEntry<Beta[]>) {
+    Onyx.set(ONYXKEYS.BETAS_OVERRIDE, null).then(() => rebroadcastBetas(betas));
+}
+
 function setShouldShowBranchNameInTitle(value: boolean) {
     Onyx.set(ONYXKEYS.SHOULD_SHOW_BRANCH_NAME_IN_TITLE, value);
 }
@@ -2043,6 +2071,8 @@ export {
     clearValidateCodeActionError,
     setIsDebugModeEnabled,
     setShouldShowBranchNameInTitle,
+    setBetaOverride,
+    clearBetaOverrides,
     lockAccount,
     requestUnlockAccount,
     respondToProactiveAppReview,
