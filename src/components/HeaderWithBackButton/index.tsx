@@ -63,7 +63,7 @@ function HeaderWithBackButton({
     shouldSetModalVisibility = true,
     shouldShowThreeDotsButton = false,
     shouldDisableThreeDotsButton = false,
-    shouldUseHeadlineHeader = false,
+    shouldUseHeadlineHeader = true,
     stepCounter,
     subtitle = '',
     title = '',
@@ -224,7 +224,6 @@ function HeaderWithBackButton({
         <View
             style={[
                 styles.headerBar,
-                shouldUseHeadlineHeader && styles.headerBarHeight,
                 shouldShowBorderBottom && styles.borderBottom,
                 // progressBarPercentage can be 0 which would
                 // be falsy, hence using !== undefined explicitly

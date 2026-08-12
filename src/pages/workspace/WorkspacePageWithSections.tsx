@@ -25,7 +25,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import type {Policy} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import type IconAsset from '@src/types/utils/IconAsset';
 
 import type {ReactNode} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -78,13 +77,6 @@ type WorkspacePageWithSectionsProps = WithPolicyAndFullscreenLoadingProps &
         /** Policy values needed in the component */
         policy: OnyxEntry<Policy>;
 
-        /**
-         * Icon displayed on the left of the title.
-         * If it is passed, the new styling is applied to the component:
-         * taller header on desktop and different font of the title.
-         * */
-        icon?: IconAsset;
-
         /** Content to be added to the header */
         headerContent?: ReactNode;
 
@@ -121,7 +113,6 @@ function WorkspacePageWithSections({
     backButtonRoute,
     children = () => null,
     footer = null,
-    icon = undefined,
     headerText,
     policy,
     policyDraft,
@@ -142,7 +133,7 @@ function WorkspacePageWithSections({
     onBackButtonPress,
     shouldShowThreeDotsButton,
     threeDotsMenuItems,
-    shouldUseHeadlineHeader = true,
+    shouldUseHeadlineHeader,
     addBottomSafeAreaPadding = false,
     modals,
 }: WorkspacePageWithSectionsProps) {
@@ -250,7 +241,6 @@ function WorkspacePageWithSections({
                     title={headerText}
                     onBackButtonPress={handleOnBackButtonPress}
                     shouldShowBackButton={shouldUseNarrowLayout || shouldShowBackButton}
-                    icon={icon ?? undefined}
                     shouldShowThreeDotsButton={shouldShowThreeDotsButton}
                     threeDotsMenuItems={threeDotsMenuItems}
                     shouldUseHeadlineHeader={shouldUseHeadlineHeader}
