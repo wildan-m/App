@@ -1986,7 +1986,8 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
                 break;
             case CONST.SEARCH.TABLE_COLUMNS.DATE:
                 columnWidth = {
-                    ...getWidthStyle(isDateColumnWide ? variables.w102 : variables.w62),
+                    // The narrow width fits the "Created" header alongside the sort caret, which needs a little more room than a current-year date.
+                    ...getWidthStyle(isDateColumnWide ? variables.w102 : variables.w72),
                 };
                 break;
             case CONST.SEARCH.TABLE_COLUMNS.WITHDRAWN:
