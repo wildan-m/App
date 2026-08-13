@@ -481,6 +481,8 @@ const translations: TranslationDeepObject<typeof en> = {
         commuter: 'viajero diario',
         noResultsFoundSubtitle: 'Sin resultados. Intenta ajustar tus filtros o la búsqueda.',
         exportsTo: 'Exporta a',
+        created: 'Creado',
+        createdDate: 'Fecha de creación',
     },
     socials: {
         podcast: 'Síguenos en Podcast',

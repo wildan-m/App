@@ -493,6 +493,8 @@ const translations: TranslationDeepObject<typeof en> = {
         webGLNotSupported: '您的浏览器不支持 WebGL。请启用该功能或更换浏览器。',
         apiKey: 'API 密钥',
         exportsTo: '导出到',
+        created: '创建日期',
+        createdDate: '创建日期',
     },
     socials: {
         podcast: '在播客上关注我们',

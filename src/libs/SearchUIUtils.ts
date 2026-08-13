@@ -4492,7 +4492,7 @@ function getSearchColumnTranslationKey(column: SearchSortBy): TranslationPaths {
         case CONST.SEARCH.TABLE_COLUMNS.AVATAR:
             return 'common.avatar';
         case CONST.SEARCH.TABLE_COLUMNS.DATE:
-            return 'common.date';
+            return 'common.created';
         case CONST.SEARCH.TABLE_COLUMNS.SUBMITTED:
             return 'common.submitted';
         case CONST.SEARCH.TABLE_COLUMNS.APPROVED:
@@ -5446,7 +5446,7 @@ const FILTER_VIEW_MAP = {
         icon: 'Coins',
     },
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE]: {
-        labelKey: 'common.date',
+        labelKey: 'common.createdDate',
         icon: 'CalendarSolid',
     },
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.APPROVED]: {

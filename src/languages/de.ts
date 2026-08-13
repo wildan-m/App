@@ -498,6 +498,8 @@ const translations: TranslationDeepObject<typeof en> = {
         webGLNotSupported: 'Ihr Browser unterstützt WebGL nicht. Bitte aktivieren Sie es oder wechseln Sie den Browser.',
         apiKey: 'API-Schlüssel',
         exportsTo: 'Exportiert nach',
+        created: 'Erstellt',
+        createdDate: 'Erstellungsdatum',
     },
     socials: {
         podcast: 'Folgen Sie uns auf Podcast',

@@ -497,6 +497,8 @@ const translations: TranslationDeepObject<typeof en> = {
         webGLNotSupported: 'Twoja przeglądarka nie obsługuje WebGL. Włącz ją albo zmień przeglądarkę.',
         apiKey: 'Klucz API',
         exportsTo: 'Eksporty do',
+        created: 'Data utworzenia',
+        createdDate: 'Data utworzenia',
     },
     socials: {
         podcast: 'Śledź nas na Podcast',

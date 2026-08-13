@@ -166,6 +166,10 @@ const translations = {
         here: 'here',
         avatar: 'Avatar',
         date: 'Date',
+        // @context Column header on the search results table for the date an expense, report or task was created. Keep it short — it labels a table column.
+        created: 'Created',
+        // @context Name of the search filter that narrows results by the date an expense, report or task was created.
+        createdDate: 'Created date',
         dob: 'Date of birth',
         currentYear: 'Current year',
         currentMonth: 'Current month',

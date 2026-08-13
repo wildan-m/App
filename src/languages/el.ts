@@ -497,6 +497,8 @@ const translations: TranslationDeepObject<typeof en> = {
         dialogOpened: 'διάλογος',
         downloadReceipts: 'Λήψη αποδείξεων',
         commuter: 'επιβάτης καθημερινών μετακινήσεων',
+        created: 'Ημ/νία δημιουργίας',
+        createdDate: 'Ημερομηνία δημιουργίας',
     },
     socials: {
         podcast: 'Ακολουθήστε μας στο Podcast',
