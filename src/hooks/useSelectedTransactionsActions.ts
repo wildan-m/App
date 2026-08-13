@@ -394,6 +394,10 @@ function useSelectedTransactionsActions({
             // If we've selected all the transactions on the report, we can also provide the report level export option
             const includeReportLevelExport = allTransactionsLength === selectedTransactionIDs.length;
 
+            // The Canadian Multiple Tax Export is offered when the workspace outputs in CAD, but the policy is no longer available once the workspace is deleted and its chat archived.
+            // The expense report keeps the workspace output currency in its own currency field, so fall back to it when there's no policy currency to read.
+            const includeMultipleTaxExport = policy?.outputCurrency ? policy.outputCurrency === CONST.CURRENCY.CAD : report?.currency === CONST.CURRENCY.CAD;
+
             // The export templates available to the user, pre-grouped and sorted alphabetically. The basic export is part of the default group so it's sorted alongside the other default templates.
             const {customTemplates, defaultTemplates} = getExportTemplates(
                 integrationsExportTemplates ?? [],
@@ -403,6 +407,7 @@ function useSelectedTransactionsActions({
                 policy,
                 includeReportLevelExport,
                 true,
+                includeMultipleTaxExport,
             );
             // Builds a single export sub-menu item for a template. `isDefaultTemplate` picks the icon and `addSeparatorBefore` draws the divider at the top of each group.
             const buildExportOption = (template: ExportTemplate, isDefaultTemplate: boolean, addSeparatorBefore: boolean): PopoverMenuItem => {

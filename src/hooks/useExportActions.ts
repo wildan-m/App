@@ -64,8 +64,20 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
 
     const connectedIntegration = getValidConnectedIntegration(policy);
     const connectedIntegrationFallback = getConnectedIntegration(policy);
+    // The Canadian Multiple Tax Export is offered when the workspace outputs in CAD, but the policy is no longer available once the workspace is deleted and its chat archived.
+    // The expense report keeps the workspace output currency in its own currency field, so fall back to it when there's no policy currency to read.
+    const includeMultipleTaxExport = policy?.outputCurrency ? policy.outputCurrency === CONST.CURRENCY.CAD : moneyRequestReport?.currency === CONST.CURRENCY.CAD;
     // The export templates available to the user, pre-grouped and sorted alphabetically. The basic export is part of the default group so it's sorted alongside the other default templates.
-    const {customTemplates, defaultTemplates} = getExportTemplates(integrationsExportTemplates ?? [], csvExportLayouts ?? {}, translate, localeCompare, policy, true, true);
+    const {customTemplates, defaultTemplates} = getExportTemplates(
+        integrationsExportTemplates ?? [],
+        csvExportLayouts ?? {},
+        translate,
+        localeCompare,
+        policy,
+        true,
+        true,
+        includeMultipleTaxExport,
+    );
     const isExported = isExportedUtils(reportActions, moneyRequestReport);
 
     const {showDecisionModal} = useDecisionModal();
