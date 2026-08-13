@@ -4,15 +4,36 @@ import {addressFromGpsPoint, coordinatesToString, getGpsPoints, getTotalGpsTripP
 import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {GpsDraftDetails} from '@src/types/onyx';
 import type {GPSPoint} from '@src/types/onyx/GpsDraftDetails';
 
 import type {LocationObject} from 'expo-location';
+import type {OnyxEntry} from 'react-native-onyx';
 
 import NetInfo from '@react-native-community/netinfo';
 import {defineTask} from 'expo-task-manager';
-import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
+import Onyx from 'react-native-onyx';
 
 type BackgroundLocationTrackingTaskData = {locations: LocationObject[]};
+
+/**
+ * Reads the current GPS draft details with a short-lived connection.
+ *
+ * `useOnyx` can't be used here: this module is a headless background task registered via `defineTask`,
+ * so it runs outside React (including in the Android headless JS context). The connection is torn down
+ * as soon as the first value arrives, making this a one-shot read rather than a lasting subscription.
+ */
+function getGpsDraftDetails(): Promise<OnyxEntry<GpsDraftDetails>> {
+    return new Promise((resolve) => {
+        const connection = Onyx.connectWithoutView({
+            key: ONYXKEYS.GPS_DRAFT_DETAILS,
+            callback: (gpsDraftDetails) => {
+                Onyx.disconnect(connection);
+                resolve(gpsDraftDetails);
+            },
+        });
+    });
+}
 
 defineTask<BackgroundLocationTrackingTaskData>(BACKGROUND_LOCATION_TRACKING_TASK_NAME, async ({data, error}) => {
     if (error) {
@@ -23,7 +44,7 @@ defineTask<BackgroundLocationTrackingTaskData>(BACKGROUND_LOCATION_TRACKING_TASK
     // Use NetInfo.fetch() instead of the in-memory NetworkState.isOffline() because this
     // background task may run in a headless JS context (Android) where module-level state
     // in NetworkState.ts hasn't been populated via Onyx/NetInfo subscribers.
-    const [gpsDraftDetailsPromiseResult, netInfoState] = await Promise.all([OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS).catch(() => undefined), NetInfo.fetch()]);
+    const [gpsDraftDetailsPromiseResult, netInfoState] = await Promise.all([getGpsDraftDetails().catch(() => undefined), NetInfo.fetch()]);
     const gpsDraftDetails = gpsDraftDetailsPromiseResult ?? undefined;
     if (!gpsDraftDetails) {
         return;
@@ -58,7 +79,7 @@ async function updateStartAddress(gpsPoints: GPSPoint[][], isOffline: boolean) {
         const address = await addressFromGpsPoint({lat: startPoint.lat, long: startPoint.long});
 
         // To avoid race conditions, we need to get the latest gpsDraftDetails, because reverse geocoding may even take a few seconds
-        const gpsDraftDetailsPromiseResult = await OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS).catch(() => undefined);
+        const gpsDraftDetailsPromiseResult = await getGpsDraftDetails().catch(() => undefined);
         const updatedGpsDraftDetails = gpsDraftDetailsPromiseResult ?? undefined;
         const updatedGpsPoints = updatedGpsDraftDetails ? getGpsPoints(updatedGpsDraftDetails) : gpsPoints;
 
