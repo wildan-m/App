@@ -15,11 +15,16 @@ type UseDebounceOptions = DebounceSettings & {
     shouldExecuteOnUnmount?: boolean;
 };
 
+type DebouncedCallback<T extends GenericFunction> = T & {
+    /** Cancel the pending trailing invocation, if there is one. */
+    cancel: () => void;
+};
+
 /**
  * Non-generic implementation so OXC's React Compiler can memoize the hook.
  * OXC bails on type params inside hooks ("Unsupported declaration type for hoisting").
  */
-function useDebounceImpl(func: GenericFunction, wait: number, options?: UseDebounceOptions): GenericFunction {
+function useDebounceImpl(func: GenericFunction, wait: number, options?: UseDebounceOptions): DebouncedCallback<GenericFunction> {
     const debouncedFnRef = useRef<DebouncedFunc<GenericFunction> | undefined>(undefined);
     const {leading, maxWait, trailing = true, shouldExecuteOnUnmount = false} = options ?? {};
 
@@ -44,13 +49,19 @@ function useDebounceImpl(func: GenericFunction, wait: number, options?: UseDebou
         };
     }, [func, wait, leading, maxWait, trailing]);
 
-    return (...args: unknown[]) => {
+    const callDebouncedFn = (...args: unknown[]) => {
         const debouncedFn = debouncedFnRef.current;
 
         if (debouncedFn) {
             debouncedFn(...args);
         }
     };
+
+    callDebouncedFn.cancel = () => {
+        debouncedFnRef.current?.cancel();
+    };
+
+    return callDebouncedFn;
 }
 
 /**
@@ -66,10 +77,10 @@ function useDebounceImpl(func: GenericFunction, wait: number, options?: UseDebou
  * @param options.maxWait The maximum time func is allowed to be delayed before it's invoked.
  * @param options.trailing Specify invoking on the trailing edge of the timeout.
  * @param options.shouldExecuteOnUnmount When true, flush pending invocations on unmount instead of cancelling them.
- * @returns Returns a function to call the debounced function.
+ * @returns Returns a function to call the debounced function. It also exposes `cancel` to drop a pending invocation on demand.
  */
-export default function useDebounce<T extends GenericFunction>(func: T, wait: number, options?: UseDebounceOptions): T {
-    return useDebounceImpl(func, wait, options) as T;
+export default function useDebounce<T extends GenericFunction>(func: T, wait: number, options?: UseDebounceOptions): DebouncedCallback<T> {
+    return useDebounceImpl(func, wait, options) as DebouncedCallback<T>;
 }
 
-export type {UseDebounceOptions};
+export type {DebouncedCallback, UseDebounceOptions};

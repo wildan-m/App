@@ -30,7 +30,7 @@ type UseEditMessageProps = {
     /** The debounced comment max length validation */
     debouncedCommentMaxLengthValidation: DebouncedFuncLeading<(value: string) => boolean>;
     /** The ref to the composer */
-    composerRef: React.RefObject<ComposerRef | null>;
+    composerRef: React.RefObject<(ComposerRef & {cancelPendingDraftSave?: () => void}) | null>;
 };
 
 /**
@@ -51,6 +51,11 @@ function useEditMessage({reportID, originalReportID, reportAction, shouldScrollT
         if (!reportAction) {
             return;
         }
+
+        // When the message is edited in the main composer (narrow layout) the composer is not unmounted once the edit
+        // ends, so a debounced draft save can still be pending. Drop it before clearing, otherwise it lands after the
+        // clear and puts the edited text back into the drafts, which drags the composer back into edit mode.
+        composerRef.current?.cancelPendingDraftSave?.();
 
         stopEditing();
 

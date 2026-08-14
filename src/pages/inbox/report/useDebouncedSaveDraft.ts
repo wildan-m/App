@@ -8,6 +8,7 @@ import {useRef} from 'react';
 
 type UseDebouncedSaveDraftResult = {
     saveDraft: (...args: unknown[]) => void;
+    cancelSaveDraft: () => void;
     isSavePending: RefObject<boolean>;
 };
 
@@ -32,8 +33,14 @@ function useDebouncedSaveDraftImpl(saveDraftFn: (...args: unknown[]) => void, wa
         debouncedSaveDraft(...args);
     };
 
+    const cancelSaveDraft = () => {
+        debouncedSaveDraft.cancel();
+        isSavePending.current = false;
+    };
+
     return {
         saveDraft,
+        cancelSaveDraft,
         isSavePending,
     };
 }
@@ -43,14 +50,16 @@ function useDebouncedSaveDraftImpl(saveDraftFn: (...args: unknown[]) => void, wa
  * @param saveDraft - The function to save the draft. It will be called with the arguments passed to the triggerSaveDraft function.
  * @param wait - The number of milliseconds to delay.
  * @param shouldExecuteOnUnmount - Whether to execute the save draft function on unmount.
- * @returns An object containing the debounced save draft function, the trigger save draft function, and the is save pending ref.
+ * @returns An object containing the debounced save draft function, the cancel function, and the is save pending ref.
  * @property {Function} debouncedSaveDraft - The debounced save draft function.
  * @property {Function} triggerSaveDraft - The trigger save draft function.
+ * @property {Function} cancelSaveDraft - Drops a pending debounced save, e.g. when the draft it would write has already been discarded.
  * @property {Ref<boolean>} isSavePending - The ref to check whether the save is pending.
  */
 function useDebouncedSaveDraft<SaveDraftArgs extends unknown[]>(saveDraftFn: (...args: SaveDraftArgs) => void, wait = CONST.TIMING.DRAFT_SAVE_DEBOUNCE_TIME, shouldExecuteOnUnmount = false) {
     return useDebouncedSaveDraftImpl(saveDraftFn as (...args: unknown[]) => void, wait, shouldExecuteOnUnmount) as {
         saveDraft: (...args: SaveDraftArgs) => void;
+        cancelSaveDraft: () => void;
         isSavePending: RefObject<boolean>;
     };
 }

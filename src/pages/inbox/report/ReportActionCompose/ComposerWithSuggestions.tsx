@@ -108,6 +108,13 @@ type ComposerWithSuggestionsRef = ComposerRef & {
 
     /** Reset the height of the composer */
     resetHeight: () => void;
+
+    /**
+     * Drop the pending debounced report action draft save.
+     * The composer stays mounted when an edit ends, so the pending save has to be cancelled explicitly or it would
+     * write the edited text back into the drafts after they have been cleared.
+     */
+    cancelPendingDraftSave: () => void;
 };
 
 type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
@@ -286,7 +293,7 @@ function ComposerWithSuggestions({
     });
 
     // Save the draft of the report action. This debounced so that we're not ceaselessly saving your edit.
-    const {saveDraft: debouncedSaveReportActionDraft, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(saveReportActionDraft);
+    const {saveDraft: debouncedSaveReportActionDraft, cancelSaveDraft: cancelPendingDraftSave, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(saveReportActionDraft);
 
     // Save the draft of the report comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
     // allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
@@ -960,6 +967,9 @@ function ComposerWithSuggestions({
                         }
                         if (prop === 'resetHeight') {
                             return resetHeight;
+                        }
+                        if (prop === 'cancelPendingDraftSave') {
+                            return cancelPendingDraftSave;
                         }
 
                         return composerRef.current?.[prop as keyof ComposerRef];
