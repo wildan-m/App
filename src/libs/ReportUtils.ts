@@ -13190,6 +13190,23 @@ function isExported(reportActions: OnyxEntry<ReportActions> | ReportAction[], re
     return lastSuccessfulExportCreated > lastResetCreated;
 }
 
+/**
+ * Whether an export to an accounting integration is currently running for this report.
+ *
+ * This mirrors the condition that renders the "started exporting this report to ..." message, so the export
+ * buttons and that message can never disagree. Actions carrying errors are ignored so a failed export attempt
+ * re-enables the buttons.
+ */
+function isExportInProgress(reportActions: OnyxEntry<ReportActions> | ReportAction[]): boolean {
+    if (!reportActions) {
+        return false;
+    }
+
+    const reportActionList = Array.isArray(reportActions) ? reportActions : Object.values(reportActions);
+
+    return reportActionList.some((action) => isExportIntegrationAction(action) && action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD && isEmptyObject(action.errors));
+}
+
 function hasExportError(reportActions: OnyxEntry<ReportActions> | ReportAction[], report?: OnyxEntry<Report>) {
     if (report?.hasExportError) {
         return true;
@@ -14386,6 +14403,7 @@ export {
     getIntegrationIcon,
     canBeExported,
     isExported,
+    isExportInProgress,
     hasExportError,
     hasOnlyNonReimbursableTransactions,
     getReportLastMessage,

@@ -11,7 +11,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import {savePreferredExportMethod as savePreferredExportMethodUtils} from '@libs/actions/Policy/Policy';
 import {exportToIntegration, markAsManuallyExported} from '@libs/actions/Report';
-import {canBeExported as canBeExportedUtils, getIntegrationIcon, isExported as isExportedUtils} from '@libs/ReportUtils';
+import {canBeExported as canBeExportedUtils, getIntegrationIcon, isExported as isExportedUtils, isExportInProgress as isExportInProgressUtils} from '@libs/ReportUtils';
 
 import variables from '@styles/variables';
 
@@ -72,12 +72,15 @@ function ExportWithDropdownMenu({
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons);
     const canBeExported = canBeExportedUtils(report);
     const isExported = isExportedUtils(reportActions, report);
+    const isExportInProgress = isExportInProgressUtils(reportActions);
     const flattenedWrapperStyle = StyleSheet.flatten([styles.flex1, wrapperStyle]);
 
     const dropdownOptions: Array<DropdownOption<ReportExportType>> = useMemo(() => {
         const optionTemplate = {
             icon: iconToDisplay,
-            disabled: !canBeExported,
+            // The split button's dropdown anchor stays pressable while the button is loading, so the options
+            // themselves have to be disabled to keep an in-progress export from being triggered again.
+            disabled: !canBeExported || isExportInProgress,
             displayInDefaultIconColor: true,
             iconWidth: variables.iconSizeMenuItem,
             iconHeight: variables.iconSizeMenuItem,
@@ -102,7 +105,7 @@ function ExportWithDropdownMenu({
         return options;
         // We do not include exportMethods not to re-render the component when the preferred export method changes
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [canBeExported, iconToDisplay, connectionName, report?.policyID, translate]);
+    }, [canBeExported, isExportInProgress, iconToDisplay, connectionName, report?.policyID, translate]);
 
     const handleExport = (exportType: ReportExportType) => {
         if (!reportID) {
@@ -128,6 +131,7 @@ function ExportWithDropdownMenu({
             pressOnEnter
             shouldAlwaysShowDropdownMenu
             anchorAlignment={dropdownAnchorAlignment}
+            isLoading={isExportInProgress}
             onPress={(_, value) => {
                 if (isExported) {
                     showConfirmModal({
