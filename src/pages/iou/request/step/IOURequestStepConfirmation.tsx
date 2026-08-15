@@ -863,6 +863,13 @@ function IOURequestStepConfirmation({
             shouldEnableMaxHeight={canUseTouchScreen() && !isMobileSafari()}
             shouldAvoidScrollOnVirtualViewport={!isMobileSafari()}
             testID="IOURequestStepConfirmation"
+            /*
+             * When this screen is embedded on IOURequestStartPage (shouldHideHeader=true), that page already owns the
+             * focus trap and registers the header, the tab bar and this tab's content as its container elements.
+             * Leaving this wrapper's own trap active would push a second trap onto the shared stack, pause the parent
+             * one, and confine Tab to this tab's content, making the Back button and the tab bar unreachable.
+             */
+            focusTrapSettings={shouldHideHeader ? {active: false} : undefined}
         >
             <TelemetrySpanManager
                 iouType={iouType}
