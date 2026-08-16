@@ -950,6 +950,9 @@ function MoneyRequestView({
     const amountCopyValue = !canEditAmount ? amountTitle : undefined;
     const descriptionHTML = updatedTransactionDescription ?? transactionDescription;
     const descriptionCopyValue = !canEdit && descriptionHTML ? Parser.htmlToText(descriptionHTML) : undefined;
+    // Descriptions saved through the app are stored as HTML, but a description set outside of it (e.g. by Concierge) can arrive as plain
+    // markdown text. Parse those at render time so they aren't displayed as dead plain text.
+    const isDescriptionHTML = !!descriptionHTML && Parser.isHTML(descriptionHTML);
     const merchantCopyValue = !canEditMerchant ? updatedMerchantTitle : undefined;
     const dateCopyValue = !canEditDate ? transactionDate : undefined;
     const categoryValue = updatedTransaction?.category ?? categoryForDisplay;
@@ -1243,8 +1246,9 @@ function MoneyRequestView({
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('comment')}>
                         <MenuItemWithTopDescription
                             description={translate('common.description')}
-                            shouldRenderAsHTML
-                            title={updatedTransactionDescription ?? transactionDescription}
+                            shouldRenderAsHTML={isDescriptionHTML}
+                            shouldParseTitle={!isDescriptionHTML}
+                            title={descriptionHTML}
                             interactive={canEdit}
                             shouldShowRightIcon={canEdit}
                             titleStyle={styles.flex1}
