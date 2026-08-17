@@ -42,7 +42,7 @@ describe('useReportTransactionsCollection', () => {
         expect(result.current).toEqual(reportTransactionsAndViolations[reportID].transactions);
     });
 
-    it('returns an empty object when reportID is missing', async () => {
+    it('returns undefined when reportID is missing', async () => {
         const transaction = createRandomTransaction(1);
         const reportID = '1';
         const reportTransactionsAndViolations = getReportTransactionsAndViolations(reportID, transaction);
@@ -51,10 +51,10 @@ describe('useReportTransactionsCollection', () => {
 
         const {result} = renderHook(() => useReportTransactionsCollection());
 
-        expect(result.current).toEqual({});
+        expect(result.current).toBeUndefined();
     });
 
-    it('returns an empty object when report does not have transactions', async () => {
+    it('returns undefined when report does not have transactions', async () => {
         const transaction = createRandomTransaction(1);
         const reportID = '1';
         const reportTransactionsAndViolations = getReportTransactionsAndViolations(reportID, transaction);
@@ -63,6 +63,6 @@ describe('useReportTransactionsCollection', () => {
 
         const {result} = renderHook(() => useReportTransactionsCollection('999'));
 
-        expect(result.current).toEqual({});
+        expect(result.current).toBeUndefined();
     });
 });

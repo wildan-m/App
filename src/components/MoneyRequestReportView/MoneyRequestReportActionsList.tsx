@@ -145,7 +145,13 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
     const draftReportActionID = draftReportAction?.reportActionID;
 
     const allReportTransactions = useReportTransactionsCollection(reportIDFromRoute);
-    const reportTransactions = useMemo(() => getAllNonDeletedTransactions(allReportTransactions, reportActions, isOffline, true), [allReportTransactions, reportActions, isOffline]);
+    // Stay `undefined` until the report's transactions have actually been delivered, so useNewTransactions treats the
+    // first hydrated list as its baseline instead of diffing it against a pre-hydration empty list and marking every
+    // existing expense as newly added.
+    const reportTransactions = useMemo(
+        () => (allReportTransactions ? getAllNonDeletedTransactions(allReportTransactions, reportActions, isOffline, true) : undefined),
+        [allReportTransactions, reportActions, isOffline],
+    );
     const transactions = useMemo(
         () => reportTransactions?.filter((transaction) => isOffline || transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) ?? [],
         [reportTransactions, isOffline],
