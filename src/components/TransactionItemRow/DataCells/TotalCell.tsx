@@ -92,10 +92,21 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave, report,
         return convertToBackendAmount(finalAmount);
     };
 
+    // A failed-scan placeholder has no real amount, so the inline editor opens empty instead of showing the
+    // synthetic 0.00. This mirrors initializeAmount in MoneyRequestAmountForm, which maps a zero amount to an
+    // empty input for the full-page amount editor.
+    const onFormatAmount = (amountAsInt: number, currencyParam?: string) => {
+        if (hasFailedScanAmountPlaceholder && amountAsInt === 0) {
+            return '';
+        }
+        const decimals = getCurrencyDecimals(currencyParam);
+        return convertToFrontendAmountAsString(amountAsInt, decimals);
+    };
+
     // localValue tracks the frontend-format amount string (e.g. "12.34") while editing
     const {isEditing, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(
         canEdit,
-        convertToFrontendAmountAsString(absoluteAmount, getCurrencyDecimals(currency)),
+        onFormatAmount(absoluteAmount, currency),
         onSave
             ? (value) => {
                   const normalizedValue = getNormalizedValue(value, isNegative);
@@ -129,11 +140,6 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave, report,
     const handleAmountChange = (amountString: string) => {
         hasUserTypedRef.current = true;
         setLocalValue(amountString);
-    };
-
-    const onFormatAmount = (amountAsInt: number, currencyParam?: string) => {
-        const decimals = getCurrencyDecimals(currencyParam);
-        return convertToFrontendAmountAsString(amountAsInt, decimals);
     };
 
     const toggleNegative = () => setIsNegative((prev) => !prev);
