@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h b/node_modules/react-native/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
+index ecc79d8..99fbf01 100644
+--- a/node_modules/react-native/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
++++ b/node_modules/react-native/ReactCommon/react/featureflags/ReactNativeFeatureFlagsDefaults.h
+@@ -52,7 +52,7 @@ class ReactNativeFeatureFlagsDefaults : public ReactNativeFeatureFlagsProvider {
+   }
+ 
+   bool disableMountItemReorderingAndroid() override {
+-    return false;
++    return true;
+   }
+ 
+   bool disableSubviewClippingAndroid() override {
