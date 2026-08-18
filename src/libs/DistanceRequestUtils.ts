@@ -336,6 +336,34 @@ function getCommuterExclusionDisplayData(customUnit: TransactionCustomUnit | und
     };
 }
 
+/**
+ * Whether a transaction carries a commuter exclusion at all, independently of whether that exclusion may be surfaced.
+ */
+function hasCommuterExclusion(transaction: OnyxEntry<Transaction>): boolean {
+    const commuterExclusion = transaction?.comment?.customUnit?.commuterExclusion;
+    return typeof commuterExclusion === 'number' && commuterExclusion > 0;
+}
+
+/**
+ * A commuter exclusion is a workspace control, so it is never surfaced on a personal (self-DM or P2P) expense, even
+ * when that expense carries the exclusion fields because it was created with a workspace rate. Every surface that
+ * reads commuter data answers this question here so the surfaces cannot drift apart.
+ */
+function shouldApplyCommuterExclusion(transaction: OnyxEntry<Transaction>, isWorkspaceExpense: boolean): boolean {
+    return isWorkspaceExpense && !transaction?.comment?.originalTransactionID;
+}
+
+/**
+ * Returns the transaction with the commuter-modified amount and merchant dropped whenever the exclusion must not be
+ * surfaced, so that readers fall back to `amount` and `merchant`, which still describe the full route.
+ */
+function getTransactionWithoutIgnoredCommuterExclusion(transaction: OnyxEntry<Transaction>, isWorkspaceExpense: boolean): OnyxEntry<Transaction> {
+    if (!transaction || !hasCommuterExclusion(transaction) || shouldApplyCommuterExclusion(transaction, isWorkspaceExpense)) {
+        return transaction;
+    }
+    return {...transaction, modifiedAmount: undefined, modifiedMerchant: undefined};
+}
+
 function getTransactionCommuterExclusionData({
     transaction,
     policy,
@@ -853,6 +881,9 @@ export default {
     getDistanceRequestAmount,
     getCommuterExclusionDisplayData,
     getTransactionCommuterExclusionData,
+    getTransactionWithoutIgnoredCommuterExclusion,
+    hasCommuterExclusion,
+    shouldApplyCommuterExclusion,
     getDistanceDisplayDetailsWithCommuter,
     getFormattedRateValue,
     getMileageRates,

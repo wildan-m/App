@@ -124,6 +124,7 @@ import {convertAttendeesToArray} from './AttendeeUtils';
 import {getCategoryGLCode} from './CategoryUtils';
 import {convertToDisplayStringEnLocale} from './CurrencyUtils';
 import DateUtils from './DateUtils';
+import DistanceRequestUtils from './DistanceRequestUtils';
 import {getEnvironmentURL} from './Environment/Environment';
 import getEnvironment from './Environment/getEnvironment';
 import {getMicroSecondOnyxErrorWithTranslationKey, isReceiptError} from './ErrorUtils';
@@ -5736,9 +5737,14 @@ function getTransactionReportName({
         return getIOUReportActionDisplayMessage(translate, reportAction as ReportAction, convertToDisplayString, linkedTransaction);
     }
 
-    const amount = getTransactionAmount(linkedTransaction, !isEmptyObject(report) && isExpenseReport(report), linkedTransaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) ?? 0;
+    const isWorkspaceExpense = !isEmptyObject(report) && isExpenseReport(report);
+    // A commuter exclusion is a workspace control, so on a personal expense the exclusion the server applied is ignored
+    // here the same way it is ignored in the expense view, otherwise the header would describe the commuter-reduced trip
+    // while every other surface describes the full route.
+    const transactionForName = DistanceRequestUtils.getTransactionWithoutIgnoredCommuterExclusion(linkedTransaction, isWorkspaceExpense);
+    const amount = getTransactionAmount(transactionForName, isWorkspaceExpense, linkedTransaction?.reportID === CONST.REPORT.UNREPORTED_REPORT_ID) ?? 0;
     const formattedAmount = convertToDisplayString(amount, getCurrency(linkedTransaction)) ?? '';
-    const comment = getMerchantOrDescription(linkedTransaction);
+    const comment = getMerchantOrDescription(transactionForName);
     return translate('iou.threadExpenseReportName', formattedAmount, Parser.htmlToText(comment));
 }
 
