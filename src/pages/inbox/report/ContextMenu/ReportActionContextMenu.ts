@@ -17,6 +17,8 @@ type OnConfirm = () => void;
 
 type OnCancel = () => void;
 
+type HoldEducationalModalVariant = 'submitter' | 'holdOrReject';
+
 type ContextMenuType = ValueOf<typeof CONST.CONTEXT_MENU_TYPES>;
 
 type ContextMenuAnchor = View | RNText | TextInput | HTMLDivElement | null | undefined;
@@ -62,6 +64,7 @@ type ReportActionContextMenu = {
     hideContextMenu: HideContextMenu;
     showDeleteModal: (reportID: string, reportAction: OnyxEntry<ReportAction>, shouldSetModalVisibility?: boolean, onConfirm?: OnConfirm, onCancel?: OnCancel) => void;
     hideDeleteModal: () => void;
+    showHoldEducationalModal: (variant: HoldEducationalModalVariant, isChatReportDM: boolean, onConfirm?: OnConfirm) => void;
     isActiveReportAction: (accountID: string | number) => boolean;
     instanceIDRef: RefObject<string>;
     runAndResetOnPopoverHide: () => void;
@@ -176,6 +179,16 @@ function showDeleteModal(reportID: string | undefined, reportAction: OnyxEntry<R
 }
 
 /**
+ * Opens the first-time Hold educational modal before continuing with the hold flow
+ */
+function showHoldEducationalModal(variant: HoldEducationalModalVariant, isChatReportDM: boolean, onConfirm?: OnConfirm) {
+    if (!contextMenuRef.current) {
+        return;
+    }
+    contextMenuRef.current.showHoldEducationalModal(variant, isChatReportDM, onConfirm);
+}
+
+/**
  * Whether Context Menu is active for the Report Action.
  */
 function isActiveReportAction(actionID: string | number): boolean {
@@ -193,5 +206,15 @@ function clearActiveReportAction() {
     return contextMenuRef.current.clearActiveReportAction();
 }
 
-export {contextMenuRef, showContextMenu, hideContextMenu, isActiveReportAction, clearActiveReportAction, showDeleteModal, hideDeleteModal, registerEnsureContextMenuMounted};
-export type {ContextMenuType, ReportActionContextMenu, ContextMenuAnchor};
+export {
+    contextMenuRef,
+    showContextMenu,
+    hideContextMenu,
+    isActiveReportAction,
+    clearActiveReportAction,
+    showDeleteModal,
+    hideDeleteModal,
+    showHoldEducationalModal,
+    registerEnsureContextMenuMounted,
+};
+export type {ContextMenuType, ReportActionContextMenu, ContextMenuAnchor, HoldEducationalModalVariant};

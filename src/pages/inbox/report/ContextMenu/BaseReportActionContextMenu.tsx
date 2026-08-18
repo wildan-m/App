@@ -21,6 +21,7 @@ import useReportAttributes from '@hooks/useReportAttributes';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useShouldSuppressPromotionalUI from '@hooks/useShouldSuppressPromotionalUI';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
 
@@ -44,6 +45,8 @@ import {
     getHarvestOriginalReportID,
     getSourceIDFromReportAction,
     isArchivedNonExpenseReport,
+    isCurrentUserSubmitter,
+    isDM,
     isHarvestCreatedExpenseReport,
     isUnread,
     isInvoiceReport as ReportUtilsIsInvoiceReport,
@@ -243,6 +246,12 @@ function BaseReportActionContextMenu({
     const iouReportID = (moneyRequestAction ?? reportAction)?.reportID;
     const [moneyRequestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportID}`);
     const [moneyRequestPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${moneyRequestReport?.policyID}`);
+    const [moneyRequestChatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(moneyRequestReport?.chatReportID)}`);
+    const [dismissedHoldUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION);
+    const [dismissedRejectUseExplanation] = useOnyx(ONYXKEYS.NVP_DISMISSED_REJECT_USE_EXPLANATION);
+    const shouldSuppressPromotionalUI = useShouldSuppressPromotionalUI();
+    const isMoneyRequestReportSubmitter = isCurrentUserSubmitter(moneyRequestChatReport);
+    const isMoneyRequestChatReportDM = isDM(moneyRequestChatReport);
     const {transactions} = useTransactionsAndViolationsForReport(childReport?.reportID);
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
@@ -440,6 +449,11 @@ function BaseReportActionContextMenu({
                                 isOffline,
                                 conciergeReportID,
                                 delegateAccountID,
+                                dismissedHoldUseExplanation,
+                                dismissedRejectUseExplanation,
+                                shouldSuppressPromotionalUI,
+                                isMoneyRequestReportSubmitter,
+                                isMoneyRequestChatReportDM,
                                 reportAttributes,
                                 originalReportOfUnapprovedTransaction,
                                 memberChangeLogRoomReportName,

@@ -1,5 +1,7 @@
 import {Actions, useActionSheetAwareScrollViewActions} from '@components/ActionSheetAwareScrollView';
 import ConfirmModal from '@components/ConfirmModal';
+import HoldOrRejectEducationalModal from '@components/HoldOrRejectEducationalModal';
+import HoldSubmitterEducationalModal from '@components/HoldSubmitterEducationalModal';
 import PopoverWithMeasuredContent from '@components/PopoverWithMeasuredContent';
 import {useSearchQueryContext} from '@components/Search/SearchContext';
 
@@ -18,6 +20,7 @@ import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViol
 
 import {deleteTrackExpense} from '@libs/actions/IOU/TrackExpense';
 import {deleteAppReport, deleteReportComment} from '@libs/actions/Report';
+import {setNameValuePair} from '@libs/actions/User';
 import calculateAnchorPosition from '@libs/calculateAnchorPosition';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import refocusComposerAfterPreventFirstResponder from '@libs/refocusComposerAfterPreventFirstResponder';
@@ -26,6 +29,8 @@ import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManag
 import {getOriginalMessage, isMoneyRequestAction, isReportPreviewAction, isTrackExpenseAction} from '@libs/ReportActionsUtils';
 import {getOriginalReportID} from '@libs/ReportUtils';
 import {getOriginalTransactionWithSplitInfo} from '@libs/TransactionUtils';
+
+import {dismissRejectUseExplanation} from '@userActions/IOU/RejectMoneyRequest';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -37,13 +42,14 @@ import type {ForwardedRef} from 'react';
 import type {EmitterSubscription, GestureResponderEvent, NativeTouchEvent, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 
+import {shouldFailAllRequestsSelector} from '@selectors/Network';
 import React, {useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {DeviceEventEmitter, Dimensions} from 'react-native';
 import {cancelAnimation, useSharedValue, withTiming} from 'react-native-reanimated';
 import {scheduleOnRN} from 'react-native-worklets';
 
 import type {ContextMenuAction} from './ContextMenuActions';
-import type {ContextMenuAnchor, ContextMenuType, ReportActionContextMenu} from './ReportActionContextMenu';
+import type {ContextMenuAnchor, ContextMenuType, HoldEducationalModalVariant, ReportActionContextMenu} from './ReportActionContextMenu';
 
 import BaseReportActionContextMenu from './BaseReportActionContextMenu';
 
@@ -93,6 +99,9 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const hideDelayProgress = useSharedValue(0);
     const [isDeleteCommentConfirmModalVisible, setIsDeleteCommentConfirmModalVisible] = useState(false);
     const [shouldSetModalVisibilityForDeleteConfirmation, setShouldSetModalVisibilityForDeleteConfirmation] = useState(true);
+    const [holdEducationalModalVariant, setHoldEducationalModalVariant] = useState<HoldEducationalModalVariant | null>(null);
+    const [isHoldEducationalChatReportDM, setIsHoldEducationalChatReportDM] = useState(false);
+    const [shouldFailAllRequests] = useOnyx(ONYXKEYS.NETWORK, {selector: shouldFailAllRequestsSelector});
 
     const [isThreadReportParentAction, setIsThreadReportParentAction] = useState(false);
     const [disabledActions, setDisabledActions] = useState<ContextMenuAction[]>([]);
@@ -119,6 +128,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const onEmojiPickerToggle = useRef<undefined | ((state: boolean) => void)>(undefined);
     const onCancelDeleteModal = useRef(() => {});
     const onConfirmDeleteModal = useRef(() => {});
+    const onConfirmHoldEducationalModal = useRef(() => {});
 
     const onPopoverHideActionCallback = useRef(() => {});
     const callbackWhenDeleteModalHide = useRef(() => {});
@@ -488,11 +498,29 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
         setIsDeleteCommentConfirmModalVisible(true);
     };
 
+    /** Opens the first-time Hold educational modal before continuing with the hold flow */
+    const showHoldEducationalModal: ReportActionContextMenu['showHoldEducationalModal'] = (variant, isChatReportDM, onConfirm = () => {}) => {
+        onConfirmHoldEducationalModal.current = onConfirm;
+        setIsHoldEducationalChatReportDM(isChatReportDM);
+        setHoldEducationalModalVariant(variant);
+    };
+
+    const dismissHoldEducationalModalAndConfirm = () => {
+        if (holdEducationalModalVariant === 'submitter') {
+            setNameValuePair(ONYXKEYS.NVP_DISMISSED_HOLD_USE_EXPLANATION, true, false, !shouldFailAllRequests);
+        } else {
+            dismissRejectUseExplanation();
+        }
+        setHoldEducationalModalVariant(null);
+        onConfirmHoldEducationalModal.current = runAndResetCallback(onConfirmHoldEducationalModal.current);
+    };
+
     useImperativeHandle(ref, () => ({
         showContextMenu,
         hideContextMenu,
         showDeleteModal,
         hideDeleteModal,
+        showHoldEducationalModal,
         isActiveReportAction,
         instanceIDRef,
         runAndResetOnPopoverHide,
@@ -552,6 +580,19 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                 cancelText={translate('common.cancel')}
                 danger
             />
+            {holdEducationalModalVariant === 'submitter' && (
+                <HoldSubmitterEducationalModal
+                    onClose={dismissHoldEducationalModalAndConfirm}
+                    onConfirm={dismissHoldEducationalModalAndConfirm}
+                    isDM={isHoldEducationalChatReportDM}
+                />
+            )}
+            {holdEducationalModalVariant === 'holdOrReject' && (
+                <HoldOrRejectEducationalModal
+                    onClose={dismissHoldEducationalModalAndConfirm}
+                    onConfirm={dismissHoldEducationalModalAndConfirm}
+                />
+            )}
         </>
     );
 }

@@ -249,7 +249,7 @@ import React from 'react';
 
 import type {ContextMenuAnchor} from './ReportActionContextMenu';
 
-import {hideContextMenu, showDeleteModal} from './ReportActionContextMenu';
+import {hideContextMenu, showDeleteModal, showHoldEducationalModal} from './ReportActionContextMenu';
 
 /** Gets the HTML version of the message in an action */
 function getActionHtml(reportAction: OnyxInputOrEntry<ReportAction>): string {
@@ -366,6 +366,11 @@ type ContextMenuActionPayload = {
     delegateAccountID: number | undefined;
     reportAttributes: ReportAttributesDerivedValue['reports'] | undefined;
     memberChangeLogRoomReportName: string | undefined;
+    dismissedHoldUseExplanation?: boolean;
+    dismissedRejectUseExplanation?: boolean;
+    shouldSuppressPromotionalUI?: boolean;
+    isMoneyRequestReportSubmitter?: boolean;
+    isMoneyRequestChatReportDM?: boolean;
 };
 
 type OnPress = (closePopover: boolean, payload: ContextMenuActionPayload, selection?: string, reportID?: string) => void;
@@ -733,6 +738,11 @@ const ContextMenuActions: ContextMenuAction[] = [
                 currentUserPersonalDetails,
                 isTrackIntentUser,
                 delegateAccountID,
+                dismissedHoldUseExplanation,
+                dismissedRejectUseExplanation,
+                shouldSuppressPromotionalUI,
+                isMoneyRequestReportSubmitter,
+                isMoneyRequestChatReportDM,
             },
         ) => {
             if (isDelegateAccessRestricted) {
@@ -740,33 +750,39 @@ const ContextMenuActions: ContextMenuAction[] = [
                 return;
             }
 
-            if (closePopover) {
-                hideContextMenu(false, () =>
-                    changeMoneyRequestHoldStatus(
-                        moneyRequestAction,
-                        iouTransaction,
-                        isOffline,
-                        currentUserPersonalDetails?.login ?? '',
-                        currentUserPersonalDetails.accountID,
-                        iouTransactionViolations,
-                        isTrackIntentUser,
-                        delegateAccountID,
-                    ),
+            const proceedWithHold = () =>
+                changeMoneyRequestHoldStatus(
+                    moneyRequestAction,
+                    iouTransaction,
+                    isOffline,
+                    currentUserPersonalDetails?.login ?? '',
+                    currentUserPersonalDetails.accountID,
+                    iouTransactionViolations,
+                    isTrackIntentUser,
+                    delegateAccountID,
                 );
+
+            const shouldShowHoldEducationalModal = isMoneyRequestReportSubmitter || isMoneyRequestChatReportDM;
+            const isDismissed = shouldShowHoldEducationalModal ? dismissedHoldUseExplanation : dismissedRejectUseExplanation;
+
+            // Show the first-time educational modal before starting the hold flow, mirroring the "More > Hold" path in useHoldRejectActions
+            if (!isDismissed && !shouldSuppressPromotionalUI) {
+                const variant = shouldShowHoldEducationalModal ? 'submitter' : 'holdOrReject';
+                if (closePopover) {
+                    hideContextMenu(false, () => showHoldEducationalModal(variant, !!isMoneyRequestChatReportDM, proceedWithHold));
+                    return;
+                }
+                showHoldEducationalModal(variant, !!isMoneyRequestChatReportDM, proceedWithHold);
+                return;
+            }
+
+            if (closePopover) {
+                hideContextMenu(false, proceedWithHold);
                 return;
             }
 
             // No popover to hide, call changeMoneyRequestHoldStatus immediately
-            changeMoneyRequestHoldStatus(
-                moneyRequestAction,
-                iouTransaction,
-                isOffline,
-                currentUserPersonalDetails?.login ?? '',
-                currentUserPersonalDetails.accountID,
-                iouTransactionViolations,
-                isTrackIntentUser,
-                delegateAccountID,
-            );
+            proceedWithHold();
         },
         getDescription: () => {},
         sentryLabel: CONST.SENTRY_LABEL.CONTEXT_MENU.HOLD,
