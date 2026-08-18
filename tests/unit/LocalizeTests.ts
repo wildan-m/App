@@ -73,41 +73,41 @@ describe('localize', () => {
                 [],
                 {
                     [CONST.LOCALES.DEFAULT]: '',
-                    [CONST.LOCALES.ES]: '',
+                    [CONST.LOCALES.ES_419]: '',
                 },
             ],
             [
                 ['rory'],
                 {
                     [CONST.LOCALES.DEFAULT]: 'rory',
-                    [CONST.LOCALES.ES]: 'rory',
+                    [CONST.LOCALES.ES_419]: 'rory',
                 },
             ],
             [
                 ['rory', 'vit'],
                 {
                     [CONST.LOCALES.DEFAULT]: 'rory and vit',
-                    [CONST.LOCALES.ES]: 'rory y vit',
+                    [CONST.LOCALES.ES_419]: 'rory y vit',
                 },
             ],
             [
                 ['rory', 'vit', 'jules'],
                 {
                     [CONST.LOCALES.DEFAULT]: 'rory, vit, and jules',
-                    [CONST.LOCALES.ES]: 'rory, vit y jules',
+                    [CONST.LOCALES.ES_419]: 'rory, vit y jules',
                 },
             ],
             [
                 ['rory', 'vit', 'ionatan'],
                 {
                     [CONST.LOCALES.DEFAULT]: 'rory, vit, and ionatan',
-                    [CONST.LOCALES.ES]: 'rory, vit e ionatan',
+                    [CONST.LOCALES.ES_419]: 'rory, vit e ionatan',
                 },
             ],
-        ])('formatList(%s)', async (input, {[CONST.LOCALES.DEFAULT]: expectedOutput, [CONST.LOCALES.ES]: expectedOutputES}) => {
+        ])('formatList(%s)', async (input, {[CONST.LOCALES.DEFAULT]: expectedOutput, [CONST.LOCALES.ES_419]: expectedOutputES}) => {
             await IntlStore.load(CONST.LOCALES.EN);
             expect(Localize.formatList(input)).toBe(expectedOutput);
-            await IntlStore.load(CONST.LOCALES.ES);
+            await IntlStore.load(CONST.LOCALES.ES_419);
             expect(Localize.formatList(input)).toBe(expectedOutputES);
         });
     });

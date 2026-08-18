@@ -108,14 +108,14 @@ describe('OnyxDerived', () => {
 
         it('updates when locale changes', async () => {
             await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${mockReport.reportID}`, mockReport);
-            await IntlStore.load(CONST.LOCALES.ES);
+            await IntlStore.load(CONST.LOCALES.ES_419);
             // Derived recomputes are coalesced onto a microtask; pump it so the locale change is applied.
             await waitForBatchedUpdates();
 
             const derivedReportAttributes = await OnyxUtils.get(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES);
 
             expect(derivedReportAttributes).toMatchObject({
-                locale: 'es',
+                locale: 'es-419',
             });
         });
 

@@ -5,7 +5,7 @@ import type {ValueOf} from 'type-fest';
  */
 const FULLY_SUPPORTED_LOCALES = {
     EN: 'en',
-    ES: 'es',
+    ES_419: 'es-419',
     FR: 'fr',
 } as const;
 
@@ -18,6 +18,8 @@ const FULLY_SUPPORTED_LOCALES = {
 const BETA_LOCALES = {
     DE: 'de',
     EL: 'el',
+    EN_GB: 'en-GB',
+    ES_ES: 'es-ES',
     IT: 'it',
     JA: 'ja',
     NL: 'nl',
@@ -31,6 +33,14 @@ const BETA_LOCALES = {
  */
 const EXTENDED_LOCALES = {
     ES_ES_ONFIDO: 'es_ES',
+} as const;
+
+/**
+ * Legacy preferredLocale NVP values that are no longer selectable but may still be stored for existing users
+ * (or reported by device settings). Each one is normalized to its canonical replacement before being applied.
+ */
+const LEGACY_LOCALE_ALIASES = {
+    es: FULLY_SUPPORTED_LOCALES.ES_419,
 } as const;
 
 /**
@@ -51,11 +61,13 @@ const {DEFAULT, EN, ...TRANSLATION_TARGET_LOCALES} = {...LOCALES} as const;
  * These strings are never translated.
  */
 const LOCALE_TO_LANGUAGE_STRING = {
-    [FULLY_SUPPORTED_LOCALES.EN]: 'English',
-    [FULLY_SUPPORTED_LOCALES.ES]: 'Español',
+    [FULLY_SUPPORTED_LOCALES.EN]: 'English (US)',
+    [FULLY_SUPPORTED_LOCALES.ES_419]: 'Español (Latinoamérica)',
     [FULLY_SUPPORTED_LOCALES.FR]: 'Français',
     [BETA_LOCALES.DE]: 'Deutsch',
     [BETA_LOCALES.EL]: 'Ελληνικά',
+    [BETA_LOCALES.EN_GB]: 'English (UK)',
+    [BETA_LOCALES.ES_ES]: 'Español (España)',
     [BETA_LOCALES.IT]: 'Italiano',
     [BETA_LOCALES.JA]: '日本語',
     [BETA_LOCALES.NL]: 'Nederlands',
@@ -84,9 +96,18 @@ function isTranslationTargetLocale(locale: string): locale is TranslationTargetL
     return (Object.values(TRANSLATION_TARGET_LOCALES) as readonly string[]).includes(locale);
 }
 
+/**
+ * Maps a raw locale string (e.g: from the preferredLocale NVP or device settings) to its canonical
+ * replacement if it's a legacy value. Non-legacy values are returned unchanged.
+ */
+function normalizeLegacyLocale(locale: string): string {
+    return locale in LEGACY_LOCALE_ALIASES ? LEGACY_LOCALE_ALIASES[locale as keyof typeof LEGACY_LOCALE_ALIASES] : locale;
+}
+
 export {
     EXTENDED_LOCALES,
     FULLY_SUPPORTED_LOCALES,
+    LEGACY_LOCALE_ALIASES,
     LOCALES,
     LOCALE_TO_LANGUAGE_STRING,
     SORTED_LOCALES,
@@ -94,5 +115,6 @@ export {
     isSupportedLocale,
     isFullySupportedLocale,
     isTranslationTargetLocale,
+    normalizeLegacyLocale,
 };
 export type {FullySupportedLocale, Locale, TranslationTargetLocale};

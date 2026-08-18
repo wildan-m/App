@@ -236,7 +236,7 @@ describe('ReportNameUtils', () => {
             );
             expect(nameEn).toBe('#admins (archived)');
 
-            await IntlStore.load(CONST.LOCALES.ES);
+            await IntlStore.load(CONST.LOCALES.ES_419);
             const nameEs = computeReportName(
                 report,
                 emptyCollections.reports,

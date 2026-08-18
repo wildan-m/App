@@ -2,7 +2,7 @@
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import en from '@src/languages/en';
-import es from '@src/languages/es';
+import es from '@src/languages/es-419';
 import flattenObject from '@src/languages/flattenObject';
 import type {FlatTranslationsObject, TranslationDeepObject, TranslationPaths} from '@src/languages/types';
 import {translate} from '@src/libs/Localize';
@@ -13,7 +13,7 @@ jest.mock('@src/languages/IntlStore');
 
 const originalTranslations = {
     [CONST.LOCALES.EN]: flattenObject(en),
-    [CONST.LOCALES.ES]: flattenObject(es),
+    [CONST.LOCALES.ES_419]: flattenObject(es),
 };
 
 describe('TranslateTest', () => {
@@ -60,13 +60,13 @@ describe('TranslateTest', () => {
 
         it('Test when count value 0, 1, 100 passed to function', () => {
             // @ts-expect-error - TranslationPaths doesn't include pluralizationGroup.couthWithCorrespondingRule as a valid key
-            expect(translate(CONST.LOCALES.ES, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 0})).toBe('0 artículos');
+            expect(translate(CONST.LOCALES.ES_419, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 0})).toBe('0 artículos');
 
             // @ts-expect-error - TranslationPaths doesn't include pluralizationGroup.couthWithCorrespondingRule as a valid key
-            expect(translate(CONST.LOCALES.ES, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 1})).toBe('Un artículo');
+            expect(translate(CONST.LOCALES.ES_419, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 1})).toBe('Un artículo');
 
             // @ts-expect-error - TranslationPaths doesn't include pluralizationGroup.couthWithCorrespondingRule as a valid key
-            expect(translate(CONST.LOCALES.ES, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 100})).toBe('100 artículos');
+            expect(translate(CONST.LOCALES.ES_419, 'pluralizationGroup.couthWithCorrespondingRule' as TranslationPaths, {count: 100})).toBe('100 artículos');
         });
     });
 

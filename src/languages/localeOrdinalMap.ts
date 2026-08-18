@@ -24,7 +24,7 @@ type OrdinalRenderer = (count: number) => string;
 type LocaleOrdinals = Partial<Record<Intl.LDMLPluralRule, OrdinalRenderer>> & {other: OrdinalRenderer};
 
 const localeOrdinalMap: Record<Locale, LocaleOrdinals> = {
-    /** Categories: one, two, few, other. The only locale here needing all four. */
+    /** Categories: one, two, few, other. English needs all four. */
     [LOCALES.EN]: {
         one: (count) => `${count}st`,
         two: (count) => `${count}nd`,
@@ -32,8 +32,21 @@ const localeOrdinalMap: Record<Locale, LocaleOrdinals> = {
         other: (count) => `${count}th`,
     },
 
+    /** Categories: one, two, few, other. Same rules as US English. */
+    [LOCALES.EN_GB]: {
+        one: (count) => `${count}st`,
+        two: (count) => `${count}nd`,
+        few: (count) => `${count}rd`,
+        other: (count) => `${count}th`,
+    },
+
     /** Categories: other. Uses the masculine ordinal indicator. */
-    [LOCALES.ES]: {
+    [LOCALES.ES_419]: {
+        other: (count) => `${count}º`,
+    },
+
+    /** Categories: other. Uses the masculine ordinal indicator. */
+    [LOCALES.ES_ES]: {
         other: (count) => `${count}º`,
     },
 

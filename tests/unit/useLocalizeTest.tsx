@@ -65,7 +65,7 @@ describe('useLocalize', () => {
         });
 
         it('distinguishes spanish diacritic characters', async () => {
-            await Onyx.set(ONYXKEYS.NVP_PREFERRED_LOCALE, CONST.LOCALES.ES);
+            await Onyx.set(ONYXKEYS.NVP_PREFERRED_LOCALE, CONST.LOCALES.ES_419);
             await waitForBatchedUpdatesWithAct();
 
             const {result} = renderHook(() => useLocalize(), {

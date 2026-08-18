@@ -10,7 +10,7 @@ import {format} from '@libs/NumberFormatUtils';
 import {setLocale} from '@userActions/App';
 
 import CONST from '@src/CONST';
-import {isSupportedLocale} from '@src/CONST/LOCALES';
+import {isSupportedLocale, normalizeLegacyLocale} from '@src/CONST/LOCALES';
 import IntlStore from '@src/languages/IntlStore';
 import type {TranslationParameters, TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -106,10 +106,12 @@ function LocaleContextProvider({children}: LocaleContextProviderProps) {
 
     let localeToApply: Locale | undefined;
     if (!isLoadingOnyxValue(nvpPreferredLocaleMetadata)) {
-        if (nvpPreferredLocale && isSupportedLocale(nvpPreferredLocale)) {
-            localeToApply = nvpPreferredLocale;
+        // Legacy stored values (e.g. `es` before the es-ES/es-419 split) are normalized to their canonical locale
+        const normalizedPreferredLocale = nvpPreferredLocale ? normalizeLegacyLocale(nvpPreferredLocale) : undefined;
+        if (normalizedPreferredLocale && isSupportedLocale(normalizedPreferredLocale)) {
+            localeToApply = normalizedPreferredLocale;
         } else {
-            const deviceLocale = getDevicePreferredLocale();
+            const deviceLocale = normalizeLegacyLocale(getDevicePreferredLocale());
             localeToApply = isSupportedLocale(deviceLocale) ? deviceLocale : CONST.LOCALES.DEFAULT;
         }
     }

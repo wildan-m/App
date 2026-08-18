@@ -17,7 +17,9 @@ import Onyx from 'react-native-onyx';
 import type de from './de';
 import type el from './el';
 import type en from './en';
-import type es from './es';
+import type enGB from './en-GB';
+import type es419 from './es-419';
+import type esES from './es-ES';
 import type fr from './fr';
 import type it from './it';
 import type ja from './ja';
@@ -101,19 +103,47 @@ class IntlStore {
                       shouldPolyfillListFormat(LOCALES.EN) ? import('@formatjs/intl-listformat/locale-data/en') : Promise.resolve(),
                       shouldPolyfillPluralRules(LOCALES.EN) ? import('@formatjs/intl-pluralrules/locale-data/en') : Promise.resolve(),
                   ]),
-        [LOCALES.ES]: () =>
-            this.cache.has(LOCALES.ES)
+        [LOCALES.EN_GB]: () =>
+            this.cache.has(LOCALES.EN_GB)
                 ? Promise.all([Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve()])
                 : Promise.all([
-                      import('./es').then((module: DynamicModule<typeof es>) => {
-                          this.cache.set(LOCALES.ES, flattenObject(extractModuleDefaultExport(module)));
+                      import('./en-GB').then((module: DynamicModule<typeof enGB>) => {
+                          this.cache.set(LOCALES.EN_GB, flattenObject(extractModuleDefaultExport(module)));
+                      }),
+                      import('date-fns/locale/en-GB').then((module) => {
+                          this.dateUtilsCache.set(LOCALES.EN_GB, module.enGB);
+                      }),
+                      shouldPolyfillNumberFormat(LOCALES.EN_GB) ? import('@formatjs/intl-numberformat/locale-data/en') : Promise.resolve(),
+                      shouldPolyfillListFormat(LOCALES.EN_GB) ? import('@formatjs/intl-listformat/locale-data/en') : Promise.resolve(),
+                      shouldPolyfillPluralRules(LOCALES.EN_GB) ? import('@formatjs/intl-pluralrules/locale-data/en') : Promise.resolve(),
+                  ]),
+        [LOCALES.ES_419]: () =>
+            this.cache.has(LOCALES.ES_419)
+                ? Promise.all([Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve()])
+                : Promise.all([
+                      import('./es-419').then((module: DynamicModule<typeof es419>) => {
+                          this.cache.set(LOCALES.ES_419, flattenObject(extractModuleDefaultExport(module)));
                       }),
                       import('date-fns/locale/es').then((module) => {
-                          this.dateUtilsCache.set(LOCALES.ES, module.es);
+                          this.dateUtilsCache.set(LOCALES.ES_419, module.es);
                       }),
-                      shouldPolyfillNumberFormat(LOCALES.ES) ? import('@formatjs/intl-numberformat/locale-data/es') : Promise.resolve(),
-                      shouldPolyfillListFormat(LOCALES.ES) ? import('@formatjs/intl-listformat/locale-data/es') : Promise.resolve(),
-                      shouldPolyfillPluralRules(LOCALES.ES) ? import('@formatjs/intl-pluralrules/locale-data/es') : Promise.resolve(),
+                      shouldPolyfillNumberFormat(LOCALES.ES_419) ? import('@formatjs/intl-numberformat/locale-data/es') : Promise.resolve(),
+                      shouldPolyfillListFormat(LOCALES.ES_419) ? import('@formatjs/intl-listformat/locale-data/es') : Promise.resolve(),
+                      shouldPolyfillPluralRules(LOCALES.ES_419) ? import('@formatjs/intl-pluralrules/locale-data/es') : Promise.resolve(),
+                  ]),
+        [LOCALES.ES_ES]: () =>
+            this.cache.has(LOCALES.ES_ES)
+                ? Promise.all([Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve(), Promise.resolve()])
+                : Promise.all([
+                      import('./es-ES').then((module: DynamicModule<typeof esES>) => {
+                          this.cache.set(LOCALES.ES_ES, flattenObject(extractModuleDefaultExport(module)));
+                      }),
+                      import('date-fns/locale/es').then((module) => {
+                          this.dateUtilsCache.set(LOCALES.ES_ES, module.es);
+                      }),
+                      shouldPolyfillNumberFormat(LOCALES.ES_ES) ? import('@formatjs/intl-numberformat/locale-data/es') : Promise.resolve(),
+                      shouldPolyfillListFormat(LOCALES.ES_ES) ? import('@formatjs/intl-listformat/locale-data/es') : Promise.resolve(),
+                      shouldPolyfillPluralRules(LOCALES.ES_ES) ? import('@formatjs/intl-pluralrules/locale-data/es') : Promise.resolve(),
                   ]),
         [LOCALES.FR]: () =>
             this.cache.has(LOCALES.FR)

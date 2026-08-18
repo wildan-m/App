@@ -4698,7 +4698,7 @@ describe('actions/Policy', () => {
 
         it('should generate a workspace name with an incremented number even if previous workspaces were created in english lang', async () => {
             await Onyx.set(ONYXKEYS.COLLECTION.POLICY, {});
-            await IntlStore.load(CONST.LOCALES.ES);
+            await IntlStore.load(CONST.LOCALES.ES_419);
             const existingPolicies = {
                 ...createRandomPolicy(0, CONST.POLICY.TYPE.PERSONAL, `${TEST_DISPLAY_NAME}'s Workspace`),
                 ...createRandomPolicy(0, CONST.POLICY.TYPE.PERSONAL, `${TEST_DISPLAY_NAME}'s Workspace 1`),

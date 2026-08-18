@@ -11,7 +11,7 @@ function ExampleCheckImage() {
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
     const {preferredLocale} = useLocalize();
-    const isSpanish = (preferredLocale ?? CONST.LOCALES.DEFAULT) === CONST.LOCALES.ES;
+    const isSpanish = preferredLocale === CONST.LOCALES.ES_419 || preferredLocale === CONST.LOCALES.ES_ES;
 
     return (
         <Image

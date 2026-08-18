@@ -79,13 +79,13 @@ const spanishGlossary = new Glossary([
 ]);
 
 export default Str.dedent(`
-    When translating to Spanish, follow these rules:
+    When translating to Latin American Spanish (es-419), follow these rules:
 
     - Prefer clear, natural Spanish for the product locale; keep branded names (Expensify, Concierge, QuickBooks Online, New Expensify, Expensify Classic) as in the source unless the glossary says otherwise.
     - Always use the informal tú and not the more formal usted form.
-    - Use neutral Spanish by default. If there is any ambiguity in wording, terminology, or regional usage, prefer Spanish from Spain (es-ES) conventions.
+    - Use neutral Latin American Spanish by default. If there is any ambiguity in wording, terminology, or regional usage, prefer vocabulary that is broadly understood across Latin America over region-specific terms.
 
-    Use the following glossary for canonical Spanish translations of common terms:
+    Use the following glossary for canonical Latin American Spanish translations of common terms:
 
     ${spanishGlossary.toXML()}
 `);

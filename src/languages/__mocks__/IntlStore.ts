@@ -25,7 +25,7 @@ class IntlStore {
             }),
         ],
         [
-            LOCALES.ES,
+            LOCALES.ES_419,
             flattenObject({
                 testKey1: 'Spanish',
                 testKey2: 'Spanish Word 2',
@@ -43,7 +43,7 @@ class IntlStore {
         [LOCALES.EN]: () => {
             return Promise.all([Promise.resolve(), Promise.resolve()]);
         },
-        [LOCALES.ES]: () => {
+        [LOCALES.ES_419]: () => {
             return Promise.all([Promise.resolve(), Promise.resolve()]);
         },
     };

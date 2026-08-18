@@ -19,7 +19,7 @@ import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 import currencyList from './currencyList.json';
 
 const currencyCodeList = Object.keys(currencyList);
-const AVAILABLE_LOCALES = [CONST.LOCALES.EN, CONST.LOCALES.ES];
+const AVAILABLE_LOCALES = [CONST.LOCALES.EN, CONST.LOCALES.ES_419];
 
 describe('CurrencyUtils', () => {
     let currencyListProvider: RenderAPI;
@@ -154,7 +154,7 @@ describe('CurrencyUtils', () => {
             ['EUR', 250000, '2500,00\xa0€'],
             ['EUR', 250000000, '2.500.000,00\xa0€'],
         ])('Correctly displays %s in ES locale', (currency, amount, expectedResult) =>
-            IntlStore.load(CONST.LOCALES.ES).then(() => expect(CurrencyUtils.convertToDisplayString(amount, currency)).toBe(expectedResult)),
+            IntlStore.load(CONST.LOCALES.ES_419).then(() => expect(CurrencyUtils.convertToDisplayString(amount, currency)).toBe(expectedResult)),
         );
     });
 
@@ -181,7 +181,7 @@ describe('CurrencyUtils', () => {
             ['EUR', 250000, '2500\xa0€'],
             ['EUR', 250000000, '2.500.000\xa0€'],
         ])('Correctly displays %s in ES locale', (currency, amount, expectedResult) =>
-            IntlStore.load(CONST.LOCALES.ES).then(() => expect(CurrencyUtils.convertToShortDisplayString(amount, currency)).toBe(expectedResult)),
+            IntlStore.load(CONST.LOCALES.ES_419).then(() => expect(CurrencyUtils.convertToShortDisplayString(amount, currency)).toBe(expectedResult)),
         );
     });
 

@@ -1675,7 +1675,7 @@ describe('ReportUtils', () => {
                 const allReportNameValuePairs = {[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${baseAdminsRoom.reportID}`]: reportNameValuePairs};
                 expect(computeReportName(baseAdminsRoom, undefined, undefined, undefined, allReportNameValuePairs)).toBe('#admins (archived)');
 
-                return IntlStore.load(CONST.LOCALES.ES).then(() =>
+                return IntlStore.load(CONST.LOCALES.ES_419).then(() =>
                     expect(computeReportName(baseAdminsRoom, undefined, undefined, undefined, allReportNameValuePairs)).toBe('#admins (archivado)'),
                 );
             });
@@ -1710,7 +1710,7 @@ describe('ReportUtils', () => {
                 const allReportNameValuePairs = {[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${baseUserCreatedRoom.reportID}`]: reportNameValuePairs};
                 expect(computeReportName(archivedPolicyRoom, undefined, undefined, undefined, allReportNameValuePairs)).toBe('#VikingsChat (archived)');
 
-                return IntlStore.load(CONST.LOCALES.ES).then(() =>
+                return IntlStore.load(CONST.LOCALES.ES_419).then(() =>
                     expect(computeReportName(archivedPolicyRoom, undefined, undefined, undefined, allReportNameValuePairs)).toBe('#VikingsChat (archivado)'),
                 );
             });
@@ -1795,7 +1795,7 @@ describe('ReportUtils', () => {
                     const allReportNameValuePairs = {[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${baseArchivedPolicyExpenseChat.reportID}`]: reportNameValuePairs};
                     expect(computeReportName(memberArchivedPolicyExpenseChat, undefined, undefined, undefined, allReportNameValuePairs)).toBe(`Ragnar Lothbrok's expenses (archived)`);
 
-                    return IntlStore.load(CONST.LOCALES.ES).then(() =>
+                    return IntlStore.load(CONST.LOCALES.ES_419).then(() =>
                         expect(computeReportName(memberArchivedPolicyExpenseChat, undefined, undefined, undefined, allReportNameValuePairs)).toBe(`Ragnar Lothbrok's gastos (archivado)`),
                     );
                 });
@@ -1811,7 +1811,7 @@ describe('ReportUtils', () => {
                     const allReportNameValuePairs = {[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${baseArchivedPolicyExpenseChat.reportID}`]: reportNameValuePairs};
                     expect(computeReportName(adminArchivedPolicyExpenseChat, undefined, undefined, undefined, allReportNameValuePairs)).toBe(`Ragnar Lothbrok's expenses (archived)`);
 
-                    return IntlStore.load(CONST.LOCALES.ES).then(() =>
+                    return IntlStore.load(CONST.LOCALES.ES_419).then(() =>
                         expect(computeReportName(adminArchivedPolicyExpenseChat, undefined, undefined, undefined, allReportNameValuePairs)).toBe(`Ragnar Lothbrok's gastos (archivado)`),
                     );
                 });
@@ -17387,9 +17387,9 @@ describe('ReportUtils', () => {
             it('uses the injected translate function (not translateLocal) so output follows the passed locale, while getReportPreviewReportActionMessage stays English', async () => {
                 const params = {reportOrID: expenseReport};
                 const englishTranslate: LocalizedTranslate = (path, ...parameters) => translate(CONST.LOCALES.EN, path, ...parameters);
-                const spanishTranslate: LocalizedTranslate = (path, ...parameters) => translate(CONST.LOCALES.ES, path, ...parameters);
+                const spanishTranslate: LocalizedTranslate = (path, ...parameters) => translate(CONST.LOCALES.ES_419, path, ...parameters);
 
-                await IntlStore.load(CONST.LOCALES.ES).then(waitForBatchedUpdates);
+                await IntlStore.load(CONST.LOCALES.ES_419).then(waitForBatchedUpdates);
 
                 // The localized preview differs between English and Spanish...
                 expect(getReportPreviewMessage(spanishTranslate, convertToDisplayString, params)).not.toBe(getReportPreviewMessage(englishTranslate, convertToDisplayString, params));
