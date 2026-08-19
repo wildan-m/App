@@ -269,7 +269,14 @@ function getCardDescriptionForSearchTable(card: Card, translate: LocalizedTransl
  * Returns the formatted card name for a company card. Returns an empty string
  * if the card is not a real card, but a cash expense
  */
-function getCompanyCardDescription(translate: LocalizedTranslate, transactionCardName?: string, cardID?: number, cards?: CardList, feedCountry?: string) {
+function getCompanyCardDescription(
+    translate: LocalizedTranslate,
+    transactionCardName?: string,
+    cardID?: number,
+    cards?: CardList,
+    feedCountry?: string,
+    cardFeeds?: OnyxCollection<CardFeeds>,
+) {
     const formattedTransactionCardName = transactionCardName === CONST.EXPENSE.TYPE.CASH_CARD_NAME ? '' : transactionCardName;
     const card = cardID ? cards?.[cardID] : undefined;
 
@@ -285,6 +292,17 @@ function getCompanyCardDescription(translate: LocalizedTranslate, transactionCar
 
     if (isExpensifyCard(card)) {
         return formattedTransactionCardName;
+    }
+
+    // Commercial feeds store the masked full PAN in `cardName`, which says nothing about the feed the card belongs to.
+    // When the caller provides the card feeds we can show `{feed name} - {last four}` instead, the way direct feeds already read.
+    if (cardFeeds && isCustomFeed(card.bank) && card.lastFourPAN) {
+        const feed = card.bank as CompanyCardFeed;
+        const customFeedName = card.fundID ? cardFeeds?.[`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${card.fundID}`]?.settings?.companyCardNicknames?.[feed] : undefined;
+        const feedName = getCustomOrFormattedFeedName(translate, feed, customFeedName);
+        if (feedName) {
+            return `${feedName} - ${card.lastFourPAN}`;
+        }
     }
 
     return card.cardName === CONST.EXPENSE.TYPE.CASH_CARD_NAME ? '' : card.cardName;

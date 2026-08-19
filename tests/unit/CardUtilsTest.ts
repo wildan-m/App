@@ -3383,6 +3383,9 @@ describe('CardUtils', () => {
             if (key === 'cardTransactions.travelInvoicing' && parameters.length === 0) {
                 return 'Travel invoicing';
             }
+            if (key === 'workspace.companyCards.feedName') {
+                return `${String(parameters.at(0))} cards`;
+            }
             return key;
         };
         const cardList: CardList = {
@@ -3439,6 +3442,37 @@ describe('CardUtils', () => {
         it("should return 'Travel invoicing' for another member's travel card that isn't in the viewer's card list", () => {
             const description = getCompanyCardDescription(mockTranslate, 'Expensify Card - 6909', 99999, undefined, CONST.TRAVEL.PROGRAM_TRAVEL_US);
             expect(description).toBe('Travel invoicing');
+        });
+
+        it('should return the default feed name and the last four digits for a commercial feed card when the card feeds are provided', () => {
+            const description = getCompanyCardDescription(mockTranslate, 'Test', 21310091, cardList, undefined, {});
+            expect(description).toBe('Visa cards - 2554');
+        });
+
+        it('should return the custom feed name set by the admin for a commercial feed card', () => {
+            const commercialCardList: CardList = {
+                '21310092': {
+                    ...cardList['21310091'],
+                    cardID: 21310092,
+                    fundID: '4321',
+                },
+            };
+            const cardFeeds: OnyxCollection<CardFeeds> = {
+                [`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}4321`]: {
+                    settings: {
+                        companyCardNicknames: {
+                            [CONST.COMPANY_CARD.FEED_BANK_NAME.VISA]: 'Design team cards',
+                        },
+                    },
+                },
+            };
+            const description = getCompanyCardDescription(mockTranslate, 'Test', 21310092, commercialCardList, undefined, cardFeeds);
+            expect(description).toBe('Design team cards - 2554');
+        });
+
+        it('should keep showing the masked PAN for a commercial feed card when the card feeds are not provided', () => {
+            const description = getCompanyCardDescription(mockTranslate, 'Test', 21310091, cardList);
+            expect(description).toBe('480801XXXXXX2554');
         });
     });
 
