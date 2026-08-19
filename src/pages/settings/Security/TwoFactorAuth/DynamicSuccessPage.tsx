@@ -56,7 +56,8 @@ function DynamicSuccessPage({route}: DynamicSuccessPageProps) {
     const isIncompleteOnboarding = hasCompletedGuidedSetupFlow === false;
     const hasSavedOnboardingPath = !!onboardingInitialPath?.includes(`/${ROUTES.ONBOARDING_ROOT.route}`);
     // Forced onboarding 2FA always enters via Settings > Security (from the require-2FA overlay).
-    const isForcedOnboardingHandoff = AccountUtils.isForced2FAOnboardingSetup(account, false) || (!!account?.requiresTwoFactorAuth && isIncompleteOnboarding && hasSavedOnboardingPath);
+    const isForcedOnboardingHandoff =
+        AccountUtils.isForced2FAOnboardingSetup(account, !isIncompleteOnboarding) || (!!account?.requiresTwoFactorAuth && isIncompleteOnboarding && hasSavedOnboardingPath);
     const shouldReturnToOnboardingAfter2FA = isSecuritySettingsFlow && isForcedOnboardingHandoff;
 
     const completeForcedOnboarding2FAHandoff = () => {
