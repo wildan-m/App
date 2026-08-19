@@ -10,6 +10,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import {navigateToAndOpenChildReport} from '@libs/actions/Report';
 import {getParticipantsPersonalDetails} from '@libs/PersonalDetailsUtils';
+import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -53,11 +54,18 @@ function ReportActionItemThread({report, reportAction, isHovered, onSecondaryInt
     const personalDetails = usePersonalDetails();
 
     const numberOfReplies = reportAction.childVisibleActionCount ?? 0;
-    const accountIDs =
+    const commenterAccountIDs =
         reportAction.childOldestFourAccountIDs
             ?.split(',')
             .map((accountID) => Number(accountID))
             .filter((accountID): accountID is number => typeof accountID === 'number') ?? [];
+    const delegateAccountID = getDelegateAccountIDFromReportAction(reportAction);
+
+    // When a copilot acts on behalf of another account, the commenter recorded in the thread is the account acted on behalf of,
+    // so we swap it for the copilot to keep the thread summary consistent with the avatar shown on the message itself.
+    const accountIDs = delegateAccountID
+        ? [...new Set(commenterAccountIDs.map((accountID) => (accountID === Number(reportAction.actorAccountID) ? delegateAccountID : accountID)))]
+        : commenterAccountIDs;
     const mostRecentReply = `${reportAction.childLastVisibleActionCreated}`;
 
     const numberOfRepliesText = numberOfReplies > CONST.MAX_THREAD_REPLIES_PREVIEW ? `${CONST.MAX_THREAD_REPLIES_PREVIEW}+` : `${numberOfReplies}`;
