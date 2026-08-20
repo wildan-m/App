@@ -220,7 +220,7 @@ function FormWrapper({
             disablePressOnEnter={disablePressOnEnter}
             enterKeyEventListenerPriority={enterKeyEventListenerPriority}
             shouldRenderFooterAboveSubmit={shouldRenderFooterAboveSubmit}
-            shouldBlendOpacity={shouldSubmitButtonBlendOpacity}
+            blendOpacity={shouldSubmitButtonBlendOpacity}
             shouldPreventDefaultFocusOnPress={shouldPreventDefaultFocusOnPressSubmit}
             sentryLabel={sentryLabel}
         />

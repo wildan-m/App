@@ -12,7 +12,7 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import React from 'react';
 import {View} from 'react-native';
 
-import Button from './Button';
+import Button from './ButtonComposed';
 import FormAlertWrapper from './FormAlertWrapper';
 
 type FormAlertWithSubmitButtonProps = WithSentryLabel & {
@@ -85,7 +85,7 @@ type FormAlertWithSubmitButtonProps = WithSentryLabel & {
      * Whether the button should have a background layer in the color of theme.appBG.
      * This is needed for buttons that allow content to display under them.
      */
-    shouldBlendOpacity?: boolean;
+    blendOpacity?: boolean;
 
     /** Whether to add a bottom padding to the button */
     addButtonBottomPadding?: boolean;
@@ -114,7 +114,7 @@ function FormAlertWithSubmitButton({
     errorMessageStyle,
     enterKeyEventListenerPriority = 0,
     shouldRenderFooterAboveSubmit = false,
-    shouldBlendOpacity = false,
+    blendOpacity = false,
     addButtonBottomPadding = true,
     shouldPreventDefaultFocusOnPress = false,
     shouldShowLoadingImmediatelyOnPress = true,
@@ -139,6 +139,11 @@ function FormAlertWithSubmitButton({
     const isAndroidNative = getPlatform() === CONST.PLATFORM.ANDROID;
     const pressOnEnter = isAndroidNative ? false : !disablePressOnEnter;
 
+    // The legacy Button rendered danger styles over the hardcoded success ones when both were set,
+    // so a dangerous submit action maps to the danger variant and everything else stays success.
+    const buttonVariant = isSubmitActionDangerous ? CONST.BUTTON_VARIANT.DANGER : CONST.BUTTON_VARIANT.SUCCESS;
+    const buttonSize = useSmallerSubmitButtonSize ? CONST.BUTTON_SIZE.MEDIUM : CONST.BUTTON_SIZE.LARGE;
+
     return (
         <FormAlertWrapper
             containerStyles={[styles.justifyContentEnd, containerStyles]}
@@ -153,35 +158,32 @@ function FormAlertWithSubmitButton({
                     {shouldRenderFooterAboveSubmit && footerContent}
                     {isOffline && !enabledWhenOffline ? (
                         <Button
-                            success
-                            shouldBlendOpacity={shouldBlendOpacity}
+                            variant={buttonVariant}
+                            blendOpacity={blendOpacity}
                             isDisabled
-                            text={buttonText}
                             style={style}
-                            danger={isSubmitActionDangerous}
-                            medium={useSmallerSubmitButtonSize}
-                            large={!useSmallerSubmitButtonSize}
+                            size={buttonSize}
                             onMouseDown={shouldPreventDefaultFocusOnPress ? (e) => e.preventDefault() : undefined}
                             sentryLabel={sentryLabel}
-                        />
+                        >
+                            <Button.Text>{buttonText}</Button.Text>
+                        </Button>
                     ) : (
                         <Button
                             ref={buttonRef}
-                            success
-                            shouldBlendOpacity={shouldBlendOpacity}
-                            pressOnEnter={pressOnEnter}
-                            enterKeyEventListenerPriority={enterKeyEventListenerPriority}
-                            text={buttonText}
+                            variant={buttonVariant}
+                            blendOpacity={blendOpacity}
                             style={style}
                             onPress={submit}
                             isDisabled={isDisabled}
                             isLoading={isLoading}
-                            danger={isSubmitActionDangerous}
-                            medium={useSmallerSubmitButtonSize}
-                            large={!useSmallerSubmitButtonSize}
+                            size={buttonSize}
                             onMouseDown={shouldPreventDefaultFocusOnPress ? (e) => e.preventDefault() : undefined}
                             sentryLabel={sentryLabel}
-                        />
+                        >
+                            {pressOnEnter && <Button.KeyboardShortcut enterKeyEventListenerPriority={enterKeyEventListenerPriority} />}
+                            <Button.Text>{buttonText}</Button.Text>
+                        </Button>
                     )}
                     {!shouldRenderFooterAboveSubmit && footerContent}
                 </View>
