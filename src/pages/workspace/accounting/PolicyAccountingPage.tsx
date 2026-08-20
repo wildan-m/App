@@ -138,6 +138,8 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
 
     const canUseRilletIntegration = isBetaEnabled(CONST.BETAS.RILLET) || !!policy?.connections?.rillet;
     const canUseDualEntryIntegration = isBetaEnabled(CONST.BETAS.DUALENTRY) || !!policy?.connections?.dualEntry;
+    // The Business Central connector entry is added separately; only surface the integration once the policy is already connected
+    const canUseBusinessCentralIntegration = !!policy?.connections?.businessCentral;
     const shouldShowIntuitEnterpriseSuiteIntegration = isBetaEnabled(CONST.BETAS.INTUIT_ENTERPRISE_SUITE) && (isCollectPolicy(policy) || isControlPolicy(policy));
     const accountingIntegrations = useMemo(
         () =>
@@ -148,9 +150,12 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
                 if (name === CONST.POLICY.CONNECTIONS.NAME.DUALENTRY) {
                     return canUseDualEntryIntegration;
                 }
+                if (name === CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL) {
+                    return canUseBusinessCentralIntegration;
+                }
                 return true;
             }),
-        [canUseRilletIntegration, canUseDualEntryIntegration],
+        [canUseRilletIntegration, canUseDualEntryIntegration, canUseBusinessCentralIntegration],
     );
     const accountingIntegrationOptions = useMemo(
         () =>

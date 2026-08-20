@@ -924,6 +924,8 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
         require<ReactComponentModule>('../../../../pages/workspace/accounting/dualentry/export/DualEntryExpensifyCardAccountPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.DUALENTRY_DEFAULT_COMPANY_CARD_VENDOR]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/dualentry/export/DualEntryDefaultCompanyCardVendorPage').default,
+    [SCREENS.WORKSPACE.ACCOUNTING.BUSINESS_CENTRAL_IMPORT]: () =>
+        require<ReactComponentModule>('../../../../pages/workspace/accounting/businessCentral/import/BusinessCentralImportPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.CARD_RECONCILIATION]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/reconciliation/CardReconciliationPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.CARD_RECONCILIATION_SAGE_INTACCT_AUTO_SYNC]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/reconciliation/CardReconciliationSageIntacctAutoSyncPage').default,

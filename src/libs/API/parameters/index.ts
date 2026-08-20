@@ -65,6 +65,9 @@ export type {default as UpdateDualEntryExportDateParams} from './UpdateDualEntry
 export type {default as UpdateDualEntryDefaultVendorParams} from './UpdateDualEntryDefaultVendorParams';
 export type {default as UpdateDualEntryCreditCardAccountParams} from './UpdateDualEntryCreditCardAccountParams';
 export type {default as UpdateDualEntryExpensifyCardAccountParams} from './UpdateDualEntryExpensifyCardAccountParams';
+export type {default as UpdateBusinessCentralEnableNewCategoriesParams} from './UpdateBusinessCentralEnableNewCategoriesParams';
+export type {default as UpdateBusinessCentralDimensionMappingParams} from './UpdateBusinessCentralDimensionMappingParams';
+export type {default as UpdateBusinessCentralSyncTaxRatesParams} from './UpdateBusinessCentralSyncTaxRatesParams';
 export type {default as UpdateNetSuiteAccountingMethodParams} from './UpdateNetSuiteAccountingMethodParams';
 export type {default as UpdateQuickbooksOnlineAccountingMethodParams} from './UpdateQuickbooksOnlineAccountingMethodParams';
 export type {default as UpdateXeroAccountingMethodParams} from './UpdateXeroAccountingMethodParams';

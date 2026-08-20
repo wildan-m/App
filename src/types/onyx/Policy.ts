@@ -2246,6 +2246,117 @@ type DualEntryConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
     DualEntryCodingOfflineFeedbackKeys | DualEntryExportOfflineFeedbackKeys | keyof DualEntryAutoSync | keyof DualEntrySync
 >;
 
+/**
+ * Company retrieved from Business Central.
+ */
+type BusinessCentralCompany = {
+    /** Unique identifier of the company. */
+    id: string;
+
+    /** Name of the company. */
+    name: string;
+
+    /** ISO country code of the company. Determines whether EU VAT settings apply. */
+    country: string;
+};
+
+/**
+ * Dimension retrieved from Business Central.
+ */
+type BusinessCentralDimension = {
+    /** Unique identifier of the dimension. */
+    id: string;
+
+    /** Name of the dimension. */
+    name: string;
+};
+
+/**
+ * Tax rate retrieved from Business Central.
+ */
+type BusinessCentralTaxRate = {
+    /** Unique identifier of the tax rate. */
+    id: string;
+
+    /** Name of the tax rate. */
+    name: string;
+
+    /** Percentage value of the tax rate. */
+    value: string;
+};
+
+/**
+ * Connection data retrieved from Business Central.
+ */
+type BusinessCentralConnectionData = {
+    /** Companies available in Business Central. */
+    companies?: BusinessCentralCompany[];
+
+    /** Dimensions available in Business Central. */
+    dimensions?: BusinessCentralDimension[];
+
+    /** Tax rates available in Business Central. */
+    taxRates?: BusinessCentralTaxRate[];
+};
+
+/**
+ * Coding configuration used when importing data from Business Central.
+ */
+type BusinessCentralCoding = {
+    /**
+     * Mapping of Business Central dimension IDs to their configured mapping behavior.
+     */
+    dimensionMappings?: Record<string, ValueOf<typeof CONST.BUSINESS_CENTRAL_MAPPING_VALUE>>;
+
+    /** Whether EU VAT tax rates should be imported from Business Central. */
+    syncTaxRates: boolean;
+};
+
+/**
+ * Auto-sync configuration for Business Central.
+ */
+type BusinessCentralAutoSync = {
+    /** Whether automatic synchronization is enabled. */
+    enabled: boolean;
+
+    /** Unique identifier of the automatic synchronization job. */
+    jobID?: string | null;
+};
+
+/** Offline feedback key for dimension mapping */
+type BusinessCentralCodingDimensionMappingsOfflineFeedbackKey = `${typeof CONST.BUSINESS_CENTRAL_CONFIG.DIMENSION_MAPPING_PREFIX}${string}`;
+
+/**
+ * Offline feedback keys for `BusinessCentralCoding`
+ */
+type BusinessCentralCodingOfflineFeedbackKeys = keyof Omit<BusinessCentralCoding, 'dimensionMappings'> | BusinessCentralCodingDimensionMappingsOfflineFeedbackKey;
+
+/**
+ * Connection config for Business Central.
+ */
+type BusinessCentralConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
+    {
+        /** The ID of the selected company in Business Central */
+        companyID: string;
+
+        /** Whether to enable a new Expense Category into Expensify */
+        enableNewCategories: boolean;
+
+        /** Coding settings */
+        coding?: BusinessCentralCoding;
+
+        /** Auto-sync settings */
+        autoSync?: BusinessCentralAutoSync;
+
+        /** Collection of errors coming from BE */
+        errors?: OnyxCommon.Errors;
+
+        /** Collection of form field errors  */
+        errorFields?: OnyxCommon.ErrorFields;
+    },
+    BusinessCentralCodingOfflineFeedbackKeys | keyof BusinessCentralAutoSync
+>;
+
 /** Gusto connection data */
 type GustoConnectionData = Record<string, never>;
 
@@ -2453,6 +2564,9 @@ type Connections = {
 
     /** DualEntry integration connection */
     [CONST.POLICY.CONNECTIONS.NAME.DUALENTRY]: Connection<DualEntryConnectionData, DualEntryConnectionsConfig>;
+
+    /** Business Central integration connection */
+    [CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL]: Connection<BusinessCentralConnectionData, BusinessCentralConnectionsConfig>;
 
     /** Gusto integration connection */
     [CONST.POLICY.CONNECTIONS.NAME.GUSTO]: Connection<GustoConnectionData, GustoConnectionConfig>;
@@ -3291,4 +3405,8 @@ export type {
     DualEntryVendor,
     DualEntryAccount,
     DualEntryExport,
+    BusinessCentralConnectionsConfig,
+    BusinessCentralCoding,
+    BusinessCentralCompany,
+    BusinessCentralDimension,
 };

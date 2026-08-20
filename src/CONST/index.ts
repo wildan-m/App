@@ -3646,6 +3646,18 @@ const CONST = {
         GST: 'GST',
     },
 
+    BUSINESS_CENTRAL_CONFIG: {
+        COMPANY_ID: 'companyID',
+        ENABLE_NEW_CATEGORIES: 'enableNewCategories',
+        SYNC_TAX_RATES: 'syncTaxRates',
+        DIMENSION_MAPPING_PREFIX: 'dimensionMapping_',
+    },
+
+    BUSINESS_CENTRAL_MAPPING_VALUE: {
+        NONE: 'NONE',
+        TAG: 'TAG',
+    },
+
     DUALENTRY_ACCOUNT_TYPE: {
         EXPENSE: 'expense',
         CREDIT_CARD: 'credit_card',
@@ -4408,6 +4420,7 @@ const CONST = {
                 CERTINIA: 'financialforce',
                 RILLET: 'rillet',
                 DUALENTRY: 'dualEntry',
+                BUSINESS_CENTRAL: 'businessCentral',
                 GUSTO: 'gusto',
                 ZENEFITS: 'zenefits',
                 MERGE_HR: 'merge_hris',
@@ -4425,6 +4438,7 @@ const CONST = {
                 CERTINIA: 'certinia',
                 RILLET: 'rillet',
                 DUALENTRY: 'dualentry',
+                BUSINESS_CENTRAL: 'business-central',
                 GUSTO: 'gusto',
                 ZENEFITS: 'zenefits',
                 MERGE_HR: 'merge-hr',
@@ -4438,6 +4452,7 @@ const CONST = {
                 financialforce: 'Certinia',
                 rillet: 'Rillet',
                 dualEntry: 'DualEntry',
+                businessCentral: 'Business Central',
                 gusto: 'Gusto',
                 billCom: 'Bill.com',
                 zenefits: 'TriNet',
@@ -4448,7 +4463,17 @@ const CONST = {
                 other: 'Other',
             },
             get ACCOUNTING_CONNECTION_NAMES() {
-                return [this.NAME.QBO, this.NAME.QBD, this.NAME.XERO, this.NAME.NETSUITE, this.NAME.SAGE_INTACCT, this.NAME.CERTINIA, this.NAME.RILLET, this.NAME.DUALENTRY] as const;
+                return [
+                    this.NAME.QBO,
+                    this.NAME.QBD,
+                    this.NAME.XERO,
+                    this.NAME.NETSUITE,
+                    this.NAME.SAGE_INTACCT,
+                    this.NAME.CERTINIA,
+                    this.NAME.RILLET,
+                    this.NAME.DUALENTRY,
+                    this.NAME.BUSINESS_CENTRAL,
+                ] as const;
             },
             get HR_CONNECTION_NAMES() {
                 return [this.NAME.GUSTO, this.NAME.ZENEFITS, this.NAME.MERGE_HR] as const;

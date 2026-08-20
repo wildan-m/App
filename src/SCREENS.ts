@@ -699,6 +699,7 @@ const SCREENS = {
             DUALENTRY_COMPANY_CARD_ACCOUNT: 'Policy_Accounting_DualEntry_Company_Card_Account',
             DUALENTRY_EXPENSIFY_CARD_ACCOUNT: 'Policy_Accounting_DualEntry_Expensify_Card_Account',
             DUALENTRY_DEFAULT_COMPANY_CARD_VENDOR: 'Policy_Accounting_DualEntry_Default_Company_Card_Vendor',
+            BUSINESS_CENTRAL_IMPORT: 'Policy_Accounting_Business_Central_Import',
             CARD_RECONCILIATION: 'Policy_Accounting_Card_Reconciliation',
             CARD_RECONCILIATION_SAGE_INTACCT_AUTO_SYNC: 'Policy_Accounting_Card_Reconciliation_Sage_Intacct_Auto_Sync',
             DYNAMIC_RECONCILIATION_ACCOUNT_SETTINGS: 'Dynamic_Policy_Accounting_Reconciliation_Account_Settings',

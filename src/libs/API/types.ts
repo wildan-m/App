@@ -537,6 +537,9 @@ const WRITE_COMMANDS = {
     UPDATE_DUALENTRY_DEFAULT_VENDOR: 'UpdateDualEntryDefaultVendor',
     UPDATE_DUALENTRY_CREDIT_CARD_ACCOUNT: 'UpdateDualEntryCreditCardAccount',
     UPDATE_DUALENTRY_EXPENSIFY_CARD_ACCOUNT: 'UpdateDualEntryExpensifyCardAccount',
+    UPDATE_BUSINESS_CENTRAL_ENABLE_NEW_CATEGORIES: 'UpdateBusinessCentralEnableNewCategories',
+    UPDATE_BUSINESS_CENTRAL_DIMENSION_MAPPING: 'UpdateBusinessCentralDimensionMapping',
+    UPDATE_BUSINESS_CENTRAL_SYNC_TAX_RATES: 'UpdateBusinessCentralSyncTaxRates',
 
     SET_PROMO_CODE: 'User_SetPromoCode',
     REQUEST_TAX_EXEMPTION: 'RequestTaxExemption',
@@ -1179,6 +1182,10 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.UPDATE_DUALENTRY_DEFAULT_VENDOR]: Parameters.UpdateDualEntryDefaultVendorParams;
     [WRITE_COMMANDS.UPDATE_DUALENTRY_CREDIT_CARD_ACCOUNT]: Parameters.UpdateDualEntryCreditCardAccountParams;
     [WRITE_COMMANDS.UPDATE_DUALENTRY_EXPENSIFY_CARD_ACCOUNT]: Parameters.UpdateDualEntryExpensifyCardAccountParams;
+
+    [WRITE_COMMANDS.UPDATE_BUSINESS_CENTRAL_ENABLE_NEW_CATEGORIES]: Parameters.UpdateBusinessCentralEnableNewCategoriesParams;
+    [WRITE_COMMANDS.UPDATE_BUSINESS_CENTRAL_DIMENSION_MAPPING]: Parameters.UpdateBusinessCentralDimensionMappingParams;
+    [WRITE_COMMANDS.UPDATE_BUSINESS_CENTRAL_SYNC_TAX_RATES]: Parameters.UpdateBusinessCentralSyncTaxRatesParams;
 
     [WRITE_COMMANDS.UPGRADE_TO_CORPORATE]: Parameters.UpgradeToCorporateParams;
     [WRITE_COMMANDS.DOWNGRADE_TO_TEAM]: Parameters.DowngradeToTeamParams;

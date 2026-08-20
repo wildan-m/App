@@ -571,6 +571,23 @@ function getAccountingIntegrationData(
                 errorFields: policy?.connections?.dualEntry?.config?.errorFields,
             };
         }
+        case CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL: {
+            return {
+                title: translate('workspace.accounting.businessCentral'),
+                // The connector entry (tile, icon, and setup flow) is added separately; this page is only reachable once the connection exists
+                setupConnectionFlow: null,
+                onImportPagePress: () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_BUSINESS_CENTRAL_IMPORT.getRoute(policyID)),
+                subscribedImportSettings: [
+                    CONST.BUSINESS_CENTRAL_CONFIG.ENABLE_NEW_CATEGORIES,
+                    CONST.BUSINESS_CENTRAL_CONFIG.SYNC_TAX_RATES,
+                    ...(policy?.connections?.businessCentral?.data?.dimensions?.map((dimension) => `${CONST.BUSINESS_CENTRAL_CONFIG.DIMENSION_MAPPING_PREFIX}${dimension.id}`) ?? []),
+                ],
+                onExportPagePress: () => null,
+                onAdvancedPagePress: () => null,
+                pendingFields: policy?.connections?.businessCentral?.config?.pendingFields,
+                errorFields: policy?.connections?.businessCentral?.config?.errorFields,
+            };
+        }
         default:
             return undefined;
     }

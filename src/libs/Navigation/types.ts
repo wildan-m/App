@@ -1307,6 +1307,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.ACCOUNTING.DUALENTRY_DEFAULT_COMPANY_CARD_VENDOR]: {
         policyID: string;
     };
+    [SCREENS.WORKSPACE.ACCOUNTING.BUSINESS_CENTRAL_IMPORT]: {
+        policyID: string;
+    };
     [SCREENS.WORKSPACE.ACCOUNTING.CARD_RECONCILIATION]: {
         policyID: string;
         connection: ValueOf<typeof CONST.POLICY.CONNECTIONS.ROUTE>;
