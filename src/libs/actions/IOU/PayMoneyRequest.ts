@@ -53,6 +53,7 @@ import Onyx from 'react-native-onyx';
 import {getAllPersonalDetails, getAllTransactionViolations} from '.';
 import {getReportFromHoldRequestsOnyxData} from './Hold';
 import {getReportPreviewReportAction} from './MoneyRequestBuilder';
+import {getSnapshotReportUpdates} from './SearchUpdate';
 
 type PayInvoiceArgs = {
     paymentMethodType: PaymentMethodType;
@@ -536,7 +537,21 @@ function getPayMoneyRequestParams({
 function cancelSendMoneyPayment(iouReport: OnyxTypes.Report, chatReport: OnyxTypes.Report, currentUserAccountIDParam: number) {
     const optimisticIOUCancelAction = buildOptimisticCancelPaymentReportAction(iouReport.reportID, -(iouReport.total ?? 0), iouReport.currency ?? '', currentUserAccountIDParam);
 
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    // The cancelled state has to reach the cached search snapshots too: Search screens read the report from the
+    // snapshot instead of live Onyx, so without this they keep showing the report as it was before the cancel.
+    const optimisticReportValue = {
+        isWaitingOnBankAccount: false,
+        isCancelledIOU: true,
+        // These reports belong to the sender's personal policy, which approves optionally, so cancelling
+        // returns the report to submitted and closed rather than approved.
+        stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+        statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
+        lastVisibleActionCreated: optimisticIOUCancelAction.created,
+        lastMessageText: getReportActionText(optimisticIOUCancelAction),
+        lastMessageHtml: getReportActionHtml(optimisticIOUCancelAction),
+    };
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`,
@@ -547,18 +562,9 @@ function cancelSendMoneyPayment(iouReport: OnyxTypes.Report, chatReport: OnyxTyp
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`,
-            value: {
-                isWaitingOnBankAccount: false,
-                isCancelledIOU: true,
-                // These reports belong to the sender's personal policy, which approves optionally, so cancelling
-                // returns the report to submitted and closed rather than approved.
-                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
-                statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
-                lastVisibleActionCreated: optimisticIOUCancelAction.created,
-                lastMessageText: getReportActionText(optimisticIOUCancelAction),
-                lastMessageHtml: getReportActionHtml(optimisticIOUCancelAction),
-            },
+            value: optimisticReportValue,
         },
+        ...getSnapshotReportUpdates(iouReport.reportID, optimisticReportValue),
     ];
 
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
@@ -573,7 +579,14 @@ function cancelSendMoneyPayment(iouReport: OnyxTypes.Report, chatReport: OnyxTyp
         },
     ];
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    const failureReportValue = {
+        isWaitingOnBankAccount: iouReport.isWaitingOnBankAccount,
+        isCancelledIOU: false,
+        stateNum: iouReport.stateNum,
+        statusNum: iouReport.statusNum,
+    };
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`,
@@ -586,13 +599,9 @@ function cancelSendMoneyPayment(iouReport: OnyxTypes.Report, chatReport: OnyxTyp
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`,
-            value: {
-                isWaitingOnBankAccount: iouReport.isWaitingOnBankAccount,
-                isCancelledIOU: false,
-                stateNum: iouReport.stateNum,
-                statusNum: iouReport.statusNum,
-            },
+            value: failureReportValue,
         },
+        ...getSnapshotReportUpdates(iouReport.reportID, failureReportValue),
     ];
 
     API.write(
@@ -664,7 +673,24 @@ function cancelPayment(
     const expenseReportActions = getAllReportActions(expenseReport.reportID);
     const iouCreatedAction = Object.values(iouReportActions).find((action) => isCreatedAction(action));
     const expenseCreatedAction = Object.values(expenseReportActions).find((action) => isCreatedAction(action));
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    // The cancelled state has to reach the cached search snapshots too: Search screens read the report from the
+    // snapshot instead of live Onyx, so without this they keep showing the report as it was before the cancel.
+    const optimisticReportValue = {
+        ...expenseReport,
+        isWaitingOnBankAccount: false,
+        lastVisibleActionCreated: optimisticReportAction?.created,
+        lastMessageText: getReportActionText(optimisticReportAction),
+        lastMessageHtml: getReportActionHtml(optimisticReportAction),
+        stateNum,
+        statusNum,
+        isCancelledIOU: true,
+        nextStep: optimisticNextStep,
+        pendingFields: {
+            nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+        },
+    };
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}`,
@@ -686,21 +712,9 @@ function cancelPayment(
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
-            value: {
-                ...expenseReport,
-                isWaitingOnBankAccount: false,
-                lastVisibleActionCreated: optimisticReportAction?.created,
-                lastMessageText: getReportActionText(optimisticReportAction),
-                lastMessageHtml: getReportActionHtml(optimisticReportAction),
-                stateNum,
-                statusNum,
-                isCancelledIOU: true,
-                nextStep: optimisticNextStep,
-                pendingFields: {
-                    nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
-                },
-            },
+            value: optimisticReportValue,
         },
+        ...getSnapshotReportUpdates(expenseReport.reportID, optimisticReportValue),
     ];
 
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>> = [
@@ -724,7 +738,22 @@ function cancelPayment(
         },
     ];
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    const failureReportValue = {
+        statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+        isWaitingOnBankAccount: expenseReport.isWaitingOnBankAccount,
+        isCancelledIOU: false,
+        nextStep:
+            buildOptimisticNextStep({
+                report: expenseReport,
+                predictedNextStatus: CONST.REPORT.STATUS_NUM.REIMBURSED,
+                isTrackIntentUser,
+            }) ?? null,
+        pendingFields: {
+            nextStep: null,
+        },
+    };
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}`,
@@ -737,21 +766,9 @@ function cancelPayment(
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
-            value: {
-                statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
-                isWaitingOnBankAccount: expenseReport.isWaitingOnBankAccount,
-                isCancelledIOU: false,
-                nextStep:
-                    buildOptimisticNextStep({
-                        report: expenseReport,
-                        predictedNextStatus: CONST.REPORT.STATUS_NUM.REIMBURSED,
-                        isTrackIntentUser,
-                    }) ?? null,
-                pendingFields: {
-                    nextStep: null,
-                },
-            },
+            value: failureReportValue,
         },
+        ...getSnapshotReportUpdates(expenseReport.reportID, failureReportValue),
     ];
 
     if (expenseReport.parentReportID && expenseReport.parentReportActionID) {

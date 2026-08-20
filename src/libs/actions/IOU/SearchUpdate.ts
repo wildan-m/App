@@ -11,7 +11,7 @@ import type {Participant} from '@src/types/onyx/IOU';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 
-import type {OnyxEntry, OnyxUpdate} from 'react-native-onyx';
+import type {NullishDeep, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 
 import Onyx from 'react-native-onyx';
 
@@ -334,4 +334,36 @@ function getSearchOnyxUpdate({
     };
 }
 
-export {getSearchOnyxUpdate, shouldOptimisticallyUpdateSearch};
+/**
+ * Builds the Onyx updates that mirror a report-level change into every cached search snapshot already holding
+ * that report.
+ *
+ * Search screens read reports from the search snapshot rather than from live Onyx, so a report update that is
+ * not mirrored here leaves those screens rendering the pre-update copy until the next Search request refreshes
+ * them - which never happens while the user is offline. Only snapshots that already contain the report are
+ * touched, so a report is never added to a search result that did not include it.
+ */
+function getSnapshotReportUpdates(reportID: string | undefined, reportUpdate: NullishDeep<OnyxTypes.Report>): Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> {
+    if (!reportID) {
+        return [];
+    }
+
+    const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${reportID}` as const;
+
+    return Object.entries(getAllSnapshots() ?? {})
+        .filter(([, snapshot]) => !!snapshot?.data?.[reportKey])
+        .map(([snapshotKey]) => {
+            const hash = snapshotKey.slice(ONYXKEYS.COLLECTION.SNAPSHOT.length);
+            // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
+            const snapshotData: NullishDeep<SearchResultDataType> = {};
+            snapshotData[reportKey] = reportUpdate;
+
+            return {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` as const,
+                value: {data: snapshotData},
+            };
+        });
+}
+
+export {getSearchOnyxUpdate, getSnapshotReportUpdates, shouldOptimisticallyUpdateSearch};
