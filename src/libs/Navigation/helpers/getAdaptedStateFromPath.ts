@@ -34,6 +34,7 @@ import findFocusedRouteWithOnyxTabGuard from './findFocusedRouteWithOnyxTabGuard
 import getDefaultDeeplinkSearchQuery from './getDefaultDeeplinkSearchQuery';
 import getMatchingNewRoute from './getMatchingNewRoute';
 import getParamsFromRoute from './getParamsFromRoute';
+import getRightModalRoutesFromBackToChain from './getRightModalRoutesFromBackToChain';
 import getStateFromPath from './getStateFromPath';
 import {isFullScreenName} from './isNavigatorName';
 import normalizePath from './normalizePath';
@@ -333,6 +334,36 @@ function getOnboardingAdaptedState(state: PartialState<NavigationState>): Partia
     return getRoutesWithIndex(routes);
 }
 
+/**
+ * Re-inserts the RHP screens that the focused RHP's `backTo` chain went through into the right modal stack, so an RHP
+ * that was opened on top of another RHP still has that one underneath it after a refresh.
+ */
+function restoreRightModalStackFromBackToChain(
+    state: PartialState<NavigationState<RootNavigatorParamList>>,
+    focusedRoute: NavigationRoute,
+): PartialState<NavigationState<RootNavigatorParamList>> {
+    const rightModalRoute = state.routes.find((route) => route.name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR);
+    const rightModalState = rightModalRoute?.state as PartialState<NavigationState> | undefined;
+
+    if (!rightModalRoute || !rightModalState?.routes) {
+        return state;
+    }
+
+    const ancestorRoutes = getRightModalRoutesFromBackToChain(focusedRoute);
+
+    if (ancestorRoutes.length === 0) {
+        return state;
+    }
+
+    const updatedRightModalRoute = {
+        ...rightModalRoute,
+        state: getRoutesWithIndex([...ancestorRoutes, ...(rightModalState.routes as NavigationPartialRoute[])]),
+    };
+    const updatedRoutes = state.routes.map((route) => (route === rightModalRoute ? updatedRightModalRoute : route));
+
+    return {...state, routes: updatedRoutes} as PartialState<NavigationState<RootNavigatorParamList>>;
+}
+
 function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamList>>): GetAdaptedStateReturnType {
     let currentState = state;
     const fullScreenRoute = currentState.routes.find((route) => isFullScreenName(route.name));
@@ -389,6 +420,10 @@ function getAdaptedState(state: PartialState<NavigationState<RootNavigatorParamL
         }
 
         if (focusedRoute) {
+            // An RHP opened on top of another RHP only puts the screen the URL points at in the stack.
+            // Rebuild the RHP screens its backTo chain went through so the one underneath stays open.
+            currentState = restoreRightModalStackFromBackToChain(currentState, focusedRoute);
+
             // getAdaptedState only runs when building navigation state from a path
             // (deeplink / browser refresh / cold load), so deeplink-only relations apply here.
             const matchingRootRoute = getMatchingFullScreenRoute(focusedRoute, true);
