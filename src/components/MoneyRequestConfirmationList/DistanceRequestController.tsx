@@ -104,6 +104,14 @@ function DistanceRequestController({
             return;
         }
 
+        // While the draft is still being rebound to the destination expense chat, the resolved policy can transiently be
+        // the user's active policy instead of the workspace the user picked. Validating (and auto-selecting a rate)
+        // against that policy would write a foreign workspace's rate ID onto the draft, so wait until the policy matches
+        // the selected participants' workspace, the same way the rate auto-assignment effect below does.
+        if (!selectedParticipants.some((participant) => participant.policyID === policy?.id)) {
+            return;
+        }
+
         const errorKey = 'iou.error.invalidRate';
         const policyRates = DistanceRequestUtils.getMileageRates(policy);
 
@@ -141,6 +149,7 @@ function DistanceRequestController({
         transaction,
         prevPolicy?.id,
         personalPolicy?.outputCurrency,
+        selectedParticipants,
     ]);
 
     useEffect(() => {
