@@ -1546,6 +1546,28 @@ function getCorrectedAutoReportingFrequency(policy: OnyxInputOrEntry<Policy>): V
     return CONST.POLICY.AUTO_REPORTING_FREQUENCIES.MANUAL;
 }
 
+/** The days of the week a "weekly" submission schedule can fire on, in picker order */
+const WEEKLY_AUTO_REPORTING_DAYS = [
+    CONST.POLICY.AUTO_REPORTING_OFFSET.SUNDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.MONDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.TUESDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.WEDNESDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.THURSDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.FRIDAY,
+    CONST.POLICY.AUTO_REPORTING_OFFSET.SATURDAY,
+] as const;
+
+type WeeklyAutoReportingDay = TupleToUnion<typeof WEEKLY_AUTO_REPORTING_DAYS>;
+
+/**
+ * The day of the week a "weekly" submission schedule fires on. Policies with no stored day keep
+ * today's fixed behavior of submitting on Sunday evening.
+ */
+function getWeeklyAutoReportingDay(policy: OnyxInputOrEntry<Policy>): WeeklyAutoReportingDay {
+    const offset = policy?.autoReportingOffset;
+    return WEEKLY_AUTO_REPORTING_DAYS.find((day) => day === offset) ?? CONST.POLICY.AUTO_REPORTING_OFFSET.SUNDAY;
+}
+
 /**
  * Checks if policy's approval mode is "optional", a.k.a. "Submit & Close"
  */
@@ -3128,6 +3150,8 @@ export {
     isInstantSubmitEnabled,
     isDelayedSubmissionEnabled,
     getCorrectedAutoReportingFrequency,
+    getWeeklyAutoReportingDay,
+    WEEKLY_AUTO_REPORTING_DAYS,
     isPaidGroupPolicy,
     isPaidGroupPolicyByType,
     canEditWorkspaceSettings,
@@ -3282,4 +3306,4 @@ export {
     isMergeHRCompleteSetupNeededSelector,
 };
 
-export type {MemberEmailsToAccountIDs, PolicyFeature, PolicyFeatureAccess};
+export type {MemberEmailsToAccountIDs, PolicyFeature, PolicyFeatureAccess, WeeklyAutoReportingDay};

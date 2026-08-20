@@ -4179,6 +4179,13 @@ const CONST = {
         AUTO_REPORTING_OFFSET: {
             LAST_BUSINESS_DAY_OF_MONTH: 'lastBusinessDayOfMonth',
             LAST_DAY_OF_MONTH: 'lastDayOfMonth',
+            SUNDAY: 'sunday',
+            MONDAY: 'monday',
+            TUESDAY: 'tuesday',
+            WEDNESDAY: 'wednesday',
+            THURSDAY: 'thursday',
+            FRIDAY: 'friday',
+            SATURDAY: 'saturday',
         },
         APPROVAL_MODE: {
             OPTIONAL: 'OPTIONAL',

@@ -828,6 +828,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_MONTHLY_OFFSET]: {
                             path: ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_MONTHLY_OFFSET.route,
                         },
+                        [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_WEEKLY_DAY]: {
+                            path: ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_WEEKLY_DAY.route,
+                        },
                         [SCREENS.WORKSPACE.SHARE]: {
                             path: ROUTES.WORKSPACE_OVERVIEW_SHARE.route,
                         },

@@ -26,7 +26,8 @@ import type {ValueOf} from 'type-fest';
 
 import React, {useCallback, useMemo, useState} from 'react';
 
-const DAYS_OF_MONTH = 28;
+// Days that don't exist in a given month fall back to that month's last day at submission time
+const DAYS_OF_MONTH = 31;
 
 type WorkspaceAutoReportingMonthlyOffsetProps = WithPolicyOnyxProps &
     PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_MONTHLY_OFFSET>;

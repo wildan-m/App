@@ -2852,6 +2852,13 @@ const translations = {
             daily: 'Daily',
             lastDayOfMonth: 'Last day of the month',
             lastBusinessDayOfMonth: 'Last business day of the month',
+            sunday: 'Sunday',
+            monday: 'Monday',
+            tuesday: 'Tuesday',
+            wednesday: 'Wednesday',
+            thursday: 'Thursday',
+            friday: 'Friday',
+            saturday: 'Saturday',
             ordinals: {
                 /* eslint-disable @typescript-eslint/naming-convention */
                 '1': 'First',
@@ -2867,6 +2874,8 @@ const translations = {
                 /* eslint-enable @typescript-eslint/naming-convention */
             },
         },
+        submitOn: 'Submit on',
+        weeklySchedule: (dayName: string) => `Weekly on ${dayName}s`,
         approverInMultipleWorkflows: 'This member already belongs to another approval workflow. Any updates here will reflect there too.',
         approverCircularReference: (name1: string, name2: string) =>
             `<strong>${name1}</strong> already approves reports to <strong>${name2}</strong>. Please choose a different approver to avoid a circular workflow.`,

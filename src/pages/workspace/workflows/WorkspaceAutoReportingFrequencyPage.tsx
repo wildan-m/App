@@ -14,7 +14,15 @@ import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
-import {canEditWorkspaceSettings, getCorrectedAutoReportingFrequency, goBackFromInvalidPolicy, isGroupPolicy, isPendingDeletePolicy, isSubmitPolicy} from '@libs/PolicyUtils';
+import {
+    canEditWorkspaceSettings,
+    getCorrectedAutoReportingFrequency,
+    getWeeklyAutoReportingDay,
+    goBackFromInvalidPolicy,
+    isGroupPolicy,
+    isPendingDeletePolicy,
+    isSubmitPolicy,
+} from '@libs/PolicyUtils';
 
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import withPolicy from '@pages/workspace/withPolicy';
@@ -128,6 +136,35 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
         </OfflineWithFeedback>
     );
 
+    const weeklyFrequencyDetails = () => (
+        <OfflineWithFeedback
+            pendingAction={policy?.pendingFields?.autoReportingOffset}
+            errors={getLatestErrorField(policy ?? {}, CONST.POLICY.COLLECTION_KEYS.AUTOREPORTING_OFFSET)}
+            onClose={() => clearPolicyErrorField(policy?.id, CONST.POLICY.COLLECTION_KEYS.AUTOREPORTING_OFFSET)}
+            errorRowStyles={[styles.ml7]}
+        >
+            <MenuItem
+                title={translate('workflowsPage.submitOn')}
+                titleStyle={styles.textLabelSupportingNormal}
+                description={translate(`workflowsPage.frequencies.${getWeeklyAutoReportingDay(policy)}`)}
+                descriptionTextStyle={styles.textNormalThemeText}
+                wrapperStyle={styles.pr3}
+                onPress={() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_WEEKLY_DAY.getRoute(policy?.id))}
+                shouldShowRightIcon
+            />
+        </OfflineWithFeedback>
+    );
+
+    const getSelectedFrequencyDetails = (frequencyKey: string) => {
+        if (frequencyKey === CONST.POLICY.AUTO_REPORTING_FREQUENCIES.MONTHLY) {
+            return monthlyFrequencyDetails();
+        }
+        if (frequencyKey === CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY) {
+            return weeklyFrequencyDetails();
+        }
+        return null;
+    };
+
     const isSubmitWorkspace = isSubmitPolicy(policy);
     const autoReportingFrequencyDisplayNames = getAutoReportingFrequencyDisplayNames(translate, isSubmitWorkspace);
 
@@ -135,7 +172,7 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
         text: autoReportingFrequencyDisplayNames[frequencyKey as AutoReportingFrequencyKey] ?? '',
         keyForList: frequencyKey,
         isSelected: frequencyKey === selectedFrequency,
-        footerContent: frequencyKey === selectedFrequency && frequencyKey === CONST.POLICY.AUTO_REPORTING_FREQUENCIES.MONTHLY ? monthlyFrequencyDetails() : null,
+        footerContent: frequencyKey === selectedFrequency ? getSelectedFrequencyDetails(frequencyKey) : null,
     }));
 
     return (

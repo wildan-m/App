@@ -8,7 +8,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {clearPolicyErrorField, setWorkspaceAutoHarvesting} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getCorrectedAutoReportingFrequency} from '@libs/PolicyUtils';
+import {getCorrectedAutoReportingFrequency, getWeeklyAutoReportingDay} from '@libs/PolicyUtils';
 
 import {getAutoReportingFrequencyDisplayNames} from '@pages/workspace/workflows/WorkspaceAutoReportingFrequencyPage';
 
@@ -30,6 +30,11 @@ function WorkflowsSubmissionsTab({policyID}: WorkflowsSubmissionsTabProps) {
     const {canWrite: canWriteWorkflows, showReadOnlyModal, withReadOnlyFallback: withWorkflowsReadOnlyFallback} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.WORKFLOWS);
 
     const hasDelayedSubmissionError = !!(policy?.errorFields?.autoReporting ?? policy?.errorFields?.autoReportingFrequency);
+    const correctedFrequency = getCorrectedAutoReportingFrequency(policy) ?? CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY;
+    const frequencyTitle =
+        correctedFrequency === CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY
+            ? translate('workflowsPage.weeklySchedule', translate(`workflowsPage.frequencies.${getWeeklyAutoReportingDay(policy)}`))
+            : getAutoReportingFrequencyDisplayNames(translate)[correctedFrequency];
     const onPressAutoReportingFrequency = useCallback(() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_AUTOREPORTING_FREQUENCY.getRoute(policyID)), [policyID]);
 
     const onToggle = (isEnabled: boolean) => {
@@ -51,7 +56,7 @@ function WorkflowsSubmissionsTab({policyID}: WorkflowsSubmissionsTabProps) {
             onToggle={onToggle}
             subMenuItems={
                 <MenuItemWithTopDescription
-                    title={getAutoReportingFrequencyDisplayNames(translate)[getCorrectedAutoReportingFrequency(policy) ?? CONST.POLICY.AUTO_REPORTING_FREQUENCIES.WEEKLY]}
+                    title={frequencyTitle}
                     titleStyle={styles.textNormalThemeText}
                     descriptionTextStyle={styles.textLabelSupportingNormal}
                     onPress={onPressAutoReportingFrequency}

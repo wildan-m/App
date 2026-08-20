@@ -2933,6 +2933,9 @@ type WorkspaceSplitNavigatorParamList = {
     [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_MONTHLY_OFFSET]: {
         policyID: string;
     };
+    [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_WEEKLY_DAY]: {
+        policyID: string;
+    };
     [SCREENS.WORKSPACE.INVOICES]: {
         policyID: string;
     };

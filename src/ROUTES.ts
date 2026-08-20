@@ -3006,6 +3006,15 @@ const ROUTES = {
             return `workspaces/${policyID}/workflows/auto-reporting-frequency/monthly-offset` as const;
         },
     },
+    WORKSPACE_WORKFLOWS_AUTOREPORTING_WEEKLY_DAY: {
+        route: 'workspaces/:policyID/workflows/auto-reporting-frequency/weekly-day',
+        getRoute: (policyID: string | undefined) => {
+            if (!policyID) {
+                Log.warn('Invalid policyID is used to build the WORKSPACE_WORKFLOWS_AUTOREPORTING_WEEKLY_DAY route');
+            }
+            return `workspaces/${policyID}/workflows/auto-reporting-frequency/weekly-day` as const;
+        },
+    },
     WORKSPACE_INVOICES: {
         route: 'workspaces/:policyID/invoices',
         getRoute: (policyID: string | undefined) => {

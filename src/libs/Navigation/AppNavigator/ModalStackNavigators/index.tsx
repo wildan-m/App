@@ -932,6 +932,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_FREQUENCY]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceAutoReportingFrequencyPage').default,
     [SCREENS.WORKSPACE.WORKFLOWS_CURRENCY_CONVERSION_FEES]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceWorkflowsCurrencyConversionFeesPage').default,
     [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_MONTHLY_OFFSET]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceAutoReportingMonthlyOffsetPage').default,
+    [SCREENS.WORKSPACE.WORKFLOWS_AUTO_REPORTING_WEEKLY_DAY]: () => require<ReactComponentModule>('../../../../pages/workspace/workflows/WorkspaceAutoReportingWeeklyDayPage').default,
     [SCREENS.WORKSPACE.TAX_EDIT]: () => require<ReactComponentModule>('../../../../pages/workspace/taxes/WorkspaceEditTaxPage').default,
     [SCREENS.WORKSPACE.TAX_NAME]: () => require<ReactComponentModule>('../../../../pages/workspace/taxes/NamePage').default,
     [SCREENS.WORKSPACE.TAX_VALUE]: () => require<ReactComponentModule>('../../../../pages/workspace/taxes/ValuePage').default,
