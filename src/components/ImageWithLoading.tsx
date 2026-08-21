@@ -1,6 +1,8 @@
 import useNetwork from '@hooks/useNetwork';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import CONST from '@src/CONST';
+
 import type {LayoutChangeEvent, StyleProp, ViewStyle} from 'react-native';
 
 import delay from 'lodash/delay';
@@ -52,10 +54,15 @@ function ImageWithLoading({
     const [isImageCached, setIsImageCached] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     // The full-resolution image is not guaranteed to ever emit `onLoad`/`onError` (e.g. a receipt derivative that is
-    // still being generated server-side), so `isLoading` can stay `true` indefinitely. Once the low-resolution preview
-    // is on screen we have something readable to show, so the loading state must stop being visible at that point.
-    const [isThumbnailLoading, setIsThumbnailLoading] = useState(!!previewUri);
+    // still being generated server-side), so `isLoading` can stay `true` indefinitely. The progressive transition
+    // therefore gets its own deadline instead of waiting on the full-resolution image to settle.
+    const [hasWaitedForFullResolution, setHasWaitedForFullResolution] = useState(false);
     const {isOffline} = useNetwork();
+
+    // While this is true the low-resolution preview is dimmed underneath a loading indicator, to show that a sharper
+    // version is on its way. Once it turns false the preview is what we settle on, drawn exactly as it is when nothing
+    // is loading, while the full-resolution image stays mounted and still swaps in if it ever arrives.
+    const isAwaitingFullResolution = isLoading && !isImageCached && !isOffline && !hasWaitedForFullResolution;
 
     const handleError = () => {
         onError?.();
@@ -90,6 +97,15 @@ function ImageWithLoading({
         return () => clearTimeout(timeout);
     }, [isLoading]);
 
+    /** Bound how long the progressive transition waits, so a full-resolution image that never settles cannot keep it running. */
+    useEffect(() => {
+        if (!isLoading || hasWaitedForFullResolution) {
+            return;
+        }
+        const timeout = delay(() => setHasWaitedForFullResolution(true), CONST.TIMING.FULL_RESOLUTION_IMAGE_TIMEOUT);
+        return () => clearTimeout(timeout);
+    }, [isLoading, hasWaitedForFullResolution]);
+
     return (
         <View
             style={[styles.w100, styles.h100, containerStyles]}
@@ -101,12 +117,9 @@ function ImageWithLoading({
                     <Image
                         {...rest}
                         source={{uri: previewUri}}
-                        style={[styles.w100, styles.h100, style]}
+                        style={[styles.w100, styles.h100, isAwaitingFullResolution && styles.opacitySemiTransparent, style]}
                         resizeMode={resizeMode}
-                        onLoad={(e) => {
-                            setIsThumbnailLoading(false);
-                            onLoad?.(e);
-                        }}
+                        onLoad={onLoad}
                         loadingIconSize={loadingIconSize}
                         loadingIndicatorStyles={loadingIndicatorStyles}
                     />
@@ -132,13 +145,13 @@ function ImageWithLoading({
                     isLoadedRef.current = false;
                     setIsImageCached(false);
                     setIsLoading(true);
-                    setIsThumbnailLoading(!!previewUri);
+                    setHasWaitedForFullResolution(false);
                     waitForSession?.();
                 }}
                 loadingIconSize={loadingIconSize}
                 loadingIndicatorStyles={loadingIndicatorStyles}
             />
-            {isLoading && (!previewUri || isThumbnailLoading) && !isImageCached && !isOffline && (
+            {isAwaitingFullResolution && (
                 <LoadingIndicator
                     iconSize={loadingIconSize}
                     style={[styles.opacity1, styles.bgTransparent, loadingIndicatorStyles]}
