@@ -15,13 +15,7 @@ function ComposerEditingButtons() {
 
     const {deleteDraft} = useComposerEditActions();
 
-    const editingButtonsContainerStyles = [
-        styles.dFlex,
-        styles.alignItemsCenter,
-        styles.flexWrap,
-        styles.justifyContentCenter,
-        {paddingVertical: styles.composerSizeButton.marginHorizontal},
-    ];
+    const editingButtonsContainerStyles = [styles.dFlex, styles.alignItemsCenter, styles.flexWrap, styles.justifyContentCenter];
     const expandCollapseComposerButtonStyles = [styles.flexGrow1, styles.flexShrink0, {marginRight: styles.composerSizeButton.marginHorizontal}];
 
     return (
