@@ -2,6 +2,7 @@ import {hasAuthToken} from '@libs/actions/Session';
 import continuePlaidOAuth from '@libs/continuePlaidOAuth';
 import navigationRef from '@libs/Navigation/navigationRef';
 import type {RootNavigatorParamList} from '@libs/Navigation/types';
+import {getRouteFromLink, parseReportRouteParams} from '@libs/ReportUtils';
 
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -55,7 +56,12 @@ const subscribe: LinkingOptions<RootNavigatorParamList>['subscribe'] = (listener
         // which lives in AuthScreens and is not mounted while PublicScreens is showing. Dispatching it here
         // throws "NAVIGATE ... was not handled by any navigator". openReportFromDeepLink() already opens the
         // public room as an anonymous user and handles navigation, so defer to it instead. See #92672.
-        if (!hasAuthToken() && url.includes(`/${ROUTES.REPORT}/`)) {
+        //
+        // Resolve the URL to the route it actually targets rather than searching the raw URL text: a security
+        // link such as `/v/<accountID>/<validateCode>?exitTo=/r/<reportID>` only mentions the report route in a
+        // query parameter, but it targets ValidateLogin, which *is* registered in PublicScreens. Dropping it
+        // leaves an invited user stranded on the sign-in page instead of signing them in. See #99156.
+        if (!hasAuthToken() && !!parseReportRouteParams(getRouteFromLink(url)).reportID) {
             return;
         }
         listener(url);
