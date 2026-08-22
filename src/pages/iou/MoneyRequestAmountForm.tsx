@@ -158,14 +158,17 @@ function MoneyRequestAmountForm({
     const toggleNegative = useCallback(() => {
         const nextIsNegative = !isNegative;
         setIsNegative(nextIsNegative);
-        // The sign flip bypasses the input's change handler, so report the newly signed value like a keystroke would
+        // The sign flip bypasses the input's change handler, so report the newly signed value like a keystroke would.
+        // The sign counts as input on its own, so it is reported even when no digits have been typed yet.
         const currentNumber = moneyRequestAmountInputRef.current?.getNumber() ?? '';
-        onAmountChange?.(currentNumber && nextIsNegative ? `-${currentNumber}` : currentNumber);
+        onAmountChange?.(nextIsNegative ? `-${currentNumber}` : currentNumber);
     }, [isNegative, onAmountChange]);
 
     const clearNegative = useCallback(() => {
         setIsNegative(false);
-    }, []);
+        // Backspace removed the sign from an empty field, so report the now-unsigned value instead of leaving a stale sign
+        onAmountChange?.(moneyRequestAmountInputRef.current?.getNumber() ?? '');
+    }, [onAmountChange]);
 
     const initializeIsNegative = useCallback((currentAmount: number) => {
         if (currentAmount >= 0) {
@@ -304,8 +307,8 @@ function MoneyRequestAmountForm({
                 onCurrencyButtonPress={onCurrencyButtonPress}
                 onFormatAmount={onFormatAmount}
                 onAmountChange={(newAmount) => {
-                    // Signed the same way `getNumber` composes it, so the parent compares like-for-like
-                    onAmountChange?.(newAmount && isNegative ? `-${newAmount}` : newAmount);
+                    // Report what the field displays: the sign stays part of the value even once every digit is deleted
+                    onAmountChange?.(isNegative ? `-${newAmount}` : newAmount);
                     if (!formError) {
                         return;
                     }
