@@ -20,8 +20,17 @@ function ValidateCodeCountdown({onCountdownFinish, requestedAt, ref}: ValidateCo
     );
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
+    // Callers that don't stamp a request timestamp anywhere still need a wall-clock anchor to measure against. Without one
+    // the only way to count down is to assume every scheduled callback fires once per second, which is false in a hidden
+    // browser tab (timers are throttled) and on native while the app is backgrounded (the JS thread is suspended).
+    const localRequestedAtRef = useRef<number | undefined>(undefined);
+
     useImperativeHandle(ref, () => ({
-        resetCountdown: () => setTimeRemaining(CONST.REQUEST_CODE_DELAY),
+        resetCountdown: () => {
+            // Re-anchor so a resend measures the new window from this moment.
+            localRequestedAtRef.current = Date.now();
+            setTimeRemaining(CONST.REQUEST_CODE_DELAY);
+        },
     }));
 
     useEffect(() => {
@@ -30,15 +39,16 @@ function ValidateCodeCountdown({onCountdownFinish, requestedAt, ref}: ValidateCo
             return;
         }
 
-        // When anchored to `requestedAt`, align the next tick to the wall-clock second boundary so every tab/reload flips the
-        // displayed second at the same instant instead of drifting by each tab's own mount offset. Without an anchor (the
-        // `hasValidateCodeBeenSent` flows) there is nothing to align to, so fall back to a fixed 1s cadence.
-        const msUntilNextTick = requestedAt ? CONST.MILLISECONDS_PER_SECOND - ((Date.now() - requestedAt) % CONST.MILLISECONDS_PER_SECOND) : CONST.MILLISECONDS_PER_SECOND;
+        localRequestedAtRef.current ??= Date.now();
+
+        // Align the next tick to the wall-clock second boundary of the request so every tab/reload flips the
+        // displayed second at the same instant instead of drifting by each tab's own mount offset.
+        const msUntilNextTick = CONST.MILLISECONDS_PER_SECOND - ((Date.now() - (requestedAt ?? localRequestedAtRef.current)) % CONST.MILLISECONDS_PER_SECOND);
 
         timerRef.current = setTimeout(() => {
-            // With an anchor, re-derive from the wall clock so the countdown self-corrects against setTimeout drift,
-            // background-tab throttling, and cross-tab phase differences. Without one, keep the simple decrement.
-            setTimeRemaining((prev) => (requestedAt ? DateUtils.getRemainingSecondsInWindow(requestedAt, CONST.REQUEST_CODE_DELAY * CONST.MILLISECONDS_PER_SECOND) : prev - 1));
+            // Re-derive from the wall clock so the countdown self-corrects against setTimeout drift, background-tab
+            // throttling and a suspended JS thread instead of trusting how many callbacks actually ran.
+            setTimeRemaining(DateUtils.getRemainingSecondsInWindow(requestedAt ?? localRequestedAtRef.current, CONST.REQUEST_CODE_DELAY * CONST.MILLISECONDS_PER_SECOND));
         }, msUntilNextTick);
 
         return () => {
