@@ -52,7 +52,7 @@ function VerifyAccountPageBase({navigateBackTo, navigateForwardTo, handleClose, 
 
     const handleSubmitForm = useCallback(
         (validateCode: string) => {
-            validateSecondaryLogin(contactMethod, validateCode);
+            validateSecondaryLogin(contactMethod, validateCode, true);
         },
         [contactMethod],
     );

@@ -574,7 +574,7 @@ function requestValidateCodeAction(params?: ResendValidateCodeParams) {
 /**
  * Validates a secondary login / contact method
  */
-function validateSecondaryLogin(contactMethod: string, validateCode: string) {
+function validateSecondaryLogin(contactMethod: string, validateCode: string, shouldResetActionCode?: boolean) {
     const loginKey = getExpensifyLoginKey(contactMethod);
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.LOGINS | typeof ONYXKEYS.ACCOUNT>> = [
         {
@@ -601,7 +601,7 @@ function validateSecondaryLogin(contactMethod: string, validateCode: string) {
             },
         },
     ];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.LOGINS | typeof ONYXKEYS.ACCOUNT>> = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.LOGINS | typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.VALIDATE_ACTION_CODE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.LOGINS,
@@ -627,7 +627,7 @@ function validateSecondaryLogin(contactMethod: string, validateCode: string) {
         },
     ];
 
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.LOGINS | typeof ONYXKEYS.ACCOUNT>> = [
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.LOGINS | typeof ONYXKEYS.ACCOUNT | typeof ONYXKEYS.VALIDATE_ACTION_CODE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.LOGINS,
@@ -649,6 +649,19 @@ function validateSecondaryLogin(contactMethod: string, validateCode: string) {
             value: {isLoading: false},
         },
     ];
+
+    // The requested code is consumed by this validation, so some flows need to clear the timestamp to be able to request a new magic code right after.
+    if (shouldResetActionCode) {
+        const resetActionCode: OnyxUpdate<typeof ONYXKEYS.VALIDATE_ACTION_CODE> = {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.VALIDATE_ACTION_CODE,
+            value: {
+                lastValidateCodeRequestedAt: null,
+            },
+        };
+        successData.push(resetActionCode);
+        failureData.push(resetActionCode);
+    }
 
     getDeviceInfoWithID().then((deviceInfo) => {
         const parameters: ValidateSecondaryLoginParams = {partnerUserID: contactMethod, validateCode, deviceInfo};
