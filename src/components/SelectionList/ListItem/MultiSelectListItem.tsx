@@ -1,4 +1,5 @@
-import Avatar from '@components/Avatar';
+import SingleAvatar from '@components/Avatar/layouts/SingleAvatar';
+import {AvatarTooltipsProvider} from '@components/Avatar/tooltips/AvatarTooltipContext';
 
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -40,7 +41,14 @@ function MultiSelectListItem<TItem extends ListItem>({
 
     const itemWithAvatar = {
         ...item,
-        leftElement: icon ? <AvatarLeftElement icon={icon} /> : item.leftElement,
+        leftElement: icon ? (
+            <AvatarLeftElement
+                icon={icon}
+                showTooltip={showTooltip}
+            />
+        ) : (
+            item.leftElement
+        ),
     };
     const computedWrapperStyle = [icon ? [styles.pv0, styles.mnh13] : styles.optionRowCompact, wrapperStyle];
 
@@ -70,19 +78,18 @@ function MultiSelectListItem<TItem extends ListItem>({
     );
 }
 
-function AvatarLeftElement({icon}: {icon: Icon}) {
+function AvatarLeftElement({icon, showTooltip}: {icon: Icon; showTooltip: boolean}) {
     const styles = useThemeStyles();
 
     return (
         <View style={[styles.mentionSuggestionsAvatarContainer, styles.mr3]}>
-            <Avatar
-                source={icon.source}
-                size={CONST.AVATAR_SIZE.X_SMALL}
-                name={icon.name}
-                avatarID={icon.id}
-                type={icon.type ?? CONST.ICON_TYPE_AVATAR}
-                fallbackIcon={icon.fallbackIcon}
-            />
+            <AvatarTooltipsProvider isEnabled={showTooltip}>
+                <SingleAvatar
+                    avatar={icon}
+                    size={CONST.AVATAR_SIZE.X_SMALL}
+                    containerStyles={[]}
+                />
+            </AvatarTooltipsProvider>
         </View>
     );
 }

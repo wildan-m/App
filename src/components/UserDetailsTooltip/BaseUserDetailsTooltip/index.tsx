@@ -1,4 +1,5 @@
-import Avatar from '@components/Avatar';
+import UserAvatar from '@components/Avatar/UserAvatar';
+import WorkspaceAvatar from '@components/Avatar/WorkspaceAvatar';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
@@ -10,6 +11,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import {isAnonymousUser} from '@libs/actions/Session';
 import {getUserDetailTooltipText} from '@libs/ReportUtils';
+import {getAccountIDFromAvatarID} from '@libs/UserAvatarUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -59,14 +61,21 @@ function BaseUserDetailsTooltip({accountID, fallbackUserDetails, icon, delegateA
         () => (
             <View style={[styles.alignItemsCenter, styles.ph2, styles.pv2]}>
                 <View style={styles.emptyAvatar}>
-                    <Avatar
-                        containerStyles={[styles.actionAvatar]}
-                        source={icon?.source ?? userAvatar}
-                        avatarID={icon?.id ?? userAccountID}
-                        type={icon?.type ?? CONST.ICON_TYPE_AVATAR}
-                        name={icon?.name ?? userLogin}
-                        fallbackIcon={icon?.fallbackIcon}
-                    />
+                    {icon?.type === CONST.ICON_TYPE_WORKSPACE ? (
+                        <WorkspaceAvatar
+                            containerStyles={[styles.actionAvatar]}
+                            source={icon.source}
+                            avatarID={icon.id ?? CONST.DEFAULT_NUMBER_ID}
+                            name={icon.name ?? ''}
+                        />
+                    ) : (
+                        <UserAvatar
+                            containerStyles={[styles.actionAvatar]}
+                            source={icon?.source ?? userAvatar}
+                            accountID={getAccountIDFromAvatarID(icon?.id ?? userAccountID)}
+                            fallbackIcon={icon?.fallbackIcon}
+                        />
+                    )}
                 </View>
                 <Text style={[styles.mt2, styles.textMicroBold, styles.textReactionSenders, styles.textAlignCenter]}>{title}</Text>
                 <Text style={[styles.textMicro, styles.fontColorReactionLabel, styles.breakWord, styles.textAlignCenter]}>{subtitle}</Text>
@@ -89,7 +98,6 @@ function BaseUserDetailsTooltip({accountID, fallbackUserDetails, icon, delegateA
             icon,
             userAvatar,
             userAccountID,
-            userLogin,
             title,
             subtitle,
         ],
