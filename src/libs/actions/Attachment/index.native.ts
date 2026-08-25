@@ -1,5 +1,6 @@
 import {getImageCacheFileExtension} from '@libs/AttachmentUtils';
 import Log from '@libs/Log';
+import ReceiptStorage from '@libs/ReceiptStorage';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -23,10 +24,16 @@ async function cacheAttachment({attachmentID, uri, mimeType}: CacheAttachmentPro
         const fileName = `${attachmentID}.${fileExtension}`;
         const destPath = `${ATTACHMENT_DIR}/${fileName}`;
 
+        // A stored receipts URI is an absolute path, and on iOS the app data container moves on most
+        // upgrades, so the stored path can name a directory the device no longer has. Every other
+        // reader of a stored receipts path re-anchors it to the current container first, so this copy
+        // does the same instead of reading a path that may no longer resolve.
+        const sourceUri = ReceiptStorage.resolve(uri) ?? uri;
+
         try {
             // The OS can purge Caches wholesale, so the directory may need recreating
             await RNFS.mkdir(ATTACHMENT_DIR);
-            await RNFS.copyFile(uri, destPath);
+            await RNFS.copyFile(sourceUri, destPath);
             await Onyx.set(`${ONYXKEYS.COLLECTION.ATTACHMENT}${attachmentID}`, {
                 attachmentID,
                 source: destPath,
@@ -75,11 +82,15 @@ async function cacheAttachment({attachmentID, uri, mimeType}: CacheAttachmentPro
 }
 
 async function getCachedAttachment({attachmentID, attachment, currentSource}: GetCachedAttachmentProps) {
+    // Whenever there is no cached copy to serve, the caller renders this source directly, so it is
+    // re-anchored to the current container for the same reason the cache copy is.
+    const resolvedSource = ReceiptStorage.resolve(currentSource) ?? currentSource;
+
     const isStale = attachment ? attachment?.remoteSource && attachment.remoteSource !== currentSource : false;
     if (isStale) {
         // Only re-cache the [markdown-attachment] if it is outdated (updated)
         cacheAttachment({attachmentID, uri: currentSource});
-        return currentSource;
+        return resolvedSource;
     }
 
     const localSource = attachment?.source;
@@ -93,7 +104,7 @@ async function getCachedAttachment({attachmentID, attachment, currentSource}: Ge
         cacheAttachment({attachmentID, uri: currentSource});
     }
 
-    return currentSource;
+    return resolvedSource;
 }
 
 async function removeCachedAttachment({attachmentID, localSource}: RemoveCachedAttachmentProps): Promise<void> {
