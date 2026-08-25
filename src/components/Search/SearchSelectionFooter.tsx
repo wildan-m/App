@@ -3,17 +3,19 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotals';
 
-import {getFooterConvertedAmounts} from '@libs/actions/Search';
+import {getFooterConvertedAmounts, search} from '@libs/actions/Search';
+import SearchFooterSelectionsActions from '@libs/actions/SearchFooterSelections';
 import {isGroupEntry} from '@libs/SearchUIUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchResults} from '@src/types/onyx';
+import type {SearchResults, Transaction} from '@src/types/onyx';
+import type {SearchFooterCountType, SearchFooterTotalType} from '@src/types/onyx/SearchFooterSelections';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {OnyxEntry} from 'react-native-onyx';
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 
 import type {SelectedTransactionInfo, SelectedTransactions} from './types';
 
@@ -23,17 +25,6 @@ import SearchPageFooter from './SearchPageFooter';
 type SearchSelectionFooterProps = {
     /** The (sorting-aware) results the page is displaying; source of the footer's totals metadata. */
     searchResults: OnyxEntry<SearchResults>;
-};
-
-type FooterCurrencyState = {
-    /** Search hash this footer currency state belongs to */
-    searchHash: number | undefined;
-
-    /** Custom currency selected in the footer, if any */
-    selectedCurrency: string | undefined;
-
-    /** Default currency captured for this search */
-    defaultCurrency: string | undefined;
 };
 
 const EMPTY_REPORT_IDS: string[] = [];
@@ -58,6 +49,39 @@ function getTransactionCount(transactionKeys: string[], transactions: SelectedTr
         }
         return count + 1;
     }, 0);
+}
+
+// Snapshot entries are a union of every search row type, so read the footer's flags without asserting a row type.
+function getSnapshotFlag(entry: unknown, field: 'reimbursable' | 'billable'): boolean {
+    if (!entry || typeof entry !== 'object') {
+        return false;
+    }
+    if (field === 'reimbursable') {
+        return 'reimbursable' in entry && entry.reimbursable === true;
+    }
+    return 'billable' in entry && entry.billable === true;
+}
+
+function getSnapshotID(entry: unknown, field: 'reportID' | 'policyID'): string | undefined {
+    if (!entry || typeof entry !== 'object') {
+        return undefined;
+    }
+    if (field === 'reportID') {
+        return 'reportID' in entry && typeof entry.reportID === 'string' ? entry.reportID : undefined;
+    }
+    return 'policyID' in entry && typeof entry.policyID === 'string' ? entry.policyID : undefined;
+}
+
+// A workspace that disabled the billable field has no billable value to break spend out by.
+function doesPolicyTrackBillable(policy: unknown): boolean {
+    if (!policy || typeof policy !== 'object' || !('disabledFields' in policy)) {
+        return true;
+    }
+    const disabledFields = policy.disabledFields;
+    if (!disabledFields || typeof disabledFields !== 'object' || !('defaultBillable' in disabledFields)) {
+        return true;
+    }
+    return disabledFields.defaultBillable !== true;
 }
 
 function getTransactionTotal(transactions: SelectedTransactionInfo[]): number {
@@ -110,14 +134,12 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     const activePolicy = useActivePolicy();
     // The server converts search figures to the active policy's currency when the query carries no explicit target.
     const searchTargetCurrency = activePolicy?.outputCurrency ?? CONST.CURRENCY.USD;
-    const [footerCurrencyState, setFooterCurrencyState] = useState<FooterCurrencyState>({
-        searchHash: undefined,
-        selectedCurrency: undefined,
-        defaultCurrency: undefined,
-    });
-    const isCurrentFooterState = footerCurrencyState.searchHash === currentSearchHash;
-    const selectedCurrency = isCurrentFooterState ? footerCurrencyState.selectedCurrency : undefined;
-    const defaultFooterCurrency = isCurrentFooterState ? footerCurrencyState.defaultCurrency : undefined;
+    // Footer selections are persisted per search type, so a choice made on one search type never leaks into another
+    // and survives leaving the page.
+    const [footerSelections] = useOnyx(ONYXKEYS.NVP_SEARCH_FOOTER_SELECTIONS);
+    const searchType = currentSearchQueryJSON?.type ?? CONST.SEARCH.DATA_TYPES.EXPENSE;
+    const footerSelection = footerSelections?.[searchType];
+    const selectedCurrency = footerSelection?.currency;
 
     // The Auth command merges converted figures here (by transaction, report, group, and query hash, each nested
     // under the target currency); the live search snapshot stays in its original currency.
@@ -142,6 +164,76 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     const metadataCount = metadata?.count;
     const metadataCurrency = metadata?.currency;
     const metadataTotal = metadata?.total;
+    const metadataReportCount = metadata?.reportCount;
+    const defaultCountType: SearchFooterCountType = isReportsSearch ? CONST.SEARCH.FOOTER_COUNT_TYPES.REPORTS : CONST.SEARCH.FOOTER_COUNT_TYPES.EXPENSES;
+    const selectedCountType = footerSelection?.countType ?? defaultCountType;
+    const selectedTotalType = footerSelection?.totalType ?? CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL;
+
+    // Total options are offered only when at least one loaded expense matches; the billable pair also needs that
+    // expense's policy to track billable, since expenses elsewhere have no billable value to match on.
+    const availableTotalTypes = useMemo<SearchFooterTotalType[]>(() => {
+        const data = currentSearchResults?.data;
+        const types: SearchFooterTotalType[] = [CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL];
+        if (!data) {
+            return types;
+        }
+        let hasReimbursable = false;
+        let hasNonReimbursable = false;
+        let hasBillable = false;
+        let hasNonBillable = false;
+        for (const [key, transaction] of Object.entries(data)) {
+            if (!key.startsWith(ONYXKEYS.COLLECTION.TRANSACTION) || !transaction) {
+                continue;
+            }
+            if (getSnapshotFlag(transaction, 'reimbursable')) {
+                hasReimbursable = true;
+            } else {
+                hasNonReimbursable = true;
+            }
+            const report: unknown = data[`${ONYXKEYS.COLLECTION.REPORT}${getSnapshotID(transaction, 'reportID')}`];
+            const policy: unknown = data[`${ONYXKEYS.COLLECTION.POLICY}${getSnapshotID(report, 'policyID')}`];
+            if (!doesPolicyTrackBillable(policy)) {
+                continue;
+            }
+            if (getSnapshotFlag(transaction, 'billable')) {
+                hasBillable = true;
+            } else {
+                hasNonBillable = true;
+            }
+        }
+        if (hasReimbursable) {
+            types.push(CONST.SEARCH.FOOTER_TOTAL_TYPES.REIMBURSABLE);
+        }
+        if (hasNonReimbursable) {
+            types.push(CONST.SEARCH.FOOTER_TOTAL_TYPES.NON_REIMBURSABLE);
+        }
+        if (hasBillable) {
+            types.push(CONST.SEARCH.FOOTER_TOTAL_TYPES.BILLABLE);
+        }
+        if (hasNonBillable) {
+            types.push(CONST.SEARCH.FOOTER_TOTAL_TYPES.NON_BILLABLE);
+        }
+        return types;
+    }, [currentSearchResults?.data]);
+
+    // A partial selection is summed on the client, so the selected rows are narrowed to the chosen aggregate here.
+    const doesTransactionMatchTotalType = useCallback(
+        (transaction: Transaction | undefined) => {
+            switch (selectedTotalType) {
+                case CONST.SEARCH.FOOTER_TOTAL_TYPES.REIMBURSABLE:
+                    return !!transaction?.reimbursable;
+                case CONST.SEARCH.FOOTER_TOTAL_TYPES.NON_REIMBURSABLE:
+                    return !transaction?.reimbursable;
+                case CONST.SEARCH.FOOTER_TOTAL_TYPES.BILLABLE:
+                    return !!transaction?.billable;
+                case CONST.SEARCH.FOOTER_TOTAL_TYPES.NON_BILLABLE:
+                    return !transaction?.billable;
+                default:
+                    return true;
+            }
+        },
+        [selectedTotalType],
+    );
     const selectedTransactionsKeys = useMemo(() => Object.keys(selectedTransactions ?? {}), [selectedTransactions]);
     const excludedTransactionsKeys = useMemo(() => Object.keys(excludedTransactions), [excludedTransactions]);
     const isExpenseType = currentSearchQueryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE;
@@ -272,7 +364,7 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     const firstSelectedTransactionKey = selectedTransactionsKeys.at(0);
     const firstSelectedTransaction = firstSelectedTransactionKey ? selectedTransactions[firstSelectedTransactionKey] : undefined;
     const selectedTransactionDefaultCurrency = firstSelectedTransaction?.groupCurrency ?? firstSelectedTransaction?.currency;
-    const effectiveDefaultCurrency = defaultFooterCurrency ?? metadataCurrency ?? selectedTransactionDefaultCurrency;
+    const effectiveDefaultCurrency = metadataCurrency ?? selectedTransactionDefaultCurrency;
     const hasCustomFooterCurrency = !!selectedCurrency && selectedCurrency !== effectiveDefaultCurrency;
 
     // The most recent conversion request for this currency failed, so stop waiting on a converted value that isn't coming.
@@ -414,10 +506,12 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
                 queryJSON: currentSearchQueryJSON,
                 searchKey: currentSearchKey,
                 targetCurrency: selectedCurrency,
+                totalType: selectedTotalType,
                 sources: metadataTotal !== undefined ? {searchTotals: {[currentSearchHash]: {[selectedCurrency]: metadataTotal}}} : undefined,
             });
         }
     }, [
+        selectedTotalType,
         areAllSelectedConverted,
         currentSearchHash,
         currentSearchKey,
@@ -445,14 +539,50 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
 
     const handleFooterCurrencyChange = useCallback(
         (currency: string) => {
-            setFooterCurrencyState({
-                searchHash: currentSearchHash,
-                selectedCurrency: currency,
-                defaultCurrency: effectiveDefaultCurrency,
-            });
+            SearchFooterSelectionsActions.setSearchFooterSelection(searchType, {currency});
         },
-        [currentSearchHash, effectiveDefaultCurrency],
+        [searchType],
     );
+
+    // Both counts come back on every search, so switching is purely local: no request, no loader.
+    const handleFooterCountTypeChange = useCallback(
+        (countType: SearchFooterCountType) => {
+            SearchFooterSelectionsActions.setSearchFooterSelection(searchType, {countType});
+        },
+        [searchType],
+    );
+
+    // Re-run the same query (same hash, first page) asking for the chosen aggregate. The loading data only flips the
+    // snapshot's loading state, so the rows stay in place and only the footer total reloads.
+    const requestedTotalTypeRef = useRef<string | undefined>(undefined);
+    const requestTotalType = useCallback(
+        (totalType: SearchFooterTotalType) => {
+            if (!currentSearchQueryJSON || isOffline) {
+                return;
+            }
+            requestedTotalTypeRef.current = `${currentSearchHash}_${totalType}`;
+            search({queryJSON: currentSearchQueryJSON, searchKey: currentSearchKey, offset: 0, shouldCalculateTotals: true, totalType, isLoading: false});
+        },
+        [currentSearchHash, currentSearchKey, currentSearchQueryJSON, isOffline],
+    );
+    const handleFooterTotalTypeChange = useCallback(
+        (totalType: SearchFooterTotalType) => {
+            SearchFooterSelectionsActions.setSearchFooterSelection(searchType, {totalType});
+            requestTotalType(totalType);
+        },
+        [requestTotalType, searchType],
+    );
+
+    // A restored non-default selection needs its aggregate fetched once the default snapshot has loaded (once per
+    // hash + aggregate, so a backend that does not echo `totalType` cannot cause a refetch loop).
+    useEffect(() => {
+        const isDefaultTotal = selectedTotalType === CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL;
+        const isSnapshotForSelection = metadata?.totalType === selectedTotalType;
+        if (isDefaultTotal || isSnapshotForSelection || metadataTotal === undefined || metadata?.isLoading || requestedTotalTypeRef.current === `${currentSearchHash}_${selectedTotalType}`) {
+            return;
+        }
+        requestTotalType(selectedTotalType);
+    }, [currentSearchHash, metadata?.isLoading, metadata?.totalType, metadataTotal, requestTotalType, selectedTotalType]);
 
     const footerData = useMemo(() => {
         if (!shouldAllowFooterTotals && selectedTransactionsKeys.length === 0) {
@@ -474,6 +604,9 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
             } else {
                 total = selectedTransactionsKeys.reduce((acc, key) => {
                     const transaction = selectedTransactions[key];
+                    if (!isGroupEntry(key) && !doesTransactionMatchTotalType(transaction.transaction)) {
+                        return acc;
+                    }
                     let convertedAmount;
                     if (shouldUseConvertedSelectedTotal && selectedCurrency) {
                         if (isGroupEntry(key)) {
@@ -520,6 +653,7 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
         areAllSelectedConverted,
         areAllExcludedConverted,
         convertedGroups,
+        doesTransactionMatchTotalType,
         convertedReports,
         convertedTransactions,
         effectiveDefaultCurrency,
@@ -553,13 +687,27 @@ function SearchSelectionFooter({searchResults}: SearchSelectionFooterProps) {
     // but don't recalculate totals, so gate on offset 0.)
     const isFooterTotalLoading = isFooterTotalConverting || (!hasPartialSelection && !!metadata?.isLoading && metadata?.offset === 0);
 
+    // A partial selection counts the selected reports on the Reports search; other searches have no report count to
+    // show for a selection, so the count stays static there.
+    let footerReportCount = metadataReportCount;
+    if (hasPartialSelection) {
+        footerReportCount = isReportsSearch ? selectedReportIDs.length : undefined;
+    }
+
     return (
         <SearchPageFooter
             count={footerData.count}
+            reportCount={footerReportCount}
+            countType={selectedCountType}
+            defaultCountType={defaultCountType}
             total={footerData.total}
+            totalType={selectedTotalType}
+            availableTotalTypes={availableTotalTypes}
             currency={footerData.currency}
             defaultCurrency={searchTargetCurrency}
             isTotalLoading={isFooterTotalLoading}
+            onCountTypeChange={handleFooterCountTypeChange}
+            onTotalTypeChange={handleFooterTotalTypeChange}
             onCurrencyChange={handleFooterCurrencyChange}
         />
     );

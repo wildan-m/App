@@ -170,6 +170,7 @@ import type ScheduleCallDraft from './ScheduleCallDraft';
 import type ScreenShareRequest from './ScreenShareRequest';
 import type SearchContext from './SearchContext';
 import type SearchFooterConversion from './SearchFooterConversion';
+import type SearchFooterSelections from './SearchFooterSelections';
 import type SearchResults from './SearchResults';
 import type SearchSidebar from './SearchSidebar';
 import type SecurityGroup from './SecurityGroup';
@@ -394,6 +395,7 @@ export type {
     RecentSearchItem,
     SearchContext,
     SearchFooterConversion,
+    SearchFooterSelections,
     SearchSidebar,
     ImportedSpreadsheet,
     BankAccountShareDetails,

@@ -95,6 +95,7 @@ import type {PaymentInformation} from '@src/types/onyx/LastPaymentMethod';
 import type {ConnectionName} from '@src/types/onyx/Policy';
 import type {AnyOnyxUpdate, OnyxData} from '@src/types/onyx/Request';
 import type SearchFooterConversion from '@src/types/onyx/SearchFooterConversion';
+import type {SearchFooterTotalType} from '@src/types/onyx/SearchFooterSelections';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type Nullable from '@src/types/utils/Nullable';
 
@@ -1132,11 +1133,17 @@ function search({
     shouldUpdateLastSearchParams = false,
     skipWaitForWrites = false,
     shouldSaveRecentSearch = false,
+    totalType,
 }: {
     queryJSON: Readonly<SearchQueryJSON>;
     searchKey: SearchKey | undefined;
     offset?: number;
     shouldCalculateTotals?: boolean;
+    /**
+     * Which spend aggregate the footer total should cover (reimbursable, billable, ...). Omitted for the plain total
+     * spend so the default request stays identical to before. The rows returned do not change; only the total does.
+     */
+    totalType?: SearchFooterTotalType;
     prevReportsLength?: number;
     isLoading: boolean;
     shouldUpdateLastSearchParams?: boolean;
@@ -1159,7 +1166,8 @@ function search({
         return;
     }
 
-    const dedupeKey = `${queryJSON.hash}_${offset ?? 0}`;
+    // A footer-driven refresh for a different spend aggregate must not be swallowed by the same query already in flight.
+    const dedupeKey = `${queryJSON.hash}_${offset ?? 0}_${totalType ?? CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL}`;
     const inFlightRequest = inFlightSearchRequests.get(dedupeKey);
     if (inFlightRequest) {
         const needsTotalsUpgrade = queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE && shouldCalculateTotals && !inFlightRequest.shouldCalculateTotals;
@@ -1182,6 +1190,7 @@ function search({
                     shouldUpdateLastSearchParams,
                     skipWaitForWrites,
                     shouldSaveRecentSearch: inFlightRequest.pendingShouldSaveRecentSearch,
+                    totalType,
                 });
         }
         return;
@@ -1197,6 +1206,7 @@ function search({
         offset,
         filters: backendQueryJSON.filters ?? null,
         shouldCalculateTotals,
+        ...(totalType && totalType !== CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL && {totalType}),
         ...(shouldSaveRecentSearch && {shouldSaveRecentSearch: true}),
         // Backend expects 'maximumResults' instead of 'limit'
         ...(limit !== undefined && {maximumResults: limit}),
@@ -1328,12 +1338,15 @@ function getFooterConvertedAmounts({
     transactionIDList,
     reportIDList,
     sources,
+    totalType,
 }: {
     queryJSON: Readonly<SearchQueryJSON>;
     searchKey: SearchKey | undefined;
     targetCurrency: string;
     transactionIDList?: string;
     reportIDList?: string;
+    /** Which spend aggregate the whole-search converted total should cover; omitted for the plain total spend */
+    totalType?: SearchFooterTotalType;
     /** Default-currency source figures to stamp the requested conversions against (for stale detection on edit). */
     sources?: SearchFooterConversion['sources'];
 }) {
@@ -1360,6 +1373,7 @@ function getFooterConvertedAmounts({
             targetCurrency,
             ...(transactionIDList && {transactionIDList}),
             ...(reportIDList && {reportIDList}),
+            ...(totalType && totalType !== CONST.SEARCH.FOOTER_TOTAL_TYPES.TOTAL && {totalType}),
         },
         {
             // Stamp the source figures this request converts (and clear any prior failure for this currency) so a later

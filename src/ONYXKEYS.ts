@@ -768,6 +768,9 @@ const ONYXKEYS = {
     /** Stores the information about the state of the Search sidebar */
     NVP_SEARCH_SIDEBAR: 'nvp_searchSidebar',
 
+    /** Stores the Search footer count/total/currency selections, keyed by search type so each type keeps its own choice */
+    NVP_SEARCH_FOOTER_SELECTIONS: 'nvp_searchFooterSelections',
+
     /** Stores the user's app review prompt state and response */
     NVP_APP_REVIEW: 'nvp_appReview',
 
@@ -1802,6 +1805,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.BILLING_RECEIPT_DETAILS]: OnyxTypes.BillingReceiptDetails;
     [ONYXKEYS.NVP_SIDE_PANEL]: OnyxTypes.SidePanel;
     [ONYXKEYS.NVP_SEARCH_SIDEBAR]: OnyxTypes.SearchSidebar;
+    [ONYXKEYS.NVP_SEARCH_FOOTER_SELECTIONS]: OnyxTypes.SearchFooterSelections;
     [ONYXKEYS.NVP_APP_REVIEW]: OnyxTypes.AppReview;
     [ONYXKEYS.NVP_ONBOARDING_RHP_VARIANT]: OnyxTypes.OnboardingRHPVariant;
     [ONYXKEYS.NVP_DISMISSED_REJECT_USE_EXPLANATION]: boolean;

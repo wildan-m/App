@@ -6884,6 +6884,19 @@ const CONST = {
             LOADING: 'loading',
             LOADED: 'loaded',
         },
+        // Which count the Search footer displays. Both counts come back on every search, so switching is client-side.
+        FOOTER_COUNT_TYPES: {
+            EXPENSES: 'expenses',
+            REPORTS: 'reports',
+        },
+        // Which spend aggregate the Search footer displays. Anything other than TOTAL is requested from the backend by param.
+        FOOTER_TOTAL_TYPES: {
+            TOTAL: 'total',
+            REIMBURSABLE: 'reimbursable',
+            NON_REIMBURSABLE: 'nonReimbursable',
+            BILLABLE: 'billable',
+            NON_BILLABLE: 'nonBillable',
+        },
         ACTION_FILTERS: {
             SUBMIT: 'submit',
             APPROVE: 'approve',

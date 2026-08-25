@@ -56,6 +56,7 @@ function clearStorageAndRedirect(errorMessage?: string, isSAMLReauthentication?:
     keysToPreserve.push(ONYXKEYS.RAM_ONLY_ARE_TRANSLATIONS_LOADING);
     keysToPreserve.push(ONYXKEYS.PREFERRED_THEME);
     keysToPreserve.push(ONYXKEYS.NVP_SEARCH_SIDEBAR);
+    keysToPreserve.push(ONYXKEYS.NVP_SEARCH_FOOTER_SELECTIONS);
     keysToPreserve.push(ONYXKEYS.ACTIVE_CLIENTS);
     keysToPreserve.push(ONYXKEYS.DEVICE_ID);
     keysToPreserve.push(ONYXKEYS.SHOULD_USE_STAGING_SERVER);

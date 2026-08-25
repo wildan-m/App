@@ -12,6 +12,9 @@ type GetTransactionsConvertedAmountParams = {
 
     /** Comma-separated report IDs to convert each selected report's total; used by the Reports search */
     reportIDList?: string;
+
+    /** Which spend aggregate the whole-search total should cover; omitted for the plain total spend */
+    totalType?: string;
 };
 
 export default GetTransactionsConvertedAmountParams;

@@ -81,8 +81,14 @@ type SearchResultsInfo = {
      * snapshot survives, so without this a reload would offer a pointless Retry. */
     responseJsonCode?: number;
 
-    /** The number of results */
+    /** The number of results (expenses) */
     count?: number;
+
+    /** The number of reports the results belong to; returned alongside `count` so the footer can switch counts client-side */
+    reportCount?: number;
+
+    /** The spend aggregate `total` was computed for; absent when it is the plain total spend */
+    totalType?: ValueOf<typeof CONST.SEARCH.FOOTER_TOTAL_TYPES>;
 
     /** The total spend */
     total?: number;
