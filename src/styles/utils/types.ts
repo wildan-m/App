@@ -20,6 +20,11 @@ type AvatarStyle = Dimensions & {
 
 type ButtonSizeValue = ValueOf<typeof CONST.DROPDOWN_BUTTON_SIZE>;
 type ButtonStateName = ValueOf<typeof CONST.BUTTON_STATES>;
+type GetIconFillColorOptions = {
+    buttonState?: ButtonStateName;
+    isMenuIcon?: boolean;
+    isPane?: boolean;
+};
 type ButtonVariant = ValueOf<typeof CONST.BUTTON_VARIANT>;
 type ButtonVariantStyles = {
     normal: Record<ButtonVariant, StyleProp<ViewStyle>>;
@@ -43,6 +48,7 @@ export type {
     AvatarStyle,
     ButtonSizeValue,
     ButtonStateName,
+    GetIconFillColorOptions,
     ButtonVariant,
     ButtonVariantStyles,
     SVGAvatarColorStyle,
