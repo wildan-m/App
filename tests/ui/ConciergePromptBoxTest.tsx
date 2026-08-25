@@ -23,6 +23,7 @@ const SHORT_PLACEHOLDER = 'homePage.conciergePrompt.inputPlaceholderMobile';
 const ADD_ATTACHMENT = 'reportActionCompose.addAttachment';
 const PLUS_BUTTON = 'accessibilityHints.openActionsMenu';
 const SEND_BUTTON = 'common.send';
+const EXCEEDED_LENGTH_ERROR = 'composer.commentExceededMaxLength';
 
 const mockAskConcierge = jest.fn();
 const mockAskConciergeWithAttachment = jest.fn();
@@ -71,6 +72,7 @@ jest.mock('@components/PopoverMenu', () => ({
 jest.mock('@hooks/useLocalize', () =>
     jest.fn(() => ({
         translate: (key: string) => key,
+        numberFormat: (value: number) => String(value),
         getLocalDateFromDatetime: () => new Date('2026-08-24T09:00:00'),
     })),
 );
@@ -307,6 +309,82 @@ describe('ConciergePromptBox', () => {
             // Then the attachments are sent with the message and the input is emptied
             expect(mockAskConciergeWithAttachment).toHaveBeenCalledWith(files, 'Here it is');
             expect(getInput()).toHaveDisplayValue('');
+        });
+    });
+
+    describe('comment length', () => {
+        const overLimitText = 'a'.repeat(CONST.MAX_COMMENT_LENGTH + 1);
+
+        // The length check is debounced, so the timers have to run before the result reaches the UI.
+        function flushLengthValidation() {
+            act(() => jest.advanceTimersByTime(CONST.TIMING.COMMENT_LENGTH_DEBOUNCE_TIME));
+        }
+
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        it('shows the error and blocks sending once the message is over the limit', () => {
+            // Given a message longer than the maximum comment length
+            render(<ConciergePromptBoxWrapper />);
+            fireEvent.changeText(getInput(), overLimitText);
+            flushLengthValidation();
+
+            // When the send button is pressed
+            fireEvent.press(screen.getByLabelText(SEND_BUTTON));
+
+            // Then the error is shown inline, the button is disabled and nothing is sent
+            expect(screen.getByText(EXCEEDED_LENGTH_ERROR)).toBeOnTheScreen();
+            expect(screen.getByLabelText(SEND_BUTTON)).toBeDisabled();
+            expect(mockAskConcierge).not.toHaveBeenCalled();
+        });
+
+        it('blocks Enter while the message is over the limit', () => {
+            // Given a message longer than the maximum comment length
+            render(<ConciergePromptBoxWrapper />);
+            fireEvent.changeText(getInput(), overLimitText);
+            flushLengthValidation();
+
+            // When Enter is pressed
+            pressEnter();
+
+            // Then nothing is sent
+            expect(mockAskConcierge).not.toHaveBeenCalled();
+        });
+
+        it('blocks the attachment path while the message is over the limit', () => {
+            // Given a message longer than the maximum comment length
+            const files: FileObject[] = [{name: 'receipt.jpg', type: 'image/jpeg', uri: 'file://receipt.jpg'}];
+            render(<ConciergePromptBoxWrapper />);
+            fireEvent.changeText(getInput(), overLimitText);
+            flushLengthValidation();
+
+            // When attachments are confirmed in the preview modal
+            act(() => pickerHandler.onConfirm?.(files));
+
+            // Then the over-length message cannot slip through with the attachment
+            expect(mockAskConciergeWithAttachment).not.toHaveBeenCalled();
+        });
+
+        it('clears the error once the message is back within the limit', () => {
+            // Given a message that was over the maximum comment length
+            render(<ConciergePromptBoxWrapper />);
+            fireEvent.changeText(getInput(), overLimitText);
+            flushLengthValidation();
+            expect(screen.getByText(EXCEEDED_LENGTH_ERROR)).toBeOnTheScreen();
+
+            // When it is shortened back within the limit
+            fireEvent.changeText(getInput(), 'Where is my expense?');
+            flushLengthValidation();
+
+            // Then the error goes away and the message can be sent
+            expect(screen.queryByText(EXCEEDED_LENGTH_ERROR)).toBeNull();
+            fireEvent.press(screen.getByLabelText(SEND_BUTTON));
+            expect(mockAskConcierge).toHaveBeenCalledWith('Where is my expense?');
         });
     });
 
