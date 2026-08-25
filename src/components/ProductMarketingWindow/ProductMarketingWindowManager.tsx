@@ -1,4 +1,5 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useIsFirstSessionAfterOnboarding from '@hooks/useIsFirstSessionAfterOnboarding';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
@@ -87,7 +88,11 @@ function ProductMarketingWindowManager({topmostRouteName}: ProductMarketingWindo
     const isAdminCtaPending = shouldPrefetchTargetPolicyConnections && (isLoadingFetchedFlag || (isFetchNeeded && hasBeenFetched === undefined));
     const isAdminPolicyConnectionDataAvailable = !shouldPrefetchTargetPolicyConnections || hasBeenFetched === true;
     const isCoveredByCenteredModalScreen = !!topmostRouteName && CENTERED_MODAL_SCREEN_NAVIGATORS.has(topmostRouteName);
-    const isLoading = isLoadingOnyxValue(lastDismissedMarketingWindowMetadata, targetAdminPolicyIDMetadata, activePolicyIDMetadata, isLoadingAppMetadata, accountMetadata) || isLoadingApp;
+    // New accounts never see promotional windows during the session they signed up in, whatever the campaign or audience.
+    const {isFirstSessionAfterOnboarding, onboardingMetadata} = useIsFirstSessionAfterOnboarding();
+    const isLoading =
+        isLoadingOnyxValue(lastDismissedMarketingWindowMetadata, targetAdminPolicyIDMetadata, activePolicyIDMetadata, isLoadingAppMetadata, accountMetadata, onboardingMetadata) ||
+        isLoadingApp;
     const shouldShowRequire2FAPage = useShouldShowRequire2FAPage();
     const navigation = useNavigation();
     const isIn2FASetupFlow = useRootNavigationState((state) => {
@@ -104,6 +109,7 @@ function ProductMarketingWindowManager({topmostRouteName}: ProductMarketingWindo
         isProductMarketingWindowCovered ||
         isAnonymousSession ||
         isActingAsDelegate ||
+        isFirstSessionAfterOnboarding ||
         isCoveredByCenteredModalScreen ||
         shouldShowRequire2FAPage ||
         isIn2FASetupFlow
