@@ -1,5 +1,6 @@
 import useBankLinkedPersonalCards from '@hooks/useBankLinkedPersonalCards';
 import useCardFeeds from '@hooks/useCardFeeds';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnboardingIntent from '@hooks/useOnboardingIntent';
 import useOnyx from '@hooks/useOnyx';
@@ -12,6 +13,7 @@ import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/crea
 import Navigation from '@libs/Navigation/Navigation';
 import {
     arePolicyRulesEnabled,
+    canEditWorkspaceSettings,
     getValidConnectedIntegration,
     hasAccountingFeatureConnection,
     hasConfiguredRules,
@@ -20,6 +22,7 @@ import {
     isPaidGroupPolicy,
     isPendingDeletePolicy,
     isPolicyAdmin,
+    isSubmitPolicy,
     isWorkspaceProvisionedForTravel,
 } from '@libs/PolicyUtils';
 import {generateReportID} from '@libs/ReportUtils';
@@ -64,8 +67,10 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const intent = useOnboardingIntent();
+    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
+    const [firstPolicyCreatedDate] = useOnyx(ONYXKEYS.NVP_PRIVATE_FIRST_POLICY_CREATED_DATE);
     const [reportedIntegration] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${activePolicyID}`);
@@ -96,12 +101,47 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         return {shouldShowSection: true, items: builtItems};
     };
 
-    if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE && intent !== CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+    const isEmployerIntent = intent === CONST.ONBOARDING_CHOICES.EMPLOYER;
+
+    if (!isEmployerIntent && intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE && intent !== CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
         return emptyResult;
     }
 
-    if (!isWithinGettingStartedPeriod(firstDayFreeTrial)) {
+    // Submit is a free plan, so creating a Submit workspace doesn't start a trial and `firstDayFreeTrial` stays unset
+    // until the user upgrades. Anchor the Submit intent's 60-day window on the first workspace creation date instead.
+    const gettingStartedStartDate = isEmployerIntent ? (firstPolicyCreatedDate ?? firstDayFreeTrial) : firstDayFreeTrial;
+    if (!isWithinGettingStartedPeriod(gettingStartedStartDate)) {
         return emptyResult;
+    }
+
+    if (isEmployerIntent) {
+        // This checklist is for users who created their own Submit workspace. Its creator holds the editor role
+        // (not admin), so use the same "can configure this workspace" check as the workspace settings pages.
+        if (!activePolicyID || !policy || isPendingDeletePolicy(policy) || !isSubmitPolicy(policy) || !canEditWorkspaceSettings(policy, currentUserLogin)) {
+            return emptyResult;
+        }
+
+        const submitItems: GettingStartedItem[] = [];
+
+        if (policy.areCategoriesEnabled) {
+            submitItems.push({
+                key: 'customizeExpenseCategories',
+                label: translate('homePage.gettingStartedSection.customizeExpenseCategories'),
+                subText: translate('homePage.gettingStartedSection.customizeExpenseCategoriesSubText'),
+                isComplete: hasCustomCategories(policyCategories),
+                route: ROUTES.WORKSPACE_CATEGORIES.getRoute(activePolicyID),
+            });
+        }
+
+        submitItems.push({
+            key: 'linkPersonalCard',
+            label: translate('homePage.gettingStartedSection.linkPersonalCard'),
+            subText: translate('homePage.gettingStartedSection.linkPersonalCardSubText'),
+            isComplete: Object.keys(personalCards).length > 0,
+            route: ROUTES.SETTINGS_WALLET,
+        });
+
+        return buildResult(submitItems);
     }
 
     // When there is no active paid workspace to run onboarding against (e.g. the user just deleted their only

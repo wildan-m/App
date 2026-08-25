@@ -107,6 +107,24 @@ async function setupTrackPersonalScenario(overrides: {policy?: Partial<Policy>; 
     await waitForBatchedUpdates();
 }
 
+// Submit workspaces are free, so no trial NVPs are written for this audience. The 60-day window is anchored on the
+// first workspace creation date instead, and the creator holds the editor role rather than admin.
+async function setupSubmitScenario(overrides: {policy?: Partial<Policy>; firstPolicyCreatedDate?: string; intentSource?: 'introSelected' | 'onboardingPurpose'} = {}) {
+    const policy = buildPolicy({type: CONST.POLICY.TYPE.SUBMIT, role: CONST.POLICY.ROLE.EDITOR, areCategoriesEnabled: true, ...overrides.policy});
+    await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
+
+    if (overrides.intentSource === 'onboardingPurpose') {
+        await Onyx.merge(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, CONST.ONBOARDING_CHOICES.EMPLOYER);
+    } else {
+        await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.EMPLOYER});
+    }
+
+    await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
+    await Onyx.merge(ONYXKEYS.NVP_PRIVATE_FIRST_POLICY_CREATED_DATE, overrides.firstPolicyCreatedDate ?? RECENT_TRIAL_START);
+
+    await waitForBatchedUpdates();
+}
+
 async function setupManageTeamScenario(overrides: {policy?: Partial<Policy>; accounting?: OnboardingAccounting; firstDayTrial?: string; lastDayTrial?: string} = {}) {
     // New workspaces enable Categories by default, so keep the categories step visible unless a test opts out.
     const policy = buildPolicy({areCategoriesEnabled: true, ...overrides.policy});
@@ -1844,6 +1862,179 @@ describe('useGettingStartedItems', () => {
             await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}1`, {transactionID: '1', reportID: 'r1'});
             await Onyx.merge(ONYXKEYS.CARD_LIST, {testCard: {cardID: 1}});
             await setupTrackPersonalScenario({policy: {areCategoriesEnabled: true}});
+
+            const {result} = renderHook(() => useGettingStartedItems());
+
+            await waitFor(() => expect(result.current.shouldShowSection).toBe(false));
+            expect(result.current.items).toEqual([]);
+        });
+    });
+
+    describe('EMPLOYER intent (Submit workspace)', () => {
+        const customCategories: PolicyCategories = {
+            'Custom Category': {
+                name: 'Custom Category',
+                enabled: true,
+                unencodedName: 'Custom Category',
+                areCommentsRequired: false,
+                'GL Code': '',
+                externalID: '',
+                origin: '',
+                previousCategoryName: undefined,
+            },
+        };
+
+        describe('visibility rules', () => {
+            it('should show the section for a Submit workspace editor within 60 days of the first workspace creation, with no trial dates set', async () => {
+                await setupSubmitScenario();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(true);
+                expect(result.current.items.length).toBeGreaterThan(0);
+            });
+
+            it('should fall back to ONBOARDING_PURPOSE_SELECTED when NVP_INTRO_SELECTED is not available', async () => {
+                await setupSubmitScenario({intentSource: 'onboardingPurpose'});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(true);
+            });
+
+            it('should fall back to the trial start date when the first workspace creation date is missing', async () => {
+                await setupSubmitScenario();
+                await Onyx.set(ONYXKEYS.NVP_PRIVATE_FIRST_POLICY_CREATED_DATE, null);
+                await Onyx.merge(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL, RECENT_TRIAL_START);
+                await Onyx.merge(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL, FUTURE_TRIAL_END);
+                await waitForBatchedUpdates();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(true);
+            });
+
+            it('should be hidden when neither the first workspace creation date nor the trial start date is set', async () => {
+                await setupSubmitScenario();
+                await Onyx.set(ONYXKEYS.NVP_PRIVATE_FIRST_POLICY_CREATED_DATE, null);
+                await waitForBatchedUpdates();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+
+            it('should be hidden after the 60-day Getting Started window', async () => {
+                const sixtyOneDaysAgo = new Date(Date.now() - 61 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
+                await setupSubmitScenario({firstPolicyCreatedDate: sixtyOneDaysAgo});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+
+            it('should be hidden (not fall back to create-workspace) when the active policy is not a Submit workspace', async () => {
+                await setupSubmitScenario({policy: {type: CONST.POLICY.TYPE.TEAM, role: CONST.POLICY.ROLE.ADMIN}});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+
+            it('should be hidden when there is no active policy', async () => {
+                await setupSubmitScenario();
+                await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, null);
+                await waitForBatchedUpdates();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+
+            it('should be hidden for a plain member of the Submit workspace', async () => {
+                await setupSubmitScenario({policy: {role: CONST.POLICY.ROLE.USER}});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+
+            it('should be hidden when the Submit workspace is pending deletion', async () => {
+                await setupSubmitScenario({policy: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.shouldShowSection).toBe(false);
+                expect(result.current.items).toEqual([]);
+            });
+        });
+
+        describe('items and check states', () => {
+            it('should return the two Submit to-dos in order, without a create-workspace row', async () => {
+                await setupSubmitScenario();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.items.map((item) => item.key)).toEqual(['customizeExpenseCategories', 'linkPersonalCard']);
+            });
+
+            it('should omit customizeExpenseCategories when the Categories feature is disabled', async () => {
+                await setupSubmitScenario({policy: {areCategoriesEnabled: false}});
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                expect(result.current.items.map((item) => item.key)).toEqual(['linkPersonalCard']);
+            });
+
+            it('should route customizeExpenseCategories to the workspace categories page and use the Submit copy', async () => {
+                await setupSubmitScenario();
+
+                const {result} = renderHook(() => useGettingStartedItems());
+
+                const categoriesItem = result.current.items.find((item) => item.key === 'customizeExpenseCategories');
+                expect(categoriesItem?.route).toBe(ROUTES.WORKSPACE_CATEGORIES.getRoute(POLICY_ID));
+                expect(categoriesItem?.label).toBe('homePage.gettingStartedSection.customizeExpenseCategories');
+                expect(categoriesItem?.subText).toBe('homePage.gettingStartedSection.customizeExpenseCategoriesSubText');
+            });
+
+            it('should mark customizeExpenseCategories incomplete with only default categories and complete with a custom one', async () => {
+                await setupSubmitScenario();
+
+                const {result: defaultResult} = renderHook(() => useGettingStartedItems());
+                expect(defaultResult.current.items.find((item) => item.key === 'customizeExpenseCategories')?.isComplete).toBe(false);
+
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${POLICY_ID}`, customCategories);
+                await waitForBatchedUpdates();
+
+                const {result: customResult} = renderHook(() => useGettingStartedItems());
+                expect(customResult.current.items.find((item) => item.key === 'customizeExpenseCategories')?.isComplete).toBe(true);
+            });
+
+            it('should resolve linkPersonalCard to the wallet route and reflect linked-card state', async () => {
+                await setupSubmitScenario();
+
+                const {result: noCards} = renderHook(() => useGettingStartedItems());
+                const linkCardItem = noCards.current.items.find((item) => item.key === 'linkPersonalCard');
+                expect(linkCardItem?.route).toBe(ROUTES.SETTINGS_WALLET);
+                expect(linkCardItem?.isComplete).toBe(false);
+
+                await Onyx.merge(ONYXKEYS.CARD_LIST, {testCard: {cardID: 1}});
+                await waitForBatchedUpdates();
+
+                const {result: withCard} = renderHook(() => useGettingStartedItems());
+                expect(withCard.current.items.find((item) => item.key === 'linkPersonalCard')?.isComplete).toBe(true);
+            });
+        });
+
+        it('should hide the section once both to-dos are complete', async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${POLICY_ID}`, customCategories);
+            await Onyx.merge(ONYXKEYS.CARD_LIST, {testCard: {cardID: 1}});
+            await setupSubmitScenario();
 
             const {result} = renderHook(() => useGettingStartedItems());
 

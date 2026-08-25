@@ -1178,6 +1178,8 @@ const translations = {
             createExpenseSubText: 'Scan, drag and drop, or manually enter an expense using the + button',
             linkPersonalCard: 'Link personal card',
             linkPersonalCardSubText: 'Import expenses automatically',
+            customizeExpenseCategories: 'Customize your expense categories',
+            customizeExpenseCategoriesSubText: "Add your company's categories to code your expenses.",
             setupRulesSubText: 'Require receipts, flag high spend, and more',
             needHelp: 'Need help?',
             talkToConcierge: 'Talk to Concierge',
