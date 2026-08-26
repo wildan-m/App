@@ -3,6 +3,8 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {hasDomainCompanyCardFeeds} from '@libs/CardUtils';
+
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
@@ -43,8 +45,12 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
     const [domainCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
     const isDomainUsingExpensifyCard = !!domainCardSettings;
 
+    const [isDomainUsingCompanyCards] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
+        selector: hasDomainCompanyCardFeeds,
+    });
+
     const isActive = !!group?.overridePreferredPolicyWithCardPolicy;
-    const isDisabled = (!isPreferredPolicyEnabled || !isDomainUsingExpensifyCard) && !isActive;
+    const isDisabled = (!isPreferredPolicyEnabled || (!isDomainUsingExpensifyCard && !isDomainUsingCompanyCards)) && !isActive;
 
     return (
         <View style={styles.mv3}>

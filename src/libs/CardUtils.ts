@@ -807,6 +807,13 @@ function getOriginalCompanyFeeds(cardFeeds: OnyxEntry<CardFeeds>, feedKeysWithCa
     );
 }
 
+/**
+ * Whether a domain has at least one usable company card feed, ignoring feeds that are pending setup or pending deletion.
+ */
+function hasDomainCompanyCardFeeds(cardFeeds: OnyxEntry<CardFeeds>): boolean {
+    return Object.keys(getOriginalCompanyFeeds(cardFeeds)).length > 0;
+}
+
 function getCompanyFeeds(cardFeeds: OnyxEntry<CombinedCardFeeds>, shouldFilterOutRemovedFeeds = false, shouldFilterOutPendingFeeds = false): CombinedCardFeeds {
     return Object.fromEntries(
         Object.entries(cardFeeds ?? {}).filter(([, value]) => {
@@ -2248,6 +2255,7 @@ export {
     isDirectFeed,
     feedHasCards,
     getOriginalCompanyFeeds,
+    hasDomainCompanyCardFeeds,
     getCompanyCardFeed,
     getCardFeedWithDomainID,
     getCompanyCardFeedWithDomainIDForCard,

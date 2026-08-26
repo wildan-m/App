@@ -13,6 +13,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {hasDomainCompanyCardFeeds} from '@libs/CardUtils';
 import {addErrorMessage} from '@libs/ErrorUtils';
 
 import Navigation from '@navigation/Navigation';
@@ -63,6 +64,9 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
     const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector()});
     const [domainCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
     const isDomainUsingExpensifyCard = !!domainCardSettings;
+    const [isDomainUsingCompanyCards] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
+        selector: hasDomainCompanyCardFeeds,
+    });
 
     const firstAdminPolicy = Object.values(adminPolicies ?? {})
         .sort((a, b) => localeCompare(a?.created ?? '', b?.created ?? ''))
@@ -216,7 +220,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
                         switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                         isActive={expensifyCardPreferredWorkspace}
-                        disabled={!preferredWorkspace || !isDomainUsingExpensifyCard}
+                        disabled={!preferredWorkspace || (!isDomainUsingExpensifyCard && !isDomainUsingCompanyCards)}
                         disabledAction={() => {
                             showConfirmModal({
                                 title: translate('workspace.distanceRates.oopsNotSoFast'),
