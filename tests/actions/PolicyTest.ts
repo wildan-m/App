@@ -1264,7 +1264,7 @@ describe('actions/Policy', () => {
             });
         });
 
-        it('create a new workspace with enabled workflows if the onboarding choice is newDotTrackWorkspace', async () => {
+        it('create a new workspace with disabled workflows but delayed submission if the onboarding choice is newDotTrackWorkspace', async () => {
             const policyID = Policy.generatePolicyID();
             // When a new workspace is created with introSelected set to TRACK_WORKSPACE
             Policy.createWorkspace({
@@ -1288,8 +1288,12 @@ describe('actions/Policy', () => {
             await TestHelper.getOnyxData({
                 key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
                 callback: (policy) => {
-                    // Then workflows is enabled
-                    expect(policy?.areWorkflowsEnabled).toBeTruthy();
+                    // Then workflows is not enabled, matching what CreateWorkspace returns
+                    expect(policy?.areWorkflowsEnabled).toBeFalsy();
+
+                    // But the delayed submission defaults still apply
+                    expect(policy?.autoReportingFrequency).toBe(CONST.POLICY.AUTO_REPORTING_FREQUENCIES.IMMEDIATE);
+                    expect(policy?.harvesting?.enabled).toBe(false);
                 },
             });
         });

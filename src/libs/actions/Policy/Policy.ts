@@ -2735,12 +2735,11 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
     const optimisticMccGroupData = buildOptimisticMccGroup();
 
     const isSubmitWorkspace = type === CONST.POLICY.TYPE.SUBMIT;
-    const shouldEnableWorkflowsByDefault =
-        isSubmitWorkspace ||
-        !engagementChoice ||
-        engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM ||
-        engagementChoice === CONST.ONBOARDING_CHOICES.LOOKING_AROUND ||
-        isTrackOnboardingChoice(engagementChoice);
+    // CreateWorkspace does not turn the Workflows feature on for track onboarding choices, so the optimistic policy must not either,
+    // otherwise the Workflows menu row shows up while offline and disappears once the API response is merged.
+    const shouldEnableWorkflowsFeature =
+        isSubmitWorkspace || !engagementChoice || engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM || engagementChoice === CONST.ONBOARDING_CHOICES.LOOKING_AROUND;
+    const shouldEnableWorkflowsByDefault = shouldEnableWorkflowsFeature || isTrackOnboardingChoice(engagementChoice);
     const shouldSetCreatedPolicyAsActive = !activePolicy?.id || activePolicy?.type === CONST.POLICY.TYPE.PERSONAL;
 
     // Determine workspace type based on selected features or user reported integration
@@ -2798,7 +2797,7 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
                 areCompanyCardsEnabled: !isSubmitWorkspace,
                 areTagsEnabled: isSubmitWorkspace,
                 areDistanceRatesEnabled,
-                areWorkflowsEnabled: shouldEnableWorkflowsByDefault,
+                areWorkflowsEnabled: shouldEnableWorkflowsFeature,
                 areReportFieldsEnabled: false,
                 areConnectionsEnabled: false,
                 areExpensifyCardsEnabled: false,
