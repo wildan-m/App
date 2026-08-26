@@ -2255,6 +2255,21 @@ function moveTrackedExpenseToPolicy(trackedExpenseParams: TrackedExpenseParams, 
     }
 }
 
+/**
+ * Move-from-track writes (categorize/share/submit) have to go through the same deferred-write channel as every other
+ * create path. When the confirmation screen submits while Search is the visible screen it reserves the SEARCH channel,
+ * and only a registered write hands that channel the moved transaction's watch key. Without it Search never resolves
+ * the optimistic row and its skeleton placeholder lingers until the 10s safety timeout.
+ */
+function deferMoveTrackedExpenseWrite(write: () => void, transactionID: string | undefined, isRetry: boolean | undefined) {
+    deferOrExecuteWrite(write, {
+        shouldDeferForSearch: false,
+        isRetry,
+        optimisticWatchKey: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
+        onDeferred: () => addOptimization(CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DEFERRED_WRITE),
+    });
+}
+
 function categorizeTrackedExpense(trackedExpenseParams: TrackedExpenseParams) {
     const {transactionParams, createdWorkspaceParams} = trackedExpenseParams;
     moveTrackedExpenseToPolicy(trackedExpenseParams, {
@@ -2722,7 +2737,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 reportActionsList: reportActionsList ?? {},
             };
 
-            categorizeTrackedExpense(trackedExpenseParams);
+            deferMoveTrackedExpenseWrite(() => categorizeTrackedExpense(trackedExpenseParams), transaction?.transactionID, params.isRetry);
             break;
         }
         case CONST.IOU.ACTION.SHARE: {
@@ -2775,7 +2790,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 currentUser: {accountID: currentUserAccountIDParam, email: currentUserEmailParam},
                 reportActionsList,
             };
-            shareTrackedExpense(trackedExpenseParams);
+            deferMoveTrackedExpenseWrite(() => shareTrackedExpense(trackedExpenseParams), transaction?.transactionID, params.isRetry);
             break;
         }
         case CONST.IOU.ACTION.SUBMIT: {
@@ -2830,7 +2845,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 reportActionsList,
             };
 
-            submitTrackedExpenseToPolicy(trackedExpenseParams);
+            deferMoveTrackedExpenseWrite(() => submitTrackedExpenseToPolicy(trackedExpenseParams), transaction?.transactionID, params.isRetry);
             break;
         }
         default: {
