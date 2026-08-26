@@ -559,6 +559,16 @@ const translations = {
     concierge: {
         collapseReasoning: 'Collapse reasoning',
         expandReasoning: 'Expand reasoning',
+        feedback: {
+            // @context Question shown under the latest Concierge message, inviting the user to rate it with a thumbs up or thumbs down reaction.
+            prompt: 'Was this response useful?',
+            // @context Brief acknowledgement shown after the user gives a Concierge response a thumbs up.
+            thanks: 'Thanks for the feedback!',
+            // @context Accessibility label for the thumbs up button of the Concierge feedback prompt.
+            useful: 'This response was useful',
+            // @context Accessibility label for the thumbs down button of the Concierge feedback prompt.
+            notUseful: 'This response was not useful',
+        },
         enableNotifications: {
             prompt: 'Want to be notified when Concierge responds?',
             cta: 'Notify',

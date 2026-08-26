@@ -23,6 +23,7 @@ import {
     getFirstVisibleReportActionID,
     getReportActionHtml,
     getReportActionMessage,
+    isConciergeAuthoredMessage,
     isConsecutiveActionMadeByPreviousActor,
     isDeletedParentAction,
     isNewerReportAction,
@@ -354,6 +355,10 @@ function ReportActionsListContent({reportID, onLayout}: ReportActionsListContent
         return isExpenseReport(report) || isIOUReport(report) || isInvoiceReport(report);
     })();
 
+    // The feedback prompt only belongs under the newest Concierge message, and the list is the only place that
+    // knows the ordering. The list is sorted newest first, so the first match is the one that gets the prompt.
+    const latestConciergeMessageID = sortedVisibleReportActions.find(isConciergeAuthoredMessage)?.reportActionID;
+
     const renderItem = ({item: reportAction, index}: ListRenderItemInfo<OnyxTypes.ReportAction>) => {
         const shouldDisableContextMenuForConciergeDraft = isDraftPendingCompletion && draftReportActionID === reportAction.reportActionID;
 
@@ -378,6 +383,7 @@ function ReportActionsListContent({reportID, onLayout}: ReportActionsListContent
                     shouldUseThreadDividerLine={shouldUseThreadDividerLine}
                     isHarvestCreatedExpenseReport={isHarvestCreatedExpenseReportAction}
                     shouldDisableContextMenuForConciergeDraft={shouldDisableContextMenuForConciergeDraft}
+                    isLatestConciergeMessage={!!latestConciergeMessageID && latestConciergeMessageID === reportAction.reportActionID}
                 />
                 {!!reportStable?.reportID && (
                     <ShowPreviousMessagesButton

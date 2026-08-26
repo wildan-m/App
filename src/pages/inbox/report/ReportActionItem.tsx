@@ -151,6 +151,9 @@ type ReportActionItemProps = {
     /** Whether context menu should be displayed */
     shouldDisplayContextMenu?: boolean;
 
+    /** Whether this action is the most recent Concierge-authored message in the report */
+    isLatestConciergeMessage?: boolean;
+
     /** Linked transaction route error */
     linkedTransactionRouteError?: Errors;
 
@@ -179,6 +182,7 @@ function ReportActionItem({
     isThreadReportParentAction = false,
     shouldUseThreadDividerLine = false,
     shouldDisplayContextMenu = true,
+    isLatestConciergeMessage = false,
     parentReportActionForTransactionThread,
     linkedTransactionRouteError: linkedTransactionRouteErrorProp,
     shouldShowBorder,
@@ -645,6 +649,7 @@ function ReportActionItem({
                                                                 shouldShowBorder={shouldShowBorder}
                                                                 isOnSearch={isOnSearch}
                                                                 setIsPaymentMethodPopoverActive={setIsPaymentMethodPopoverActive}
+                                                                isLatestConciergeMessage={isLatestConciergeMessage}
                                                             />
                                                             {Permissions.canUseLinkPreviews() && !isHidden && (action.linkMetadata?.length ?? 0) > 0 && (
                                                                 <View style={hasDraft ? styles.chatItemReactionsDraftRight : {}}>

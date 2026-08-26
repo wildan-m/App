@@ -59,6 +59,9 @@ type ReportActionsListItemRendererProps = {
 
     /** Whether context menu should be disabled for the active Concierge draft */
     shouldDisableContextMenuForConciergeDraft?: boolean;
+
+    /** Whether this action is the most recent Concierge-authored message in the report */
+    isLatestConciergeMessage?: boolean;
 };
 
 function ReportActionsListItemRenderer({
@@ -78,6 +81,7 @@ function ReportActionsListItemRenderer({
     parentReportActionForTransactionThread,
     isHarvestCreatedExpenseReport = false,
     shouldDisableContextMenuForConciergeDraft = false,
+    isLatestConciergeMessage = false,
 }: ReportActionsListItemRendererProps) {
     const originalMessage = useMemo(() => getOriginalMessage(reportAction), [reportAction]);
 
@@ -187,6 +191,7 @@ function ReportActionsListItemRenderer({
             shouldHighlight={shouldHighlight}
             isHarvestCreatedExpenseReport={isHarvestCreatedExpenseReport}
             shouldDisplayContextMenu={!shouldDisableContextMenuForConciergeDraft}
+            isLatestConciergeMessage={isLatestConciergeMessage}
         />
     );
 }

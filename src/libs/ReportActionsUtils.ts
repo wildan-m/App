@@ -629,6 +629,21 @@ function getHumanAgentAccountIDFromReportAction(reportAction: OnyxInputOrEntry<R
 }
 
 /**
+ * Whether the report action is a Concierge-authored chat message, which is what makes it eligible to
+ * carry the inline "Was this response useful?" feedback prompt. Every Concierge comment qualifies, in
+ * every chat type - narrowing the prompt down to the most recent one is the report action list's job,
+ * since only the list knows the ordering.
+ */
+function isConciergeAuthoredMessage(reportAction: OnyxInputOrEntry<ReportAction>): boolean {
+    return (
+        reportAction?.actorAccountID === CONST.ACCOUNT_ID.CONCIERGE &&
+        isActionOfType(reportAction, CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT) &&
+        !isDeletedAction(reportAction) &&
+        !isMessageDeleted(reportAction)
+    );
+}
+
+/**
  * Returns the human Concierge agent's first name for the "assisted by [Name]" label.
  * We intentionally use the first name only (not `displayName`, which is "First Last")
  * to keep the label casual and minimize exposed agent identity.
@@ -5058,6 +5073,7 @@ export {
     isExportIntegrationAction,
     isIntegrationMessageAction,
     isMessageDeleted,
+    isConciergeAuthoredMessage,
     useTableReportViewActionRenderConditionals,
     isModifiedExpenseAction,
     isMovedTransactionAction,

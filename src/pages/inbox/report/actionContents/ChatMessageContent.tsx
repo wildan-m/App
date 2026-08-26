@@ -1,6 +1,7 @@
 import {AttachmentContext} from '@components/AttachmentContext';
 import Button from '@components/ButtonComposed';
 import MentionReportContext from '@components/HTMLEngineProvider/HTMLRenderers/MentionReportRenderer/MentionReportContext';
+import ConciergeFeedbackPrompt from '@components/ReportActionItem/ConciergeFeedbackPrompt';
 import Text from '@components/Text';
 
 import useLocalize from '@hooks/useLocalize';
@@ -41,9 +42,21 @@ type ChatMessageContentProps = {
     isHidden: boolean;
     updateHiddenState: (isHiddenValue: boolean) => void;
     isOnSearch: boolean;
+    isLatestConciergeMessage: boolean;
 };
 
-function ChatMessageContent({action, policyID, reportID, originalReportID, displayAsGroup, draftMessage, isHidden, updateHiddenState, isOnSearch}: ChatMessageContentProps) {
+function ChatMessageContent({
+    action,
+    policyID,
+    reportID,
+    originalReportID,
+    displayAsGroup,
+    draftMessage,
+    isHidden,
+    updateHiddenState,
+    isOnSearch,
+    isLatestConciergeMessage,
+}: ChatMessageContentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
@@ -102,6 +115,12 @@ function ChatMessageContent({action, policyID, reportID, originalReportID, displ
                                     {isHidden ? translate('moderation.revealMessage') : translate('moderation.hideMessage')}
                                 </Text>
                             </Button>
+                        )}
+                        {isLatestConciergeMessage && !isHidden && (
+                            <ConciergeFeedbackPrompt
+                                action={action}
+                                reportID={reportID}
+                            />
                         )}
                         {mayHaveActionableButtons && (
                             <ChatActionableButtons

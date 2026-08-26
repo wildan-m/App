@@ -139,6 +139,9 @@ type ActionContentRouterProps = {
 
     /** Whether the user is a track intent user */
     isTrackIntentUser?: boolean;
+
+    /** Whether this action is the most recent Concierge-authored message in the report */
+    isLatestConciergeMessage: boolean;
 };
 
 function ActionContentRouter({
@@ -160,6 +163,7 @@ function ActionContentRouter({
     isOnSearch,
     setIsPaymentMethodPopoverActive,
     isTrackIntentUser,
+    isLatestConciergeMessage,
 }: ActionContentRouterProps): React.JSX.Element | null {
     const {translate, formatTravelDate} = useLocalize();
     const styles = useThemeStyles();
@@ -543,6 +547,7 @@ function ActionContentRouter({
             isHidden={isHidden}
             updateHiddenState={updateHiddenState}
             isOnSearch={isOnSearch}
+            isLatestConciergeMessage={isLatestConciergeMessage}
         />
     );
 }
