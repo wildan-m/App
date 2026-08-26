@@ -165,9 +165,11 @@ import {
     isMoneyRequestReport,
     isOpenExpenseReport,
     isOptimisticPersonalDetail,
+    isPolicyExpenseChat,
     isProcessingReport,
     isReportManuallyReimbursed,
     isReportNotFound,
+    isReportOwner,
     isSelfDM,
     isUploadingAttachmentRemovedFromDraft,
     isValidReportIDFromPath,
@@ -998,6 +1000,14 @@ function addActions({
         optimisticReport.participants = {
             [currentUserAccountID]: {notificationPreference: getDefaultNotificationPreferenceForReport(reportForAction)},
         };
+    }
+
+    // AddComment does not join the sender to a workspace chat they don't own (e.g. an auditor commenting in a member's
+    // workspace chat) and echoes the hidden preference back, which would undo the optimistic update above and bring the
+    // Join button back. Persist the join explicitly, queued ahead of AddComment, so the server already has the preference
+    // set when it processes the comment.
+    if (shouldUpdateNotificationPreference && isPolicyExpenseChat(reportForAction) && !isReportOwner(reportForAction, currentUserAccountID)) {
+        joinRoom(reportForAction, currentUserAccountID);
     }
 
     // Optimistically add the new actions to the store before waiting to save them to the server
