@@ -167,13 +167,13 @@ function ConciergePromptBox({isMenuVisible, setIsMenuVisible}: ConciergePromptBo
                                                     }}
                                                     style={({hovered, pressed}) => [
                                                         styles.composerSizeButton,
-                                                        StyleUtils.getButtonBackgroundColorStyle(getButtonState(hovered && shouldShowAskConcierge, pressed && shouldShowAskConcierge)),
+                                                        StyleUtils.getButtonBackgroundColorStyle(getButtonState(hovered, pressed, false, !shouldShowAskConcierge)),
                                                     ]}
                                                 >
                                                     {({hovered, pressed}) => (
                                                         <Icon
                                                             src={icons.Plus}
-                                                            fill={StyleUtils.getIconFillColor(getButtonState(hovered && shouldShowAskConcierge, pressed && shouldShowAskConcierge))}
+                                                            fill={StyleUtils.getIconFillColor(getButtonState(hovered, pressed, false, !shouldShowAskConcierge))}
                                                         />
                                                     )}
                                                 </PressableWithoutFeedback>

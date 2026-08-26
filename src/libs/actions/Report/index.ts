@@ -4239,6 +4239,69 @@ function updateWriteCapability(report: Report, newValue: WriteCapability) {
     API.write(WRITE_COMMANDS.UPDATE_REPORT_WRITE_CAPABILITY, parameters, {optimisticData, failureData});
 }
 
+type LoadConciergeChatParams = {
+    /** The Concierge report ID stored in the conciergeReportID NVP, if the server already sent it */
+    conciergeReportID: string | undefined;
+
+    /** The personal details of the participants */
+    personalDetails: OnyxEntry<PersonalDetailsList>;
+
+    /** The current user's account ID */
+    currentUserAccountID: number;
+
+    /** The intro selected by the user */
+    introSelected: OnyxEntry<IntroSelected>;
+
+    /** Whether the user has seen the self tour */
+    isSelfTourViewed: boolean | undefined;
+
+    /** Beta features list */
+    betas: OnyxEntry<Beta[]>;
+};
+
+/**
+ * Loads the 1:1 report with Concierge into Onyx without navigating to it, creating the chat when it doesn't exist yet.
+ * This is for surfaces that compose to Concierge in place, such as the Home prompt box, which stay on the current page.
+ * Returns the report ID the Concierge conversation will live under, so the caller can target it right away.
+ */
+function loadConciergeChat({conciergeReportID, personalDetails, currentUserAccountID, introSelected, isSelfTourViewed, betas}: LoadConciergeChatParams) {
+    if (conciergeReportID) {
+        openReport({reportID: conciergeReportID, introSelected, isSelfTourViewed, betas, currentUserAccountID, hasReportActions: false, shouldMarkAsRead: false});
+        return conciergeReportID;
+    }
+
+    const participantAccountIDs = PersonalDetailsUtils.getAccountIDsByLogins([CONST.EMAIL.CONCIERGE]);
+    const chat = getChatByParticipants([...participantAccountIDs, currentUserAccountID]);
+    if (!isEmptyObject(chat) && !isReportNotFound(chat)) {
+        openReport({reportID: chat.reportID, introSelected, isSelfTourViewed, betas, currentUserAccountID, hasReportActions: false, shouldMarkAsRead: false});
+        return chat.reportID;
+    }
+
+    const optimisticConciergeChat = buildOptimisticChatReport({
+        participantList: [...participantAccountIDs, currentUserAccountID],
+        notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
+        currentUserAccountID,
+    });
+
+    // We pass newReportObject to force chat creation on the server.
+    openReport({
+        reportID: optimisticConciergeChat.reportID,
+        introSelected,
+        reportActionID: '',
+        participants: buildParticipantInfoFromLogins([CONST.EMAIL.CONCIERGE]),
+        personalDetails,
+        newReportObject: optimisticConciergeChat,
+        isSelfTourViewed,
+        hasCompletedGuidedSetupFlow: undefined,
+        hasReportActions: false,
+        shouldMarkAsRead: false,
+        betas,
+        currentUserAccountID,
+    });
+
+    return optimisticConciergeChat.reportID;
+}
+
 /**
  * Navigates to the 1:1 report with Concierge
  */
@@ -8682,6 +8745,7 @@ export {
     joinRoom,
     leaveGroupChat,
     leaveRoom,
+    loadConciergeChat,
     markAsManuallyExported,
     markCommentAsUnread,
     navigateToAndOpenChildReport,
