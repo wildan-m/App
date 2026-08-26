@@ -13,6 +13,7 @@ import {
 } from '@libs/Middleware';
 import FraudMonitoring from '@libs/Middleware/FraudMonitoring';
 import LoadPostDataForOpenOrReconnect from '@libs/Middleware/LoadPostDataForOpenOrReconnect';
+import PreserveKnownLogin from '@libs/Middleware/PreserveKnownLogin';
 import SentryServerTiming from '@libs/Middleware/SentryServerTiming';
 import {push as pushToSequentialQueue} from '@libs/Network/SequentialQueue';
 import {getIsOffline} from '@libs/NetworkState';
@@ -59,6 +60,9 @@ addMiddleware(SupportalPermission);
 
 // If an optimistic ID is not used by the server, this will update the remaining serialized requests using that optimistic ID to use the correct ID instead.
 addMiddleware(HandleUnusedOptimisticID);
+
+// PreserveKnownLogin - Keeps the stored login of a known account when a lookup by one of its secondary logins echoes that login back. Must run before SaveResponseInOnyx applies the response.
+addMiddleware(PreserveKnownLogin);
 
 addMiddleware(Pagination);
 
