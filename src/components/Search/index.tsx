@@ -25,7 +25,12 @@ import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {saveLastSearchParams} from '@libs/actions/ReportNavigation';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import {setOptimisticDataForTransactionThreadPreview} from '@libs/actions/Search';
-import {clearActiveTransactionIDs, setActiveTransactionIDs, shouldWriteActiveTransactionIDsForSearch} from '@libs/actions/TransactionThreadNavigation';
+import {
+    clearActiveTransactionIDs,
+    setActiveTransactionIDsForSearchPage,
+    shouldReleaseSearchPageActiveTransactionIDs,
+    shouldWriteActiveTransactionIDsForSearch,
+} from '@libs/actions/TransactionThreadNavigation';
 import {flushDeferredWrite, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import Log from '@libs/Log';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
@@ -583,7 +588,7 @@ function Search({
             // with all sibling transactions so prev/next navigation works in the RHP transaction view.
             if (isTransactionItem) {
                 if (carouselSiblingTransactionIDs.length > 1) {
-                    setActiveTransactionIDs(carouselSiblingTransactionIDs, hash);
+                    setActiveTransactionIDsForSearchPage(carouselSiblingTransactionIDs, hash);
                 } else {
                     clearActiveTransactionIDs();
                 }
@@ -769,10 +774,16 @@ function Search({
         if (shouldShowLoadingState) {
             return;
         }
+        // A carousel this page seeded for an earlier query stays active after the query changes, and a report
+        // opened from the new query can then be captured by it, so release it before seeding the current search.
+        if (shouldReleaseSearchPageActiveTransactionIDs(hash, activeCarouselSnapshotHash)) {
+            clearActiveTransactionIDs();
+            return;
+        }
         if (!shouldWriteActiveTransactionIDsForSearch(activeCarouselTransactionIDs, activeCarouselSnapshotHash, hash, carouselSiblingTransactionIDs)) {
             return;
         }
-        setActiveTransactionIDs(carouselSiblingTransactionIDs, hash);
+        setActiveTransactionIDsForSearchPage(carouselSiblingTransactionIDs, hash);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- carouselSiblingsKey is an order-sensitive proxy for the array, which is rebuilt on every search data change
     }, [carouselSiblingsKey, activeCarouselSnapshotHash, activeCarouselTransactionIDs, hash, shouldShowLoadingState]);
 

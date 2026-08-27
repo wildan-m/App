@@ -21,6 +21,11 @@ let lastSetIDs: string[] | null = null;
 let lastSetSnapshotHash: number | null = null;
 let lastSetDescriptors: Record<string, TransactionThreadNavigationDescriptor> | null = null;
 
+// The search snapshot hash the Search page last seeded the carousel with. It is kept here rather than in the
+// Search component because that component is keyed by the query hash, so it remounts whenever the query changes
+// and could not remember what the previous query left behind.
+let lastSearchPageSeedHash: number | null = null;
+
 function areDescriptorMapsEqual(a: Record<string, TransactionThreadNavigationDescriptor> | null, b: Record<string, TransactionThreadNavigationDescriptor> | null) {
     if (a === b) {
         return true;
@@ -95,6 +100,27 @@ function shouldWriteActiveTransactionIDsForSearch(
     return !isUpToDate;
 }
 
+/**
+ * Seeds the carousel from the Search page, recording that the page owns it for this search snapshot.
+ */
+function setActiveTransactionIDsForSearchPage(ids: string[], snapshotHash: number) {
+    lastSearchPageSeedHash = snapshotHash;
+    return setActiveTransactionIDs(ids, snapshotHash);
+}
+
+/**
+ * Whether the active carousel is one the Search page seeded for a search it is no longer displaying. Changing the
+ * query leaves the seeded IDs behind, and a report opened later can be captured by them, so the page releases them.
+ * A carousel another owner has taken over since (an expanded group row, an expense report, the duplicate review)
+ * no longer matches the seeded hash, so it is left alone.
+ */
+function shouldReleaseSearchPageActiveTransactionIDs(searchSnapshotHash: number, activeSnapshotHash: number | undefined): boolean {
+    if (lastSearchPageSeedHash === null || lastSearchPageSeedHash === searchSnapshotHash) {
+        return false;
+    }
+    return activeSnapshotHash === lastSearchPageSeedHash;
+}
+
 function shouldPreserveActiveTransactionIDs(candidateIDs: string[], anchorTransactionID: string): boolean {
     const activeIDs = lastSetIDs;
     if (!activeIDs?.includes(anchorTransactionID)) {
@@ -107,6 +133,7 @@ function clearActiveTransactionIDs() {
     lastSetIDs = null;
     lastSetSnapshotHash = null;
     lastSetDescriptors = null;
+    lastSearchPageSeedHash = null;
     return Promise.all([
         Onyx.set(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_TRANSACTION_IDS, null),
         Onyx.set(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_SNAPSHOT_HASH, null),
@@ -114,4 +141,12 @@ function clearActiveTransactionIDs() {
     ]);
 }
 
-export {setActiveTransactionIDs, clearActiveTransactionIDs, getActiveTransactionIDs, shouldWriteActiveTransactionIDsForSearch, shouldPreserveActiveTransactionIDs};
+export {
+    setActiveTransactionIDs,
+    setActiveTransactionIDsForSearchPage,
+    clearActiveTransactionIDs,
+    getActiveTransactionIDs,
+    shouldWriteActiveTransactionIDsForSearch,
+    shouldReleaseSearchPageActiveTransactionIDs,
+    shouldPreserveActiveTransactionIDs,
+};
