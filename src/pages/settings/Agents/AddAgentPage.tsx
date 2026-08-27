@@ -58,7 +58,10 @@ function AddAgentPageContent({route, template}: AddAgentPageContentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {windowWidth, windowHeight} = useWindowDimensions();
-    const shouldUseScrollableLayout = useIsInLandscapeMode() || (isMobile() && windowWidth > windowHeight);
+    // Narrow layouts are too short to fit this page's fixed-height column once the keyboard opens, so they
+    // need the same scrollable layout landscape already uses. getIsNarrowLayout is used here for the same
+    // reason it is used in handleSubmit below: useResponsiveLayout always reads as "narrow" inside the RHP.
+    const shouldUseScrollableLayout = useIsInLandscapeMode() || getIsNarrowLayout() || (isMobile() && windowWidth > windowHeight);
     const {accountID: ownerAccountID, login: ownerLogin, displayName} = useCurrentUserPersonalDetails();
     const defaultAgentName = template?.name ?? (displayName ? translate('addAgentPage.defaultAgentName', displayName) : undefined);
     const defaultPrompt = template?.prompt ?? translate('addAgentPage.defaultPrompt');
