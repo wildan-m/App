@@ -6,6 +6,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import usePersonalDetailsByEmail from '@hooks/usePersonalDetailsByEmail';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -42,6 +43,8 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
     const [approvalWorkflow, approvalWorkflowMetadata] = useOnyx(ONYXKEYS.APPROVAL_WORKFLOW);
     const isApprovalWorkflowLoading = isLoadingOnyxValue(approvalWorkflowMetadata);
     const personalDetailsByEmail = usePersonalDetailsByEmail();
+    const {isBetaEnabled} = usePermissions();
+    const isMultipleApproversBetaEnabled = isBetaEnabled(CONST.BETAS.MULTIPLE_APPROVERS);
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
     const approverIndex = Number(route.params.approverIndex) ?? 0;
     const rhpRoutes = useNavigationState((state) => state.routes);
@@ -64,6 +67,37 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
 
     const shouldShowNotFoundView = isAnyHRReadOnlyWorkflowMode(policy);
     const shouldFilterOutExpensifyTeam = shouldFilterExpensifyTeam(policy?.owner, currentUserLogin);
+
+    // In the legacy `employeeList` structure a workflow has no identity of its own: it is keyed by its
+    // first approver, and that approver's `forwardsTo` holds the rest of the chain, so one approver can
+    // only ever lead one workflow. Picking another workflow's first approver here would overwrite that
+    // workflow's chain and absorb its members instead of creating a new workflow, so those approvers are
+    // not offered at position 0. The rules-based structure behind the beta keys each workflow by its full
+    // approver chain and doesn't have this limitation.
+    const firstApproversOfOtherWorkflows = useMemo(() => {
+        if (isMultipleApproversBetaEnabled || isDefault || approverIndex !== 0 || !employeeList) {
+            return new Set<string>();
+        }
+
+        const membersEmail = new Set(approvalWorkflow?.members?.map((member) => member.email));
+        const emails = new Set<string>();
+
+        for (const employee of Object.values(employeeList)) {
+            if (employee.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE || !employee.email || !employee.submitsTo) {
+                continue;
+            }
+
+            // Members of the workflow being edited submit to its own first approver, so they must not make
+            // that approver unavailable to the very workflow they belong to.
+            if (membersEmail.has(employee.email)) {
+                continue;
+            }
+
+            emails.add(employee.submitsTo);
+        }
+
+        return emails;
+    }, [isMultipleApproversBetaEnabled, isDefault, approverIndex, employeeList, approvalWorkflow?.members]);
 
     const allApprovers: SelectionListApprover[] = useMemo(() => {
         if (isApprovalWorkflowLoading || !employeeList) {
@@ -100,6 +134,11 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
 
                 // Do not allow the default approver to be added as the first approver
                 if (!isDefault && approverIndex === 0 && defaultApprover === email) {
+                    return null;
+                }
+
+                // Do not allow an approver who already leads another workflow to be added as the first approver
+                if (firstApproversOfOtherWorkflows.has(email) && visibleSelectedApproverEmail !== email) {
                     return null;
                 }
 
@@ -141,6 +180,7 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
         visibleSelectedApproverEmail,
         approverIndex,
         defaultApprover,
+        firstApproversOfOtherWorkflows,
         personalDetails,
         icons.FallbackAvatar,
         shouldFilterOutExpensifyTeam,
