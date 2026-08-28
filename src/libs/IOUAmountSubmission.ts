@@ -531,7 +531,10 @@ function submitGlobalCreate(args: SubmitAmountArgs, ctx: SubmitAmountContext): v
     const transactionAssociatedReport = getReportOrReportDraftForAmount(transaction?.reportID, allReports, allReportDrafts);
     const selectedReport = iouReportID === CONST.REPORT.UNREPORTED_REPORT_ID ? selfDMReport : transactionAssociatedReport;
     const navigationIOUType = isSelfDM(selectedReport) ? CONST.IOU.TYPE.TRACK : CONST.IOU.TYPE.SUBMIT;
-    const chatReportID = selectedReport?.chatReportID ?? selectedReport?.reportID;
+    // A chat report can carry an empty `chatReportID`, so pick the chat ID by report type instead of relying on
+    // the field being absent, and fall back to the draft's report ID so the route can never miss its report segment.
+    const selectedChatReportID = isMoneyRequestReport(selectedReport) ? selectedReport?.chatReportID : selectedReport?.reportID;
+    const chatReportID = selectedChatReportID || iouReportID;
 
     navigateToExistingParticipantConfirmation(navigationIOUType, transactionID, chatReportID);
 }
