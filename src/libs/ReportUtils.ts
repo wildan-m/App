@@ -12003,7 +12003,10 @@ function canJoinChat(
         return false;
     }
 
-    const isExpenseChat = isMoneyRequestReport(report) || isMoneyRequest(report) || isInvoiceReport(report) || isTrackExpenseReportNew(report, parentReport, parentReportAction);
+    // The transaction thread of an invoice is a money-related chat just like an IOU or expense request thread, but isMoneyRequest doesn't cover an invoice parent report
+    const isInvoiceTransactionThread = isThread(report) && isTransactionThread(parentReportAction) && isInvoiceReport(parentReport);
+    const isExpenseChat =
+        isMoneyRequestReport(report) || isMoneyRequest(report) || isInvoiceReport(report) || isTrackExpenseReportNew(report, parentReport, parentReportAction) || isInvoiceTransactionThread;
     // Anyone viewing these chat types is already a participant and therefore cannot join
     if (isRootGroupChat(report, isReportArchived) || isSelfDM(report) || isInvoiceRoom(report) || isSystemChat(report) || isExpenseChat) {
         return false;
