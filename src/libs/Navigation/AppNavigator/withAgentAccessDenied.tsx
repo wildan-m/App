@@ -77,6 +77,12 @@ function withAgentAccessDenied(getComponent: () => React.ComponentType): () => R
                     return null;
                 }
                 if (isAgent === true) {
+                    // A guarded screen that has lost focus is either an RHP animating closed after dismissModal, or a
+                    // pane sitting behind the redirect target. Either way it is on its way out and must not flash the
+                    // blocking view over the screen the user is actually being taken to.
+                    if (!isFocused) {
+                        return null;
+                    }
                     return (
                         <FullPageNotFoundView
                             shouldShow

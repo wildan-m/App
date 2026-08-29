@@ -184,6 +184,26 @@ describe('withAgentAccessDenied', () => {
         });
     });
 
+    it('does not show the access denied view on an unfocused guarded screen that is already on the redirect target', async () => {
+        // Reproduces the copilot flash: the owner taps "Copilot into account" from the agent-edit RHP, the guard
+        // dismisses that RHP and replaces the central pane with Profile. The dismissed RHP stays mounted while it
+        // animates out, so it re-renders with isActiveRoute(Profile) already true and would otherwise fall through
+        // to "Not so fast..." inside the closing panel. An unfocused guarded screen must render nothing.
+        mockIsScreenFocused = false;
+        jest.mocked(Navigation.isActiveRoute).mockReturnValue(true);
+        await signInAsAgent();
+        await waitForBatchedUpdatesWithAct();
+
+        renderComponent();
+        await waitForBatchedUpdatesWithAct();
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('protected-content')).toBeNull();
+            expect(screen.queryByText('Not so fast...')).toBeNull();
+            expect(Navigation.navigate).not.toHaveBeenCalled();
+        });
+    });
+
     it('renders wrapped component for non-agent account', async () => {
         await TestHelper.signInWithTestUser(1, 'user@expensify.com');
         await Onyx.set(ONYXKEYS.IS_LOADING_APP, false);
