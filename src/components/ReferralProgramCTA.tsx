@@ -65,7 +65,7 @@ function ReferralProgramCTA({referralContentType, style, onDismiss, onBeforeNavi
                 sentryLabel={CONST.SENTRY_LABEL.REFERRAL_PROGRAM.CTA}
                 onPress={() => {
                     onBeforeNavigate?.();
-                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(referralContentType), Navigation.getActiveRouteWithoutParams()));
+                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(referralContentType)));
                 }}
                 style={[styles.pAbsolute, styles.t0, styles.b0, styles.l0, {right: CLOSE_BUTTON_OFFSET}]}
                 accessibilityLabel={translate(`referralProgram.${referralContentType}.header`)}
