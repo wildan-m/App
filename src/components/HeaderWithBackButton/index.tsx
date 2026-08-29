@@ -2,7 +2,7 @@ import ActivityIndicator from '@components/ActivityIndicator';
 import UserAvatar from '@components/Avatar/UserAvatar';
 import WorkspaceAvatar from '@components/Avatar/WorkspaceAvatar';
 import AvatarWithDisplayName from '@components/AvatarWithDisplayName';
-import Header from '@components/Header';
+import HeaderTitle from '@components/HeaderTitle';
 import Icon from '@components/Icon';
 import PinButton from '@components/PinButton';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
@@ -11,6 +11,8 @@ import SidePanelButton from '@components/SidePanel/SidePanelButton';
 import ThreeDotsMenu from '@components/ThreeDotsMenu';
 import Tooltip from '@components/Tooltip';
 
+import useAccessibilityAnnouncement from '@hooks/useAccessibilityAnnouncement';
+import useDialogContainerFocus from '@hooks/useDialogContainerFocus';
 import useDialogLabelRegistration from '@hooks/useDialogLabelRegistration';
 import useInitialFocusRef from '@hooks/useInitialFocusRef';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
@@ -91,8 +93,8 @@ function HeaderWithBackButton({
     openParentReportInCurrentTab = false,
     shouldSkipFocusAfterTransition = false,
 }: HeaderWithBackButtonProps) {
-    // Avatar-header routes skip Header, so register the dialog label here.
-    useDialogLabelRegistration(shouldShowReportAvatarWithDisplay ? (report?.reportName ?? '') : '');
+    // The screen header owns the dialog label for both the avatar and the title path.
+    const {isTransitionReady, claimInitialFocus, containerRef} = useDialogLabelRegistration(shouldShowReportAvatarWithDisplay ? (report?.reportName ?? '') : title);
 
     const icons = useMemoizedLazyExpensifyIcons(['Download', 'Rotate', 'BackArrow', 'Close']);
     const theme = useTheme();
@@ -102,6 +104,20 @@ function HeaderWithBackButton({
     const {translate} = useLocalize();
     const isInLandscapeMode = useIsInLandscapeMode();
     const setBackButtonRef = useInitialFocusRef({shouldSkip: shouldSkipFocusAfterTransition});
+
+    // Only the title header moves focus and announces the dialog; the avatar header just registers its label above.
+    const isTitleHeaderReady = isTransitionReady && !shouldShowReportAvatarWithDisplay;
+    useDialogContainerFocus(containerRef, isTitleHeaderReady, claimInitialFocus, shouldSkipFocusAfterTransition);
+
+    const dialogAnnouncement = title ? `${title}, ${translate('common.dialogOpened')}` : '';
+    // Polite so JAWS can finish the tab-title "(1) …" (left paren…) before "{title}, dialog" — assertive was cutting it off at "lef".
+    // Keep announcing even when shouldSkipFocusAfterTransition is set — that flag only skips focus moves (e.g. New Task / IOU confirmation).
+    // Web-only: iOS VoiceOver must not speak this (index.ios honors shouldAnnounceOnNative; default would announce).
+    useAccessibilityAnnouncement(dialogAnnouncement, isTitleHeaderReady && !!title, {
+        shouldAnnounceOnWeb: true,
+        shouldAnnounceOnNative: false,
+        politeness: 'polite',
+    });
 
     const middleContent = useMemo(() => {
         const stepCounterTranslation = stepCounter ? translate('stepCounter', stepCounter.step, stepCounter.total, stepCounter.text) : undefined;
@@ -117,15 +133,16 @@ function HeaderWithBackButton({
         }
 
         return (
-            <Header
-                title={title}
-                subtitle={stepCounterTranslation ?? subtitle}
-                textStyles={[titleColor ? StyleUtils.getTextColorStyle(titleColor) : {}, shouldUseHeadlineHeader && styles.textHeadlineH2, titleStyles]}
-                subTitleLink={subTitleLink}
-                numberOfTitleLines={numberOfTitleLines}
-                isScreenHeader
-                shouldSkipFocusAfterTransition={shouldSkipFocusAfterTransition}
-            />
+            <HeaderTitle>
+                <HeaderTitle.Text
+                    numberOfLines={numberOfTitleLines}
+                    style={[titleColor ? StyleUtils.getTextColorStyle(titleColor) : {}, shouldUseHeadlineHeader && styles.textHeadlineH2, titleStyles]}
+                >
+                    {title}
+                </HeaderTitle.Text>
+                <HeaderTitle.Subtitle>{stepCounterTranslation ?? subtitle}</HeaderTitle.Subtitle>
+                <HeaderTitle.SubtitleLink>{subTitleLink}</HeaderTitle.SubtitleLink>
+            </HeaderTitle>
         );
     }, [
         StyleUtils,
@@ -144,7 +161,6 @@ function HeaderWithBackButton({
         translate,
         openParentReportInCurrentTab,
         shouldDisplayStatus,
-        shouldSkipFocusAfterTransition,
     ]);
     const ThreeDotMenuButton = useMemo(() => {
         if (shouldShowThreeDotsButton) {
