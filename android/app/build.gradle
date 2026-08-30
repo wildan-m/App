@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "fullstory"
+apply plugin: "io.sentry.android.gradle"
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
@@ -15,6 +16,31 @@ fullstory {
     enabledVariants 'all'
     logcatLevel 'debug'
     recordOnStart false
+}
+
+/* Sentry settings
+ *
+ * Only the native debug-symbol upload is enabled, so NDK crashes symbolicate in Sentry
+ * (org/project come from android/sentry.properties). Uploads run only when the environment
+ * provides SENTRY_AUTH_TOKEN (exported to the build by CI) — local and fork builds skip
+ * the upload tasks entirely. Everything else the plugin can do (ProGuard mapping upload,
+ * source context, tracing instrumentation, dependency auto-installation) stays disabled
+ * so runtime behavior is unchanged.
+ */
+def sentryUploadEnabled = System.getenv('SENTRY_AUTH_TOKEN') ? true : false
+sentry {
+    uploadNativeSymbols = sentryUploadEnabled
+    autoUploadNativeSymbols = sentryUploadEnabled
+    includeNativeSources = true
+    includeProguardMapping = false
+    autoUploadProguardMapping = false
+    includeSourceContext = false
+    tracingInstrumentation {
+        enabled = false
+    }
+    autoInstallation {
+        enabled = false
+    }
 }
 
 react {
