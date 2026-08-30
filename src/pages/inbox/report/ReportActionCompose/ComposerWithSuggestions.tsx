@@ -286,7 +286,13 @@ function ComposerWithSuggestions({
     });
 
     // Save the draft of the report action. This debounced so that we're not ceaselessly saving your edit.
-    const {saveDraft: debouncedSaveReportActionDraft, isSavePending: isDraftSavePending, cancelSaveDraft: cancelSaveReportActionDraft} = useDebouncedSaveDraft(saveReportActionDraft);
+    // The pending save is flushed on unmount so that leaving the report while an edit is in progress persists the last
+    // change instead of discarding it, which would leave a stale draft behind and repopulate the composer on return.
+    const {
+        saveDraft: debouncedSaveReportActionDraft,
+        isSavePending: isDraftSavePending,
+        cancelSaveDraft: cancelSaveReportActionDraft,
+    } = useDebouncedSaveDraft(saveReportActionDraft, undefined, true);
 
     // Save the draft of the report comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
     // allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
