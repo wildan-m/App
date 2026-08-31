@@ -24,7 +24,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {isMobileChrome, isMobileSafari, isSafari} from '@libs/Browser';
-import {scrollToRight} from '@libs/InputUtils';
+import {scrollToBottom, scrollToRight} from '@libs/InputUtils';
 import isInputAutoFilled from '@libs/isInputAutoFilled';
 
 import variables from '@styles/variables';
@@ -321,6 +321,30 @@ function BaseTextInput({
             style.whiteSpace = original;
         };
     }, [textInputHeight]);
+
+    /**
+     * Re-anchors an auto-growing input to the end of its value once it has finished growing.
+     * The browser scrolls the caret into view while the value is being inserted, but the input is still
+     * being measured then: it only becomes scrollable once its content passes `maxAutoGrowHeight`, and it
+     * gains extra bottom padding once its height passes `variables.componentSizeLarge`. Both land a render
+     * later, so the offset the browser settled on no longer reaches the bottom and the end of a long pasted
+     * value is left out of view. Only the caret-at-the-end case is re-anchored, so a caret placed midway
+     * through the value is never scrolled away from.
+     * @see https://github.com/Expensify/App/issues/99715
+     */
+    useEffect(() => {
+        const inputElement = input.current;
+        if (!autoGrowHeight || !inputElement || textInputHeight === 0 || typeof document === 'undefined' || document.activeElement !== inputElement) {
+            return;
+        }
+
+        const endOfValue = inputElement.value.length;
+        if (inputElement.selectionStart !== endOfValue || inputElement.selectionEnd !== endOfValue) {
+            return;
+        }
+
+        scrollToBottom(inputElement);
+    }, [autoGrowHeight, textInputHeight]);
 
     const togglePasswordVisibility = useCallback(() => {
         setPasswordHidden((prevPasswordHidden: boolean | undefined) => !prevPasswordHidden);
