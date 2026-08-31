@@ -33,6 +33,8 @@ import {Bar, CartesianChart} from 'victory-native';
 
 import type {CartesianChartProps, ChartDataPoint} from '..';
 
+import HorizontalBarChart from './HorizontalBarChart';
+
 /** Extra pixel spacing between the chart boundary and the data range, applied per side (Victory's `domainPadding` prop)
  * We need bottom: 1 for proper display of the bottom label
  */
@@ -51,9 +53,6 @@ function BarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'l
     const styles = useThemeStyles();
     const fontManager = useChartFontManager();
     const [chartWidth, setChartWidth] = useState(0);
-    const [barAreaWidth, setBarAreaWidth] = useState(0);
-    const [boundsLeft, setBoundsLeft] = useState(0);
-    const [boundsRight, setBoundsRight] = useState(0);
     const defaultBarColor = VictoryTheme.colors.default;
 
     const chartData = data.map((point, index) => ({
@@ -85,29 +84,38 @@ function BarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'l
         return {...BASE_DOMAIN_PADDING, left: horizontalPadding, right: horizontalPadding};
     })();
 
-    const totalDomainPadding = domainPadding.left + domainPadding.right;
-    const paddingScale = barAreaWidth > 0 ? barAreaWidth / (barAreaWidth + totalDomainPadding) : 0;
-
-    const originalLabels = data.map(getXAxisLabel);
-
-    const measurements = useChartLabelMeasurements(data, fontManager, variables.iconSizeExtraSmall);
-
-    const {labelRotation, labelSkipInterval, truncatedLabelWidths, xAxisLabelHeight, regularLabelMaxWidth, firstLabelMaxWidth, lastLabelMaxWidth, ellipsisWidth} = useChartLabelLayout({
-        data,
-        fontManager,
-        fontSize: variables.iconSizeExtraSmall,
-        tickSpacing: barAreaWidth > 0 ? barAreaWidth / data.length : 0,
-        labelAreaWidth: barAreaWidth,
-        firstTickLeftSpace: boundsLeft + domainPadding.left * paddingScale,
-        lastTickRightSpace: chartWidth > 0 ? chartWidth - boundsRight + domainPadding.right * paddingScale : 0,
-        measurements,
-    });
-
     const {formatValue} = useChartLabelFormats({
         data,
         unit: yAxisUnit,
         unitPosition: yAxisUnitPosition,
     });
+
+    // Plot geometry derived from the container width and the paddings passed to CartesianChart below.
+    // Deriving it (instead of reading it back from onChartBoundsChange) keeps the label layout
+    // responsive to resizes even while the horizontal-bar fallback is mounted.
+    const yAxisLabelWidth = getYAxisLabelWidth(data, formatValue, fontManager, variables.iconSizeExtraSmall, BASE_DOMAIN_PADDING);
+    const plotLeft = yAxisLabelWidth + GLYPH_PADDING;
+    const plotAreaWidth = chartWidth > 0 ? Math.max(0, chartWidth - plotLeft - VictoryTheme.axis.padding.right) : 0;
+
+    const totalDomainPadding = domainPadding.left + domainPadding.right;
+    const paddingScale = plotAreaWidth > 0 ? plotAreaWidth / (plotAreaWidth + totalDomainPadding) : 0;
+
+    const originalLabels = data.map(getXAxisLabel);
+
+    const measurements = useChartLabelMeasurements(data, fontManager, variables.iconSizeExtraSmall);
+
+    const {labelRotation, labelSkipInterval, truncatedLabelWidths, xAxisLabelHeight, regularLabelMaxWidth, firstLabelMaxWidth, lastLabelMaxWidth, ellipsisWidth, shouldUseHorizontalBars} =
+        useChartLabelLayout({
+            data,
+            fontManager,
+            fontSize: variables.iconSizeExtraSmall,
+            tickSpacing: plotAreaWidth > 0 ? plotAreaWidth / data.length : 0,
+            labelAreaWidth: plotAreaWidth,
+            firstTickLeftSpace: plotLeft + domainPadding.left * paddingScale,
+            lastTickRightSpace: chartWidth > 0 ? VictoryTheme.axis.padding.right + domainPadding.right * paddingScale : 0,
+            measurements,
+            preferHorizontalBars: true,
+        });
 
     const barWidth = useSharedValue(0);
     const chartBottom = useSharedValue(0);
@@ -127,9 +135,6 @@ function BarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'l
         const calculatedBarWidth = ((1 - BAR_INNER_PADDING) * domainWidth) / data.length;
         barWidth.set(calculatedBarWidth);
         yZero.set(0);
-        setBarAreaWidth(domainWidth);
-        setBoundsLeft(bounds.left);
-        setBoundsRight(bounds.right);
     };
 
     const checkIsOverBar = (args: HitTestArgs) => {
@@ -230,8 +235,7 @@ function BarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'l
 
     const labelSpace = VictoryTheme.axis.labelGap + (xAxisLabelHeight ?? 0);
     const dynamicChartStyle = {height: CHART_CONTENT_MIN_HEIGHT + labelSpace};
-    const yAxisLabelWidth = getYAxisLabelWidth(data, formatValue, fontManager, variables.iconSizeExtraSmall, BASE_DOMAIN_PADDING);
-    const chartPadding = {...VictoryTheme.axis.padding, bottom: labelSpace + VictoryTheme.axis.padding.bottom, left: yAxisLabelWidth + GLYPH_PADDING};
+    const chartPadding = {...VictoryTheme.axis.padding, bottom: labelSpace + VictoryTheme.axis.padding.bottom, left: plotLeft};
 
     if (isLoading || !fontManager) {
         return (
@@ -243,6 +247,24 @@ function BarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'l
 
     if (data.length === 0) {
         return null;
+    }
+
+    // The horizontal container is measured too, so the label layout keeps reacting to
+    // resizes and flips the chart back to vertical bars when the labels fit again.
+    if (shouldUseHorizontalBars) {
+        return (
+            <View onLayout={handleLayout}>
+                <HorizontalBarChart
+                    data={data}
+                    chartWidth={chartWidth}
+                    fontManager={fontManager}
+                    formatValue={formatValue}
+                    valueDomain={yAxisDomain}
+                    useSingleColor={useSingleColor}
+                    onBarPress={handleBarPress}
+                />
+            </View>
+        );
     }
 
     return (

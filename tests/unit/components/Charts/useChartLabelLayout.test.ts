@@ -60,6 +60,7 @@ describe('useChartLabelLayout', () => {
             firstLabelMaxWidth: Infinity,
             lastLabelMaxWidth: Infinity,
             ellipsisWidth: 0,
+            shouldUseHorizontalBars: false,
         };
 
         it('returns defaults when fontManager is null', () => {
@@ -113,6 +114,53 @@ describe('useChartLabelLayout', () => {
             // tickSpacing=20: 0° fails (46>20), 45° fails (29.7+4=33.7>20)
             const {result} = renderLayout({data: makeData('AAAAAA', 'BBBBBB'), fontManager: mockFontMgr, fontSize: FONT_SIZE, tickSpacing: 20, labelAreaWidth: 400});
             expect(result.current.labelRotation).toBe(90);
+        });
+    });
+
+    describe('horizontal-bar fallback', () => {
+        it('does not request horizontal bars when the flag is off and labels overflow at 45°', () => {
+            // Same geometry as the 90° case above — without preferHorizontalBars the 90° fallback stays.
+            const {result} = renderLayout({data: makeData('AAAAAA', 'BBBBBB'), fontManager: mockFontMgr, fontSize: FONT_SIZE, tickSpacing: 20, labelAreaWidth: 400});
+            expect(result.current.labelRotation).toBe(90);
+            expect(result.current.shouldUseHorizontalBars).toBe(false);
+        });
+
+        it('requests horizontal bars instead of 90° when the flag is on and labels overflow at 45°', () => {
+            const {result} = renderLayout({
+                data: makeData('AAAAAA', 'BBBBBB'),
+                fontManager: mockFontMgr,
+                fontSize: FONT_SIZE,
+                tickSpacing: 20,
+                labelAreaWidth: 400,
+                preferHorizontalBars: true,
+            });
+            expect(result.current.shouldUseHorizontalBars).toBe(true);
+        });
+
+        it('does not request horizontal bars when labels fit at 0°', () => {
+            const {result} = renderLayout({
+                data: makeData('AAA', 'BBB', 'CCC'),
+                fontManager: mockFontMgr,
+                fontSize: FONT_SIZE,
+                tickSpacing: 30,
+                labelAreaWidth: 90,
+                preferHorizontalBars: true,
+            });
+            expect(result.current.labelRotation).toBe(0);
+            expect(result.current.shouldUseHorizontalBars).toBe(false);
+        });
+
+        it('does not request horizontal bars when labels fit at 45°', () => {
+            const {result} = renderLayout({
+                data: makeData('AAAAAA', 'BBBBBB'),
+                fontManager: mockFontMgr,
+                fontSize: FONT_SIZE,
+                tickSpacing: 40,
+                labelAreaWidth: 400,
+                preferHorizontalBars: true,
+            });
+            expect(result.current.labelRotation).toBe(45);
+            expect(result.current.shouldUseHorizontalBars).toBe(false);
         });
     });
 
