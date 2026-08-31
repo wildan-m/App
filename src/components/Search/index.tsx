@@ -811,6 +811,19 @@ function Search({
         setOffset((prev) => prev + CONST.SEARCH.RESULTS_PAGE_SIZE);
     }, [isFocused, searchResults?.search?.hasMoreResults, shouldShowLoadingMoreItems, shouldShowLoadingState, offset, allDataLength]);
 
+    // A to-do search renders every row from live Onyx data up front, so `onEndReached` only fires once the user
+    // reaches the bottom of the whole list, and each firing advances by a single page. The snapshot pages carry each
+    // report's export actions, so the rows past the pages that were actually fetched would stay without them. Keep
+    // requesting the next page while the to-do search is being viewed, one page at a time (the previous page has to
+    // land before the next is requested), until the fetched pages cover the rendered rows.
+    useEffect(() => {
+        if (!shouldUseLiveData || searchResults?.search?.offset !== offset) {
+            return;
+        }
+
+        fetchMoreResults();
+    }, [shouldUseLiveData, searchResults?.search?.offset, offset, fetchMoreResults]);
+
     const onLayoutBase = useCallback(() => {
         hasHadFirstLayout.current = true;
         onDestinationVisible?.(isSearchResultsEmptyRef.current, 'layout');

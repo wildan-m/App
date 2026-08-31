@@ -4,7 +4,7 @@ import {getTransactionsByReportID, getViolationsFromSearchData, isTodoSearch} fr
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchResultsInfo} from '@src/types/onyx/SearchResults';
+import type {SearchResultDataType, SearchResultsInfo} from '@src/types/onyx/SearchResults';
 
 import React, {useState} from 'react';
 // This provider is the source of the snapshot data that `@hooks/useOnyx` later routes consumers onto,
@@ -39,6 +39,39 @@ const defaultSearchInfo: SearchResultsInfo = {
     currency: undefined,
 };
 
+/**
+ * `Search` API responses only ever write to the `snapshot_<hash>` key, so a report's export actions never reach the
+ * live `reportActions_` collection unless that report happened to be loaded through some other flow. When a to-do
+ * search renders from live data we would otherwise drop those actions entirely, which leaves the Exported and
+ * Exported To columns blank for every row the client has not loaded separately. Overlay the snapshot's actions onto
+ * the reports we are rendering, keeping the live actions whenever they exist so the live path stays as fresh as it is
+ * meant to be.
+ */
+function mergeSnapshotReportActions(liveData: SearchResultDataType, snapshotData: SearchResultDataType | undefined): SearchResultDataType {
+    if (!snapshotData) {
+        return liveData;
+    }
+
+    let mergedData: SearchResultDataType | undefined;
+
+    for (const key of Object.keys(liveData)) {
+        if (!key.startsWith(ONYXKEYS.COLLECTION.REPORT)) {
+            continue;
+        }
+
+        const reportID = key.slice(ONYXKEYS.COLLECTION.REPORT.length);
+        const reportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}` as const;
+        if (liveData[reportActionsKey] || !snapshotData[reportActionsKey]) {
+            continue;
+        }
+
+        mergedData ??= {...liveData};
+        mergedData[reportActionsKey] = snapshotData[reportActionsKey];
+    }
+
+    return mergedData ?? liveData;
+}
+
 function SearchResultsProvider({children}: SearchResultsProviderProps) {
     const {currentSearchHash, currentSearchKey, currentSearchQueryJSON, suggestedSearches} = useSearchQueryContext();
     const currentRecentSearchHash = currentSearchQueryJSON?.recentSearchHash ?? -1;
@@ -64,7 +97,7 @@ function SearchResultsProvider({children}: SearchResultsProviderProps) {
         // This ensures we show the empty state instead of loading/blocking views
         currentSearchResults = {
             search: {...searchInfo, isLoading: false, hasResults},
-            data: liveData.data,
+            data: mergeSnapshotReportActions(liveData.data, snapshotSearchResults?.data),
         };
     } else {
         currentSearchResults = snapshotSearchResults ?? undefined;
