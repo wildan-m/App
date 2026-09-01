@@ -42,4 +42,16 @@ function buildRecentCardTransactionsQuery(accountID: number, cardID: number): st
     });
 }
 
-export {buildAwaitingApprovalQuery, buildRepaidLast30DaysQuery, buildRecentCardTransactionsQuery};
+// One grouped query covering every displayable card, so the home screen fetches all
+// per-card totals in a single Search request instead of one request per card.
+function buildRecentCardTransactionsGroupedQuery(accountID: number, cardIDs: number[]): string {
+    return buildQueryStringFromFilterFormValues({
+        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+        from: [String(accountID)],
+        cardID: cardIDs.map(String),
+        [FILTER_KEYS.DATE_AFTER]: get30DaysAgoDateString(),
+        [FILTER_KEYS.GROUP_BY]: CONST.SEARCH.GROUP_BY.CARD,
+    });
+}
+
+export {buildAwaitingApprovalQuery, buildRepaidLast30DaysQuery, buildRecentCardTransactionsQuery, buildRecentCardTransactionsGroupedQuery};

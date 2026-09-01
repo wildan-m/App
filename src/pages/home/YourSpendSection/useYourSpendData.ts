@@ -15,6 +15,7 @@ import type {Card, Policy, Report} from '@src/types/onyx';
 import type {CardFeedWithNumber} from '@src/types/onyx/CardFeeds';
 import type {AnyRequest} from '@src/types/onyx/Request';
 import type SearchResults from '@src/types/onyx/SearchResults';
+import type {SearchCardGroup} from '@src/types/onyx/SearchResults';
 
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -23,7 +24,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {useEffect, useEffectEvent, useMemo, useState} from 'react';
 
 import {YOUR_SPEND_CARD_KIND, YOUR_SPEND_ROW_STATE} from './const';
-import {buildAwaitingApprovalQuery, buildRecentCardTransactionsQuery, buildRepaidLast30DaysQuery} from './queries';
+import {buildAwaitingApprovalQuery, buildRecentCardTransactionsGroupedQuery, buildRecentCardTransactionsQuery, buildRepaidLast30DaysQuery} from './queries';
 
 type YourSpendRowState = ValueOf<typeof YOUR_SPEND_ROW_STATE>;
 type YourSpendCardKind = ValueOf<typeof YOUR_SPEND_CARD_KIND>;
@@ -423,24 +424,25 @@ function useYourSpendData(): UseYourSpendDataReturn {
         .sort((a, b) => a - b)
         .join(',');
 
+    // Per-card query strings, kept only for row navigation (pressing a row opens that
+    // card's filtered Search page). The data itself comes from one grouped query below.
     const cardQueryByCardID = useMemo(
         () =>
-            displayableCards.reduce<Record<number, {query: string; queryJSON: ReturnType<typeof buildSearchQueryJSON>}>>((acc, {card}) => {
-                const query = buildRecentCardTransactionsQuery(accountID, card.cardID);
-                acc[card.cardID] = {query, queryJSON: buildSearchQueryJSON(query)};
+            displayableCards.reduce<Record<number, string>>((acc, {card}) => {
+                acc[card.cardID] = buildRecentCardTransactionsQuery(accountID, card.cardID);
                 return acc;
             }, {}),
         [displayableCards, accountID],
     );
 
-    const cardSnapshotKeys = useMemo(
-        () =>
-            Object.values(cardQueryByCardID)
-                .map((entry) => entry.queryJSON?.hash)
-                .filter((hash): hash is number => hash !== undefined)
-                .map((hash) => `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`),
-        [cardQueryByCardID],
-    );
+    // One grouped (group-by:card) query covering every displayable card, so the whole
+    // section costs a single Search request instead of one request per card. The card
+    // IDs are sorted so the query hash is stable across renders.
+    const groupedCardQuery = useMemo(() => {
+        const cardIDs = displayableCards.map(({card}) => card.cardID).sort((a, b) => a - b);
+        return cardIDs.length > 0 ? buildRecentCardTransactionsGroupedQuery(accountID, cardIDs) : undefined;
+    }, [displayableCards, accountID]);
+    const groupedCardQueryJSON = useMemo(() => (groupedCardQuery ? buildSearchQueryJSON(groupedCardQuery) : undefined), [groupedCardQuery]);
 
     type CardSnapshotSummary = {
         count: number | undefined;
@@ -448,20 +450,28 @@ function useYourSpendData(): UseYourSpendDataReturn {
         currency: string | undefined;
     };
 
-    // Project snapshots down to {count, total, currency} so unrelated snapshot
-    // mutations don't re-render us (useOnyx deep-equals selector output).
-    const cardSnapshotsSelector = (snapshots: OnyxCollection<SearchResults> | undefined): Record<string, CardSnapshotSummary | undefined> | undefined => {
-        if (!snapshots || cardSnapshotKeys.length === 0) {
+    // Project the grouped snapshot down to {count, total, currency} per cardID so
+    // unrelated snapshot mutations don't re-render us (useOnyx deep-equals selector
+    // output). Group entries live in the snapshot data under GROUP_PREFIX keys and
+    // carry their own server-computed totals.
+    const cardGroupsSelector = (snapshot: OnyxEntry<SearchResults>): Record<number, CardSnapshotSummary> | undefined => {
+        if (!snapshot?.data) {
             return undefined;
         }
-        const projected: Record<string, CardSnapshotSummary | undefined> = {};
-        for (const key of cardSnapshotKeys) {
-            const s = snapshots[key];
-            projected[key] = s ? {count: s.search.count, total: s.search.total, currency: s.search.currency} : undefined;
+        const groups: Record<number, CardSnapshotSummary> = {};
+        for (const [key, value] of Object.entries(snapshot.data)) {
+            if (!key.startsWith(CONST.SEARCH.GROUP_PREFIX)) {
+                continue;
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion
+            const group = value as SearchCardGroup;
+            if (group?.cardID !== undefined) {
+                groups[group.cardID] = {count: group.count, total: group.total, currency: group.currency};
+            }
         }
-        return projected;
+        return groups;
     };
-    const [cardSnapshots] = useOnyx(ONYXKEYS.COLLECTION.SNAPSHOT, {selector: cardSnapshotsSelector});
+    const [cardGroups] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${groupedCardQueryJSON?.hash}`, {selector: cardGroupsSelector});
 
     // Per-card READY totals cache. See the approval/payment cache below for the mechanic.
     const [cachedCardTotals, setCachedCardTotals] = useState<Record<number, YourSpendRowTotals>>({});
@@ -469,10 +479,7 @@ function useYourSpendData(): UseYourSpendDataReturn {
     const cardCacheUpdates: Record<number, YourSpendRowTotals> = {};
     let hasCardCacheUpdates = false;
     for (const {card} of displayableCards) {
-        const entry = cardQueryByCardID[card.cardID];
-        const hash = entry?.queryJSON?.hash;
-        const snapshotKey = hash !== undefined ? `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` : undefined;
-        const snapshot = snapshotKey ? cardSnapshots?.[snapshotKey] : undefined;
+        const snapshot = cardGroups?.[card.cardID];
         if (!snapshot?.count) {
             continue;
         }
@@ -489,13 +496,11 @@ function useYourSpendData(): UseYourSpendDataReturn {
     const cardRows: YourSpendCardRow[] = useMemo(
         () =>
             displayableCards.reduce<YourSpendCardRow[]>((acc, {card, kind}) => {
-                const entry = cardQueryByCardID[card.cardID];
-                if (!entry) {
+                const query = cardQueryByCardID[card.cardID];
+                if (!query) {
                     return acc;
                 }
-                const hash = entry.queryJSON?.hash;
-                const snapshotKey = hash !== undefined ? `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` : undefined;
-                const snapshot = snapshotKey ? cardSnapshots?.[snapshotKey] : undefined;
+                const snapshot = cardGroups?.[card.cardID];
 
                 // Snapshot loaded but count wiped by the Search screen, so fall back to cached READY totals.
                 const countIsMissing = snapshot !== undefined && (snapshot.count === undefined || snapshot.count === null);
@@ -525,7 +530,7 @@ function useYourSpendData(): UseYourSpendDataReturn {
                 acc.push({
                     cardID: card.cardID,
                     lastFour,
-                    query: entry.query,
+                    query,
                     total,
                     currency,
                     spentFraction,
@@ -536,7 +541,7 @@ function useYourSpendData(): UseYourSpendDataReturn {
                 });
                 return acc;
             }, []),
-        [displayableCards, cardQueryByCardID, cardSnapshots, cachedCardTotals],
+        [displayableCards, cardQueryByCardID, cardGroups, cachedCardTotals],
     );
 
     const approvalRowStateRaw = getYourSpendRowState({isApplicable: isApprovalApplicable, isOffline, searchResults: approvalSearchResults});
@@ -610,13 +615,9 @@ function useYourSpendData(): UseYourSpendDataReturn {
         if (isOffline) {
             return;
         }
-        for (const {card} of displayableCards) {
-            const cardQueryJSON = cardQueryByCardID[card.cardID]?.queryJSON;
-            if (!cardQueryJSON) {
-                continue;
-            }
+        if (groupedCardQueryJSON) {
             search({
-                queryJSON: cardQueryJSON,
+                queryJSON: groupedCardQueryJSON,
                 searchKey: undefined,
                 offset: 0,
                 isLoading: false,
