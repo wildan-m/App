@@ -431,6 +431,20 @@ function getCurrentAddress(privatePersonalDetails: OnyxEntry<PrivatePersonalDeta
 }
 
 /**
+ * Whether the saved address holds everything a deposit account submission needs, so the flows that collect it can
+ * skip asking again. A state is only required for the countries that have one.
+ *
+ * @param privatePersonalDetails - details object
+ */
+function hasCompleteAddress(privatePersonalDetails: OnyxEntry<PrivatePersonalDetails>): boolean {
+    const currentAddress = getCurrentAddress(privatePersonalDetails);
+    const isUsOrCanada = currentAddress?.country === CONST.COUNTRY.US || currentAddress?.country === CONST.COUNTRY.CA;
+    const hasValidState = !isUsOrCanada || !!currentAddress?.state;
+
+    return !!currentAddress?.street && !!currentAddress?.city && hasValidState && !!currentAddress?.zip;
+}
+
+/**
  * Builds a PersonalDetailsForm snapshot from Onyx private details,
  * optionally layering draft values on top so in-progress edits win.
  */
@@ -622,6 +636,7 @@ export {
     getLoginsByAccountIDs,
     getPersonalDetailsOnyxDataForOptimisticUsers,
     getCurrentAddress,
+    hasCompleteAddress,
     getFormattedAddress,
     getFormattedStreet,
     getPrivatePersonalDetailsFormValues,

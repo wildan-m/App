@@ -1,6 +1,5 @@
-import {getCurrentAddress} from '@libs/PersonalDetailsUtils';
+import {hasCompleteAddress} from '@libs/PersonalDetailsUtils';
 
-import CONST from '@src/CONST';
 import type {PrivatePersonalDetails} from '@src/types/onyx';
 
 /**
@@ -10,7 +9,6 @@ import type {PrivatePersonalDetails} from '@src/types/onyx';
  * so the legal name / address / phone number steps that follow it are at indexes 2, 3 and 4.
  */
 function getSkippedStepsPersonalInfo(data: Partial<PrivatePersonalDetails> | undefined, shouldCollectInternationalDepositDetails: boolean): number[] {
-    const currentAddress = getCurrentAddress(data);
     const skippedSteps = [];
 
     // US page 1 never has an IBAN or SWIFT/BIC, so this step is omitted only when collection is not needed.
@@ -22,10 +20,7 @@ function getSkippedStepsPersonalInfo(data: Partial<PrivatePersonalDetails> | und
         skippedSteps.push(2);
     }
 
-    const isUsOrCanada = currentAddress?.country === CONST.COUNTRY.US || currentAddress?.country === CONST.COUNTRY.CA;
-    const hasValidState = !isUsOrCanada || !!currentAddress?.state;
-
-    if (!!currentAddress?.street && !!currentAddress?.city && hasValidState && !!currentAddress?.zip) {
+    if (hasCompleteAddress(data)) {
         skippedSteps.push(3);
     }
 

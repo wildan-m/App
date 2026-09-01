@@ -13,9 +13,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {addPersonalBankAccount, clearPersonalBankAccount} from '@libs/actions/BankAccounts';
 import {continueSetup} from '@libs/actions/PaymentMethods';
 import {updateCurrentStep} from '@libs/actions/Wallet';
+import {getCurrentAddress, getStreetLines, hasCompleteAddress} from '@libs/PersonalDetailsUtils';
 
 import Navigation from '@navigation/Navigation';
 
+import Address from '@pages/AddPersonalBankAccountPage/substeps/AddressStep';
 import useIsBankAccountAdded from '@pages/EnablePayments/Wallet/utils/useIsBankAccountAdded';
 
 import CONST from '@src/CONST';
@@ -34,6 +36,7 @@ const ADD_BANK_ACCOUNT_SUB_PAGES = CONST.ENABLE_PAYMENTS.ADD_BANK_ACCOUNT_STEP.S
 
 const plaidPages = [
     {pageName: ADD_BANK_ACCOUNT_SUB_PAGES.PLAID, component: Plaid},
+    {pageName: ADD_BANK_ACCOUNT_SUB_PAGES.ADDRESS, component: Address},
     {pageName: ADD_BANK_ACCOUNT_SUB_PAGES.CONFIRMATION, component: Confirmation},
 ];
 
@@ -41,6 +44,7 @@ const confirmationPageIndex = plaidPages.findIndex((page) => page.pageName === A
 
 function AddBankAccount() {
     const [plaidData] = useOnyx(ONYXKEYS.PLAID_DATA);
+    const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
     const [personalBankAccount] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT);
     const [personalBankAccountDraft] = useOnyx(ONYXKEYS.FORMS.PERSONAL_BANK_ACCOUNT_FORM_DRAFT);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
@@ -68,14 +72,36 @@ function AddBankAccount() {
                       ...selectedPlaidBankAccount,
                       plaidAccessToken: plaidData?.plaidAccessToken ?? '',
                   };
-            addPersonalBankAccount(bankAccountWithToken, personalPolicyID);
+
+            // When the address sub-page is skipped (the profile already has a complete address), the flat
+            // addressStreet/addressCity/... keys that addPersonalBankAccount expects are never written to the form
+            // draft, so fall back to the saved profile address (stored nested in the addresses array).
+            const currentAddress = getCurrentAddress(privatePersonalDetails);
+            const [addressStreet, street2] = getStreetLines(currentAddress?.street);
+            // The unit/suite may be stored either embedded after a newline in `street` (extracted above) or in the
+            // separate `street2`/`addressLine2` fields; fall back to those so it isn't dropped.
+            const addressStreet2 = street2 ?? currentAddress?.street2 ?? currentAddress?.addressLine2;
+            const accountData = {
+                addressStreet: personalBankAccountDraft?.addressStreet ?? addressStreet,
+                addressStreet2: personalBankAccountDraft?.addressStreet2 ?? addressStreet2,
+                addressCity: personalBankAccountDraft?.addressCity ?? currentAddress?.city,
+                addressState: personalBankAccountDraft?.addressState ?? currentAddress?.state,
+                addressZipCode: personalBankAccountDraft?.addressZipCode ?? currentAddress?.zip,
+                country: personalBankAccountDraft?.country ?? currentAddress?.country,
+                ...bankAccountWithToken,
+            };
+            addPersonalBankAccount(accountData, personalPolicyID);
         }
-    }, [isBankAccountAlreadyAdded, personalBankAccountDraft?.plaidAccountID, plaidData?.bankAccounts, plaidData?.plaidAccessToken, personalPolicyID]);
+    }, [isBankAccountAlreadyAdded, personalBankAccountDraft, plaidData?.bankAccounts, plaidData?.plaidAccessToken, personalPolicyID, privatePersonalDetails]);
 
     const isSetupTypeChosen = personalBankAccountDraft?.setupType === CONST.BANK_ACCOUNT.SETUP_TYPE.PLAID;
 
+    // Only ask for the address when we don't already have a complete one on file.
+    const skipPages = hasCompleteAddress(privatePersonalDetails) ? [ADD_BANK_ACCOUNT_SUB_PAGES.ADDRESS] : [];
+
     const {CurrentPage, isEditing, pageIndex, nextPage, prevPage, moveTo, isRedirecting} = useSubPage<SubPageProps, EnablePaymentsSubPageType>({
         pages: plaidPages,
+        skipPages,
         // Once the bank account is added there is nothing to redo on the Plaid sub-page, so a revisit shows only the confirmation.
         startFrom: isBankAccountAlreadyAdded ? confirmationPageIndex : 0,
         onFinished: submit,
