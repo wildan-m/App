@@ -1,5 +1,7 @@
 import {handleRHPVariantNavigation, shouldOpenRHPVariant} from '@components/SidePanel/RHPVariantTest';
 
+import {dismissMarketingWindow} from '@userActions/User';
+
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -10,12 +12,11 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 
 import {setDisableDismissOnEscape} from './actions/Modal';
-import SidePanelActions from './actions/SidePanel';
-import {setOnboardingRHPVariant} from './actions/Welcome';
 import isReportTopmostSplitNavigator from './Navigation/helpers/isReportTopmostSplitNavigator';
 import {dismissOnboardingModalBeforeExit} from './Navigation/helpers/OnboardingNavigationUtils';
 import shouldOpenOnAdminRoom from './Navigation/helpers/shouldOpenOnAdminRoom';
 import Navigation from './Navigation/Navigation';
+import {ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT} from './ProductMarketingWindowUtils';
 import {findLastAccessedReport, isConciergeChatReport, isSelfDM} from './ReportUtils';
 import {buildCannedSearchQuery} from './SearchQueryUtils';
 
@@ -67,6 +68,19 @@ function getReportIDAfterOnboarding(
     }
 
     return undefined;
+}
+
+/**
+ * A user who just signed up has never seen the active product marketing announcement, so showing them a
+ * "product update" window on their very first Home view is noise. Record the announcement as dismissed on
+ * their behalf when onboarding completes: they start in the same state as someone who already closed it,
+ * and the next announcement (which carries a new update key) still shows normally.
+ */
+function dismissProductMarketingWindowAfterOnboarding() {
+    if (!ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT) {
+        return;
+    }
+    dismissMarketingWindow(ACTIVE_PRODUCT_MARKETING_ANNOUNCEMENT.updateKey);
 }
 
 function navigateAfterOnboarding(
@@ -125,6 +139,7 @@ function navigateAfterOnboardingWithMicrotaskQueue(
     shouldPreventOpenAdminRoom = false,
     options?: NavigateAfterOnboardingOptions,
 ) {
+    dismissProductMarketingWindowAfterOnboarding();
     dismissOnboardingModalBeforeExit();
     Navigation.setNavigationActionToMicrotaskQueue(() => {
         navigateAfterOnboarding(
@@ -141,10 +156,11 @@ function navigateAfterOnboardingWithMicrotaskQueue(
 }
 
 /**
- * After creating or joining a Submit workspace during onboarding, navigate to Spend > Expenses
- * with the side panel open so the #admins room is visible in Concierge Anywhere.
+ * After creating or joining a Submit workspace during onboarding, navigate to Spend > Expenses.
+ * The side panel stays closed so onboarding isn't duplicated between the main pane and the #admins
+ * room; interacting with Concierge opens the panel on demand.
  */
-function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, shouldUseNarrowLayout = false) {
+function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string) {
     setDisableDismissOnEscape(false);
 
     if (!policyID) {
@@ -152,15 +168,14 @@ function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, shouldUseNa
         return;
     }
 
-    setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
     Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE})}));
-    SidePanelActions.openSidePanel(!shouldUseNarrowLayout);
 }
 
-function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string, shouldUseNarrowLayout = false) {
+function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string) {
+    dismissProductMarketingWindowAfterOnboarding();
     dismissOnboardingModalBeforeExit();
     Navigation.setNavigationActionToMicrotaskQueue(() => {
-        navigateToSubmitWorkspaceAfterOnboarding(policyID, shouldUseNarrowLayout);
+        navigateToSubmitWorkspaceAfterOnboarding(policyID);
     });
 }
 

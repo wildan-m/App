@@ -998,12 +998,6 @@ const translations: TranslationDeepObject<typeof en> = {
             addVirtualCardPersonalDetails: {title: 'Dodaj swoje dane, aby wyświetlić i zacząć używać swojej Karty Expensify.', subtitle: 'Karta Expensify', cta: 'Dodaj szczegóły'},
             enterSignerInfo: {title: 'Wymagane dane podpisującego', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `Konto bankowe ${bankAccountLastFour}`},
         },
-        discoverSection: {
-            title: 'Odkryj',
-            menuItemTitleNonAdmin: 'Dowiedz się, jak tworzyć wydatki i wysyłać raporty.',
-            menuItemTitleAdmin: 'Dowiedz się, jak zapraszać członków, edytować procesy zatwierdzania i uzgadniać karty firmowe.',
-            menuItemDescription: 'Zobacz, co Expensify potrafi w 2 minuty',
-        },
         forYouSection: {
             submit: ({count}: {count: number}) => ({
                 one: 'Prześlij 1 raport',
@@ -1149,8 +1143,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `Dzień dobry, ${name}.` : 'Dzień dobry.'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `Dzień dobry, ${name}.` : 'Dzień dobry.'),
             goodEvening: ({name}: {name?: string}) => (name ? `Dobry wieczór, ${name}.` : 'Dobry wieczór.'),
-            inputPlaceholder: 'Poproś Concierge o przeanalizowanie swoich wydatków lub uzyskaj pomoc',
-            inputPlaceholderMobile: 'Zapytaj Concierge o cokolwiek',
+            inputPlaceholder: 'Zapytaj Concierge, jak korzystać z Expensify',
+            inputPlaceholderMobile: 'Zapytaj, jak korzystać z Expensify',
         },
     },
     allSettingsScreen: {

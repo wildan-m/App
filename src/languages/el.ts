@@ -1061,12 +1061,6 @@ const translations: TranslationDeepObject<typeof en> = {
             recentTransactions: ({lastFour}: {lastFour: string}) => `Πρόσφατες συναλλαγές • ${lastFour}`,
         },
         seeMore: ({count}: {count: number}) => `Δείτε ακόμα ${count}`,
-        discoverSection: {
-            title: 'Ανακαλύψτε',
-            menuItemTitleNonAdmin: 'Μάθετε πώς να δημιουργείτε δαπάνες και να υποβάλλετε αναφορές.',
-            menuItemTitleAdmin: 'Μάθετε πώς να προσκαλείτε μέλη, να επεξεργάζεστε ροές έγκρισης και να πραγματοποιείτε συμφωνία εταιρικών καρτών.',
-            menuItemDescription: 'Δείτε τι μπορεί να κάνει το Expensify σε 2 λεπτά',
-        },
         forYouSection: {
             reviewExpenses: ({count}: {count: number}) => ({
                 one: 'Ελέγξτε 1 δαπάνη',
@@ -1183,8 +1177,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `Καλημέρα, ${name}.` : 'Καλημέρα.'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `Καλησπέρα σας, ${name}.` : 'Καλό απόγευμα.'),
             goodEvening: ({name}: {name?: string}) => (name ? `Καλησπέρα, ${name}.` : 'Καλησπέρα.'),
-            inputPlaceholder: 'Ζητήστε από το Concierge να αναλύσει τα έξοδά σας ή να λάβετε υποστήριξη',
-            inputPlaceholderMobile: 'Ρωτήστε το Concierge οτιδήποτε',
+            inputPlaceholder: 'Ρωτήστε το Concierge πώς να χρησιμοποιήσετε το Expensify',
+            inputPlaceholderMobile: 'Ρωτήστε πώς να χρησιμοποιήσετε το Expensify',
         },
     },
     allSettingsScreen: {

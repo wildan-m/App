@@ -979,12 +979,6 @@ const translations: TranslationDeepObject<typeof en> = {
             addVirtualCardPersonalDetails: {title: 'Expensify カードを表示して利用を開始するには、ご自身の情報を追加してください。', subtitle: 'Expensify カード', cta: '詳細を追加'},
             enterSignerInfo: {title: '署名者情報が必要です', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `銀行口座 ${bankAccountLastFour}`},
         },
-        discoverSection: {
-            title: '発見',
-            menuItemTitleNonAdmin: '経費の作成方法とレポートの提出方法を学びましょう。',
-            menuItemTitleAdmin: 'メンバーの招待方法、承認ワークフローの編集方法、会社カードの照合方法を確認しましょう。',
-            menuItemDescription: 'Expensify でできることを 2 分で確認',
-        },
         forYouSection: {
             submit: ({count}: {count: number}) => ({
                 one: `${count} 件のレポートを送信`,
@@ -1118,8 +1112,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `${name}さん、おはようございます。` : 'おはようございます。'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `${name}さん、こんにちは。` : 'こんにちは。'),
             goodEvening: ({name}: {name?: string}) => (name ? `${name}さん、こんばんは。` : 'こんばんは。'),
-            inputPlaceholder: 'Concierge に経費の分析を依頼するか、サポートを受けます',
-            inputPlaceholderMobile: 'Concierge に何でも聞いてください',
+            inputPlaceholder: 'Concierge に Expensify の使い方を聞く',
+            inputPlaceholderMobile: 'Expensify の使い方を質問する',
         },
     },
     allSettingsScreen: {

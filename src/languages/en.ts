@@ -1006,8 +1006,9 @@ const translations = {
             goodMorning: ({name}: {name?: string}) => (name ? `Good morning, ${name}.` : 'Good morning.'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `Good afternoon, ${name}.` : 'Good afternoon.'),
             goodEvening: ({name}: {name?: string}) => (name ? `Good evening, ${name}.` : 'Good evening.'),
-            inputPlaceholder: 'Ask Concierge to analyze your expenses or get support',
-            inputPlaceholderMobile: 'Ask Concierge anything',
+            // @context Placeholder text inside the Concierge chat input on the Home page. It invites a new user to ask Concierge how to use Expensify. Keep "Concierge" and "Expensify" untranslated. The first string is shown on wide screens and must stay short enough to fit on a single line; the second is the shorter variant shown on narrow screens.
+            inputPlaceholder: 'Ask Concierge how to use Expensify',
+            inputPlaceholderMobile: 'Ask how to use Expensify',
         },
         timeSensitiveSection: {
             title: 'Time sensitive',
@@ -1104,12 +1105,6 @@ const translations = {
             recentTransactions: ({lastFour}: {lastFour: string}) => `Recent transactions • ${lastFour}`,
         },
         seeMore: ({count}: {count: number}) => `See ${count} more`,
-        discoverSection: {
-            title: 'Discover',
-            menuItemTitleNonAdmin: 'Learn how to create expenses and submit reports.',
-            menuItemTitleAdmin: 'Learn how to invite members, edit approval workflows, and reconcile company cards.',
-            menuItemDescription: 'See what Expensify can do in 2 min',
-        },
         forYouSection: {
             reviewExpenses: ({count}: {count: number}) => ({
                 one: 'Review 1 expense',

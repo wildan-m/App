@@ -1011,12 +1011,6 @@ const translations: TranslationDeepObject<typeof en> = {
             repaidLast30Days: 'Reembolsado últimos 30 días',
             recentTransactions: ({lastFour}: {lastFour: string}) => `Transacciones recientes • ${lastFour}`,
         },
-        discoverSection: {
-            title: 'Descubrir',
-            menuItemTitleNonAdmin: 'Aprende a crear gastos y enviar informes.',
-            menuItemTitleAdmin: 'Aprende a invitar a miembros, editar flujos de aprobación y conciliar tarjetas corporativas.',
-            menuItemDescription: 'Descubre lo que Expensify puede hacer en 2 minutos',
-        },
         forYouSection: {
             submit: ({count}: {count: number}) => ({
                 one: 'Enviar 1 informe',
@@ -1131,8 +1125,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `Buenos días, ${name}.` : 'Buenos días.'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `Buenas tardes, ${name}.` : 'Buenas tardes.'),
             goodEvening: ({name}: {name?: string}) => (name ? `Buenas noches, ${name}.` : 'Buenas noches.'),
-            inputPlaceholder: 'Pídele a Concierge que analice tus gastos o que te ayude',
-            inputPlaceholderMobile: 'Pregunta a Concierge cualquier cosa',
+            inputPlaceholder: 'Pregunta a Concierge cómo usar Expensify',
+            inputPlaceholderMobile: 'Pregunta cómo usar Expensify',
         },
     },
     allSettingsScreen: {

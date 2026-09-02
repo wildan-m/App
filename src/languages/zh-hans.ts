@@ -954,12 +954,6 @@ const translations: TranslationDeepObject<typeof en> = {
             addVirtualCardPersonalDetails: {title: '添加你的详细信息以查看并开始使用 Expensify 卡。', subtitle: 'Expensify 卡', cta: '添加详细信息'},
             enterSignerInfo: {title: '需要签署人信息', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `银行账户 ${bankAccountLastFour}`},
         },
-        discoverSection: {
-            title: '发现',
-            menuItemTitleNonAdmin: '了解如何创建报销和提交报表。',
-            menuItemTitleAdmin: '了解如何邀请成员、编辑审批流程以及对公司卡进行对账。',
-            menuItemDescription: '了解 Expensify 的强大功能，只需 2 分钟',
-        },
         forYouSection: {
             submit: ({count}: {count: number}) => ({
                 one: `提交 ${count} 份报表`,
@@ -1083,8 +1077,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `早上好，${name}。` : '早上好。'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `下午好，${name}。` : '下午好。'),
             goodEvening: ({name}: {name?: string}) => (name ? `晚上好，${name}。` : '晚上好。'),
-            inputPlaceholder: '向 Concierge 请求分析你的报销或获取支持',
-            inputPlaceholderMobile: '向 Concierge 提问任何问题',
+            inputPlaceholder: '向 Concierge 询问如何使用 Expensify',
+            inputPlaceholderMobile: '询问如何使用 Expensify',
         },
     },
     allSettingsScreen: {

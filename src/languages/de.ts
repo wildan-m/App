@@ -995,12 +995,6 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             enterSignerInfo: {title: 'Unterzeichnerdaten erforderlich', subtitle: ({bankAccountLastFour}: {bankAccountLastFour: string}) => `Bankkonto ${bankAccountLastFour}`},
         },
-        discoverSection: {
-            title: 'Entdecken',
-            menuItemTitleNonAdmin: 'Erfahren Sie, wie Sie Ausgaben erstellen und Berichte einreichen.',
-            menuItemTitleAdmin: 'Erfahren Sie, wie Sie Mitglieder einladen, Genehmigungsworkflows bearbeiten und Firmenkarten abstimmen.',
-            menuItemDescription: 'Sieh dir an, was Expensify in 2 Minuten kann',
-        },
         forYouSection: {
             submit: ({count}: {count: number}) => ({
                 one: '1 Bericht einreichen',
@@ -1134,8 +1128,8 @@ const translations: TranslationDeepObject<typeof en> = {
             goodMorning: ({name}: {name?: string}) => (name ? `Guten Morgen, ${name}.` : 'Guten Morgen.'),
             goodAfternoon: ({name}: {name?: string}) => (name ? `Guten Tag, ${name}.` : 'Guten Tag.'),
             goodEvening: ({name}: {name?: string}) => (name ? `Guten Abend, ${name}.` : 'Guten Abend.'),
-            inputPlaceholder: 'Bitten Sie Concierge, Ihre Ausgaben zu analysieren oder Unterstützung zu erhalten',
-            inputPlaceholderMobile: 'Stellen Sie Concierge eine Frage',
+            inputPlaceholder: 'Fragen Sie Concierge, wie Sie Expensify verwenden',
+            inputPlaceholderMobile: 'Fragen Sie, wie Sie Expensify verwenden',
         },
     },
     allSettingsScreen: {
