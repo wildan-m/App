@@ -3,6 +3,7 @@ import {render} from '@testing-library/react-native';
 import ComposeProviders from '@components/ComposeProviders';
 import GPSTripStateChecker from '@components/GPSTripStateChecker/index.native';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
+import {ModalProvider} from '@components/Modal/Global/ModalContext';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 
 import CONST from '@src/CONST';
@@ -44,7 +45,7 @@ const trip: GpsDraftDetails = {
 
 function renderChecker() {
     return render(
-        <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, SplashScreenStateContextProvider]}>
+        <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, SplashScreenStateContextProvider, ModalProvider]}>
             <GPSTripStateChecker />
         </ComposeProviders>,
     );

@@ -1,5 +1,6 @@
-import ConfirmModal from '@components/ConfirmModal';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -19,7 +20,7 @@ import {useSplashScreenState} from '@src/SplashScreenStateContext';
 
 import {accountIDSelector} from '@selectors/Session';
 import {hasStartedLocationUpdatesAsync, startLocationUpdatesAsync, stopLocationUpdatesAsync} from 'expo-location';
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useEffectEvent, useRef, useState} from 'react';
 
 import useUpdateGpsNotification from './useUpdateGpsNotification';
 import useUpdateGpsTripOnReconnect from './useUpdateGpsTripOnReconnect';
@@ -32,6 +33,9 @@ function GPSTripStateChecker() {
     const isSessionLoaded = currentAccountIDResult.status === 'loaded';
     const hasHandledAppRestart = useRef(false);
     const {isOffline} = useNetwork();
+    const {showConfirmModal, closeModal} = useConfirmModal();
+    const isContinueTripModalShownRef = useRef(false);
+    const isAutoHidingContinueTripModalRef = useRef(false);
 
     const {splashScreenState} = useSplashScreenState();
 
@@ -129,30 +133,72 @@ function GPSTripStateChecker() {
         startGpsTripNotification(translate, reportID, unit, gpsDraftDetails?.distanceInMeters);
     };
 
-    const onContinueTrip = () => {
+    // The handlers run when the modal promise resolves, long after it was shown. They are effect events so
+    // they read the latest gpsDraftDetails/isOffline — GPS points keep accumulating while the modal is open,
+    // and stopping the trip with a show-time snapshot would submit a truncated set of points.
+    const onContinueTrip = useEffectEvent(() => {
         setShowContinueTripModal(false);
         continueGpsTrip();
         navigateToGpsScreen();
-    };
+    });
 
-    const onViewTrip = () => {
+    const onViewTrip = useEffectEvent(() => {
         setShowContinueTripModal(false);
         stopGpsTrip(isOffline, getGpsPoints(gpsDraftDetails));
         navigateToGpsScreen();
-    };
+    });
 
-    return (
-        <ConfirmModal
-            isVisible={showContinueTripModal && !!gpsDraftDetails?.isTracking && !isTripFromDifferentUser && splashScreenState === CONST.BOOT_SPLASH_STATE.HIDDEN}
-            title={translate('gps.continueGpsTripModal.title')}
-            prompt={translate('gps.continueGpsTripModal.prompt')}
-            shouldReverseStackedButtons
-            confirmText={translate('gps.continueGpsTripModal.confirm')}
-            cancelText={translate('gps.continueGpsTripModal.cancel')}
-            onCancel={onViewTrip}
-            onConfirm={onContinueTrip}
-        />
-    );
+    const showContinueTripConfirmModal = useEffectEvent(() => {
+        if (isContinueTripModalShownRef.current) {
+            return;
+        }
+        isContinueTripModalShownRef.current = true;
+        showConfirmModal({
+            title: translate('gps.continueGpsTripModal.title'),
+            prompt: translate('gps.continueGpsTripModal.prompt'),
+            shouldReverseStackedButtons: true,
+            confirmText: translate('gps.continueGpsTripModal.confirm'),
+            cancelText: translate('gps.continueGpsTripModal.cancel'),
+            // Cancelling this modal stops the trip, so Android hardware-back must not be routed into it.
+            shouldHandleNavigationBack: false,
+        }).then((result) => {
+            isContinueTripModalShownRef.current = false;
+            if (isAutoHidingContinueTripModalRef.current) {
+                // The modal was hidden because a visibility condition went false, not by a user choice.
+                // Leave showContinueTripModal set so the modal can re-show if the conditions hold again.
+                isAutoHidingContinueTripModalRef.current = false;
+                return;
+            }
+            if (result.action === ModalActions.CONFIRM) {
+                onContinueTrip();
+                return;
+            }
+            onViewTrip();
+        });
+    });
+
+    const hideContinueTripConfirmModal = useEffectEvent(() => {
+        // closeModal() pops whatever modal is on top, so only call it while our modal is up and unresolved.
+        if (!isContinueTripModalShownRef.current) {
+            return;
+        }
+        isAutoHidingContinueTripModalRef.current = true;
+        closeModal();
+    });
+
+    // The old declarative modal derived its visibility from these conditions on every render, hiding itself
+    // when tracking stops, the trip changes owner, or the splash screen is showing. Reproduce that here.
+    const shouldShowContinueTripModal = showContinueTripModal && !!gpsDraftDetails?.isTracking && !isTripFromDifferentUser && splashScreenState === CONST.BOOT_SPLASH_STATE.HIDDEN;
+
+    useEffect(() => {
+        if (shouldShowContinueTripModal) {
+            showContinueTripConfirmModal();
+        } else {
+            hideContinueTripConfirmModal();
+        }
+    }, [shouldShowContinueTripModal]);
+
+    return null;
 }
 
 GPSTripStateChecker.displayName = 'GPSTripStateChecker';

@@ -1,8 +1,9 @@
 import Button from '@components/ButtonComposed';
-import ConfirmModal from '@components/ConfirmModal';
 import {loadIllustration} from '@components/Icon/IllustrationLoader';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import {useSession} from '@components/OnyxListItemProvider';
 
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyAsset} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -50,9 +51,7 @@ type ButtonsProps = {
 
 function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowPermissionsError, reportID, unit, gpsPoints}: ButtonsProps) {
     const [startPermissionsFlow, setStartPermissionsFlow] = useState(false);
-    const [showLocationRequiredModal, setShowLocationRequiredModal] = useState(false);
-    const [showZeroDistanceModal, setShowZeroDistanceModal] = useState(false);
-    const [showDisabledServicesModal, setShowDisabledServicesModal] = useState(false);
+    const {showConfirmModal} = useConfirmModal();
     const {isOffline} = useNetwork();
     const session = useSession();
 
@@ -69,11 +68,42 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
         const hasLocationServicesEnabled = await hasServicesEnabledAsync();
 
         if (!hasLocationServicesEnabled) {
-            setShowDisabledServicesModal(true);
+            showConfirmModal({
+                title: translate('gps.locationServicesRequiredModal.title'),
+                confirmText: translate('gps.locationServicesRequiredModal.confirm'),
+                cancelText: translate('common.dismiss'),
+                prompt: translate('gps.locationServicesRequiredModal.prompt'),
+                shouldReverseStackedButtons: true,
+            }).then((result) => {
+                if (result.action !== ModalActions.CONFIRM) {
+                    return;
+                }
+                openSettings();
+            });
             return;
         }
 
         setStartPermissionsFlow(true);
+    };
+
+    const showLocationRequiredModal = () => {
+        showConfirmModal({
+            title: translate('gps.locationRequiredModal.title'),
+            confirmText: translate('common.settings'),
+            cancelText: translate('common.dismiss'),
+            prompt: translate('gps.locationRequiredModal.prompt'),
+            iconSource: ReceiptLocationMarker,
+            iconFill: false,
+            iconWidth: 140,
+            iconHeight: 120,
+            shouldCenterIcon: true,
+            shouldReverseStackedButtons: true,
+        }).then((result) => {
+            if (result.action !== ModalActions.CONFIRM) {
+                return;
+            }
+            Linking.openSettings();
+        });
     };
 
     // Returns true if location tracking was successfully initialized, false otherwise
@@ -116,16 +146,16 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
 
     const saveGpsTrip = () => {
         if (gpsDraftDetails?.distanceInMeters === 0) {
-            setShowZeroDistanceModal(true);
+            showConfirmModal({
+                shouldShowCancelButton: false,
+                title: translate('gps.zeroDistanceTripModal.title'),
+                confirmText: translate('common.buttonConfirm'),
+                prompt: translate('gps.zeroDistanceTripModal.prompt'),
+            });
             return;
         }
 
         navigateToNextStep();
-    };
-
-    const openSettingsForLocationServices = () => {
-        setShowDisabledServicesModal(false);
-        openSettings();
     };
 
     return (
@@ -175,44 +205,7 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
                 setStartPermissionsFlow={setStartPermissionsFlow}
                 // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onGrant={isTripStopped ? resumeGpsTrip : startGpsTrip}
-                onDeny={() => setShowLocationRequiredModal(true)}
-            />
-
-            <ConfirmModal
-                shouldShowCancelButton={false}
-                title={translate('gps.zeroDistanceTripModal.title')}
-                isVisible={showZeroDistanceModal}
-                onConfirm={() => setShowZeroDistanceModal(false)}
-                confirmText={translate('common.buttonConfirm')}
-                prompt={translate('gps.zeroDistanceTripModal.prompt')}
-            />
-            <ConfirmModal
-                isVisible={showLocationRequiredModal}
-                title={translate('gps.locationRequiredModal.title')}
-                onConfirm={() => {
-                    setShowLocationRequiredModal(false);
-                    Linking.openSettings();
-                }}
-                onCancel={() => setShowLocationRequiredModal(false)}
-                confirmText={translate('common.settings')}
-                cancelText={translate('common.dismiss')}
-                prompt={translate('gps.locationRequiredModal.prompt')}
-                iconSource={ReceiptLocationMarker}
-                iconFill={false}
-                iconWidth={140}
-                iconHeight={120}
-                shouldCenterIcon
-                shouldReverseStackedButtons
-            />
-            <ConfirmModal
-                title={translate('gps.locationServicesRequiredModal.title')}
-                isVisible={showDisabledServicesModal}
-                onConfirm={openSettingsForLocationServices}
-                onCancel={() => setShowDisabledServicesModal(false)}
-                confirmText={translate('gps.locationServicesRequiredModal.confirm')}
-                cancelText={translate('common.dismiss')}
-                prompt={translate('gps.locationServicesRequiredModal.prompt')}
-                shouldReverseStackedButtons
+                onDeny={showLocationRequiredModal}
             />
         </>
     );
