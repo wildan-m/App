@@ -2,6 +2,7 @@
 import {act, fireEvent, render, screen} from '@testing-library/react-native';
 
 import type {ConfirmModalProps} from '@components/ConfirmModal';
+import {ModalProvider} from '@components/Modal/Global/ModalContext';
 
 import type {revokeMultifactorAuthenticationCredentials as revokeMultifactorAuthenticationCredentialsType} from '@libs/actions/MultifactorAuthentication';
 import * as API from '@libs/API';
@@ -136,6 +137,16 @@ function setBiometricStatus(overrides: Partial<typeof mockBiometricStatus>) {
     };
 }
 
+// The page shows its confirmation modal through the global modal system, so it must render inside
+// a ModalProvider for the (mocked) ConfirmModal to be reachable.
+function renderPage() {
+    return render(
+        <ModalProvider>
+            <MultifactorAuthenticationRevokePage />
+        </ModalProvider>,
+    );
+}
+
 describe('MultifactorAuthenticationRevokePage', () => {
     afterEach(() => {
         jest.clearAllMocks();
@@ -152,7 +163,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({totalDeviceCount: 0});
 
             // When the page renders
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             // Then the bottom button should say "Done" because there is nothing to revoke
             expect(screen.getByText('multifactorAuthentication.revoke.dismiss')).toBeTruthy();
@@ -163,7 +174,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
             // When the page renders
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             // Then the bottom button should say "Revoke access" because there is only one device
             expect(screen.getAllByText('multifactorAuthentication.revoke.cta').length).toBeGreaterThan(0);
@@ -174,7 +185,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 2, otherDeviceCount: 1});
 
             // When the page renders
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             // Then the bottom button should say "Revoke all" because there are multiple devices
             expect(screen.getByText('multifactorAuthentication.revoke.ctaAll')).toBeTruthy();
@@ -187,7 +198,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
             // When the user presses the inline Revoke button next to "This device"
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const thisDeviceButton = revokeButtons.at(0);
             expect(thisDeviceButton).toBeTruthy();
@@ -206,7 +217,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 2, otherDeviceCount: 1});
 
             // When the user presses the inline Revoke button next to "Other devices"
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const otherDevicesButton = revokeButtons.at(1);
             expect(otherDevicesButton).toBeTruthy();
@@ -222,7 +233,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 4, otherDeviceCount: 3});
 
             // When the user presses the inline Revoke button next to "Other devices"
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const otherDevicesButton = revokeButtons.at(1);
             expect(otherDevicesButton).toBeTruthy();
@@ -240,7 +251,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
 
             // When the user presses the inline Revoke button next to "Other devices"
             // (revoking "other devices" when this device is unregistered means revoking all)
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const otherDevicesButton = revokeButtons.at(0);
             expect(otherDevicesButton).toBeTruthy();
@@ -258,7 +269,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
             // When the user presses the bottom "Revoke access" button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             fireEvent.press(screen.getByText('multifactorAuthentication.revoke.cta'));
 
             // Then the modal should say "this device" and the confirm button should say "Revoke access"
@@ -272,7 +283,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({isCurrentDeviceRegistered: false, totalDeviceCount: 1, otherDeviceCount: 1});
 
             // When the user presses the bottom "Revoke access" button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.cta');
             const bottomButton = revokeButtons.at(-1);
             expect(bottomButton).toBeTruthy();
@@ -289,7 +300,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({isCurrentDeviceRegistered: false, totalDeviceCount: 3, otherDeviceCount: 3});
 
             // When the user presses the bottom "Revoke all" button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             fireEvent.press(screen.getByText('multifactorAuthentication.revoke.ctaAll'));
 
             // Then the modal should say "any device" and the confirm button should say "Revoke all"
@@ -303,7 +314,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 3, otherDeviceCount: 2});
 
             // When the user presses the bottom "Revoke all" button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             fireEvent.press(screen.getByText('multifactorAuthentication.revoke.ctaAll'));
 
             // Then the modal should say "any device" and the confirm button should say "Revoke all"
@@ -319,7 +330,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
             // When the user confirms revoking this device via the inline button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const thisDeviceButton = revokeButtons.at(0);
             expect(thisDeviceButton).toBeTruthy();
@@ -338,7 +349,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 2, otherDeviceCount: 1});
 
             // When the user confirms revoking other devices via the inline button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const otherDevicesButton = revokeButtons.at(1);
             expect(otherDevicesButton).toBeTruthy();
@@ -356,7 +367,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({isCurrentDeviceRegistered: false, totalDeviceCount: 2, otherDeviceCount: 2});
 
             // When the user confirms revoking other devices
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const otherDevicesButton = revokeButtons.at(0);
             expect(otherDevicesButton).toBeTruthy();
@@ -375,7 +386,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 2, otherDeviceCount: 1});
 
             // When the user confirms revoking all via the bottom "Revoke all" button
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
             fireEvent.press(screen.getByText('multifactorAuthentication.revoke.ctaAll'));
             await act(async () => {
                 capturedConfirmModalProps.onConfirm();
@@ -391,7 +402,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
             mockRevokeCredentials.mockResolvedValueOnce(createMock<MultifactorAuthenticationRevokeResponse>({httpStatusCode: 500}));
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             const thisDeviceButton = revokeButtons.at(0);
@@ -411,7 +422,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('shows "Done" button when no devices are registered and navigates back on press', () => {
             setBiometricStatus({totalDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             const dismissButton = screen.getByText('multifactorAuthentication.revoke.dismiss');
             expect(dismissButton).toBeTruthy();
@@ -420,7 +431,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('hides confirm modal when cancel is pressed', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             fireEvent.press(revokeButtons.at(0)!);
@@ -439,7 +450,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('shows explanation text when devices are registered', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             expect(screen.getByText('multifactorAuthentication.revoke.explanation')).toBeTruthy();
         });
@@ -447,7 +458,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('shows "no devices" text when no devices are registered', () => {
             setBiometricStatus({totalDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             expect(screen.getByText('multifactorAuthentication.revoke.noDevices')).toBeTruthy();
         });
@@ -457,7 +468,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('shows "Revoke all" title on modal when revoking all devices', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 2, otherDeviceCount: 1});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             fireEvent.press(screen.getByText('multifactorAuthentication.revoke.ctaAll'));
 
@@ -467,7 +478,7 @@ describe('MultifactorAuthenticationRevokePage', () => {
         it('shows "Revoke access" title on modal when revoking a single device', () => {
             setBiometricStatus({localCredentialID: 'key-this', isCurrentDeviceRegistered: true, totalDeviceCount: 1, otherDeviceCount: 0});
 
-            render(<MultifactorAuthenticationRevokePage />);
+            renderPage();
 
             const revokeButtons = screen.getAllByText('multifactorAuthentication.revoke.revoke');
             fireEvent.press(revokeButtons.at(0)!);
