@@ -116,12 +116,12 @@ function TransactionDetailsFields({policy, amountDisplay, distanceData, required
                             }
                             Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID)));
                         }}
-                        accessibilityLabel={translate('iou.addReceipt')}
+                        accessibilityLabel={translate('receipt.addReceipt')}
                         innerStyles={[styles.compactReceiptButton, styles.mr4]}
                     >
                         <Button.Icon
                             src={icons.ReceiptPlus}
-                            accessibilityLabel={translate('iou.addReceipt')}
+                            accessibilityLabel={translate('receipt.addReceipt')}
                         />
                     </Button>
                 </View>
