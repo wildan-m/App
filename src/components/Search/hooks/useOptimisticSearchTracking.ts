@@ -1,6 +1,6 @@
 import type {SearchQueryJSON} from '@components/Search/types';
 
-import {flushDeferredWrite, getOptimisticWatchKey, hasDeferredWrite} from '@libs/deferredLayoutWrite';
+import {clearFlushedWatchKey, flushDeferredWrite, getOptimisticWatchKey, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {isSearchDataLoaded, isTransactionSearchType} from '@libs/SearchUIUtils';
 import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
@@ -43,7 +43,10 @@ function useOptimisticSearchTracking({searchResults, queryJSON, transactions, re
     const {type} = queryJSON;
 
     const hasPendingWriteOnMount = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-    const initialWatchKey = getOptimisticWatchKey(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+    // Only seed the watch key when a write is actually pending. Without a pending write there is
+    // no optimistic lifecycle to track on this mount, and a key left over from an already settled
+    // one would be injected into every later search that doesn't return that transaction.
+    const initialWatchKey = hasPendingWriteOnMount ? getOptimisticWatchKey(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH) : undefined;
 
     const mutableRef = useRef<TrackingMutableState>({
         hasPendingWriteOnMount,
@@ -70,6 +73,9 @@ function useOptimisticSearchTracking({searchResults, queryJSON, transactions, re
         tracking.isCleanedUp = true;
         tracking.cachedOptimisticItem = null;
         tracking.optimisticWatchKey = undefined;
+        // The lifecycle is over, so drop the key parked by the immediate-flush path. It would
+        // otherwise stay until the next channel reservation and leak into a later mount.
+        clearFlushedWatchKey(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         setOptimisticWatchKey(undefined);
         setShowPendingExpensePlaceholder(false);
         setIsOptimisticTrackingCleared(true);

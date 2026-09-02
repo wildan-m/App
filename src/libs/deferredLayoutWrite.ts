@@ -180,6 +180,16 @@ function reserveDeferredWriteChannel(key: string, options: {destinationReportID?
     channels.set(key, {write: () => {}, safetyTimeoutId, isReserved: true, destinationReportID: options.destinationReportID});
 }
 
+/**
+ * Remove the watch key that was parked for a channel flushed via the
+ * immediate-flush path. Consumers call this when their optimistic lifecycle
+ * ends, so a later lookup cannot resolve the key of an item that has already
+ * settled. No-op when nothing is parked for the key.
+ */
+function clearFlushedWatchKey(key: string) {
+    flushedWatchKeys.delete(key);
+}
+
 function hasDeferredWrite(key: string): boolean {
     return channels.has(key);
 }
@@ -291,6 +301,7 @@ export {
     hasDeferredWrite,
     hasDeferredWriteForReport,
     getOptimisticWatchKey,
+    clearFlushedWatchKey,
     deferOrExecuteWrite,
     resetForTesting,
 };
