@@ -1,4 +1,6 @@
+import MenuItemDropdownField from '@components/MenuItem/presets/MenuItemDropdownField';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/context';
 
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -53,6 +55,7 @@ function CategoryField({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {isNewManualExpenseFlowEnabled} = useConfirmationFields();
 
     const categoryState = useTransactionSelector(transactionID, categoryStateSelector);
 
@@ -72,40 +75,54 @@ function CategoryField({
         return '';
     };
 
+    const navigateToCategoryStep = () => {
+        if (!transactionID) {
+            return;
+        }
+
+        if (shouldNavigateToUpgradePath) {
+            Navigation.navigate(
+                createDynamicRoute(
+                    DYNAMIC_ROUTES.MONEY_REQUEST_UPGRADE.getRoute({
+                        action,
+                        iouType,
+                        transactionID,
+                        reportID,
+                        upgradeBackTo: createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID})),
+                        upgradePath: CONST.UPGRADE_PATHS.CATEGORIES,
+                    }),
+                ),
+            );
+        } else if (!policy && shouldSelectPolicy) {
+            Navigation.navigate(
+                ROUTES.SET_DEFAULT_WORKSPACE.getRoute(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID}))),
+            );
+        } else {
+            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID})));
+        }
+    };
+
+    if (isNewManualExpenseFlowEnabled && !isReadOnly) {
+        return (
+            <MenuItemDropdownField
+                label={translate('common.category')}
+                value={decodedCategoryName}
+                rightLabel={getCategoryRightLabel()}
+                errorText={shouldDisplayCategoryError ? translate(formError as TranslationPaths) : ''}
+                onPress={navigateToCategoryStep}
+                isDisabled={didConfirm}
+                sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.CATEGORY_FIELD}
+            />
+        );
+    }
+
     return (
         <MenuItemWithTopDescription
             shouldShowRightIcon={!isReadOnly}
             title={decodedCategoryName}
             description={translate('common.category')}
             numberOfLinesTitle={2}
-            onPress={() => {
-                if (!transactionID) {
-                    return;
-                }
-
-                if (shouldNavigateToUpgradePath) {
-                    Navigation.navigate(
-                        createDynamicRoute(
-                            DYNAMIC_ROUTES.MONEY_REQUEST_UPGRADE.getRoute({
-                                action,
-                                iouType,
-                                transactionID,
-                                reportID,
-                                upgradeBackTo: createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID})),
-                                upgradePath: CONST.UPGRADE_PATHS.CATEGORIES,
-                            }),
-                        ),
-                    );
-                } else if (!policy && shouldSelectPolicy) {
-                    Navigation.navigate(
-                        ROUTES.SET_DEFAULT_WORKSPACE.getRoute(
-                            createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID})),
-                        ),
-                    );
-                } else {
-                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute({action, iouType, transactionID, reportID, reportActionID})));
-                }
-            }}
+            onPress={navigateToCategoryStep}
             style={[styles.moneyRequestMenuItem]}
             titleStyle={styles.flex1}
             disabled={didConfirm}

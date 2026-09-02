@@ -1,20 +1,34 @@
+import Button from '@components/ButtonComposed';
 import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/context';
 import AmountField from '@components/MoneyRequestConfirmationList/sections/AmountField';
 import DescriptionField from '@components/MoneyRequestConfirmationList/sections/DescriptionField';
 import DistanceField from '@components/MoneyRequestConfirmationList/sections/DistanceField';
 import MerchantField from '@components/MoneyRequestConfirmationList/sections/MerchantField';
 import RateField from '@components/MoneyRequestConfirmationList/sections/RateField';
+import {receiptSliceSelector} from '@components/MoneyRequestConfirmationList/sections/selectors';
 import TimeFields from '@components/MoneyRequestConfirmationList/sections/TimeFields';
+import useTransactionSelector from '@components/MoneyRequestConfirmationList/sections/useTransactionSelector';
 import {useDetailsFields} from '@components/MoneyRequestConfirmationListFooter/DetailsFieldsContext';
 import type {AmountDisplay, DistanceData, ErrorState, RequiredFlags} from '@components/MoneyRequestConfirmationListFooter/fieldGroupTypes';
 
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useLocalize from '@hooks/useLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 
+import {canUseTouchScreen} from '@libs/DeviceCapabilities';
+import {shouldShowReceiptEmptyState} from '@libs/IOUUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
+import Navigation from '@libs/Navigation/Navigation';
+import {hasReceipt} from '@libs/TransactionUtils';
+
+import CONST from '@src/CONST';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 
 import type {OnyxEntry} from 'react-native-onyx';
 
 import React from 'react';
+import {View} from 'react-native';
 
 type TransactionDetailsFieldsProps = {
     /** Active policy (read by Amount/Description/Rate/Merchant) */
@@ -41,6 +55,9 @@ type TransactionDetailsFieldsProps = {
  * footer variant of its own.
  */
 function TransactionDetailsFields({policy, amountDisplay, distanceData, requiredFlags, errorState, isParticipantPickerVisible}: TransactionDetailsFieldsProps) {
+    const styles = useThemeStyles();
+    const {translate} = useLocalize();
+    const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
     const {fieldVisibility, isCompactMode, iouCurrencyCode, shouldNavigateToUpgradePath, shouldSelectPolicy} = useDetailsFields();
     const {
         action,
@@ -52,30 +69,64 @@ function TransactionDetailsFields({policy, amountDisplay, distanceData, required
         didConfirm,
         isNewManualExpenseFlowEnabled,
         isPolicyExpenseChat,
+        isPerDiemRequest,
         isManualDistanceRequest,
         isOdometerDistanceRequest,
         isGPSDistanceRequest,
     } = useConfirmationFields();
     const shouldAutoFocusAmountField = !canUseTouchScreen();
 
+    const receiptSlice = useTransactionSelector(transactionID, receiptSliceSelector);
+
+    // The compact add-receipt button replaces the full-width receipt empty state on the new manual
+    // expense flow (see ReceiptSection, which hides the empty state under the same conditions).
+    const shouldShowCompactReceiptButton =
+        isNewManualExpenseFlowEnabled &&
+        receiptSlice?.iouRequestType === CONST.IOU.REQUEST_TYPE.MANUAL &&
+        !hasReceipt(receiptSlice) &&
+        shouldShowReceiptEmptyState(iouType, action, policy, isPerDiemRequest);
+
+    const amountField = !isCompactMode && fieldVisibility.amount && (
+        <AmountField
+            amount={amountDisplay.amount}
+            formattedAmount={amountDisplay.formattedAmount}
+            distanceRateCurrency={distanceData.distanceRateCurrency}
+            iouCurrencyCode={iouCurrencyCode}
+            isDistanceRequest={fieldVisibility.distance}
+            shouldShowTimeRequestFields={fieldVisibility.time}
+            shouldDisplayFieldError={errorState.shouldDisplayFieldError}
+            formError={errorState.formError}
+            policy={policy}
+            clearFormErrors={errorState.clearFormErrors}
+            setFormError={errorState.setFormError}
+            autoFocus={shouldAutoFocusAmountField}
+            isParticipantPickerVisible={isParticipantPickerVisible}
+        />
+    );
+
     return (
         <>
-            {!isCompactMode && fieldVisibility.amount && (
-                <AmountField
-                    amount={amountDisplay.amount}
-                    formattedAmount={amountDisplay.formattedAmount}
-                    distanceRateCurrency={distanceData.distanceRateCurrency}
-                    iouCurrencyCode={iouCurrencyCode}
-                    isDistanceRequest={fieldVisibility.distance}
-                    shouldShowTimeRequestFields={fieldVisibility.time}
-                    shouldDisplayFieldError={errorState.shouldDisplayFieldError}
-                    formError={errorState.formError}
-                    policy={policy}
-                    clearFormErrors={errorState.clearFormErrors}
-                    setFormError={errorState.setFormError}
-                    autoFocus={shouldAutoFocusAmountField}
-                    isParticipantPickerVisible={isParticipantPickerVisible}
-                />
+            {amountField && shouldShowCompactReceiptButton ? (
+                <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                    <View style={styles.flex1}>{amountField}</View>
+                    <Button
+                        onPress={() => {
+                            if (!transactionID) {
+                                return;
+                            }
+                            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID)));
+                        }}
+                        accessibilityLabel={translate('iou.addReceipt')}
+                        innerStyles={[styles.compactReceiptButton, styles.mr4]}
+                    >
+                        <Button.Icon
+                            src={icons.ReceiptPlus}
+                            accessibilityLabel={translate('iou.addReceipt')}
+                        />
+                    </Button>
+                </View>
+            ) : (
+                amountField
             )}
 
             {!isCompactMode && fieldVisibility.merchant && (

@@ -37,9 +37,12 @@ type MenuItemRootProps = PropsWithChildren &
          * their text statically should pass it.
          */
         accessibilityLabel?: string;
+
+        /** Additional styles for the pressable container, applied after the base row styles */
+        style?: StyleProp<ViewStyle>;
     };
 
-function MenuItemRoot({children, onPress, isDisabled = false, sentryLabel, testID, accessibilityLabel}: MenuItemRootProps) {
+function MenuItemRoot({children, onPress, isDisabled = false, sentryLabel, testID, accessibilityLabel, style}: MenuItemRootProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const pressableRef = useRef<View>(null);
@@ -77,6 +80,7 @@ function MenuItemRoot({children, onPress, isDisabled = false, sentryLabel, testI
                         style={({pressed}) =>
                             [
                                 styles.popoverMenuItem,
+                                style,
                                 !isInteractive && styles.cursorDefault,
                                 isCompactPopover && styles.compactPopoverMenuItemBase,
                                 StyleUtils.getButtonBackgroundColorStyle(getButtonState({isActive: isHovered, isPressed: pressed, isDisabled, isInteractive}), true),

@@ -1,4 +1,6 @@
+import MenuItemDropdownField from '@components/MenuItem/presets/MenuItemDropdownField';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/context';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import UserPills from '@components/UserPills';
 
@@ -47,6 +49,43 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
 
     const rawIouAttendees = useAttendees(attendeeSlice as OnyxEntry<OnyxTypes.Transaction>);
     const iouAttendees = enrichAndSortAttendees(rawIouAttendees, loginToAccountIDMap, personalDetailsList, localeCompare);
+    const {isNewManualExpenseFlowEnabled} = useConfirmationFields();
+
+    const attendeesLabel = `${translate('iou.attendees')} ${
+        iouAttendees?.length && iouAttendees.length > 1 && formattedAmountPerAttendee ? `· ${formattedAmountPerAttendee} ${translate('common.perPerson')}` : ''
+    }`.trim();
+
+    const navigateToAttendeeStep = () => {
+        if (!transactionID) {
+            return;
+        }
+
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_ATTENDEE.getRoute(action, iouType, transactionID, reportID)));
+    };
+
+    if (isNewManualExpenseFlowEnabled && !isReadOnly) {
+        return (
+            <MenuItemDropdownField
+                label={attendeesLabel}
+                valueComponent={
+                    Array.isArray(iouAttendees) && iouAttendees.length > 0 ? (
+                        <UserPills
+                            users={iouAttendees.map((a) => ({
+                                avatar: a?.avatarUrl,
+                                displayName: a?.displayName ?? a?.email ?? '',
+                                accountID: a?.accountID,
+                                email: a?.email,
+                            }))}
+                        />
+                    ) : undefined
+                }
+                errorText={shouldDisplayAttendeesError ? translate(formError as TranslationPaths) : ''}
+                onPress={navigateToAttendeeStep}
+                accessibilityLabel={`${translate('iou.attendees')}, ${Array.isArray(iouAttendees) ? getAttendeesListDisplayString(iouAttendees) : ''}`}
+                sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.ATTENDEES_FIELD}
+            />
+        );
+    }
 
     return (
         <MenuItemWithTopDescription
@@ -72,13 +111,7 @@ function AttendeeField({formattedAmountPerAttendee, isReadOnly, transactionID, a
             }
             style={[styles.moneyRequestMenuItem]}
             titleStyle={styles.flex1}
-            onPress={() => {
-                if (!transactionID) {
-                    return;
-                }
-
-                Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_ATTENDEE.getRoute(action, iouType, transactionID, reportID)));
-            }}
+            onPress={navigateToAttendeeStep}
             interactive={!isReadOnly}
             brickRoadIndicator={shouldDisplayAttendeesError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
             errorText={shouldDisplayAttendeesError ? translate(formError as TranslationPaths) : ''}

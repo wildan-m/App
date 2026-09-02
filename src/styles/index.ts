@@ -1540,6 +1540,26 @@ const staticStyles = (theme: ThemeColors) =>
             borderColor: theme.bordersBold,
         },
 
+        compactReceiptButton: {
+            height: variables.inputHeight,
+            width: variables.inputHeight,
+            borderRadius: variables.componentBorderRadiusLarge,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+
+        dropdownFieldContainer: {
+            backgroundColor: theme.appBG,
+            overflow: 'hidden',
+            borderWidth: 1,
+            borderRadius: variables.componentBorderRadiusNormal,
+            borderColor: theme.bordersBold,
+            minHeight: variables.inputHeight,
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            alignItems: 'center',
+        },
+
         cannotBeEditedSplitInputContainer: {
             flexDirection: 'row',
             alignItems: 'center',

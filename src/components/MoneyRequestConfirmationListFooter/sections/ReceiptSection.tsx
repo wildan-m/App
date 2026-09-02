@@ -67,7 +67,8 @@ function ReceiptSection({
     const styles = useThemeStyles();
     const {windowWidth} = useWindowDimensions();
     const isInLandscapeMode = useIsInLandscapeMode();
-    const {action, iouType, transactionID, reportID, isReadOnly, isPerDiemRequest, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest} = useConfirmationFields();
+    const {action, iouType, transactionID, reportID, isReadOnly, isPerDiemRequest, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest, isNewManualExpenseFlowEnabled} =
+        useConfirmationFields();
     const transaction = useTransactionSelector(transactionID, receiptSliceSelector);
 
     const receiptSource = useReceiptThumbnailSource({transaction, receiptPath, receiptFilename});
@@ -122,6 +123,12 @@ function ReceiptSection({
 
     const showReceiptEmptyState = shouldShowReceiptEmptyState(iouType, action, policy, isPerDiemRequest);
     if (!showReceiptEmptyState) {
+        return null;
+    }
+
+    // In the new manual expense flow the add-receipt action renders as a compact button beside the
+    // Amount field (see TransactionDetailsFields), so the full-width empty state is not shown.
+    if (isNewManualExpenseFlowEnabled && transaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.MANUAL) {
         return null;
     }
 

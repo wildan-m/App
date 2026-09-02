@@ -1,3 +1,4 @@
+import MenuItemDropdownField from '@components/MenuItem/presets/MenuItemDropdownField';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/context';
 import NumberWithSymbolForm from '@components/NumberWithSymbolForm';
@@ -135,29 +136,43 @@ function TaxFields({policy, policyForMovingExpenses, iouCurrencyCode, canModifyT
         clearFormErrors(['iou.error.invalidTaxAmount']);
     }, [isNewManualExpenseFlowEnabled, formError, taxAmount, maxTaxAmount, clearFormErrors]);
 
+    const navigateToTaxRateStep = () => {
+        if (!transactionID) {
+            return;
+        }
+
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_TAX_RATE.getRoute(action, iouType, transactionID, reportID)));
+    };
+
     return (
         <>
-            <MenuItemWithTopDescription
-                key={`${taxRates?.name}_rate`}
-                pressableTestID={`${taxRates?.name}_rate`}
-                shouldShowRightIcon={canModifyTaxFields}
-                title={taxRateTitle}
-                description={taxRates?.name}
-                style={[styles.moneyRequestMenuItem]}
-                titleStyle={styles.flex1}
-                onPress={() => {
-                    if (!transactionID) {
-                        return;
-                    }
-
-                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_TAX_RATE.getRoute(action, iouType, transactionID, reportID)));
-                }}
-                disabled={didConfirm}
-                interactive={canModifyTaxFields}
-                brickRoadIndicator={shouldDisplayTaxRateError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                errorText={shouldDisplayTaxRateError ? translate(formError as TranslationPaths) : ''}
-                sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAX_RATE_FIELD}
-            />
+            {isNewManualExpenseFlowEnabled ? (
+                <MenuItemDropdownField
+                    label={taxRates?.name ?? ''}
+                    value={taxRateTitle}
+                    errorText={shouldDisplayTaxRateError ? translate(formError as TranslationPaths) : ''}
+                    onPress={canModifyTaxFields ? navigateToTaxRateStep : undefined}
+                    isDisabled={didConfirm}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAX_RATE_FIELD}
+                    testID={`${taxRates?.name}_rate`}
+                />
+            ) : (
+                <MenuItemWithTopDescription
+                    key={`${taxRates?.name}_rate`}
+                    pressableTestID={`${taxRates?.name}_rate`}
+                    shouldShowRightIcon={canModifyTaxFields}
+                    title={taxRateTitle}
+                    description={taxRates?.name}
+                    style={[styles.moneyRequestMenuItem]}
+                    titleStyle={styles.flex1}
+                    onPress={navigateToTaxRateStep}
+                    disabled={didConfirm}
+                    interactive={canModifyTaxFields}
+                    brickRoadIndicator={shouldDisplayTaxRateError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                    errorText={shouldDisplayTaxRateError ? translate(formError as TranslationPaths) : ''}
+                    sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.TAX_RATE_FIELD}
+                />
+            )}
             {isNewManualExpenseFlowEnabled && canModifyTaxFields ? (
                 <View style={[styles.mh4, styles.mv2]}>
                     <NumberWithSymbolForm

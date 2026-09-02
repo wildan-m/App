@@ -35,35 +35,50 @@ type SettingsFieldsProps = {
  * (including `COLLECTION.REPORT_NVP`) from instantiating on non-policy-expense flows.
  */
 function SettingsFields({selectedParticipants, shouldShowBillable, shouldShowReimbursable, toggleHandlers, isCompactMode, fieldVisibility}: SettingsFieldsProps) {
-    const {action, iouType, transactionID, reportID, reportActionID, isReadOnly, isPolicyExpenseChat, isPerDiemRequest} = useConfirmationFields();
+    const {action, iouType, transactionID, reportID, reportActionID, isReadOnly, isPolicyExpenseChat, isPerDiemRequest, isNewManualExpenseFlowEnabled} = useConfirmationFields();
 
     if (isCompactMode) {
         return null;
     }
+
+    const toggleFields = fieldVisibility.toggles && (
+        <ToggleFields
+            isReadOnly={isReadOnly}
+            shouldShowReimbursable={shouldShowReimbursable}
+            shouldShowBillable={shouldShowBillable}
+            onToggleReimbursable={toggleHandlers.onToggleReimbursable}
+            onToggleBillable={toggleHandlers.onToggleBillable}
+            transactionID={transactionID}
+        />
+    );
+
+    const reportField = fieldVisibility.report && (
+        <ReportField
+            selectedParticipants={selectedParticipants}
+            isPolicyExpenseChat={isPolicyExpenseChat}
+            iouType={iouType}
+            reportID={reportID}
+            reportActionID={reportActionID}
+            action={action}
+            transactionID={transactionID}
+            isPerDiemRequest={isPerDiemRequest}
+        />
+    );
+
+    // In the new manual expense flow the toggle rows group at the bottom of the form, below the report row.
+    if (isNewManualExpenseFlowEnabled) {
+        return (
+            <>
+                {reportField}
+                {toggleFields}
+            </>
+        );
+    }
+
     return (
         <>
-            {fieldVisibility.toggles && (
-                <ToggleFields
-                    isReadOnly={isReadOnly}
-                    shouldShowReimbursable={shouldShowReimbursable}
-                    shouldShowBillable={shouldShowBillable}
-                    onToggleReimbursable={toggleHandlers.onToggleReimbursable}
-                    onToggleBillable={toggleHandlers.onToggleBillable}
-                    transactionID={transactionID}
-                />
-            )}
-            {fieldVisibility.report && (
-                <ReportField
-                    selectedParticipants={selectedParticipants}
-                    isPolicyExpenseChat={isPolicyExpenseChat}
-                    iouType={iouType}
-                    reportID={reportID}
-                    reportActionID={reportActionID}
-                    action={action}
-                    transactionID={transactionID}
-                    isPerDiemRequest={isPerDiemRequest}
-                />
-            )}
+            {toggleFields}
+            {reportField}
         </>
     );
 }

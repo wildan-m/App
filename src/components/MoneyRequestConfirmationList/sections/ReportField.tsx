@@ -1,4 +1,6 @@
+import MenuItemDropdownField from '@components/MenuItem/presets/MenuItemDropdownField';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/context';
 
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -8,6 +10,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
+import Parser from '@libs/Parser';
 import {getReportName} from '@libs/ReportNameUtils';
 import {generateReportID, getOutstandingReportsForUser, isMoneyRequestReport, isReportOutstanding} from '@libs/ReportUtils';
 
@@ -123,6 +126,26 @@ function ReportField({selectedParticipants, iouType, reportID, reportActionID, a
     // since the destination is already determined and there's no need to show a selectable list.
     const shouldReportBeEditable = (isUnreported ? outstandingReports.length >= 1 : outstandingReports.length > 1) && !isMoneyRequestReport(reportID);
 
+    const {isNewManualExpenseFlowEnabled} = useConfirmationFields();
+
+    const navigateToReportStep = () => {
+        if (!transactionID || !selectedReportID) {
+            return;
+        }
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_REPORT.getRoute(action, iouType, transactionID, selectedReportID, reportActionID)));
+    };
+
+    if (isNewManualExpenseFlowEnabled) {
+        return (
+            <MenuItemDropdownField
+                label={translate('common.report')}
+                value={Parser.htmlToText(reportName)}
+                onPress={shouldReportBeEditable ? navigateToReportStep : undefined}
+                sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.REPORT_FIELD}
+            />
+        );
+    }
+
     return (
         <MenuItemWithTopDescription
             shouldShowRightIcon={shouldReportBeEditable}
@@ -130,12 +153,7 @@ function ReportField({selectedParticipants, iouType, reportID, reportActionID, a
             description={translate('common.report')}
             style={[styles.moneyRequestMenuItem]}
             titleStyle={styles.flex1}
-            onPress={() => {
-                if (!transactionID || !selectedReportID) {
-                    return;
-                }
-                Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_REPORT.getRoute(action, iouType, transactionID, selectedReportID, reportActionID)));
-            }}
+            onPress={navigateToReportStep}
             interactive={shouldReportBeEditable}
             shouldRenderAsHTML
             sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.REPORT_FIELD}

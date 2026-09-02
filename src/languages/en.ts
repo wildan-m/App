@@ -1389,6 +1389,7 @@ const translations = {
         amount: 'Amount',
         percent: 'Percent',
         date: 'Date',
+        expenseDetails: 'Expense details',
         taxAmount: 'Tax amount',
         taxRate: 'Tax rate',
         approve: ({formattedAmount}: {formattedAmount?: string} = {}) => (formattedAmount ? `Approve ${formattedAmount}` : 'Approve'),

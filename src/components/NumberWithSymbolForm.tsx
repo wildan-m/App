@@ -504,6 +504,7 @@ function NumberWithSymbolForm({
                         onPress={handleFlipPress}
                         onMouseDown={(e) => e.preventDefault()}
                         contentContainerStyle={styles.justifyContentCenter}
+                        innerStyles={styles.bgTransparent}
                         accessibilityLabel={translate('iou.flip')}
                         isDisabled={disabled}
                     >
@@ -519,6 +520,7 @@ function NumberWithSymbolForm({
                         size={CONST.BUTTON_SIZE.SMALL}
                         onPress={onTrailingDropdownPress}
                         contentContainerStyle={styles.justifyContentCenter}
+                        innerStyles={styles.bgTransparent}
                         accessibilityLabel={currencyButtonAccessibilityLabel ?? `${translate('common.selectCurrency')}, ${currencyOrUnitButtonText}`}
                         isDisabled={disabled}
                     >
