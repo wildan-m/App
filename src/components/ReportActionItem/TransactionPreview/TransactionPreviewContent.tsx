@@ -12,6 +12,7 @@ import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDistanceRateOriginalPolicy from '@hooks/useDistanceRateOriginalPolicy';
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -26,15 +27,23 @@ import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {calculateAmount} from '@libs/IOUUtils';
 import Parser from '@libs/Parser';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
+import {getDistanceRateCustomUnitRate} from '@libs/PolicyUtils';
 import {getThumbnailAndImageURIs} from '@libs/ReceiptUtils';
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {isMarkAsCashActionForTransaction} from '@libs/ReportPrimaryActionUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
-import {canEditMoneyRequest, getTransactionDetails, isPolicyExpenseChat, isReportApproved, isSettled} from '@libs/ReportUtils';
+import {canEditMoneyRequest, getTransactionDetails, isExpenseReport, isPolicyExpenseChat, isReportApproved, isSettled} from '@libs/ReportUtils';
 import StringUtils from '@libs/StringUtils';
 import type {TranslationPathOrText} from '@libs/TransactionPreviewUtils';
 import {createTransactionPreviewConditionals, getIOUPayerAndReceiver, getTransactionPreviewTextAndTranslationPaths} from '@libs/TransactionPreviewUtils';
-import {isManagedCardTransaction as isCardTransactionUtils, isGPSDistanceRequest, isMapDistanceRequest, isScanning} from '@libs/TransactionUtils';
+import {
+    getDisplayTransactionWithoutInvalidCommuterExclusion,
+    isManagedCardTransaction as isCardTransactionUtils,
+    isDistanceRequest,
+    isGPSDistanceRequest,
+    isMapDistanceRequest,
+    isScanning,
+} from '@libs/TransactionUtils';
 import ViolationsUtils, {filterReceiptViolations} from '@libs/Violations/ViolationsUtils';
 
 import variables from '@styles/variables';
@@ -44,6 +53,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {cardByIdSelector} from '@src/selectors/Card';
 import {getStableReportSelector} from '@src/selectors/Report';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 import truncate from 'lodash/truncate';
 import React, {useContext, useMemo} from 'react';
@@ -81,12 +91,29 @@ function TransactionPreviewContent({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, dateFnsLocale} = useLocalize();
-    const {convertToDisplayString, getCurrencyDecimals} = useCurrencyListActions();
+    const {convertToDisplayString, getCurrencyDecimals, getCurrencySymbol} = useCurrencyListActions();
     const {environmentURL} = useEnvironment();
     const isParentPolicyExpenseChat = isPolicyExpenseChat(chatReport);
+    // The commuter exclusion is a workspace distance rate setting, so it only applies while the expense is on an expense report.
+    // Once the expense is unreported the stored exclusion-applied amount and merchant must not be displayed anymore.
+    const isTransactionOnExpenseReport = !isEmptyObject(report) && isExpenseReport(report);
+    const customUnitRateID = isDistanceRequest(transaction) ? transaction?.comment?.customUnit?.customUnitRateID : undefined;
+    const shouldLookupDistancePolicy = !!customUnitRateID && !getDistanceRateCustomUnitRate(policy, customUnitRateID);
+    const distanceOriginalPolicy = useDistanceRateOriginalPolicy(customUnitRateID, shouldLookupDistancePolicy);
+    const displayTransaction = useMemo(
+        () =>
+            getDisplayTransactionWithoutInvalidCommuterExclusion({
+                transaction,
+                isPolicyExpenseChat: isTransactionOnExpenseReport,
+                policy: distanceOriginalPolicy ?? policy,
+                translate,
+                getCurrencySymbol,
+            }),
+        [transaction, isTransactionOnExpenseReport, distanceOriginalPolicy, policy, translate, getCurrencySymbol],
+    );
     const transactionDetails = useMemo<Partial<TransactionDetails>>(
-        () => getTransactionDetails(transaction, undefined, policy, isParentPolicyExpenseChat) ?? {},
-        [transaction, policy, isParentPolicyExpenseChat],
+        () => getTransactionDetails(displayTransaction, undefined, policy, isParentPolicyExpenseChat) ?? {},
+        [displayTransaction, policy, isParentPolicyExpenseChat],
     );
     const {amount, comment: requestComment, merchant, category, currency: requestCurrency} = transactionDetails;
     const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transaction?.comment?.originalTransactionID)}`);
