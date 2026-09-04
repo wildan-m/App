@@ -463,6 +463,12 @@ function updateWorkflowDataOnApproverRemoval({approvalWorkflows, removedApprover
     const ownerDisplayName = ownerDetails.displayName ?? '';
 
     return approvalWorkflows.flatMap((workflow) => {
+        // A workflow without approvers has nothing to update when an approver is removed, and passing it on would make
+        // convertApprovalWorkflowToPolicyEmployees throw because it requires at least one approver
+        if (workflow.approvers.length === 0) {
+            return [];
+        }
+
         const [currentApprover] = workflow.approvers;
         const isSingleApprover = workflow.approvers.length === 1;
         const isMultipleApprovers = workflow.approvers.length > 1;

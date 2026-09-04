@@ -1048,6 +1048,38 @@ describe('WorkflowUtils', () => {
     });
 
     describe('updateWorkflowDataOnApproverRemoval', () => {
+        it('Should drop workflows that have no approvers so they are never sent to updateApprovalWorkflow', () => {
+            const emptyDefaultWorkflow: ApprovalWorkflow = {
+                members: [],
+                approvers: [],
+                isDefault: true,
+            };
+            const emptyWorkflow: ApprovalWorkflow = {
+                members: [buildMember(4)],
+                approvers: [],
+                isDefault: false,
+            };
+            const workflowWithApprover: ApprovalWorkflow = {
+                members: [buildMember(1), buildMember(2)],
+                approvers: [buildApprover(3)],
+                isDefault: false,
+            };
+
+            const ownerDetails = personalDetails[1];
+            const removedApprover = personalDetails[2];
+
+            if (!removedApprover || !ownerDetails) {
+                return;
+            }
+
+            const result = updateWorkflowDataOnApproverRemoval({
+                approvalWorkflows: [emptyDefaultWorkflow, workflowWithApprover, emptyWorkflow],
+                removedApprover,
+                ownerDetails,
+            });
+
+            expect(result).toEqual([workflowWithApprover]);
+        });
         it('Should remove Workflow 2 if its approvers are removed and it has no approvers, with Workspace (default) having the approver as the Workspace Owner.', () => {
             const approvalWorkflow1: ApprovalWorkflow = {
                 members: [buildMember(1), buildMember(2)],
