@@ -1,8 +1,11 @@
+import {DEBUG_TAB_VIEW_HEIGHT, getSettingsMessage} from '@components/Navigation/DebugTabView';
 import type {CompareItemsCallback, FilterConfig, IsItemInFilterCallback, IsItemInSearchCallback, TableColumn, TableData, TableHandle} from '@components/Table';
 import Table, {composeTableListHeader} from '@components/Table';
 
+import useIndicatorStatus from '@hooks/useIndicatorStatus';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -18,6 +21,7 @@ import type {AvatarSource} from '@libs/UserUtils';
 import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type * as OnyxCommon from '@src/types/onyx/OnyxCommon';
 
@@ -74,6 +78,13 @@ export default function WorkspaceListTable({ref, workspaces, headerComponent, on
     const illustrations = useMemoizedLazyIllustrations(['PlanetWithMobileApp']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
+    const [isDebugModeEnabled] = useOnyx(ONYXKEYS.IS_DEBUG_MODE_ENABLED);
+    const {status} = useIndicatorStatus();
+
+    // On wide layouts the debug banner is an absolutely-positioned overlay pinned to the bottom of this
+    // full-width page, so the list has to reserve scroll space for it or its last row stays permanently
+    // covered. The conditions mirror the ones DebugTabView renders under for the workspaces tab.
+    const shouldReserveSpaceForDebugBanner = !!isDebugModeEnabled && !shouldUseNarrowLayout && !!getSettingsMessage(status);
 
     const workspaceTableColumns: Array<TableColumn<WorkspaceTableColumnKey>> = [
         {
@@ -222,7 +233,7 @@ export default function WorkspaceListTable({ref, workspaces, headerComponent, on
             />
 
             <Table.Header />
-            <Table.Body />
+            <Table.Body additionalContentBottomPadding={shouldReserveSpaceForDebugBanner ? DEBUG_TAB_VIEW_HEIGHT : undefined} />
         </Table>
     );
 }

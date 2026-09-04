@@ -21,6 +21,7 @@ import isTabRouteAtRoot from '@libs/Navigation/helpers/isTabRouteAtRoot';
 import Navigation from '@libs/Navigation/Navigation';
 import {getChatTabBrickRoadReportID} from '@libs/WorkspacesSettingsUtils';
 
+import spacing from '@styles/utils/spacing';
 import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
@@ -41,6 +42,12 @@ import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
 
 import NAVIGATION_TABS from './NavigationTabBar/NAVIGATION_TABS';
+
+// The rendered height of the banner: the vertical padding of its container (`styles.p3`, top and
+// bottom) plus the normal-size "View" button laid out next to the message. On wide layouts the
+// banner is an absolutely-positioned overlay, so screens rendered underneath it reserve this much
+// extra bottom scroll space to keep their last row reachable.
+const DEBUG_TAB_VIEW_HEIGHT = spacing.p3.padding * 2 + variables.componentSizeNormal;
 
 function getActiveTabRoute(rootState: NavigationState | undefined) {
     if (!rootState) {
@@ -257,3 +264,4 @@ function DebugTabView({selectedTab}: Props) {
 }
 
 export default DebugTabView;
+export {DEBUG_TAB_VIEW_HEIGHT, getSettingsMessage};

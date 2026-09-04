@@ -27,6 +27,9 @@ import {TableRowSemanticIDContext, useTableContext} from './TableContext';
 type TableBodyProps = ViewProps & {
     /** Optional custom styles for the FlashList content container. */
     contentContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Extra bottom padding added to the scrollable content, e.g. to clear an overlay pinned to the bottom of the page. */
+    additionalContentBottomPadding?: number;
 };
 
 type TableBodyListProps = TableBodyProps & {
@@ -95,7 +98,7 @@ function doesBodyRenderWhenEmpty(listProps: {ListEmptyComponent?: unknown; ListH
  * </Table>
  * ```
  */
-function TableBodyList({contentContainerStyle, emptyMessage, onLayout, style, ...props}: TableBodyListProps) {
+function TableBodyList({additionalContentBottomPadding, contentContainerStyle, emptyMessage, onLayout, style, ...props}: TableBodyListProps) {
     const styles = useThemeStyles();
     const scrollEnabled = useScrollEnabled();
     const [isListLoaded, setIsListLoaded] = useState(false);
@@ -144,6 +147,7 @@ function TableBodyList({contentContainerStyle, emptyMessage, onLayout, style, ..
     const tableBodyContentContainerStyle = useBottomSafeSafeAreaPaddingStyle({
         addBottomSafeAreaPadding: true,
         addOfflineIndicatorBottomSafeAreaPadding: true,
+        additionalPaddingBottom: additionalContentBottomPadding,
         style: shouldUseNarrowTableLayout ? styles.pb20 : styles.pb4,
     });
     const flattenedListContentContainerStyle = StyleSheet.flatten(listContentContainerStyle);
