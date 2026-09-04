@@ -104,6 +104,20 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
     const {currentTime} = useEvent(videoPlayerRef.current, 'timeUpdate', {currentTime: 0, bufferedPosition: 0} as TimeUpdateEventPayload);
     const {status} = useEvent(videoPlayerRef.current, 'statusChange', {status: shouldUseSharedVideoElement ? playerStatus.current : 'loading'} as StatusChangeEventPayload);
 
+    if (shouldUseSharedVideoElement) {
+        // eslint-disable-next-line react-hooks/refs
+        console.log(
+            '[DBG100377] shared player render ' +
+                JSON.stringify({
+                    isContextPlayer: videoPlayerRef.current === currentVideoPlayerRef.current,
+                    contextNull: currentVideoPlayerRef.current === null,
+                    currentTime,
+                    status,
+                    isPlaying,
+                }),
+        );
+    }
+
     const isLoading = useMemo(() => {
         return status === 'loading';
     }, [status]);
@@ -535,6 +549,7 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
         if (currentVideoPlayerRef.current) {
             videoPlayerRef.current = currentVideoPlayerRef.current;
             videoViewRef.current = currentVideoViewRef.current;
+            console.log('[DBG100377] ADOPTED context player ' + JSON.stringify({url, adopted: videoPlayerRef.current === currentVideoPlayerRef.current}));
         }
         if (currentlyPlayingURL === url && newParentRef && 'appendChild' in newParentRef) {
             if (newParentRef.hasChildNodes()) {
