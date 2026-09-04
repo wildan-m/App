@@ -52,11 +52,11 @@ import {getExportMenuItem} from '@pages/workspace/companyCards/utils';
 
 import variables from '@styles/variables';
 
-import {deactivateCard as deactivateCardAction, freezeCard as freezeCardAction, openCardDetailsPage, unfreezeCard as unfreezeCardAction} from '@userActions/Card';
+import {deactivateCard as deactivateCardAction, freezeCard as freezeCardAction, openCardDetailsPage, setIssueNewCardStepAndData, unfreezeCard as unfreezeCardAction} from '@userActions/Card';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {DYNAMIC_ROUTES} from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
@@ -202,9 +202,22 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                 return;
             }
 
-            Navigation.goBack(undefined, {
-                afterTransition: () => deactivateCardAction(defaultFundID, card),
+            // Snapshot the card's details into the issue-new draft before deactivating,
+            // because the deactivate action's optimistic data removes the card from Onyx.
+            setIssueNewCardStepAndData({
+                policyID,
+                isChangeAssigneeDisabled: true,
+                data: {
+                    assigneeEmail: cardholder?.login ?? '',
+                    cardType: isVirtual ? CONST.EXPENSIFY_CARD.CARD_TYPE.VIRTUAL : CONST.EXPENSIFY_CARD.CARD_TYPE.PHYSICAL,
+                    limit: card?.nameValuePairs?.unapprovedExpenseLimit ?? 0,
+                    limitType: card?.nameValuePairs?.limitType ?? CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
+                    cardTitle: card?.nameValuePairs?.cardTitle ?? '',
+                    currency,
+                },
             });
+            deactivateCardAction(defaultFundID, card);
+            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_REPLACE_DEACTIVATED.path, ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID)));
         });
     };
 

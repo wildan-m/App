@@ -759,6 +759,7 @@ const SCREENS = {
         EXPENSIFY_CARD_ADD_WORK_EMAIL: 'Workspace_ExpensifyCard_Add_Work_Email',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW: 'Dynamic_Workspace_ExpensifyCard_New',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_VALIDATE_CODE: 'Dynamic_Workspace_ExpensifyCard_IssueNew_ConfirmValidateCode',
+        DYNAMIC_WORKSPACE_EXPENSIFY_CARD_REPLACE_DEACTIVATED: 'Dynamic_Workspace_ExpensifyCard_Replace_Deactivated',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_SELECT_FEED: 'Dynamic_Workspace_ExpensifyCard_Select_Feed',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_SPEND_RULE_SELECTION: 'Workspace_ExpensifyCard_Rule_Selection',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_SPEND_RULE_MERCHANTS: 'Workspace_ExpensifyCard_Rule_Merchants',

@@ -7110,6 +7110,11 @@ const translations = {
                 deactivateCard: 'Deactivate card',
                 deactivateConfirmation: 'Deactivating this card will decline all future transactions and can’t be undone.',
             },
+            replaceDeactivatedCard: {
+                title: 'Do you want to issue a new card to this member?',
+                successTitle: 'Card deactivated',
+                successDescription: 'The card was successfully deactivated.',
+            },
         },
         accounting: {
             settings: 'settings',

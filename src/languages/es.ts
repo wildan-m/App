@@ -7187,6 +7187,11 @@ El plan Controlar empieza en 9 $ por miembro activo al mes.`,
                 deactivateCard: 'Desactivar tarjeta',
                 deactivateConfirmation: 'Al desactivar esta tarjeta, se rechazarán todas las transacciones futuras y no se podrá deshacer.',
             },
+            replaceDeactivatedCard: {
+                title: '¿Quieres emitir una nueva tarjeta a este miembro?',
+                successTitle: 'Tarjeta desactivada',
+                successDescription: 'La tarjeta se ha desactivado correctamente.',
+            },
         },
         hr: {
             title: 'HR',
