@@ -130,8 +130,24 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
     };
 
     useEffect(() => {
-        return navigation.addListener('blur', () => !isOnAttachmentRoute() && setIsThumbnail(true));
+        return navigation.addListener('blur', () => {
+            console.log(
+                '[DBG100377] VideoPlayerPreview blur ' +
+                    JSON.stringify({
+                        activeRoute: Navigation.getActiveRouteWithoutParams(),
+                        isOnAttachmentRoute: isOnAttachmentRoute(),
+                        willResetToThumbnail: !isOnAttachmentRoute(),
+                    }),
+            );
+            return !isOnAttachmentRoute() && setIsThumbnail(true);
+        });
     }, [navigation]);
+
+    useEffect(() => {
+        console.log('[DBG100377] VideoPlayerPreview MOUNT ' + JSON.stringify({videoUrl}));
+        return () => console.log('[DBG100377] VideoPlayerPreview UNMOUNT ' + JSON.stringify({videoUrl}));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const playbackKey = `${currentlyPlayingURL}|${currentRouteReportID}|${videoUrl}|${reportID}|${isOnSearch}`;
     const [prevPlaybackKey, setPrevPlaybackKey] = useState(playbackKey);

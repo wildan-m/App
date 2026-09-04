@@ -400,6 +400,15 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
     // ref url: https://reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
     useLayoutEffect(
         () => () => {
+            console.log(
+                '[DBG100377] BaseVideoPlayer unmount cleanup ' +
+                    JSON.stringify({
+                        url,
+                        shouldUseShared: shouldUseSharedVideoElementRef.current,
+                        isContextPlayer: videoPlayerRef.current === currentVideoPlayerRef.current,
+                        willNullContextRef: !shouldUseSharedVideoElementRef.current && videoPlayerRef.current === currentVideoPlayerRef.current && !!currentVideoPlayerRef.current,
+                    }),
+            );
             // Use ref to read the latest value of shouldUseSharedVideoElement, preventing
             // destructive cleanup when this value changes during viewport resize.
             // Without the ref, the cleanup captures the stale (old) closure value and
