@@ -122,6 +122,7 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
     };
 
     const handleOnPress = () => {
+        console.log('[DBG100377] VideoPlayerPreview.handleOnPress', {videoUrl, reportID, hasReport: !!report});
         updateCurrentURLAndReportID(videoUrl, report, reportID);
         if (isSmallScreenWidth) {
             onShowModalPress();
@@ -137,6 +138,13 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
     if (prevPlaybackKey !== playbackKey) {
         setPrevPlaybackKey(playbackKey);
         const isFocused = doesUserRemainOnFirstRenderRoute();
+        console.log('[DBG100377] VideoPlayerPreview thumbnail-flip check', {
+            urlMatch: videoUrl === currentlyPlayingURL,
+            reportIDMatch: reportID === currentRouteReportID,
+            reportID,
+            currentRouteReportID: String(currentRouteReportID),
+            isFocused,
+        });
         if (videoUrl === currentlyPlayingURL && reportID === currentRouteReportID && isFocused) {
             setIsThumbnail(false);
         }

@@ -39,6 +39,7 @@ function PlaybackContextProvider({children}: ChildrenProps) {
 
     const updateCurrentURLAndReportID: PlaybackActionsContextValues['updateCurrentURLAndReportID'] = useCallback(
         (url, report, reportID) => {
+            console.log('[DBG100377] updateCurrentURLAndReportID', {url, reportID, hasReport: !!report, isThread: isChatThread(report)});
             if (!reportID) {
                 return;
             }
@@ -62,6 +63,7 @@ function PlaybackContextProvider({children}: ChildrenProps) {
             } else {
                 reportIDtoSet = reportID;
             }
+            console.log('[DBG100377] setCurrentRouteReportID', {reportIDtoSet: String(reportIDtoSet), isReportAChatThread});
 
             // Always set currentRouteReportID so that shareVideoPlayerElements can match.
             // When the video is in a thread/child report but the focused route shows a parent report,
@@ -99,6 +101,16 @@ function PlaybackContextProvider({children}: ChildrenProps) {
             // (e.g. after narrow→wide resize). In that case we skip the reportID check so any non-shared
             // player whose URL matches can reclaim the context refs.
             const hasReportIDMismatch = currentRouteReportID !== NO_REPORT_ID && reportID !== currentRouteReportID;
+            console.log('[DBG100377] shareVideoPlayerElements', {
+                shouldUseSharedVideoElement,
+                urlMatch: url === currentlyPlayingURL,
+                url,
+                currentlyPlayingURL,
+                reportID,
+                currentRouteReportID: String(currentRouteReportID),
+                hasReportIDMismatch,
+                blocked: shouldUseSharedVideoElement || url !== currentlyPlayingURL || hasReportIDMismatch,
+            });
             if (shouldUseSharedVideoElement || url !== currentlyPlayingURL || hasReportIDMismatch) {
                 return;
             }
