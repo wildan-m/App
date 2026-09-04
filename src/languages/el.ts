@@ -2282,6 +2282,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: 'Εμφανιζόμενο όνομα',
         isShownOnProfile: 'Το εμφανιζόμενο όνομά σας εμφανίζεται στο προφίλ σας.',
+        isShownOnMemberProfile: 'Το εμφανιζόμενο όνομα θα εμφανίζεται στο προφίλ του μέλους.',
     },
     timezonePage: {
         timezone: 'Ζώνη ώρας',

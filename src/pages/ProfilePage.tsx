@@ -27,7 +27,8 @@ import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/crea
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import Permissions from '@libs/Permissions';
-import {getPhoneNumber, temporaryGetDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
+import {extractFirstAndLastNameFromAvailableDetails, getPhoneNumber, temporaryGetDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
+import {hasNoDisplayName, isAdminOfSharedWorkspace} from '@libs/PolicyUtils';
 import {
     findSelfDMReportID,
     getChatByParticipants,
@@ -86,7 +87,8 @@ function ProfilePage({route}: ProfilePageProps) {
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: reportsSelector});
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [personalDetailsMetadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_METADATA);
-    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const {accountID: currentUserAccountID, login: currentUserLogin} = useCurrentUserPersonalDetails();
+    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [isDebugModeEnabled = false] = useOnyx(ONYXKEYS.IS_DEBUG_MODE_ENABLED);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
@@ -157,6 +159,12 @@ function ProfilePage({route}: ProfilePageProps) {
     }
 
     const isSMSLogin = Str.isSMSLogin(login);
+
+    // Admins of a workspace the member belongs to see the member's display name, and can set it while the member has none of their own.
+    const shouldShowDisplayName = isAdminOfSharedWorkspace(login, currentUserLogin, policies);
+    const canSetDisplayName = shouldShowDisplayName && hasNoDisplayName(details);
+    const memberFirstAndLastName = details ? extractFirstAndLastNameFromAvailableDetails(details) : undefined;
+    const memberDisplayName = `${memberFirstAndLastName?.firstName ?? ''} ${memberFirstAndLastName?.lastName ?? ''}`.trim();
     const phoneNumber = getPhoneNumber(details);
 
     const hasAvatar = !!details?.avatar;
@@ -277,6 +285,18 @@ function ProfilePage({route}: ProfilePageProps) {
                                         description={translate(isSMSLogin ? 'common.phoneNumber' : 'common.email')}
                                         interactive={false}
                                         copyable
+                                    />
+                                </View>
+                            ) : null}
+                            {shouldShowDisplayName ? (
+                                <View style={[styles.w100, styles.detailsPageSectionContainer]}>
+                                    <MenuItemWithTopDescription
+                                        style={[styles.ph0]}
+                                        title={memberDisplayName}
+                                        description={translate('displayNamePage.headerTitle')}
+                                        interactive={canSetDisplayName}
+                                        shouldShowRightIcon={canSetDisplayName}
+                                        onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.PROFILE_DISPLAY_NAME.getRoute()))}
                                     />
                                 </View>
                             ) : null}

@@ -2151,6 +2151,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: 'Nombre',
         isShownOnProfile: 'Este nombre es visible en tu perfil.',
+        isShownOnMemberProfile: 'Este nombre será visible en el perfil del miembro.',
     },
     timezonePage: {
         timezone: 'Zona horaria',

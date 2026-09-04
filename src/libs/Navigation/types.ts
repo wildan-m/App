@@ -1989,6 +1989,10 @@ type ProfileNavigatorParamList = {
         reportID: string;
         login?: string;
     };
+    [SCREENS.DYNAMIC_PROFILE_DISPLAY_NAME]: {
+        accountID: string;
+        login?: string;
+    };
 };
 
 type NewReportWorkspaceSelectionNavigatorParamList = {

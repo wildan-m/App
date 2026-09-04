@@ -2228,6 +2228,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: 'Anzeigename',
         isShownOnProfile: 'Dein Anzeigename wird in deinem Profil angezeigt.',
+        isShownOnMemberProfile: 'Der Anzeigename wird im Profil des Mitglieds angezeigt.',
     },
     timezonePage: {
         timezone: 'Zeitzone',

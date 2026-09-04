@@ -2202,6 +2202,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: '表示名',
         isShownOnProfile: '表示名はあなたのプロフィールに表示されます。',
+        isShownOnMemberProfile: '表示名はメンバーのプロフィールに表示されます。',
     },
     timezonePage: {
         timezone: 'タイムゾーン',

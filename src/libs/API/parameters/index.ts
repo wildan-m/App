@@ -154,6 +154,7 @@ export type {default as DuplicateWorkspaceParams} from './DuplicateWorkspacePara
 export type {default as CopyPolicySettingsParams} from './CopyPolicySettingsParams';
 export type {default as CopyPolicySettingsNotifyParams} from './CopyPolicySettingsNotifyParams';
 export type {default as UpdateDisplayNameParams} from './UpdateDisplayNameParams';
+export type {default as UpdateMemberDisplayNameParams} from './UpdateMemberDisplayNameParams';
 export type {default as UpdateChatNameParams} from './UpdateChatNameParams';
 export type {default as UpdateGroupChatMemberRolesParams} from './UpdateGroupChatMemberRolesParams';
 export type {default as UpdateHomeAddressParams} from './UpdateHomeAddressParams';

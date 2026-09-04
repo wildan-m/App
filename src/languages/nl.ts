@@ -2220,6 +2220,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: 'Weergavenaam',
         isShownOnProfile: 'Je weergavenaam wordt weergegeven op je profiel.',
+        isShownOnMemberProfile: 'De weergavenaam wordt weergegeven op het profiel van het lid.',
     },
     timezonePage: {
         timezone: 'Tijdzone',

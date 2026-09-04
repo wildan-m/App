@@ -601,6 +601,11 @@ const DYNAMIC_ROUTES = {
         getRoute: (accountID?: number, login?: string) => getUrlWithParams(`a/${accountID}`, {login}),
         queryParams: ['login'],
     },
+    PROFILE_DISPLAY_NAME: {
+        path: 'display-name',
+        entryScreens: [SCREENS.DYNAMIC_PROFILE],
+        getRoute: () => 'display-name' as const,
+    },
     PROFILE_AVATAR: {
         path: 'avatar/:accountID',
         entryScreens: ['*'],

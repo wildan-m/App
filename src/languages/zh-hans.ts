@@ -2143,6 +2143,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: '显示名称',
         isShownOnProfile: '您的显示名称会显示在您的个人资料中。',
+        isShownOnMemberProfile: '显示名称会显示在该成员的个人资料中。',
     },
     timezonePage: {
         timezone: '时区',

@@ -1100,6 +1100,8 @@ const ONYXKEYS = {
         CLOSE_ACCOUNT_FORM_DRAFT: 'closeAccountDraft',
         DISPLAY_NAME_FORM: 'displayNameForm',
         DISPLAY_NAME_FORM_DRAFT: 'displayNameFormDraft',
+        MEMBER_DISPLAY_NAME_FORM: 'memberDisplayNameForm',
+        MEMBER_DISPLAY_NAME_FORM_DRAFT: 'memberDisplayNameFormDraft',
         ONBOARDING_PERSONAL_DETAILS_FORM: 'onboardingPersonalDetailsForm',
         ONBOARDING_PERSONAL_DETAILS_FORM_DRAFT: 'onboardingPersonalDetailsFormDraft',
         ROOM_NAME_FORM: 'roomNameForm',
@@ -1355,6 +1357,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER_FORM]: FormTypes.WorkspaceCategoryFlagAmountsOverForm;
     [ONYXKEYS.FORMS.CLOSE_ACCOUNT_FORM]: FormTypes.CloseAccountForm;
     [ONYXKEYS.FORMS.DISPLAY_NAME_FORM]: FormTypes.DisplayNameForm;
+    [ONYXKEYS.FORMS.MEMBER_DISPLAY_NAME_FORM]: FormTypes.DisplayNameForm;
     [ONYXKEYS.FORMS.ONBOARDING_PERSONAL_DETAILS_FORM]: FormTypes.DisplayNameForm;
     [ONYXKEYS.FORMS.ROOM_NAME_FORM]: FormTypes.RoomNameForm;
     [ONYXKEYS.FORMS.CHRONOS_SCHEDULE_OOO_FORM]: FormTypes.ChronosScheduleOOOForm;

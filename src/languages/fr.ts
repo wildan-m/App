@@ -2234,6 +2234,7 @@ const translations: TranslationDeepObject<typeof en> = {
     displayNamePage: {
         headerTitle: 'Nom d’affichage',
         isShownOnProfile: 'Votre nom d’affichage est affiché sur votre profil.',
+        isShownOnMemberProfile: 'Le nom d’affichage sera affiché sur le profil du membre.',
     },
     timezonePage: {
         timezone: 'Fuseau horaire',

@@ -10,6 +10,7 @@ import type {
     BankAccount,
     BankAccountList,
     OnyxInputOrEntry,
+    PersonalDetails,
     PersonalDetailsList,
     Policy,
     PolicyCategories,
@@ -59,7 +60,7 @@ import isTeachersUnitePolicyID from './isTeachersUnitePolicyID';
 import {getHRAdvancedModeFinalApprover, isAnyHRConnected, isMergeHRCompleteSetupNeeded, shouldShowHRConnectionError} from './merge/HRUtils';
 import Navigation from './Navigation/Navigation';
 import {getIsOffline} from './NetworkState';
-import {getAccountIDsByLogins, getKnownAccountIDByLogin, getPersonalDetailByEmail} from './PersonalDetailsUtils';
+import {extractFirstAndLastNameFromAvailableDetails, getAccountIDsByLogins, getKnownAccountIDByLogin, getPersonalDetailByEmail} from './PersonalDetailsUtils';
 import {getAllSortedTransactions, getCategory, getTag, getTagArrayFromName} from './TransactionUtils';
 import {generateAccountID} from './UserUtils';
 import {isPublicDomain, isValidAccountRoute} from './ValidationUtils';
@@ -2056,6 +2057,40 @@ function getActiveAdminWorkspaces(policies: OnyxCollection<Policy> | null, curre
     return activePolicies.filter((policy) => shouldShowPolicy(policy, getIsOffline(), currentUserLogin) && isPolicyAdmin(policy, currentUserLogin));
 }
 
+/**
+ * Whether a member has no display name of their own. A name set by the member, by an HR integration,
+ * or by Clearbit all surface as a first/last name pair, while an unset name only ever falls back to
+ * the login, so an empty pair is what "no name is set" looks like.
+ */
+function hasNoDisplayName(personalDetails: OnyxEntry<PersonalDetails>): boolean {
+    if (!personalDetails) {
+        return false;
+    }
+    const {firstName, lastName} = extractFirstAndLastNameFromAvailableDetails(personalDetails);
+    return !firstName && !lastName;
+}
+
+/**
+ * Whether the current user is an admin of at least one active workspace the given member belongs to.
+ */
+function isAdminOfSharedWorkspace(memberLogin: string | undefined, currentUserLogin: string | undefined, policies: OnyxCollection<Policy> | null): boolean {
+    if (!memberLogin || !currentUserLogin || memberLogin === currentUserLogin) {
+        return false;
+    }
+    return getActiveAdminWorkspaces(policies, currentUserLogin).some((policy) => {
+        const employee = policy.employeeList?.[memberLogin];
+        return !!employee && employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+    });
+}
+
+/**
+ * Whether the current user may set another member's display name. The viewer has to be an admin of an
+ * active workspace the member belongs to, and the member must not already have a name of their own.
+ */
+function canAdminSetMemberDisplayName(memberPersonalDetails: OnyxEntry<PersonalDetails>, currentUserLogin: string | undefined, policies: OnyxCollection<Policy> | null): boolean {
+    return isAdminOfSharedWorkspace(memberPersonalDetails?.login, currentUserLogin, policies) && hasNoDisplayName(memberPersonalDetails);
+}
+
 /** Return active policies where current user is an employee (of the role "user") */
 function getActiveEmployeeWorkspaces(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): Policy[] {
     const activePolicies = getActivePolicies(policies, currentUserLogin);
@@ -3296,6 +3331,9 @@ export {
     isTaxTrackingEnabled,
     shouldShowPolicy,
     getActiveAdminWorkspaces,
+    canAdminSetMemberDisplayName,
+    hasNoDisplayName,
+    isAdminOfSharedWorkspace,
     hasActiveAdminWorkspaces,
     getOwnedPaidPolicies,
     canSendInvoiceFromWorkspace,

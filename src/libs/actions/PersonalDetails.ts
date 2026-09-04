@@ -9,6 +9,7 @@ import type {
     UpdateAutomaticTimezoneParams,
     UpdateDisplayNameParams,
     UpdateHomeAddressParams,
+    UpdateMemberDisplayNameParams,
     UpdateLegalNameParams,
     UpdatePrivatePersonalDetailsParams,
     UpdatePronounsParams,
@@ -157,6 +158,45 @@ function updateDisplayName(firstName: string, lastName: string, formatPhoneNumbe
                         lastName: currentUserPersonalDetails.lastName ?? null,
                         displayName: currentUserPersonalDetails.displayName ?? null,
                         ...(optimisticDetails.avatar && {avatar: currentUserPersonalDetails.avatar}),
+                    },
+                },
+            },
+        ],
+    });
+}
+
+/**
+ * Sets another workspace member's display name at the account level. Only usable by an admin of a
+ * workspace the member belongs to, and only while the member has no name of their own.
+ */
+function updateMemberDisplayName(firstName: string, lastName: string, formatPhoneNumber: LocaleContextProps['formatPhoneNumber'], memberPersonalDetails: DisplayNamePersonalDetails) {
+    if (!memberPersonalDetails.accountID) {
+        return;
+    }
+
+    const optimisticDetails = buildOptimisticDisplayNameDetails(firstName, lastName, formatPhoneNumber, memberPersonalDetails);
+    const parameters: UpdateMemberDisplayNameParams = {accountID: memberPersonalDetails.accountID, firstName, lastName};
+
+    API.write(WRITE_COMMANDS.UPDATE_MEMBER_DISPLAY_NAME, parameters, {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PERSONAL_DETAILS_LIST,
+                value: {
+                    [memberPersonalDetails.accountID]: optimisticDetails,
+                },
+            },
+        ],
+        failureData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PERSONAL_DETAILS_LIST,
+                value: {
+                    [memberPersonalDetails.accountID]: {
+                        firstName: memberPersonalDetails.firstName ?? null,
+                        lastName: memberPersonalDetails.lastName ?? null,
+                        displayName: memberPersonalDetails.displayName ?? null,
+                        ...(optimisticDetails.avatar && {avatar: memberPersonalDetails.avatar}),
                     },
                 },
             },
@@ -735,6 +775,7 @@ export {
     updateAvatarStyle,
     setDisplayName,
     updateDisplayName,
+    updateMemberDisplayName,
     updateLegalName,
     updatePronouns,
     updateSelectedTimezone,

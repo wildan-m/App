@@ -74,6 +74,7 @@ const WRITE_COMMANDS = {
     DELETE_PAYMENT_CARD: 'DeletePaymentCard',
     UPDATE_PRONOUNS: 'UpdatePronouns',
     UPDATE_DISPLAY_NAME: 'UpdateDisplayName',
+    UPDATE_MEMBER_DISPLAY_NAME: 'UpdateMemberDisplayName',
     UPDATE_LEGAL_NAME: 'UpdateLegalName',
     UPDATE_HOME_ADDRESS: 'UpdateHomeAddress',
     UPDATE_PRIVATE_PERSONAL_DETAILS: 'UpdatePrivatePersonalDetails',
@@ -743,6 +744,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.DELETE_PAYMENT_CARD]: Parameters.DeletePaymentCardParams;
     [WRITE_COMMANDS.UPDATE_PRONOUNS]: Parameters.UpdatePronounsParams;
     [WRITE_COMMANDS.UPDATE_DISPLAY_NAME]: Parameters.UpdateDisplayNameParams;
+    [WRITE_COMMANDS.UPDATE_MEMBER_DISPLAY_NAME]: Parameters.UpdateMemberDisplayNameParams;
     [WRITE_COMMANDS.UPDATE_LEGAL_NAME]: Parameters.UpdateLegalNameParams;
     [WRITE_COMMANDS.VERIFY_ADD_SECONDARY_LOGIN_CODE]: Parameters.VerifyAddSecondaryLoginCodeParams;
     [WRITE_COMMANDS.UPDATE_POLICY_ADDRESS]: Parameters.UpdatePolicyAddressParams;
