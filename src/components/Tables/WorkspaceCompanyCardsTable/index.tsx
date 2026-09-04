@@ -13,13 +13,16 @@ import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {resetFailedWorkspaceCompanyCardUnassignment} from '@libs/actions/CompanyCards';
 import {getCompanyCardCustomName, getDefaultCardName} from '@libs/CardUtils';
+import {getConnectedIntegration} from '@libs/PolicyUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
 
+import {getExportMenuItem} from '@pages/workspace/companyCards/utils';
 import WorkspaceCompanyCardPageEmptyState from '@pages/workspace/companyCards/WorkspaceCompanyCardPageEmptyState';
 import WorkspaceCompanyCardsFeedPendingPage from '@pages/workspace/companyCards/WorkspaceCompanyCardsFeedPendingPage';
 
@@ -32,7 +35,7 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import type {ListRenderItemInfo} from '@shopify/flash-list';
 
 import {companyCardCustomNamesSelector} from '@selectors/Card';
-import React, {useImperativeHandle, useRef, useState} from 'react';
+import React, {useImperativeHandle, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableRow';
@@ -41,7 +44,7 @@ import WorkspaceCompanyCardsTableControls from './WorkspaceCompanyCardsTableCont
 import WorkspaceCompanyCardsTableHeaderButtons from './WorkspaceCompanyCardsTableHeaderButtons';
 import WorkspaceCompanyCardTableItem from './WorkspaceCompanyCardsTableRow';
 
-type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName' | 'actions';
+type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName' | 'exportAccount' | 'actions';
 
 type WorkspaceCompanyCardsTableHandle = {
     clearSelection: () => void;
@@ -132,6 +135,11 @@ function WorkspaceCompanyCardsTable({
     const [personalDetails, personalDetailsMetadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [sharedCardCustomNames] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainOrWorkspaceAccountID}`, {selector: companyCardCustomNamesSelector});
     const [companyCardsLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_COMPANY_CARDS_LOADING_STATE}${domainOrWorkspaceAccountID}`);
+    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
+
+    const policy = usePolicy(policyID);
+    const syncingAccountingIntegration = CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES.find((integration) => integration === connectionSyncProgress?.connectionName);
+    const connectedIntegration = getConnectedIntegration(policy, CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES) ?? syncingAccountingIntegration;
 
     const hasOnceLoadedPage = !!companyCardsLoadingState?.hasOnceLoadedPage;
     const hasOnceLoadedSelectedFeed = !!bankName && !!companyCardsLoadingState?.feeds?.[bankName]?.hasOnceLoaded;
@@ -192,6 +200,47 @@ function WorkspaceCompanyCardsTable({
     const shouldShowGBDisclaimer = isGB && (isNoFeed || hasNoAssignedCard);
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
 
+    // Resolving the export account walks the connection's account list for every card, so keep it out of the
+    // per-render row mapping below and only redo it when the cards or the connection's export config change.
+    const exportAccountNamesByCardKey = useMemo(() => {
+        const exportAccountNames = new Map<string, string>();
+
+        for (const {cardName, encryptedCardNumber, assignedCard} of companyCardEntries ?? []) {
+            const exportMenuItem = getExportMenuItem(connectedIntegration, policyID, translate, styles, policy, assignedCard);
+            exportAccountNames.set(`${cardName}_${encryptedCardNumber}`, exportMenuItem?.shouldShowMenuItem ? (exportMenuItem.title ?? '') : '');
+        }
+
+        return exportAccountNames;
+    }, [companyCardEntries, connectedIntegration, policyID, translate, styles, policy]);
+
+    const cardsData: WorkspaceCompanyCardTableItemData[] = isLoadingOnyxCardList
+        ? []
+        : (companyCardEntries ?? [])
+              .map(({cardName, encryptedCardNumber, isAssigned, assignedCard}) => {
+                  const cardholder = assignedCard?.accountID ? personalDetails?.[assignedCard.accountID] : undefined;
+
+                  return {
+                      cardName,
+                      keyForList: `${cardName}_${assignedCard?.cardID ?? 'unassigned'}_${encryptedCardNumber}`,
+                      exportAccountName: exportAccountNamesByCardKey.get(`${cardName}_${encryptedCardNumber}`) ?? '',
+                      encryptedCardNumber,
+                      customCardName: getCompanyCardCustomName(assignedCard?.cardID, sharedCardCustomNames, customCardNames) ?? getDefaultCardName(cardholder?.displayName ?? ''),
+                      isCardDeleted: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                      disabled: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                      isAssigned,
+                      assignedCard,
+                      cardholder,
+                      errors: isFeedConnectionBroken || assignedCard?.pendingFields?.lastScrape ? undefined : assignedCard?.errors,
+                      pendingAction: assignedCard?.pendingAction,
+                      onDismissError: () => resetFailedWorkspaceCompanyCardUnassignment(domainOrWorkspaceAccountID, bankName, assignedCard?.cardID),
+                  };
+              })
+              .filter((item) => isOffline || item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
+
+    // The export account mapping is only surfaced when the card details page would surface it too, and it is dropped on
+    // narrow layouts where there is no room for a secondary column.
+    const shouldShowExportAccountColumn = !shouldUseNarrowTableLayout && cardsData.some((card) => !!card.exportAccountName);
+
     const columns: Array<TableColumn<CompanyCardsTableColumnKey>> = [
         {
             key: 'member',
@@ -208,6 +257,15 @@ function WorkspaceCompanyCardsTable({
             label: translate('workspace.companyCards.cardName'),
             sortable: true,
         },
+        ...(shouldShowExportAccountColumn
+            ? [
+                  {
+                      key: 'exportAccount' as const,
+                      label: translate('workspace.companyCards.exportAccount'),
+                      sortable: true,
+                  },
+              ]
+            : []),
         {
             key: 'actions',
             label: '',
@@ -217,29 +275,6 @@ function WorkspaceCompanyCardsTable({
             },
         },
     ];
-
-    const cardsData: WorkspaceCompanyCardTableItemData[] = isLoadingOnyxCardList
-        ? []
-        : (companyCardEntries ?? [])
-              .map(({cardName, encryptedCardNumber, isAssigned, assignedCard}) => {
-                  const cardholder = assignedCard?.accountID ? personalDetails?.[assignedCard.accountID] : undefined;
-
-                  return {
-                      cardName,
-                      keyForList: `${cardName}_${assignedCard?.cardID ?? 'unassigned'}_${encryptedCardNumber}`,
-                      encryptedCardNumber,
-                      customCardName: getCompanyCardCustomName(assignedCard?.cardID, sharedCardCustomNames, customCardNames) ?? getDefaultCardName(cardholder?.displayName ?? ''),
-                      isCardDeleted: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                      disabled: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                      isAssigned,
-                      assignedCard,
-                      cardholder,
-                      errors: isFeedConnectionBroken || assignedCard?.pendingFields?.lastScrape ? undefined : assignedCard?.errors,
-                      pendingAction: assignedCard?.pendingAction,
-                      onDismissError: () => resetFailedWorkspaceCompanyCardUnassignment(domainOrWorkspaceAccountID, bankName, assignedCard?.cardID),
-                  };
-              })
-              .filter((item) => isOffline || item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
 
     const [selectedCardsFeedName, setSelectedCardsFeedName] = useState(feedName);
     const isSelectedCardsFeedCurrent = selectedCardsFeedName === feedName;
@@ -291,6 +326,10 @@ function WorkspaceCompanyCardsTable({
 
         if (activeSorting.columnKey === 'customCardName') {
             return localeCompare(a.customCardName ?? '', b.customCardName ?? '') * orderMultiplier;
+        }
+
+        if (activeSorting.columnKey === 'exportAccount') {
+            return localeCompare(a.exportAccountName ?? '', b.exportAccountName ?? '') * orderMultiplier;
         }
 
         return 0;
@@ -368,6 +407,7 @@ function WorkspaceCompanyCardsTable({
             onAssignCard={onAssignCard}
             isAssigningCardDisabled={isAssigningCardDisabled}
             canWriteCompanyCards={canWriteCompanyCards}
+            shouldShowExportAccountColumn={shouldShowExportAccountColumn}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
         />
     );

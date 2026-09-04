@@ -6142,6 +6142,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             confirmationDescription: 'Wir beginnen sofort mit dem Import der Transaktionen.',
             card: 'Karte',
             cardName: 'Kartenname',
+            exportAccount: 'Exportkonto',
             brokenConnectionError:
                 '<rbr>Die Verbindung zum Kartenfeed ist unterbrochen. Bitte <a href="#">melde dich bei deiner Bank an</a>, damit wir die Verbindung erneut herstellen können.</rbr>',
             assignedCard: (assignee: string, link: string) => `${assignee} wurde ${link} zugewiesen! Importierte Transaktionen werden in diesem Chat angezeigt.`,

@@ -6094,6 +6094,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             confirmationDescription: 'Começaremos a importar as transações imediatamente.',
             card: 'Cartão',
             cardName: 'Nome do cartão',
+            exportAccount: 'Conta de exportação',
             brokenConnectionError: '<rbr>A conexão do feed do cartão foi interrompida. <a href="#">Acesse seu banco</a> para que possamos restabelecer a conexão.</rbr>',
             assignedCard: (assignee: string, link: string) => `atribuiu um(a) ${link} a ${assignee}! As transações importadas aparecerão neste chat.`,
             companyCard: 'cartão corporativo',

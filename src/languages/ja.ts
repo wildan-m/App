@@ -6028,6 +6028,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             confirmationDescription: 'ただちに取引のインポートを開始します。',
             card: 'カード',
             cardName: 'カード名',
+            exportAccount: 'エクスポート先アカウント',
             brokenConnectionError: '<rbr>カードフィード接続が切断されています。再度接続を確立するため、<a href="#">銀行にログイン</a>してください。</rbr>',
             assignedCard: (assignee: string, link: string) => `${assignee} に ${link} を割り当てました！取り込まれた取引はこのチャットに表示されます。`,
             companyCard: '会社カード',

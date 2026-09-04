@@ -6147,6 +6147,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             confirmationDescription: 'Nous allons commencer à importer les transactions immédiatement.',
             card: 'Carte',
             cardName: 'Nom de la carte',
+            exportAccount: "Compte d'exportation",
             brokenConnectionError:
                 '<rbr>La connexion du flux de cartes est interrompue. Veuillez <a href="#">vous connecter à votre banque</a> afin que nous puissions rétablir la connexion.</rbr>',
             assignedCard: (assignee: string, link: string) => `a assigné ${assignee} à ${link} ! Les transactions importées apparaîtront dans cette discussion.`,

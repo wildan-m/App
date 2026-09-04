@@ -5887,6 +5887,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             confirmationDescription: '我们会立即开始导入交易记录。',
             card: '卡片',
             cardName: '卡片名称',
+            exportAccount: '导出账户',
             brokenConnectionError: '<rbr>银行卡流水连接已中断。请<a href="#">登录您的网上银行</a>，以便我们重新建立连接。</rbr>',
             assignedCard: (assignee: string, link: string) => `已将${assignee}分配了一个${link}！导入的交易将显示在此聊天中。`,
             companyCard: '公司卡',

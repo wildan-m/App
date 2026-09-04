@@ -36,10 +36,12 @@ import {getExpensifyCardFeedDescription} from '@libs/ExpensifyCardFeedSelectorUt
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import {temporaryGetDisplayNameOrDefault} from '@libs/PersonalDetailsUtils';
-import {getMemberAccountIDsForWorkspace} from '@libs/PolicyUtils';
+import {getConnectedIntegration, getMemberAccountIDsForWorkspace} from '@libs/PolicyUtils';
 
 import Navigation from '@navigation/Navigation';
 import type {WorkspaceSplitNavigatorParamList} from '@navigation/types';
+
+import {getExportMenuItem} from '@pages/workspace/companyCards/utils';
 
 import variables from '@styles/variables';
 
@@ -82,6 +84,9 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [domains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
+    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
+    const syncingAccountingIntegration = CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES.find((integration) => integration === connectionSyncProgress?.connectionName);
+    const connectedIntegration = getConnectedIntegration(policy, CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES) ?? syncingAccountingIntegration;
     const settings = getCardSettings(cardSettings);
     const {allFeeds: allAdminExpensifyCardFeeds} = useExpensifyCardFeedsForFeedSelector(policyID);
     const shouldShowSelector = allAdminExpensifyCardFeeds.length >= 1;
@@ -140,6 +145,8 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                       }) || undefined
                     : undefined;
 
+                const exportMenuItem = getExportMenuItem(connectedIntegration, policyID, translate, styles, policy, card);
+
                 return {
                     keyForList: String(card.cardID),
                     cardID: card.cardID,
@@ -157,11 +164,12 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                     frozenDate: card.nameValuePairs?.frozen?.date,
                     errors: card.errors,
                     pendingAction: card.pendingAction,
+                    exportAccountName: exportMenuItem?.shouldShowMenuItem ? (exportMenuItem.title ?? '') : '',
                     action: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_DETAILS.getRoute(card.cardID.toString()))),
                     onClose: () => clearDeletePaymentMethodError(`${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${defaultFundID}_${CONST.EXPENSIFY_CARD.BANK}`, card.cardID),
                 };
             }),
-        [allCards, defaultFundID, personalDetails, settlementCurrency, translate, formatPhoneNumber],
+        [allCards, defaultFundID, personalDetails, settlementCurrency, translate, formatPhoneNumber, connectedIntegration, policyID, styles, policy],
     );
 
     const bulkExportOptions: Array<DropdownOption<typeof CONST.EXPENSIFY_CARD.BULK_ACTIONS.EXPORT_CSV>> = [

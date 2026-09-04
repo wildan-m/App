@@ -34,6 +34,9 @@ type WorkspaceCompanyCardTableRowData = TableData &
         /** Whether the card is assigned */
         isAssigned: boolean;
 
+        /** The accounting export account the card is mapped to, empty when the card has no export account to show */
+        exportAccountName?: string;
+
         /** Assigned card */
         assignedCard?: Card;
 
@@ -57,6 +60,9 @@ type WorkspaceCompanyCardTableRowProps = {
     /** Whether the current member can edit company cards */
     canWriteCompanyCards: boolean;
 
+    /** Whether the export account column is rendered in the table */
+    shouldShowExportAccountColumn: boolean;
+
     /** Whether to use narrow table row layout */
     shouldUseNarrowTableLayout: boolean;
 
@@ -75,6 +81,7 @@ function WorkspaceCompanyCardTableRow({
     item,
     feedName,
     CardFeedIcon,
+    shouldShowExportAccountColumn,
     shouldUseNarrowTableLayout,
     rowIndex,
     isAssigningCardDisabled,
@@ -87,7 +94,7 @@ function WorkspaceCompanyCardTableRow({
     const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
-    const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, isCardDeleted, onDismissError} = item;
+    const {cardName, encryptedCardNumber, customCardName, exportAccountName, cardholder, assignedCard, isAssigned, errors, pendingAction, isCardDeleted, onDismissError} = item;
 
     const formattedCustomCardName = customCardName ?? '';
     const formattedCardDetails = formatMaskedCardName(cardName);
@@ -196,6 +203,20 @@ function WorkspaceCompanyCardTableRow({
                                 shouldShowTooltip
                                 numberOfLines={1}
                                 text={customCardName ?? ''}
+                                style={[styles.lh16, styles.optionDisplayName, styles.pre]}
+                            />
+                        </View>
+                    )}
+
+                    {shouldShowExportAccountColumn && (
+                        <View
+                            style={[styles.flex1, styles.justifyContentCenter]}
+                            {...getCellAccessibilityProps(isTableSemanticsEnabled)}
+                        >
+                            <TextWithTooltip
+                                shouldShowTooltip
+                                numberOfLines={1}
+                                text={exportAccountName ?? ''}
                                 style={[styles.lh16, styles.optionDisplayName, styles.pre]}
                             />
                         </View>

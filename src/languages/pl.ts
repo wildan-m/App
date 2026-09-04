@@ -6115,6 +6115,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             confirmationDescription: 'Natychmiast rozpoczniemy importowanie transakcji.',
             card: 'Karta',
             cardName: 'Nazwa karty',
+            exportAccount: 'Konto eksportu',
             brokenConnectionError: '<rbr>Połączenie z kartą jest przerwane. Proszę <a href="#">zalogować się do swojego banku</a>, abyśmy mogli ponownie nawiązać połączenie.</rbr>',
             assignedCard: (assignee: string, link: string) => `przypisał(-a) ${assignee} ${link}! Zaimportowane transakcje pojawią się na tym czacie.`,
             companyCard: 'karta firmowa',

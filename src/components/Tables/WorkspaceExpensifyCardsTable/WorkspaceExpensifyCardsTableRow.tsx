@@ -32,11 +32,14 @@ type WorkspaceExpensifyCardsTableRowProps = {
     /** The index of the row relative to all other rows */
     rowIndex: number;
 
+    /** Whether the export account column is rendered in the table */
+    shouldShowExportAccountColumn: boolean;
+
     /** Whether to use narrow table row layout */
     shouldUseNarrowTableLayout: boolean;
 };
 
-export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldUseNarrowTableLayout}: WorkspaceExpensifyCardsTableRowProps) {
+export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldShowExportAccountColumn, shouldUseNarrowTableLayout}: WorkspaceExpensifyCardsTableRowProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FreezeCard']);
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
@@ -186,6 +189,19 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
                                 shouldShowTooltip
                                 numberOfLines={1}
                                 text={statusLabel}
+                            />
+                        </View>
+                    )}
+
+                    {shouldShowExportAccountColumn && (
+                        <View
+                            style={[styles.flex1, styles.mnw0, styles.flexRow, styles.alignItemsCenter]}
+                            {...getCellAccessibilityProps(isTableSemanticsEnabled)}
+                        >
+                            <TextWithTooltip
+                                shouldShowTooltip
+                                numberOfLines={1}
+                                text={item.exportAccountName ?? ''}
                             />
                         </View>
                     )}

@@ -6100,6 +6100,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             confirmationDescription: 'Inizieremo immediatamente a importare le transazioni.',
             card: 'Carta',
             cardName: 'Nome della carta',
+            exportAccount: 'Conto di esportazione',
             brokenConnectionError: '<rbr>La connessione al feed della carta è interrotta. Per favore <a href="#">accedi alla tua banca</a> così possiamo ristabilire la connessione.</rbr>',
             assignedCard: (assignee: string, link: string) => `ha assegnato a ${assignee} un ${link}! Le transazioni importate appariranno in questa chat.`,
             companyCard: 'carta aziendale',

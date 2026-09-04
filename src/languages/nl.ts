@@ -6093,6 +6093,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             confirmationDescription: 'We beginnen direct met het importeren van transacties.',
             card: 'Kaart',
             cardName: 'Kaartnaam',
+            exportAccount: 'Exportrekening',
             brokenConnectionError: '<rbr>De kaartfeedverbinding is verbroken. Log alsjeblieft <a href="#">in bij je bank</a> zodat we de verbinding opnieuw kunnen tot stand brengen.</rbr>',
             assignedCard: (assignee: string, link: string) => `${assignee} een ${link} toegewezen! Geïmporteerde transacties verschijnen in deze chat.`,
             companyCard: 'bedrijfskaart',

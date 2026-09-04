@@ -6230,6 +6230,7 @@ const translations = {
             confirmationDescription: "We'll begin importing transactions immediately.",
             card: 'Card',
             cardName: 'Card name',
+            exportAccount: 'Export account',
             brokenConnectionError: '<rbr>Card feed connection is broken. Please <a href="#">log into your bank</a> so we can establish the connection again.</rbr>',
             assignedCard: (assignee: string, link: string) => `assigned ${assignee} a ${link}! Imported transactions will appear in this chat.`,
             companyCard: 'company card',

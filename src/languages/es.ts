@@ -6012,6 +6012,7 @@ ${amount} para ${merchant} - ${date}`,
             confirmationDescription: 'Comenzaremos a importar transacciones inmediatamente.',
             card: 'Tarjeta',
             cardName: 'Nombre de la tarjeta',
+            exportAccount: 'Cuenta de exportación',
             brokenConnectionError:
                 '<rbr>La conexión de la fuente de tarjetas está rota. Por favor, <a href="#">inicia sesión en tu banco</a> para que podamos restablecer la conexión.</rbr>',
             assignedCard: (assignee, link) => `ha asignado a ${assignee} una ${link}! Las transacciones importadas aparecerán en este chat.`,

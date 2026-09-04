@@ -28,7 +28,7 @@ import {View} from 'react-native';
 
 import WorkspaceExpensifyCardsTableRow from './WorkspaceExpensifyCardsTableRow';
 
-type WorkspaceExpensifyCardTableColumnKey = 'name' | 'type' | 'limitType' | 'lastFour' | 'status' | 'limit' | 'remainingLimit' | 'actions';
+type WorkspaceExpensifyCardTableColumnKey = 'name' | 'type' | 'limitType' | 'lastFour' | 'status' | 'exportAccount' | 'limit' | 'remainingLimit' | 'actions';
 
 type WorkspaceExpensifyCardTableRowData = TableData & {
     cardID: number;
@@ -41,6 +41,7 @@ type WorkspaceExpensifyCardTableRowData = TableData & {
     currency?: string;
     isVirtual: boolean;
     limitType: CardLimitType | undefined;
+    exportAccountName?: string;
     frozenByDisplayName?: string;
     frozenByAccountID?: number;
     frozenDate?: string;
@@ -109,6 +110,10 @@ export default function WorkspaceExpensifyCardsTable({
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
     const errorMessage = getLatestErrorMessage(cardSettings) ?? '';
 
+    // The export account mapping is only surfaced when the card details page would surface it too, and it is dropped on
+    // narrow layouts where there is no room for a secondary column.
+    const shouldShowExportAccountColumn = !shouldUseNarrowTableLayout && cards.some((card) => !!card.exportAccountName);
+
     const columns: Array<TableColumn<WorkspaceExpensifyCardTableColumnKey>> = [
         {
             key: 'name',
@@ -155,6 +160,18 @@ export default function WorkspaceExpensifyCardsTable({
                 containerStyles: [styles.mnw0],
             },
         },
+        ...(shouldShowExportAccountColumn
+            ? [
+                  {
+                      key: 'exportAccount' as const,
+                      label: translate('workspace.companyCards.exportAccount'),
+                      sortable: true,
+                      styling: {
+                          containerStyles: [styles.mnw0],
+                      },
+                  },
+              ]
+            : []),
         {
             key: 'limit',
             label: translate('workspace.expensifyCard.limit'),
@@ -206,6 +223,10 @@ export default function WorkspaceExpensifyCardsTable({
             return localeCompare(status1, status2) * orderMultiplier;
         }
 
+        if (activeSorting.columnKey === 'exportAccount') {
+            return localeCompare(item1.exportAccountName ?? '', item2.exportAccountName ?? '') * orderMultiplier;
+        }
+
         if (activeSorting.columnKey === 'limit') {
             return (item1.limit - item2.limit) * orderMultiplier;
         }
@@ -225,6 +246,7 @@ export default function WorkspaceExpensifyCardsTable({
         <WorkspaceExpensifyCardsTableRow
             item={item}
             rowIndex={index}
+            shouldShowExportAccountColumn={shouldShowExportAccountColumn}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
         />
     );
