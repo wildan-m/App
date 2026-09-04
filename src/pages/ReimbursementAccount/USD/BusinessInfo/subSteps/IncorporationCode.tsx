@@ -26,6 +26,8 @@ function IncorporationCode({onNext, isEditing}: SubPageProps) {
     const styles = useThemeStyles();
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
 
+    const defaultCompanyIndustryCode = reimbursementAccount?.achData?.industryCode ?? '';
+
     const handleSubmit = useReimbursementAccountStepFormSubmit({
         fieldIds: STEP_FIELDS,
         onNext,
@@ -59,7 +61,7 @@ function IncorporationCode({onNext, isEditing}: SubPageProps) {
                 InputComponent={IndustryCodeSelector}
                 inputID={COMPANY_INCORPORATION_CODE_KEY}
                 shouldSaveDraft={!isEditing}
-                defaultValue={isEditing ? reimbursementAccount?.achData?.industryCode : ''}
+                defaultValue={defaultCompanyIndustryCode}
             />
         </FormProvider>
     );
