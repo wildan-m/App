@@ -9,11 +9,11 @@ import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import Navigation from '@libs/Navigation/Navigation';
-import {getWorkflowApprovalsUnavailable, isControlPolicy} from '@libs/PolicyUtils';
+import {canMarkNonReimbursableReportsAsPaid, getWorkflowApprovalsUnavailable, isControlPolicy} from '@libs/PolicyUtils';
 
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 
-import {enableAutoApprovalOptions, enablePolicyAutoReimbursementLimit, setPolicyPreventSelfApproval} from '@userActions/Policy/Policy';
+import {enableAutoApprovalOptions, enablePolicyAutoReimbursementLimit, setPolicyMarkNonReimbursableReportsAsPaid, setPolicyPreventSelfApproval} from '@userActions/Policy/Policy';
 
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -164,6 +164,19 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                     />
                 </OfflineWithFeedback>,
             ],
+        },
+        {
+            title: translate('workspace.rules.expenseReportRules.markNonReimbursableReportsAsPaidTitle'),
+            subtitle: translate('workspace.rules.expenseReportRules.markNonReimbursableReportsAsPaidSubtitle'),
+            switchAccessibilityLabel: translate('workspace.rules.expenseReportRules.markNonReimbursableReportsAsPaidTitle'),
+            isActive: canMarkNonReimbursableReportsAsPaid(policy),
+            onToggle: (isEnabled: boolean) => {
+                setPolicyMarkNonReimbursableReportsAsPaid(policyID, isEnabled, policy?.shouldMarkNonReimbursableReportsAsPaid);
+            },
+            disabled: !canWritePayments,
+            disabledAction: withPaymentsReadOnlyFallback(),
+            showLockIcon: !canWritePayments,
+            pendingAction: policy?.pendingFields?.shouldMarkNonReimbursableReportsAsPaid ?? policy?.pendingAction,
         },
     ];
 

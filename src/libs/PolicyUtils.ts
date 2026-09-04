@@ -2772,6 +2772,14 @@ function getWorkflowApprovalsUnavailable(policy: OnyxEntry<Policy>) {
     return policy?.approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL || !!policy?.errorFields?.approvalMode;
 }
 
+/**
+ * Whether reports made up entirely of non-reimbursable expenses can be marked as paid on this policy.
+ * The workspace setting is enabled by default, so an unset value keeps the existing behavior.
+ */
+function canMarkNonReimbursableReportsAsPaid(policy: OnyxInputOrEntry<Policy>) {
+    return policy?.shouldMarkNonReimbursableReportsAsPaid ?? true;
+}
+
 function getUserFriendlyWorkspaceType(workspaceType: ValueOf<typeof CONST.POLICY.TYPE>, translate: LocalizedTranslate) {
     switch (workspaceType) {
         case CONST.POLICY.TYPE.CORPORATE:
@@ -3302,6 +3310,7 @@ export {
     getTagApproverRule,
     getDomainNameForPolicy,
     hasSupportedOnlyOnOldDotIntegration,
+    canMarkNonReimbursableReportsAsPaid,
     getWorkflowApprovalsUnavailable,
     getNetSuiteImportCustomFieldLabel,
     getUserFriendlyWorkspaceType,

@@ -7809,6 +7809,8 @@ ${reportName}`,
                 autoPayApprovedReportsLockedSubtitle: '「その他の機能」に移動してワークフローを有効にし、その後「支払い」を追加してこの機能を有効化してください。',
                 autoPayReportsUnderTitle: '自動支払いレポートの対象:',
                 autoPayReportsUnderDescription: 'この金額以下で完全準拠の経費精算書は、自動的に支払われます。',
+                markNonReimbursableReportsAsPaidTitle: '返金対象外のレポートを支払い済みとしてマークする',
+                markNonReimbursableReportsAsPaidSubtitle: 'すべての支出が返金対象外であるレポートを支払い済みとしてマークするオプションを表示します。',
                 unlockFeatureEnableWorkflowsSubtitle: (featureName: string) => `この機能を利用するには、${featureName} を追加してください。`,
                 enableFeatureSubtitle: (featureName: string, moreFeaturesLink?: string) =>
                     `[その他の機能](${moreFeaturesLink})に移動し、${featureName} を有効にしてこの機能を利用できるようにしてください。`,

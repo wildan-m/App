@@ -7,6 +7,7 @@ import type {ValueOf} from 'type-fest';
 
 import {
     arePaymentsEnabled as arePaymentsEnabledUtils,
+    canMarkNonReimbursableReportsAsPaid,
     canMemberWrite,
     getManagerAccountID,
     getSubmitToAccountID,
@@ -257,7 +258,7 @@ function isPrimaryPayAction({
         isExpenseReport &&
         arePaymentsEnabled &&
         isReportFinished &&
-        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, reportTransactions)))
+        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && canMarkNonReimbursableReportsAsPaid(policy) && hasOnlyNonReimbursableTransactions(report?.reportID, reportTransactions)))
     ) {
         return isSecondaryAction ?? !didExportFail;
     }

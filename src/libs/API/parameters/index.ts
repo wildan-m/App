@@ -416,6 +416,7 @@ export type {default as StartIssueNewCardFlowParams} from './StartIssueNewCardFl
 export type {default as ConnectAsDelegateParams} from './ConnectAsDelegateParams';
 export type {default as SetPolicyRulesEnabledParams} from './SetPolicyRulesEnabledParams';
 export type {default as SetPolicyDefaultReportTitleParams} from './SetPolicyDefaultReportTitle';
+export type {default as SetPolicyMarkNonReimbursableReportsAsPaidParams} from './SetPolicyMarkNonReimbursableReportsAsPaid';
 export type {default as SetPolicyPreventSelfApprovalParams} from './SetPolicyPreventSelfApproval';
 export type {default as SetPolicyAutomaticApprovalLimitParams} from './SetPolicyAutomaticApprovalLimit';
 export type {default as SetPolicyAutomaticApprovalRateParams} from './SetPolicyAutomaticApprovalRate';

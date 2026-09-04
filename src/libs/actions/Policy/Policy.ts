@@ -50,6 +50,7 @@ import type {
     SetPolicyBillableModeParams,
     SetPolicyDefaultReportTitleParams,
     SetPolicyPreventMemberCreatedTitleParams,
+    SetPolicyMarkNonReimbursableReportsAsPaidParams,
     SetPolicyPreventSelfApprovalParams,
     SetPolicyProhibitedExpensesParams,
     SetPolicyRulesEnabledParams,
@@ -7302,6 +7303,72 @@ function setPolicyPreventSelfApproval(policyID: string, preventSelfApproval: boo
 }
 
 /**
+ * Call the API to enable or disable marking reports made up entirely of non-reimbursable expenses as paid
+ * @param policyID - id of the policy to update
+ * @param shouldMarkNonReimbursableReportsAsPaid - whether the mark as paid option should be offered for those reports
+ * @param currentShouldMarkNonReimbursableReportsAsPaid - current value of the setting, used to restore it if the request fails
+ */
+function setPolicyMarkNonReimbursableReportsAsPaid(policyID: string, shouldMarkNonReimbursableReportsAsPaid: boolean, currentShouldMarkNonReimbursableReportsAsPaid: boolean | undefined) {
+    if (shouldMarkNonReimbursableReportsAsPaid === currentShouldMarkNonReimbursableReportsAsPaid) {
+        return;
+    }
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                shouldMarkNonReimbursableReportsAsPaid,
+                pendingFields: {
+                    shouldMarkNonReimbursableReportsAsPaid: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                pendingFields: {
+                    shouldMarkNonReimbursableReportsAsPaid: null,
+                },
+                errorFields: null,
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+            value: {
+                // The setting is enabled by default, so an unset value must be restored as enabled rather than as false.
+                shouldMarkNonReimbursableReportsAsPaid: currentShouldMarkNonReimbursableReportsAsPaid ?? true,
+                pendingFields: {
+                    shouldMarkNonReimbursableReportsAsPaid: null,
+                },
+                errorFields: {
+                    shouldMarkNonReimbursableReportsAsPaid: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                },
+            },
+        },
+    ];
+
+    const parameters: SetPolicyMarkNonReimbursableReportsAsPaidParams = {
+        shouldMarkNonReimbursableReportsAsPaid,
+        policyID,
+    };
+
+    API.write(WRITE_COMMANDS.SET_POLICY_MARK_NON_REIMBURSABLE_REPORTS_AS_PAID, parameters, {
+        optimisticData,
+        successData,
+        failureData,
+    });
+}
+
+/**
  * Call the API to apply automatic approval limit for the given policy
  * @param policyID - id of the policy to apply the limit to
  * @param limit - max amount for auto-approval of the reports in the given policy
@@ -8011,6 +8078,7 @@ export {
     setPolicyDefaultReportTitle,
     clearQBDErrorField,
     setPolicyPreventMemberCreatedTitle,
+    setPolicyMarkNonReimbursableReportsAsPaid,
     setPolicyPreventSelfApproval,
     setPolicyAutomaticApprovalLimit,
     setPolicyAutomaticApprovalRate,

@@ -19,6 +19,7 @@ import {getIsOffline} from '@libs/NetworkState';
 import {buildOptimisticNextStep} from '@libs/NextStepUtils';
 import {
     arePaymentsEnabled,
+    canMarkNonReimbursableReportsAsPaid,
     canMemberWrite,
     getAccountIDForSubmitManagerEmail,
     getSubmitReportManagerAccountID,
@@ -263,7 +264,8 @@ function canIOUBePaid(
     const isReportFinished = (isApproved || isClosed) && !iouReport?.isWaitingOnBankAccount;
     const isIOU = isIOUReport(iouReport);
     const canShowMarkedAsPaidForNegativeAmount = onlyShowPayElsewhere && reimbursableSpend < 0;
-    const isOnlyNonReimbursablePayElsewhere = onlyShowPayElsewhere && nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(iouReport?.reportID, transactions);
+    const isOnlyNonReimbursablePayElsewhere =
+        onlyShowPayElsewhere && nonReimbursableSpend !== 0 && canMarkNonReimbursableReportsAsPaid(policy) && hasOnlyNonReimbursableTransactions(iouReport?.reportID, transactions);
 
     if (isIOU && canPay && !iouSettled && reimbursableSpend > 0) {
         return true;

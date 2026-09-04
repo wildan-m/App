@@ -6,6 +6,7 @@ import type {ValueOf} from 'type-fest';
 
 import {
     arePaymentsEnabled,
+    canMarkNonReimbursableReportsAsPaid,
     canMemberWrite,
     getSubmitToAccountID,
     getValidConnectedIntegration,
@@ -163,7 +164,7 @@ function canPay(
         canPayReport &&
         isPaymentsEnabled &&
         isReportFinished &&
-        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, transactions)))
+        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && canMarkNonReimbursableReportsAsPaid(policy) && hasOnlyNonReimbursableTransactions(report?.reportID, transactions)))
     ) {
         return !didExportFail;
     }
