@@ -682,9 +682,11 @@ const config = defineConfig([
         rules: {'report-name-utils/no-function-call-in-get-report-name': 'error'},
     },
 
-    // The typography token files are where raw font sizes and line heights are defined.
+    // The typography token file is where the scale composes raw sizes, so the rule stays off there.
+    // variables.ts is NOT exempt: the rule flags its fontSize*/lineHeight* keys, seatbelted at the
+    // current count, so new raw size keys fail lint while the grandfathered ones await migration.
     {
-        files: ['src/styles/typography.ts', 'src/styles/variables.ts'],
+        files: ['src/styles/typography.ts'],
         rules: {
             'rulesdir/no-raw-typography': 'off',
         },

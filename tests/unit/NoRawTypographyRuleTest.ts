@@ -53,16 +53,21 @@ const tsRuleTester = new RuleTester({
 describe('no-raw-typography', () => {
     ruleTester.run(ruleModule.name, ruleModule, {
         valid: [
-            'const style = {fontSize: variables.fontSizeNormal};',
             'const style = {fontSize: fontScale.text, lineHeight: lineHeightScale.text};',
             'const style = {...textVariants.h1, color: theme.heading};',
             'const style = {lineHeight: undefined};',
             'const style = {lineHeight: getLineHeight(size)};',
             'const style = {[fontSize]: 17};',
             'const style = {fontWeight: 700, height: 20, size: 17};',
+            'const style = {height: variables.inputHeight, fontSize: fontScale.text};',
+            'const style = {fontSize: sizes.fontSizeNormal};',
             'const jsx = <Text variant="body">hi</Text>;',
-            'const jsx = <Text fontSize={variables.fontSizeNormal}>hi</Text>;',
+            'const jsx = <Text fontSize={fontScale.text}>hi</Text>;',
             'const jsx = <Icon width={16} height={16} />;',
+            {
+                filename: 'src/styles/variables.ts',
+                code: 'export default {iconSizeSmall: 16, inputHeight: 52};',
+            },
         ],
         invalid: [
             {
@@ -101,12 +106,38 @@ describe('no-raw-typography', () => {
                 code: 'const jsx = <CustomText lineHeight={20}>hi</CustomText>;',
                 errors: [{messageId: 'rawTypography'}],
             },
+            {
+                code: 'const style = {fontSize: variables.fontSizeNormal};',
+                errors: [{messageId: 'rawTypography'}],
+            },
+            {
+                code: 'const style = {lineHeight: variables.lineHeightXLarge};',
+                errors: [{messageId: 'rawTypography'}],
+            },
+            {
+                code: 'const jsx = <Text fontSize={variables.fontSizeNormal}>hi</Text>;',
+                errors: [{messageId: 'rawTypography'}],
+            },
+            {
+                filename: 'src/styles/variables.ts',
+                code: 'export default {fontSizeNewThing: 21};',
+                errors: [{messageId: 'rawVariableKey'}],
+            },
+            {
+                filename: 'src/styles/variables.ts',
+                code: 'export default {lineHeightNewThing: 24};',
+                errors: [{messageId: 'rawVariableKey'}],
+            },
         ],
     });
 
     tsRuleTester.run(`${ruleModule.name} (TS assertions)`, ruleModule, {
-        valid: ['const style = {fontSize: variables.fontSizeNormal as number};'],
+        valid: ['const style = {fontSize: fontScale.text as number};'],
         invalid: [
+            {
+                code: 'const style = {fontSize: variables.fontSizeNormal as number};',
+                errors: [{messageId: 'rawTypography'}],
+            },
             {
                 code: 'const style = {fontSize: 17 as const};',
                 errors: [{messageId: 'rawTypography'}],

@@ -520,8 +520,8 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         textExtraSmall: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeExtraSmall,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.finePrint,
         },
 
         textMicro: {
@@ -551,14 +551,16 @@ const staticStyles = (theme: ThemeColors) =>
 
         textExtraSmallSupporting: {
             color: theme.textSupporting,
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeExtraSmall,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.finePrint,
+            // lineHeightXSmall has no scale token; changing it needs design sign-off.
             lineHeight: variables.lineHeightXSmall,
         },
         textDoubleDecker: {
-            fontSize: variables.fontSizeSmall,
+            fontSize: fontScale.micro,
             opacity: 0.8,
             fontWeight: FontUtils.fontWeight.bold,
+            // Equals lineHeightScale.finePrint, but pairing that token with the micro font size needs design sign-off.
             lineHeight: 12,
         },
         noPaddingBottom: {
@@ -574,25 +576,25 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         textLarge: {
-            fontSize: variables.fontSizeLarge,
+            fontSize: fontScale.pageHeader,
         },
 
         textXLarge: {
-            fontSize: variables.fontSizeXLarge,
+            fontSize: fontScale.h1,
         },
 
         textXLargeThemeText: {
             color: theme.text,
-            fontSize: variables.fontSizeXLarge,
+            fontSize: fontScale.h1,
         },
 
         textXXLarge: {
-            fontSize: variables.fontSizeXXLarge,
+            fontSize: fontScale.display,
         },
 
         textXXXLarge: {
-            fontSize: variables.fontSizeXXXLarge,
-            lineHeight: variables.lineHeightXXXLarge,
+            fontSize: fontScale.displayLarge,
+            lineHeight: lineHeightScale.displayLarge,
         },
 
         textHero: {
@@ -1583,9 +1585,9 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         textInputLabel: {
-            fontSize: variables.fontSizeNormal,
+            fontSize: fontScale.text,
             color: theme.textSupporting,
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
+            ...fontFamilyScale.regular,
         },
 
         textInputLabelBackground: {
@@ -1667,15 +1669,15 @@ const staticStyles = (theme: ThemeColors) =>
 
         textInputPrefix: {
             color: theme.text,
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeNormal,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.text,
             verticalAlign: 'middle',
         },
 
         textInputSuffix: {
             color: theme.text,
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeNormal,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.text,
             verticalAlign: 'middle',
         },
 
@@ -1710,20 +1712,20 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         textLabelSupporting: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeLabel,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.label,
             color: theme.textSupporting,
         },
 
         textLabelSupportingEmptyValue: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeNormal,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.text,
             color: theme.textSupporting,
         },
 
         textLabelSupportingNormal: {
-            ...FontUtils.fontFamily.platform.EXP_NEUE,
-            fontSize: variables.fontSizeLabel,
+            ...fontFamilyScale.regular,
+            fontSize: fontScale.label,
             color: theme.textSupporting,
         },
 
@@ -1968,8 +1970,8 @@ const staticStyles = (theme: ThemeColors) =>
 
         topBarLabel: {
             color: theme.text,
-            fontSize: variables.fontSizeH2,
-            lineHeight: variables.lineHeightSizeH2,
+            fontSize: fontScale.h2,
+            lineHeight: lineHeightScale.h2,
             ...headlineFont,
         },
 
@@ -3462,7 +3464,7 @@ const staticStyles = (theme: ThemeColors) =>
 
         moneyRequestConfirmationAmount: {
             ...headlineFont,
-            fontSize: variables.fontSizeH1,
+            fontSize: fontScale.h2,
         },
 
         moneyRequestMenuItem: {

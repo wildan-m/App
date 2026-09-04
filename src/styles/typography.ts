@@ -17,6 +17,8 @@ const fontScale = {
     pageHeader: variables.fontSizeLarge,
     h2: variables.fontSizeH2,
     h1: variables.fontSizeXLarge,
+    display: variables.fontSizeXXLarge,
+    displayLarge: variables.fontSizeXXXLarge,
     introHeadline: variables.fontSizeHero,
 } as const;
 
@@ -28,6 +30,7 @@ const lineHeightScale = {
     pageHeader: variables.lineHeightXLarge,
     h2: variables.lineHeightSizeH2,
     h1: variables.lineHeightSizeH1,
+    displayLarge: variables.lineHeightXXXLarge,
     introHeadline: variables.lineHeightHero,
 } as const;
 
