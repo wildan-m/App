@@ -493,6 +493,19 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
 
     // append shared video element to new parent (used for example in attachment modal)
     useEffect(() => {
+        if (shouldUseSharedVideoElement) {
+            console.log(
+                '[DBG100377] append/adopt effect ' +
+                    JSON.stringify({
+                        urlMatch: url === currentlyPlayingURL,
+                        url,
+                        currentlyPlayingURL,
+                        hasSharedElement: !!sharedElement,
+                        contextPlayerNull: currentVideoPlayerRef.current === null,
+                        isFullScreen: isFullScreenRef.current,
+                    }),
+            );
+        }
         // Read via ref so fullscreen toggle does NOT re-run this effect and trigger cleanup,
         // which would move the shared element away from the attachment modal mid-fullscreen.
         if (url !== currentlyPlayingURL || !sharedElement || isFullScreenRef.current) {
