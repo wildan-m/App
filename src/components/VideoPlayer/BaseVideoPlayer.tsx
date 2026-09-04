@@ -311,13 +311,16 @@ function BaseVideoPlayer(props: BaseVideoPlayerProps) {
         setHasErrorIconVisible(false);
         if (isFirstLoad) {
             setIsFirstLoad(false);
-            console.log('[DBG100377] readyToPlay autoplay check', {
-                isContextPlayer: videoPlayerRef.current === currentVideoPlayerRef.current,
-                contextRefNull: currentVideoPlayerRef.current === null,
-                isUploading,
-                isOffline,
-                url,
-            });
+            console.log(
+                '[DBG100377] readyToPlay autoplay check ' +
+                    JSON.stringify({
+                        isContextPlayer: videoPlayerRef.current === currentVideoPlayerRef.current,
+                        contextRefNull: currentVideoPlayerRef.current === null,
+                        isUploading,
+                        isOffline,
+                        url,
+                    }),
+            );
             if (videoPlayerRef.current === currentVideoPlayerRef.current && !isUploading && !isOffline) {
                 playVideo();
             }
