@@ -333,10 +333,21 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
 
     const filteredMembers = useMemo(() => {
         const shouldFilter = shouldFilterExpensifyTeam(policyOwner, currentUserLogin);
+        const employeeList = policy?.employeeList ?? {};
+        const primaryLoginsInvited = policy?.primaryLoginsInvited ?? {};
         const result: Array<{email: string; policyEmployee: PolicyEmployee; accountID: number; details: PersonalDetails}> = [];
 
-        for (const [email, policyEmployee] of Object.entries(policy?.employeeList ?? {})) {
+        for (const [email, policyEmployee] of Object.entries(employeeList)) {
             if (isDeletedPolicyEmployee(policyEmployee, isOffline)) {
+                continue;
+            }
+
+            // A member invited by one of their secondary logins is added by the backend under their primary login, while the
+            // optimistically written secondary entry stays behind, so the same person would be listed twice. primaryLoginsInvited
+            // records that secondary -> primary mapping, so skip the secondary entry, but only when the paired primary login is
+            // actually in the list, so a member can never disappear from the page.
+            const pairedPrimaryLogin = primaryLoginsInvited[email];
+            if (pairedPrimaryLogin && pairedPrimaryLogin in employeeList) {
                 continue;
             }
 
@@ -366,7 +377,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             result.push({email, policyEmployee, accountID, details});
         }
         return result;
-    }, [policy?.employeeList, policyMemberEmailsToAccountIDs, isOffline, personalDetails, policyOwner, currentUserLogin, formatPhoneNumber]);
+    }, [policy?.employeeList, policy?.primaryLoginsInvited, policyMemberEmailsToAccountIDs, isOffline, personalDetails, policyOwner, currentUserLogin, formatPhoneNumber]);
 
     const hasAnyCustomField1 = useMemo(() => filteredMembers.some(({policyEmployee}) => !!policyEmployee.employeeUserID), [filteredMembers]);
     const hasAnyCustomField2 = useMemo(() => filteredMembers.some(({policyEmployee}) => !!policyEmployee.employeePayrollID), [filteredMembers]);
@@ -503,7 +514,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     // eslint-disable-next-line @typescript-eslint/naming-convention
                     messages={{0: translate('workspace.people.addedWithPrimary')}}
                     containerStyles={[styles.pb5, styles.ph5]}
-                    onDismiss={() => dismissAddedWithPrimaryLoginMessages(policyID)}
+                    onDismiss={() => dismissAddedWithPrimaryLoginMessages(policyID, policy)}
                 />
             )}
         </View>

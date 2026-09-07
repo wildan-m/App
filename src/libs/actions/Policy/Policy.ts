@@ -4359,8 +4359,21 @@ function clearErrors(policyID: string) {
 /**
  * Dismiss the informative messages about which policy members were added with primary logins when invited with their secondary login.
  */
-function dismissAddedWithPrimaryLoginMessages(policyID: string) {
-    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {primaryLoginsInvited: null});
+function dismissAddedWithPrimaryLoginMessages(policyID: string, policy: OnyxEntry<Policy>) {
+    // A member invited by a secondary login is optimistically written to the employeeList under that secondary login, while the
+    // backend adds them under their primary login, so the leftover secondary entry stays behind. primaryLoginsInvited is the only
+    // record of which entries those are, so the leftovers have to be cleared together with it, otherwise they would outlive the
+    // mapping and be rendered as duplicate members.
+    const employeeList = policy?.employeeList ?? {};
+    const staleSecondaryLogins: Record<string, null> = {};
+    for (const [secondaryLogin, primaryLogin] of Object.entries(policy?.primaryLoginsInvited ?? {})) {
+        // Only drop the secondary entry when the member is provably still listed under their primary login.
+        if (secondaryLogin === primaryLogin || !(secondaryLogin in employeeList) || !(primaryLogin in employeeList)) {
+            continue;
+        }
+        staleSecondaryLogins[secondaryLogin] = null;
+    }
+    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {primaryLoginsInvited: null, employeeList: staleSecondaryLogins});
 }
 
 /**
