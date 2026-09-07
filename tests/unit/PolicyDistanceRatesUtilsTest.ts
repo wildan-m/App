@@ -110,6 +110,25 @@ describe('PolicyDistanceRatesUtils', () => {
             // A snapshot missing its rate amount alongside an unset rate must not be reported as unmodified.
             expect(isGovernmentRateUnmodified(buildRate({rate: undefined}, {sourceRateID: 'US_2026-01-01', startDate: '2026-01-01', endDate: '2026-12-31'}))).toBe(false);
         });
+
+        it('should return true when the amount only differs by the kilometers to miles conversion of a distance unit switch', () => {
+            // Switching the workspace default currency from CAD to USD converts the per kilometer rate of CA$0.73 into the
+            // per mile amount of $1.1748, while the snapshot keeps the per kilometer amount it was published with.
+            const governmentRate = {sourceRateID: 'CA_2026-01-01', rate: 73, startDate: '2026-01-01', endDate: '2026-12-31'};
+            expect(isGovernmentRateUnmodified(buildRate({rate: 117.48}, governmentRate))).toBe(true);
+        });
+
+        it('should return true when the amount only differs by the miles to kilometers conversion of a distance unit switch', () => {
+            // The reverse switch converts the per mile rate of $1.1748 back into the per kilometer amount of CA$0.73.
+            const governmentRate = {sourceRateID: 'US_2026-01-01', rate: 117.48, startDate: '2026-01-01', endDate: '2026-12-31'};
+            expect(isGovernmentRateUnmodified(buildRate({rate: 73}, governmentRate))).toBe(true);
+        });
+
+        it('should return false when the amount is edited to a value that matches the snapshot in neither distance unit', () => {
+            const governmentRate = {sourceRateID: 'CA_2026-01-01', rate: 73, startDate: '2026-01-01', endDate: '2026-12-31'};
+            expect(isGovernmentRateUnmodified(buildRate({rate: 90}, governmentRate))).toBe(false);
+            expect(isGovernmentRateUnmodified(buildRate({rate: 120}, governmentRate))).toBe(false);
+        });
     });
 
     describe('getGovernmentRateCountryForCurrency', () => {

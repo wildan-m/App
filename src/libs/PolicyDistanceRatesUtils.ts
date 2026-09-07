@@ -186,9 +186,38 @@ function getRateStatus(rate: Rate): string {
 }
 
 /**
+ * A unit-converted amount is re-rounded to the rate precision (amounts are stored as `Number(value) * 100` and accept
+ * `MAX_TAX_RATE_DECIMAL_PLACES` decimals), so comparing against a converted snapshot has to absorb up to half of that
+ * rounding step on top of the usual floating-point tolerance.
+ */
+const GOVERNMENT_RATE_CONVERTED_MATCH_TOLERANCE = 100 / 10 ** CONST.MAX_TAX_RATE_DECIMAL_PLACES / 2 + CONST.CUSTOM_UNITS.GOVERNMENT_RATE_MATCH_TOLERANCE;
+
+/**
+ * Whether a rate amount still matches the amount of the government-published snapshot it was copied from, in the
+ * workspace's current distance unit or in the one the snapshot was published in.
+ */
+function isGovernmentRateAmountMatching(rateAmount: number, governmentRateAmount: number): boolean {
+    // The submit path stores the amount as `Number(value) * 100`, which can introduce tiny floating-point errors (e.g. restoring
+    // 0.29 yields 28.999999999999996), so compare amounts within a tolerance rather than requiring strict equality.
+    if (Math.abs(rateAmount - governmentRateAmount) < CONST.CUSTOM_UNITS.GOVERNMENT_RATE_MATCH_TOLERANCE) {
+        return true;
+    }
+
+    // Changing the workspace default currency also switches the workspace distance unit and converts every existing rate amount
+    // into it, while the snapshot keeps the amount in the unit it was published in. That conversion is done by the app, not by an
+    // admin, so an amount matching the snapshot converted between kilometers and miles in either direction still counts as
+    // unmodified. An amount edited to anything else matches neither unit and still drops the auto-generated status.
+    return (
+        Math.abs(rateAmount - governmentRateAmount * CONST.CUSTOM_UNITS.MILES_TO_KILOMETERS) < GOVERNMENT_RATE_CONVERTED_MATCH_TOLERANCE ||
+        Math.abs(rateAmount - governmentRateAmount * CONST.CUSTOM_UNITS.KILOMETERS_TO_MILES) < GOVERNMENT_RATE_CONVERTED_MATCH_TOLERANCE
+    );
+}
+
+/**
  * Whether a government-managed rate still matches the government-published snapshot it was copied from.
  * Returns true only when the rate amount, start date, and end date each match the snapshot in attributes.governmentRate.
- * The amount is compared within a small tolerance to absorb floating-point noise from the stored cents value.
+ * The amount is compared within a small tolerance to absorb floating-point noise from the stored cents value, and also against
+ * the snapshot amount converted between kilometers and miles so an app-side distance unit switch is not read as an edit.
  * A date omitted on both sides counts as a match; a date omitted on only one side does not.
  */
 function isGovernmentRateUnmodified(rate: Rate): boolean {
@@ -199,11 +228,9 @@ function isGovernmentRateUnmodified(rate: Rate): boolean {
         return false;
     }
 
-    // The submit path stores the amount as `Number(value) * 100`, which can introduce tiny floating-point errors (e.g. restoring
-    // 0.29 yields 28.999999999999996), so compare amounts within a tolerance rather than requiring strict equality.
-    const isRateAmountMatching = Math.abs(rate.rate - governmentRate.rate) < CONST.CUSTOM_UNITS.GOVERNMENT_RATE_MATCH_TOLERANCE;
-
-    return isRateAmountMatching && (rate.startDate ?? undefined) === governmentRate.startDate && (rate.endDate ?? undefined) === governmentRate.endDate;
+    return (
+        isGovernmentRateAmountMatching(rate.rate, governmentRate.rate) && (rate.startDate ?? undefined) === governmentRate.startDate && (rate.endDate ?? undefined) === governmentRate.endDate
+    );
 }
 
 /** The country publishing government mileage rates for a currency, or undefined when we can't auto-update them. */
