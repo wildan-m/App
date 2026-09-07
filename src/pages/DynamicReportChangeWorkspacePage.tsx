@@ -74,7 +74,7 @@ function DynamicReportChangeWorkspacePage({report}: DynamicReportChangeWorkspace
     const styles = useThemeStyles();
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const {translate, localeCompare} = useLocalize();
-    const {getCurrencyDecimals} = useCurrencyListActions();
+    const {getCurrencyDecimals, getCurrencySymbol} = useCurrencyListActions();
     const reportTransactions = useReportTransactions(reportID);
 
     const reportPreviewAction = useParentReportAction(report);
@@ -87,6 +87,8 @@ function DynamicReportChangeWorkspacePage({report}: DynamicReportChangeWorkspace
     const shouldSkipChangePolicyTrainingModal = isChangePolicyTrainingModalDismissed || shouldSuppressPromotionalUI;
     const isAppLoadPending = useIsAppLoadPending();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
+    const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
+    const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
     const isReportLastVisibleArchived = useReportIsArchived(report?.parentReportID);
     const ownerAccountID = report?.ownerAccountID;
     const managerID = report?.managerID;
@@ -144,6 +146,9 @@ function DynamicReportChangeWorkspacePage({report}: DynamicReportChangeWorkspace
         }
         Navigation.goBack(navigateBackFromChangeWorkspacePath);
         const filteredReportActions = getAllPolicyExpenseChatReportActions(allReports, allReportActions);
+        const currentPolicy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
+        const policyTagList = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`];
+        const policyCategories = allPolicyCategories?.[`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`];
         if (isIOUReport(reportID)) {
             const invite = moveIOUReportToPolicyAndInviteSubmitter(
                 report,
@@ -188,6 +193,11 @@ function DynamicReportChangeWorkspacePage({report}: DynamicReportChangeWorkspace
                 reportPreviewAction,
                 isTrackIntentUser,
                 reportTransactions,
+                currentPolicy,
+                policyTagList,
+                policyCategories,
+                transactionViolations,
+                getCurrencySymbol,
             });
             refreshSearch();
             return;
@@ -209,6 +219,11 @@ function DynamicReportChangeWorkspacePage({report}: DynamicReportChangeWorkspace
             reportPreviewAction,
             isTrackIntentUser,
             reportTransactions,
+            currentPolicy,
+            policyTagList,
+            policyCategories,
+            transactionViolations,
+            getCurrencySymbol,
         });
         refreshSearch();
     };

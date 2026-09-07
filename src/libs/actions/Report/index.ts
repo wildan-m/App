@@ -60,6 +60,7 @@ import * as Browser from '@libs/Browser';
 import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types';
 import {getCurrencyDecimals as getCurrencyDecimalsUtil} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import * as Environment from '@libs/Environment/Environment';
 import {getOldDotURLFromEnvironment} from '@libs/Environment/Environment';
 import getEnvironment from '@libs/Environment/getEnvironment';
@@ -69,6 +70,8 @@ import fileDownload from '@libs/fileDownload';
 import {getExportFileName} from '@libs/fileDownload/FileUtils';
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
 import HttpUtils from '@libs/HttpUtils';
+import {toLocaleDigit} from '@libs/LocaleDigitUtils';
+import {translateLocal} from '@libs/Localize';
 import Log from '@libs/Log';
 import {isEmailPublicDomain} from '@libs/LoginUtils';
 import {getMovedReportID} from '@libs/ModifiedExpenseMessage';
@@ -83,7 +86,7 @@ import enhanceParameters from '@libs/Network/enhanceParameters';
 import {getDBTimeWithSkew, getIsOffline as isOfflineNetwork} from '@libs/NetworkState';
 import {buildOptimisticNextStep} from '@libs/NextStepUtils';
 import LocalNotification from '@libs/Notification/LocalNotification';
-import {rand64} from '@libs/NumberUtils';
+import {rand64, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {isSupportedInviteOnboardingChoice, isSupportedPendingInviteOnboarding} from '@libs/OnboardingUtils';
 import capturePageHTML from '@libs/PageHTMLCapture';
 import {prunePagesToNewestWindow} from '@libs/PaginationUtils';
@@ -95,6 +98,7 @@ import {
     getDefaultApprover,
     getMemberAccountIDsForWorkspace,
     getSubmitToAccountID,
+    hasDependentTags,
     isInstantSubmitEnabled,
     isPolicyAdmin as isPolicyAdminPolicyUtils,
     isPolicyMember,
@@ -180,8 +184,11 @@ import playSound, {SOUNDS} from '@libs/Sound';
 import {
     getAmount,
     getCurrency,
+    getDistanceInMeters,
     getNegatedAmountTransaction,
     hasAppliedCommuterExclusion,
+    isDistanceRequest,
+    isFetchingWaypointsFromServer,
     isOnHold,
     isManualDistanceRequest,
     isOdometerDistanceRequest,
@@ -190,6 +197,7 @@ import {
 } from '@libs/TransactionUtils';
 import {appendParam, getSearchParamFromPath} from '@libs/Url';
 import {buildSecureDownloadURL} from '@libs/UrlUtils';
+import ViolationsUtils from '@libs/Violations/ViolationsUtils';
 import Visibility from '@libs/Visibility';
 
 import {cacheAttachment, removeCachedAttachment} from '@userActions/Attachment';
@@ -217,6 +225,7 @@ import type {OnboardingCompanySize, OnboardingMessage} from '@userActions/Welcom
 import CONFIG from '@src/CONFIG';
 import type {OnboardingAccounting} from '@src/CONST';
 import CONST from '@src/CONST';
+import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
@@ -7653,11 +7662,16 @@ function updatePolicyIdForReportAndThreads(
             | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
             | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
             | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
         >
     >,
     failureData: Array<
         OnyxUpdate<
-            typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
         >
     >,
 ) {
@@ -7708,6 +7722,11 @@ function buildOptimisticChangePolicyData({
     reportPreviewAction,
     isTrackIntentUser,
     getCurrencyDecimals,
+    currentPolicy,
+    policyTagList,
+    policyCategories,
+    transactionViolations,
+    getCurrencySymbol,
 }: {
     report: Report;
     parentReport: OnyxEntry<Report>;
@@ -7723,6 +7742,11 @@ function buildOptimisticChangePolicyData({
     reportPreviewAction: OnyxEntry<ReportAction>;
     isTrackIntentUser: boolean | undefined;
     getCurrencyDecimals: CurrencyListActionsContextType['getCurrencyDecimals'];
+    currentPolicy: OnyxEntry<Policy>;
+    policyTagList: OnyxEntry<PolicyTagLists>;
+    policyCategories: OnyxEntry<PolicyCategories>;
+    transactionViolations: OnyxCollection<TransactionViolations>;
+    getCurrencySymbol: CurrencyListActionsContextType['getCurrencySymbol'];
 }) {
     const optimisticData: Array<
         OnyxUpdate<
@@ -7731,12 +7755,17 @@ function buildOptimisticChangePolicyData({
             | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
             | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
             | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
         >
     > = [];
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION>> = [];
     const failureData: Array<
         OnyxUpdate<
-            typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.REPORT
+            | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS
+            | typeof ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION
+            | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
         >
     > = [];
 
@@ -8103,6 +8132,126 @@ function buildOptimisticChangePolicyData({
         });
     }
 
+    // 6b. Auto-select a valid distance rate on the destination policy for each distance transaction,
+    // recomputing the derived fields (amount, merchant, currency) and the violations so the report
+    // doesn't keep a stale rate or a customUnitOutOfPolicy violation while waiting for the server.
+    // The server is authoritative — Auth performs the same selection, this only mirrors it optimistically.
+    const policyHasDependentTags = hasDependentTags(policy, policyTagList);
+    for (const transaction of transactions) {
+        if (!isDistanceRequest(transaction)) {
+            continue;
+        }
+
+        const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
+        const currentRate = currentRateID ? DistanceRequestUtils.getRateByCustomUnitRateID({customUnitRateID: currentRateID, policy: currentPolicy}) : undefined;
+        const newRate = DistanceRequestUtils.getRateForPolicyChange({transaction, policy, currentRate});
+        if (!newRate?.customUnitRateID || newRate.customUnitRateID === currentRateID) {
+            continue;
+        }
+
+        // Build an updated transaction with the new rate so we can derive fields from it
+        const updatedTransaction: typeof transaction = {
+            ...transaction,
+            comment: {
+                ...transaction.comment,
+                customUnit: {
+                    ...transaction.comment?.customUnit,
+                    customUnitRateID: newRate.customUnitRateID,
+                    defaultP2PRate: undefined,
+                },
+            },
+        };
+
+        // Update distanceUnit if the new rate has a different unit, and convert distance if needed
+        const existingDistanceUnit = transaction.comment?.customUnit?.distanceUnit;
+        const newDistanceUnit = DistanceRequestUtils.getUpdatedDistanceUnit({transaction: updatedTransaction, policy});
+        if (updatedTransaction.comment?.customUnit) {
+            updatedTransaction.comment.customUnit.distanceUnit = newDistanceUnit;
+        }
+        if (existingDistanceUnit && newDistanceUnit !== existingDistanceUnit && !isOdometerDistanceRequest(transaction)) {
+            const conversionFactor = existingDistanceUnit === CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES ? CONST.CUSTOM_UNITS.MILES_TO_KILOMETERS : CONST.CUSTOM_UNITS.KILOMETERS_TO_MILES;
+            const distance = roundToTwoDecimalPlaces((transaction.comment?.customUnit?.quantity ?? 0) * conversionFactor);
+            if (updatedTransaction.comment?.customUnit) {
+                updatedTransaction.comment.customUnit.quantity = distance;
+            }
+        }
+
+        // Recalculate amount, merchant, and currency from the new rate
+        const optimisticValue: Partial<typeof transaction> = {
+            comment: updatedTransaction.comment,
+        };
+
+        if (!isFetchingWaypointsFromServer(transaction)) {
+            const {unit, rate} = newRate;
+            const distanceInMeters = getDistanceInMeters(updatedTransaction, unit);
+            const calculatedAmount = DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, rate ?? 0);
+            const updatedAmount = isExpenseReport(report) ? -calculatedAmount : calculatedAmount;
+            const updatedCurrency = newRate.currency ?? CONST.CURRENCY.USD;
+            const updatedMerchant = DistanceRequestUtils.getDistanceMerchant(
+                true,
+                distanceInMeters,
+                unit,
+                rate,
+                updatedCurrency,
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                translateLocal,
+                (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
+                getCurrencySymbol,
+                isManualDistanceRequest(transaction),
+            );
+
+            optimisticValue.amount = updatedAmount;
+            optimisticValue.modifiedAmount = updatedAmount;
+            optimisticValue.modifiedMerchant = updatedMerchant;
+            optimisticValue.modifiedCurrency = updatedCurrency;
+        }
+
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
+            value: optimisticValue,
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
+            value: {
+                comment: {
+                    customUnit: {
+                        customUnitRateID: currentRateID ?? null,
+                        defaultP2PRate: transaction.comment?.customUnit?.defaultP2PRate,
+                        distanceUnit: existingDistanceUnit,
+                        quantity: transaction.comment?.customUnit?.quantity,
+                    },
+                },
+                amount: transaction.amount,
+                modifiedAmount: transaction.modifiedAmount,
+                modifiedMerchant: transaction.modifiedMerchant,
+                modifiedCurrency: transaction.modifiedCurrency,
+            },
+        });
+
+        // Recompute the violations with the updated rate — the rate swap has to come first so
+        // getViolationsOnyxData rejects customUnitOutOfPolicy once the rate resolves.
+        const currentViolations = transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`] ?? [];
+        const violationData = ViolationsUtils.getViolationsOnyxData({
+            updatedTransaction: {...updatedTransaction, ...optimisticValue},
+            transactionViolations: currentViolations,
+            policy,
+            policyTagList: policyTagList ?? {},
+            policyCategories: policyCategories ?? {},
+            hasDependentTags: policyHasDependentTags,
+            isInvoiceTransaction: false,
+            shouldRemoveRejectedExpenseViolation: false,
+            ownerLogin: undefined,
+        });
+        optimisticData.push(violationData);
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transaction.transactionID}`,
+            value: currentViolations,
+        });
+    }
+
     // 7. Update report totals when source and destination currencies differ
     // Only include transactions that match the destination currency (their amounts can be used directly)
     if (sourceCurrency && destinationCurrency && sourceCurrency !== destinationCurrency) {
@@ -8205,6 +8354,11 @@ function changeReportPolicy({
     isTrackIntentUser,
     getCurrencyDecimals,
     reportTransactions,
+    currentPolicy,
+    policyTagList,
+    policyCategories,
+    transactionViolations,
+    getCurrencySymbol,
 }: {
     report: Report;
     parentReport: OnyxEntry<Report>;
@@ -8221,6 +8375,11 @@ function changeReportPolicy({
     isTrackIntentUser: boolean | undefined;
     getCurrencyDecimals: CurrencyListActionsContextType['getCurrencyDecimals'];
     reportTransactions: Transaction[];
+    currentPolicy: OnyxEntry<Policy>;
+    policyTagList: OnyxEntry<PolicyTagLists>;
+    policyCategories: OnyxEntry<PolicyCategories>;
+    transactionViolations: OnyxCollection<TransactionViolations>;
+    getCurrencySymbol: CurrencyListActionsContextType['getCurrencySymbol'];
 }) {
     if (!report || !policy || report.policyID === policy.id || !isExpenseReport(report) || shouldBlockChangeReportPolicyForMapOrGPSRequirement(reportTransactions, policy)) {
         return;
@@ -8240,6 +8399,11 @@ function changeReportPolicy({
         reportPreviewAction,
         isTrackIntentUser,
         getCurrencyDecimals,
+        currentPolicy,
+        policyTagList,
+        policyCategories,
+        transactionViolations,
+        getCurrencySymbol,
     });
 
     const params = {
@@ -8275,6 +8439,11 @@ function changeReportPolicyAndInviteSubmitter({
     isTrackIntentUser,
     getCurrencyDecimals,
     reportTransactions,
+    currentPolicy,
+    policyTagList,
+    policyCategories,
+    transactionViolations,
+    getCurrencySymbol,
 }: {
     report: Report;
     parentReport: OnyxEntry<Report>;
@@ -8292,6 +8461,11 @@ function changeReportPolicyAndInviteSubmitter({
     isTrackIntentUser: boolean | undefined;
     getCurrencyDecimals: CurrencyListActionsContextType['getCurrencyDecimals'];
     reportTransactions: Transaction[];
+    currentPolicy: OnyxEntry<Policy>;
+    policyTagList: OnyxEntry<PolicyTagLists>;
+    policyCategories: OnyxEntry<PolicyCategories>;
+    transactionViolations: OnyxCollection<TransactionViolations>;
+    getCurrencySymbol: CurrencyListActionsContextType['getCurrencySymbol'];
 }) {
     if (
         !report.reportID ||
@@ -8354,6 +8528,11 @@ function changeReportPolicyAndInviteSubmitter({
         reportPreviewAction,
         isTrackIntentUser,
         getCurrencyDecimals,
+        currentPolicy,
+        policyTagList,
+        policyCategories,
+        transactionViolations,
+        getCurrencySymbol,
     });
 
     const optimisticData = [...optimisticAddMembersData, ...optimisticChangePolicyData];

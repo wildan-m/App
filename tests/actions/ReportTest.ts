@@ -4860,6 +4860,11 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction: undefined,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
             expect(buildOptimisticNextStep).toHaveBeenCalledWith({
                 report,
@@ -4915,6 +4920,11 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction: undefined,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
 
             // Find the transaction optimistic data
@@ -4980,6 +4990,11 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction: undefined,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
 
             // Should NOT find transaction optimistic data when currencies are the same
@@ -5029,6 +5044,11 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction: undefined,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
 
             // Should NOT find transaction optimistic data when transaction matches destination currency
@@ -5091,6 +5111,11 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction: undefined,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
 
             // Should NOT find optimistic data for the matching transaction (USD matches USD destination)
@@ -5156,14 +5181,19 @@ describe('actions/Report', () => {
                 isReportLastVisibleArchived: undefined,
                 reportPreviewAction,
                 isTrackIntentUser: false,
+                currentPolicy: undefined,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionViolations: undefined,
+                getCurrencySymbol: TestHelper.getCurrencySymbolLocal,
             });
 
             const parentReportActionKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${parentReportID}`;
             const optimisticReportActionData = optimisticData.find((data) => data.key === parentReportActionKey);
             const failureReportActionData = failureData.find((data) => data.key === parentReportActionKey);
 
-            function isReportActions(value: OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>['value']): value is OnyxTypes.ReportActions {
-                return !!value && parentReportActionID in value;
+            function isReportActions(value: unknown): value is OnyxTypes.ReportActions {
+                return !!value && typeof value === 'object' && parentReportActionID in value;
             }
 
             expect(optimisticReportActionData).toBeDefined();

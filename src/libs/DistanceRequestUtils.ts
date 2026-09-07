@@ -622,6 +622,45 @@ function getBestEligibleRateOrPolicyDefault(mileageRates: Record<string, Mileage
 }
 
 /**
+ * Selects the distance rate to apply to a transaction when its policy changes.
+ * Selection order:
+ * 1. An enabled rate on the destination policy, valid for the expense date, whose value, currency
+ *    and unit all equal the transaction's current rate.
+ * 2. The destination policy's best eligible or default rate.
+ * 3. Undefined, leaving the rate unresolved (the customUnitOutOfPolicy violation stands).
+ * The server is authoritative — Auth performs the same selection when the policy changes, and this
+ * exists only to build optimistic data. Keep the two implementations in sync.
+ */
+function getRateForPolicyChange({
+    transaction,
+    policy,
+    currentRate,
+}: {
+    transaction: OnyxEntry<Transaction>;
+    policy: OnyxEntry<Policy>;
+    currentRate: MileageRate | undefined;
+}): MileageRate | undefined {
+    const expenseDate = transaction?.modifiedCreated || transaction?.created || '';
+    const mileageRates = getMileageRates(policy);
+
+    if (currentRate) {
+        const matchingRate = Object.values(mileageRates).find(
+            (rate) =>
+                rate.enabled !== false &&
+                isRateEligibleForDate(rate, expenseDate) &&
+                rate.rate === currentRate.rate &&
+                rate.currency === currentRate.currency &&
+                rate.unit === currentRate.unit,
+        );
+        if (matchingRate) {
+            return matchingRate;
+        }
+    }
+
+    return getBestEligibleRateOrPolicyDefault(mileageRates, expenseDate, policy);
+}
+
+/**
  * Returns custom unit rate ID for the distance transaction.
  * When an expenseDate is provided, uses date-aware rate selection:
  * 1. Last selected rate, if enabled and valid for the expense date
@@ -934,6 +973,7 @@ export default {
     isUnsetDistanceCustomUnitRateID,
     getBestEligibleRate,
     getRateDateLabel,
+    getRateForPolicyChange,
 };
 
 export type {MileageRate, CommuterExclusionData};
