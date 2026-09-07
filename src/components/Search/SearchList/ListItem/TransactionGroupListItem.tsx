@@ -65,7 +65,7 @@ import QuarterListItemHeader from './QuarterListItemHeader';
 import ReportListItemHeader from './ReportListItemHeader';
 import TagListItemHeader from './TagListItemHeader';
 import TransactionGroupListExpandedItem from './TransactionGroupListExpanded';
-import useGroupChildren from './useGroupChildren';
+import useGroupChildren, {useGroupPendingAction} from './useGroupChildren';
 import useLiveRowCapabilities from './useLiveRowCapabilities';
 import WeekListItemHeader from './WeekListItemHeader';
 import WithdrawalIDListItemHeader from './WithdrawalIDListItemHeader';
@@ -462,11 +462,7 @@ function TransactionGroupListItemImpl({
 
     useSyncFocus(pressableRef, !!isFocused, shouldSyncFocus);
 
-    const pendingAction =
-        item.pendingAction ??
-        (groupItem.transactions.length > 0 && groupItem.transactions.every((transaction) => isTransactionPendingDelete(transaction))
-            ? CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE
-            : undefined);
+    const pendingAction = useGroupPendingAction({itemPendingAction: item.pendingAction, groupTransactions: groupItem.transactions});
 
     const snapshotData = transactionsSnapshot?.data;
     const groupViolations: Record<string, TransactionViolations | undefined> = {};
