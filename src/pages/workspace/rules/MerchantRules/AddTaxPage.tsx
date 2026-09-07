@@ -4,7 +4,7 @@ import RuleTaxesDisabledEmptyState from '@components/Rule/RuleTaxesDisabledEmpty
 import useOnyx from '@hooks/useOnyx';
 
 import {updateDraftMerchantRule} from '@libs/actions/User';
-import {hasUsableTaxRates, isCategoryRuleDraft} from '@libs/CategoryTaxRulesUtils';
+import {getCategoryTaxRuleTaxID, hasUsableTaxRates, isCategoryRuleDraft} from '@libs/CategoryTaxRulesUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -29,10 +29,13 @@ function AddTaxPage({route}: AddTaxPageProps) {
     // showing an empty picker.
     const areTaxesEnabled = hasUsableTaxRates(policy);
 
-    // Writing the workspace default rate deletes the rule, so offering it here would remove rather than save.
+    // Writing the workspace default rate deletes the rule, so offering it here would remove rather than save. The rate
+    // the rule already carries is exempt: the workspace default can be changed to it after the rule was saved, and
+    // hiding it then would drop the rule's own selection out of the list.
     const isCategoryRule = isCategoryRuleDraft(form, categoryName);
     const defaultExternalID = policy?.taxRates?.defaultExternalID;
-    const shouldHideTax = (taxKey: string) => isCategoryRule && taxKey === defaultExternalID;
+    const existingCategoryTaxID = categoryName ? getCategoryTaxRuleTaxID(policy?.rules?.expenseRules, categoryName) : undefined;
+    const shouldHideTax = (taxKey: string) => isCategoryRule && taxKey === defaultExternalID && taxKey !== existingCategoryTaxID;
 
     const taxes = policy?.taxRates?.taxes ?? {};
     const taxItems = Object.entries(taxes)

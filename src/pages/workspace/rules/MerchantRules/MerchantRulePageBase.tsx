@@ -283,8 +283,10 @@ function MerchantRulePageBase({policyID, ruleID, editCategoryTaxRuleFor, titleKe
     // Deleting means writing the workspace default rate back, so without one there is nothing to write.
     const canDeleteCategoryTaxRule = isEditingCategoryTaxRule && !!policy?.taxRates?.defaultExternalID;
     // Writing the workspace default rate deletes the rule, so a draft tax equal to it means "no rule". A merchant
-    // draft can carry it in before a category condition is added, so ignore it rather than let a save delete.
-    const categoryTaxID = isCategoryRule && form?.tax === policy?.taxRates?.defaultExternalID ? undefined : form?.tax;
+    // draft can carry it in before a category condition is added, so ignore it rather than let a save delete. The rate
+    // the rule already carries is exempt: the workspace default can be changed to it after the rule was saved, and the
+    // rule stays in `expenseRules`, so reading it as "no rule" would blank a rate the admin did set.
+    const categoryTaxID = isCategoryRule && form?.tax === policy?.taxRates?.defaultExternalID && form?.tax !== existingCategoryTaxID ? undefined : form?.tax;
     const showCategoryRulesApplyGoingForwardExplainer = () => {
         showConfirmModal({
             title: translate('workspace.rules.merchantRules.categoryRulesApplyGoingForwardTitle'),
