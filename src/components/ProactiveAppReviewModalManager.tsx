@@ -33,6 +33,9 @@ function ProactiveAppReviewModalManager() {
     const currentUserEmail = currentUserPersonalDetails?.email;
     const currentUserAccountID = currentUserPersonalDetails?.accountID;
     const [isAppReviewModalOpen, setIsAppReviewModalOpen] = useState(false);
+    // Once the user has answered or dismissed the prompt, never re-latch it in this session,
+    // even if the nvp_appReview data coming back from the server doesn't reflect the response.
+    const [hasResponded, setHasResponded] = useState(false);
 
     // Latch open: show the App Review modal only when the user is eligible AND
     // no other modal (e.g. attachment picker, settings) is on screen. Once latched,
@@ -40,7 +43,7 @@ function ProactiveAppReviewModalManager() {
     // isVisible:true to ONYXKEYS.MODAL (which would otherwise self-dismiss it).
     // Using setState-during-render (React-recommended derived state pattern)
     // instead of useEffect to satisfy react-hooks/set-state-in-effect.
-    if (shouldShowModal && !isAnyOtherModalActive && !isAppReviewModalOpen) {
+    if (shouldShowModal && !isAnyOtherModalActive && !isAppReviewModalOpen && !hasResponded) {
         setIsAppReviewModalOpen(true);
     }
     // Latch reset: close the App Review modal when the user is no longer eligible
@@ -50,6 +53,7 @@ function ProactiveAppReviewModalManager() {
     }
 
     const handleResponse = (response: AppReviewResponse, message?: string) => {
+        setHasResponded(true);
         respondToProactiveAppReview(response, proactiveAppReview, currentUserEmail, currentUserAccountID, delegateAccountID, policyID, message, conciergeReportID);
     };
 

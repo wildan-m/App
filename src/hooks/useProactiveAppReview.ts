@@ -4,6 +4,7 @@ import type ProactiveAppReview from '@src/types/onyx/AppReview';
 import {useState} from 'react';
 
 import useOnyx from './useOnyx';
+import useShouldShowRequire2FAPage from './useShouldShowRequire2FAPage';
 import useShouldSuppressPromotionalUI from './useShouldSuppressPromotionalUI';
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
@@ -22,6 +23,7 @@ type UseProactiveAppReviewReturn = {
 function useProactiveAppReview(): UseProactiveAppReviewReturn {
     const [proactiveAppReview] = useOnyx(ONYXKEYS.NVP_APP_REVIEW);
     const shouldSuppressPromotionalUI = useShouldSuppressPromotionalUI();
+    const shouldShowRequire2FAPage = useShouldShowRequire2FAPage();
 
     // Capture once so render stays pure (Date.now is impure). Fine for a 30-day cool-down gate.
     const [timeAtMount] = useState(Date.now);
@@ -29,6 +31,9 @@ function useProactiveAppReview(): UseProactiveAppReviewReturn {
     let shouldShowModal = true;
     if (shouldSuppressPromotionalUI) {
         // Supportal agents and copilots should not leave reviews on behalf of another account.
+        shouldShowModal = false;
+    } else if (shouldShowRequire2FAPage) {
+        // Don't ask for a review while the account is locked behind the required 2FA setup screen and can't use the app.
         shouldShowModal = false;
     } else if (!proactiveAppReview?.trigger) {
         // Don't show if the trigger is not set
