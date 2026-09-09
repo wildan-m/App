@@ -5602,12 +5602,17 @@ const staticStyles = (theme: ThemeColors) =>
         onboardingAccountingItem: {
             backgroundColor: theme.cardBG,
             borderRadius: variables.componentBorderRadiusNormal,
+            // Reserve the border space on every tile so selecting one doesn't shift the grid
+            borderWidth: 2,
+            borderColor: theme.cardBG,
             paddingHorizontal: 16,
             paddingVertical: 20,
             flexGrow: 1,
             flexShrink: 1,
+        },
 
-            flexBasis: '35%',
+        onboardingAccountingItemSelected: {
+            borderColor: theme.success,
         },
 
         onboardingInterestedFeaturesItem: {

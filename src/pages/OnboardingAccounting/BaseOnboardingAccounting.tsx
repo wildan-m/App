@@ -5,7 +5,6 @@ import FormHelpMessage from '@components/FormHelpMessage';
 import Icon from '@components/Icon';
 import OnboardingHeader from '@components/OnboardingHeader';
 import {PressableWithoutFeedback} from '@components/Pressable';
-import RadioButtonWithLabel from '@components/RadioButtonWithLabel';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import type {ListItem} from '@components/SelectionList/types';
@@ -47,8 +46,20 @@ import {View} from 'react-native';
 import type {BaseOnboardingAccountingProps} from './types';
 
 type Integration = {
-    key: keyof typeof CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY;
-    iconName: 'QBOCircle' | 'QBDSquare' | 'XeroCircle' | 'NetSuiteSquare' | 'IntacctSquare' | 'SapSquare' | 'OracleSquare' | 'MicrosoftDynamicsSquare';
+    key: keyof typeof CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY | typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_INTEGRATION_ALIASES.INTUIT_ENTERPRISE_SUITE;
+    iconName:
+        | 'QBOCircle'
+        | 'QBDSquare'
+        | 'IntuitSquare'
+        | 'XeroCircle'
+        | 'NetSuiteSquare'
+        | 'IntacctSquare'
+        | 'SapSquare'
+        | 'OracleSquare'
+        | 'MicrosoftDynamicsSquare'
+        | 'CertiniaSquare'
+        | 'RilletSquare'
+        | 'DualEntrySquare';
     translationKey: TranslationPaths;
 };
 
@@ -64,6 +75,11 @@ const integrations: Integration[] = [
         key: 'quickbooksDesktop',
         iconName: 'QBDSquare',
         translationKey: 'workspace.accounting.qbd',
+    },
+    {
+        key: CONST.POLICY.CONNECTIONS.ACCOUNTING_INTEGRATION_ALIASES.INTUIT_ENTERPRISE_SUITE,
+        iconName: 'IntuitSquare',
+        translationKey: 'workspace.accounting.intuitEnterpriseSuite',
     },
     {
         key: 'xero',
@@ -95,6 +111,21 @@ const integrations: Integration[] = [
         iconName: 'MicrosoftDynamicsSquare',
         translationKey: 'workspace.accounting.microsoftDynamics',
     },
+    {
+        key: 'financialforce',
+        iconName: 'CertiniaSquare',
+        translationKey: 'workspace.certinia.title',
+    },
+    {
+        key: 'rillet',
+        iconName: 'RilletSquare',
+        translationKey: 'workspace.accounting.rillet',
+    },
+    {
+        key: 'dualEntry',
+        iconName: 'DualEntrySquare',
+        translationKey: 'workspace.accounting.dualEntry',
+    },
 ];
 
 function isIntegrationKey(integrationKey: OnboardingAccounting | undefined): integrationKey is Integration['key'] {
@@ -103,6 +134,7 @@ function isIntegrationKey(integrationKey: OnboardingAccounting | undefined): int
 
 type OnboardingListItem = ListItem & {
     keyForList: AccountingOptionKey;
+    text: string;
 };
 
 function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccountingProps) {
@@ -114,12 +146,16 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
         'Connect',
         'QBOCircle',
         'QBDSquare',
+        'IntuitSquare',
         'XeroCircle',
         'NetSuiteSquare',
         'IntacctSquare',
         'SapSquare',
         'OracleSquare',
         'MicrosoftDynamicsSquare',
+        'CertiniaSquare',
+        'RilletSquare',
+        'DualEntrySquare',
     ]);
     // We need to use isSmallScreenWidth, see navigateAfterOnboarding function comment
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -168,7 +204,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
                     src={icon}
                     width={variables.iconSizeExtraLarge}
                     height={variables.iconSizeExtraLarge}
-                    additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.AVATAR_SHAPE.CIRCLE), styles.mr3]}
+                    additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.AVATAR_SHAPE.CIRCLE)]}
                 />
             ),
             isSelected: selectedIntegration === integration.key,
@@ -184,7 +220,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}
                 fill={theme.icon}
-                additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.AVATAR_SHAPE.CIRCLE), styles.mr3, styles.onboardingSmallIcon]}
+                additionalStyles={[StyleUtils.getAvatarBorderStyle(CONST.AVATAR_SIZE.DEFAULT, CONST.AVATAR_SHAPE.CIRCLE), styles.onboardingSmallIcon]}
             />
         ),
         isSelected: isOtherSelected,
@@ -241,24 +277,18 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
                 onPress={() => handleIntegrationSelect(item.keyForList)}
                 accessibilityLabel={item.text}
                 sentryLabel={CONST.SENTRY_LABEL.ONBOARDING.ACCOUNTING_SELECT_INTEGRATION}
-                accessible={false}
+                role={CONST.ROLE.RADIO}
+                accessibilityState={{checked: !!item.isSelected}}
                 hoverStyle={styles.hoveredComponentBG}
-                style={[styles.onboardingAccountingItem, isSmallScreenWidth && styles.flexBasis100]}
+                style={[
+                    styles.onboardingAccountingItem,
+                    !!item.isSelected && styles.onboardingAccountingItemSelected,
+                    // The percentages account for the column gap and keep items aligned when the scrollbar appears
+                    isSmallScreenWidth ? {flexBasis: '48.5%', maxWidth: '48.5%'} : {flexBasis: '31.5%', maxWidth: '31.5%'},
+                ]}
             >
-                <RadioButtonWithLabel
-                    isChecked={!!item.isSelected}
-                    onPress={() => handleIntegrationSelect(item.keyForList)}
-                    accessibilityLabel={item.text}
-                    style={[styles.flexRowReverse]}
-                    wrapperStyle={[styles.ml0]}
-                    labelElement={
-                        <View style={[styles.alignItemsCenter, styles.flexRow]}>
-                            {item.leftElement}
-                            <Text style={styles.textStrong}>{item.text}</Text>
-                        </View>
-                    }
-                    shouldBlendOpacity
-                />
+                {item.leftElement}
+                <Text style={[styles.textStrong, styles.mt3]}>{item.text}</Text>
             </PressableWithoutFeedback>
         );
     }
@@ -312,16 +342,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
                 onContentSizeChange={handleContentSizeChange}
                 keyboardShouldPersistTaps="handled"
             >
-                <View style={[styles.flexRow, styles.flexWrap, styles.gap3, styles.mb3]}>
-                    {accountingOptions.map(renderOption)}
-                    {/* Keep Other from expanding across the empty second column on wide layouts. */}
-                    {!isSmallScreenWidth && (
-                        <View
-                            testID="onboarding-accounting-wide-layout-spacer"
-                            style={[styles.onboardingAccountingItem, styles.bgTransparent, styles.p0]}
-                        />
-                    )}
-                </View>
+                <View style={[styles.flexRow, styles.flexWrap, styles.gap3, styles.mb3]}>{accountingOptions.map(renderOption)}</View>
                 {isOtherSelected && (
                     <TextInput
                         ref={otherAccountingSoftwareInputRef}
