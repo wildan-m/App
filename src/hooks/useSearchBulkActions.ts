@@ -28,6 +28,7 @@ import {
     getReportFromSearchSnapshot,
     getReportType,
     getChatReportWithFallback,
+    getFullySelectedReportIDs,
     getSearchApproveOnyxData,
     getSearchPayOnyxData,
     getTotalFormattedAmount,
@@ -881,6 +882,13 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 );
             } else {
                 const isGroupExport = !!queryJSON?.groupBy && selectedTransactionsKeys.some((key) => key.startsWith(CONST.SEARCH.GROUP_PREFIX));
+
+                // Empty report rows are stored in the selection under their report ID, so they have to be kept out of the transaction list.
+                const transactionIDList = selectedTransactionsKeys.filter((key) => selectedTransactions[key]?.reportID !== key);
+
+                // Scope the reports the same way the CSV export does, so both export entries send the backend the set the user selected.
+                const scopedReportIDList = selectedReports.length > 0 ? selectedReportIDs : selectedTransactionReportIDs;
+                const reportIDList = getFullySelectedReportIDs(scopedReportIDList, transactionIDList);
                 queueExportSearchWithTemplate(
                     {
                         templateName,
@@ -891,8 +899,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                                   getGroupExportExactMatchFilterKeys(queryJSON.groupBy),
                               )
                             : '{}',
-                        reportIDList: isGroupExport ? [] : selectedTransactionReportIDs,
-                        transactionIDList: isGroupExport ? [] : selectedTransactionsKeys,
+                        reportIDList: isGroupExport ? [] : reportIDList,
+                        transactionIDList: isGroupExport ? [] : transactionIDList,
                         policyID,
                         exportName,
                     },
@@ -911,6 +919,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             areAllMatchingItemsSelected,
             currentSearchResults?.data,
             queryJSON,
+            selectedReportIDs,
             selectedTransactionReportIDs,
             selectedTransactionsKeys,
             selectAllMatchingItems,

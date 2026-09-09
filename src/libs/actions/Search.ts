@@ -1805,11 +1805,12 @@ function rejectMoneyRequestsOnSearch(
 
 type Params = Record<string, ExportSearchItemsToCSVParams>;
 
-function exportSearchItemsToCSV(
-    {jsonQuery, reportIDList, transactionIDList, excludedTransactionIDList, isBasicExport, exportColumnLabels, exportName, isGroupExport}: ExportSearchItemsToCSVParams,
-    onDownloadFailed: () => void,
-    translate: LocalizedTranslate,
-) {
+/**
+ * Keeps only the reports that are exported as a whole, meaning every one of their transactions is part of the selection.
+ * A report that is only partially selected has to be exported through its line items instead, otherwise the export would
+ * contain expenses the user did not select.
+ */
+function getFullySelectedReportIDs(reportIDList: string[], transactionIDList: string[]): string[] {
     const reportIDSet = new Set<string>();
     const transactionIDSet = new Set(transactionIDList);
     for (const reportID of reportIDList) {
@@ -1835,9 +1836,17 @@ function exportSearchItemsToCSV(
         }
     }
 
+    return Array.from(reportIDSet);
+}
+
+function exportSearchItemsToCSV(
+    {jsonQuery, reportIDList, transactionIDList, excludedTransactionIDList, isBasicExport, exportColumnLabels, exportName, isGroupExport}: ExportSearchItemsToCSVParams,
+    onDownloadFailed: () => void,
+    translate: LocalizedTranslate,
+) {
     const finalParameters = enhanceParameters(WRITE_COMMANDS.EXPORT_SEARCH_ITEMS_TO_CSV, {
         jsonQuery,
-        reportIDList: Array.from(reportIDSet),
+        reportIDList: getFullySelectedReportIDs(reportIDList, transactionIDList),
         transactionIDList,
         ...(excludedTransactionIDList?.length ? {excludedTransactionIDList} : {}),
         isBasicExport,
@@ -2414,6 +2423,7 @@ export {
     clearFooterConversion,
     rejectMoneyRequestsOnSearch,
     exportSearchItemsToCSV,
+    getFullySelectedReportIDs,
     queueExportSearchItemsToCSV,
     queueExportSearchWithTemplate,
     queueBulkPayReports,
