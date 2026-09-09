@@ -17,19 +17,40 @@ jobs:
     if: ${{ github.actor != 'OSBotify' }}
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
-      - name: Checkout baseline branch
+      # Restores the baseline seedJestPerfCache.yml measured on the push that created base.sha, so
+      # a hit skips the four-minute measure entirely and both sides of the comparison are anchored
+      # to the commit the PR branched from. Restore-only and no restore-keys: an entry from any
+      # other commit would reintroduce the drift this cache exists to remove. Placed before the
+      # checkout so a hit pays for nothing but this restore and the upload at the end - every step
+      # in between carries the miss guard.
+      - name: Restore main's Reassure baseline
+        id: restoreBaseline
+        # v5.0.1
+        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb
+        with:
+          path: .reassure/baseline.perf
+          key: ${{ format('{0}-{1}-reassure-baseline-{2}', runner.os, runner.arch, github.event.pull_request.base.sha) }}
+
+      - name: Checkout
+        if: steps.restoreBaseline.outputs.cache-hit != 'true'
         uses: useblacksmith/checkout@f50565632710173b0e366f2cd39b928d31362815 # v1.6.0
 
-      - name: Checkout baseline branch
+      # Reassure only needs the base commit's source tree, not its history. Measuring base.sha
+      # rather than the current main tip keeps a miss equivalent to a hit: both sides of the
+      # comparison are measured from the commit the PR branched from, so commits that merged to
+      # main afterwards cannot flip the verdict.
+      - name: Checkout the base commit
+        if: steps.restoreBaseline.outputs.cache-hit != 'true'
         shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           set -e
-          BASELINE_BRANCH=${BASELINE_BRANCH:="main"}
-          # Reassure only needs the baseline commit's source tree, not its history.
-          git fetch origin "$BASELINE_BRANCH" --no-tags --depth=1
-          git checkout --force --detach "origin/$BASELINE_BRANCH" --no-recurse-submodules
+          git fetch origin "$BASE_SHA" --no-tags --depth=1
+          git checkout --force --detach "$BASE_SHA" --no-recurse-submodules
 
       - name: Setup NodeJS
+        if: steps.restoreBaseline.outputs.cache-hit != 'true'
         uses: ./.github/actions/composite/setupNode
 
       # Skips a cold Babel pass over the whole source tree; seedJestPerfCache.yml writes the entry
@@ -38,6 +59,7 @@ jobs:
       # by an older babel-plugin-react-compiler and move the render counts gated at
       # COUNT_DEVIATION: 0. Keep the key identical to the other three.
       - name: Restore Jest transform cache
+        if: steps.restoreBaseline.outputs.cache-hit != 'true'
         id: restoreJestCache
         # v5.0.1
         uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb
@@ -49,17 +71,18 @@ jobs:
       # silently died: `Report Jest cache size` below reads the directory after the perf run, by
       # which point Jest has written a full transform set either way.
       - name: Warn on a Jest transform cache miss
-        if: steps.restoreJestCache.outputs.cache-hit != 'true'
+        if: steps.restoreBaseline.outputs.cache-hit != 'true' && steps.restoreJestCache.outputs.cache-hit != 'true'
         run: echo "::warning::Jest perf transform cache miss - this job re-transforms the whole source tree. Expected only when the toolchain key rotated (lockfile, patches, Babel or Jest config, Node version); otherwise seedJestPerfCache.yml has stopped writing the entry."
 
       - name: Run baseline performance tests
+        if: steps.restoreBaseline.outputs.cache-hit != 'true'
         shell: bash
         run: NODE_OPTIONS=--experimental-vm-modules npx reassure --baseline
 
       # Compare against the seed job's notice on a recent push to main: near zero means the seed
       # stopped running, roughly double means a second transform set is being written.
       - name: Report Jest cache size
-        if: always()
+        if: always() && steps.restoreBaseline.outputs.cache-hit != 'true'
         run: |
           if [[ -d .jest-cache ]]; then
             echo "::notice::Jest perf cache: $(du -sm .jest-cache | cut -f1)MB, $(find .jest-cache -type f | wc -l) files"
@@ -67,6 +90,8 @@ jobs:
             echo "::notice::Jest perf cache: absent"
           fi
 
+      # Runs on both paths: the file is either the restored entry or the measure's fresh output,
+      # and validate-perf-tests downloads this artifact either way.
       - name: Upload baseline performance results
         # v6
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
