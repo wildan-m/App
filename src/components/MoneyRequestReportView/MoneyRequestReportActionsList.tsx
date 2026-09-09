@@ -231,7 +231,11 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
     // Set when the user taps "Latest messages"; the report is marked as read only once the scroll actually reaches the bottom.
     const pendingMarkAsReadRef = useRef(false);
     const lastVisibleActionCreated = getReportLastVisibleActionCreated(report, transactionThreadReport);
-    const hasNewestReportAction = lastAction?.created === lastVisibleActionCreated;
+    // An optimistic action can be newer than the report's lastVisibleActionCreated, which only advances once the
+    // server responds - an inline category/description edit writes a pending MODIFIED_EXPENSE without advancing it.
+    // The list is still showing the newest action we know about in that case, so compare with >= rather than a
+    // strict equality that a pending edit would break until the next server response.
+    const hasNewestReportAction = !!lastVisibleActionCreated && !!lastAction?.created && lastAction.created >= lastVisibleActionCreated;
     const userActiveSince = useRef<string>(DateUtils.getDBTime());
 
     const reportActionIDs = useMemo(() => {
