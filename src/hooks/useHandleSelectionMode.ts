@@ -19,7 +19,7 @@ function useHandleSelectionMode<TItem extends ListItem>(selectedItems: readonly 
 
     useEffect(() => {
         if (!isSmallScreenWidth) {
-            if (selectedItems.length === 0 && isMobileSelectionModeEnabled) {
+            if (isMobileSelectionModeEnabled) {
                 turnOffMobileSelectionMode();
             }
             return;
