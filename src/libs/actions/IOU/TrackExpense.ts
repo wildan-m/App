@@ -774,7 +774,7 @@ function getDeleteTrackExpenseInformation({
         },
     );
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReport?.reportID}`,
@@ -786,6 +786,14 @@ function getDeleteTrackExpenseInformation({
             },
         },
     ];
+
+    // Keep the violations cleared on success too, so a stale queued response cannot re-introduce
+    // violations (such as a duplicate warning) that only applied while the expense lived in the old report.
+    successData.push({
+        onyxMethod: Onyx.METHOD.SET,
+        key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`,
+        value: null,
+    });
 
     // Ensure that any remaining data is removed upon successful completion, even if the server sends a report removal response.
     // This is done to prevent the removal update from lingering in the applyHTTPSOnyxUpdates function.
@@ -1248,7 +1256,7 @@ const getConvertTrackedExpenseInformation = (
     const optimisticData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>
     > = [];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [];
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT>> = [];
     const failureData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>
     > = [];
@@ -1276,6 +1284,55 @@ const getConvertTrackedExpenseInformation = (
     optimisticData?.push(...deleteOptimisticData);
     successData?.push(...deleteSuccessData);
     failureData?.push(...deleteFailureData);
+
+    // The moved expense no longer sits in the same report as the transactions it was flagged as a duplicate of,
+    // so drop it from each partner's duplicate list. This is kept on success as well so stale queued responses
+    // cannot re-introduce one-sided duplicate warnings.
+    const allViolations = getAllTransactionViolations();
+    const duplicateTransactionIDs = transactionID
+        ? allViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`]?.find((violation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION)?.data?.duplicates
+        : undefined;
+
+    for (const partnerTransactionID of duplicateTransactionIDs ?? []) {
+        const partnerViolations = allViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${partnerTransactionID}`] ?? [];
+        const partnerDuplicateViolation = partnerViolations.find((violation) => violation.name === CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
+
+        if (!partnerDuplicateViolation?.data?.duplicates?.includes(transactionID)) {
+            continue;
+        }
+
+        const remainingDuplicateTransactionIDs = partnerDuplicateViolation.data.duplicates.filter((duplicateTransactionID) => duplicateTransactionID !== transactionID);
+        const updatedPartnerViolations = partnerViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.DUPLICATED_TRANSACTION);
+
+        if (remainingDuplicateTransactionIDs.length > 0) {
+            updatedPartnerViolations.push({
+                ...partnerDuplicateViolation,
+                data: {
+                    ...partnerDuplicateViolation.data,
+                    duplicates: remainingDuplicateTransactionIDs,
+                },
+            });
+        }
+
+        const updatedPartnerViolationsValue = updatedPartnerViolations.length > 0 ? updatedPartnerViolations : null;
+        const partnerViolationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${partnerTransactionID}` as const;
+
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: partnerViolationsKey,
+            value: updatedPartnerViolationsValue,
+        });
+        successData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: partnerViolationsKey,
+            value: updatedPartnerViolationsValue,
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: partnerViolationsKey,
+            value: partnerViolations,
+        });
+    }
 
     // Build modified expense report action with the transaction changes
     const modifiedExpenseReportAction = buildOptimisticMovedTransactionAction(transactionThreadReportID, linkedTrackedExpenseReportID ?? CONST.REPORT.UNREPORTED_REPORT_ID);
