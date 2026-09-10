@@ -135,7 +135,7 @@ function CopyPolicySettingsSelectFeaturesPage() {
         hasWorkflowRules: !!workflows?.length,
         hasWorkspaceRules: !!rules?.length,
         codingRulesCount,
-        hasInvoiceConfiguration: !!sourcePolicy?.areInvoicesEnabled && (!!invoiceConfigurationText || invoiceFieldsCount > 0),
+        hasInvoiceConfiguration: !!sourcePolicy?.areInvoicesEnabled && (!!invoiceConfigurationText || invoiceFieldsCount > 0 || !!sourcePolicy?.areInvoiceFieldsEnabled),
         isCollectPolicy: isCollectPolicy(sourcePolicy),
     };
 
