@@ -1,0 +1,65 @@
+diff --git a/node_modules/react-native/Libraries/Blob/RCTBlobManager.mm b/node_modules/react-native/Libraries/Blob/RCTBlobManager.mm
+--- a/node_modules/react-native/Libraries/Blob/RCTBlobManager.mm
++++ b/node_modules/react-native/Libraries/Blob/RCTBlobManager.mm
+@@ -11,6 +11,7 @@
+ 
+ #import <FBReactNativeSpec/FBReactNativeSpec.h>
+ #import <React/RCTConvert.h>
++#import <React/RCTLog.h>
+ #import <React/RCTMockDef.h>
+ #import <React/RCTNetworking.h>
+ #import <React/RCTUtils.h>
+@@ -111,9 +112,34 @@
+   if (!data) {
+     return nil;
+   }
+-  if (offset != 0 || (size != -1 && size != data.length)) {
+-    data = [data subdataWithRange:NSMakeRange(offset, size)];
++  // The offset and size come from a blob descriptor that JavaScript maintains on its own, so they
++  // can describe more bytes than are actually stored. Clamp the range to the data we really have
++  // instead of letting -subdataWithRange: raise an uncatchable NSRangeException on a background
++  // queue. This matches the Android implementation, which normalises a -1 size and copies a range
++  // rather than throwing.
++  NSInteger length = (NSInteger)data.length;
++  NSInteger safeOffset = MAX((NSInteger)0, MIN(offset, length));
++  if (safeOffset != offset) {
++    RCTLogError(
++        @"Blob %@ was requested at offset %ld but only %ld bytes are stored.",
++        blobId,
++        (long)offset,
++        (long)length);
++  }
++  NSInteger available = length - safeOffset;
++  NSInteger safeSize = size < 0 ? available : MIN(size, available);
++  if (size >= 0 && safeSize != size) {
++    RCTLogError(
++        @"Blob %@ was recorded as %ld bytes at offset %ld but only %ld bytes are stored. Reading %ld bytes instead.",
++        blobId,
++        (long)size,
++        (long)offset,
++        (long)length,
++        (long)safeSize);
+   }
++  if (safeOffset != 0 || safeSize != length) {
++    data = [data subdataWithRange:NSMakeRange((NSUInteger)safeOffset, (NSUInteger)safeSize)];
++  }
+   return data;
+ }
+ 
+@@ -287,7 +313,15 @@
+     contentType = blob[@"type"];
+   }
+ 
+-  return @{@"body" : [self resolve:blob], @"contentType" : contentType};
++  // -resolve: returns nil when the blob is unknown or has already been released. An NSDictionary
++  // literal raises NSInvalidArgumentException on a nil value, so fall back to an empty body.
++  NSData *body = [self resolve:blob];
++  if (body == nil) {
++    RCTLogError(@"Blob %@ could not be resolved for an upload. Sending an empty body.", blob[@"blobId"]);
++    body = [NSData data];
++  }
++
++  return @{@"body" : body, @"contentType" : contentType};
+ }
+ 
+ - (BOOL)canHandleNetworkingResponse:(NSString *)responseType
