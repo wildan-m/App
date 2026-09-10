@@ -27,6 +27,7 @@ jest.mock('@libs/Navigation/linkingConfig/RELATIONS', () => {
     return {
         RHP_TO_DOMAIN: {},
         RHP_TO_HOME: {Home: 'home'},
+        RHP_TO_HOME_DEEPLINK: {},
         RHP_TO_SEARCH: {},
         // Deeplink-only mapping: create-flow entry points resolve to the Search fullscreen under the RHP.
         RHP_TO_SEARCH_DEEPLINK: {
@@ -37,6 +38,7 @@ jest.mock('@libs/Navigation/linkingConfig/RELATIONS', () => {
             [SCREENS_MOCK.TRACK_EXPENSE]: SCREENS_MOCK.SEARCH.ROOT,
         },
         RHP_TO_SETTINGS: {},
+        RHP_TO_SETTINGS_DEEPLINK: {},
         RHP_TO_SIDEBAR: {},
         RHP_TO_WORKSPACE: {},
         RHP_TO_WORKSPACES_LIST: {},

@@ -113,11 +113,7 @@ function getActiveScreenInRoute(route: NavigationPartialRoute): string | undefin
     return route.state?.routes?.at(-1)?.name;
 }
 
-function shouldChangeToMatchingFullScreen(
-    newFocusedRoute: ReturnType<typeof findFocusedRoute>,
-    matchingFullScreenRoute: NavigationPartialRoute,
-    lastFullScreenRoute: NavigationPartialRoute,
-) {
+function shouldChangeToMatchingFullScreen(matchingFullScreenRoute: NavigationPartialRoute, lastFullScreenRoute: NavigationPartialRoute) {
     if (matchingFullScreenRoute.name !== lastFullScreenRoute.name) {
         return true;
     }
@@ -125,14 +121,7 @@ function shouldChangeToMatchingFullScreen(
     // When both are TAB_NAVIGATOR, compare the active tab inside rather than the last declared route.
     const lastActiveScreen = getActiveScreenInRoute(lastFullScreenRoute);
     const matchingActiveScreen = getActiveScreenInRoute(matchingFullScreenRoute);
-    if (matchingFullScreenRoute.name === NAVIGATORS.TAB_NAVIGATOR && lastActiveScreen !== matchingActiveScreen) {
-        return true;
-    }
-
-    // We always want the fullscreen route of SCREENS.SETTINGS.SUBSCRIPTION.ADD_PAYMENT_CARD to be the SUBSCRIPTION tab of SCREENS.SETTINGS.
-    // The add payment card page can be opened via the Global create button from the create expense flow, so even when we are already on SCREENS.SETTINGS, with any tab currently open,
-    // the add payment card page can still be opened. Therefore, checking only the fullscreen name above is not sufficient, and the check below using the last route name is necessary.
-    return newFocusedRoute?.name === SCREENS.SETTINGS.SUBSCRIPTION.ADD_PAYMENT_CARD && lastActiveScreen !== SCREENS.SETTINGS.SUBSCRIPTION.ROOT;
+    return matchingFullScreenRoute.name === NAVIGATORS.TAB_NAVIGATOR && lastActiveScreen !== matchingActiveScreen;
 }
 
 /**
@@ -254,7 +243,7 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
             const tabState = tabRoute ? getTabState(tabRoute as NavigationPartialRoute) : undefined;
             const tabNavigatorStateKey = tabRoute?.state?.key;
             const lastFullScreenRoute = tabState?.routes?.at(tabState.index ?? 0) as NavigationPartialRoute | undefined;
-            if (matchingFullScreenRoute && lastFullScreenRoute && shouldChangeToMatchingFullScreen(newFocusedRoute, matchingFullScreenRoute, lastFullScreenRoute)) {
+            if (matchingFullScreenRoute && lastFullScreenRoute && shouldChangeToMatchingFullScreen(matchingFullScreenRoute, lastFullScreenRoute)) {
                 const matchingFullScreenRouteInTabRootState = tabState?.routes?.find((route) => route.name === matchingFullScreenRoute.name);
                 if (matchingFullScreenRouteInTabRootState && matchingFullScreenRouteInTabRootState.state === undefined) {
                     // If matchingFullScreenRoute state is uninitialized (has never been visited)

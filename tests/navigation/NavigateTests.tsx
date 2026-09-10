@@ -258,7 +258,7 @@ describe('Navigate', () => {
             expect(lastRootRoute?.state?.routes.at(-1)?.name).toBe(SCREENS.RIGHT_MODAL.SETTINGS);
         });
 
-        it('shows Subscription behind the payment-card RHP when navigating from Reports', () => {
+        it('keeps the report behind the payment-card RHP when navigating from Reports', () => {
             render(
                 <TestNavigationContainer
                     initialState={{
@@ -306,8 +306,8 @@ describe('Navigate', () => {
 
             const tabState = rootState?.routes.at(0)?.state;
             const activeTab = tabState?.routes.at(tabState.index ?? 0);
-            expect(activeTab?.name).toBe(NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR);
-            expect(activeTab?.state?.routes.at(-1)?.name).toBe(SCREENS.SETTINGS.SUBSCRIPTION.ROOT);
+            expect(activeTab?.name).toBe(NAVIGATORS.REPORTS_SPLIT_NAVIGATOR);
+            expect(activeTab?.state?.routes.at(-1)?.name).toBe(SCREENS.REPORT);
         });
 
         it('preserves report navigation history when opening a workspace from an RHP', () => {

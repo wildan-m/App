@@ -50,7 +50,7 @@ function getCrossTabContext(currentState: NavigationState | undefined, route: Ro
             return undefined;
         }
 
-        if (!shouldChangeToMatchingFullScreen(targetFocusedRoute, matchingFullScreenRoute, currentFullScreenRoute)) {
+        if (!shouldChangeToMatchingFullScreen(matchingFullScreenRoute, currentFullScreenRoute)) {
             return undefined;
         }
 
