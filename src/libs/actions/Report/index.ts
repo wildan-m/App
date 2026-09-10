@@ -103,6 +103,7 @@ import {
 import processReportIDDeeplink from '@libs/processReportIDDeeplink';
 import Pusher from '@libs/Pusher';
 import type {UserIsLeavingRoomEvent, UserIsTypingEvent} from '@libs/Pusher/types';
+import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import * as ReportActionsFollowupUtils from '@libs/ReportActionFollowupUtils';
 import * as ReportActionsUtils from '@libs/ReportActionsUtils';
 import {updateTitleFieldToMatchPolicy} from '@libs/ReportTitleUtils';
@@ -2517,6 +2518,10 @@ function navigateToReport(reportID: string | undefined, options?: {shouldDismiss
             Navigation.dismissModal({afterTransition: options?.afterTransition});
             return;
         }
+
+        // Picking a chat destination hands composer focus ownership over to the main pane. Without this, the Side Panel composer
+        // still counts as "focused before" when the modal closes and steals the focus back from the report we are navigating to.
+        ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
         Navigation.dismissModal();
     }
 
