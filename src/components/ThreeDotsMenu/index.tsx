@@ -23,6 +23,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import KeyboardUtils from '@src/utils/keyboard';
 
+import debounce from 'lodash/debounce';
 import React, {useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 
@@ -139,9 +140,17 @@ function ThreeDotsMenu({
             return;
         }
 
-        getMenuPosition?.().then((value) => {
-            setPosition(value);
-        });
+        // Surrounding layout can settle a render pass after the window dimensions change, so measuring right
+        // away captures the anchor's pre-resize position and leaves the menu behind. Debounce so the layout
+        // finishes first, the same way the date picker and the Copilot delegate menu re-position on resize.
+        const debouncedUpdatePosition = debounce(() => {
+            getMenuPosition().then((value) => {
+                setPosition(value);
+            });
+        }, CONST.TIMING.RESIZE_DEBOUNCE_TIME);
+        debouncedUpdatePosition();
+
+        return () => debouncedUpdatePosition.cancel();
     }, [windowWidth, windowHeight, shouldSelfPosition, getMenuPosition, isPopupMenuVisible]);
 
     const getIconFill = () => {
