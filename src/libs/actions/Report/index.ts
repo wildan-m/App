@@ -387,6 +387,9 @@ type OpenReportActionParams = {
 
     /** The Concierge chat report used to build the guided setup onboarding data */
     conciergeChat: OnyxEntry<Report>;
+
+    /** Whether the guided setup should create the "Review your workspace settings" task already completed */
+    shouldAutoCompleteReviewWorkspaceSettingsTask?: boolean;
 };
 
 type PregeneratedResponseParams = {
@@ -1591,6 +1594,7 @@ function getGuidedSetupDataForOpenReport(
     isSelfTourViewed?: boolean,
     // TODO: This will be required eventually. Refactor issue: https://github.com/Expensify/App/issues/66424
     hasCompletedGuidedSetupFlow?: boolean,
+    shouldAutoCompleteReviewWorkspaceSettingsTask?: boolean,
 ): GuidedSetupDataForOpenReport | undefined {
     const isInviteOnboardingComplete = introSelected?.isInviteOnboardingComplete ?? false;
     const isOnboardingCompleted = hasCompletedGuidedSetupFlow ?? onboarding?.hasCompletedGuidedSetupFlow ?? false;
@@ -1617,6 +1621,11 @@ function getGuidedSetupDataForOpenReport(
     if (choice === CONST.ONBOARDING_CHOICES.CHAT_SPLIT) {
         const updatedTasks = onboardingMessage.tasks.map((task) => (task.type === 'startChat' ? {...task, autoCompleted: true} : task));
         onboardingMessage.tasks = updatedTasks;
+    }
+
+    // The user already reviewed their workspace settings before this guided setup ran, so create that task already completed.
+    if (shouldAutoCompleteReviewWorkspaceSettingsTask) {
+        onboardingMessage.tasks = onboardingMessage.tasks.map((task) => (task.type === CONST.ONBOARDING_TASK_TYPE.REVIEW_WORKSPACE_SETTINGS ? {...task, autoCompleted: true} : task));
     }
 
     const onboardingData = prepareOnboardingOnyxData({
@@ -1678,6 +1687,7 @@ function openReport(params: OpenReportActionParams) {
         hasReportActions,
         shouldMarkAsRead = true,
         conciergeChat,
+        shouldAutoCompleteReviewWorkspaceSettingsTask,
     } = params;
     if (!reportID) {
         return;
@@ -1910,7 +1920,14 @@ function openReport(params: OpenReportActionParams) {
         });
     }
 
-    const guidedSetup = getGuidedSetupDataForOpenReport(introSelected, currentUserAccountID, conciergeChat, isSelfTourViewed, hasCompletedGuidedSetupFlow);
+    const guidedSetup = getGuidedSetupDataForOpenReport(
+        introSelected,
+        currentUserAccountID,
+        conciergeChat,
+        isSelfTourViewed,
+        hasCompletedGuidedSetupFlow,
+        shouldAutoCompleteReviewWorkspaceSettingsTask,
+    );
     if (guidedSetup) {
         optimisticData.push(...guidedSetup.optimisticData);
         successData.push(...guidedSetup.successData);
