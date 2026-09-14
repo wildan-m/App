@@ -80,6 +80,19 @@ function SearchEditMultipleTagPage() {
             }
         }
 
+        // A select-then-deselect round trip leaves nothing but empty intents behind. Keeping them makes
+        // apply time rebuild a tag for every transaction and clear the level, so the tag flickers and a
+        // spurious edit message is created even though the user changed nothing. Drop the whole intent
+        // map once no selection remains, reusing the null-merge deletion the child cleanup above relies
+        // on. Empty intents are kept while a real selection remains, because a deselected level that was
+        // auto-selected by its parent still needs its marker for the apply-time replay to trim it.
+        const mergedTagChanges = {...draftTransaction?.bulkEditTagChanges, ...bulkEditTagChanges};
+        if (!Object.values(mergedTagChanges).some((tagChange) => !!tagChange)) {
+            for (const recordedIndex of Object.keys(mergedTagChanges)) {
+                bulkEditTagChanges[recordedIndex] = null;
+            }
+        }
+
         updateBulkEditDraftTransaction({
             // Keep the flattened tag for the summary display, and record the per-level edit intent so
             // apply time can merge it into each transaction's own tag instead of overwriting all levels.
