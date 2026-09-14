@@ -30,6 +30,12 @@ type CustomBaseTextInputProps = ForwardedFSClassProps &
         /** Icon to display in right side of text input */
         icon?: IconAsset | null;
 
+        /** Callback when the right icon is pressed. When provided, the icon is rendered as a pressable element */
+        onIconPress?: () => void;
+
+        /** Accessibility label for the pressable right icon. Required for screen readers when `onIconPress` is set */
+        iconAccessibilityLabel?: string;
+
         /** Icon to display in left side of text input */
         iconLeft?: IconAsset | null;
 

@@ -1,5 +1,5 @@
 import TextInput from '@components/TextInput';
-import type {BaseTextInputProps, BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
 import useAccessibilityAnnouncement from '@hooks/useAccessibilityAnnouncement';
 import useAutoFocusInput from '@hooks/useAutoFocusInput';
@@ -9,13 +9,10 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 
 import ComposerFocusManager from '@libs/ComposerFocusManager';
-import {isNumeric} from '@libs/ValidationUtils';
 
 import {setDraftValues} from '@userActions/FormActions';
 
 import CONST from '@src/CONST';
-
-import type {TextInputKeyPressEvent} from 'react-native';
 
 import {format, setYear} from 'date-fns';
 import debounce from 'lodash/debounce';
@@ -156,26 +153,11 @@ function DatePicker({
         Keyboard.dismiss();
     }, [shouldDismissKeyboardBeforeShow, setPickerVisibility]);
 
-    const handlePress = useCallback<NonNullable<BaseTextInputProps['onPress']>>(
-        (event) => {
-            if ('preventDefault' in event) {
-                event.preventDefault();
-            }
-            showDatePickerModal();
-        },
-        [showDatePickerModal],
-    );
-
-    const handleInputKeyPress = useCallback(
-        (event: TextInputKeyPressEvent) => {
-            if (!isNumeric(event.nativeEvent.key)) {
-                return;
-            }
-            event.preventDefault();
-            showDatePickerModal();
-        },
-        [showDatePickerModal],
-    );
+    const handleTypedDate = (text: string) => {
+        onTouched?.();
+        setSelectedDate(text);
+        onInputChange?.(text);
+    };
 
     const handleDateSelected = (newDate: string) => {
         onTouched?.();
@@ -233,7 +215,9 @@ function DatePicker({
                     ref={combinedTextInputRef}
                     inputID={inputID}
                     forceActiveLabel
-                    icon={selectedDate || shouldHideCalendarIcon ? null : icons.Calendar}
+                    icon={shouldHideCalendarIcon ? null : icons.Calendar}
+                    onIconPress={showDatePickerModal}
+                    iconAccessibilityLabel={translate('common.openCalendar')}
                     iconContainerStyle={styles.pr0}
                     label={label}
                     accessibilityLabel={label}
@@ -242,18 +226,18 @@ function DatePicker({
                     value={selectedDate}
                     placeholder={placeholder ?? translate('common.dateFormat')}
                     errorText={errorText}
-                    inputStyle={styles.pointerEventsNone}
                     disabled={disabled}
                     hideFocusedState={shouldDismissKeyboardBeforeShow}
-                    onPress={shouldDismissKeyboardBeforeShow ? handlePress : () => showDatePickerModal()}
-                    onSubmitEditing={() => showDatePickerModal()}
-                    onKeyPress={handleInputKeyPress}
+                    type="mask"
+                    mask="[0000]-[00]-[00]"
+                    allowedKeys="0123456789-"
+                    inputMode={CONST.INPUT_MODE.NUMERIC}
+                    onChangeText={handleTypedDate}
                     textInputContainerStyles={isModalVisible ? styles.borderColorFocus : {}}
                     shouldHideClearButton={shouldHideClearButton}
                     onClearInput={handleClear}
                     forwardedFSClass={forwardedFSClass}
                     autoComplete={autoComplete}
-                    disableKeyboard
                     rightHandSideComponent={rightHandSideComponent}
                 />
             </View>

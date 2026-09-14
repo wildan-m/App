@@ -50,6 +50,8 @@ function BaseTextInput({
     errorText = '',
     iconLeft = null,
     icon = null,
+    onIconPress,
+    iconAccessibilityLabel,
     textInputContainerStyles,
     shouldApplyPaddingToContainer = true,
     touchableInputWrapperStyle,
@@ -499,10 +501,23 @@ function BaseTextInput({
                                         iconContainerStyle,
                                     ]}
                                 >
-                                    <Icon
-                                        src={icon}
-                                        fill={theme.icon}
-                                    />
+                                    {onIconPress && !isReadOnly ? (
+                                        <PressableWithoutFeedback
+                                            onPress={onIconPress}
+                                            role={CONST.ROLE.BUTTON}
+                                            accessibilityLabel={iconAccessibilityLabel ?? ''}
+                                        >
+                                            <Icon
+                                                src={icon}
+                                                fill={theme.icon}
+                                            />
+                                        </PressableWithoutFeedback>
+                                    ) : (
+                                        <Icon
+                                            src={icon}
+                                            fill={theme.icon}
+                                        />
+                                    )}
                                 </View>
                             )}
                         </View>
