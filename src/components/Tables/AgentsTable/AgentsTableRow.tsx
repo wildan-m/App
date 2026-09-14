@@ -42,6 +42,7 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
     const areActionsDisabled = isPendingAddOrDelete || item.accountID <= 0 || !item.login;
     const accessibilityLabel = [item.displayName, item.login].filter(Boolean).join(', ');
     const selectedButtonInnerStyle = item.selected ? styles.buttonDefaultHovered : undefined;
+    const canManage = item.canManage ?? true;
 
     return (
         <Table.Row
@@ -99,25 +100,29 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
                                 >
                                     <Button.Icon src={icons.ChatBubble} />
                                 </Button>
-                                <Button
-                                    size={CONST.BUTTON_SIZE.SMALL}
-                                    onPress={item.onCopilotPress}
-                                    isDisabled={areActionsDisabled}
-                                    innerStyles={selectedButtonInnerStyle}
-                                    accessibilityLabel={translate('editAgentPage.copilotIntoAccount')}
-                                    sentryLabel={CONST.SENTRY_LABEL.AGENTS.COPILOT}
-                                >
-                                    <Button.Text>{translate('delegate.copilot')}</Button.Text>
-                                </Button>
-                                <Button
-                                    size={CONST.BUTTON_SIZE.SMALL}
-                                    onPress={item.action}
-                                    isDisabled={isPendingDeletion}
-                                    innerStyles={selectedButtonInnerStyle}
-                                    sentryLabel={CONST.SENTRY_LABEL.AGENTS.EDIT}
-                                >
-                                    <Button.Text>{translate('common.edit')}</Button.Text>
-                                </Button>
+                                {canManage && (
+                                    <Button
+                                        size={CONST.BUTTON_SIZE.SMALL}
+                                        onPress={item.onCopilotPress}
+                                        isDisabled={areActionsDisabled}
+                                        innerStyles={selectedButtonInnerStyle}
+                                        accessibilityLabel={translate('editAgentPage.copilotIntoAccount')}
+                                        sentryLabel={CONST.SENTRY_LABEL.AGENTS.COPILOT}
+                                    >
+                                        <Button.Text>{translate('delegate.copilot')}</Button.Text>
+                                    </Button>
+                                )}
+                                {canManage && (
+                                    <Button
+                                        size={CONST.BUTTON_SIZE.SMALL}
+                                        onPress={item.action}
+                                        isDisabled={isPendingDeletion}
+                                        innerStyles={selectedButtonInnerStyle}
+                                        sentryLabel={CONST.SENTRY_LABEL.AGENTS.EDIT}
+                                    >
+                                        <Button.Text>{translate('common.edit')}</Button.Text>
+                                    </Button>
+                                )}
                             </View>
                         )}
                         <Icon

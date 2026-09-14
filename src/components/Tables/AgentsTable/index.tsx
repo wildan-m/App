@@ -34,6 +34,9 @@ type AgentRowData = TableData & {
     onChatPress: () => void;
     onCopilotPress: () => void;
     dismissError: () => void;
+
+    /** Whether the viewer manages this agent (owns it or copilots its owner). Defaults to true; when false the Copilot and Edit actions are hidden. */
+    canManage?: boolean;
 };
 
 type AgentsTableProps = {

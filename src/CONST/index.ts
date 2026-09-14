@@ -9464,6 +9464,7 @@ const CONST = {
                 MORE_FEATURES: 'WorkspaceInitial-MoreFeatures',
                 VENDORS: 'WorkspaceInitial-Vendors',
                 MCP: 'WorkspaceInitial-MCP',
+                AGENTS: 'WorkspaceInitial-Agents',
             },
             OVERVIEW: {
                 AVATAR: 'WorkspaceOverview-Avatar',

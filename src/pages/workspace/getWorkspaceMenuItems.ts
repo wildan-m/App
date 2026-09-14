@@ -264,6 +264,14 @@ function getWorkspaceMenuItems({
             });
         }
 
+        items.push({
+            translationKey: 'agentsPage.title',
+            icon: icons.Bot,
+            getRoute: () => ROUTES.WORKSPACE_AGENTS.getRoute(policyID),
+            screenName: SCREENS.WORKSPACE.AGENTS,
+            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.AGENTS,
+        });
+
         if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.ARE_CATEGORIES_ENABLED] && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.CATEGORIES)) {
             items.push({
                 translationKey: 'workspace.common.categories',
