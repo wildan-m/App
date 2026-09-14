@@ -14,12 +14,13 @@ import {startMoneyRequest} from '@libs/actions/IOU/MoneyRequest';
 import {navigateToQuickAction} from '@libs/actions/QuickActionNavigation';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
+import isTeachersUnitePolicyID from '@libs/isTeachersUnitePolicyID';
 import Navigation from '@libs/Navigation/Navigation';
 import {isGroupPolicy} from '@libs/PolicyUtils';
 import {getQuickActionIcon, getQuickActionTitle, isQuickActionAllowed} from '@libs/QuickActionUtils';
 import {getReportNameFromNames} from '@libs/ReportAttributesUtils';
 import {getReportName} from '@libs/ReportNameUtils';
-import {getDisplayNameForParticipant, getIcons, getWorkspaceChats, isPolicyExpenseChat} from '@libs/ReportUtils';
+import {generateReportID, getDisplayNameForParticipant, getIcons, getWorkspaceChats, isPolicyExpenseChat} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 
 import FABFocusableMenuItem from '@pages/inbox/sidebar/FABPopoverContent/FABFocusableMenuItem';
@@ -73,6 +74,9 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
     const isValidReport = !(isEmptyObject(quickActionReport) || isReportArchived);
 
     const policyChatForActivePolicy = !isEmptyObject(activePolicy) && isGroupPolicy(activePolicy) && policyChats.length > 0 ? policyChats.at(0) : undefined;
+
+    // Teachers Unite workspace chats only accept Split, so the fallback quick action must not pre-target them with a Submit flow.
+    const isActivePolicyTeachersUnite = isTeachersUnitePolicyID(activePolicyID);
 
     const derivedNames = useDerivedReportNamesByReportIDs([quickActionReport?.reportID, policyChatForActivePolicy?.reportID]);
     const derivedQuickActionReportName = getReportNameFromNames(derivedNames, quickActionReport?.reportID);
@@ -215,8 +219,8 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
             shouldTeleportPortalToModalLayer
             icon={icons.ReceiptScan}
             title={translate('quickAction.scanReceipt')}
-            description={getReportName(policyChatForActivePolicy, derivedPolicyChatReportName)}
-            rightIconReportID={policyChatForActivePolicy?.reportID}
+            description={isActivePolicyTeachersUnite ? '' : getReportName(policyChatForActivePolicy, derivedPolicyChatReportName)}
+            rightIconReportID={isActivePolicyTeachersUnite ? undefined : policyChatForActivePolicy?.reportID}
             onPress={() =>
                 interceptAnonymousUser(() => {
                     if (
@@ -231,6 +235,11 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
                         )
                     ) {
                         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyChatForActivePolicyPolicyID));
+                        return;
+                    }
+
+                    if (isActivePolicyTeachersUnite) {
+                        startMoneyRequest(CONST.IOU.TYPE.CREATE, generateReportID(), draftTransactionIDs, CONST.IOU.REQUEST_TYPE.SCAN, true, undefined, true);
                         return;
                     }
 
