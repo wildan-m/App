@@ -12,6 +12,7 @@ import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
+import type {ButtonProps} from './Button';
 import type DotLottieAnimation from './LottieAnimations/types';
 
 import Button from './Button';
@@ -34,31 +35,64 @@ type ConfirmationPageProps = {
     /** Call to action component of the confirmation page */
     ctaComponent?: React.ReactNode;
 
-    /** The text for the primary button label */
+    /** Primary button rendered in the footer, composed by the caller (e.g. via `ConfirmationPage.Button`). Takes precedence over the deprecated flat primary button props */
+    primaryButtonComponent?: React.ReactNode;
+
+    /** Secondary button rendered in the footer above the primary button, composed by the caller (e.g. via `ConfirmationPage.Button`). Takes precedence over the deprecated flat secondary button props */
+    secondaryButtonComponent?: React.ReactNode;
+
+    /**
+     * The text for the primary button label
+     * @deprecated Compose the button via `primaryButtonComponent` instead
+     */
     buttonText?: string;
 
-    /** A function that is called when the primary button is clicked on */
+    /**
+     * A function that is called when the primary button is clicked on
+     * @deprecated Compose the button via `primaryButtonComponent` instead
+     */
     onButtonPress?: () => void;
 
-    /** Whether we should show a primary confirmation button */
+    /**
+     * Whether we should show a primary confirmation button
+     * @deprecated Compose the button via `primaryButtonComponent` instead — a provided slot is always rendered
+     */
     shouldShowButton?: boolean;
 
-    /** Whether the primary confirmation button should be disabled */
+    /**
+     * Whether the primary confirmation button should be disabled
+     * @deprecated Compose the button via `primaryButtonComponent` instead
+     */
     isButtonDisabled?: boolean;
 
-    /** Whether the primary confirmation button should show a loading spinner */
+    /**
+     * Whether the primary confirmation button should show a loading spinner
+     * @deprecated Compose the button via `primaryButtonComponent` instead
+     */
     isButtonLoading?: boolean;
 
-    /** The text for the secondary button label */
+    /**
+     * The text for the secondary button label
+     * @deprecated Compose the button via `secondaryButtonComponent` instead
+     */
     secondaryButtonText?: string;
 
+    /** @deprecated Compose the button via `secondaryButtonComponent` instead */
     onSecondaryButtonPress?: () => void;
+
+    /** @deprecated Compose the button via `secondaryButtonComponent` instead — a provided slot is always rendered */
     shouldShowSecondaryButton?: boolean;
 
-    /** Whether the secondary confirmation button should be disabled */
+    /**
+     * Whether the secondary confirmation button should be disabled
+     * @deprecated Compose the button via `secondaryButtonComponent` instead
+     */
     isSecondaryButtonDisabled?: boolean;
 
-    /** Whether the secondary confirmation button should show a loading spinner */
+    /**
+     * Whether the secondary confirmation button should show a loading spinner
+     * @deprecated Compose the button via `secondaryButtonComponent` instead
+     */
     isSecondaryButtonLoading?: boolean;
     headingStyle?: TextStyle;
 
@@ -83,6 +117,8 @@ function ConfirmationPage({
     descriptionComponent,
     cta,
     ctaComponent,
+    primaryButtonComponent,
+    secondaryButtonComponent,
     buttonText = '',
     onButtonPress = () => {},
     shouldShowButton = false,
@@ -156,40 +192,63 @@ function ConfirmationPage({
                 </ScrollView>
                 {!!footerComponent && <View style={[styles.pAbsolute, styles.b0, styles.l0, styles.r0, styles.ph5]}>{footerComponent}</View>}
             </View>
-            {(shouldShowSecondaryButton || shouldShowButton) && (
+            {(!!secondaryButtonComponent || !!primaryButtonComponent || shouldShowSecondaryButton || shouldShowButton) && (
                 <FixedFooter style={footerStyle}>
-                    {shouldShowSecondaryButton && (
-                        <Button
-                            size={CONST.BUTTON_SIZE.LARGE}
-                            testID="confirmation-secondary-button"
-                            style={styles.mt3}
-                            isDisabled={isSecondaryButtonDisabled}
-                            isLoading={isSecondaryButtonLoading}
-                            onPress={onSecondaryButtonPress}
-                        >
-                            <Button.Text>{secondaryButtonText}</Button.Text>
-                        </Button>
-                    )}
-                    {shouldShowButton && (
-                        <Button
-                            variant={CONST.BUTTON_VARIANT.SUCCESS}
-                            size={CONST.BUTTON_SIZE.LARGE}
-                            testID="confirmation-primary-button"
-                            style={styles.mt3}
-                            isDisabled={isButtonDisabled}
-                            isLoading={isButtonLoading}
-                            onPress={onButtonPress}
-                        >
-                            <Button.KeyboardShortcut />
-                            <Button.Text>{buttonText}</Button.Text>
-                        </Button>
-                    )}
+                    {secondaryButtonComponent ??
+                        (shouldShowSecondaryButton && (
+                            <Button
+                                size={CONST.BUTTON_SIZE.LARGE}
+                                testID="confirmation-secondary-button"
+                                style={styles.mt3}
+                                isDisabled={isSecondaryButtonDisabled}
+                                isLoading={isSecondaryButtonLoading}
+                                onPress={onSecondaryButtonPress}
+                            >
+                                <Button.Text>{secondaryButtonText}</Button.Text>
+                            </Button>
+                        ))}
+                    {primaryButtonComponent ??
+                        (shouldShowButton && (
+                            <Button
+                                variant={CONST.BUTTON_VARIANT.SUCCESS}
+                                size={CONST.BUTTON_SIZE.LARGE}
+                                testID="confirmation-primary-button"
+                                style={styles.mt3}
+                                isDisabled={isButtonDisabled}
+                                isLoading={isButtonLoading}
+                                onPress={onButtonPress}
+                            >
+                                <Button.KeyboardShortcut />
+                                <Button.Text>{buttonText}</Button.Text>
+                            </Button>
+                        ))}
                 </FixedFooter>
             )}
         </View>
     );
 }
 
-export default ConfirmationPage;
+/**
+ * Footer button for the ConfirmationPage slots. Pre-applies the footer sizing (large size, top margin) so composed
+ * buttons stay visually consistent across confirmation screens, while the content stays composable by the caller
+ * via the compound Button primitives (Button.Text, Button.Icon, Button.KeyboardShortcut).
+ */
+function ConfirmationPageButton({size = CONST.BUTTON_SIZE.LARGE, style, ...rest}: ButtonProps) {
+    const styles = useThemeStyles();
+    return (
+        <Button
+            size={size}
+            style={[styles.mt3, style]}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...rest}
+        />
+    );
+}
+
+const ConfirmationPageCompound = Object.assign(ConfirmationPage, {
+    Button: ConfirmationPageButton,
+});
+
+export default ConfirmationPageCompound;
 
 export type {ConfirmationPageProps};

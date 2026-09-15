@@ -1,3 +1,4 @@
+import Button from '@components/Button';
 import ConfirmationPage from '@components/ConfirmationPage';
 import LottieAnimations from '@components/LottieAnimations';
 
@@ -29,9 +30,16 @@ function SuccessPageBase({onButtonPress, onBackButtonPress}: SuccessPageBaseProp
                 illustration={LottieAnimations.Fireworks}
                 heading={translate('twoFactorAuth.enabled')}
                 description={translate('twoFactorAuth.congrats')}
-                shouldShowButton
-                buttonText={translate('common.buttonConfirm')}
-                onButtonPress={onButtonPress}
+                primaryButtonComponent={
+                    <ConfirmationPage.Button
+                        variant={CONST.BUTTON_VARIANT.SUCCESS}
+                        testID="confirmation-primary-button"
+                        onPress={onButtonPress}
+                    >
+                        <Button.KeyboardShortcut />
+                        <Button.Text>{translate('common.buttonConfirm')}</Button.Text>
+                    </ConfirmationPage.Button>
+                }
                 containerStyle={styles.flex1}
             />
         </TwoFactorAuthWrapper>

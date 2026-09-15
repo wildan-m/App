@@ -1,3 +1,4 @@
+import Button from '@components/Button';
 import ConfirmationPage from '@components/ConfirmationPage';
 import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -16,6 +17,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspacesDomainModalNavigatorParamList} from '@libs/Navigation/types';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -73,19 +75,31 @@ function DomainAccessRestrictedPage({route}: DomainAccessRestrictedPageProps) {
                                 />
                             )
                         }
-                        shouldShowSecondaryButton
-                        secondaryButtonText={translate(hasPendingRequest ? 'domain.requestSent' : 'domain.accessRestricted.requestAdminAccess')}
-                        isSecondaryButtonLoading={isRequestPending}
-                        isSecondaryButtonDisabled={!isRequestPending && (!!hasPendingRequest || isOffline)}
-                        onSecondaryButtonPress={() => {
-                            if (!currentUserAccountID) {
-                                return;
-                            }
-                            requestDomainAdminship(domainAccountID, currentUserAccountID, false);
-                        }}
-                        shouldShowButton
-                        buttonText={translate('domain.accessRestricted.verifyYourself')}
-                        onButtonPress={() => Navigation.navigate(ROUTES.WORKSPACES_VERIFY_DOMAIN.getRoute(domainAccountID))}
+                        secondaryButtonComponent={
+                            <ConfirmationPage.Button
+                                testID="confirmation-secondary-button"
+                                isLoading={isRequestPending}
+                                isDisabled={!isRequestPending && (!!hasPendingRequest || isOffline)}
+                                onPress={() => {
+                                    if (!currentUserAccountID) {
+                                        return;
+                                    }
+                                    requestDomainAdminship(domainAccountID, currentUserAccountID, false);
+                                }}
+                            >
+                                <Button.Text>{translate(hasPendingRequest ? 'domain.requestSent' : 'domain.accessRestricted.requestAdminAccess')}</Button.Text>
+                            </ConfirmationPage.Button>
+                        }
+                        primaryButtonComponent={
+                            <ConfirmationPage.Button
+                                variant={CONST.BUTTON_VARIANT.SUCCESS}
+                                testID="confirmation-primary-button"
+                                onPress={() => Navigation.navigate(ROUTES.WORKSPACES_VERIFY_DOMAIN.getRoute(domainAccountID))}
+                            >
+                                <Button.KeyboardShortcut />
+                                <Button.Text>{translate('domain.accessRestricted.verifyYourself')}</Button.Text>
+                            </ConfirmationPage.Button>
+                        }
                     />
                 </ScreenWrapper>
             )}
