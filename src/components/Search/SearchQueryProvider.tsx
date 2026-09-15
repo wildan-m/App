@@ -127,7 +127,10 @@ function SearchQueryProvider({children}: SearchQueryProviderProps) {
         // from the currently selected search key query or the type is different. For example, the "Card statements" suggested
         // search default filters are Feed and Posted. When the query changes (by removing Posted), the search key becomes invalid,
         // it's not a "Card statements" search anymore. This can happen when accessing the page through a link/deeplink.
-        else if (!doesQueryMatchDefaultFilterKeysAndType(currentSearchQueryJSON, currentDefaultSearchQueryJSON)) {
+        // We also re-derive the key when the new query resolves to a different suggested search than the current one: a
+        // superset query (e.g. the "Needs approval" search, which adds action/to on top of the "Reports" defaults) still
+        // matches the current key's default filters, so without this the key would stay stuck on the previous suggested search.
+        else if (!doesQueryMatchDefaultFilterKeysAndType(currentSearchQueryJSON, currentDefaultSearchQueryJSON) || getSearchKeyForQuery() !== currentSearchKey) {
             resetSearchKey();
         }
     }
