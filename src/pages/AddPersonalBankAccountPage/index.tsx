@@ -2,6 +2,7 @@ import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import InteractiveStepWrapper from '@components/InteractiveStepWrapper';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
 
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useSubPage from '@hooks/useSubPage';
@@ -17,6 +18,7 @@ import Navigation, {navigationRef} from '@navigation/Navigation';
 
 import {addPersonalBankAccount, clearPersonalBankAccount} from '@userActions/BankAccounts';
 import {continueSetup} from '@userActions/PaymentMethods';
+import {openReport} from '@userActions/Report';
 
 import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
@@ -68,6 +70,12 @@ function AddPersonalBankAccountPage() {
     const [plaidData] = useOnyx(ONYXKEYS.PLAID_DATA);
     const kycWallRef = useContext(KYCWallContext);
 
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [conciergeChat] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
+    const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+
     const shouldShowSuccess = fullPersonalBankAccount?.shouldShowSuccess ?? false;
 
     const exit = () => {
@@ -92,6 +100,11 @@ function AddPersonalBankAccountPage() {
         const onSuccessFallbackRoute = fullPersonalBankAccount?.onSuccessFallbackRoute ?? '';
 
         if (exitReportID) {
+            // The bank account was just added, so the report we are returning to is stale: both its next step and the
+            // settlement system message are written by the server, and dismissing back onto a report we are already on
+            // does not re-open it. Re-fetch the report so it reconciles instead of waiting for a push to arrive.
+            // hasReportActions is always true here: this flow is only entered from that report, which already has actions.
+            openReport({reportID: exitReportID, introSelected, betas, conciergeChat, currentUserAccountID, hasReportActions: true});
             Navigation.dismissModalWithReport({reportID: exitReportID});
         } else if (shouldContinue && onSuccessFallbackRoute) {
             continueSetup(kycWallRef, onSuccessFallbackRoute);
