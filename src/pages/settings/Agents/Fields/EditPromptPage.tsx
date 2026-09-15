@@ -16,6 +16,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateAgentPrompt} from '@libs/actions/Agent';
+import {resolveAgentAccountID} from '@libs/AgentAccountIDMapping';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -41,7 +42,7 @@ function EditPromptPage({route}: EditPromptPageProps) {
     const {isKeyboardActive} = useKeyboardState();
     const isInLandscapeMode = useIsInLandscapeMode();
     const shouldShrinkPromptInput = isInLandscapeMode && isKeyboardActive;
-    const accountID = route.params.accountID;
+    const accountID = resolveAgentAccountID(route.params.accountID);
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
     const formRef = useRef<FormRef>(null);
     const promptTopOffsetRef = useRef(0);

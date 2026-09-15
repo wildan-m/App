@@ -11,6 +11,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateAgentName} from '@libs/actions/Agent';
+import {resolveAgentAccountID} from '@libs/AgentAccountIDMapping';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -28,7 +29,7 @@ type EditNamePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, ty
 function EditNamePage({route}: EditNamePageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const accountID = route.params.accountID;
+    const accountID = resolveAgentAccountID(route.params.accountID);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
 
     const {inputCallbackRef} = useAutoFocusInput();

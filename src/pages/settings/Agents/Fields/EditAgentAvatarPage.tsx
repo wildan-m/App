@@ -17,6 +17,7 @@ import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {resolveAgentAccountID} from '@libs/AgentAccountIDMapping';
 import {AGENT_AVATARS} from '@libs/Avatars/AgentAvatarCatalog';
 import type {AgentAvatarID} from '@libs/Avatars/AgentAvatarCatalog';
 import {validateAvatarImage} from '@libs/AvatarUtils';
@@ -233,7 +234,7 @@ function EditAgentAvatarContent({accountID, fallbackRoute, onSave, initialPreset
 EditAgentAvatarContent.displayName = 'EditAgentAvatarContent';
 
 function EditAgentAvatarPage({route}: EditAgentAvatarPageProps) {
-    const {accountID} = route.params;
+    const accountID = resolveAgentAccountID(route.params.accountID);
     return (
         <EditAgentAvatarContent
             accountID={accountID}

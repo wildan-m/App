@@ -19,6 +19,7 @@ import useSwitchToDelegator from '@hooks/useSwitchToDelegator';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {clearAgentAvatarUpdateError, clearAgentNameUpdateError, clearAgentPromptUpdateError, deleteAgent} from '@libs/actions/Agent';
+import {resolveAgentAccountID} from '@libs/AgentAccountIDMapping';
 import {getRuleBotEnforcedPolicy} from '@libs/AgentRulesUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -41,7 +42,9 @@ function EditAgentPage({route}: EditAgentPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['Trashcan', 'ChatBubble', 'Users']);
-    const accountID = route.params.accountID;
+    // A newly created agent is still routed to by its optimistic accountID until redirectAgentSettingsScreens() rewrites
+    // the param, so the screen translates the accountID itself to stay correct whenever it mounts.
+    const accountID = resolveAgentAccountID(route.params.accountID);
     const [agent, agentMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
     const [personalDetails, personalDetailsMetadata] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
@@ -50,7 +53,9 @@ function EditAgentPage({route}: EditAgentPageProps) {
     const chatWithAgent = useChatWithAgent();
     const switchToDelegator = useSwitchToDelegator();
     const isOnyxLoaded = agentMetadata.status === 'loaded' && personalDetailsMetadata.status === 'loaded';
-    const shouldShowNotFoundPage = isOnyxLoaded && !agent && !personalDetails;
+    // While the accountID is being translated the real agent's data is still on its way in from the same response, so the
+    // not-found page is only shown for an accountID that is not an optimistic one.
+    const shouldShowNotFoundPage = isOnyxLoaded && !agent && !personalDetails && accountID === route.params.accountID;
 
     const agentLogin = personalDetails?.login ?? '';
     const handleBackPress = () => Navigation.goBack();
