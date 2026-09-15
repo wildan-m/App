@@ -11376,8 +11376,50 @@ describe('SearchUIUtils', () => {
                 personalDetailsList: searchResults.data.personalDetailsList,
             };
 
-            const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data, visibleColumns: []});
+            const columns = SearchUIUtils.getColumnsToShow({
+                currentAccountID: submitterAccountID,
+                data,
+                visibleColumns: [],
+                violationHasFilterValues: [CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION],
+            });
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS);
+        });
+
+        test('Should not show Violations when the query has no violations filter, even with submitted-violation data', () => {
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const tx = {
+                ...baseTransaction,
+                transactionID: 'submitted-violations-without-filter',
+                merchant: 'Test Merchant',
+                modifiedMerchant: '',
+                reportID,
+            };
+
+            // @ts-expect-error minimal dataset for getColumnsToShow
+            const data: OnyxTypes.SearchResults['data'] = {
+                [`report_${reportID}`]: searchResults.data[`report_${reportID}`],
+                [`transactions_${tx.transactionID}`]: tx,
+                [`reportActions_${reportID}`]: {
+                    '1': {
+                        reportActionID: '1',
+                        actionName: CONST.REPORT.ACTIONS.TYPE.SUBMITTED,
+                        created: '2025-01-01 00:00:00',
+                        originalMessage: {
+                            amount: 1000,
+                            currency: CONST.CURRENCY.USD,
+                            violations: {
+                                transactions: {
+                                    [tx.transactionID]: [{name: CONST.VIOLATIONS.MISSING_CATEGORY}],
+                                },
+                            },
+                        },
+                    },
+                },
+                personalDetailsList: searchResults.data.personalDetailsList,
+            };
+
+            const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data, visibleColumns: []});
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS);
         });
 
         test('Should inject Violations into custom column layouts when submitted-violation data is present', () => {
@@ -11421,7 +11463,12 @@ describe('SearchUIUtils', () => {
                 personalDetailsList: searchResults.data.personalDetailsList,
             };
 
-            const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data, visibleColumns: customVisibleColumns});
+            const columns = SearchUIUtils.getColumnsToShow({
+                currentAccountID: submitterAccountID,
+                data,
+                visibleColumns: customVisibleColumns,
+                violationHasFilterValues: [CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION],
+            });
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS);
             expect(columns.indexOf(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS)).toBeLessThan(columns.indexOf(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT));
         });
@@ -11463,6 +11510,51 @@ describe('SearchUIUtils', () => {
 
             const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data, visibleColumns: customVisibleColumns});
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS);
+        });
+
+        test('Should not force Violations back into a custom column layout that omits it when the query has no violations filter', () => {
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const tx = {
+                ...baseTransaction,
+                transactionID: 'custom-columns-unchecked-violations',
+                merchant: 'Test Merchant',
+                modifiedMerchant: '',
+                category: 'Advertising',
+                reportID,
+            };
+            const customVisibleColumns = [
+                CONST.SEARCH.TABLE_COLUMNS.RECEIPT,
+                CONST.SEARCH.TABLE_COLUMNS.DATE,
+                CONST.SEARCH.TABLE_COLUMNS.MERCHANT,
+                CONST.SEARCH.TABLE_COLUMNS.CATEGORY,
+                CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
+            ];
+
+            // @ts-expect-error minimal dataset for getColumnsToShow
+            const data: OnyxTypes.SearchResults['data'] = {
+                [`report_${reportID}`]: searchResults.data[`report_${reportID}`],
+                [`transactions_${tx.transactionID}`]: tx,
+                [`reportActions_${reportID}`]: {
+                    '1': {
+                        reportActionID: '1',
+                        actionName: CONST.REPORT.ACTIONS.TYPE.SUBMITTED,
+                        created: '2025-01-01 00:00:00',
+                        originalMessage: {
+                            amount: 1000,
+                            currency: CONST.CURRENCY.USD,
+                            violations: {
+                                transactions: {
+                                    [tx.transactionID]: [{name: CONST.VIOLATIONS.MISSING_CATEGORY}],
+                                },
+                            },
+                        },
+                    },
+                },
+                personalDetailsList: searchResults.data.personalDetailsList,
+            };
+
+            const columns = SearchUIUtils.getColumnsToShow({currentAccountID: submitterAccountID, data, visibleColumns: customVisibleColumns});
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS);
         });
 
         test('Should only show Category GL Code when that column is selected', () => {

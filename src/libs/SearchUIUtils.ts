@@ -6682,6 +6682,7 @@ function hasGroupWithConversionAmount(column: keyof typeof conversionAmountGroup
 /**
  * Determines what columns to show based on available data
  * @param isExpenseReportView: true when we are inside an expense report view, false if we're in the Reports page.
+ * @param violationHasFilterValues: the violation-related `has` values of the executed query, which gate the Violations column the same way they gate its cells.
  * @returns An ordered array of visible column IDs
  */
 function getColumnsToShow({
@@ -6701,6 +6702,7 @@ function getColumnsToShow({
     isPolicyTaxEnabled = false,
     fallbackPolicyID,
     sortBy,
+    violationHasFilterValues,
 }: {
     currentAccountID: number | undefined;
     data: OnyxTypes.SearchResults['data'] | OnyxTypes.Transaction[];
@@ -6718,6 +6720,7 @@ function getColumnsToShow({
     isPolicyTaxEnabled?: boolean;
     fallbackPolicyID?: string;
     sortBy?: SearchSortBy;
+    violationHasFilterValues?: HasFilterValues;
 }): SearchColumnType[] {
     const reportCustomColumns = new Set<SearchColumnType>([
         CONST.SEARCH.TABLE_COLUMNS.SUBMITTER_USER_ID,
@@ -7022,9 +7025,12 @@ function getColumnsToShow({
             columns[CONST.SEARCH.TABLE_COLUMNS.TAG] = !isExpenseReportViewFromIOUReport;
         }
 
-        if (!isExpenseReportView && !Array.isArray(data)) {
+        // The cells only render violations the query asked for, so the column has to be gated on the same
+        // filter values and resolved by the same function — otherwise a search without a violations filter
+        // turns the column on and every cell in it renders blank.
+        if (!isExpenseReportView && !Array.isArray(data) && !!violationHasFilterValues?.length) {
             const reportActions = Object.values(data[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction.reportID}`] ?? {});
-            if (getSubmittedViolationsForTransaction(reportActions, transaction.transactionID) || getApprovedViolationsForTransaction(reportActions, transaction.transactionID)) {
+            if (getViolationsForTransaction(reportActions, transaction.transactionID, violationHasFilterValues)) {
                 columns[CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS] = true;
             }
         }

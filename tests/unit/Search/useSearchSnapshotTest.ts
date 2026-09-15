@@ -67,6 +67,7 @@ jest.mock('@libs/TransactionUtils', () => ({
 }));
 jest.mock('@libs/SearchQueryUtils', () => ({
     isDefaultExpensesQuery: () => false,
+    getViolationHasFilterValues: () => undefined,
 }));
 jest.mock('@libs/ReportUtils', () => ({
     selectFilteredReportActions: (value: unknown) => value,

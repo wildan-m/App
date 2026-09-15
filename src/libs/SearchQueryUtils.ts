@@ -458,19 +458,25 @@ function getFilterFromQuery(queryJSON: SearchQueryJSON | undefined, filterKey: S
     return {value, isNegated};
 }
 
+const violationHasValues = [CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION, CONST.SEARCH.HAS_VALUES.APPROVED_VIOLATION] as const;
+
 /**
- * Whether the query includes a positive `has:submitted-violation` filter.
- * Grouped CSV export uses this so Violations is included even when the query has no saved `columns`.
+ * The positive violation-related `has:` values the query asks for, or undefined when it asks for none.
+ * Both the Violations column and its cells are derived from this, so they can never disagree about
+ * whether violations are being searched for. Grouped CSV export uses it too, so Violations is included
+ * even when the query has no saved `columns`.
  */
-function queryHasSubmittedViolationFilter(queryJSON: SearchQueryJSON | undefined): boolean {
+function getViolationHasFilterValues(queryJSON: SearchQueryJSON | undefined): HasFilterValues | undefined {
     const hasFilterGroups = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS) ?? [];
     if (hasFilterGroups.length === 0) {
-        return false;
+        return undefined;
     }
 
-    return hasFilterGroups.some((group) =>
-        group.filters.some((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO && filter.value.toString() === CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION),
+    const values: HasFilterValues = violationHasValues.filter((violationValue) =>
+        hasFilterGroups.some((group) => group.filters.some((filter) => filter.operator === CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO && filter.value.toString() === violationValue)),
     );
+
+    return values.length > 0 ? values : undefined;
 }
 
 /**
@@ -2759,7 +2765,7 @@ export {
     getFilterFromQuery,
     getValidLastQuery,
     doesQueryMatchDefaultFilterKeysAndType,
-    queryHasSubmittedViolationFilter,
+    getViolationHasFilterValues,
 };
 
 export type {BuildUserReadableQueryStringParams};

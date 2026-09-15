@@ -21,6 +21,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {ModifiedMouseEvent} from '@libs/Navigation/helpers/openInternalRouteInNewTab';
+import {getViolationHasFilterValues} from '@libs/SearchQueryUtils';
 import {getColumnsToShow, getGroupColumnWidthFlags, getGroupTableScrollLayout} from '@libs/SearchUIUtils';
 import {isTransactionPendingDelete} from '@libs/TransactionUtils';
 
@@ -146,8 +147,9 @@ function GroupHeader({
             visibleColumns,
             type: snapshotSearchType,
             fallbackPolicyID: policyForMovingExpensesID,
+            violationHasFilterValues: getViolationHasFilterValues(groupItem.transactionsQueryJSON),
         });
-    }, [isExpenseReportType, columns, snapshotData, snapshotSearchType, currentUserDetails.accountID, visibleColumns, policyForMovingExpensesID]);
+    }, [isExpenseReportType, columns, snapshotData, snapshotSearchType, currentUserDetails.accountID, visibleColumns, policyForMovingExpensesID, groupItem.transactionsQueryJSON]);
 
     const {
         isAmountColumnWide: isSubHeaderAmountColumnWide,

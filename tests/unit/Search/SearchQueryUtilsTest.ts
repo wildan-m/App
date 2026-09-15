@@ -24,7 +24,7 @@ import {
     getFilterDisplayValue,
     getFilterFormValues,
     getFilterFromQuery,
-    queryHasSubmittedViolationFilter,
+    getViolationHasFilterValues,
     getDateFilterRange,
     getKeywordQueryWithCurrentSearchContext,
     getLastRouteByName,
@@ -3996,39 +3996,51 @@ describe('SearchQueryUtils', () => {
         });
     });
 
-    describe('queryHasSubmittedViolationFilter', () => {
-        test('returns true for a positive has:submitted-violation filter', () => {
+    describe('getViolationHasFilterValues', () => {
+        test('returns the value for a positive has:submitted-violation filter', () => {
             const queryJSON = buildSearchQueryJSON(`type:expense has:${CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION}`);
 
-            expect(queryHasSubmittedViolationFilter(queryJSON)).toBe(true);
+            expect(getViolationHasFilterValues(queryJSON)).toEqual([CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION]);
         });
 
-        test('returns false when the has filter is negated', () => {
+        test('returns the value for a positive has:approved-violation filter', () => {
+            const queryJSON = buildSearchQueryJSON(`type:expense has:${CONST.SEARCH.HAS_VALUES.APPROVED_VIOLATION}`);
+
+            expect(getViolationHasFilterValues(queryJSON)).toEqual([CONST.SEARCH.HAS_VALUES.APPROVED_VIOLATION]);
+        });
+
+        test('returns both values when the query asks for both', () => {
+            const queryJSON = buildSearchQueryJSON(`type:expense has:${CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION} has:${CONST.SEARCH.HAS_VALUES.APPROVED_VIOLATION}`);
+
+            expect(getViolationHasFilterValues(queryJSON)).toEqual([CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION, CONST.SEARCH.HAS_VALUES.APPROVED_VIOLATION]);
+        });
+
+        test('returns undefined when the has filter is negated', () => {
             const queryJSON = buildSearchQueryJSON(`type:expense -has:${CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION}`);
 
-            expect(queryHasSubmittedViolationFilter(queryJSON)).toBe(false);
+            expect(getViolationHasFilterValues(queryJSON)).toBeUndefined();
         });
 
-        test('returns false when submitted-violation is negated alongside other positive has filters', () => {
+        test('returns undefined when submitted-violation is negated alongside other positive has filters', () => {
             const queryJSON = buildSearchQueryJSON(`type:expense groupBy:from has:${CONST.SEARCH.HAS_VALUES.RECEIPT} -has:${CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION}`);
 
-            expect(queryHasSubmittedViolationFilter(queryJSON)).toBe(false);
+            expect(getViolationHasFilterValues(queryJSON)).toBeUndefined();
         });
 
-        test('returns true when submitted-violation is positive alongside other has filters', () => {
+        test('returns the value when submitted-violation is positive alongside other has filters', () => {
             const queryJSON = buildSearchQueryJSON(`type:expense groupBy:from has:${CONST.SEARCH.HAS_VALUES.RECEIPT} has:${CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION}`);
 
-            expect(queryHasSubmittedViolationFilter(queryJSON)).toBe(true);
+            expect(getViolationHasFilterValues(queryJSON)).toEqual([CONST.SEARCH.HAS_VALUES.SUBMITTED_VIOLATION]);
         });
 
-        test('returns false when the query has no submitted-violation filter', () => {
+        test('returns undefined when the query has no violation filter', () => {
             const queryJSON = buildSearchQueryJSON('type:expense groupBy:from');
 
-            expect(queryHasSubmittedViolationFilter(queryJSON)).toBe(false);
+            expect(getViolationHasFilterValues(queryJSON)).toBeUndefined();
         });
 
-        test('returns false for an undefined queryJSON', () => {
-            expect(queryHasSubmittedViolationFilter(undefined)).toBe(false);
+        test('returns undefined for an undefined queryJSON', () => {
+            expect(getViolationHasFilterValues(undefined)).toBeUndefined();
         });
     });
 
