@@ -901,8 +901,14 @@ function startSplitBill({
     }
     notifyNewAction(splitChatReport.reportID, undefined, true);
 
-    // Return the split transactionID for testing purpose
-    return {splitTransactionID: splitTransaction.transactionID};
+    // Return the split transactionID for testing purpose, plus everything CompleteSplitBill needs so the caller can
+    // immediately complete a split whose amount, merchant and date the user already entered on the confirmation page.
+    return {
+        splitTransactionID: splitTransaction.transactionID,
+        splitChatReportID: splitChatReport.reportID,
+        splitIOUReportAction: splitIOUReportAction as OnyxTypes.ReportAction,
+        splitTransaction: {...splitTransaction, comment: {...splitTransaction.comment, splits}},
+    };
 }
 
 /** Used for editing a split expense while it's still scanning or when SmartScan fails, it completes a split expense started by startSplitBill above.

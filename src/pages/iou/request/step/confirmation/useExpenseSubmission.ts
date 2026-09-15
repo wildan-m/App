@@ -67,7 +67,14 @@ import {isOneToTwoTransactionTransition} from '@userActions/IOU/PendingNewTransa
 import {getPerDiemExpensePolicyID, hasCompletePerDiemCustomUnit, submitPerDiemExpenseForSelfDM, submitPerDiemExpense as submitPerDiemExpenseIOUActions} from '@userActions/IOU/PerDiem';
 import {getReceiverType, sendInvoice} from '@userActions/IOU/SendInvoice';
 import {sendMoneyElsewhere, sendMoneyWithWallet} from '@userActions/IOU/SendMoney';
-import {createDistanceRequest as createDistanceRequestIOUActions, resolveOptimisticSplitChatReportID, splitBill, splitBillAndOpenReport, startSplitBill} from '@userActions/IOU/Split';
+import {
+    completeSplitBill,
+    createDistanceRequest as createDistanceRequestIOUActions,
+    resolveOptimisticSplitChatReportID,
+    splitBill,
+    splitBillAndOpenReport,
+    startSplitBill,
+} from '@userActions/IOU/Split';
 import {requestMoney as requestMoneyIOUActions, trackExpense as trackExpenseIOUActions} from '@userActions/IOU/TrackExpense';
 import type {GPSPoint as GpsPoint} from '@userActions/IOU/types/TrackExpenseTransactionParams';
 
@@ -119,7 +126,7 @@ type UseExpenseSubmissionParams = {
     transactions: Transaction[];
     receiptFiles: Record<string, Receipt>;
 
-    /** Whether this surface offers manual entry of the amount / merchant / date. False for splits, test receipts and moved tracked expenses. */
+    /** Whether this surface offers manual entry of the amount / merchant / date. False for test receipts and moved tracked expenses. */
     canEnterScanFieldsManually: boolean;
 
     // Report data
@@ -1043,7 +1050,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
                     const itemTrimmedComment = item?.comment?.comment?.trim() ?? '';
 
                     // If we have a receipt let's start the split expense by creating only the action, the transaction, and the group DM if needed
-                    startSplitBill({
+                    const {splitChatReportID, splitIOUReportAction, splitTransaction} = startSplitBill({
                         getCurrencyDecimals,
                         participants: selectedParticipants,
                         currentUserLogin,
@@ -1069,6 +1076,37 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
                         shouldDeferForSearch: shouldDeferSplitForSearch,
                         delegateAccountID,
                         formatPhoneNumber,
+                    });
+
+                    // StartSplitBill has no amount / merchant / date, so when the user filled all three in behind
+                    // "Show more" we complete the split right away with those values, exactly like the split details
+                    // page does once SmartScan is done. Both commands queue offline, and the splits array the
+                    // completion needs was persisted by startSplitBill for that reason.
+                    if (!canEnterScanFieldsManually || !hasAllManuallyEnteredScanFields(item)) {
+                        continue;
+                    }
+                    completeSplitBill({
+                        chatReportID: splitChatReportID,
+                        reportAction: splitIOUReportAction,
+                        updatedTransaction: {
+                            ...splitTransaction,
+                            modifiedAmount: item.amount,
+                            modifiedCurrency: item.currency,
+                            modifiedMerchant: item.merchant,
+                            modifiedCreated: item.created,
+                        },
+                        sessionAccountID: currentUserPersonalDetails.accountID,
+                        sessionEmail: currentUserLogin,
+                        isASAPSubmitBetaEnabled,
+                        quickAction,
+                        transactionViolations: transactionViolationsRef.current,
+                        betas,
+                        personalDetails,
+                        delegateAccountID,
+                        isTrackIntentUser,
+                        formatPhoneNumber,
+                        getCurrencyDecimals,
+                        rules,
                     });
                 }
             }
