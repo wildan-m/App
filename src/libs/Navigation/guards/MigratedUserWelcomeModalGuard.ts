@@ -1,6 +1,7 @@
 import Log from '@libs/Log';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
+import navigationRef from '@libs/Navigation/navigationRef';
 import isProductTrainingElementDismissed from '@libs/TooltipUtils';
 
 import CONST from '@src/CONST';
@@ -28,6 +29,7 @@ let session: OnyxEntry<Session>;
 let isLoadingApp = true;
 
 let hasRedirectedToMigratedUserModal = false;
+let isWaitingForNavigationReady = false;
 
 function getMigratedUserWelcomeModalRoute(basePath?: string): Route {
     return createDynamicRoute(DYNAMIC_ROUTES.MIGRATED_USER_WELCOME.path, basePath ?? (Navigation.getActiveRoute() || ROUTES.HOME));
@@ -53,6 +55,23 @@ function navigateToMigratedUserWelcomeModalIfReady() {
         !isDismissedProductTrainingLoaded ||
         isProductTrainingElementDismissed('migratedUserWelcomeModal', dismissedProductTraining)
     ) {
+        return;
+    }
+
+    // On HybridApp the AuthScreens (which mount the modal navigator) only render once
+    // readyToShowAuthScreens flips true, which can happen after IS_LOADING_APP and the NVPs have
+    // already settled. Navigating before the container is ready silently drops the call, yet we would
+    // still mark the modal as shown - so it never opens and no later Onyx callback retries. Wait for
+    // the container to be ready, then re-evaluate the conditions before marking it as shown.
+    if (!navigationRef.isReady()) {
+        if (isWaitingForNavigationReady) {
+            return;
+        }
+        isWaitingForNavigationReady = true;
+        Navigation.isNavigationReady().then(() => {
+            isWaitingForNavigationReady = false;
+            navigateToMigratedUserWelcomeModalIfReady();
+        });
         return;
     }
 
