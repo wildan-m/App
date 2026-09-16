@@ -1,6 +1,7 @@
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Modal from '@components/Modal';
 
+import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -50,6 +51,9 @@ function VictoryChartExpandModal({isVisible, onClose}: VictoryChartExpandModalPr
         const {width, height} = event.nativeEvent.layout;
         setAvailableSize((prev) => (prev.width === width && prev.height === height ? prev : {width, height}));
     };
+
+    // Close on escape keydown like the attachment viewer does, instead of waiting for the modal's own keyup listener
+    useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ESCAPE, () => onClose(), {isActive: isVisible, shouldBubble: true});
 
     const isMeasured = availableSize.width > 0 && availableSize.height > 0;
     const shouldRenderChart = isMeasured && (isVisible || !isHidden);
