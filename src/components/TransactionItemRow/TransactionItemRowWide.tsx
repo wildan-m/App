@@ -234,9 +234,18 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TAG_GL_CODE)]}
+                        style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TAG_GL_CODE), styles.editableCellColumn]}
                     >
-                        <TextCell text={getTagGLCode(policyTagLists, transactionItem.tag)} />
+                        <TagCell
+                            transactionItem={transactionItem}
+                            shouldShowTooltip={shouldShowTooltip}
+                            shouldUseNarrowLayout={false}
+                            canEdit={canEditTag}
+                            onSave={onEditTag}
+                            policyID={effectivePolicyID}
+                            policy={policy}
+                            displayTextOverride={getTagGLCode(policyTagLists, transactionItem.tag)}
+                        />
                     </View>
                 );
             case CONST.SEARCH.TABLE_COLUMNS.DATE:
@@ -329,9 +338,17 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.CATEGORY_GL_CODE)]}
+                        style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.CATEGORY_GL_CODE), styles.editableCellColumn]}
                     >
-                        <TextCell text={getCategoryGLCode(policyCategories, transactionItem.category)} />
+                        <CategoryCell
+                            transactionItem={transactionItem}
+                            shouldShowTooltip={shouldShowTooltip}
+                            shouldUseNarrowLayout={false}
+                            canEdit={canEditCategory}
+                            onSave={onEditCategory}
+                            policyID={effectivePolicyID}
+                            displayTextOverride={getCategoryGLCode(policyCategories, transactionItem.category)}
+                        />
                     </View>
                 );
             case CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE:

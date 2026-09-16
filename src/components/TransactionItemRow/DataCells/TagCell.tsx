@@ -23,9 +23,12 @@ type TagCellProps = TransactionDataCellProps &
     EditableProps<string> & {
         policyID?: string;
         policy?: Policy;
+
+        /** Text to render in place of the tag name, used by the Tag GL Code column so it edits through the same picker */
+        displayTextOverride?: string;
     };
 
-function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, transactionItem, policyID, policy: policyProp}: TagCellProps) {
+function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, transactionItem, policyID, policy: policyProp, displayTextOverride}: TagCellProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Tag']);
     const styles = useThemeStyles();
 
@@ -43,7 +46,8 @@ function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, tra
     });
 
     // Decode HTML entities so tags stored with encoding are displayed properly (e.g. `uno &amp; dos` display as `uno & dos`)
-    const tagForDisplay = getDecodedTagName(getTagForDisplay(transactionItem));
+    // The column can override the text (e.g. the GL code) while keeping the same picker and save behaviour
+    const tagForDisplay = displayTextOverride ?? getDecodedTagName(getTagForDisplay(transactionItem));
 
     const displayContent = shouldUseNarrowLayout ? (
         <TextWithIconCell

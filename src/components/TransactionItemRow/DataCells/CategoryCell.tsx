@@ -17,14 +17,18 @@ import type TransactionDataCellProps from './TransactionDataCellProps';
 type CategoryCellProps = TransactionDataCellProps &
     EditableProps<string> & {
         policyID?: string;
+
+        /** Text to render in place of the category name, used by the Category GL Code column so it edits through the same picker */
+        displayTextOverride?: string;
     };
 
-function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem, canEdit, onSave, policyID}: CategoryCellProps) {
+function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem, canEdit, onSave, policyID, displayTextOverride}: CategoryCellProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Folder']);
     const styles = useThemeStyles();
 
-    // For display: decoded category name for user-readable text
-    const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedLeafCategoryName(transactionItem?.category ?? '');
+    // For display: decoded category name for user-readable text, unless the column overrides it (e.g. the GL code)
+    const categoryName = isCategoryMissing(transactionItem?.category) ? '' : getDecodedLeafCategoryName(transactionItem?.category ?? '');
+    const categoryForDisplay = displayTextOverride ?? categoryName;
 
     // For picker comparison: raw category name (empty if missing, matches IOURequestStepCategory)
     const categoryForComparison = isCategoryMissing(transactionItem?.category) ? '' : (transactionItem?.category ?? '');
