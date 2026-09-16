@@ -16,7 +16,10 @@ import navigateToCardTransactions from '@libs/CardNavigationUtils';
 import {formatMaskedCardName} from '@libs/CardUtils';
 import localFileDownload from '@libs/localFileDownload';
 
+import Navigation from '@navigation/Navigation';
+
 import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
 
 import {format, parseISO} from 'date-fns';
 import React from 'react';
@@ -24,12 +27,15 @@ import {View} from 'react-native';
 
 import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableRow';
 
-type WorkspaceCompanyCardBulkActionType = 'unassign' | 'viewTransactions' | 'exportCSV';
+type WorkspaceCompanyCardBulkActionType = 'unassign' | 'viewTransactions' | 'updateTransactionStartDate' | 'exportCSV';
 
 type WorkspaceCompanyCardsTableControlsProps = {
     policyID: string;
     domainOrWorkspaceAccountID: number;
     bankName: UseCompanyCardsResult['bankName'];
+
+    /** The feed the displayed cards belong to */
+    feedName: UseCompanyCardsResult['feedName'];
 
     /** Whether the current member can edit company cards */
     canWriteCompanyCards: boolean;
@@ -55,6 +61,7 @@ function WorkspaceCompanyCardsTableControls({
     policyID,
     domainOrWorkspaceAccountID,
     bankName,
+    feedName,
     canWriteCompanyCards,
     clearCardSelection,
     isSelectionModeEnabled,
@@ -62,7 +69,7 @@ function WorkspaceCompanyCardsTableControls({
     const styles = useThemeStyles();
     const {translate, getLocalDateFromDatetime} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['Export', 'MoneySearch', 'RemoveMembers']);
+    const icons = useMemoizedLazyExpensifyIcons(['Calendar', 'Export', 'MoneySearch', 'RemoveMembers']);
     const {processedData, shouldUseNarrowTableLayout} = useTableContext<WorkspaceCompanyCardTableItemData>();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
@@ -146,6 +153,16 @@ function WorkspaceCompanyCardsTableControls({
         clearCardSelection();
     };
 
+    const updateSelectedCardsTransactionStartDate = () => {
+        const selectedCardIDs = selectedAssignedCards.map((card) => card.assignedCard?.cardID).filter((cardID): cardID is number => cardID !== undefined);
+        if (!feedName || selectedCardIDs.length === 0) {
+            return;
+        }
+
+        Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_BULK_TRANSACTION_START_DATE.getRoute(policyID, feedName, selectedCardIDs.join(',')));
+        clearCardSelection();
+    };
+
     const getBulkActionOptions = (): Array<DropdownOption<WorkspaceCompanyCardBulkActionType>> => {
         const options: Array<DropdownOption<WorkspaceCompanyCardBulkActionType>> = [];
 
@@ -166,6 +183,15 @@ function WorkspaceCompanyCardsTableControls({
                 value: 'viewTransactions',
                 onSelected: viewSelectedCardTransactions,
             });
+
+            if (canWriteCompanyCards) {
+                options.push({
+                    icon: icons.Calendar,
+                    text: translate('workspace.companyCards.bulkUpdateTransactionStartDate'),
+                    value: 'updateTransactionStartDate',
+                    onSelected: updateSelectedCardsTransactionStartDate,
+                });
+            }
         }
 
         options.push({

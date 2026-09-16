@@ -384,6 +384,7 @@ function WorkspaceCompanyCardsTable({
             policyID={policyID}
             domainOrWorkspaceAccountID={domainOrWorkspaceAccountID}
             bankName={bankName}
+            feedName={feedName}
             canWriteCompanyCards={canWriteCompanyCards}
             clearCardSelection={clearCardSelection}
             isSelectionModeEnabled={isSelectionModeEnabled}

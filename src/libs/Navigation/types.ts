@@ -1503,6 +1503,17 @@ type SettingsNavigatorParamList = {
         feed: string;
         cardID: string;
     };
+    [SCREENS.WORKSPACE.COMPANY_CARDS_BULK_TRANSACTION_START_DATE]: {
+        policyID: string;
+        feed: string;
+
+        /** Comma-separated list of the selected card IDs */
+        cardIDs: string;
+    };
+    [SCREENS.WORKSPACE.COMPANY_CARDS_BULK_TRANSACTION_START_DATE_SUCCESS]: {
+        policyID: string;
+        feed: string;
+    };
     [SCREENS.WORKSPACE.DYNAMIC_COMPANY_CARD_EXPORT]: {
         policyID: string;
         cardID: string;

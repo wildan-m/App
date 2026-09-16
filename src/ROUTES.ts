@@ -3730,6 +3730,15 @@ const ROUTES = {
         getRoute: (policyID: string, cardID: string, feed: CompanyCardFeedWithDomainID) =>
             `workspaces/${policyID}/company-cards/${encodeURIComponent(feed)}/${encodeURIComponent(cardID)}/edit/transaction-start-date` as const,
     },
+    WORKSPACE_COMPANY_CARDS_BULK_TRANSACTION_START_DATE: {
+        route: 'workspaces/:policyID/company-cards/:feed/bulk/transaction-start-date/:cardIDs',
+        getRoute: (policyID: string, feed: CompanyCardFeedWithDomainID, cardIDs: string) =>
+            `workspaces/${policyID}/company-cards/${encodeURIComponent(feed)}/bulk/transaction-start-date/${encodeURIComponent(cardIDs)}` as const,
+    },
+    WORKSPACE_COMPANY_CARDS_BULK_TRANSACTION_START_DATE_SUCCESS: {
+        route: 'workspaces/:policyID/company-cards/:feed/bulk/transaction-start-date-success',
+        getRoute: (policyID: string, feed: CompanyCardFeedWithDomainID) => `workspaces/${policyID}/company-cards/${encodeURIComponent(feed)}/bulk/transaction-start-date-success` as const,
+    },
     WORKSPACE_EXPENSIFY_CARD: {
         route: 'workspaces/:policyID/expensify-card',
         getRoute: (policyID: string | undefined) => {

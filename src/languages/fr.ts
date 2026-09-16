@@ -6218,6 +6218,11 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             startDateDescription: 'Choisissez votre date de début d’importation. Nous synchroniserons toutes les transactions à partir de cette date.',
             editStartDateDescription:
                 'Choisissez une nouvelle date de début de transaction. Nous synchroniserons toutes les transactions à partir de cette date, en excluant celles que nous avons déjà importées.',
+            bulkEditStartDateDescription:
+                "Choisissez une date de début des transactions pour toutes les cartes sélectionnées. Nous synchroniserons les transactions à partir de cette date, à l'exclusion de celles que nous avons déjà importées.",
+            bulkUpdateTransactionStartDate: 'Mettre à jour la date de début des transactions',
+            bulkStartDateUpdated: 'Date de début des transactions mise à jour',
+            bulkStartDateUpdatedDescription: 'La date de début des transactions a été mise à jour pour toutes les cartes sélectionnées.',
             fromTheBeginning: 'Depuis le début',
             customStartDate: 'Date de début personnalisée',
             customCloseDate: 'Date de clôture personnalisée',

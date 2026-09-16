@@ -14,21 +14,21 @@ import Navigation from '@navigation/Navigation';
 
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 
-import {updateCardTransactionStartDate} from '@userActions/CompanyCards';
+import {updateCardsTransactionStartDate} from '@userActions/CompanyCards';
 
 import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {CompanyCardFeedWithDomainID} from '@src/types/onyx';
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import CompanyCardTransactionStartDateSelector from './CompanyCardTransactionStartDateSelector';
-import {getCompanyCardDetailsBackPath} from './utils';
 
-type WorkspaceCompanyCardEditTransactionStartDatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.COMPANY_CARD_EDIT_TRANSACTION_START_DATE>;
+type WorkspaceCompanyCardsBulkTransactionStartDatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.COMPANY_CARDS_BULK_TRANSACTION_START_DATE>;
 
-function WorkspaceCompanyCardEditTransactionStartDatePage({route, navigation}: WorkspaceCompanyCardEditTransactionStartDatePageProps) {
-    const {policyID, cardID} = route.params;
+function WorkspaceCompanyCardsBulkTransactionStartDatePage({route}: WorkspaceCompanyCardsBulkTransactionStartDatePageProps) {
+    const {policyID} = route.params;
     const feedName = decodeURIComponent(route.params.feed) as CompanyCardFeedWithDomainID;
     const bank = getCompanyCardFeed(feedName);
 
@@ -39,15 +39,24 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route, navigation}: W
     const [cardFeeds] = useCardFeeds(policyID);
     const companyFeeds = getCompanyFeeds(cardFeeds);
     const domainOrWorkspaceAccountID = getDomainOrWorkspaceAccountID(workspaceAccountID, companyFeeds[feedName]);
-    const goBackToCardDetails = () => Navigation.goBack(getCompanyCardDetailsBackPath(policyID, feedName, cardID, navigation.getState()));
+
+    const cardIDs = useMemo(() => decodeURIComponent(route.params.cardIDs).split(',').filter(Boolean), [route.params.cardIDs]);
 
     const [allBankCards] = useCardsList(feedName);
-    const card = allBankCards?.[cardID];
-    const currentStartDate = card?.scrapeMinDate;
+
+    // The selected cards can each have a different start date, so there is no single value to prefill. We keep the
+    // previous date per card only so the failure update can put each card back the way it was.
+    const previousStartDates = useMemo(() => {
+        const startDates: Record<string, string | undefined> = {};
+        for (const cardID of cardIDs) {
+            startDates[cardID] = allBankCards?.[cardID]?.scrapeMinDate;
+        }
+        return startDates;
+    }, [allBankCards, cardIDs]);
 
     const submit = (newStartDate: string) => {
-        updateCardTransactionStartDate(domainOrWorkspaceAccountID, cardID, newStartDate, bank, currentStartDate);
-        goBackToCardDetails();
+        updateCardsTransactionStartDate(domainOrWorkspaceAccountID, cardIDs, newStartDate, bank, previousStartDates);
+        Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_BULK_TRANSACTION_START_DATE_SUCCESS.getRoute(policyID, feedName));
     };
 
     return (
@@ -58,16 +67,15 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route, navigation}: W
             policyFeatureAccess={CONST.POLICY.POLICY_FEATURE_ACCESS.WRITE}
         >
             <ScreenWrapper
-                testID="WorkspaceCompanyCardEditTransactionStartDatePage"
+                testID="WorkspaceCompanyCardsBulkTransactionStartDatePage"
                 enableEdgeToEdgeBottomSafeAreaPadding
             >
                 <HeaderWithBackButton
                     title={translate('workspace.moreFeatures.companyCards.transactionStartDate')}
-                    onBackButtonPress={goBackToCardDetails}
+                    onBackButtonPress={() => Navigation.goBack()}
                 />
                 <CompanyCardTransactionStartDateSelector
-                    description={translate('workspace.companyCards.editStartDateDescription')}
-                    currentStartDate={currentStartDate}
+                    description={translate('workspace.companyCards.bulkEditStartDateDescription')}
                     onSubmit={submit}
                 />
             </ScreenWrapper>
@@ -75,4 +83,4 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route, navigation}: W
     );
 }
 
-export default WorkspaceCompanyCardEditTransactionStartDatePage;
+export default WorkspaceCompanyCardsBulkTransactionStartDatePage;

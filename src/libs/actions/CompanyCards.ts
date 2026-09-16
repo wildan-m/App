@@ -14,6 +14,7 @@ import type {
     SetCompanyCardExportAccountParams,
     SetFeedStatementPeriodEndDayParams,
     UpdateCardTransactionStartDateParams,
+    UpdateCardsTransactionStartDateParams,
     UpdateCompanyCardNameParams,
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
@@ -904,6 +905,90 @@ function updateCardTransactionStartDate(domainOrWorkspaceAccountID: number, card
     });
 }
 
+/**
+ * Applies a single transaction start date to every selected card in a feed. All the cards live under the same
+ * domain-and-feed Onyx key, so each Onyx update is one merge holding the same per-card shape the single-card
+ * path writes.
+ */
+function updateCardsTransactionStartDate(
+    domainOrWorkspaceAccountID: number,
+    cardIDs: string[],
+    newStartDate: string,
+    bankName: CompanyCardFeedWithNumber,
+    oldStartDates: Record<string, string | undefined> = {},
+) {
+    if (cardIDs.length === 0) {
+        return;
+    }
+
+    const cardsListKey = `${ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST}${domainOrWorkspaceAccountID}_${bankName}` as const;
+
+    const optimisticCards: Record<string, unknown> = {};
+    const finallyCards: Record<string, unknown> = {};
+    const failureCards: Record<string, unknown> = {};
+
+    for (const cardID of cardIDs) {
+        optimisticCards[cardID] = {
+            scrapeMinDate: newStartDate,
+            pendingFields: {
+                scrapeMinDate: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+            },
+            errorFields: {
+                scrapeMinDate: null,
+            },
+        };
+        finallyCards[cardID] = {
+            pendingFields: {
+                scrapeMinDate: null,
+            },
+        };
+        failureCards[cardID] = {
+            scrapeMinDate: oldStartDates[cardID],
+            pendingFields: {
+                scrapeMinDate: null,
+            },
+            errorFields: {
+                scrapeMinDate: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+            },
+        };
+    }
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: cardsListKey,
+            value: optimisticCards,
+        },
+    ];
+
+    const finallyData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: cardsListKey,
+            value: finallyCards,
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: cardsListKey,
+            value: failureCards,
+        },
+    ];
+
+    const parameters: UpdateCardsTransactionStartDateParams = {
+        cardIDs: JSON.stringify(cardIDs.map(Number)),
+        startDate: newStartDate,
+    };
+
+    API.write(WRITE_COMMANDS.UPDATE_CARDS_TRANSACTION_START_DATE, parameters, {
+        optimisticData,
+        finallyData,
+        failureData,
+    });
+}
+
 function setCompanyCardExportAccount(policyID: string, domainOrWorkspaceAccountID: number, cardID: string, accountKey: string, newAccount: string, bank: CompanyCardFeedWithNumber) {
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST>> = [
         {
@@ -1483,6 +1568,7 @@ export {
     updateWorkspaceCompanyCard,
     updateCompanyCardName,
     updateCardTransactionStartDate,
+    updateCardsTransactionStartDate,
     setCompanyCardExportAccount,
     clearCompanyCardErrorField,
     setAddNewCompanyCardStepAndData,
