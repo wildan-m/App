@@ -218,3 +218,59 @@ describe('QuickCreationActionsBar - travel', () => {
         expect(screen.queryByText(translateLocal('workspace.common.travel'))).toBeNull();
     });
 });
+
+describe('QuickCreationActionsBar - analytics identifiers', () => {
+    const TRAVEL_POLICY_ID = 'policy-travel-789';
+
+    beforeAll(() => {
+        Onyx.init({keys: ONYXKEYS});
+    });
+
+    beforeEach(async () => {
+        await act(async () => {
+            await Onyx.merge(ONYXKEYS.SESSION, {accountID: CURRENT_USER_ACCOUNT_ID, email: CURRENT_USER_EMAIL});
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {primaryLogin: CURRENT_USER_EMAIL});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${TRAVEL_POLICY_ID}`, {
+                id: TRAVEL_POLICY_ID,
+                name: 'Travel Workspace',
+                type: CONST.POLICY.TYPE.CORPORATE,
+                role: CONST.POLICY.ROLE.ADMIN,
+                pendingAction: null,
+                owner: CURRENT_USER_EMAIL,
+                outputCurrency: CONST.CURRENCY.USD,
+                isTravelEnabled: true,
+                travelSettings: {spotnanaCompanyID: 'spotnana-company-uuid', associatedTravelDomainAccountID: 'spotnana-entity-uuid', hasAcceptedTerms: true},
+            });
+            await Onyx.set(ONYXKEYS.NVP_ACTIVE_POLICY_ID, TRAVEL_POLICY_ID);
+        });
+        await waitForBatchedUpdatesWithAct();
+    });
+
+    afterEach(async () => {
+        jest.clearAllMocks();
+        await act(async () => {
+            await Onyx.clear();
+        });
+        await waitForBatchedUpdatesWithAct();
+    });
+
+    it('gives every quick creation button a distinct test ID', async () => {
+        renderComponent();
+        await waitForBatchedUpdatesWithAct();
+
+        expect(screen.getByTestId('QuickCreationActionsBar-expense')).toBeOnTheScreen();
+        expect(screen.getByTestId('QuickCreationActionsBar-report')).toBeOnTheScreen();
+        expect(screen.getByTestId('QuickCreationActionsBar-distance')).toBeOnTheScreen();
+        expect(screen.getByTestId('QuickCreationActionsBar-travel')).toBeOnTheScreen();
+    });
+
+    it('labels every quick creation button for assistive technology', async () => {
+        renderComponent();
+        await waitForBatchedUpdatesWithAct();
+
+        expect(screen.getByLabelText(translateLocal('common.expense'))).toBeOnTheScreen();
+        expect(screen.getByLabelText(translateLocal('common.report'))).toBeOnTheScreen();
+        expect(screen.getByLabelText(translateLocal('common.distance'))).toBeOnTheScreen();
+        expect(screen.getByLabelText(translateLocal('workspace.common.travel'))).toBeOnTheScreen();
+    });
+});

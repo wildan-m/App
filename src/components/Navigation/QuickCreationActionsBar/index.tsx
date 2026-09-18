@@ -220,6 +220,8 @@ function QuickCreationActionsBar() {
             <Button
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={handleExpense}
+                testID="QuickCreationActionsBar-expense"
+                accessibilityLabel={translate('common.expense')}
                 style={styles.quickCreationActionsBarButton}
             >
                 <Button.Icon src={icons.ReceiptPlus} />
@@ -228,6 +230,8 @@ function QuickCreationActionsBar() {
             <Button
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={handleReport}
+                testID="QuickCreationActionsBar-report"
+                accessibilityLabel={translate('common.report')}
                 style={styles.quickCreationActionsBarButton}
             >
                 <Button.Icon src={icons.DocumentPlus} />
@@ -236,6 +240,8 @@ function QuickCreationActionsBar() {
             <Button
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={handleDistance}
+                testID="QuickCreationActionsBar-distance"
+                accessibilityLabel={translate('common.distance')}
                 style={styles.quickCreationActionsBarButton}
             >
                 <Button.Icon src={icons.LocationAdd} />
@@ -245,6 +251,8 @@ function QuickCreationActionsBar() {
                 <Button
                     size={CONST.BUTTON_SIZE.SMALL}
                     onPress={handleBookTravel}
+                    testID="QuickCreationActionsBar-travel"
+                    accessibilityLabel={translate('workspace.common.travel')}
                     style={styles.quickCreationActionsBarButton}
                 >
                     <Button.Icon src={icons.LuggageWithLinesPlus} />
