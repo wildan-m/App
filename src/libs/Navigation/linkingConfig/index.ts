@@ -10,7 +10,12 @@ import prefixes from './prefixes';
 import subscribe from './subscribe';
 
 const linkingConfig: LinkingOptions<RootNavigatorParamList> = {
-    getStateFromPath: getAdaptedStateFromPath,
+    // Referenced lazily instead of by value: `linkingConfig` sits in an import cycle
+    // (getAdaptedStateFromPath -> ReportUtils -> ... -> OnboardingFlow -> linkingConfig), so this module
+    // body can run while `getAdaptedStateFromPath` is still initializing. Capturing it by value there
+    // stores `undefined`, and React Navigation silently falls back to its built-in `getStateFromPath`,
+    // which never adds the fullscreen route underneath an RHP (blank background after a refresh).
+    getStateFromPath: (...args: Parameters<typeof getAdaptedStateFromPath>) => getAdaptedStateFromPath(...args),
     getPathFromState,
     prefixes,
     config,
