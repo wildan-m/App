@@ -218,6 +218,22 @@ type LoginToAccountIDMapDerivedValue = Record<string, number>;
  */
 type GuideAccountIDsDerivedValue = number[];
 
+/**
+ * Per-card change counters for the Home cards. Each counter is incremented whenever an expense changes in a
+ * way the matching card actually renders, so a card can refetch its Search snapshot on a data change instead of
+ * on screen focus. The numbers carry no meaning on their own; only the fact that one moved matters.
+ */
+type HomeCardChangeCountersDerivedValue = {
+    /** Moves when a field the "Recently added" rows render changes (insertion time, date, merchant, amount, currency, report, receipt, pending state). */
+    recentlyAdded: number;
+
+    /** Moves when a field the Home insights group or total by changes (amount, currency, category, merchant, date, report). */
+    insights: number;
+
+    /** Moves when a field the "Your Spend" card rows total by changes (amount, currency, card). */
+    yourSpendCards: number;
+};
+
 export type {
     ReportAttributes,
     ReportAttributesDerivedValue,
@@ -231,6 +247,7 @@ export type {
     CardFeedErrorsDerivedValue,
     LoginToAccountIDMapDerivedValue,
     GuideAccountIDsDerivedValue,
+    HomeCardChangeCountersDerivedValue,
     CardFeedErrorsObject,
     CardFeedErrorState,
     CardFeedErrors,

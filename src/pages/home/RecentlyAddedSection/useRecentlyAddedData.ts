@@ -1,4 +1,5 @@
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useIsHomeTabFocused from '@hooks/useIsHomeTabFocused';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -15,7 +16,6 @@ import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
 import type {OnyxCollection} from 'react-native-onyx';
 
-import {useIsFocused} from '@react-navigation/native';
 import {useEffect, useEffectEvent, useMemo, useState} from 'react';
 
 /** A single expense row surfaced by the Recently added slot. */
@@ -98,7 +98,8 @@ function useRecentlyAddedData(): RecentlyAddedData {
     const {accountID} = useCurrentUserPersonalDetails();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const isFocused = useIsFocused();
+    const isHomeTabFocused = useIsHomeTabFocused();
+    const [recentlyAddedChangeCounter] = useOnyx(ONYXKEYS.DERIVED.HOME_CARD_CHANGE_COUNTERS, {selector: (counters) => counters?.recentlyAdded});
 
     const query = useMemo(
         () =>
@@ -141,12 +142,15 @@ function useRecentlyAddedData(): RecentlyAddedData {
         });
     });
 
+    // The snapshot is only refreshed by an API call and Pusher never writes it, so the card refetches when the
+    // expenses it is built from change, plus when Home becomes the selected tab. Gating on the selected tab rather
+    // than on `useIsFocused()` keeps an RHP opening and closing over Home from looking like a data change.
     useEffect(() => {
-        if (!isFocused) {
+        if (!isHomeTabFocused) {
             return;
         }
         fireSearch();
-    }, [isFocused, isOffline, hash]);
+    }, [isHomeTabFocused, isOffline, hash, recentlyAddedChangeCounter]);
 
     const snapshotData = searchResults?.data;
 

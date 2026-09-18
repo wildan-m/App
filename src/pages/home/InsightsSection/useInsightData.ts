@@ -2,6 +2,7 @@ import type {ChartView, GroupedItem, SearchQueryJSON, SearchView} from '@compone
 
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useIsHomeTabFocused from '@hooks/useIsHomeTabFocused';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -9,6 +10,7 @@ import useOnyx from '@hooks/useOnyx';
 import {search} from '@libs/actions/Search';
 import type {SearchTypeMenuItem} from '@libs/SearchUIUtils';
 import {getSections, getSortedSections, isGroupedItemArray, isSearchDataLoaded} from '@libs/SearchUIUtils';
+import Visibility from '@libs/Visibility';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -17,7 +19,6 @@ import type SearchResults from '@src/types/onyx/SearchResults';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
-import {useIsFocused} from '@react-navigation/native';
 import {useEffect, useEffectEvent} from 'react';
 
 const INSIGHT_STATE = {
@@ -69,7 +70,8 @@ function useInsightData(config: SearchTypeMenuItem | undefined) {
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
 
     const {isOffline} = useNetwork();
-    const isFocused = useIsFocused();
+    const isHomeTabFocused = useIsHomeTabFocused();
+    const [insightsChangeCounter] = useOnyx(ONYXKEYS.DERIVED.HOME_CARD_CHANGE_COUNTERS, {selector: (counters) => counters?.insights});
 
     const retry = () => {
         // `search.isLoading` is persisted and may be stale after a reload. Call `search()` again and let it ignore a request that is still running.
@@ -92,12 +94,29 @@ function useInsightData(config: SearchTypeMenuItem | undefined) {
         retry();
     });
 
+    // The snapshot is only refreshed by an API call and Pusher never writes it, so the insight refetches when the
+    // expenses it groups and totals change, plus when Home becomes the selected tab. Gating on the selected tab
+    // rather than on `useIsFocused()` keeps an RHP opening and closing over Home from looking like a data change.
     useEffect(() => {
-        if (!isFocused) {
+        if (!isHomeTabFocused) {
             return;
         }
         onConfigChanged();
-    }, [queryJSON?.hash, isOffline, isFocused]);
+    }, [queryJSON?.hash, isOffline, isHomeTabFocused, insightsChangeCounter]);
+
+    // Some of what an insight shows has nothing local to watch — the converted display currency depends on rates
+    // that live outside any collection the change counter can observe. Refresh those once the app comes back into
+    // view, which is the only moment they can have moved without a local write.
+    useEffect(
+        () =>
+            Visibility.onVisibilityChange(() => {
+                if (!isHomeTabFocused || !Visibility.isVisible()) {
+                    return;
+                }
+                onConfigChanged();
+            }),
+        [isHomeTabFocused],
+    );
 
     const sortedSections =
         searchResults?.data && queryJSON && groupBy && login

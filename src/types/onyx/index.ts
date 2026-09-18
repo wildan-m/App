@@ -61,6 +61,7 @@ import type DatabaseSizeMeasurement from './DatabaseSizeMeasurement';
 import type {
     CardFeedErrorsDerivedValue,
     GuideAccountIDsDerivedValue,
+    HomeCardChangeCountersDerivedValue,
     LoginToAccountIDMapDerivedValue,
     NonPersonalAndWorkspaceCardListDerivedValue,
     OutstandingReportsByPolicyIDDerivedValue,
@@ -447,6 +448,7 @@ export type {
     CardFeedErrorsDerivedValue,
     LoginToAccountIDMapDerivedValue,
     GuideAccountIDsDerivedValue,
+    HomeCardChangeCountersDerivedValue,
     ScheduleCallDraft,
     ValidateUserAndGetAccessiblePolicies,
     VacationDelegate,

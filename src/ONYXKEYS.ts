@@ -1360,6 +1360,7 @@ const ONYXKEYS = {
         RAM_ONLY_SORTED_REPORT_ACTIONS: 'sortedReportActions',
         LOGIN_TO_ACCOUNT_ID_MAP: 'loginToAccountIDMap',
         GUIDE_ACCOUNT_IDS: 'guideAccountIDs',
+        HOME_CARD_CHANGE_COUNTERS: 'homeCardChangeCounters',
     },
 
     /** Stores HybridApp specific state required to interoperate with OldDot */
@@ -1911,6 +1912,7 @@ type OnyxDerivedValuesMapping = {
     [ONYXKEYS.DERIVED.RAM_ONLY_SORTED_REPORT_ACTIONS]: OnyxTypes.SortedReportActionsDerivedValue;
     [ONYXKEYS.DERIVED.LOGIN_TO_ACCOUNT_ID_MAP]: OnyxTypes.LoginToAccountIDMapDerivedValue;
     [ONYXKEYS.DERIVED.GUIDE_ACCOUNT_IDS]: OnyxTypes.GuideAccountIDsDerivedValue;
+    [ONYXKEYS.DERIVED.HOME_CARD_CHANGE_COUNTERS]: OnyxTypes.HomeCardChangeCountersDerivedValue;
 };
 
 type OnyxValues = OnyxValuesMapping & OnyxCollectionValuesMapping & OnyxFormValuesMapping & OnyxFormDraftValuesMapping & OnyxDerivedValuesMapping;

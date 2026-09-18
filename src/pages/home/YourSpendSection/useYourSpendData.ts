@@ -1,5 +1,6 @@
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useIsHomeTabFocused from '@hooks/useIsHomeTabFocused';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 
@@ -20,7 +21,6 @@ import type SearchResults from '@src/types/onyx/SearchResults';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
-import {useIsFocused} from '@react-navigation/native';
 import {useEffect, useEffectEvent, useMemo, useState} from 'react';
 
 import {YOUR_SPEND_CARD_KIND, YOUR_SPEND_ROW_STATE} from './const';
@@ -376,7 +376,8 @@ function getYourSpendRowState({isApplicable, isOffline, searchResults}: GetYourS
 function useYourSpendData(): UseYourSpendDataReturn {
     const {accountID} = useCurrentUserPersonalDetails();
     const {isOffline} = useNetwork();
-    const isFocused = useIsFocused();
+    const isHomeTabFocused = useIsHomeTabFocused();
+    const [cardsChangeCounter] = useOnyx(ONYXKEYS.DERIVED.HOME_CARD_CHANGE_COUNTERS, {selector: (counters) => counters?.yourSpendCards});
 
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
@@ -579,12 +580,16 @@ function useYourSpendData(): UseYourSpendDataReturn {
         }
     });
 
+    // The snapshots are only refreshed by an API call and Pusher never writes them, so the rows refetch on their
+    // own data signals: `applicabilityKey` already carries the outstanding-reports signature for the approval row,
+    // and `cardsChangeCounter` covers the card rows. Gating on the selected tab rather than on `useIsFocused()`
+    // keeps an RHP opening and closing over Home from looking like a data change.
     useEffect(() => {
-        if (!isFocused) {
+        if (!isHomeTabFocused) {
             return;
         }
         fireSearches();
-    }, [isFocused, isOffline, cardGroupQueryJSON?.hash, applicabilityKey, accountID]);
+    }, [isHomeTabFocused, isOffline, cardGroupQueryJSON?.hash, applicabilityKey, accountID, cardsChangeCounter]);
 
     return {
         approvalRowState,
