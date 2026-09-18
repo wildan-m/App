@@ -21,6 +21,7 @@ import {searchInServer} from '@libs/actions/Report';
 import {clearFooterConversion, search} from '@libs/actions/Search';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
+import {hasFiltersChangedFromDefault} from '@libs/SearchQueryUtils';
 import {isSearchDataLoaded} from '@libs/SearchUIUtils';
 
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -28,7 +29,7 @@ import type SCREENS from '@src/SCREENS';
 import {hasFilterBarsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Animated from 'react-native-reanimated';
 
 import SearchPageNarrow from './SearchPageNarrow';
@@ -42,12 +43,19 @@ function SearchPage({route}: SearchPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
     const {lastSearchType, currentSearchResults, shouldUseLiveData} = useSearchResultsContext();
-    const {currentSearchKey, currentSearchQueryJSON} = useSearchQueryContext();
+    const {currentSearchKey, currentSearchQueryJSON, currentDefaultSearchQueryJSON} = useSearchQueryContext();
     const {clearSelectedTransactions} = useSearchSelectionActions();
     const {setLastSearchType} = useSearchResultsActions();
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
-    const [hasFilterBars = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
+    const [hasFilterChips = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
+    // The filters bar also takes up a row when it shows only the reset button, which happens for filters that render no
+    // chip (e.g. action, payer). The list reserves its top space from this flag, so it has to match what the bar renders.
+    const hasResetFiltersButton = useMemo(
+        () => !!currentSearchQueryJSON && !!currentDefaultSearchQueryJSON && hasFiltersChangedFromDefault(currentSearchQueryJSON, currentDefaultSearchQueryJSON),
+        [currentSearchQueryJSON, currentDefaultSearchQueryJSON],
+    );
+    const hasFilterBars = hasFilterChips || hasResetFiltersButton;
 
     const [lastNonEmptySearchResults, setLastNonEmptySearchResults] = useState<SearchResults | undefined>(undefined);
 
