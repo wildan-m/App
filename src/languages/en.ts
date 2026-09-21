@@ -11038,8 +11038,10 @@ const translations = {
         subscriptionSettings: {
             title: 'Subscription settings',
             editSubscription: 'Edit subscription',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Subscription type: ${subscriptionType}, Subscription size: ${subscriptionSize}${expensifyCode ? `, Expensify code: ${expensifyCode}` : ''}, Auto renew: ${autoRenew}, Auto increase annual seats: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'member' : 'members'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Auto-renew: ${isOn ? 'on' : 'off'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Auto-increase annual seats: ${isOn ? 'on' : 'off'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Expensify code: ${expensifyCode}`,
             none: 'none',
             on: 'on',
             off: 'off',

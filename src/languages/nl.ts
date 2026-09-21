@@ -10789,8 +10789,10 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         },
         subscriptionSettings: {
             title: 'Abonnementsinstellingen',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Abonnementstype: ${subscriptionType}, Abonnementsomvang: ${subscriptionSize}${expensifyCode ? `, Expensify-code: ${expensifyCode}` : ''}, Automatisch verlengen: ${autoRenew}, Automatisch jaarlijkse seats verhogen: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'lid' : 'leden'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Automatisch verlengen: ${isOn ? 'aan' : 'uit'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Automatisch jaarlijkse seats verhogen: ${isOn ? 'aan' : 'uit'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Expensify-code: ${expensifyCode}`,
             none: 'geen',
             on: 'aan',
             off: 'uit',

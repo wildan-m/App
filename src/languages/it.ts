@@ -10824,8 +10824,10 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         },
         subscriptionSettings: {
             title: 'Impostazioni abbonamento',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Tipo di abbonamento: ${subscriptionType}, Dimensione abbonamento: ${subscriptionSize}${expensifyCode ? `, Codice Expensify: ${expensifyCode}` : ''}, Rinnovo automatico: ${autoRenew}, Aumento automatico dei posti annuali: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'membro' : 'membri'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Rinnovo automatico: ${isOn ? 'attivo' : 'disattivato'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Aumento automatico dei posti annuali: ${isOn ? 'attivo' : 'disattivato'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Codice Expensify: ${expensifyCode}`,
             none: 'nessuno',
             on: 'attivo',
             off: 'disattivato',

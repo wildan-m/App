@@ -10673,8 +10673,10 @@ ${reportName}`,
         },
         subscriptionSettings: {
             title: 'サブスクリプション設定',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `サブスクリプションタイプ: ${subscriptionType}、サブスクリプション規模: ${subscriptionSize}${expensifyCode ? `、Expensifyコード: ${expensifyCode}` : ''}、自動更新: ${autoRenew}、年間席数の自動増加: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount}名のメンバー（${subscriptionType}）`,
+            autoRenewStatus: (isOn: boolean) => `自動更新: ${isOn ? 'オン' : 'オフ'}`,
+            autoIncreaseStatus: (isOn: boolean) => `年間席数の自動増加: ${isOn ? 'オン' : 'オフ'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Expensifyコード: ${expensifyCode}`,
             none: 'なし',
             on: 'オン',
             off: 'オフ',

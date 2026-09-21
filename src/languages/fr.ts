@@ -10892,8 +10892,10 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         },
         subscriptionSettings: {
             title: 'Paramètres d’abonnement',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Type d’abonnement : ${subscriptionType}, Taille de l’abonnement : ${subscriptionSize}${expensifyCode ? `, Code Expensify : ${expensifyCode}` : ''}, Renouvellement automatique : ${autoRenew}, Augmentation automatique des licences annuelles : ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'membre' : 'membres'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Renouvellement automatique : ${isOn ? 'activé' : 'désactivé'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Augmentation automatique des licences annuelles : ${isOn ? 'activée' : 'désactivée'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Code Expensify : ${expensifyCode}`,
             none: 'aucun',
             on: 'activé',
             off: 'désactivé',

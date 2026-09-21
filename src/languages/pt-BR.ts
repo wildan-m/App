@@ -10783,8 +10783,10 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         },
         subscriptionSettings: {
             title: 'Configurações de assinatura',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Tipo de assinatura: ${subscriptionType}, Tamanho da assinatura: ${subscriptionSize}${expensifyCode ? `, Código Expensify: ${expensifyCode}` : ''}, Renovação automática: ${autoRenew}, Aumento automático de assentos anuais: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'membro' : 'membros'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Renovação automática: ${isOn ? 'ativada' : 'desativada'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Aumento automático de assentos anuais: ${isOn ? 'ativado' : 'desativado'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Código Expensify: ${expensifyCode}`,
             none: 'nenhum',
             on: 'ativado',
             off: 'desligado',

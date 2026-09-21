@@ -10809,8 +10809,10 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         },
         subscriptionSettings: {
             title: 'Ustawienia subskrypcji',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Typ subskrypcji: ${subscriptionType}, Rozmiar subskrypcji: ${subscriptionSize}${expensifyCode ? `, Kod Expensify: ${expensifyCode}` : ''}, Automatyczne odnawianie: ${autoRenew}, Automatyczne zwiększanie rocznych miejsc: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'członek' : 'członków'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Automatyczne odnawianie: ${isOn ? 'włączone' : 'wyłączone'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Automatyczne zwiększanie rocznych miejsc: ${isOn ? 'włączone' : 'wyłączone'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Kod Expensify: ${expensifyCode}`,
             none: 'brak',
             on: 'włączony',
             off: 'wyłączone',

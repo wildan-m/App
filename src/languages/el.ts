@@ -11093,8 +11093,10 @@ ${reportName}`,
         subscriptionSettings: {
             title: 'Ρυθμίσεις συνδρομής',
             editSubscription: 'Επεξεργασία συνδρομής',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `Τύπος συνδρομής: ${subscriptionType}, Μέγεθος συνδρομής: ${subscriptionSize}${expensifyCode ? `, κωδικός Expensify: ${expensifyCode}` : ''}, Αυτόματη ανανέωση: ${autoRenew}, Αυτόματη ετήσια αύξηση θέσεων: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} ${memberCount === 1 ? 'μέλος' : 'μέλη'} (${subscriptionType})`,
+            autoRenewStatus: (isOn: boolean) => `Αυτόματη ανανέωση: ${isOn ? 'ενεργή' : 'ανενεργή'}`,
+            autoIncreaseStatus: (isOn: boolean) => `Αυτόματη ετήσια αύξηση θέσεων: ${isOn ? 'ενεργή' : 'ανενεργή'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Κωδικός Expensify: ${expensifyCode}`,
             none: 'κανένα',
             on: 'ενεργό',
             off: 'κλειστό',

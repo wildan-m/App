@@ -11075,8 +11075,10 @@ ${reportName}`,
         },
         subscriptionSettings: {
             title: 'Configuración de suscripción',
-            summary: (subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease) =>
-                `Tipo de suscripción: ${subscriptionType}, Tamaño de suscripción: ${subscriptionSize}${expensifyCode ? `, Código Expensify: ${expensifyCode}` : ''}, Renovación automática: ${autoRenew}, Aumento automático de asientos anuales: ${autoIncrease}`,
+            sizeAndFrequency: (memberCount, subscriptionType) => `${memberCount} ${memberCount === 1 ? 'miembro' : 'miembros'} (${subscriptionType})`,
+            autoRenewStatus: (isOn) => `Renovación automática: ${isOn ? 'activada' : 'desactivada'}`,
+            autoIncreaseStatus: (isOn) => `Aumento automático de asientos anuales: ${isOn ? 'activado' : 'desactivado'}`,
+            appliedExpensifyCode: (expensifyCode) => `Código Expensify: ${expensifyCode}`,
             none: 'ninguno',
             on: 'activado',
             off: 'desactivado',

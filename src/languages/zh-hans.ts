@@ -10402,8 +10402,10 @@ ${reportName}`,
         },
         subscriptionSettings: {
             title: '订阅设置',
-            summary: (subscriptionType: string, subscriptionSize: string, expensifyCode: string, autoRenew: string, autoIncrease: string) =>
-                `订阅类型：${subscriptionType}，订阅规模：${subscriptionSize}${expensifyCode ? `，Expensify代码：${expensifyCode}` : ''}，自动续订：${autoRenew}，年度席位自动增加：${autoIncrease}`,
+            sizeAndFrequency: (memberCount: number, subscriptionType: string) => `${memberCount} 名成员（${subscriptionType}）`,
+            autoRenewStatus: (isOn: boolean) => `自动续订：${isOn ? '开启' : '关闭'}`,
+            autoIncreaseStatus: (isOn: boolean) => `年度席位自动增加：${isOn ? '开启' : '关闭'}`,
+            appliedExpensifyCode: (expensifyCode: string) => `Expensify代码：${expensifyCode}`,
             none: '无',
             on: '开在',
             off: '关关闭',

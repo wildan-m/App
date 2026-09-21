@@ -1,5 +1,4 @@
 import Button from '@components/Button';
-import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import Text from '@components/Text';
 
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -135,22 +134,26 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
         return undefined;
     }
 
-    const autoIncrease = privateSubscription?.addNewUsersAutomatically ? translate('subscription.subscriptionSettings.on') : translate('subscription.subscriptionSettings.off');
     const subscriptionType = isAnnual ? translate('subscription.subscriptionSettings.annual') : translate('subscription.details.payPerUse');
-    const subscriptionSize = `${privateSubscription?.userCount ?? translate('subscription.subscriptionSettings.none')}`;
-    const autoRenew = privateSubscription?.autoRenew ? translate('subscription.subscriptionSettings.on') : translate('subscription.subscriptionSettings.off');
     const expensifyCode = isSecretPromoCode ? '' : (privatePromoCode ?? '');
+    const sizeAndFrequency = privateSubscription?.userCount
+        ? translate('subscription.subscriptionSettings.sizeAndFrequency', privateSubscription.userCount, subscriptionType)
+        : subscriptionType;
 
     return (
         <View>
-            <MenuItemWithTopDescription
-                description={translate('subscription.subscriptionSettings.title')}
-                style={style}
-                interactive={false}
-                numberOfLinesTitle={3}
-                title={translate('subscription.subscriptionSettings.summary', subscriptionType, subscriptionSize, expensifyCode, autoRenew, autoIncrease)}
-            />
-            <View style={[style, styles.mt2]}>
+            <View style={style}>
+                <Text style={styles.mutedNormalTextLabel}>{translate('subscription.subscriptionSettings.title')}</Text>
+                <Text style={styles.mt1}>{sizeAndFrequency}</Text>
+                {isAnnual && (
+                    <>
+                        <Text style={styles.mt1}>{translate('subscription.subscriptionSettings.autoRenewStatus', !!privateSubscription?.autoRenew)}</Text>
+                        <Text style={styles.mt1}>{translate('subscription.subscriptionSettings.autoIncreaseStatus', !!privateSubscription?.addNewUsersAutomatically)}</Text>
+                    </>
+                )}
+                {!!expensifyCode && <Text style={styles.mt1}>{translate('subscription.subscriptionSettings.appliedExpensifyCode', expensifyCode)}</Text>}
+            </View>
+            <View style={[style, styles.mt3]}>
                 <Button
                     onPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_SETTINGS_DETAILS)}
                     style={styles.alignSelfStart}
