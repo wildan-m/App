@@ -15,7 +15,7 @@ import type {Dimensions} from '@src/types/utils/Layout';
 import type Nullable from '@src/types/utils/Nullable';
 
 // eslint-disable-next-line no-restricted-imports
-import type {AnimatableNumericValue, Animated, ColorValue, ImageStyle, PressableStateCallbackType, StyleProp, TextStyle, ViewStyle} from 'react-native';
+import type {Animated, ColorValue, ImageStyle, PressableStateCallbackType, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {EdgeInsets} from 'react-native-safe-area-context';
 import type {ValueOf} from 'type-fest';
@@ -1101,7 +1101,7 @@ function getEmojiReactionBubbleTextStyle(isContextMenu = false): TextStyle {
     };
 }
 
-function getTransformScaleStyle(scaleValue: AnimatableNumericValue): ViewStyle {
+function getTransformScaleStyle(scaleValue: number | Animated.AnimatedNode): ViewStyle {
     return {
         transform: [{scale: scaleValue}],
     };
@@ -1125,7 +1125,7 @@ function getTopLeftTransformScaleStyle(scaleValue: number): ViewStyle {
  */
 function getDirectionStyle(direction: ValueOf<typeof CONST.DIRECTION>): ViewStyle {
     if (direction === CONST.DIRECTION.LEFT) {
-        return {transform: 'rotate(180deg)'};
+        return {transform: [{rotate: '180deg'}]};
     }
 
     return {};
