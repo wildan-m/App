@@ -310,6 +310,7 @@ type GetTransactionSectionsParams = {
     queryJSON?: SearchQueryJSON;
     isAttendeesEnabledForMovingPolicy?: boolean;
     optimisticTransactionID?: string;
+    liveTransactions?: OnyxCollection<OnyxTypes.Transaction>;
 };
 
 const transactionColumnNamesToSortingProperty: TransactionSorting = {
@@ -632,6 +633,7 @@ type GetSectionsParams = {
     onyxPersonalDetailsList?: OnyxTypes.PersonalDetailsList;
     isAttendeesEnabledForMovingPolicy?: boolean;
     optimisticTransactionID?: string;
+    liveTransactions?: OnyxCollection<OnyxTypes.Transaction>;
     /**
      * Callers may pass `undefined` for non-CHAT/TASK search types as a perf optimization (see `useSearchSnapshot`).
      * Only `getReportActionsSections` (CHAT) and `getTaskSections` (TASK) read it — if you consume it in another
@@ -1801,6 +1803,29 @@ function getLiveOrSnapshotReportActions(
 
 /**
  * @private
+ * Returns the transaction with the live collection's copy layered over the snapshot's, when the device holds one.
+ *
+ * The server does not refresh a stored search snapshot when it pushes a transaction update (a finished SmartScan,
+ * for instance), so the snapshot copy can still hold the creation-time merchant, amount and receipt state while the
+ * live collection already holds the completed one. Snapshot-only search fields survive because the live copy only
+ * overwrites the fields it actually carries.
+ */
+function getLiveOrSnapshotTransaction(
+    snapshotTransaction: OnyxTypes.Transaction,
+    transactionKey: TransactionKey,
+    liveTransactions: OnyxCollection<OnyxTypes.Transaction> | undefined,
+): OnyxTypes.Transaction {
+    const liveTransaction = liveTransactions?.[transactionKey];
+
+    if (!liveTransaction) {
+        return snapshotTransaction;
+    }
+
+    return {...snapshotTransaction, ...liveTransaction};
+}
+
+/**
+ * @private
  * Organizes data into List Sections for display, for the TransactionListItemType of Search Results.
  *
  * Do not use directly, use only via `getSections()` facade.
@@ -1819,6 +1844,7 @@ function getTransactionsSections({
     queryJSON,
     isAttendeesEnabledForMovingPolicy,
     optimisticTransactionID,
+    liveTransactions,
 }: GetTransactionSectionsParams): [TransactionListItemType[], number, boolean] {
     const {
         transactionKeys,
@@ -1845,7 +1871,7 @@ function getTransactionsSections({
     const currentQueryJSON = queryJSON ?? getCurrentSearchQueryJSON();
 
     for (const key of transactionKeys) {
-        const transactionItem = data[key];
+        const transactionItem = getLiveOrSnapshotTransaction(data[key], key, liveTransactions);
         const report = getReportOrDraftReport(transactionItem.reportID) ?? data[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`];
 
         const isActionLoading = !!isActionLoadingSet?.has(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${transactionItem.reportID}`);
@@ -3668,6 +3694,7 @@ function getSections({
     convertToDisplayString,
     optimisticTransactionID,
     reportAttributesDerivedValue,
+    liveTransactions,
 }: GetSectionsParams): GetSectionsResult {
     if (type === CONST.SEARCH.DATA_TYPES.CHAT) {
         return [...getReportActionsSections(data, reportAttributesDerivedValue, visibleReportActionsData), false];
@@ -3739,6 +3766,7 @@ function getSections({
         queryJSON,
         isAttendeesEnabledForMovingPolicy,
         optimisticTransactionID,
+        liveTransactions,
     });
 }
 

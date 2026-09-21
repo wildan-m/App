@@ -79,8 +79,9 @@ type UseSearchSnapshotParams = {
     searchResults: SearchResults | undefined;
     /** Keys flagged for the post-create highlight animation. */
     newSearchResultKeys: Set<string> | null | undefined;
-    /** Full TRANSACTION + REPORT_ACTIONS collections used by the optimistic-row tracking. Threaded in from
-     *  the parent (which already subscribes to them for the highlight hook) so we don't open duplicate
+    /** Full TRANSACTION + REPORT_ACTIONS collections used by the optimistic-row tracking, and (for
+     *  transactions) to layer live data over the stale snapshot copy of a row. Threaded in from the parent
+     *  (which already subscribes to them for the highlight hook) so we don't open duplicate
      *  full-collection reads. */
     transactions: OptimisticTrackingParams['transactions'];
     reportActions: OptimisticTrackingParams['reportActions'];
@@ -220,6 +221,7 @@ function useSearchSnapshot({queryJSON, searchResults, newSearchResultKeys, trans
             convertToDisplayString,
             reportAttributesDerivedValue: reportAttributesForSections,
             optimisticTransactionID,
+            liveTransactions: transactions,
         });
         return {
             baseFilteredData: filtered as SearchListItem[],
@@ -255,6 +257,7 @@ function useSearchSnapshot({queryJSON, searchResults, newSearchResultKeys, trans
         reportAttributesForSections,
         optimisticTransactionID,
         dateFnsLocale,
+        transactions,
     ]);
 
     // Stage 2: for grouped views, fetch each group's sub-snapshot and enrich it with its transactions.
