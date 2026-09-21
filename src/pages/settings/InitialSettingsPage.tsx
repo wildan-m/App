@@ -14,6 +14,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSafeAreaInsets from '@hooks/useSafeAreaInsets';
 import useScrollEventEmitter from '@hooks/useScrollEventEmitter';
 import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -45,6 +46,7 @@ type InitialSettingsPageProps = WithCurrentUserPersonalDetailsProps;
 
 function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPageProps) {
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    const {left: safeAreaLeft, right: safeAreaRight} = useSafeAreaInsets();
     const [canSwitchAccounts = false] = useOnyx(ONYXKEYS.ACCOUNT, {selector: canSwitchAccountsSelector});
     const tabBarContent = <TabBarBottomContent selectedTab={NAVIGATION_TABS.SETTINGS} />;
     const styles = useThemeStyles();
@@ -107,8 +109,15 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
     // Must match the same condition in AccountSwitcher, or the skeleton and the loaded header lay out differently.
     const shouldStackHeader = shouldUseNarrowLayout && !isInLandscapeMode;
 
+    // On Android a rotation delivers the window frame and the safe area insets in separate updates. When the frame lands first,
+    // the header re-renders into its landscape row against the not-yet-inset width, and nothing here reads the insets, so the
+    // stale row width is never recomputed and the Switch button ends up outside the padded area. Keying the header on the side
+    // insets as well as the header mode remounts it once the landscape insets arrive, forcing a layout against the padded width.
     const headerContent = (
-        <View style={[styles.ph5, styles.pv4]}>
+        <View
+            key={`${shouldStackHeader ? 'stacked' : 'inline'}-${safeAreaLeft}-${safeAreaRight}`}
+            style={[styles.ph5, styles.pv4]}
+        >
             {isPersonalDetailsEmpty ? (
                 <AccountSwitcherSkeletonView
                     avatarSize={shouldStackHeader ? CONST.AVATAR_SIZE.XXXX_LARGE : CONST.AVATAR_SIZE.DEFAULT}
