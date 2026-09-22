@@ -53,6 +53,8 @@ const selectQueryHash = (lastSearchQuery: OnyxEntry<LastSearchParams>): number |
 
 const searchLoadingSelector = (snapshot: OnyxEntry<SearchResults>): boolean => !!snapshot?.search?.isLoading;
 
+const searchOffsetSelector = (snapshot: OnyxEntry<SearchResults>): number => snapshot?.search?.offset ?? 0;
+
 const isSameReportList = (a: Array<string | undefined>, b: Array<string | undefined> | null): boolean => {
     if (a === b) {
         return true;
@@ -95,9 +97,10 @@ const buildSnapshotGuardSelector =
 
 // Mounts the heavy useSearchSections subscriptions (card feeds, report NVPs, bank accounts, report
 // attributes) and the getSections/getSortedSections rebuild, then lifts the computed list up. It is
-// rendered by the content component ONLY on the slow path (pagination in flight or no context list), so
-// those subscriptions never run while the fast context path is active — restoring the lightweight fast
-// path from #86238. Keeping the lifted value in the always-mounted content component means it (and the
+// rendered by the content component only on the slow path (pagination in flight, no context list, or the
+// user close enough to the end of the context list that pagination is about to start), so those
+// subscriptions never run while the fast context path is active — restoring the lightweight fast path
+// from #86238. Keeping the lifted value in the always-mounted content component means it (and the
 // lastValidReports cache) survive the isSearchLoading toggle instead of being wiped by a subtree swap.
 function MoneyRequestReportNavigationStandalone({onReportsChange}: MoneyRequestReportNavigationStandaloneProps) {
     const {allReports} = useSearchSections();
@@ -118,15 +121,33 @@ function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersi
     // the heavy useSearchSections subscription set, so the fast context path stays cheap.
     const [lastSearchQuery] = useOnyx(ONYXKEYS.REPORT_NAVIGATION_LAST_SEARCH_QUERY);
     const [isSearchLoading = false] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${lastSearchQuery?.queryJSON?.hash}`, {selector: searchLoadingSelector});
+    const [searchOffset = 0] = useOnyx(`${ONYXKEYS.COLLECTION.SNAPSHOT}${lastSearchQuery?.queryJSON?.hash}`, {selector: searchOffsetSelector});
 
     // Fast path: use the pre-computed IDs from the search context when they are usable and no page is in
     // flight. Otherwise fall back to the standalone list, which is produced by the child below that mounts
-    // the heavy subscriptions only on this slow path. Because this is a value swap inside a single, stable
+    // the heavy subscriptions only on the slow paths. Because this is a value swap inside a single, stable
     // component, toggling isSearchLoading (e.g. the search refresh triggered by submitting a report) no
     // longer unmounts the component and wipes the lastValidReports cache below.
-    const shouldUseContextReports = contextReports.length > 0 && !isSearchLoading;
     const [standaloneReports, setStandaloneReports] = useState<Array<string | undefined>>([]);
+
+    // The context list is written only from the search list screen, which is covered and suspended while a
+    // report is open, so it stays pinned to the reports of the page that was loaded when the report was
+    // opened. Pages fetched by the carousel itself land in the search snapshot but never in that list, so
+    // the context list must stop winning once the standalone list has actually grown past it — otherwise
+    // the carousel is stuck at one page and the next arrow is disabled at its last report.
+    const shouldUseContextReports = contextReports.length > 0 && !isSearchLoading && standaloneReports.length <= contextReports.length;
     const allReports = shouldUseContextReports ? contextReports : standaloneReports;
+
+    // Derived from the context list rather than the list actually in use, so that mounting the standalone
+    // source cannot change the condition that decides whether to mount it.
+    const contextIndex = contextReports.indexOf(reportID);
+    const contextThreshold = Math.min(contextReports.length * 0.75, contextReports.length - 2);
+    const hasReachedContextPrefetchThreshold = contextIndex !== -1 && contextIndex + 1 >= contextThreshold;
+
+    // Mount the standalone source on the existing slow path, and also once the user is close enough to the
+    // end of the context list that pagination is about to start, so the pages it fetches have somewhere to
+    // appear. Reports that are fully loaded never reach this, so the cheap fast path is kept for them.
+    const shouldMountStandaloneSource = !shouldUseContextReports || (hasReachedContextPrefetchThreshold && !!lastSearchQuery?.hasMoreResults);
 
     const liveCurrentIndex = allReports.indexOf(reportID);
 
@@ -206,17 +227,24 @@ function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersi
         }
         const threshold = Math.min(effectiveAllReports.length * 0.75, effectiveAllReports.length - 2);
 
-        if (currentIndex + 1 >= threshold && lastSearchQuery?.hasMoreResults) {
-            const newOffset = (lastSearchQuery.offset ?? 0) + CONST.SEARCH.RESULTS_PAGE_SIZE;
+        // Derive the next page from the snapshot's own cursor instead of the previously persisted offset.
+        // The persisted offset advances with every response, so pressing next repeatedly near the end of a
+        // page would keep adding a page size to it and walk it past the end of the result set, persisting a
+        // false hasMoreResults. Skip the request entirely while the page covering that cursor is still in
+        // flight, so a single press can never advance pagination by more than one page.
+        const nextOffset = searchOffset + CONST.SEARCH.RESULTS_PAGE_SIZE;
+        const isNextPageAlreadyRequested = searchOffset > effectiveAllReports.length - CONST.SEARCH.RESULTS_PAGE_SIZE;
+
+        if (currentIndex + 1 >= threshold && lastSearchQuery?.hasMoreResults && !isSearchLoading && !isNextPageAlreadyRequested) {
             const queryJSON = lastSearchQuery.queryJSON;
             requestAnimationFrame(() => {
                 search({
                     queryJSON,
-                    offset: newOffset,
+                    offset: nextOffset,
                     prevReportsLength: effectiveAllReports.length,
                     shouldCalculateTotals: false,
                     searchKey: lastSearchQuery.searchKey,
-                    isLoading: isSearchLoading,
+                    isLoading: false,
                     shouldUpdateLastSearchParams: true,
                 });
             });
@@ -237,9 +265,10 @@ function MoneyRequestReportNavigationContent({reportID, shouldDisplayNarrowVersi
 
     return (
         <>
-            {/* Slow path only: mount the heavy subscriptions and lift the computed list up. Rendered even
-                when the arrows are hidden, since standaloneReports is what decides whether to show them. */}
-            {!shouldUseContextReports && <MoneyRequestReportNavigationStandalone onReportsChange={setStandaloneReports} />}
+            {/* Slow path and end-of-page only: mount the heavy subscriptions and lift the computed list up.
+                Rendered even when the arrows are hidden, since standaloneReports is what decides whether to
+                show them. */}
+            {shouldMountStandaloneSource && <MoneyRequestReportNavigationStandalone onReportsChange={setStandaloneReports} />}
             {shouldDisplayNavigationArrows && (
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                     {!shouldDisplayNarrowVersion && <Text style={styles.mutedTextLabel}>{`${currentIndex + 1} of ${allReportsCount}`}</Text>}
