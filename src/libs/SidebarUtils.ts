@@ -97,6 +97,7 @@ function compareStringDates(a: string, b: string): 0 | 1 | -1 {
 
 const NUMERIC_PAD_WIDTH = 15;
 const DIGIT_SEQUENCE = /\d+/g;
+const NON_ASCII_CHARACTER = /[\u0080-\uFFFF]/;
 
 /**
  * Persists across renders so sort keys are computed at most once per unique display name.
@@ -114,6 +115,9 @@ const loggedChatReportIDs = new Set<string>();
  * Lowercases the name and zero-pads numeric segments ("Report 2" → "report 000000000000002")
  * so that numeric ordering is preserved without Intl.Collator.
  *
+ * Names containing non-ASCII characters get an empty key, since code-unit comparison can't order them
+ * alphabetically (e.g. "ñ" would sort after "z"). Those names are compared with the locale Collator instead.
+ *
  * Results are cached at module level so each unique name pays the cost only once.
  */
 function buildSortKey(displayName: string): string {
@@ -122,7 +126,7 @@ function buildSortKey(displayName: string): string {
         return cached;
     }
 
-    const key = displayName.toLowerCase().replaceAll(DIGIT_SEQUENCE, (match) => match.padStart(NUMERIC_PAD_WIDTH, '0'));
+    const key = NON_ASCII_CHARACTER.test(displayName) ? '' : displayName.toLowerCase().replaceAll(DIGIT_SEQUENCE, (match) => match.padStart(NUMERIC_PAD_WIDTH, '0'));
     sortKeyCache.set(displayName, key);
     return key;
 }
@@ -514,17 +518,22 @@ function sortCategorizedReports(
 } {
     const {pinnedAndGBRReports, errorReports, draftReports, nonArchivedReports, archivedReports} = categories;
 
+    // An empty sort key on a non-empty name means the name has non-ASCII characters and needs the Collator
+    const hasComparableSortKey = (report: MiniReport) => !!report.sortKey || !report.displayName;
+
     const compareDisplayNames = (a: MiniReport, b: MiniReport) => {
-        if (a.sortKey < b.sortKey) {
-            return -1;
-        }
-        if (a.sortKey > b.sortKey) {
-            return 1;
+        if (hasComparableSortKey(a) && hasComparableSortKey(b)) {
+            if (a.sortKey < b.sortKey) {
+                return -1;
+            }
+            if (a.sortKey > b.sortKey) {
+                return 1;
+            }
         }
         if (!a.displayName || !b.displayName) {
             return 0;
         }
-        // Sort keys tied — fall back to Collator for locale-correct ordering
+        // Sort keys tied or not comparable — fall back to Collator for locale-correct ordering
         return localeCompare(a.displayName, b.displayName);
     };
 

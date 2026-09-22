@@ -5,6 +5,7 @@ import useReportIsArchived from '@hooks/useReportIsArchived';
 import type {ReportsToDisplayInLHN} from '@hooks/useSidebarOrderedReports';
 
 import {generateTransactionID} from '@libs/actions/Transaction';
+import getCollator from '@libs/CollatorUtils';
 import DateUtils from '@libs/DateUtils';
 import type * as PolicyUtils from '@libs/PolicyUtils';
 import {getConnectedIntegration} from '@libs/PolicyUtils';
@@ -4335,6 +4336,34 @@ describe('SidebarUtils', () => {
                 expect(result.pinnedAndGBRReports).toHaveLength(2);
             });
 
+            it('should sort names with locale-specific letters alphabetically', () => {
+                // Given pinned reports whose names include a non-ASCII letter
+                const categories = {
+                    pinnedAndGBRReports: [
+                        {reportID: '1', displayName: 'Zote Report', sortKey: _buildSortKey('Zote Report')},
+                        {reportID: '2', displayName: 'Ñu Safari', sortKey: _buildSortKey('Ñu Safari')},
+                        {reportID: '3', displayName: 'Nuevo Budget', sortKey: _buildSortKey('Nuevo Budget')},
+                    ],
+                    errorReports: [],
+                    draftReports: [],
+                    nonArchivedReports: [],
+                    archivedReports: [],
+                };
+
+                // When the reports are sorted with the Spanish Collator
+                const spanishCollator = getCollator(CONST.LOCALES.ES);
+                const spanishResult = _sortCategorizedReports({...categories, pinnedAndGBRReports: [...categories.pinnedAndGBRReports]}, true, (a, b) => spanishCollator.compare(a, b));
+
+                // Then "Ñ" is ordered as its own letter right after "N", and not after "Z"
+                expect(spanishResult.pinnedAndGBRReports.map((report) => report.displayName)).toEqual(['Nuevo Budget', 'Ñu Safari', 'Zote Report']);
+
+                // When the reports are sorted with the English Collator
+                const englishResult = _sortCategorizedReports({...categories, pinnedAndGBRReports: [...categories.pinnedAndGBRReports]}, true, localeCompare);
+
+                // Then "Ñ" is ordered as a variant of "N", and not after "Z"
+                expect(englishResult.pinnedAndGBRReports.map((report) => report.displayName)).toEqual(['Ñu Safari', 'Nuevo Budget', 'Zote Report']);
+            });
+
             it('should handle reports with missing dates', () => {
                 // Given the reports are created
                 const categories = {
@@ -4358,13 +4387,10 @@ describe('SidebarUtils', () => {
         });
 
         describe('buildSortKey', () => {
-            it('should sort accented characters by Unicode code point, not locale-aware order', () => {
-                // Given names with accented characters
-                const cafeAccented = _buildSortKey('Café');
-                const cafePlain = _buildSortKey('Cafe');
-
-                // Then accented "é" sorts after plain "e" by code point
-                expect(cafeAccented > cafePlain).toBe(true);
+            it('should return an empty key for names with non-ASCII characters so they are compared with the Collator', () => {
+                expect(_buildSortKey('Café')).toBe('');
+                expect(_buildSortKey('Ñu Safari')).toBe('');
+                expect(_buildSortKey('Cafe')).toBe('cafe');
             });
 
             it('should be case-insensitive', () => {
