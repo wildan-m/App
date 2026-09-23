@@ -1,3 +1,4 @@
+import AutoUpdateTime from '@components/AutoUpdateTime';
 import UserAvatar from '@components/Avatar/UserAvatar';
 import Button from '@components/Button';
 import ButtonDisabledWhenOffline from '@components/Button/composed/ButtonDisabledWhenOffline';
@@ -19,6 +20,7 @@ import useConfirmModal from '@hooks/useConfirmModal';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useExpensifyCardFeeds from '@hooks/useExpensifyCardFeeds';
+import useIsSupportalSession from '@hooks/useIsSupportalSession';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -48,7 +50,8 @@ import {
     PAYER_ROLES,
     tryNavigateToSubmitWorkspaceUpgrade,
 } from '@libs/PolicyUtils';
-import {isApproverOfOutstandingPolicyReports} from '@libs/ReportUtils';
+import {getChatByParticipants, hasAutomatedExpensifyAccountIDs, isApproverOfOutstandingPolicyReports} from '@libs/ReportUtils';
+import {buildQueryStringFromFilterFormValues} from '@libs/SearchQueryUtils';
 import shouldRenderTransferOwnerButton from '@libs/shouldRenderTransferOwnerButton';
 import {getDefaultAvatarURL} from '@libs/UserAvatarUtils';
 import {generateAccountID} from '@libs/UserUtils';
@@ -65,16 +68,20 @@ import withPolicyAndFullscreenLoading from '@pages/workspace/withPolicyAndFullsc
 import variables from '@styles/variables';
 
 import {clearWorkspaceOwnerChangeFlow, openPolicyMemberProfilePage, removeMembers} from '@userActions/Policy/Member';
+import {navigateToAndOpenReport} from '@userActions/Report';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type {CompanyCardFeed, CompanyCardFeedWithDomainID, Card as MemberCard, PersonalDetails, PersonalDetailsList, Policy} from '@src/types/onyx';
+import type {CompanyCardFeed, CompanyCardFeedWithDomainID, Card as MemberCard, PersonalDetails, PersonalDetailsList, Policy, Report} from '@src/types/onyx';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import mapOnyxCollectionItems from '@src/utils/mapOnyxCollectionItems';
 
-import type {OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
+import {guidedSetupAndTourStatusSelector} from '@selectors/Onboarding';
 import {createOutstandingReportsForPolicySelector} from '@selectors/Report';
 import {Str} from 'expensify-common';
 import React, {useEffect} from 'react';
@@ -87,6 +94,20 @@ type WorkspacePolicyOnyxProps = {
 type WorkspaceMemberDetailsPageProps = Omit<WithPolicyAndFullscreenLoadingProps, 'route'> &
     WorkspacePolicyOnyxProps &
     PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.MEMBER_DETAILS>;
+
+const chatReportsSelector = (reports: OnyxCollection<Report>) =>
+    mapOnyxCollectionItems(
+        reports,
+        (report: OnyxEntry<Report>): OnyxEntry<Report> =>
+            report && {
+                reportID: report.reportID,
+                participants: report.participants,
+                parentReportID: report.parentReportID,
+                parentReportActionID: report.parentReportActionID,
+                type: report.type,
+                chatType: report.chatType,
+            },
+    );
 
 function isNameValuePairsObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -114,7 +135,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const workspaceAccountID = policy?.policyAccountID ?? CONST.DEFAULT_NUMBER_ID;
 
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info', 'Transfer']);
+    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Transfer', 'CommentBubbles', 'MagnifyingGlass']);
     const styles = useThemeStyles();
     const {formatPhoneNumber, translate, localeCompare} = useLocalize();
     const StyleUtils = useStyleUtils();
@@ -128,6 +149,13 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const [outstandingReportsForPolicy] = useOnyx(ONYXKEYS.DERIVED.OUTSTANDING_REPORTS_BY_POLICY_ID, {selector: createOutstandingReportsForPolicySelector(policyID)});
     const privateIsArchivedMap = usePrivateIsArchivedMap();
     const expensifyCardSettings = useExpensifyCardFeeds(policyID);
+    const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: chatReportsSelector});
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const [guidedSetupAndTourStatus] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: guidedSetupAndTourStatusSelector});
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [conciergeChat] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
+    const isSupportalSession = useIsSupportalSession();
     const {showConfirmModal} = useConfirmModal();
     const showRuleBotGuardModal = useRuleBotGuardModal();
 
@@ -160,6 +188,10 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const assignablePayerRoles = PAYER_ROLES.filter((payerRole) => canMemberAssignRole(policy, currentUserLogin, payerRole));
     const canReimburserChangeRole = assignablePayerRoles.some((payerRole) => payerRole !== member?.role);
     const canEditSelectedMemberRole = !isSelectedMemberOwner && !isSelectedMemberCurrentUser && canManageSelectedMemberRole && (!isReimburser || canReimburserChangeRole);
+    const timezone = details.timezone;
+    const shouldShowLocalTime = !hasAutomatedExpensifyAccountIDs([accountID]) && !details.isCustomAgent && !isEmptyObject(timezone) && !!details.validated;
+    const chatReportID = getChatByParticipants([accountID, currentUserAccountID], reports)?.reportID;
+    const [hasChatReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, {selector: Boolean});
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
@@ -296,8 +328,29 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
         showRemoveMemberModal();
     };
 
-    const navigateToProfile = () => {
-        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.PROFILE.getRoute(accountID)));
+    const navigateToChat = () => {
+        navigateToAndOpenReport({
+            userLogins: [memberLogin],
+            personalDetails,
+            currentUserAccountID,
+            introSelected,
+            isSelfTourViewed: guidedSetupAndTourStatus?.isSelfTourViewed,
+            hasCompletedGuidedSetupFlow: guidedSetupAndTourStatus?.hasCompletedGuidedSetupFlow,
+            betas,
+            conciergeChat,
+            isSupportalSession,
+            shouldDismissModal: false,
+            shouldRevalidateExistingChat: true,
+            hasReportActions: hasChatReportActions,
+        });
+    };
+
+    const navigateToMemberHistory = () => {
+        const query = buildQueryStringFromFilterFormValues({
+            type: CONST.SEARCH.DATA_TYPES.CHAT,
+            from: [String(accountID)],
+        });
+        Navigation.revealRouteBeforeDismissingModal(ROUTES.SEARCH_ROOT.getRoute({query, rawQuery: query}));
     };
 
     const navigateToDetails = (card: MemberCard) => {
@@ -361,26 +414,30 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                     {displayName}
                                 </Text>
                             )}
-                            {isSelectedMemberOwner && isCurrentUserAdmin && !isCurrentUserOwner ? (
-                                shouldRenderTransferOwnerButton(fundList) && (
-                                    <ButtonDisabledWhenOffline
-                                        onPress={startChangeOwnershipFlow}
-                                        style={styles.mb5}
+                            <View style={[styles.flexRow, styles.gap3, styles.mb5]}>
+                                {!isSelectedMemberCurrentUser && (
+                                    <Button onPress={navigateToChat}>
+                                        <Button.Icon src={icons.CommentBubbles} />
+                                        <Button.Text>{translate('common.message')}</Button.Text>
+                                    </Button>
+                                )}
+                                {isSelectedMemberOwner && isCurrentUserAdmin && !isCurrentUserOwner ? (
+                                    shouldRenderTransferOwnerButton(fundList) && (
+                                        <ButtonDisabledWhenOffline onPress={startChangeOwnershipFlow}>
+                                            <Button.Icon src={icons.Transfer} />
+                                            <Button.Text>{translate('workspace.people.transferOwner')}</Button.Text>
+                                        </ButtonDisabledWhenOffline>
+                                    )
+                                ) : (
+                                    <Button
+                                        onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
+                                        isDisabled={!canRemoveSelectedMember}
                                     >
-                                        <Button.Icon src={icons.Transfer} />
-                                        <Button.Text>{translate('workspace.people.transferOwner')}</Button.Text>
-                                    </ButtonDisabledWhenOffline>
-                                )
-                            ) : (
-                                <Button
-                                    onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
-                                    isDisabled={!canRemoveSelectedMember}
-                                    style={styles.mb5}
-                                >
-                                    <Button.Icon src={icons.RemoveMembers} />
-                                    <Button.Text>{translate('workspace.people.removeWorkspaceMemberButtonTitle')}</Button.Text>
-                                </Button>
-                            )}
+                                        <Button.Icon src={icons.RemoveMembers} />
+                                        <Button.Text>{translate('workspace.people.removeWorkspaceMemberButtonTitle')}</Button.Text>
+                                    </Button>
+                                )}
+                            </View>
                         </View>
                         <View style={styles.w100}>
                             <MenuItemField
@@ -389,6 +446,18 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             >
                                 <MenuItem.Copy value={memberLoginToCopy} />
                             </MenuItemField>
+                            <OfflineWithFeedback pendingAction={details.pendingFields?.displayName}>
+                                <MenuItemField
+                                    name={translate('displayNamePage.headerTitle')}
+                                    value={displayName}
+                                    testID="member-display-name-menu-item"
+                                />
+                            </OfflineWithFeedback>
+                            {shouldShowLocalTime && (
+                                <View style={styles.ph5}>
+                                    <AutoUpdateTime timezone={timezone} />
+                                </View>
+                            )}
                             <MenuItemWithTopDescription
                                 disabled={!canEditSelectedMemberRole}
                                 title={translate(`workspace.common.roleName`, member?.role)}
@@ -434,10 +503,10 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             )}
                             <View style={styles.mb5}>
                                 <MenuItemNavigation
-                                    title={translate('common.profile')}
-                                    icon={icons.Info}
-                                    onPress={navigateToProfile}
-                                    testID="member-profile-menu-item"
+                                    title={translate('profilePage.viewMemberHistory')}
+                                    icon={icons.MagnifyingGlass}
+                                    onPress={navigateToMemberHistory}
+                                    testID="member-history-menu-item"
                                 />
                             </View>
                             {memberCards.length > 0 && (
