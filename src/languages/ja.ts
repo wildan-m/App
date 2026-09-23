@@ -3363,8 +3363,8 @@ ${date} の ${merchant} への ${amount}`,
         },
         interestedFeatures: {
             title: 'どの機能にご興味がありますか？',
-            featuresAlreadyEnabled: '当社で最も人気のある機能はこちらです。',
-            featureYouMayBeInterestedIn: '追加機能を有効にする:',
+            featuresAlreadyEnabled: 'すでに有効な機能:',
+            featureYouMayBeInterestedIn: '追加機能:',
         },
         error: {
             requiredFirstName: '続行するには名を入力してください',

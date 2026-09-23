@@ -60,27 +60,67 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
         return ONBOARDING_FEATURES.map((feature) => {
             switch (feature.id) {
                 case CONST.POLICY.MORE_FEATURES.ARE_CATEGORIES_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.categories.title'), icon: illustrations.FolderOpen};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.categories.title'),
+                        subtitle: translate('workspace.moreFeatures.categories.subtitle'),
+                        icon: illustrations.FolderOpen,
+                    };
                 case CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.connections.title'), icon: illustrations.Accounting};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.connections.title'),
+                        subtitle: translate('workspace.moreFeatures.connections.subtitle'),
+                        icon: illustrations.Accounting,
+                    };
                 case CONST.POLICY.MORE_FEATURES.ARE_COMPANY_CARDS_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.companyCards.title'), icon: illustrations.CompanyCard};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.companyCards.title'),
+                        subtitle: translate('workspace.moreFeatures.companyCards.subtitle'),
+                        icon: illustrations.CompanyCard,
+                    };
                 case CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.workflows.title'), icon: illustrations.Workflows};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.workflows.title'),
+                        subtitle: translate('workspace.moreFeatures.workflows.subtitle'),
+                        icon: illustrations.Workflows,
+                    };
                 case CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.travel.title'), icon: illustrations.Luggage};
+                    return {...feature, title: translate('workspace.moreFeatures.travel.title'), subtitle: translate('workspace.moreFeatures.travel.subtitle'), icon: illustrations.Luggage};
                 case CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.rules.title'), icon: illustrations.Rules};
+                    return {...feature, title: translate('workspace.moreFeatures.rules.title'), subtitle: translate('workspace.moreFeatures.rules.subtitle'), icon: illustrations.Rules};
                 case CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.distanceRates.title'), icon: illustrations.Car};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.distanceRates.title'),
+                        subtitle: translate('workspace.moreFeatures.distanceRates.subtitle'),
+                        icon: illustrations.Car,
+                    };
                 case CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.expensifyCard.title'), icon: illustrations.HandCard};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.expensifyCard.title'),
+                        subtitle: translate('workspace.moreFeatures.expensifyCard.subtitle'),
+                        icon: illustrations.HandCard,
+                    };
                 case CONST.POLICY.MORE_FEATURES.ARE_TAGS_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.tags.title'), icon: illustrations.Tag};
+                    return {...feature, title: translate('workspace.moreFeatures.tags.title'), subtitle: translate('workspace.moreFeatures.tags.subtitle'), icon: illustrations.Tag};
                 case CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.perDiem.title'), icon: illustrations.PerDiem};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.perDiem.title'),
+                        subtitle: translate('workspace.moreFeatures.perDiem.subtitle'),
+                        icon: illustrations.PerDiem,
+                    };
                 case CONST.POLICY.MORE_FEATURES.IS_TIME_TRACKING_ENABLED:
-                    return {...feature, title: translate('workspace.moreFeatures.timeTracking.title'), icon: illustrations.Clock};
+                    return {
+                        ...feature,
+                        title: translate('workspace.moreFeatures.timeTracking.title'),
+                        subtitle: translate('workspace.moreFeatures.timeTracking.subtitle'),
+                        icon: illustrations.Clock,
+                    };
                 default:
                     return {...feature, title: feature.id, icon: illustrations.FolderOpen};
             }
@@ -162,6 +202,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
         {
             titleTranslationKey: 'onboarding.interestedFeatures.featureYouMayBeInterestedIn',
             items: mayBeInterestedFeatures,
+            shouldShowSubtitle: true,
         },
     ];
 
@@ -181,7 +222,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
     );
 
     const renderItem = useCallback(
-        (item: Feature) => {
+        (item: Feature, shouldShowSubtitle: boolean) => {
             const isSelected = selectedFeatures.includes(item.id);
             return (
                 <PressableWithoutFeedback
@@ -194,26 +235,30 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                     hoverStyle={styles.hoveredComponentBG}
                     style={[
                         styles.onboardingInterestedFeaturesItem,
-                        // 48.5% handles the gap between columns and keeps items aligned when the scrollbar appears
-                        isSmallScreenWidth ? styles.flexBasis100 : {flexBasis: '48.5%', maxWidth: '48.5%'},
+                        isSelected && styles.onboardingInterestedFeaturesItemSelected,
+                        // Percentage flexBasis handles the gap between columns and keeps tiles aligned when the scrollbar appears
+                        isSmallScreenWidth ? {flexBasis: '48%', maxWidth: '48%'} : {flexBasis: '31.5%', maxWidth: '31.5%'},
                     ]}
                     sentryLabel={CONST.SENTRY_LABEL.ONBOARDING.INTERESTED_FEATURES_ITEM}
                 >
-                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
+                    <View style={[styles.flexRow, styles.justifyContentBetween, styles.w100]}>
                         <Icon
                             src={item.icon}
                             width={48}
                             height={48}
                         />
-                        <Text style={[styles.textStrong]}>{item.title}</Text>
+                        <Checkbox
+                            accessibilityLabel={item.title}
+                            isChecked={isSelected}
+                            onPress={() => {
+                                handleFeatureSelect(item.id);
+                            }}
+                        />
                     </View>
-                    <Checkbox
-                        accessibilityLabel={item.title}
-                        isChecked={isSelected}
-                        onPress={() => {
-                            handleFeatureSelect(item.id);
-                        }}
-                    />
+                    <View style={[styles.mt2]}>
+                        <Text style={[styles.textStrong]}>{item.title}</Text>
+                        {shouldShowSubtitle && !!item.subtitle && <Text style={[styles.textLabelSupporting, styles.mt1]}>{item.subtitle}</Text>}
+                    </View>
                 </PressableWithoutFeedback>
             );
         },
@@ -229,7 +274,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                 renderTitle={() => <Text style={[styles.mutedNormalTextLabel, styles.mb3]}>{translate(section.titleTranslationKey as TranslationPaths)}</Text>}
                 subtitleMuted
             >
-                {section.items.map(renderItem)}
+                {section.items.map((item) => renderItem(item, !!section.shouldShowSubtitle))}
             </Section>
         ),
         [styles, renderItem, translate],

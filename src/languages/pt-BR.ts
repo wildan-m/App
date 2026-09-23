@@ -3383,8 +3383,8 @@ ${amount} para ${merchant} - ${date}`,
         },
         interestedFeatures: {
             title: 'Em quais recursos você tem interesse?',
-            featuresAlreadyEnabled: 'Aqui estão nossos recursos mais populares:',
-            featureYouMayBeInterestedIn: 'Ativar recursos adicionais:',
+            featuresAlreadyEnabled: 'Já ativados:',
+            featureYouMayBeInterestedIn: 'Recursos adicionais:',
         },
         error: {
             requiredFirstName: 'Insira seu primeiro nome para continuar',
