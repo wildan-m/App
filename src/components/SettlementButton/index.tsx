@@ -57,7 +57,7 @@ import type {TupleToUnion} from 'type-fest';
 
 import {hasSeenTourSelector} from '@selectors/Onboarding';
 import truncate from 'lodash/truncate';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {View} from 'react-native';
 
 import type SettlementButtonProps from './types';
@@ -158,8 +158,7 @@ function SettlementButton({
     const {isBetaEnabled} = usePermissions();
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    // eslint-disable-next-line rulesdir/no-default-id-values
-    const [unlockRequestedAt] = useOnyx(`${ONYXKEYS.COLLECTION.NVP_LOCKED_VBA_UNLOCK_REQUESTED}${policy?.achAccount?.bankAccountID ?? CONST.DEFAULT_NUMBER_ID}`);
+    const [lockedVbaUnlockRequested] = useOnyx(ONYXKEYS.COLLECTION.NVP_LOCKED_VBA_UNLOCK_REQUESTED);
     const [initiatingBankAccountUnlock] = useOnyx(ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK);
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -177,6 +176,8 @@ function SettlementButton({
     const shouldShowPayWithExpensifyOption = !shouldHidePaymentOptions;
     const shouldShowPayElsewhereOption = !shouldHidePaymentOptions && !isInvoiceReport;
     const isBankAccountLocked = policy?.achAccount?.state === CONST.BANK_ACCOUNT.STATE.LOCKED;
+    // The bank account picked from the Pay menu for the payment awaiting account validation, so the resumed payment re-checks that same account.
+    const [pendingSelectedBankAccountID, setPendingSelectedBankAccountID] = useState<number | undefined>();
 
     function getLatestPersonalBankAccount() {
         return formattedPaymentMethods.filter((ba) => (ba.accountData as AccountData)?.type === CONST.BANK_ACCOUNT.TYPE.PERSONAL);
@@ -184,9 +185,13 @@ function SettlementButton({
 
     // The guards checked after the account-validation gate. Also re-checked when a payment
     // interrupted by account validation resumes, since the validation gate skipped them.
-    const checkForPostValidationBlockers = () => {
-        if (isBankAccountLocked) {
-            if (unlockRequestedAt) {
+    const checkForPostValidationBlockers = (selectedBankAccountID?: number) => {
+        // The selected account can be locked even when the workspace's linked account isn't (or isn't loaded yet), so check the account the user is paying with.
+        const selectedBankAccountData = selectedBankAccountID ? bankAccountList?.[selectedBankAccountID]?.accountData : undefined;
+        const isSelectedBankAccountLocked = selectedBankAccountData?.state === CONST.BANK_ACCOUNT.STATE.LOCKED;
+        if (isSelectedBankAccountLocked || isBankAccountLocked) {
+            const lockedBankAccountID = isSelectedBankAccountLocked ? (selectedBankAccountData?.bankAccountID ?? selectedBankAccountID) : policy?.achAccount?.bankAccountID;
+            if (lockedBankAccountID !== undefined && lockedVbaUnlockRequested?.[`${ONYXKEYS.COLLECTION.NVP_LOCKED_VBA_UNLOCK_REQUESTED}${lockedBankAccountID}`]) {
                 showUnlockAlreadyRequestedModal(showConfirmModal, translate);
             } else {
                 showConfirmModal({
@@ -203,11 +208,12 @@ function SettlementButton({
                     if (action !== ModalActions.CONFIRM) {
                         return;
                     }
-                    if (policy?.achAccount?.bankAccountID === undefined) {
+                    if (lockedBankAccountID === undefined) {
                         return;
                     }
-                    pressLockedBankAccount(policy?.achAccount?.bankAccountID, translate, conciergeReportID, delegateAccountID, initiatingBankAccountUnlock);
-                    navigateToConciergeChat({conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas});
+                    pressLockedBankAccount(lockedBankAccountID, translate, conciergeReportID, delegateAccountID, initiatingBankAccountUnlock);
+                    // The Pay button usually lives in a report opened in the RHP, so dismiss it or Concierge opens underneath it.
+                    navigateToConciergeChat({conciergeReportID, introSelected, currentUserAccountID, isSelfTourViewed, betas, shouldDismissModal: true});
                 });
             }
             return true;
@@ -223,13 +229,13 @@ function SettlementButton({
 
     const {isUserValidated, verifyAccountAndResume} = useVerifyAccountAndResume((retry?: () => void) => {
         // The validation gate returned before these guards could run, so apply them to the resumed.
-        if (checkForPostValidationBlockers()) {
+        if (checkForPostValidationBlockers(pendingSelectedBankAccountID)) {
             return;
         }
         retry?.();
     });
 
-    const checkForNecessaryAction = (paymentMethodType?: PaymentMethodType, retry?: () => void) => {
+    const checkForNecessaryAction = (paymentMethodType?: PaymentMethodType, retry?: () => void, selectedBankAccountID?: number) => {
         if (isDelegateAccessRestricted) {
             showDelegateNoAccessModal();
             return true;
@@ -241,15 +247,16 @@ function SettlementButton({
         }
 
         if (!isUserValidated && paymentMethodType !== CONST.IOU.PAYMENT_TYPE.ELSEWHERE) {
+            setPendingSelectedBankAccountID(selectedBankAccountID);
             verifyAccountAndResume(retry);
             return true;
         }
 
-        return checkForPostValidationBlockers();
+        return checkForPostValidationBlockers(selectedBankAccountID);
     };
 
-    const runPaymentAction = (paymentMethodType: PaymentMethodType | undefined, action: () => void) => {
-        if (checkForNecessaryAction(paymentMethodType, action)) {
+    const runPaymentAction = (paymentMethodType: PaymentMethodType | undefined, action: () => void, selectedBankAccountID?: number) => {
+        if (checkForNecessaryAction(paymentMethodType, action, selectedBankAccountID)) {
             return;
         }
         action();
@@ -315,13 +322,16 @@ function SettlementButton({
                         description: account.description,
                         shouldIgnoreCompactStyle: true,
                         onSelected: () =>
-                            runPaymentAction(CONST.IOU.PAYMENT_TYPE.VBBA, () =>
-                                onPress({
-                                    paymentType: CONST.IOU.PAYMENT_TYPE.VBBA,
-                                    payAsBusiness: true,
-                                    methodID: account.methodID,
-                                    paymentMethod: CONST.PAYMENT_METHODS.BUSINESS_BANK_ACCOUNT,
-                                }),
+                            runPaymentAction(
+                                CONST.IOU.PAYMENT_TYPE.VBBA,
+                                () =>
+                                    onPress({
+                                        paymentType: CONST.IOU.PAYMENT_TYPE.VBBA,
+                                        payAsBusiness: true,
+                                        methodID: account.methodID,
+                                        paymentMethod: CONST.PAYMENT_METHODS.BUSINESS_BANK_ACCOUNT,
+                                    }),
+                                account.methodID,
                             ),
                     });
                 }
@@ -376,13 +386,16 @@ function SettlementButton({
                         icon: formattedPaymentMethod?.icon,
                         shouldUpdateSelectedIndex: true,
                         onSelected: () =>
-                            runPaymentAction(CONST.IOU.PAYMENT_TYPE.EXPENSIFY, () =>
-                                onPress({
-                                    paymentType: CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
-                                    payAsBusiness,
-                                    methodID: formattedPaymentMethod.methodID,
-                                    paymentMethod: formattedPaymentMethod.accountType,
-                                }),
+                            runPaymentAction(
+                                CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
+                                () =>
+                                    onPress({
+                                        paymentType: CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
+                                        payAsBusiness,
+                                        methodID: formattedPaymentMethod.methodID,
+                                        paymentMethod: formattedPaymentMethod.accountType,
+                                    }),
+                                formattedPaymentMethod.methodID,
                             ),
                         iconStyles: formattedPaymentMethod?.iconStyles,
                         iconHeight: formattedPaymentMethod?.iconSize,
