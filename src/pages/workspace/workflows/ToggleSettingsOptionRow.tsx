@@ -8,6 +8,7 @@ import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 
 import useAccordionAnimation from '@hooks/useAccordionAnimation';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -129,6 +130,7 @@ function ToggleSettingOptionRow({
     const styles = useThemeStyles();
     const {isAccordionExpanded, shouldAnimateAccordionSection} = useAccordionAnimation(isActive);
     const theme = useTheme();
+    const {isExtraSmallScreenWidth} = useResponsiveLayout();
 
     // We are disabling the announcement for subtitle if subtitle and switchAccessibilityLabel are equal
     const areSubtitleAndSwitchAccessibilityLabelEqual = switchAccessibilityLabel === subtitle;
@@ -156,7 +158,9 @@ function ToggleSettingOptionRow({
 
     const subtitleSpacingStyle = (() => {
         if (!shouldPlaceSubtitleBelowSwitch) {
-            return {...styles.mt1, ...styles.mr5};
+            // The title column already keeps its own right margin from the switch, so on extra-small widths we drop the
+            // extra subtitle margin to leave the text enough room instead of wrapping it a word (or a few letters) per line
+            return isExtraSmallScreenWidth ? styles.mt1 : {...styles.mt1, ...styles.mr5};
         }
 
         return shouldUseCompactSubtitleSpacing ? styles.mt1 : styles.mt3;
@@ -211,7 +215,7 @@ function ToggleSettingOptionRow({
                 />
             )}
             {customTitle ?? (
-                <View style={[styles.flexColumn, styles.flex1, styles.mr6]}>
+                <View style={[styles.flexColumn, styles.flex1, isExtraSmallScreenWidth ? styles.mr3 : styles.mr6]}>
                     <Text
                         style={[styles.textNormal, styles.lh20, titleStyle]}
                         accessibilityRole={titleAccessibilityRole}

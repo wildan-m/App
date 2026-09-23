@@ -67,7 +67,7 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Table', 'Download', 'Send', 'ThumbsUp', 'MoneyBag', 'Wrench']);
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isExtraSmallScreenWidth} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
 
@@ -297,7 +297,8 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
             <WorkspacePageWithSections
                 headerText={translate('workspace.common.workflows')}
                 route={route}
-                headerContent={headerButtons}
+                // On extra-small widths the button would squeeze the page title down to a few letters, so it moves below the header instead
+                headerContent={!isExtraSmallScreenWidth && headerButtons}
                 shouldShowOfflineIndicatorInWideScreen
                 shouldShowNotFoundPage={!isGroupPolicy || !canReadWorkflows}
                 policyFeature={CONST.POLICY.POLICY_FEATURE.WORKFLOWS}
@@ -307,6 +308,7 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
                 shouldUseScrollView
                 addBottomSafeAreaPadding
             >
+                {isExtraSmallScreenWidth && !!headerButtons && <View style={[styles.flexRow, styles.ph5, styles.pb3]}>{headerButtons}</View>}
                 <View style={[styles.flexRow, styles.mb1, styles.w100]}>
                     <TabSelectorContextProvider activeTabKey={activeTab}>
                         <TabSelectorBase

@@ -44,6 +44,7 @@ function WorkspaceListHeaderContent({activeTabKey, headerButton, shouldShowHeade
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Globe', 'Building']);
     const {badgeText: domainsBadgeText, hasDomainErrors} = useDomainsTabBadge();
+    const {isExtraSmallScreenWidth} = useResponsiveLayout();
     const navigationOptions = [
         {
             key: 'workspaces',
@@ -75,13 +76,14 @@ function WorkspaceListHeaderContent({activeTabKey, headerButton, shouldShowHeade
     };
 
     return (
-        <View style={[styles.flexRow, styles.justifyContentBetween, styles.pr5, styles.pt1, styles.pb2]}>
+        <View style={[isExtraSmallScreenWidth ? styles.flexColumn : [styles.flexRow, styles.justifyContentBetween], styles.pr5, styles.pt1, styles.pb2]}>
             <TabSelectorBase
                 tabs={navigationOptions}
                 activeTabKey={activeTabKey}
                 onTabPress={onTabPress}
             />
-            {shouldShowHeaderButton && headerButton}
+            {/* On extra-small widths the tabs and the header button can't share one row without the button covering the tabs, so stack them */}
+            {shouldShowHeaderButton && (isExtraSmallScreenWidth ? <View style={[styles.flexRow, styles.pl5]}>{headerButton}</View> : headerButton)}
         </View>
     );
 }
