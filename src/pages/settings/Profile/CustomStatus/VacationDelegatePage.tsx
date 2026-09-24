@@ -32,7 +32,7 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 import {useNavigation} from '@react-navigation/native';
 import {format} from 'date-fns';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 
 /** The delegate stays active for the whole picked day, so it is cleared at the end of it */
@@ -58,6 +58,9 @@ function VacationDelegatePage() {
     const [clearAfterDate, setClearAfterDate] = useState(() => (savedClearAfter ? DateUtils.extractDate(savedClearAfter) : ''));
 
     const isSelectingRef = useRef(false);
+
+    // The picked delegate lives in the form draft, so drop it however the page is left (back button, Escape, clicking outside the RHP).
+    useEffect(() => () => clearDraftValues(ONYXKEYS.FORMS.VACATION_DELEGATE_FORM), []);
 
     const goBack = () => {
         clearDraftValues(ONYXKEYS.FORMS.VACATION_DELEGATE_FORM);
