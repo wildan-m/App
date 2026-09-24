@@ -262,6 +262,24 @@ function MoneyRequestReceiptView({
             rules,
         });
 
+    // A scan that is only queued while offline can't be edited yet, but its receipt can still be deleted from the receipt modal
+    const canDeleteReceipt =
+        isEditable &&
+        canEditFieldOfMoneyRequest({
+            reportAction: parentReportAction,
+            reportActions: parentReportActions,
+            fieldToEdit: CONST.EDIT_REQUEST_FIELD.RECEIPT,
+            isDeleteAction: true,
+            isChatReportArchived,
+            reportNameValuePairs,
+            transaction,
+            report: moneyRequestReport,
+            policy,
+            rules,
+            isOffline,
+        });
+    const isReceiptModalReadonly = readonly || (!canEditReceipt && !canDeleteReceipt);
+
     const onAttachmentFilesValidated = (files: FileObject[]) => {
         if (!report?.reportID) {
             return;
@@ -707,7 +725,7 @@ function MoneyRequestReceiptView({
                                                 filename={receiptURIs?.filename}
                                                 transaction={updatedTransaction ?? transaction}
                                                 enablePreviewModal
-                                                readonly={readonly || !canEditReceipt}
+                                                readonly={isReceiptModalReadonly}
                                                 mergeTransactionID={mergeTransactionID}
                                                 report={report}
                                                 onLoad={() => setIsLoading(false)}
@@ -770,7 +788,7 @@ function MoneyRequestReceiptView({
                                         <PressableWithoutFocus
                                             onPress={() =>
                                                 Navigation.navigate(
-                                                    ROUTES.TRANSACTION_RECEIPT.getRoute(report?.reportID, (updatedTransaction ?? transaction)?.transactionID, readonly || !canEditReceipt),
+                                                    ROUTES.TRANSACTION_RECEIPT.getRoute(report?.reportID, (updatedTransaction ?? transaction)?.transactionID, isReceiptModalReadonly),
                                                 )
                                             }
                                             disabled={shouldDisableExpandReceipt}
