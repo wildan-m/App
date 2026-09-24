@@ -28,10 +28,12 @@ type SetVacationDelegateOptions = {
     creator: string;
     delegate: string;
     currentDelegate?: string;
+    currentClearAfter?: string;
+    clearAfter?: string;
     shouldOverridePolicyDiffWarning?: boolean;
 };
 
-async function setVacationDelegate({creator, delegate, currentDelegate, shouldOverridePolicyDiffWarning = false}: SetVacationDelegateOptions) {
+async function setVacationDelegate({creator, delegate, currentDelegate, currentClearAfter, clearAfter, shouldOverridePolicyDiffWarning = false}: SetVacationDelegateOptions) {
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -39,11 +41,13 @@ async function setVacationDelegate({creator, delegate, currentDelegate, shouldOv
             value: {
                 creator,
                 delegate,
+                clearAfter: clearAfter ?? null,
                 errors: null,
                 pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 previousDelegate: currentDelegate ?? null,
                 policyDiff: null,
                 pendingDelegate: null,
+                pendingClearAfter: null,
             },
         },
     ];
@@ -58,6 +62,7 @@ async function setVacationDelegate({creator, delegate, currentDelegate, shouldOv
                 previousDelegate: null,
                 policyDiff: null,
                 pendingDelegate: null,
+                pendingClearAfter: null,
             },
         },
     ];
@@ -67,6 +72,7 @@ async function setVacationDelegate({creator, delegate, currentDelegate, shouldOv
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE,
             value: {
+                clearAfter: currentClearAfter ?? null,
                 errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('statusPage.vacationDelegateError'),
                 pendingAction: null,
             },
@@ -76,6 +82,7 @@ async function setVacationDelegate({creator, delegate, currentDelegate, shouldOv
     const parameters: SetVacationDelegateParams = {
         creator,
         vacationDelegateEmail: delegate,
+        clearAfter,
         overridePolicyDiffWarning: shouldOverridePolicyDiffWarning,
     };
 
@@ -106,7 +113,9 @@ async function setVacationDelegate({creator, delegate, currentDelegate, shouldOv
         Onyx.merge(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE, {
             errors: null,
             delegate: currentDelegate ?? null,
+            clearAfter: currentClearAfter ?? null,
             pendingDelegate: delegate,
+            pendingClearAfter: clearAfter ?? null,
             policyDiff: response.data.policyDiff,
             pendingAction: null,
         });
@@ -122,7 +131,7 @@ function deleteVacationDelegate(vacationDelegate?: VacationDelegate) {
         return;
     }
 
-    const {creator, delegate} = vacationDelegate;
+    const {creator, delegate, clearAfter} = vacationDelegate;
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -130,11 +139,13 @@ function deleteVacationDelegate(vacationDelegate?: VacationDelegate) {
             value: {
                 creator: null,
                 delegate: null,
+                clearAfter: null,
                 errors: null,
                 previousDelegate: vacationDelegate?.delegate,
                 pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                 policyDiff: null,
                 pendingDelegate: null,
+                pendingClearAfter: null,
             },
         },
     ];
@@ -158,6 +169,7 @@ function deleteVacationDelegate(vacationDelegate?: VacationDelegate) {
             value: {
                 creator,
                 delegate,
+                clearAfter: clearAfter ?? null,
                 errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('statusPage.vacationDelegateError'),
                 pendingAction: null,
             },
@@ -175,6 +187,7 @@ function clearVacationDelegateError(previousDelegate?: string) {
         previousDelegate: null,
         policyDiff: null,
         pendingDelegate: null,
+        pendingClearAfter: null,
     });
 }
 

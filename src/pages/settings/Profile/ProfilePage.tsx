@@ -12,6 +12,7 @@ import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
+import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDocumentTitle from '@hooks/useDocumentTitle';
@@ -27,6 +28,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {clearVacationDelegateError} from '@libs/actions/VacationDelegate';
 import getVacationDelegateErrors from '@libs/getVacationDelegateErrors';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
@@ -55,7 +57,7 @@ import type {ValueOf} from 'type-fest';
 
 import {useRoute} from '@react-navigation/native';
 import {homeAndOfficeCommuterExclusionPolicyNameSelector} from '@selectors/Policy';
-import React, {useMemo, useRef} from 'react';
+import React, {Fragment, useMemo, useRef} from 'react';
 import {View} from 'react-native';
 
 import AgentAIPromptSection from './AgentAIPromptSection';
@@ -128,7 +130,6 @@ function ProfilePage() {
             description: translate('statusPage.status'),
             title: emojiCode ? `${emojiCode} ${currentUserPersonalDetails?.status?.text ?? ''}` : '',
             pageRoute: ROUTES.SETTINGS_STATUS,
-            brickRoadIndicator: isEmptyObject(getVacationDelegateErrors(vacationDelegate)) ? undefined : CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR,
             testID: 'status-menu-item',
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.STATUS,
         },
@@ -274,18 +275,28 @@ function ProfilePage() {
                             {publicOptions.map((detail) => {
                                 const {pageRoute} = detail;
                                 return (
-                                    <MenuItemWithTopDescription
-                                        key={detail.testID}
-                                        interactive={!!pageRoute}
-                                        shouldShowRightIcon={!!pageRoute}
-                                        title={detail.title}
-                                        description={detail.description}
-                                        wrapperStyle={styles.sectionMenuItemTopDescription}
-                                        onPress={pageRoute ? () => Navigation.navigate(pageRoute) : undefined}
-                                        brickRoadIndicator={detail.brickRoadIndicator}
-                                        pressableTestID={detail?.testID}
-                                        sentryLabel={detail.sentryLabel}
-                                    />
+                                    <Fragment key={detail.testID}>
+                                        <MenuItemWithTopDescription
+                                            interactive={!!pageRoute}
+                                            shouldShowRightIcon={!!pageRoute}
+                                            title={detail.title}
+                                            description={detail.description}
+                                            wrapperStyle={styles.sectionMenuItemTopDescription}
+                                            onPress={pageRoute ? () => Navigation.navigate(pageRoute) : undefined}
+                                            brickRoadIndicator={detail.brickRoadIndicator}
+                                            pressableTestID={detail?.testID}
+                                            sentryLabel={detail.sentryLabel}
+                                        />
+                                        {detail.testID === 'status-menu-item' && (
+                                            <VacationDelegateMenuItem
+                                                vacationDelegate={vacationDelegate}
+                                                errors={getVacationDelegateErrors(vacationDelegate)}
+                                                pendingAction={vacationDelegate?.pendingAction}
+                                                onCloseError={() => clearVacationDelegateError(vacationDelegate?.previousDelegate)}
+                                                onPress={() => Navigation.navigate(ROUTES.SETTINGS_VACATION_DELEGATE)}
+                                            />
+                                        )}
+                                    </Fragment>
                                 );
                             })}
                             <Button

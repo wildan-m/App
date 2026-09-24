@@ -4,11 +4,13 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useVacationDelegatePersonalDetails from '@hooks/useVacationDelegatePersonalDetails';
 
 import getVacationDelegateDisplayName from '@libs/getVacationDelegateDisplayName';
+import isVacationDelegateExpired from '@libs/isVacationDelegateExpired';
 
 import CONST from '@src/CONST';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
 
+import {format} from 'date-fns';
 import React from 'react';
 
 import UserAvatar from './Avatar/UserAvatar';
@@ -19,6 +21,9 @@ import OfflineWithFeedback from './OfflineWithFeedback';
 
 type VacationDelegateSectionProps = {
     vacationDelegate?: BaseVacationDelegate;
+
+    /** Label shown above the delegate, defaults to "Vacation delegate" */
+    label?: string;
 
     /** Errors related to setting the vacation delegate */
     errors?: Errors;
@@ -38,12 +43,18 @@ type VacationDelegateSectionProps = {
     onPress: () => void;
 };
 
-function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCloseError, onPress}: VacationDelegateSectionProps) {
+function VacationDelegateMenuItem({vacationDelegate, label, errors, pendingAction, onCloseError, onPress}: VacationDelegateSectionProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
-    const hasVacationDelegate = !!vacationDelegate?.delegate;
+    const hasVacationDelegate = !!vacationDelegate?.delegate && !isVacationDelegateExpired(vacationDelegate?.clearAfter);
+    const menuItemLabel = label ?? translate('common.vacationDelegate');
+    const clearAfterDate = vacationDelegate?.clearAfter ? new Date(vacationDelegate.clearAfter) : undefined;
+    const clearAfterDescription =
+        clearAfterDate && !Number.isNaN(clearAfterDate.getTime())
+            ? translate('statusPage.vacationDelegateUntil', format(clearAfterDate, CONST.DATE.FNS_FORMAT_STRING).replaceAll('-', '/'))
+            : '';
     const vacationDelegatePersonalDetails = useVacationDelegatePersonalDetails(vacationDelegate?.delegate);
 
     const rawDelegateLogin = vacationDelegatePersonalDetails?.login ?? vacationDelegate?.delegate ?? '';
@@ -61,7 +72,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
         >
             {hasVacationDelegate ? (
                 <MenuItemWithLabel
-                    label={translate('common.vacationDelegate')}
+                    label={menuItemLabel}
                     onPress={onPress}
                 >
                     <MenuItem.Row>
@@ -74,6 +85,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
                         <MenuItem.Content>
                             <MenuItem.Title>{delegateDisplayName}</MenuItem.Title>
                             {!!delegateDescription && <MenuItem.Description numberOfLines={1}>{delegateDescription}</MenuItem.Description>}
+                            {!!clearAfterDescription && <MenuItem.Description numberOfLines={1}>{clearAfterDescription}</MenuItem.Description>}
                         </MenuItem.Content>
                         <MenuItem.Trailing>
                             <MenuItem.Chevron />
@@ -82,7 +94,7 @@ function VacationDelegateMenuItem({vacationDelegate, errors, pendingAction, onCl
                 </MenuItemWithLabel>
             ) : (
                 <MenuItemField
-                    name={translate('common.vacationDelegate')}
+                    name={menuItemLabel}
                     onPress={onPress}
                 />
             )}

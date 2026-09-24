@@ -36,6 +36,7 @@ export type {WorkspaceDuplicateForm} from './WorkspaceDuplicateForm';
 export type {DebugTransactionViolationForm} from './DebugTransactionViolationForm';
 export type {RoomNameForm} from './RoomNameForm';
 export type {SettingsStatusClearDateForm} from './SettingsStatusClearDateForm';
+export type {VacationDelegateForm} from './VacationDelegateForm';
 export type {SettingsStatusSetForm} from './SettingsStatusSetForm';
 export type {WaypointForm} from './WaypointForm';
 export type {WorkspaceInviteMessageForm} from './WorkspaceInviteMessageForm';

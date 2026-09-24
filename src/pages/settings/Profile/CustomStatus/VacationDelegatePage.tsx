@@ -1,32 +1,68 @@
-import BaseVacationDelegateSelectionComponent from '@components/BaseVacationDelegateSelectionComponent';
+import DatePicker from '@components/DatePicker';
+import DelegatorList from '@components/DelegatorList';
+import FormProvider from '@components/Form/FormProvider';
+import InputWrapper from '@components/Form/InputWrapper';
+import type {FormOnyxValues} from '@components/Form/types';
+import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
+import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import MenuItemAction from '@components/MenuItem/presets/MenuItemAction';
 import ScreenWrapper from '@components/ScreenWrapper';
+import Text from '@components/Text';
+import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useThemeStyles from '@hooks/useThemeStyles';
 
+import {clearDraftValues} from '@libs/actions/FormActions';
 import {clearVacationDelegateError, deleteVacationDelegate, setVacationDelegate} from '@libs/actions/VacationDelegate';
+import DateUtils from '@libs/DateUtils';
+import isVacationDelegateExpired from '@libs/isVacationDelegateExpired';
 import Navigation from '@libs/Navigation/Navigation';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {Participant} from '@src/types/onyx/IOU';
+import INPUT_IDS from '@src/types/form/VacationDelegateForm';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 import {useNavigation} from '@react-navigation/native';
-import React, {useRef} from 'react';
+import {format} from 'date-fns';
+import React, {useRef, useState} from 'react';
+import {View} from 'react-native';
+
+/** The delegate stays active for the whole picked day, so it is cleared at the end of it */
+const END_OF_DAY_TIME = '23:59:59';
 
 function VacationDelegatePage() {
+    const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
     const {showConfirmModal} = useConfirmModal();
     const navigation = useNavigation();
+    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
-    const [vacationDelegate] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE);
+    const [vacationDelegate, vacationDelegateMetadata] = useOnyx(ONYXKEYS.NVP_PRIVATE_VACATION_DELEGATE);
+    const [draftDelegate] = useOnyx(ONYXKEYS.FORMS.VACATION_DELEGATE_FORM_DRAFT, {selector: (draft) => draft?.[INPUT_IDS.DELEGATE]});
+
+    const isSavedDelegateActive = !!vacationDelegate?.delegate && !isVacationDelegateExpired(vacationDelegate?.clearAfter);
+    const savedDelegate = isSavedDelegateActive ? vacationDelegate?.delegate : undefined;
+    const savedClearAfter = isSavedDelegateActive ? vacationDelegate?.clearAfter : undefined;
+    const delegate = draftDelegate ?? savedDelegate ?? '';
+    const hasActiveDelegations = !!vacationDelegate?.delegatorFor?.length;
+
+    const [clearAfterDate, setClearAfterDate] = useState(() => (savedClearAfter ? DateUtils.extractDate(savedClearAfter) : ''));
 
     const isSelectingRef = useRef(false);
+
+    const goBack = () => {
+        clearDraftValues(ONYXKEYS.FORMS.VACATION_DELEGATE_FORM);
+        Navigation.goBack(ROUTES.SETTINGS_PROFILE.route);
+    };
 
     const showErrorModal = async (delegateToRestore?: string, message?: string) => {
         await showConfirmModal({
@@ -39,21 +75,28 @@ function VacationDelegatePage() {
         clearVacationDelegateError(delegateToRestore);
     };
 
-    const onSelectRow = (option: Participant) => {
-        if (isSelectingRef.current) {
+    const removeDelegate = () => {
+        deleteVacationDelegate(vacationDelegate);
+        goBack();
+    };
+
+    const onSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.VACATION_DELEGATE_FORM>) => {
+        if (isSelectingRef.current || !delegate) {
             return;
         }
 
-        if (option?.login === vacationDelegate?.delegate) {
-            deleteVacationDelegate(vacationDelegate);
-            Navigation.goBack(ROUTES.SETTINGS_STATUS);
+        const pickedDate = values[INPUT_IDS.CLEAR_AFTER];
+        const clearAfter = pickedDate ? `${pickedDate} ${END_OF_DAY_TIME}` : undefined;
+
+        if (delegate === savedDelegate && clearAfter === savedClearAfter) {
+            goBack();
             return;
         }
 
         isSelectingRef.current = true;
         const hasUnconfirmedChange = !!vacationDelegate?.pendingAction || !isEmptyObject(vacationDelegate?.errors) || !!vacationDelegate?.policyDiff;
         const currentDelegate = hasUnconfirmedChange ? vacationDelegate?.previousDelegate : vacationDelegate?.delegate;
-        setVacationDelegate({creator: currentUserLogin, delegate: option?.login ?? '', currentDelegate})
+        setVacationDelegate({creator: currentUserLogin, delegate, clearAfter, currentDelegate, currentClearAfter: vacationDelegate?.clearAfter})
             .then((response) => {
                 if (!navigation.isFocused()) {
                     if (response?.data?.policyDiff) {
@@ -74,7 +117,7 @@ function VacationDelegatePage() {
                     return;
                 }
 
-                Navigation.goBack(ROUTES.SETTINGS_STATUS);
+                goBack();
             })
             .catch(() => {
                 if (!navigation.isFocused()) {
@@ -89,20 +132,69 @@ function VacationDelegatePage() {
             });
     };
 
+    if (isLoadingOnyxValue(vacationDelegateMetadata)) {
+        return <FullScreenLoadingIndicator shouldUseGoBackButton />;
+    }
+
     return (
         <ScreenWrapper
-            includeSafeAreaPaddingBottom={false}
+            includeSafeAreaPaddingBottom
             testID="VacationDelegatePage"
             shouldShowOfflineIndicator={false}
         >
-            <BaseVacationDelegateSelectionComponent
-                vacationDelegate={vacationDelegate}
-                onSelectRow={onSelectRow}
-                headerTitle={translate('common.vacationDelegate')}
-                onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_STATUS)}
-                cannotSetDelegateMessage={translate('statusPage.cannotSetVacationDelegate')}
-                includeCurrentUser={false}
+            <HeaderWithBackButton
+                title={translate('common.vacationDelegate')}
+                onBackButtonPress={goBack}
             />
+            {hasActiveDelegations ? (
+                <DelegatorList
+                    delegators={vacationDelegate?.delegatorFor}
+                    message={translate('statusPage.cannotSetVacationDelegate')}
+                />
+            ) : (
+                <FormProvider
+                    style={[styles.flexGrow1]}
+                    formID={ONYXKEYS.FORMS.VACATION_DELEGATE_FORM}
+                    onSubmit={onSubmit}
+                    submitButtonText={translate('common.save')}
+                    submitButtonStyles={styles.ph5}
+                    isSubmitDisabled={!delegate}
+                    enabledWhenOffline
+                    shouldHideFixErrorsAlert
+                >
+                    <Text style={[styles.mh5, styles.mb4]}>{translate('statusPage.setVacationDelegate')}</Text>
+                    <VacationDelegateMenuItem
+                        vacationDelegate={{delegate}}
+                        label={translate('statusPage.chooseDelegate')}
+                        onCloseError={() => {}}
+                        onPress={() => Navigation.navigate(ROUTES.SETTINGS_VACATION_DELEGATE_SELECT)}
+                    />
+                    <View style={[styles.mh5, styles.mt4]}>
+                        <InputWrapper
+                            InputComponent={DatePicker}
+                            inputID={INPUT_IDS.CLEAR_AFTER}
+                            label={translate('statusPage.vacationDelegateClearAfter')}
+                            defaultValue={clearAfterDate}
+                            minDate={new Date()}
+                            onValueChange={(value) => setClearAfterDate(typeof value === 'string' ? value : '')}
+                        />
+                        {!!clearAfterDate && (
+                            <Text style={[styles.textLabelSupporting, styles.mt2]}>
+                                {translate('statusPage.vacationDelegateWillClearOn', format(new Date(`${clearAfterDate}T00:00:00`), CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT))}
+                            </Text>
+                        )}
+                    </View>
+                    {!!savedDelegate && (
+                        <View style={styles.mt4}>
+                            <MenuItemAction
+                                title={translate('common.remove')}
+                                icon={icons.Trashcan}
+                                onPress={removeDelegate}
+                            />
+                        </View>
+                    )}
+                </FormProvider>
+            )}
         </ScreenWrapper>
     );
 }

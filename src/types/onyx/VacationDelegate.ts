@@ -17,6 +17,9 @@ type BaseVacationDelegate = {
     /** Email of the vacation delegate */
     delegate?: string;
 
+    /** Date and time (yyyy-MM-dd HH:mm:ss) after which the vacation delegate is cleared automatically */
+    clearAfter?: string;
+
     /** Array of emails for users that the current user is delegating for */
     delegatorFor?: string[];
 
@@ -31,6 +34,9 @@ type BaseVacationDelegate = {
      * Kept apart from `delegate` so an abandoned step never makes an unsaved pick read as saved. Client-only.
      */
     pendingDelegate?: string;
+
+    /** Clear after date picked together with `pendingDelegate`, re-sent once the missing workspaces step is done. Client-only. */
+    pendingClearAfter?: string;
 };
 
 /** Information about vacation delegate with offline feedback */
