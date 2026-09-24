@@ -37,6 +37,7 @@ import {
     hasReceiptSource,
     isOdometerDistanceRequest,
     isReceiptBeingScanned,
+    isReceiptScanQueuedOffline,
 } from '@libs/TransactionUtils';
 import tryResolveUrlFromApiRoot from '@libs/tryResolveUrlFromApiRoot';
 
@@ -168,7 +169,14 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
 
     const parentReportAction = getReportAction(report?.parentReportID, report?.parentReportActionID);
     const canEditReceipt = canEditFieldOfMoneyRequest({reportAction: parentReportAction, fieldToEdit: CONST.EDIT_REQUEST_FIELD.RECEIPT, transaction, rules});
-    const canDeleteReceipt = canEditFieldOfMoneyRequest({reportAction: parentReportAction, fieldToEdit: CONST.EDIT_REQUEST_FIELD.RECEIPT, isDeleteAction: true, transaction, rules});
+    const canDeleteReceipt = canEditFieldOfMoneyRequest({
+        reportAction: parentReportAction,
+        fieldToEdit: CONST.EDIT_REQUEST_FIELD.RECEIPT,
+        isDeleteAction: true,
+        transaction,
+        rules,
+        isOffline,
+    });
 
     const receiptFilename = transaction?.receipt?.filename;
     const isStitchedOdometerReceipt = isOdometerDistanceRequest(transaction) && !imageType;
@@ -488,7 +496,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                 shouldShowDeleteReceiptButton &&
                 !hasOnlyEReceipt &&
                 hasReceipt(transaction) &&
-                !isReceiptBeingScanned(transaction) &&
+                (!isReceiptBeingScanned(transaction) || isReceiptScanQueuedOffline(transaction, isOffline)) &&
                 !hasMissingSmartscanFields(transaction, transactionReport);
             const isDraftOdometer = isOdometerImage && isDraftTransaction;
             if (isDeletableReceipt || isDraftOdometer) {

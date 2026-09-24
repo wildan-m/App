@@ -1985,6 +1985,13 @@ function isReceiptBeingScanned(transaction: OnyxInputOrEntry<Transaction>): bool
 }
 
 /**
+ * Check if the receipt scan is only queued because the device is offline, meaning nothing is processing the receipt yet
+ */
+function isReceiptScanQueuedOffline(transaction: OnyxInputOrEntry<Transaction>, isOffline: boolean): boolean {
+    return isOffline && transaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_READY;
+}
+
+/**
  * Check if category is being analyzed (manual request creation or auto-categorization grace period)
  */
 function isCategoryBeingAnalyzed(transaction: OnyxEntry<Transaction>, report: OnyxEntry<Report>): boolean {
@@ -3870,6 +3877,7 @@ export {
     hasEReceipt,
     hasRoute,
     isReceiptBeingScanned,
+    isReceiptScanQueuedOffline,
     didReceiptScanSucceed,
     getValidWaypoints,
     doesMoneyRequestDraftHaveUserInput,

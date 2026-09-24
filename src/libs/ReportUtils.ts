@@ -287,6 +287,7 @@ import {
     isPending,
     isPerDiemRequest,
     isReceiptBeingScanned,
+    isReceiptScanQueuedOffline,
     isScanning,
     isScanRequest as isScanRequestTransactionUtils,
     isTransactionPendingDelete,
@@ -5425,6 +5426,7 @@ function canEditFieldOfMoneyRequest({
     reportNameValuePairs,
     reportActions,
     rules,
+    isOffline = false,
 }: {
     reportAction: OnyxInputOrEntry<ReportAction>;
     fieldToEdit: ValueOf<typeof CONST.EDIT_REQUEST_FIELD>;
@@ -5439,6 +5441,7 @@ function canEditFieldOfMoneyRequest({
     // Temporarily optional while callers are migrated in smaller PRs. Once every caller passes it, the module-level fallback in hasReportBeenForwardedSinceLastSubmit is removed as part of https://github.com/Expensify/App/issues/66419.
     reportActions?: OnyxEntry<ReportActions> | ReportAction[];
     rules: OnyxCollection<Rule>;
+    isOffline?: boolean;
 }): boolean {
     // A list of fields that cannot be edited by anyone, once an expense has been settled
     const restrictedFields: string[] = [
@@ -5519,10 +5522,12 @@ function canEditFieldOfMoneyRequest({
     }
 
     if (fieldToEdit === CONST.EDIT_REQUEST_FIELD.RECEIPT) {
+        // A receipt whose scan is only queued while offline isn't being processed yet, so it can still be deleted
+        const isReceiptLockedByScan = isReceiptBeingScanned(transaction) && !(isDeleteAction && isReceiptScanQueuedOffline(transaction, isOffline));
         return (
             !isClosedReport(moneyRequestReport) &&
             !isInvoiceReport(moneyRequestReport) &&
-            !isReceiptBeingScanned(transaction) &&
+            !isReceiptLockedByScan &&
             !isPerDiemRequest(transaction) &&
             (!isDistanceRequest(transaction) || isManualDistanceRequestTransactionUtils(transaction)) &&
             canEditExpense &&
