@@ -1,6 +1,7 @@
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
+import {useSearchQueryContext} from '@components/Search/SearchContext';
 import TextInput from '@components/TextInput';
 
 import useAllTransactionViolations from '@hooks/useAllTransactionViolations';
@@ -81,6 +82,7 @@ function DynamicIOURequestStepDescription({
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    const {currentSearchHash} = useSearchQueryContext();
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -167,6 +169,7 @@ function DynamicIOURequestStepDescription({
                 currentUserAccountIDParam,
                 currentUserEmailParam,
                 isASAPSubmitBetaEnabled,
+                hash: currentSearchHash,
                 delegateAccountID,
                 reportPolicyTags,
                 isTrackIntentUser,

@@ -2341,6 +2341,8 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     const hasModifiedSelectedRouteKey = 'selectedRouteKey' in transactionChanges;
 
     const isInvoice = isInvoiceReportReportUtils(iouReport);
+    let snapshotOptimisticViolations: OnyxTypes.TransactionViolations | undefined;
+    let snapshotCurrentTransactionViolations: OnyxTypes.TransactionViolations | undefined;
     if (
         transactionID &&
         policy &&
@@ -2415,22 +2417,8 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             value: currentTransactionViolations,
         });
 
-        if (hash) {
-            const snapshotUpdates = getSearchSnapshotUpdates({
-                hash,
-                transactionID,
-                updatedTransaction,
-                pendingFields,
-                clearedPendingFields,
-                transaction,
-                optimisticViolations: Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [],
-                currentTransactionViolations,
-            });
-
-            optimisticData.push(...snapshotUpdates.optimisticData);
-            successData.push(...snapshotUpdates.successData);
-            failureData.push(...snapshotUpdates.failureData);
-        }
+        snapshotOptimisticViolations = Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [];
+        snapshotCurrentTransactionViolations = currentTransactionViolations;
 
         if (
             violationsOnyxData &&
@@ -2495,6 +2483,24 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
                 },
             });
         }
+    }
+
+    // Search result rows render from the snapshot, so it has to be updated for every edit made from Search, not only the ones that recompute violations
+    if (hash && updatedTransaction) {
+        const snapshotUpdates = getSearchSnapshotUpdates({
+            hash,
+            transactionID,
+            updatedTransaction,
+            pendingFields,
+            clearedPendingFields,
+            transaction,
+            optimisticViolations: snapshotOptimisticViolations,
+            currentTransactionViolations: snapshotCurrentTransactionViolations,
+        });
+
+        optimisticData.push(...snapshotUpdates.optimisticData);
+        successData.push(...snapshotUpdates.successData);
+        failureData.push(...snapshotUpdates.failureData);
     }
 
     // Reset the transaction thread to its original state
