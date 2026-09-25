@@ -2810,15 +2810,40 @@ function shouldReportAlignToTop(report: OnyxEntry<Report>, parentReportAction: O
 }
 
 /**
+ * Returns the passed transactions, falling back to the transactions stored for the report
+ */
+function getTransactionsOrReportTransactions(reportID: string | undefined, transactionsParam?: Transaction[]): Transaction[] {
+    return transactionsParam ?? getReportTransactions(reportID);
+}
+
+/**
  * Checks if a report contains only Non-Reimbursable transactions
  */
 function hasOnlyNonReimbursableTransactions(iouReportID: string | undefined, transactionsParam?: Transaction[]): boolean {
-    const transactions = transactionsParam ?? getReportTransactions(iouReportID);
+    const transactions = getTransactionsOrReportTransactions(iouReportID, transactionsParam);
     if (!transactions || transactions.length === 0) {
         return false;
     }
 
     return transactions.every((transaction) => !getReimbursable(transaction));
+}
+
+/**
+ * Checks if a report's expenses offset each other to a zero total (e.g. a $50 and a -$50 reimbursable expense).
+ * Requires at least one reimbursable expense with a non-zero amount, so reports made up only of non-reimbursable
+ * expenses or only of $0 expenses are excluded.
+ */
+function hasZeroTotalWithReimbursableTransactions(report: OnyxInputOrEntry<Report>, transactionsParam?: Transaction[]): boolean {
+    const {reimbursableSpend, nonReimbursableSpend} = getMoneyRequestSpendBreakdown(report);
+    if (reimbursableSpend !== 0 || nonReimbursableSpend !== 0) {
+        return false;
+    }
+
+    const transactions = getTransactionsOrReportTransactions(report?.reportID, transactionsParam);
+    return transactions.some(
+        (transaction) =>
+            transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && getReimbursable(transaction) && getTransactionAmount(transaction, isExpenseReport(report)) !== 0,
+    );
 }
 
 /**
@@ -14691,6 +14716,7 @@ export {
     hasExpensifyGuidesEmails,
     hasExportError,
     hasOnlyNonReimbursableTransactions,
+    hasZeroTotalWithReimbursableTransactions,
     getReportLastMessage,
     getReportLastVisibleActionCreated,
     getMostRecentlyVisitedReport,

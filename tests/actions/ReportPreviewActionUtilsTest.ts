@@ -1064,6 +1064,56 @@ describe('getReportPreviewAction', () => {
         ).toBe(CONST.REPORT.REPORT_PREVIEW_ACTIONS.VIEW);
     });
 
+    it('canPay should return PAY for expense report whose reimbursable expenses net to 0', async () => {
+        const report = {
+            ...createRandomReport(REPORT_ID, undefined),
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
+            stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+            total: 0,
+            nonReimbursableTotal: 0,
+            isWaitingOnBankAccount: false,
+        };
+
+        const policy = createRandomPolicy(0);
+        policy.role = CONST.POLICY.ROLE.ADMIN;
+        policy.type = CONST.POLICY.TYPE.CORPORATE;
+        policy.reimbursementChoice = CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES;
+
+        jest.mocked(getValidConnectedIntegration).mockReturnValueOnce(undefined);
+
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const expense = createMock<Transaction>({
+            transactionID: '1',
+            reportID: `${REPORT_ID}`,
+            amount: -5000,
+            reimbursable: true,
+        });
+        const credit = createMock<Transaction>({
+            transactionID: '2',
+            reportID: `${REPORT_ID}`,
+            amount: 5000,
+            reimbursable: true,
+        });
+
+        await waitForBatchedUpdatesWithAct();
+        expect(
+            getReportPreviewAction({
+                isReportArchived: false,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                currentUserLogin: CURRENT_USER_EMAIL,
+                report,
+                policy,
+                transactions: [expense, credit],
+                bankAccountList: {},
+                reportMetadata: undefined,
+                ownerLogin: CURRENT_USER_EMAIL,
+                rules: undefined,
+            }),
+        ).toBe(CONST.REPORT.REPORT_PREVIEW_ACTIONS.PAY);
+    });
+
     it('canPay should return true for submitted invoice', async () => {
         const report = {
             ...createRandomReport(REPORT_ID, undefined),

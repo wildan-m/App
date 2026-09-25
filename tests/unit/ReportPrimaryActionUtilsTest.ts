@@ -1265,6 +1265,49 @@ describe('getPrimaryAction', () => {
         ).not.toBe(CONST.REPORT.PRIMARY_ACTIONS.PAY);
     });
 
+    it('should return PAY for expense report whose reimbursable expenses net to 0', async () => {
+        const report = createMock<Report>({
+            reportID: REPORT_ID,
+            type: CONST.REPORT.TYPE.EXPENSE,
+            ownerAccountID: CURRENT_USER_ACCOUNT_ID,
+            statusNum: CONST.REPORT.STATUS_NUM.CLOSED,
+            total: 0,
+            nonReimbursableTotal: 0,
+        });
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
+        const policy = createMock<Policy>({
+            role: CONST.POLICY.ROLE.ADMIN,
+        });
+        const expense = createMock<Transaction>({
+            transactionID: '1',
+            reportID: `${REPORT_ID}`,
+            amount: -5000,
+            reimbursable: true,
+        });
+        const credit = createMock<Transaction>({
+            transactionID: '2',
+            reportID: `${REPORT_ID}`,
+            amount: 5000,
+            reimbursable: true,
+        });
+
+        expect(
+            getReportPrimaryAction({
+                rules: undefined,
+                currentUserLogin: CURRENT_USER_EMAIL,
+                currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                report,
+                ownerLogin: '',
+                chatReport,
+                reportTransactions: [expense, credit],
+                violations: {},
+                bankAccountList: {},
+                policy,
+                isChatReportArchived: false,
+            }),
+        ).toBe(CONST.REPORT.PRIMARY_ACTIONS.PAY);
+    });
+
     it('should return EXPORT TO ACCOUNTING for finished reports', async () => {
         const report = createMock<Report>({
             reportID: REPORT_ID,

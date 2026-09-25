@@ -24,6 +24,7 @@ import {
     getParentReport,
     hasExportError as hasExportErrorUtil,
     hasOnlyNonReimbursableTransactions,
+    hasZeroTotalWithReimbursableTransactions,
     isClosedReport,
     isCurrentUserSubmitter,
     isExpenseReport,
@@ -163,7 +164,9 @@ function canPay(
         canPayReport &&
         isPaymentsEnabled &&
         isReportFinished &&
-        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, transactions)))
+        (reimbursableSpend !== 0 ||
+            (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, transactions)) ||
+            hasZeroTotalWithReimbursableTransactions(report, transactions))
     ) {
         return !didExportFail;
     }

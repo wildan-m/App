@@ -51,6 +51,7 @@ import {
     hasHeldExpenses as hasHeldExpensesReportUtils,
     hasOnlyHeldExpenses,
     hasOnlyNonReimbursableTransactions,
+    hasZeroTotalWithReimbursableTransactions,
     hasOutstandingChildRequest,
     isArchivedReport,
     isClosedReport as isClosedReportUtil,
@@ -266,6 +267,8 @@ function canIOUBePaid(
     const isIOU = isIOUReport(iouReport);
     const canShowMarkedAsPaidForNegativeAmount = onlyShowPayElsewhere && reimbursableSpend < 0;
     const isOnlyNonReimbursablePayElsewhere = onlyShowPayElsewhere && nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(iouReport?.reportID, transactions);
+    // A report whose expenses net out to exactly zero (e.g. $50 and -$50) can only be settled by marking it as paid.
+    const canShowMarkedAsPaidForZeroAmount = onlyShowPayElsewhere && hasZeroTotalWithReimbursableTransactions(iouReport, transactions);
 
     if (isIOU && canPay && !iouSettled && reimbursableSpend > 0) {
         return true;
@@ -281,7 +284,7 @@ function canIOUBePaid(
         canPay &&
         isReportFinished &&
         !iouSettled &&
-        (reimbursableSpend > 0 || canShowMarkedAsPaidForNegativeAmount || isOnlyNonReimbursablePayElsewhere) &&
+        (reimbursableSpend > 0 || canShowMarkedAsPaidForNegativeAmount || isOnlyNonReimbursablePayElsewhere || canShowMarkedAsPaidForZeroAmount) &&
         !isPayBlockedByArchivedState(iouReport, policy, isChatReportArchived) &&
         !isAutoReimbursable &&
         !isPayAtEndExpenseReport &&

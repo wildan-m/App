@@ -41,6 +41,7 @@ import {
     hasExportError as hasExportErrorUtil,
     hasOnlyHeldExpenses,
     hasOnlyNonReimbursableTransactions,
+    hasZeroTotalWithReimbursableTransactions,
     isArchivedReport,
     isClosedReport as isClosedReportUtils,
     isCurrentUserSubmitter,
@@ -264,7 +265,9 @@ function isPrimaryPayAction({
         isExpenseReport &&
         arePaymentsEnabled &&
         isReportFinished &&
-        (reimbursableSpend !== 0 || (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, reportTransactions)))
+        (reimbursableSpend !== 0 ||
+            (nonReimbursableSpend !== 0 && hasOnlyNonReimbursableTransactions(report?.reportID, reportTransactions)) ||
+            hasZeroTotalWithReimbursableTransactions(report, reportTransactions))
     ) {
         return isSecondaryAction ?? !didExportFail;
     }
