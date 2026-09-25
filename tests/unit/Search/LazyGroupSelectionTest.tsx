@@ -166,6 +166,7 @@ function Wrapper({children}: {children: React.ReactNode}) {
         <SearchContextProvider>
             <SearchWriteActionsProvider
                 filteredData={[categoryGroup]}
+                selectableData={[categoryGroup]}
                 totalSelectableItemsCount={2}
                 searchResults={undefined}
                 transactions={undefined}
@@ -186,6 +187,7 @@ function FlatWrapper({children}: {children: React.ReactNode}) {
         <SearchContextProvider>
             <SearchWriteActionsProvider
                 filteredData={flatFilteredData}
+                selectableData={flatFilteredData}
                 totalSelectableItemsCount={flatFilteredData.length}
                 searchResults={flatSearchResults}
                 transactions={undefined}
@@ -207,6 +209,7 @@ function ReportsWrapper({children}: {children: React.ReactNode}) {
         <SearchContextProvider>
             <SearchWriteActionsProvider
                 filteredData={reportFilteredData}
+                selectableData={reportFilteredData}
                 totalSelectableItemsCount={totalSelectableItemsCount}
                 searchResults={reportSearchResults}
                 transactions={undefined}
@@ -227,6 +230,7 @@ function ExpandedGroupWrapper({children}: {children: React.ReactNode}) {
         <SearchContextProvider>
             <SearchWriteActionsProvider
                 filteredData={[expandedGroup]}
+                selectableData={[expandedGroup]}
                 totalSelectableItemsCount={expandedGroup.count ?? expandedGroup.transactions.length}
                 searchResults={undefined}
                 transactions={undefined}

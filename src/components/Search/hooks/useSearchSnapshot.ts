@@ -49,6 +49,8 @@ type SearchSnapshotResult = {
     chartData: SearchListItem[];
     /** Group-enriched sections before sort, capped to `visibleRowLimit`. Consumed for selection counts and bulk-action wiring. */
     filteredData: SearchData;
+    /** Group-enriched sections before sort, NOT capped. "Select all" and its item count read this so a live search selects every row, not only the rendered page. */
+    selectableData: SearchData;
     /** Length of the base (pre-sort) sections (used as `prevReportsLength` when firing the next search). */
     filteredDataLength: number;
     /** Total result count reported by `getSections` (drives the pagination guard). */
@@ -456,6 +458,7 @@ function useSearchSnapshot({
         data: visibleData,
         chartData,
         filteredData: visibleFilteredData,
+        selectableData: filteredData,
         filteredDataLength,
         allDataLength,
         hasDeletedTransaction,

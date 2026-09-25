@@ -39,6 +39,9 @@ type SearchWriteActionsProviderProps = {
     /** The currently displayed (filtered, grouped) rows. Screen-derived; the provider cannot recompute it. */
     filteredData: SearchData;
 
+    /** Every selectable row, including live rows not rendered yet under the page cap. "Select all" reads this. */
+    selectableData: SearchData;
+
     /** Keeps "select all matching" in lock-step: select-all unchecks once the selection no longer covers every item. */
     totalSelectableItemsCount: number;
 
@@ -471,6 +474,7 @@ function useSyncMobileSelectionModeWithScreenSize({
 // `selectedTransactions`, so dispatching one re-renders neither this provider's stable children nor the rows.
 function SearchWriteActionsProvider({
     filteredData,
+    selectableData,
     totalSelectableItemsCount,
     searchResults,
     transactions,
@@ -660,8 +664,8 @@ function SearchWriteActionsProvider({
                     return {};
                 }
 
-                if (areItemsGrouped && isGroupedItemArray(filteredData)) {
-                    const allSelections: Array<[string, SelectedTransactionInfo]> = filteredData.flatMap((item) => {
+                if (areItemsGrouped && isGroupedItemArray(selectableData)) {
+                    const allSelections: Array<[string, SelectedTransactionInfo]> = selectableData.flatMap((item) => {
                         if (item.transactions.length === 0 && item.keyForList) {
                             if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
                                 return [];
@@ -704,7 +708,7 @@ function SearchWriteActionsProvider({
 
                 // When items are not grouped, data is TransactionListItemType[] not TransactionGroupListItemType[]
                 const entries: Array<[string, SelectedTransactionInfo]> = [];
-                for (const transactionItem of filteredData) {
+                for (const transactionItem of selectableData) {
                     if (!isTransactionListItemType(transactionItem)) {
                         continue;
                     }
@@ -732,7 +736,7 @@ function SearchWriteActionsProvider({
                 }
                 return Object.fromEntries(entries);
             },
-            {data: filteredData, totalSelectableItemsCount},
+            {data: selectableData, totalSelectableItemsCount},
         );
     };
 

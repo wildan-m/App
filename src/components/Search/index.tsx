@@ -290,6 +290,7 @@ function Search({
         data: stableSortedData,
         chartData: sortedData,
         filteredData,
+        selectableData,
         filteredDataLength,
         allDataLength,
         hasDeletedTransaction,
@@ -600,10 +601,10 @@ function Search({
     const areItemsGrouped = !!validGroupBy || isExpenseReportType;
     const totalSelectableItemsCount = useMemo(() => {
         if (!areItemsGrouped) {
-            return filteredData.length;
+            return selectableData.length;
         }
 
-        return (filteredData as TransactionGroupListItemType[]).reduce((count, item) => {
+        return (selectableData as TransactionGroupListItemType[]).reduce((count, item) => {
             // For empty groups, count the group itself as a selectable item
             if (item.transactions.length === 0 && item.keyForList) {
                 if (item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
@@ -617,7 +618,7 @@ function Search({
 
             return count + selectableTransactions.length;
         }, 0);
-    }, [areItemsGrouped, filteredData]);
+    }, [areItemsGrouped, selectableData]);
 
     const onSelectRow = useCallback(
         (item: SearchListItem, transactionPreviewData?: TransactionPreviewData, event?: ModifiedMouseEvent) => {
@@ -1441,6 +1442,7 @@ function Search({
         <SearchScopeProvider>
             <SearchWriteActionsProvider
                 filteredData={filteredData}
+                selectableData={selectableData}
                 totalSelectableItemsCount={totalSelectableItemsCount}
                 searchResults={searchResults}
                 transactions={transactions}

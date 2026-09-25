@@ -490,6 +490,8 @@ describe('useSearchSnapshot', () => {
 
         expect(result.current.data.map((item) => item.keyForList)).toEqual(['4', '3']);
         expect(result.current.filteredData).toEqual(result.current.data);
+        // uncapped, so "select all" reaches the rows past the cap too
+        expect(result.current.selectableData).toHaveLength(5);
         // uncapped, or the offline reveal would never know there are more cached rows
         expect(result.current.filteredDataLength).toBe(5);
     });

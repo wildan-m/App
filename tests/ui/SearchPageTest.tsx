@@ -112,18 +112,30 @@ type WriteActionsRender = {
     filteredData: SearchData;
     applySelection: SearchSelectionActionsValue['applySelection'];
 };
+type SelectionProbeRender = {
+    toggleAll: () => void;
+    selectedKeys: string[];
+};
 type WriteActionsProviderProps = Parameters<typeof SearchWriteActionsProviderModule.default>[0];
 
 // The rows <Search> hands this provider are the rows selection can reach.
 const mockRenderWriteActions = jest.fn<void, [WriteActionsRender]>();
+// What the header checkbox reaches: the provider's own select-all and the selection it commits.
+const mockRenderSelectionProbe = jest.fn<void, [SelectionProbeRender]>();
 jest.mock('@components/Search/SearchWriteActionsProvider', () => {
-    const {createElement} = jest.requireActual<typeof React>('react');
-    const {useSearchSelectionActions} = jest.requireActual<typeof SearchContext>('@components/Search/SearchContext');
+    const {createElement, Fragment} = jest.requireActual<typeof React>('react');
+    const {useSearchSelectionActions, useSearchRowSelectionActions, useSearchSelectionContext} = jest.requireActual<typeof SearchContext>('@components/Search/SearchContext');
     const {default: SearchWriteActionsProvider} = jest.requireActual<typeof SearchWriteActionsProviderModule>('@components/Search/SearchWriteActionsProvider');
+    function SelectionProbe() {
+        const {toggleAll} = useSearchRowSelectionActions();
+        const {selectedTransactions} = useSearchSelectionContext();
+        mockRenderSelectionProbe({toggleAll, selectedKeys: Object.keys(selectedTransactions)});
+        return null;
+    }
     function MockSearchWriteActionsProvider(props: WriteActionsProviderProps) {
         const {applySelection} = useSearchSelectionActions();
         mockRenderWriteActions({filteredData: props.filteredData, applySelection});
-        return createElement(SearchWriteActionsProvider, props);
+        return createElement(SearchWriteActionsProvider, {...props, children: createElement(Fragment, null, props.children, createElement(SelectionProbe))});
     }
     return {__esModule: true, default: MockSearchWriteActionsProvider};
 });
@@ -1189,6 +1201,28 @@ describe('SearchPageNarrow', () => {
 
             // Then the list renders down to that report, because the selection sync drops any ticked row it cannot see
             expect(renderedRowKeys()).toContain(cutOffKey);
+        });
+
+        it('selects every report on select all, including the ones the cap has not rendered yet', async () => {
+            // Given a to-do tab holding more reports than one page, so the cap cuts the rest off
+            const rowCount = CONST.SEARCH.RESULTS_PAGE_SIZE + 10;
+            await seedTodoReports(rowCount);
+            await seedTodoSnapshot(false);
+
+            renderPage(TODO_QUERY);
+            await act(async () => {
+                jest.advanceTimersByTime(0);
+            });
+            expect(renderedRowKeys()).toHaveLength(CONST.SEARCH.RESULTS_PAGE_SIZE);
+
+            // When the header checkbox selects all
+            await act(async () => {
+                mockRenderSelectionProbe.mock.lastCall?.[0].toggleAll();
+            });
+
+            // Then every report is ticked and rendered, so the "N selected" count matches the tab's real total
+            expect(mockRenderSelectionProbe.mock.lastCall?.[0].selectedKeys).toHaveLength(rowCount);
+            expect(renderedRowKeys()).toHaveLength(rowCount);
         });
 
         it('waits for a page already running at mount instead of revealing its rows or skipping past it', async () => {
