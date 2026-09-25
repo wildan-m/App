@@ -1810,46 +1810,62 @@ function updateSplitTransactions({
                 });
             }
         }
-        // Build the snapshot data update: remove original transaction and add child transactions
-        const currentSnapshotData = allSnapshots?.[`${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContext?.currentSearchHash}`]?.data;
-        const rescaledChildSnapshotEntries: SearchResultDataType = {};
-        for (const childKey of optimisticChildSnapshotKeys) {
-            const childTransaction = optimisticChildSnapshotEntries[childKey];
-            if (!childTransaction) {
-                continue;
+        // Build the snapshot data update: remove original transaction and add child transactions.
+        // Besides the current search, expanded groups of a grouped search render from their own snapshots, so those
+        // need the same update. Otherwise they keep the original transaction, which then picks up the optimistic
+        // SPLIT_REPORT_ID and shows as "Unreported" until the group search is re-run online.
+        const originalTransactionSnapshotKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}` as const;
+        const currentSnapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContext?.currentSearchHash}` as const;
+        const snapshotKeysToUpdate = new Set<`${typeof ONYXKEYS.COLLECTION.SNAPSHOT}${string}`>([currentSnapshotKey]);
+        for (const searchHash of searchContext?.activeGroupSearchHashes ?? []) {
+            const groupSnapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${searchHash}` as const;
+            const groupSnapshotData = allSnapshots?.[groupSnapshotKey]?.data;
+            if (searchHash >= 0 && !!groupSnapshotData && Object.hasOwn(groupSnapshotData, originalTransactionSnapshotKey)) {
+                snapshotKeysToUpdate.add(groupSnapshotKey);
             }
-            const groupSourceTransaction = findSnapshotGroupSourceTransaction(currentSnapshotData, childTransaction, [childTransaction.transactionID, ...groupSourceCandidateTransactionIDs]);
-            rescaledChildSnapshotEntries[childKey] = rescaleSnapshotGroupAmount(childTransaction, groupSourceTransaction);
         }
 
-        const optimisticSnapshotData: SearchResultDataType = {
-            [`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`]: null,
-            ...rescaledChildSnapshotEntries,
-        };
+        for (const snapshotKey of snapshotKeysToUpdate) {
+            const snapshotData = allSnapshots?.[snapshotKey]?.data;
+            const rescaledChildSnapshotEntries: SearchResultDataType = {};
+            for (const childKey of optimisticChildSnapshotKeys) {
+                const childTransaction = optimisticChildSnapshotEntries[childKey];
+                if (!childTransaction) {
+                    continue;
+                }
+                const groupSourceTransaction = findSnapshotGroupSourceTransaction(snapshotData, childTransaction, [childTransaction.transactionID, ...groupSourceCandidateTransactionIDs]);
+                rescaledChildSnapshotEntries[childKey] = rescaleSnapshotGroupAmount(childTransaction, groupSourceTransaction);
+            }
 
-        // On failure, restore the original transaction and remove the child transactions
-        // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
-        const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
-        failureSnapshotData[`${ONYXKEYS.COLLECTION.TRANSACTION}${originalTransactionID}`] = originalTransaction ?? null;
-        for (const childKey of optimisticChildSnapshotKeys) {
-            failureSnapshotData[childKey] = null;
+            const optimisticSnapshotData: SearchResultDataType = {
+                [originalTransactionSnapshotKey]: null,
+                ...rescaledChildSnapshotEntries,
+            };
+
+            // On failure, restore the original transaction and remove the child transactions
+            // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
+            const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
+            failureSnapshotData[originalTransactionSnapshotKey] = snapshotData?.[originalTransactionSnapshotKey] ?? originalTransaction ?? null;
+            for (const childKey of optimisticChildSnapshotKeys) {
+                failureSnapshotData[childKey] = null;
+            }
+
+            onyxData.optimisticData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: snapshotKey,
+                value: {
+                    data: optimisticSnapshotData,
+                },
+            });
+
+            onyxData.failureData?.push({
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: snapshotKey,
+                value: {
+                    data: failureSnapshotData,
+                },
+            });
         }
-
-        onyxData.optimisticData?.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContext?.currentSearchHash}`,
-            value: {
-                data: optimisticSnapshotData,
-            },
-        });
-
-        onyxData.failureData?.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContext?.currentSearchHash}`,
-            value: {
-                data: failureSnapshotData,
-            },
-        });
     } else {
         onyxData.optimisticData?.push({
             onyxMethod: Onyx.METHOD.MERGE,
