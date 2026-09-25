@@ -130,6 +130,17 @@ function NavigateGlobalCreateSubscriber({fnRef, iouType, reportID, transactionID
                 endScanProcessAndStartConfirmationMountSpan();
                 Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, iouTypeTrackOrSubmit, transactionID, targetReport?.reportID));
             });
+        } else if (iouType === CONST.IOU.TYPE.TRACK) {
+            // A track expense started from global create can only go to the self DM (e.g. the embedded manual
+            // confirmation switched the route to track because submissions are disabled), so skip the participant picker.
+            for (const tid of transactionIDs) {
+                setTransactionReport(tid, {reportID: CONST.REPORT.UNREPORTED_REPORT_ID}, true);
+                setMoneyRequestParticipantsFromReport(tid, selfDMReport, currentUserPersonalDetails.accountID);
+            }
+            deferNavigate(() => {
+                endScanProcessAndStartConfirmationMountSpan();
+                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.TRACK, transactionID, selfDMReport?.reportID));
+            });
         } else {
             endSpan(CONST.TELEMETRY.SPAN_SCAN_PROCESS_AND_NAVIGATE);
             navigateToParticipantPage(iouType, transactionID, reportID);
