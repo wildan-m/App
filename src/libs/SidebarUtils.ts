@@ -78,6 +78,7 @@ import {
     isSystemChat as isSystemChatUtil,
     isTaskReport,
     isTripRoom,
+    hasLastActorForUnread,
     isUnread,
     isUnreadWithMention,
     isWorkspaceTaskReport,
@@ -836,7 +837,7 @@ function getOptionData({
     result.statusNum = report.statusNum;
     // When the only message of a report is deleted lastVisibleActionCreated is not reset leading to wrongly
     // setting it Unread so we add additional condition here to avoid empty chat LHN from being bold.
-    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived, reportAttributes?.isEmpty) && !!report.lastActorAccountID;
+    result.isUnread = isUnread(report, oneTransactionThreadReport, isReportArchived, reportAttributes?.isEmpty) && hasLastActorForUnread(report, lastAction);
     result.isUnreadWithMention = isUnreadWithMention(report);
     result.isPinned = report.isPinned;
     result.iouReportID = report.iouReportID;
@@ -985,11 +986,11 @@ function getOptionData({
  * Computed once while building the LHN report set (which is cached/incremental) so the tab filter only reads a flag.
  */
 function getIsUnreadReportForInboxTab(report: Report, isReportArchived: boolean, derivedIsEmptyReport: boolean | undefined): boolean {
-    // The `lastActorAccountID` guard matches getOptionData: it keeps chats whose only visible message was
+    // The last actor guard matches getOptionData: it keeps chats whose only visible message was
     // deleted out of the Unread tab even though isUnread() can still be true (lastVisibleActionCreated isn't reset).
     return (
         isUnread(report, undefined, isReportArchived, derivedIsEmptyReport) &&
-        !!report.lastActorAccountID &&
+        hasLastActorForUnread(report) &&
         getReportNotificationPreference(report) !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE
     );
 }

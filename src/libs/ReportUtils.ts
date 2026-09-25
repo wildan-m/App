@@ -9870,6 +9870,24 @@ function isUnread(report: OnyxEntry<Report>, oneTransactionThreadReport: OnyxEnt
     return isUnreadFromTimestamp;
 }
 
+/**
+ * Whether the report has a last actor, used to keep chats whose only visible message was deleted from being shown as unread
+ * (lastVisibleActionCreated isn't reset in that case). The report-level lastActorAccountID can be empty even though the chat
+ * has a real visible action (e.g. a money request preview in a DM received by a new account), so fall back to the last visible action.
+ */
+function hasLastActorForUnread(report: OnyxEntry<Report>, lastVisibleAction?: OnyxEntry<ReportAction>): boolean {
+    if (!report) {
+        return false;
+    }
+
+    if (report.lastActorAccountID) {
+        return true;
+    }
+
+    const lastAction = lastVisibleAction ?? getLastVisibleActionReportActionsUtils(report.reportID);
+    return !!lastAction && lastAction.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED && !!lastAction.actorAccountID;
+}
+
 // TODO: currentUserAccountID will be required eventually so this becomes a pure function. Subscribe the data via useOnyx and pass it from the component. Refactor issue: https://github.com/Expensify/App/issues/66412
 function isIOUOwnedByCurrentUser(report: OnyxEntry<Report>, allReportsDict?: OnyxCollection<Report>, currentUserAccountID?: number): boolean {
     const allAvailableReports = allReportsDict ?? deprecatedAllReports;
@@ -14644,6 +14662,7 @@ export {
     isThread,
     isTrackExpenseReport,
     isUnread,
+    hasLastActorForUnread,
     isUnreadWithMention,
     isUserCreatedPolicyRoom,
     isValidReport,

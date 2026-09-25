@@ -197,6 +197,7 @@ import {
     isRootGroupChat,
     isSelfDMOrSelfDMThread,
     isSortableColumnName,
+    hasLastActorForUnread,
     isUnread,
     isUploadingAttachmentRemovedFromDraft,
     isWorkspaceMemberLeavingWorkspaceRoom,
@@ -10332,6 +10333,89 @@ describe('ReportUtils', () => {
             // report has lastMessageText so generateIsEmptyReport returns false, isUnread proceeds
             expect(isUnread(report, undefined, false, undefined)).toBe(true);
             expect(isUnread(report, undefined, false, undefined)).toBe(true);
+        });
+    });
+
+    describe('hasLastActorForUnread', () => {
+        const otherUserAccountID = 999;
+
+        afterEach(async () => {
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}1`, null);
+        });
+
+        it('returns true when the report has a lastActorAccountID', () => {
+            // Given a report whose lastActorAccountID is set by the server
+            const report = {...LHNTestUtils.getFakeReport(), reportID: '1', lastActorAccountID: otherUserAccountID};
+
+            // When checking for a last actor without any last visible action
+            // Then the report-level field alone is enough
+            expect(hasLastActorForUnread(report, undefined)).toBe(true);
+        });
+
+        it('returns true when lastActorAccountID is empty but the last visible action is a money request preview from another user', () => {
+            // Given a DM received by a new account, where the server sends an empty lastActorAccountID
+            // even though the chat contains the sender's report preview
+            const report = {...LHNTestUtils.getFakeReport(), reportID: '1', lastActorAccountID: '' as unknown as number};
+            const reportPreviewAction: ReportAction = {
+                ...createRandomReportAction(1),
+                reportID: '1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                actorAccountID: otherUserAccountID,
+            };
+
+            // When checking for a last actor using that last visible action
+            // Then the chat has a real last actor, so it can still be shown as unread
+            expect(hasLastActorForUnread(report, reportPreviewAction)).toBe(true);
+        });
+
+        it('returns false when lastActorAccountID is empty and the last visible action is the CREATED action', () => {
+            // Given a chat whose only message was deleted, so the last visible action falls back to CREATED
+            const report = {...LHNTestUtils.getFakeReport(), reportID: '1', lastActorAccountID: undefined};
+            const createdAction: ReportAction = {
+                ...createRandomReportAction(1),
+                reportID: '1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.CREATED,
+                actorAccountID: otherUserAccountID,
+            };
+
+            // When checking for a last actor
+            // Then there is none, so the empty chat is not shown as unread
+            expect(hasLastActorForUnread(report, createdAction)).toBe(false);
+        });
+
+        it('falls back to the stored report actions when no last visible action is passed', async () => {
+            // Given a report with an empty lastActorAccountID and a stored report preview from another user
+            const report = {...LHNTestUtils.getFakeReport(), reportID: '1', lastActorAccountID: undefined};
+            const createdAction: ReportAction = {
+                ...createRandomReportAction(1),
+                reportActionID: '1',
+                reportID: '1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.CREATED,
+                created: '2024-03-01 12:00:00.000',
+                pendingAction: null,
+            };
+            const reportPreviewAction: ReportAction = {
+                ...createRandomReportAction(2),
+                reportActionID: '2',
+                reportID: '1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                actorAccountID: otherUserAccountID,
+                created: '2024-03-01 12:00:01.000',
+                message: [{type: 'COMMENT', html: 'owes $10', text: 'owes $10'}],
+                originalMessage: {whisperedTo: []},
+                shouldShow: true,
+                pendingAction: null,
+                isOptimisticAction: false,
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}1`, {
+                [createdAction.reportActionID]: createdAction,
+                [reportPreviewAction.reportActionID]: reportPreviewAction,
+            });
+            await waitForBatchedUpdates();
+
+            // When checking for a last actor without passing the last visible action
+            // Then it is resolved from the stored actions
+            expect(hasLastActorForUnread(report)).toBe(true);
         });
     });
 
