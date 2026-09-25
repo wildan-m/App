@@ -63,7 +63,9 @@ function SearchTransactionsChangeReport() {
     const {isSmallScreenWidth} = useResponsiveLayout();
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
 
-    const allMatchingQueryParams = getAllMatchingQueryParams(areAllMatchingItemsSelected, excludedTransactions, currentSearchQueryJSON);
+    // Offline with every match loaded, the explicit list already covers the selection, so move it without the query
+    const hasUnloadedMatchingExpenses = !!currentSearchResults?.search?.hasMoreResults;
+    const allMatchingQueryParams = isOffline && !hasUnloadedMatchingExpenses ? {} : getAllMatchingQueryParams(areAllMatchingItemsSelected, excludedTransactions, currentSearchQueryJSON);
 
     /**
      * Block offline all-matching moves because the backend reevaluates the query after reconnecting,

@@ -2378,8 +2378,9 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_REPORT,
             shouldCloseModalOnSelect: true,
             onSelected: () => {
-                // A queued all-matching move would send a stale query, so ask the user to reconnect like export does
-                if (areAllMatchingItemsSelected && isOffline) {
+                // A queued all-matching move would send a stale query, so ask the user to reconnect like export does.
+                // When every match is loaded, the explicit list covers the selection and can be moved offline
+                if (areAllMatchingItemsSelected && isOffline && hasUnloadedMatchingExpenses) {
                     setIsOfflineModalVisible(true);
                     return;
                 }
