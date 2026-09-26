@@ -1699,6 +1699,10 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
     if (reportPreviewAction) {
         reportPreviewAction = updateReportPreview(iouReport, reportPreviewAction, getCurrencyDecimals, false, comment, optimisticTransaction);
     } else {
+        // When a batch caller passes the previous item's report as existingIOUReport but we still create a new report
+        // (e.g. a scan request with the ASAP Submit beta), the shared preview ID was already used for that earlier report.
+        // Let the builder generate a fresh ID so each new report gets its own report preview action.
+        const shouldReusePreviewActionID = !(shouldCreateNewMoneyRequestReport && existingIOUReport);
         reportPreviewAction = buildOptimisticReportPreview(
             chatReport,
             iouReport,
@@ -1707,7 +1711,7 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
             comment,
             optimisticTransaction,
             undefined,
-            optimisticReportPreviewActionID,
+            shouldReusePreviewActionID ? optimisticReportPreviewActionID : undefined,
         );
         chatReport.lastVisibleActionCreated = reportPreviewAction.created;
 
