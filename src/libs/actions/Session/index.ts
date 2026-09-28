@@ -1488,11 +1488,13 @@ function validateTwoFactorAuth(twoFactorAuthCode: string, shouldClearData: boole
         // cannot race the async reconnect, then clear stale pre-2FA Onyx while deferring openApp() until
         // DynamicSuccessPage Got it so the 2FA RHP stays open through verify → success.
         // Preserve list matches login-required 2FA reconnect baseline plus onboarding resume keys
-        // (including work-email form state for account-merge validation after dismiss).
+        // (including work-email form state for account-merge validation after dismiss), plus nvp_tryNewDot
+        // so the success screen's HybridApp handoff still sees the classic-redirect preference.
         if (options.shouldKeepTwoFactorAuthFlowOpen) {
             const keysToPreserveForForcedOnboarding2FA = [
                 ...KEYS_TO_PRESERVE,
                 ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
+                ONYXKEYS.NVP_TRY_NEW_DOT,
                 ONYXKEYS.NVP_ONBOARDING,
                 ONYXKEYS.ONBOARDING_LAST_VISITED_PATH,
                 ONYXKEYS.ONBOARDING_PURPOSE_SELECTED,
@@ -1514,10 +1516,21 @@ function validateTwoFactorAuth(twoFactorAuthCode: string, shouldClearData: boole
             return;
         }
 
-        // Clear onyx data if the user has just signed in and is forced to add 2FA
+        // Clear onyx data if the user has just signed in and is forced to add 2FA. Preserve nvp_tryNewDot and
+        // seed the server-confirmed 2FA account flags atomically with the clear: the verify page only advances
+        // once requiresTwoFactorAuth is true, and the success screen's Got it reads classicRedirect.dismissed
+        // to hand HybridApp users back to OldDot — without these, the verify step re-prompts until the
+        // reconnect returns and the OldDot handoff is silently skipped.
         if (shouldClearData) {
-            const keysToPreserveWithPrivatePersonalDetails = [...KEYS_TO_PRESERVE, ONYXKEYS.PRIVATE_PERSONAL_DETAILS];
-            clearOnyxAndSeedFullReconnect(keysToPreserveWithPrivatePersonalDetails).then(() => updateAuthTokenAndOpenApp(response.authToken, response.encryptedAuthToken));
+            const keysToPreserveForForced2FA = [...KEYS_TO_PRESERVE, ONYXKEYS.PRIVATE_PERSONAL_DETAILS, ONYXKEYS.NVP_TRY_NEW_DOT];
+            clearOnyxAndSeedFullReconnect(keysToPreserveForForced2FA, {
+                [ONYXKEYS.ACCOUNT]: {
+                    requiresTwoFactorAuth: true,
+                    needsTwoFactorAuthSetup: false,
+                    codesAreCopied: true,
+                    isLoading: false,
+                },
+            }).then(() => updateAuthTokenAndOpenApp(response.authToken, response.encryptedAuthToken));
             return;
         }
 
