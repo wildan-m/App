@@ -8727,6 +8727,44 @@ ${reportName}`,
             importDescription: 'Dynamics 365 Business Central からインポートするコーディング構成を選択してください。',
             items: 'アイテム',
             enableNewCategories: '新しくインポートされたカテゴリを有効にする',
+            advanced: {
+                autoSyncDescription: 'Expensify は毎日自動的に Dynamics 365 Business Central と同期します。',
+                accountingMethods: {
+                    label: 'エクスポートのタイミング',
+                    description: '経費をエクスポートするタイミングを選択:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: '発生主義',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '現金',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: '立替経費は最終承認時にエクスポートされます',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '自己負担経費は支払われた時点でエクスポートされます',
+                    },
+                },
+                exportToNextOpenPeriod: '次の未締め期間にエクスポート',
+                exportToNextOpenPeriodDescription: '会計期間が締められている場合、エクスポートは次の未締め期間の 1 日付で転記されます。',
+                syncReimbursedReports: '精算済みレポートを同期',
+                syncReimbursedReportsDescription: 'Expensify ACH を使ってレポートが支払われるたびに、対応する支払伝票が、下記の Business Central アカウント内に作成されます。',
+                reimbursementBankAccount: {
+                    label: '払い戻し口座',
+                    description: '払い戻しに使用する銀行口座を選択すると、Business Central で関連する支払いを作成します。',
+                },
+                syncExpensifyCardSettlements: 'Expensify カードの決済を同期',
+                settlementsBankAccount: {
+                    label: 'Expensify カードの決済口座',
+                    description: '精算用の口座を選択すると、Business Central で支払いを作成します。',
+                },
+                postingMode: {
+                    label: '転記モード',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: '作成して転記',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: '作成のみ',
+                    },
+                },
+                autoCreateEntities: '従業員/取引先を自動作成',
+                noBankAccountsFound: '銀行口座が見つかりません',
+                noBankAccountsFoundDescription: 'Business Central で銀行口座を追加し、接続を再同期してください',
+            },
         },
     },
     getAssistancePage: {

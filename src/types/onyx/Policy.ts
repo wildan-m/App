@@ -2677,6 +2677,43 @@ type BusinessCentralCodingOfflineFeedbackKeys = keyof Omit<BusinessCentralCoding
 type BusinessCentralAutoSync = {
     /** Whether automatic synchronization is enabled */
     enabled: boolean;
+
+    /** Unique identifier of the automatic synchronization job */
+    jobID?: string | null;
+};
+
+/**
+ * Export settings for Business Central.
+ */
+type BusinessCentralExport = {
+    /** Whether to post to the next open period when the export period is closed */
+    exportToNextOpenPeriod: boolean;
+
+    /** Accounting method used during export */
+    accountingMethod: ValueOf<typeof COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD>;
+
+    /** Whether exported journals are created and posted, or only created */
+    postingMode: ValueOf<typeof CONST.BUSINESS_CENTRAL_POSTING_MODE>;
+
+    /** Whether employees and vendors are created in Business Central when no match is found */
+    autoCreateEntities: boolean;
+};
+
+/**
+ * Synchronization settings for reimbursed reports and Expensify Card settlements in Business Central.
+ */
+type BusinessCentralSync = {
+    /** Whether reimbursed expense reports should be synchronized */
+    syncReimbursedReports: boolean;
+
+    /** Bank account used for reimbursement bill payments */
+    reimbursementBankAccountID: string;
+
+    /** Whether Expensify Card settlement transactions should be synchronized */
+    syncExpensifyCardSettlements: boolean;
+
+    /** Bank account used for Expensify Card settlements */
+    settlementsBankAccountID: string;
 };
 
 /**
@@ -2702,8 +2739,14 @@ type BusinessCentralConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Coding settings */
         coding?: BusinessCentralCoding;
 
+        /** Export settings */
+        export?: BusinessCentralExport;
+
         /** Auto-sync settings */
         autoSync?: BusinessCentralAutoSync;
+
+        /** Sync settings */
+        sync?: BusinessCentralSync;
 
         /** Collection of errors coming from BE */
         errors?: OnyxCommon.Errors;
@@ -2711,7 +2754,7 @@ type BusinessCentralConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Collection of form field errors  */
         errorFields?: OnyxCommon.ErrorFields;
     },
-    'companyID' | 'enableNewCategories' | BusinessCentralCodingOfflineFeedbackKeys | keyof BusinessCentralAutoSync
+    'companyID' | 'enableNewCategories' | BusinessCentralCodingOfflineFeedbackKeys | keyof BusinessCentralAutoSync | keyof BusinessCentralSync | keyof BusinessCentralExport
 >;
 
 /** Gusto connection data */
@@ -3840,4 +3883,8 @@ export type {
     BusinessCentralCompany,
     BusinessCentralCoding,
     BusinessCentralCodingOfflineFeedbackKeys,
+    BusinessCentralAutoSync,
+    BusinessCentralExport,
+    BusinessCentralSync,
+    BusinessCentralBankAccount,
 };

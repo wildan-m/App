@@ -676,8 +676,18 @@ function getAccountingIntegrationData(
                 ],
                 onExportPagePress: () => null,
                 subscribedExportSettings: [],
-                onAdvancedPagePress: () => null,
-                subscribedAdvancedSettings: [],
+                onAdvancedPagePress: () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_BUSINESS_CENTRAL_ADVANCED.getRoute(policyID)),
+                subscribedAdvancedSettings: [
+                    CONST.BUSINESS_CENTRAL_CONFIG.AUTO_SYNC,
+                    CONST.BUSINESS_CENTRAL_CONFIG.ACCOUNTING_METHOD,
+                    CONST.BUSINESS_CENTRAL_CONFIG.EXPORT_TO_NEXT_OPEN_PERIOD,
+                    CONST.BUSINESS_CENTRAL_CONFIG.SYNC_REIMBURSED_REPORTS,
+                    CONST.BUSINESS_CENTRAL_CONFIG.REIMBURSEMENT_BANK_ACCOUNT_ID,
+                    CONST.BUSINESS_CENTRAL_CONFIG.SYNC_EXPENSIFY_CARD_SETTLEMENTS,
+                    CONST.BUSINESS_CENTRAL_CONFIG.SETTLEMENTS_BANK_ACCOUNT_ID,
+                    CONST.BUSINESS_CENTRAL_CONFIG.POSTING_MODE,
+                    CONST.BUSINESS_CENTRAL_CONFIG.AUTO_CREATE_ENTITIES,
+                ],
                 workspaceUpgradeNavigationDetails: {
                     integrationAlias: CONST.UPGRADE_FEATURE_INTRO_MAPPING.businessCentral.alias,
                     backToAfterWorkspaceUpgradeRoute: integrationToDisconnect

@@ -8824,6 +8824,45 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             importDescription: 'Kies welke codeerconfiguraties je uit Dynamics 365 Business Central wilt importeren.',
             items: 'Artikelen',
             enableNewCategories: 'Nieuw geïmporteerde categorieën inschakelen',
+            advanced: {
+                autoSyncDescription: 'Expensify synchroniseert elke dag automatisch met Dynamics 365 Business Central.',
+                accountingMethods: {
+                    label: 'Wanneer exporteren',
+                    description: 'Kies wanneer de onkosten moeten worden geëxporteerd:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Opbouw',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Contant',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Contante uitgaven worden geëxporteerd zodra ze definitief zijn goedgekeurd',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Uit eigen zak gemaakte uitgaven worden geëxporteerd zodra ze zijn betaald',
+                    },
+                },
+                exportToNextOpenPeriod: 'Exporteren naar volgende open periode',
+                exportToNextOpenPeriodDescription: 'Als de boekhoudperiode gesloten is, wordt de export geboekt op de 1e van de volgende open periode.',
+                syncReimbursedReports: 'Terugbetaalde rapporten synchroniseren',
+                syncReimbursedReportsDescription:
+                    'Telkens wanneer een rapport wordt betaald via Expensify ACH, wordt de bijbehorende factuurbetaling aangemaakt in het onderstaande Business Central-account.',
+                reimbursementBankAccount: {
+                    label: 'Vergoedingsrekening',
+                    description: 'Kies de bankrekening die je gebruikt voor vergoedingen en we maken de bijbehorende betaling aan in Business Central.',
+                },
+                syncExpensifyCardSettlements: 'Verrekeningen van de Expensify Kaart synchroniseren',
+                settlementsBankAccount: {
+                    label: 'Rekening voor verrekening van Expensify Kaart',
+                    description: 'Kies je vereffeningsrekening en we maken de betaling voor je aan in Business Central.',
+                },
+                postingMode: {
+                    label: 'Boekingsmodus',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Aanmaken en boeken',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Alleen aanmaken',
+                    },
+                },
+                autoCreateEntities: 'Medewerkers/leveranciers automatisch aanmaken',
+                noBankAccountsFound: 'Geen bankrekeningen gevonden',
+                noBankAccountsFoundDescription: 'Voeg een bankrekening toe in Business Central en synchroniseer de verbinding opnieuw',
+            },
         },
     },
     getAssistancePage: {

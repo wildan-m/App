@@ -3971,11 +3971,31 @@ const CONST = {
         SYNC_TAX_RATES: 'syncTaxRates',
         SYNC_ITEMS: 'syncItems',
         FIELD_MAPPING_PREFIX: 'fieldMapping_',
+        AUTO_SYNC: 'autoSync',
+        ACCOUNTING_METHOD: 'accountingMethod',
+        EXPORT_TO_NEXT_OPEN_PERIOD: 'exportToNextOpenPeriod',
+        POSTING_MODE: 'postingMode',
+        AUTO_CREATE_ENTITIES: 'autoCreateEntities',
+        SYNC_REIMBURSED_REPORTS: 'syncReimbursedReports',
+        REIMBURSEMENT_BANK_ACCOUNT_ID: 'reimbursementBankAccountID',
+        SYNC_EXPENSIFY_CARD_SETTLEMENTS: 'syncExpensifyCardSettlements',
+        SETTLEMENTS_BANK_ACCOUNT_ID: 'settlementsBankAccountID',
     },
 
     BUSINESS_CENTRAL_MAPPING_VALUE: {
         NONE: 'NONE',
         TAG: 'TAG',
+    },
+
+    BUSINESS_CENTRAL_POSTING_MODE: {
+        CREATE_AND_POST: 'CREATE_AND_POST',
+        CREATE_ONLY: 'CREATE_ONLY',
+    },
+
+    /** Which Business Central bank account setting the shared bank account selector edits */
+    BUSINESS_CENTRAL_BANK_ACCOUNT_SETTING: {
+        REIMBURSEMENT: 'reimbursement',
+        SETTLEMENTS: 'settlements',
     },
 
     /**

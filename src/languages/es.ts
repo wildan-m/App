@@ -8730,6 +8730,45 @@ ${reportName}`,
             importDescription: 'Elige qué configuraciones de codificación quieres importar desde Dynamics 365 Business Central.',
             items: 'Artículos',
             enableNewCategories: 'Activar categorías recién importadas',
+            advanced: {
+                autoSyncDescription: 'Expensify se sincronizará automáticamente con Dynamics 365 Business Central todos los días.',
+                accountingMethods: {
+                    label: 'Cuándo Exportar',
+                    description: 'Elige cuándo exportar los gastos:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Devengo',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Efectivo',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Los gastos por cuenta propia se exportarán cuando estén aprobados definitivamente',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Los gastos por cuenta propia se exportarán cuando estén pagados',
+                    },
+                },
+                exportToNextOpenPeriod: 'Exportar al siguiente período abierto',
+                exportToNextOpenPeriodDescription: 'Si el período contable está cerrado, la exportación se contabilizará el día 1 del siguiente período abierto.',
+                syncReimbursedReports: 'Sincronizar informes reembolsados',
+                syncReimbursedReportsDescription:
+                    'Cada vez que se pague un informe usando Expensify ACH, se creará el pago de la factura correspondiente en la cuenta de Business Central indicada abajo.',
+                reimbursementBankAccount: {
+                    label: 'Cuenta de reembolsos',
+                    description: 'Elige la cuenta bancaria que usarás para los reembolsos y crearemos el pago asociado en Business Central.',
+                },
+                syncExpensifyCardSettlements: 'Sincronizar liquidaciones de la Tarjeta Expensify',
+                settlementsBankAccount: {
+                    label: 'Cuenta de liquidación de la Tarjeta Expensify',
+                    description: 'Elige tu cuenta de liquidación y crearemos el pago en Business Central.',
+                },
+                postingMode: {
+                    label: 'Modo de contabilización',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Crear y contabilizar',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Solo crear',
+                    },
+                },
+                autoCreateEntities: 'Crear automáticamente empleados/proveedores',
+                noBankAccountsFound: 'No se encontraron cuentas bancarias',
+                noBankAccountsFoundDescription: 'Por favor, añade una cuenta bancaria en Business Central y vuelve a sincronizar la conexión',
+            },
         },
     },
     getAssistancePage: {

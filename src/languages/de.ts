@@ -8904,6 +8904,45 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             importDescription: 'Wählen Sie, welche Buchungskonfigurationen aus Dynamics 365 Business Central importiert werden sollen.',
             items: 'Artikel',
             enableNewCategories: 'Neu importierte Kategorien aktivieren',
+            advanced: {
+                autoSyncDescription: 'Expensify wird automatisch jeden Tag mit Dynamics 365 Business Central synchronisiert.',
+                accountingMethods: {
+                    label: 'Wann exportieren',
+                    description: 'Wähle aus, wann die Ausgaben exportiert werden sollen:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Periodenabgrenzung',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Barzahlung',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Auslagen aus eigener Tasche werden nach endgültiger Genehmigung exportiert',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Auslagenausgaben werden beim Bezahlen exportiert',
+                    },
+                },
+                exportToNextOpenPeriod: 'In die nächste offene Periode exportieren',
+                exportToNextOpenPeriodDescription: 'Wenn die Buchungsperiode geschlossen ist, wird der Export auf den 1. der nächsten offenen Periode gebucht.',
+                syncReimbursedReports: 'Erstattete Berichte synchronisieren',
+                syncReimbursedReportsDescription:
+                    'Immer wenn ein Bericht per Expensify ACH bezahlt wird, wird die entsprechende Rechnungszahlung im unten stehenden Business-Central-Konto erstellt.',
+                reimbursementBankAccount: {
+                    label: 'Erstattungskonto',
+                    description: 'Wählen Sie das Bankkonto für Erstattungen, und wir erstellen die zugehörige Zahlung in Business Central.',
+                },
+                syncExpensifyCardSettlements: 'Expensify-Karten-Abrechnungen synchronisieren',
+                settlementsBankAccount: {
+                    label: 'Verrechnungskonto für Expensify Karte',
+                    description: 'Wählen Sie Ihr Abrechnungskonto, und wir erstellen die Zahlung in Business Central.',
+                },
+                postingMode: {
+                    label: 'Buchungsmodus',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Erstellen und buchen',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Nur erstellen',
+                    },
+                },
+                autoCreateEntities: 'Mitarbeitende/Lieferanten automatisch erstellen',
+                noBankAccountsFound: 'Keine Bankkonten gefunden',
+                noBankAccountsFoundDescription: 'Bitte fügen Sie ein Bankkonto in Business Central hinzu und synchronisieren Sie die Verbindung erneut',
+            },
         },
     },
     getAssistancePage: {

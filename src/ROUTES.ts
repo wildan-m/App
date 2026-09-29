@@ -5134,6 +5134,23 @@ const ROUTES = {
         route: 'workspaces/:policyID/accounting/business-central/import',
         getRoute: (policyID: string) => `workspaces/${policyID}/accounting/business-central/import` as const,
     },
+    POLICY_ACCOUNTING_BUSINESS_CENTRAL_ADVANCED: {
+        route: 'workspaces/:policyID/accounting/business-central/advanced',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/business-central/advanced` as const,
+    },
+    POLICY_ACCOUNTING_BUSINESS_CENTRAL_AUTO_SYNC: {
+        route: 'workspaces/:policyID/accounting/business-central/advanced/autosync',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/business-central/advanced/autosync` as const,
+    },
+    POLICY_ACCOUNTING_BUSINESS_CENTRAL_ADVANCED_POSTING_MODE: {
+        route: 'workspaces/:policyID/accounting/business-central/advanced/posting-mode',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/business-central/advanced/posting-mode` as const,
+    },
+    POLICY_ACCOUNTING_BUSINESS_CENTRAL_BANK_ACCOUNT_SELECTOR: {
+        route: 'workspaces/:policyID/accounting/business-central/advanced/bank-account/:bankAccountSetting',
+        getRoute: (policyID: string, bankAccountSetting: ValueOf<typeof CONST.BUSINESS_CENTRAL_BANK_ACCOUNT_SETTING>) =>
+            `workspaces/${policyID}/accounting/business-central/advanced/bank-account/${bankAccountSetting}` as const,
+    },
     ADD_EXISTING_EXPENSE: {
         route: 'search/r/:reportID/add-existing-expense/:backToReport?',
         getRoute: (reportID: string | undefined, backToReport?: string) => `search/r/${reportID}/add-existing-expense/${backToReport ?? ''}` as const,

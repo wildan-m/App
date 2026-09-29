@@ -8830,6 +8830,45 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             importDescription: 'Escolha quais configurações de codificação importar do Dynamics 365 Business Central.',
             items: 'Itens',
             enableNewCategories: 'Ativar novas categorias importadas',
+            advanced: {
+                autoSyncDescription: 'O Expensify fará a sincronização automática com o Dynamics 365 Business Central todos os dias.',
+                accountingMethods: {
+                    label: 'Quando Exportar',
+                    description: 'Escolha quando exportar as despesas:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Regime de competência',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Dinheiro',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Despesas fora do bolso serão exportadas quando forem aprovadas em definitivo',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Despesas reembolsáveis serão exportadas quando pagas',
+                    },
+                },
+                exportToNextOpenPeriod: 'Exportar para o próximo período em aberto',
+                exportToNextOpenPeriodDescription: 'Se o período contábil estiver fechado, a exportação será lançada no dia 1º do próximo período em aberto.',
+                syncReimbursedReports: 'Sincronizar relatórios reembolsados',
+                syncReimbursedReportsDescription:
+                    'Sempre que um relatório for pago usando Expensify ACH, o pagamento de conta correspondente será criado na conta do Business Central abaixo.',
+                reimbursementBankAccount: {
+                    label: 'Conta de reembolso',
+                    description: 'Escolha a conta bancária usada para reembolsos e criaremos o pagamento associado no Business Central.',
+                },
+                syncExpensifyCardSettlements: 'Sincronizar liquidações do Cartão Expensify',
+                settlementsBankAccount: {
+                    label: 'Conta de liquidação do Cartão Expensify',
+                    description: 'Escolha sua conta de liquidação e nós criaremos o pagamento no Business Central.',
+                },
+                postingMode: {
+                    label: 'Modo de lançamento',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Criar e lançar',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Apenas criar',
+                    },
+                },
+                autoCreateEntities: 'Criar funcionários/fornecedores automaticamente',
+                noBankAccountsFound: 'Nenhuma conta bancária encontrada',
+                noBankAccountsFoundDescription: 'Adicione uma conta bancária no Business Central e sincronize a conexão novamente',
+            },
         },
     },
     getAssistancePage: {

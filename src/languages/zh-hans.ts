@@ -8492,6 +8492,44 @@ ${reportName}`,
             importDescription: '选择要从 Dynamics 365 Business Central 导入的编码配置。',
             items: '项目',
             enableNewCategories: '启用新导入的类别',
+            advanced: {
+                autoSyncDescription: 'Expensify 将每天自动与 Dynamics 365 Business Central 同步。',
+                accountingMethods: {
+                    label: '何时导出',
+                    description: '选择何时导出报销：',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: '权责发生制',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '现金',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: '自付报销将在最终批准后导出',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: '自掏腰包的报销在支付时会导出',
+                    },
+                },
+                exportToNextOpenPeriod: '导出到下一个未结会计期间',
+                exportToNextOpenPeriodDescription: '如果会计期间已关闭，导出将过账到下一个未结会计期间的第 1 天。',
+                syncReimbursedReports: '同步已报销报表',
+                syncReimbursedReportsDescription: '每当通过 Expensify ACH 支付报销单时，系统都会在下方的 Business Central 账户中创建相应的账单付款记录。',
+                reimbursementBankAccount: {
+                    label: '报销账户',
+                    description: '选择用于报销的银行账户，我们会在 Business Central 中创建相关付款。',
+                },
+                syncExpensifyCardSettlements: '同步 Expensify 卡结算',
+                settlementsBankAccount: {
+                    label: 'Expensify 卡结算账户',
+                    description: '选择您的结算账户，我们会在 Business Central 中创建这笔付款。',
+                },
+                postingMode: {
+                    label: '过账模式',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: '创建并过账',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: '仅创建',
+                    },
+                },
+                autoCreateEntities: '自动创建员工/供应商',
+                noBankAccountsFound: '未找到银行账户',
+                noBankAccountsFoundDescription: '请在 Business Central 中添加银行账户，然后重新同步连接',
+            },
         },
     },
     getAssistancePage: {

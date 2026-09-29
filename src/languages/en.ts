@@ -6348,6 +6348,44 @@ const translations = {
             importDescription: 'Choose which coding configurations to import from Dynamics 365 Business Central.',
             items: 'Items',
             enableNewCategories: 'Enable newly imported categories',
+            advanced: {
+                autoSyncDescription: 'Expensify will automatically sync with Dynamics 365 Business Central every day.',
+                accountingMethods: {
+                    label: 'When to Export',
+                    description: 'Choose when to export the expenses:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Accrual',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Cash',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Out-of-pocket expenses will export when final approved',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Out-of-pocket expenses will export when paid',
+                    },
+                },
+                exportToNextOpenPeriod: 'Export to next open period',
+                exportToNextOpenPeriodDescription: 'If the posting period is closed, the export will post to the 1st of the next open period.',
+                syncReimbursedReports: 'Sync reimbursed reports',
+                syncReimbursedReportsDescription: 'Any time a report is paid using Expensify ACH, the corresponding bill payment will be created in the Business Central account below.',
+                reimbursementBankAccount: {
+                    label: 'Reimbursement account',
+                    description: "Choose the bank account you'll use for reimbursements, and we'll create the associated payment in Business Central.",
+                },
+                syncExpensifyCardSettlements: 'Sync Expensify Card settlements',
+                settlementsBankAccount: {
+                    label: 'Expensify Card settlement account',
+                    description: "Choose your settlement account and we'll create the payment in Business Central.",
+                },
+                postingMode: {
+                    label: 'Posting mode',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Create and post',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Create only',
+                    },
+                },
+                autoCreateEntities: 'Auto-create employees/vendors',
+                noBankAccountsFound: 'No bank accounts found',
+                noBankAccountsFoundDescription: 'Please add a bank account in Business Central and sync the connection again',
+            },
         },
         type: {
             free: 'Free',

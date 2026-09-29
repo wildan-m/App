@@ -9072,6 +9072,45 @@ ${reportName}`,
             importDescription: 'Επιλέξτε ποιες ρυθμίσεις κωδικοποίησης θέλετε να εισαγάγετε από το Dynamics 365 Business Central.',
             items: 'Στοιχεία',
             enableNewCategories: 'Ενεργοποίηση νέων εισαγόμενων κατηγοριών',
+            advanced: {
+                autoSyncDescription: 'Το Expensify θα συγχρονίζεται αυτόματα με το Dynamics 365 Business Central κάθε μέρα.',
+                accountingMethods: {
+                    label: 'Πότε να γίνει εξαγωγή',
+                    description: 'Επιλέξτε πότε θα εξαχθούν οι δαπάνες:',
+                    values: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Δεδουλευμένη βάση',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Μετρητά',
+                    },
+                    alternateText: {
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.ACCRUAL]: 'Οι δαπάνες από την τσέπη σας θα εξαχθούν όταν λάβουν την τελική έγκριση',
+                        [COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD.CASH]: 'Οι εκτός τσέπης δαπάνες θα εξαχθούν όταν εξοφληθούν',
+                    },
+                },
+                exportToNextOpenPeriod: 'Εξαγωγή στην επόμενη ανοικτή περίοδο',
+                exportToNextOpenPeriodDescription: 'Εάν η λογιστική περίοδος είναι κλειστή, η εξαγωγή θα καταχωρηθεί την 1η της επόμενης ανοικτής περιόδου.',
+                syncReimbursedReports: 'Συγχρονισμός αποζημιωμένων αναφορών',
+                syncReimbursedReportsDescription:
+                    'Κάθε φορά που μια αναφορά πληρώνεται μέσω Expensify ACH, η αντίστοιχη πληρωμή λογαριασμού θα δημιουργείται στον παρακάτω λογαριασμό Business Central.',
+                reimbursementBankAccount: {
+                    label: 'Λογαριασμός αποζημιώσεων',
+                    description: 'Επιλέξτε τον τραπεζικό λογαριασμό για τις αποζημιώσεις και θα δημιουργήσουμε τη σχετική πληρωμή στο Business Central.',
+                },
+                syncExpensifyCardSettlements: 'Συγχρονισμός διακανονισμών κάρτας Expensify',
+                settlementsBankAccount: {
+                    label: 'Λογαριασμός διακανονισμού κάρτας Expensify',
+                    description: 'Επιλέξτε τον λογαριασμό διακανονισμού σας και θα δημιουργήσουμε την πληρωμή στο Business Central.',
+                },
+                postingMode: {
+                    label: 'Λειτουργία καταχώρισης',
+                    values: {
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_AND_POST]: 'Δημιουργία και καταχώριση',
+                        [CONST.BUSINESS_CENTRAL_POSTING_MODE.CREATE_ONLY]: 'Μόνο δημιουργία',
+                    },
+                },
+                autoCreateEntities: 'Αυτόματη δημιουργία υπαλλήλων/προμηθευτών',
+                noBankAccountsFound: 'Δεν βρέθηκαν τραπεζικοί λογαριασμοί',
+                noBankAccountsFoundDescription: 'Προσθέστε έναν τραπεζικό λογαριασμό στο Business Central και συγχρονίστε ξανά τη σύνδεση',
+            },
         },
     },
     getAssistancePage: {
