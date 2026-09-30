@@ -6360,6 +6360,8 @@ const translations = {
             noVendorsFoundDescription: 'Please add vendors in Business Central and sync the connection again',
             importDescription: 'Choose which coding configurations to import from Dynamics 365 Business Central.',
             items: 'Items',
+            customers: 'Customers',
+            projects: 'Projects',
             enableNewCategories: 'Enable newly imported categories',
             exportDescription: 'Configure how Expensify data exports to Dynamics 365 Business Central.',
             exportDate: {

@@ -8861,6 +8861,8 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             noVendorsFoundDescription: 'Dodaj proszę dostawców w Business Central i zsynchronizuj połączenie ponownie',
             importDescription: 'Wybierz, które konfiguracje kodowania zaimportować z Dynamics 365 Business Central.',
             items: 'Pozycje',
+            customers: 'Klienci',
+            projects: 'Projekty',
             enableNewCategories: 'Włącz nowo zaimportowane kategorie',
             exportDescription: 'Skonfiguruj sposób eksportowania danych Expensify do Dynamics 365 Business Central.',
             exportDate: {

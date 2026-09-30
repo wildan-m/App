@@ -8871,6 +8871,8 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             noVendorsFoundDescription: 'Aggiungi i fornitori in Business Central e sincronizza di nuovo la connessione',
             importDescription: 'Scegli quali configurazioni di codifica importare da Dynamics 365 Business Central.',
             items: 'Articoli',
+            customers: 'Clienti',
+            projects: 'Progetti',
             enableNewCategories: 'Abilita le categorie appena importate',
             exportDescription: 'Configura come i dati di Expensify vengono esportati in Dynamics 365 Business Central.',
             exportDate: {

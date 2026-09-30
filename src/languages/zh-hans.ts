@@ -8516,6 +8516,8 @@ ${reportName}`,
             noVendorsFoundDescription: '请在 Business Central 中添加供应商，然后再次同步连接',
             importDescription: '选择要从 Dynamics 365 Business Central 导入的编码配置。',
             items: '项目',
+            customers: '客户',
+            projects: '项目（工作）',
             enableNewCategories: '启用新导入的类别',
             exportDescription: '配置 Expensify 数据导出到 Dynamics 365 Business Central 的方式。',
             exportDate: {

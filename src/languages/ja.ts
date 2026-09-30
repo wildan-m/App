@@ -8749,6 +8749,8 @@ ${reportName}`,
             noVendorsFoundDescription: 'Business Central に仕入先を追加してから、もう一度接続を同期してください',
             importDescription: 'Dynamics 365 Business Central からインポートするコーディング構成を選択してください。',
             items: 'アイテム',
+            customers: '顧客',
+            projects: 'プロジェクト',
             enableNewCategories: '新しくインポートされたカテゴリを有効にする',
             exportDescription: 'Expensify のデータを Dynamics 365 Business Central にエクスポートする方法を設定します。',
             exportDate: {

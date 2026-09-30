@@ -8846,6 +8846,8 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             noVendorsFoundDescription: 'Voeg leveranciers toe in Business Central en synchroniseer de koppeling opnieuw',
             importDescription: 'Kies welke codeerconfiguraties je uit Dynamics 365 Business Central wilt importeren.',
             items: 'Artikelen',
+            customers: 'Klanten',
+            projects: 'Projecten',
             enableNewCategories: 'Nieuw geïmporteerde categorieën inschakelen',
             exportDescription: 'Stel in hoe Expensify-gegevens worden geëxporteerd naar Dynamics 365 Business Central.',
             exportDate: {

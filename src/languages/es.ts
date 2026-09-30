@@ -8753,6 +8753,8 @@ ${reportName}`,
             noVendorsFoundDescription: 'Por favor, añade proveedores en Business Central y vuelve a sincronizar la conexión',
             importDescription: 'Elige qué configuraciones de codificación quieres importar desde Dynamics 365 Business Central.',
             items: 'Artículos',
+            customers: 'Clientes',
+            projects: 'Proyectos',
             enableNewCategories: 'Activar categorías recién importadas',
             exportDescription: 'Configura cómo se exportan los datos de Expensify a Dynamics 365 Business Central.',
             exportDate: {

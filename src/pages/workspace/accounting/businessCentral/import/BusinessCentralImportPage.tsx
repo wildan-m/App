@@ -40,6 +40,17 @@ function BusinessCentralImportPage({policy}: WithPolicyConnectionsProps) {
     const syncTaxRates = businessCentralConfig?.coding?.syncTaxRates ?? false;
     const hasDimensions = !!businessCentralData?.dimensions?.length;
 
+    // Customers and projects only reach Business Central on documents that carry them, so their rows stay locked
+    // until some expenses export as purchase invoices. An existing mapping is kept, just not editable, while locked.
+    const isPurchaseInvoiceExportEnabled =
+        businessCentralConfig?.export?.reimbursable === CONST.BUSINESS_CENTRAL_EXPORT_DESTINATION.PURCHASE_INVOICE ||
+        businessCentralConfig?.export?.nonReimbursable === CONST.BUSINESS_CENTRAL_EXPORT_DESTINATION.PURCHASE_INVOICE;
+    const fixedTagRows = [
+        {code: CONST.BUSINESS_CENTRAL_FIELD_MAPPING_CODE.CUSTOMER, title: translate('workspace.businessCentral.customers'), shouldShow: !!businessCentralData?.customers?.length},
+        {code: CONST.BUSINESS_CENTRAL_FIELD_MAPPING_CODE.PROJECT, title: translate('workspace.businessCentral.projects'), shouldShow: !!businessCentralData?.projects?.length},
+    ];
+    const hasTagRows = hasDimensions || fixedTagRows.some((row) => row.shouldShow);
+
     // A US company has no VAT posting setup that can become a tax rate, so it has no tax row to offer.
     const hasVATPostingSetups = !!businessCentralData?.hasVATPostingSetups;
     const sectionTitleStyle = [styles.textLabel, styles.textStrong, styles.lh16, styles.ph5, styles.pt4, styles.pb2];
@@ -87,10 +98,41 @@ function BusinessCentralImportPage({policy}: WithPolicyConnectionsProps) {
                 errors={getLatestErrorField(businessCentralConfig ?? {}, CONST.BUSINESS_CENTRAL_CONFIG.ENABLE_NEW_CATEGORIES)}
                 onCloseError={() => policyID && clearBusinessCentralErrorField(policyID, CONST.BUSINESS_CENTRAL_CONFIG.ENABLE_NEW_CATEGORIES)}
             />
-            {hasDimensions && (
+            {hasTagRows && (
                 <>
                     <View style={[styles.mv3, styles.mh5, styles.borderTop]} />
                     <Text style={sectionTitleStyle}>{translate('workspace.common.tags')}</Text>
+                    {fixedTagRows.map(({code, title, shouldShow}) => {
+                        if (!shouldShow) {
+                            return null;
+                        }
+                        const mapping = businessCentralConfig?.coding?.fieldMappings?.[code];
+                        const isImported = mapping === CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG;
+                        const pendingField = `${CONST.BUSINESS_CENTRAL_CONFIG.FIELD_MAPPING_PREFIX}${code}` as const;
+                        return (
+                            <ToggleSettingOptionRow
+                                key={code}
+                                title={title}
+                                switchAccessibilityLabel={title}
+                                wrapperStyle={toggleRowStyle}
+                                isActive={isImported}
+                                disabled={!isPurchaseInvoiceExportEnabled}
+                                showLockIcon={!isPurchaseInvoiceExportEnabled}
+                                onToggle={() =>
+                                    policyID &&
+                                    updateBusinessCentralFieldMapping(
+                                        policyID,
+                                        code,
+                                        isImported ? CONST.BUSINESS_CENTRAL_MAPPING_VALUE.NONE : CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG,
+                                        mapping,
+                                    )
+                                }
+                                pendingAction={settingsPendingAction([pendingField], businessCentralConfig?.pendingFields)}
+                                errors={getLatestErrorField(businessCentralConfig ?? {}, pendingField)}
+                                onCloseError={() => policyID && clearBusinessCentralErrorField(policyID, pendingField)}
+                            />
+                        );
+                    })}
                     {businessCentralData?.dimensions?.map((dimension) => {
                         const mapping = businessCentralConfig?.coding?.fieldMappings?.[dimension.id];
                         const isImported = mapping === CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG;

@@ -416,6 +416,39 @@ describe('actions/connections/BusinessCentral', () => {
                 ],
             });
         });
+
+        it.each([CONST.BUSINESS_CENTRAL_FIELD_MAPPING_CODE.CUSTOMER, CONST.BUSINESS_CENTRAL_FIELD_MAPPING_CODE.PROJECT])(
+            'maps the fixed %s code through the same command and prefixed feedback key as a dimension',
+            (fixedCode) => {
+                // Given the Customer or Project import row, which uses a fixed field-mapping code instead of a synced dimension code
+                // When the row is switched to import as a tag
+                updateBusinessCentralFieldMapping(MOCK_POLICY_ID, fixedCode, CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG, CONST.BUSINESS_CENTRAL_MAPPING_VALUE.NONE);
+
+                // Then the generic command carries the fixed code so customers and projects need no dedicated command, and the mapping is stored under the code's own prefixed pending key
+                expect(writeSpy).toHaveBeenCalledWith(
+                    WRITE_COMMANDS.UPDATE_BUSINESS_CENTRAL_FIELD_MAPPING,
+                    expect.objectContaining({policyID: MOCK_POLICY_ID, dimensionCode: fixedCode, mapping: CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG}),
+                    expect.anything(),
+                );
+                expect(getFirstWriteOnyxData()).toMatchObject({
+                    optimisticData: [
+                        {
+                            key: POLICY_KEY,
+                            value: {
+                                connections: {
+                                    businessCentral: {
+                                        config: {
+                                            coding: {fieldMappings: {[fixedCode]: CONST.BUSINESS_CENTRAL_MAPPING_VALUE.TAG}},
+                                            pendingFields: {[`${CONST.BUSINESS_CENTRAL_CONFIG.FIELD_MAPPING_PREFIX}${fixedCode}`]: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                });
+            },
+        );
     });
 
     describe('export settings', () => {

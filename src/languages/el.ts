@@ -9092,6 +9092,8 @@ ${reportName}`,
             noVendorsFoundDescription: 'Παρακαλούμε προσθέστε προμηθευτές στο Business Central και συγχρονίστε ξανά τη σύνδεση',
             importDescription: 'Επιλέξτε ποιες ρυθμίσεις κωδικοποίησης θέλετε να εισαγάγετε από το Dynamics 365 Business Central.',
             items: 'Στοιχεία',
+            customers: 'Πελάτες',
+            projects: 'Έργα',
             enableNewCategories: 'Ενεργοποίηση νέων εισαγόμενων κατηγοριών',
             exportDescription: 'Ρυθμίστε τον τρόπο με τον οποίο τα δεδομένα του Expensify εξάγονται στο Dynamics 365 Business Central.',
             exportDate: {

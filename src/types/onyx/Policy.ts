@@ -2532,6 +2532,30 @@ type BusinessCentralDimension = {
 };
 
 /**
+ * Customer retrieved from Business Central. Customers can be imported as tags and map to a purchase-invoice dimension
+ * on export, so Integration-Server caches only the number and the name.
+ */
+type BusinessCentralCustomer = {
+    /** Customer number shown in Business Central, also the value exported into the purchase-invoice dimension */
+    number: string;
+
+    /** Name of the customer */
+    name: string;
+};
+
+/**
+ * Project (job) retrieved from Business Central. Projects can be imported as tags and map to the dedicated
+ * purchase-invoice `jobNumber` field on export, so Integration-Server caches only the number and the name.
+ */
+type BusinessCentralProject = {
+    /** Project number shown in Business Central, also the value exported into the purchase-invoice `jobNumber` field */
+    number: string;
+
+    /** Name of the project */
+    name: string;
+};
+
+/**
  * Vendor retrieved from Business Central.
  */
 type BusinessCentralVendor = {
@@ -2594,6 +2618,12 @@ type BusinessCentralConnectionData = {
 
     /** Dimensions of the selected company */
     dimensions?: BusinessCentralDimension[];
+
+    /** Customers of the selected company */
+    customers?: BusinessCentralCustomer[];
+
+    /** Projects (jobs) of the selected company */
+    projects?: BusinessCentralProject[];
 
     /** Vendors of the selected company */
     vendors?: BusinessCentralVendor[];

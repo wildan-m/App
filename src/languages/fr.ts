@@ -8947,6 +8947,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             noVendorsFoundDescription: 'Veuillez ajouter des fournisseurs dans Business Central et synchroniser à nouveau la connexion',
             importDescription: 'Choisissez quelles configurations de codage importer depuis Dynamics 365 Business Central.',
             items: 'Articles',
+            customers: 'Clients',
+            projects: 'Projets',
             enableNewCategories: 'Activer les nouvelles catégories importées',
             exportDescription: 'Configurez comment les données Expensify sont exportées vers Dynamics 365 Business Central.',
             exportDate: {

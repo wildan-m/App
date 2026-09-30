@@ -4008,6 +4008,15 @@ const CONST = {
     },
 
     /**
+     * Fixed field-mapping codes for the Customer and Project import rows. Unlike dimensions, whose codes come from
+     * Business Central, these two codes are agreed with Integration-Server and never change.
+     */
+    BUSINESS_CENTRAL_FIELD_MAPPING_CODE: {
+        CUSTOMER: 'CUSTOMER',
+        PROJECT: 'PROJECT',
+    },
+
+    /**
      * How far a Business Central vendor is blocked. `_x0020_` is the unblocked value Business Central
      * sends, `PAYMENT` still allows purchase invoices, and `ALL` forbids every transaction.
      */
