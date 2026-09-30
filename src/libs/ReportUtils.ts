@@ -4634,7 +4634,11 @@ function getReasonAndReportActionThatRequiresAttention(
     const actionTypeForAssigneeToComplete = getActionTypeForAssigneeToComplete(optionOrReport, parentReportAction);
 
     // Compute IOU candidate upfront so we can compare timestamps with task candidate
-    const {reportAction: iouReportActionToApproveOrPay, actionBadge} = getIOUReportActionWithBadge(
+    const {
+        reportAction: iouReportActionToApproveOrPay,
+        actionBadge,
+        hasReportExcludedForHeldExpenses,
+    } = getIOUReportActionWithBadge(
         optionOrReport,
         policy,
         optionReportMetadata,
@@ -4654,8 +4658,10 @@ function getReasonAndReportActionThatRequiresAttention(
     const iouReportActions = allReportActionsParam?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReportID}`] ?? getAllReportActions(iouReportID);
     // This only has to run on the fallback path: when a candidate was found, getBadgeFromIOUReport has already applied
     // the same exclusion while picking it, so the chat is known to have an actionable child even when a sibling of that
-    // child is fully held.
-    const isFallbackReportExcludedForHeldExpenses = !iouReportActionToApproveOrPay && isReportExcludedForHeldExpenses(iouReport, transactions, iouReportActions, currentUserAccountID);
+    // child is fully held. When the chat's iouReportID can't resolve a loaded child, rely on the candidate scan instead,
+    // otherwise the chat's outstanding-child flag alone would keep a fully-held child in the to-do queue.
+    const isFallbackReportExcludedForHeldExpenses =
+        !iouReportActionToApproveOrPay && (iouReport ? isReportExcludedForHeldExpenses(iouReport, transactions, iouReportActions, currentUserAccountID) : hasReportExcludedForHeldExpenses);
 
     // Has a child report that is awaiting action (e.g. approve, pay, add bank account) from current user.
     // A report whose only expenses are pending Expensify Card transactions can't be actioned until they post, so it
@@ -4927,9 +4933,12 @@ function didCurrentUserPlaceHoldOnReportExpense(reportActions: OnyxEntry<ReportA
  * An all-held report can't move to its next state, so it isn't a to-do and doesn't get an action badge. Keep it only
  * for a report awaiting approval or payment where the current user placed a hold, since they can remove it. An open
  * report stays excluded because only its owner can place a hold there, and that owner is the one who submits.
+ * When the report's transactions aren't loaded locally (e.g. an approver who hasn't opened it yet), fall back to the
+ * report's own totals: a fully-held report has no unheld amount left while its total is non-zero.
  */
 function isReportExcludedForHeldExpenses(iouReport: OnyxEntry<Report>, transactions: Transaction[], reportActions: OnyxEntry<ReportActions>, currentUserAccountID?: number): boolean {
-    if (!hasOnlyHeldExpenses(transactions)) {
+    const isFullyHeld = transactions.length > 0 ? hasOnlyHeldExpenses(transactions) : iouReport?.unheldTotal === 0 && !!iouReport?.total;
+    if (!isFullyHeld) {
         return false;
     }
     return isOpenExpenseReport(iouReport) || !didCurrentUserPlaceHoldOnReportExpense(reportActions, transactions, currentUserAccountID);

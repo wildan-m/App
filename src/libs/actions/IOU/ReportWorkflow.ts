@@ -413,9 +413,11 @@ function getIOUReportActionWithBadge(
 ): {
     reportAction: OnyxEntry<ReportAction>;
     actionBadge?: ValueOf<typeof CONST.REPORT.ACTION_BADGE>;
+    hasReportExcludedForHeldExpenses: boolean;
 } {
     let actionBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
     let earliestAction: ReportAction | undefined;
+    let hasReportExcludedForHeldExpenses = false;
 
     for (const action of Object.values(chatReportActions ?? {})) {
         if (action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW || isDeletedAction(action)) {
@@ -449,6 +451,9 @@ function getIOUReportActionWithBadge(
         // still needs action from the current user.
         const badge = getBadgeFromIOUReport(iouReport, chatReport, policy, reportMetadata, invoiceReceiverPolicy, currentUserLogin, currentUserAccountID, iouReportActions);
         if (!badge) {
+            // Remember that a fully-held child was skipped, so the caller doesn't resurrect it through the chat's
+            // outstanding-child flag when the chat's own iouReportID can't resolve that child.
+            hasReportExcludedForHeldExpenses ||= isReportExcludedForHeldExpenses(iouReport, getReportTransactions(iouReport.reportID), iouReportActions, currentUserAccountID);
             continue;
         }
 
@@ -458,7 +463,7 @@ function getIOUReportActionWithBadge(
         }
     }
 
-    return {reportAction: earliestAction, actionBadge};
+    return {reportAction: earliestAction, actionBadge, hasReportExcludedForHeldExpenses};
 }
 
 /**

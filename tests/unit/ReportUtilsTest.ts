@@ -4445,6 +4445,88 @@ describe('ReportUtils', () => {
             });
         });
 
+        describe("when the approver hasn't loaded the transactions of a submitted report", () => {
+            const chatReportID = '7400';
+            const expenseReportID = '7401';
+            const otherUserAccountID = 99;
+
+            // Seeds a policy expense chat whose single submitted child report is awaiting the current user's approval.
+            // None of the child's transactions are in Onyx, as on an approver's client before they open the report.
+            const seedUnloadedChildExpense = async (totals: Pick<Report, 'total' | 'unheldTotal'>, chatIOUReportID: string | undefined) => {
+                const policyExpenseChat = {
+                    ...createPolicyExpenseChat(7400, false),
+                    reportID: chatReportID,
+                    policyID: '1',
+                    ownerAccountID: otherUserAccountID,
+                    hasOutstandingChildRequest: true,
+                    iouReportID: chatIOUReportID,
+                };
+
+                await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}1`, {
+                    id: '1',
+                    type: CONST.POLICY.TYPE.TEAM,
+                    role: CONST.POLICY.ROLE.ADMIN,
+                    approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+                    reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
+                });
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, policyExpenseChat);
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${expenseReportID}`, {
+                    ...LHNTestUtils.getFakeReport(),
+                    reportID: expenseReportID,
+                    chatReportID,
+                    policyID: '1',
+                    ownerAccountID: otherUserAccountID,
+                    managerID: currentUserAccountID,
+                    type: CONST.REPORT.TYPE.EXPENSE,
+                    stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                    statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                    ...totals,
+                });
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, {
+                    preview_7401: {
+                        reportActionID: 'preview_7401',
+                        actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                        created: '2024-01-01 00:00:00.000',
+                        actorAccountID: otherUserAccountID,
+                        childReportID: expenseReportID,
+                        childManagerAccountID: currentUserAccountID,
+                        shouldShow: true,
+                        message: [{type: 'COMMENT', html: 'Expense report', text: 'Expense report'}],
+                        originalMessage: {linkedReportID: expenseReportID},
+                    },
+                });
+                await waitForBatchedUpdates();
+
+                return policyExpenseChat;
+            };
+
+            it('does not require attention when the report totals show every expense is held', async () => {
+                // Given a submitted report whose totals show every expense is held, and a chat that points at it
+                const policyExpenseChat = await seedUnloadedChildExpense({total: -100, unheldTotal: 0}, expenseReportID);
+
+                // When the approver's chat is evaluated, then the outstanding-child flag alone doesn't make it a to-do
+                // because a fully-held report can't move to its next state
+                expect(requiresAttentionFromCurrentUser(policyExpenseChat, currentUserEmail, currentUserAccountID)).toBe(false);
+            });
+
+            it("does not require attention for an all-held report when the chat's iouReportID doesn't point at it", async () => {
+                // Given a fully-held submitted report that the chat's iouReportID doesn't resolve to
+                const policyExpenseChat = await seedUnloadedChildExpense({total: -100, unheldTotal: 0}, undefined);
+
+                // When the approver's chat is evaluated, then the held report preview still keeps it out of the to-do
+                // queue instead of falling back to the outstanding-child flag
+                expect(requiresAttentionFromCurrentUser(policyExpenseChat, currentUserEmail, currentUserAccountID)).toBe(false);
+            });
+
+            it('still requires attention when the report totals show an unheld amount', async () => {
+                // Given a submitted report whose totals show an unheld amount still awaiting approval
+                const policyExpenseChat = await seedUnloadedChildExpense({total: -100, unheldTotal: -100}, expenseReportID);
+
+                // When the approver's chat is evaluated, then it still requires attention through the outstanding-child flag
+                expect(requiresAttentionFromCurrentUser(policyExpenseChat, currentUserEmail, currentUserAccountID)).toBe(true);
+            });
+        });
+
         it('returns true for expense report awaiting user payment/reimbursement', async () => {
             const report = {
                 ...LHNTestUtils.getFakeReport(),
