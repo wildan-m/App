@@ -10,6 +10,7 @@ import SidebarUtils from '@libs/SidebarUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
+import type {ReportAttributes} from '@src/types/onyx/DerivedValues';
 
 import type {OnyxMultiSetInput} from 'react-native-onyx';
 
@@ -426,5 +427,68 @@ describe('useSidebarOrderedReports', () => {
         });
 
         expect(fullRecomputeCall).toBeUndefined();
+    });
+
+    it('should re-check a hidden report when only its derived report attributes change', async () => {
+        const displayedReports = createMockReports({
+            report1: {reportName: 'Chat A'},
+        });
+        const newDMReport = {
+            reportID: '2',
+            reportName: 'New DM',
+            lastVisibleActionCreated: '2024-01-01 10:00:00',
+            type: CONST.REPORT.TYPE.CHAT,
+        } as Report;
+        const displayedReportAttributes: ReportAttributes = {
+            reportName: 'Chat A',
+            isEmpty: false,
+            brickRoadStatus: undefined,
+            requiresAttention: false,
+            reportErrors: {},
+        };
+        const staleNewDMAttributes: ReportAttributes = {
+            reportName: 'New DM',
+            isEmpty: true,
+            brickRoadStatus: undefined,
+            requiresAttention: false,
+            reportErrors: {},
+        };
+
+        mockSidebarUtils.getReportsToDisplayInLHN.mockReturnValue(displayedReports);
+        mockSidebarUtils.updateReportsToDisplayInLHN.mockImplementation(({displayedReports: reports}) => reports);
+
+        await act(async () => {
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}1`, displayedReports['1']);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}2`, newDMReport);
+            await Onyx.set(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {reports: {'1': displayedReportAttributes, '2': staleNewDMAttributes}, locale: null});
+        });
+
+        renderHook(() => useSidebarOrderedReports(), {
+            wrapper: TestWrapper,
+        });
+
+        await waitForBatchedUpdatesWithAct();
+
+        mockSidebarUtils.updateReportsToDisplayInLHN.mockClear();
+
+        // The derived attributes catch up after the report itself arrived: the new DM now has an expense to pay.
+        // No report key changes in this update, only the derived value.
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES, {
+                reports: {
+                    '1': displayedReportAttributes,
+                    '2': {...staleNewDMAttributes, isEmpty: false, requiresAttention: true, actionBadge: CONST.REPORT.ACTION_BADGE.PAY},
+                },
+                locale: null,
+            });
+        });
+
+        await waitForBatchedUpdatesWithAct();
+
+        expect(mockSidebarUtils.updateReportsToDisplayInLHN).toHaveBeenCalledWith(
+            expect.objectContaining({
+                updatedReportsKeys: expect.arrayContaining([`${ONYXKEYS.COLLECTION.REPORT}2`]),
+            }),
+        );
     });
 });

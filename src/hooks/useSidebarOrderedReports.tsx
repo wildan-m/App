@@ -116,6 +116,7 @@ function SidebarOrderedReportsContextProvider({
     const prevGuideAccountIDs = usePrevious(guideAccountIDs);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const reportAttributes = useReportAttributes();
+    const reportAttributesUpdates = useCollectionDelta(reportAttributes);
     const [currentReportsToDisplay, setCurrentReportsToDisplay] = useState<ReportsToDisplayInLHN>({});
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isOffline} = useNetwork();
@@ -166,6 +167,14 @@ function SidebarOrderedReportsContextProvider({
                 reportsToUpdate.add(key);
             }
         }
+        // The derived report attributes are computed after the report data they come from, so a report can be
+        // checked with stale attributes (e.g. a new DM from a first expense that looks empty and doesn't need attention yet).
+        // Re-check reports whose attributes changed so they aren't left out until the next full rebuild.
+        if (reportAttributesUpdates) {
+            for (const reportID of Object.keys(reportAttributesUpdates)) {
+                reportsToUpdate.add(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
+            }
+        }
         if (reportsDraftsUpdates) {
             for (const key of Object.keys(reportsDraftsUpdates).map((draftKey) => draftKey.replace(ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT, ONYXKEYS.COLLECTION.REPORT))) {
                 reportsToUpdate.add(key);
@@ -198,6 +207,7 @@ function SidebarOrderedReportsContextProvider({
         reportNameValuePairsUpdates,
         transactionsUpdates,
         transactionViolationsUpdates,
+        reportAttributesUpdates,
         reportsDraftsUpdates,
         policiesUpdates,
         chatReports,
