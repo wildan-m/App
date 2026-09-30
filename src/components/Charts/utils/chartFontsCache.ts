@@ -10,6 +10,8 @@ import {Image} from 'react-native';
 
 import buildSkiaFontManager from './buildSkiaFontManager';
 import {CHART_FONT_MGR_SUPPLEMENTAL_ASSETS, CHART_SKIA_TYPEFACE_ASSETS} from './chartFontAssets';
+import getChartSystemFallbackTypefaces from './getChartSystemFallbackTypefaces';
+import getSkiaReadableChartFontUri from './getSkiaReadableChartFontUri';
 import hasAnyLoadedChartTypeface from './hasAnyLoadedChartTypeface';
 import loadChartTypefacesFromAssets from './loadChartTypefacesFromAssets';
 import logChartFontLoadError from './logChartFontLoadError';
@@ -50,7 +52,7 @@ function resolveChartFontAsset(source: DataModule | string): string {
 }
 
 async function loadTypefaceFromAsset(source: DataModule | string): Promise<SkTypeface | null> {
-    const uri = resolveChartFontAsset(source);
+    const uri = await getSkiaReadableChartFontUri(source, resolveChartFontAsset(source));
     const data = await Skia.Data.fromURI(uri);
 
     return Skia.Typeface.MakeFreeTypeFaceFromData(data);
@@ -60,8 +62,10 @@ async function loadChartSkiaTypefaces(): Promise<ChartDefaultTypeface> {
     return loadChartTypefacesFromAssets(CHART_SKIA_TYPEFACE_ASSETS, async (source) => loadTypefaceFromAsset(source), logChartFontLoadError);
 }
 
-async function buildChartFontsValue(typefaces: ChartDefaultTypeface): Promise<ChartFontsValue> {
-    if (!hasAnyLoadedChartTypeface(typefaces)) {
+async function buildChartFontsValue(loadedTypefaces: ChartDefaultTypeface): Promise<ChartFontsValue> {
+    const typefaces = hasAnyLoadedChartTypeface(loadedTypefaces) ? loadedTypefaces : getChartSystemFallbackTypefaces();
+
+    if (!typefaces) {
         return EMPTY_CHART_FONTS;
     }
 
