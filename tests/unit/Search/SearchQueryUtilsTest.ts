@@ -849,6 +849,34 @@ describe('SearchQueryUtils', () => {
             expect(result).toEqual('type:expense withdrawalStatus:pending,cleared,failed');
         });
 
+        test('with multi-value withdrawal status filter on reports', () => {
+            // Given a reports search filtered by several withdrawal statuses, which the backend now supports for type:expense-report
+            const filterValues: Partial<SearchAdvancedFiltersForm> = {
+                type: 'expense-report',
+                withdrawalStatus: [CONST.SEARCH.SETTLEMENT_STATUS.PENDING, CONST.SEARCH.SETTLEMENT_STATUS.CLEARED, CONST.SEARCH.SETTLEMENT_STATUS.NEVER],
+            };
+
+            // When the query string is built from the filter form values
+            const result = buildQueryStringFromFilterFormValues(filterValues);
+
+            // Then the withdrawal status filter is kept for reports exactly like it is for expenses
+            expect(result).toEqual('type:expense-report withdrawalStatus:pending,cleared,never');
+        });
+
+        test('with negated withdrawal status filter on reports', () => {
+            // Given a reports search excluding a withdrawal status
+            const filterValues: Partial<SearchAdvancedFiltersForm> = {
+                type: 'expense-report',
+                withdrawalStatusNot: [CONST.SEARCH.SETTLEMENT_STATUS.FAILED],
+            };
+
+            // When the query string is built from the filter form values
+            const result = buildQueryStringFromFilterFormValues(filterValues);
+
+            // Then the negated withdrawal status filter is kept for reports
+            expect(result).toEqual('type:expense-report -withdrawalStatus:failed');
+        });
+
         test('with single paid status filter', () => {
             const filterValues: Partial<SearchAdvancedFiltersForm> = {
                 type: 'expense-report',
@@ -1574,6 +1602,40 @@ describe('SearchQueryUtils', () => {
                 type: 'expense',
                 withdrawalStatus: [CONST.SEARCH.SETTLEMENT_STATUS.PENDING, CONST.SEARCH.SETTLEMENT_STATUS.FAILED],
             });
+        });
+
+        test('withdrawal status filter on reports parses valid values and drops invalid ones', () => {
+            // Given a reports query filtered by withdrawal status, including one invalid value
+            const queryJSON = buildSearchQueryJSON('sortBy:date sortOrder:desc type:expense-report withdrawal-status:pending,INVALID,never');
+
+            if (!queryJSON) {
+                throw new Error('Failed to parse query string');
+            }
+
+            // When the query is converted back into filter form values
+            const result = buildFilterFormValuesFromQuery(queryJSON, {}, {}, {}, {}, {}, {});
+
+            // Then the valid withdrawal statuses survive for reports and the invalid one is dropped
+            expect(result).toEqual({
+                type: 'expense-report',
+                withdrawalStatus: [CONST.SEARCH.SETTLEMENT_STATUS.PENDING, CONST.SEARCH.SETTLEMENT_STATUS.NEVER],
+            });
+        });
+
+        test('negated withdrawal status filter on reports populates withdrawalStatusNot', () => {
+            // Given a reports query excluding a withdrawal status via the "-" prefix
+            const queryJSON = buildSearchQueryJSON('sortBy:date sortOrder:desc type:expense-report -withdrawal-status:failed');
+
+            if (!queryJSON) {
+                throw new Error('Failed to parse query string');
+            }
+
+            // When the query is converted back into filter form values
+            const result = buildFilterFormValuesFromQuery(queryJSON, {}, {}, {}, {}, {}, {});
+
+            // Then the negated value round-trips to withdrawalStatusNot rather than being treated as a positive filter
+            expect(result.withdrawalStatusNot).toEqual([CONST.SEARCH.SETTLEMENT_STATUS.FAILED]);
+            expect(result.withdrawalStatus).toBeUndefined();
         });
 
         test('paid status filter parses valid values and drops invalid ones', () => {
