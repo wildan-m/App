@@ -34,8 +34,9 @@ import type {InsightsDashboardChart, InsightsDashboardState} from './resolveDash
 
 import InsightsChartWidget from './charts/InsightsChartWidget';
 import InsightsPageControls from './controls/InsightsPageControls';
-import INSIGHTS_DASHBOARD_SPECS, {getVisibleCharts} from './dashboardSpecs';
+import INSIGHTS_DASHBOARD_SPECS, {getAccessibleDashboards, getVisibleCharts} from './dashboardSpecs';
 import buildInsightsJsonQuery from './insightsQueries';
+import InsightsTabSelector from './InsightsTabSelector';
 import {getDashboardState, INSIGHTS_DASHBOARD_STATE} from './resolveDashboardState';
 import InsightsEmptyState from './states/InsightsEmptyState';
 import InsightsNoExpensesState from './states/InsightsNoExpensesState';
@@ -204,6 +205,7 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
     }));
     const [headlineChart, ...supportingCharts] = charts;
     const state = getDashboardState(dashboard, isOffline, charts);
+    const accessibleDashboardIDs = getAccessibleDashboards(policies, filters.policyIDs, login, isBetaEnabled);
 
     return (
         <ScreenWrapper
@@ -216,6 +218,12 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
                 breadcrumbLabel={translate('common.insights')}
                 shouldDisplayHelpButton
             />
+            {accessibleDashboardIDs.length > 1 && (
+                <InsightsTabSelector
+                    activeDashboardID={dashboardID}
+                    dashboardIDs={accessibleDashboardIDs}
+                />
+            )}
             {state !== INSIGHTS_DASHBOARD_STATE.NO_EXPENSES && (
                 <InsightsPageControls
                     filters={filters}

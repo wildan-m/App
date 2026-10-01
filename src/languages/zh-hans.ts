@@ -1113,6 +1113,9 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     insightsPage: {
         viewOnSpend: '在支出中查看',
+        dashboards: {
+            compliance: '合规',
+        },
         emptyState: {title: '没有可显示的内容', subtitle: '请尝试调整上面的条件'},
         noExpensesState: {title: '查看你的资金流向', subtitle: '添加报销后，您就能查看消费趋势、主要商家等更多信息。'},
         compare: {label: '比较', previousPeriod: '上一期', average: '平均'},
