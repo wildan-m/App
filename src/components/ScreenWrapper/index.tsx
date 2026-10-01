@@ -201,13 +201,30 @@ function ScreenWrapper({
     const route = useContext(NavigationRouteContext ?? FallbackRouteContext);
     const isMfaOverlayScreen = !!route && MFA_OVERLAY_SCREENS.has(route.name);
 
-    usePreventRemove(isSingleNewDotEntry && initialURLMatchesActiveRoute && !shouldBlockSingleEntryOldAppExit && !isMfaOverlayScreen, () => {
+    // initialURLMatchesActiveRoute reflects the global active route, so without isFocused every mounted ScreenWrapper (including screens below the top one) would be guarded.
+    const shouldGuardSingleEntryExit = isSingleNewDotEntry && isFocused && initialURLMatchesActiveRoute && !shouldBlockSingleEntryOldAppExit && !isMfaOverlayScreen;
+
+    usePreventRemove(shouldGuardSingleEntryExit, () => {
         if (!CONFIG.IS_HYBRID_APP) {
             return;
         }
 
         closeReactNativeApp({shouldSetNVP: false, isTrackingGPS: false});
     });
+
+    // usePreventRemove makes native-stack set preventNativeDismiss on iOS, so a native swipe back is started by UIKit, cancelled and the screen is re-pushed by
+    // react-native-screens. Re-pushing a screen that UIKit is still unwinding crashes with "pushing the same view controller instance more than once".
+    // Disable the native swipe while the guard is active so leaving the single entry always goes through the JS back path, which never touches the native stack.
+    useEffect(() => {
+        if (!shouldGuardSingleEntryExit) {
+            return;
+        }
+
+        navigation.setOptions({gestureEnabled: false});
+        return () => {
+            navigation.setOptions({gestureEnabled: true});
+        };
+    }, [navigation, shouldGuardSingleEntryExit]);
 
     useAccessibilityFocus({didScreenTransitionEnd, isFocused, ref: screenWrapperRef, shouldMoveAccessibilityFocus});
 
