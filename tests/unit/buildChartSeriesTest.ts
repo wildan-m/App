@@ -163,6 +163,46 @@ describe('buildChartSeries', () => {
         expect(rows.every((row) => row.point.percentOfTotal === undefined)).toBe(true);
     });
 
+    it('plots the number of expenses for a count chart, without scaling it as an amount', () => {
+        // Given merchant groups whose counts differ from their totals
+        const data = [merchantGroup('Person', 480000, 12, 72), merchantGroup('Target', 190000, 41, 28)];
+
+        // When the series is built for a count chart
+        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.BAR, getLabel, getCurrencyDecimals, metric: CONST.SEARCH.CHART_METRIC.COUNT});
+
+        // Then each point is the group's expense count as is, because a count has no currency minor units to scale down
+        expect(rows.map((row) => row.point.total)).toEqual([12, 41]);
+
+        // And no share is quoted, because the search only reports each group's share of the total amount
+        expect(rows.every((row) => row.point.percentOfTotal === undefined)).toBe(true);
+    });
+
+    it('keeps plotting amounts when a chart declares the amount metric', () => {
+        // Given merchant groups returned by the search
+        const data = [merchantGroup('Person', 480000, 12, 72), merchantGroup('Target', 190000, 41, 28)];
+
+        // When the series is built with the metric spelled out and with it left out
+        const explicit = buildChartSeries({data, view: CONST.SEARCH.VIEW.BAR, getLabel, getCurrencyDecimals, metric: CONST.SEARCH.CHART_METRIC.AMOUNT});
+        const implicit = buildChartSeries({data, view: CONST.SEARCH.VIEW.BAR, getLabel, getCurrencyDecimals});
+
+        // Then both plot the scaled totals with their shares, so Search, Home and Spend charts keep their amounts
+        expect(explicit.map((row) => row.point)).toEqual(implicit.map((row) => row.point));
+        expect(explicit.map((row) => row.point.total)).toEqual([4800, 1900]);
+        expect(explicit.map((row) => row.point.percentOfTotal)).toEqual([72, 28]);
+    });
+
+    it('ranks pie colors by count for a count chart', () => {
+        // Given a group with the larger amount but fewer expenses
+        const data = [merchantGroup('Person', 480000, 2), merchantGroup('Target', 190000, 41)];
+
+        // When the series is built for a count pie
+        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.PIE, getLabel, getCurrencyDecimals, metric: CONST.SEARCH.CHART_METRIC.COUNT});
+
+        // Then the group with more expenses takes the first palette color, because the donut sizes slices by count
+        expect(rows.at(1)?.color).toBe(VictoryTheme.colors.getColor(0));
+        expect(rows.at(0)?.color).toBe(VictoryTheme.colors.getColor(1));
+    });
+
     it('returns nothing to plot for an empty result set', () => {
         // Given a search that matched no transactions
         const data: GroupedItem[] = [];

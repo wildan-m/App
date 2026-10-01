@@ -1,6 +1,6 @@
 import UserAvatar from '@components/Avatar/UserAvatar';
 import type {TransactionCardGroupListItemType, TransactionMemberGroupListItemType} from '@components/Search/SearchList/ListItem/types';
-import type {ChartView, GroupedItem, SearchChartDataRow, SearchGroupBy} from '@components/Search/types';
+import type {ChartView, GroupedItem, SearchChartDataRow, SearchChartMetric, SearchGroupBy} from '@components/Search/types';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
 
@@ -32,6 +32,9 @@ type InsightsDataTableProps = {
     /** The dimension the rows are grouped by */
     groupBy: SearchGroupBy;
 
+    /** What the chart plots for each row, so the table shows the same value. Defaults to the group's amount. */
+    metric?: SearchChartMetric;
+
     isLoading?: boolean;
 };
 
@@ -44,10 +47,10 @@ function isMemberGroup(item: GroupedItem): item is TransactionMemberGroupListIte
     return isMemberGroupBy(item.groupedBy);
 }
 
-function InsightsDataTable({rows, view, groupBy, isLoading}: InsightsDataTableProps) {
+function InsightsDataTable({rows, view, groupBy, metric = CONST.SEARCH.CHART_METRIC.AMOUNT, isLoading}: InsightsDataTableProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const {translate, preferredLocale} = useLocalize();
+    const {translate, numberFormat, preferredLocale} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
@@ -99,7 +102,7 @@ function InsightsDataTable({rows, view, groupBy, isLoading}: InsightsDataTablePr
                             />
                         </View>
                         <View style={[styles.flexColumn, styles.alignItemsEnd, styles.gap1, styles.alignSelfStretch]}>
-                            <Text>{convertToDisplayString(item.total ?? 0, item.currency)}</Text>
+                            <Text>{metric === CONST.SEARCH.CHART_METRIC.COUNT ? numberFormat(point.total) : convertToDisplayString(item.total ?? 0, item.currency)}</Text>
                             {point.percentOfTotal !== undefined && (
                                 <Text style={styles.mutedNormalTextLabel}>
                                     {translate('search.percentOfSpend', {percent: formatPercentOfTotal(point.percentOfTotal, item.total ?? 0, preferredLocale)})}

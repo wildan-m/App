@@ -1,6 +1,6 @@
 /** Declares the charts each Insights dashboard renders and how they map to backend graph slots and search views. */
 
-import type {ChartView, SearchGroupBy} from '@components/Search/types';
+import type {ChartView, SearchChartMetric, SearchGroupBy} from '@components/Search/types';
 
 import {isPolicyEligibleForTopCategories, isPolicyEligibleForTopSpenders} from '@libs/SearchUIUtils';
 
@@ -26,6 +26,9 @@ type InsightsChartSpec = {
 
     /** Color every bar is drawn in. Only a bar chart reads it. */
     color?: string;
+
+    /** What each group is plotted by, left out by charts that plot the group's amount */
+    metric?: SearchChartMetric;
 
     /** The chart is shown when any workspace in scope passes this. A chart that declares none is always shown. */
     isPolicyEligible?: (policy: Policy, login: string | undefined) => boolean;

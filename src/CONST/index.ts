@@ -8035,6 +8035,11 @@ const CONST = {
             PREVIOUS_PERIOD: 'previousPeriod',
             AVERAGE: 'average',
         },
+        // What a chart plots for each group: the summed amount, or the number of expenses
+        CHART_METRIC: {
+            AMOUNT: 'amount',
+            COUNT: 'count',
+        },
         SYNTAX_FILTER_KEYS: {
             TYPE: 'type',
             STATUS: 'status',

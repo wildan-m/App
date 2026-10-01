@@ -15,7 +15,7 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import React from 'react';
 import {View} from 'react-native';
 
-import type {ChartView, GroupedItem, SearchChartDataRow, SearchGroupBy, SearchQueryJSON} from './types';
+import type {ChartView, GroupedItem, SearchChartDataRow, SearchChartMetric, SearchGroupBy, SearchQueryJSON} from './types';
 
 import {buildChartSeries} from './buildChartSeries';
 import {buildChartDrillDownQuery} from './chartDrillDown';
@@ -39,6 +39,9 @@ type SearchChartViewProps = {
     /** Color every bar is drawn in. Only a bar chart reads it. */
     color?: string;
 
+    /** What each group is plotted by. Defaults to the group's amount. */
+    metric?: SearchChartMetric;
+
     /** Renders the details of the plotted groups below the chart */
     renderDetails?: (rows: SearchChartDataRow[]) => React.ReactNode;
 
@@ -50,14 +53,14 @@ type SearchChartViewProps = {
  * Layer 3 component - dispatches to the appropriate chart type based on view parameter
  * and handles navigation/drill-down logic
  */
-function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, renderDetails, chartContainerStyle}: SearchChartViewProps) {
+function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, metric = CONST.SEARCH.CHART_METRIC.AMOUNT, renderDetails, chartContainerStyle}: SearchChartViewProps) {
     const {preferredLocale} = useLocalize();
     const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyListActions();
     const {currentSearchKey} = useSearchQueryContext();
 
     const {getLabel, getShortLabel, getFilterQuery} = CHART_GROUP_BY_CONFIG[groupBy];
 
-    const rows = buildChartSeries({data, view, getLabel, getShortLabel, getCurrencyDecimals, color});
+    const rows = buildChartSeries({data, view, getLabel, getShortLabel, getCurrencyDecimals, metric, color});
     const points = rows.map((row) => row.point);
 
     const handleItemPress = (index: number) => {
@@ -80,7 +83,10 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, rend
     const currencyIndex = parts.findIndex((p) => p.type === 'currency');
     const integerIndex = parts.findIndex((p) => p.type === 'integer');
     const intlSymbol = parts.find((p) => p.type === 'currency')?.value;
-    const unit = {value: getCurrencySymbol(currency) ?? intlSymbol ?? currency, fallback: intlSymbol ?? currency};
+    const currencyUnit = {value: getCurrencySymbol(currency) ?? intlSymbol ?? currency, fallback: intlSymbol ?? currency};
+
+    // Counts are formatted as plain numbers, so every label, total and tooltip drops the currency symbol
+    const unit = metric === CONST.SEARCH.CHART_METRIC.COUNT ? undefined : currencyUnit;
     const unitPosition = currencyIndex < integerIndex ? 'left' : 'right';
 
     const CHART_VIEW_TO_CHART: Record<ChartView, React.ReactNode> = {
@@ -108,7 +114,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, rend
                 data={points}
                 isLoading={isLoading}
                 onSlicePress={(dataPoint, index) => handleItemPress(index)}
-                valueUnit={unit.value}
+                valueUnit={unit?.value}
                 valueUnitPosition={unitPosition}
                 shouldShowLegend={!renderDetails}
             />
