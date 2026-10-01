@@ -387,17 +387,59 @@ function getBadgeFromIOUReport(
 }
 
 /**
- * Determines if a p2p IOU can be paid by the current user using only the REPORTPREVIEW action's
- * child* fields, without requiring the full IOU report to be loaded in Onyx. This is used as a
- * fallback when the IOU report hasn't been fetched yet (e.g. right after login).
+ * Derives the action badge for a REPORTPREVIEW action using only its child* fields, without requiring the
+ * child IOU/expense report to be loaded in Onyx. This is used as a fallback when the child report hasn't been
+ * fetched yet (e.g. right after login), so the LHN row shows the same badge it would show once the report is opened.
  */
-function canPayIOUFromReportAction(action: ReportAction, chatReport: OnyxEntry<OnyxTypes.Report>, currentUserAccountID: number): boolean {
-    return (
-        action.childType === CONST.REPORT.TYPE.IOU &&
-        action.childReportID === chatReport?.iouReportID &&
-        action.childManagerAccountID === currentUserAccountID &&
-        action.childStatusNum !== CONST.REPORT.STATUS_NUM.REIMBURSED
-    );
+function getBadgeFromReportPreviewAction(
+    action: ReportAction,
+    chatReport: OnyxEntry<OnyxTypes.Report>,
+    policy: OnyxEntry<OnyxTypes.Policy>,
+    currentUserLogin: string,
+    currentUserAccountID: number,
+): ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined {
+    if (!action.childReportID || action.childStatusNum === CONST.REPORT.STATUS_NUM.REIMBURSED) {
+        return undefined;
+    }
+
+    if (action.childType === CONST.REPORT.TYPE.IOU) {
+        const canPayIOU = action.childReportID === chatReport?.iouReportID && action.childManagerAccountID === currentUserAccountID;
+        return canPayIOU ? CONST.REPORT.ACTION_BADGE.PAY : undefined;
+    }
+
+    if (action.childType !== CONST.REPORT.TYPE.EXPENSE || isArchivedOrPendingDeletePolicy(policy)) {
+        return undefined;
+    }
+
+    if (action.childStatusNum === CONST.REPORT.STATUS_NUM.OPEN) {
+        return action.childOwnerAccountID === currentUserAccountID ? CONST.REPORT.ACTION_BADGE.SUBMIT : undefined;
+    }
+
+    const isApprovalEnabled = !!policy?.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL;
+    const isAwaitingApproval = action.childStatusNum === CONST.REPORT.STATUS_NUM.SUBMITTED && isApprovalEnabled;
+    if (isAwaitingApproval) {
+        const canApprove =
+            action.childManagerAccountID === currentUserAccountID &&
+            (isPaidGroupPolicy(policy) || isSubmitPolicy(policy)) &&
+            !isSubmitterApproveBlockedOnSubmitWorkspace(policy, action.childOwnerAccountID, currentUserAccountID);
+        return canApprove ? CONST.REPORT.ACTION_BADGE.APPROVE : undefined;
+    }
+
+    // A report submitted on a workspace without approvals is ready to be paid, same as an approved one.
+    const isAwaitingPayment = action.childStatusNum === CONST.REPORT.STATUS_NUM.APPROVED || action.childStatusNum === CONST.REPORT.STATUS_NUM.SUBMITTED;
+    if (!isAwaitingPayment || !isPaidGroupPolicy(policy)) {
+        return undefined;
+    }
+    const childReport: OnyxTypes.Report = {
+        reportID: action.childReportID,
+        type: CONST.REPORT.TYPE.EXPENSE,
+        policyID: policy?.id,
+        managerID: action.childManagerAccountID,
+        ownerAccountID: action.childOwnerAccountID,
+        stateNum: action.childStateNum,
+        statusNum: action.childStatusNum,
+    };
+    return isPayerReportUtils(currentUserAccountID, currentUserLogin, childReport, undefined, policy, false) ? CONST.REPORT.ACTION_BADGE.PAY : undefined;
 }
 
 function getIOUReportActionWithBadge(
@@ -416,11 +458,13 @@ function getIOUReportActionWithBadge(
 } {
     let actionBadge: ValueOf<typeof CONST.REPORT.ACTION_BADGE> | undefined;
     let earliestAction: ReportAction | undefined;
+    let hasReportPreviewAction = false;
 
     for (const action of Object.values(chatReportActions ?? {})) {
         if (action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW || isDeletedAction(action)) {
             continue;
         }
+        hasReportPreviewAction = true;
         // Prefer the report from the fresh `allReports` snapshot (when supplied by the reportAttributes derived value)
         // over the module-level Onyx cache, which can be stale mid-recompute and surface a deleted report's badge.
         const iouReport = getReportOrDraftReport(action.childReportID, undefined, undefined, undefined, allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${action.childReportID}`]);
@@ -432,13 +476,12 @@ function getIOUReportActionWithBadge(
         }
 
         if (!iouReport) {
-            // Fallback for p2p IOUs when the IOU report isn't loaded in Onyx yet (e.g. right after login).
-            // Use the REPORTPREVIEW action's child* fields to determine PAY badge without the full report.
-            if (chatReport?.hasOutstandingChildRequest && canPayIOUFromReportAction(action, chatReport, currentUserAccountID)) {
-                if (!earliestAction || isOlderReportAction(action, earliestAction)) {
-                    earliestAction = action;
-                    actionBadge = CONST.REPORT.ACTION_BADGE.PAY;
-                }
+            // Fallback when the child report isn't loaded in Onyx yet (e.g. right after login).
+            // Use the REPORTPREVIEW action's child* fields to determine the badge without the full report.
+            const previewBadge = chatReport?.hasOutstandingChildRequest ? getBadgeFromReportPreviewAction(action, chatReport, policy, currentUserLogin, currentUserAccountID) : undefined;
+            if (previewBadge && (!earliestAction || isOlderReportAction(action, earliestAction))) {
+                earliestAction = action;
+                actionBadge = previewBadge;
             }
             continue;
         }
@@ -455,6 +498,16 @@ function getIOUReportActionWithBadge(
         if (!earliestAction || isOlderReportAction(action, earliestAction)) {
             earliestAction = action;
             actionBadge = badge;
+        }
+    }
+
+    // The chat's report actions haven't been fetched yet (it was never opened), so there is no REPORTPREVIEW to read.
+    // Fall back to the outstanding child report the chat points to, so the badge doesn't depend on the actions being loaded.
+    if (!hasReportPreviewAction && chatReport?.hasOutstandingChildRequest && chatReport.iouReportID) {
+        const iouReport = getReportOrDraftReport(chatReport.iouReportID, undefined, undefined, undefined, allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReport.iouReportID}`]);
+        if (iouReport && !isReportPendingDelete(iouReport)) {
+            const iouReportActions = allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`];
+            actionBadge = getBadgeFromIOUReport(iouReport, chatReport, policy, reportMetadata, invoiceReceiverPolicy, currentUserLogin, currentUserAccountID, iouReportActions);
         }
     }
 

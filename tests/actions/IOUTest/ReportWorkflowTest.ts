@@ -5751,6 +5751,202 @@ describe('actions/IOU/ReportWorkflow', () => {
             expect(result.reportAction).toBeUndefined();
             expect(result.actionBadge).toBeUndefined();
         });
+
+        it('should return APPROVE badge for a workspace expense preview when the expense report is not loaded in Onyx', async () => {
+            // Given a workspace chat with an outstanding submitted expense report awaiting the current user's approval,
+            // whose expense report hasn't been loaded yet (e.g. right after login) so only its REPORTPREVIEW is known
+            const chatReportID = '830';
+            const expenseReportID = '831';
+            const policyID = '832';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+            };
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+                iouReportID: expenseReportID,
+                hasOutstandingChildRequest: true,
+            };
+            const reportPreviewAction = {
+                reportActionID: '833',
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                created: '2024-08-08 19:00:00.000',
+                childReportID: expenseReportID,
+                childType: CONST.REPORT.TYPE.EXPENSE,
+                childManagerAccountID: RORY_ACCOUNT_ID,
+                childOwnerAccountID: CARLOS_ACCOUNT_ID,
+                childStateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                childStatusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                message: [{type: 'TEXT', text: 'Expense preview'}],
+            };
+            const mockChatReportActions = {
+                [reportPreviewAction.reportActionID]: reportPreviewAction,
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, mockChatReportActions);
+            await waitForBatchedUpdates();
+
+            // When the badge is derived for the chat
+            const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined, RORY_EMAIL, RORY_ACCOUNT_ID, mockChatReportActions);
+
+            // Then the row shows the APPROVE badge instead of falling back to a bare green dot
+            expect(result.reportAction).toMatchObject(reportPreviewAction);
+            expect(result.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.APPROVE);
+        });
+
+        it('should return SUBMIT badge for an open expense preview owned by the current user when the expense report is not loaded in Onyx', async () => {
+            // Given a workspace chat with an outstanding open expense report owned by the current user, whose expense
+            // report hasn't been loaded yet so only its REPORTPREVIEW is known
+            const chatReportID = '840';
+            const expenseReportID = '841';
+            const policyID = '842';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+            };
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+                iouReportID: expenseReportID,
+                hasOutstandingChildRequest: true,
+            };
+            const reportPreviewAction = {
+                reportActionID: '843',
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                created: '2024-08-08 19:00:00.000',
+                childReportID: expenseReportID,
+                childType: CONST.REPORT.TYPE.EXPENSE,
+                childManagerAccountID: CARLOS_ACCOUNT_ID,
+                childOwnerAccountID: RORY_ACCOUNT_ID,
+                childStateNum: CONST.REPORT.STATE_NUM.OPEN,
+                childStatusNum: CONST.REPORT.STATUS_NUM.OPEN,
+                message: [{type: 'TEXT', text: 'Expense preview'}],
+            };
+            const mockChatReportActions = {
+                [reportPreviewAction.reportActionID]: reportPreviewAction,
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, mockChatReportActions);
+            await waitForBatchedUpdates();
+
+            // When the badge is derived for the chat
+            const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined, RORY_EMAIL, RORY_ACCOUNT_ID, mockChatReportActions);
+
+            // Then the row shows the SUBMIT badge instead of falling back to a bare green dot
+            expect(result.reportAction).toMatchObject(reportPreviewAction);
+            expect(result.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.SUBMIT);
+        });
+
+        it('should return PAY badge for an approved expense preview when the current user is the payer and the expense report is not loaded in Onyx', async () => {
+            // Given a workspace chat with an outstanding approved expense report that the current user (the workspace
+            // admin and reimburser) has to pay, whose expense report hasn't been loaded yet
+            const chatReportID = '850';
+            const expenseReportID = '851';
+            const policyID = '852';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+                role: CONST.POLICY.ROLE.ADMIN,
+                owner: RORY_EMAIL,
+                reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_MANUAL,
+            };
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+                iouReportID: expenseReportID,
+                hasOutstandingChildRequest: true,
+            };
+            const reportPreviewAction = {
+                reportActionID: '853',
+                actionName: CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW,
+                created: '2024-08-08 19:00:00.000',
+                childReportID: expenseReportID,
+                childType: CONST.REPORT.TYPE.EXPENSE,
+                childManagerAccountID: RORY_ACCOUNT_ID,
+                childOwnerAccountID: CARLOS_ACCOUNT_ID,
+                childStateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                childStatusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+                message: [{type: 'TEXT', text: 'Expense preview'}],
+            };
+            const mockChatReportActions = {
+                [reportPreviewAction.reportActionID]: reportPreviewAction,
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${chatReportID}`, mockChatReportActions);
+            await waitForBatchedUpdates();
+
+            // When the badge is derived for the chat
+            const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined, RORY_EMAIL, RORY_ACCOUNT_ID, mockChatReportActions);
+
+            // Then the row shows the PAY badge instead of falling back to a bare green dot
+            expect(result.reportAction).toMatchObject(reportPreviewAction);
+            expect(result.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.PAY);
+        });
+
+        it('should derive the badge from the chat iouReportID when no REPORTPREVIEW action is loaded', async () => {
+            // Given a workspace chat that was never opened, so none of its report actions are loaded, while its
+            // outstanding expense report (awaiting the current user's approval) is already in Onyx
+            const chatReportID = '860';
+            const expenseReportID = '861';
+            const policyID = '862';
+
+            const fakePolicy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                type: CONST.POLICY.TYPE.TEAM,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.BASIC,
+            };
+            const fakeChatReport: Report = {
+                ...createRandomReport(Number(chatReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: chatReportID,
+                policyID,
+                iouReportID: expenseReportID,
+                hasOutstandingChildRequest: true,
+            };
+            const fakeExpenseReport: Report = {
+                ...createRandomReport(Number(expenseReportID), CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT),
+                reportID: expenseReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID,
+                stateNum: CONST.REPORT.STATE_NUM.SUBMITTED,
+                statusNum: CONST.REPORT.STATUS_NUM.SUBMITTED,
+                managerID: RORY_ACCOUNT_ID,
+            };
+            const fakeTransaction: Transaction = {
+                ...createRandomTransaction(0),
+                reportID: expenseReportID,
+                amount: 100,
+                status: CONST.TRANSACTION.STATUS.POSTED,
+                bank: '',
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`, fakeChatReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${expenseReportID}`, fakeExpenseReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${fakeTransaction.transactionID}`, fakeTransaction);
+            await waitForBatchedUpdates();
+
+            // When the badge is derived for the chat with no report actions
+            const result = getIOUReportActionWithBadge(fakeChatReport, fakePolicy, {}, undefined, RORY_EMAIL, RORY_ACCOUNT_ID, {});
+
+            // Then the badge comes from the outstanding expense report instead of falling back to a bare green dot
+            expect(result.actionBadge).toBe(CONST.REPORT.ACTION_BADGE.APPROVE);
+        });
     });
 
     describe('getBadgeFromIOUReport', () => {
