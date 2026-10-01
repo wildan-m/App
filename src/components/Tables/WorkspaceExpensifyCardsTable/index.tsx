@@ -51,6 +51,19 @@ type WorkspaceExpensifyCardTableRowData = TableData & {
     frozenDate?: string;
     errors?: OnyxCommon.Errors;
     pendingAction?: OnyxCommon.PendingAction;
+
+    /** The fund the card belongs to, used to save inline edits */
+    fundID: number;
+
+    /** Whether the card name, limit and limit type can be edited inline */
+    canEdit: boolean;
+
+    /** Limit type to fall back to when the card has none set */
+    defaultLimitType: CardLimitType;
+
+    /** Whether the workspace has approvals configured, which the Smart limit type needs */
+    areApprovalsConfigured: boolean;
+
     action: () => void;
     onClose: () => void;
 };
@@ -267,6 +280,7 @@ export default function WorkspaceExpensifyCardsTable({
     const renderCardItem = ({item, index}: ListRenderItemInfo<WorkspaceExpensifyCardTableRowData>) => (
         <WorkspaceExpensifyCardsTableRow
             item={item}
+            policyID={policyID}
             rowIndex={index}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
             shouldShowExportAccountColumn={shouldShowExportAccountColumn}

@@ -3,6 +3,7 @@ import Icon from '@components/Icon';
 import {useSession} from '@components/OnyxListItemProvider';
 import Table from '@components/Table';
 import {getCellAccessibilityProps, shouldUseTableSemantics} from '@components/Table/tableAccessibility';
+import EditableCardNameCell from '@components/Tables/EditableCardNameCell';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
 
@@ -11,6 +12,7 @@ import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {updateExpensifyCardTitle} from '@libs/actions/Card';
 import {getTranslationKeyForCardStatus, getTranslationKeyForLimitType} from '@libs/CardUtils';
 import {convertToShortDisplayString} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
@@ -25,8 +27,15 @@ import {View} from 'react-native';
 
 import type {WorkspaceExpensifyCardTableRowData} from '.';
 
+import ExpensifyCardLimitCell from './ExpensifyCardLimitCell';
+import ExpensifyCardLimitTypeCell from './ExpensifyCardLimitTypeCell';
+
 type WorkspaceExpensifyCardsTableRowProps = {
     item: WorkspaceExpensifyCardTableRowData;
+
+    /** The workspace the card feed belongs to */
+    policyID: string;
+
     rowIndex: number;
     shouldUseNarrowTableLayout: boolean;
 
@@ -34,7 +43,7 @@ type WorkspaceExpensifyCardsTableRowProps = {
     shouldShowExportAccountColumn: boolean;
 };
 
-export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldUseNarrowTableLayout, shouldShowExportAccountColumn}: WorkspaceExpensifyCardsTableRowProps) {
+export default function WorkspaceExpensifyCardsTableRow({item, policyID, rowIndex, shouldUseNarrowTableLayout, shouldShowExportAccountColumn}: WorkspaceExpensifyCardsTableRowProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FreezeCard']);
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
@@ -137,11 +146,12 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
                                     style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3]}
                                 />
                             ) : (
-                                <TextWithTooltip
-                                    shouldShowTooltip
-                                    numberOfLines={1}
-                                    text={item.name}
-                                    style={styles.textLabelSupporting}
+                                <EditableCardNameCell
+                                    name={item.name}
+                                    accessibilityLabel={translate('workspace.card.issueNewCard.cardName')}
+                                    textStyle={styles.textLabelSupporting}
+                                    canEdit={item.canEdit}
+                                    onSave={(newName) => updateExpensifyCardTitle(item.fundID, item.cardID, newName, item.name)}
                                 />
                             )}
                         </View>
@@ -165,10 +175,15 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
                             style={[styles.flex1, styles.mnw0, styles.flexRow, styles.alignItemsCenter]}
                             {...getCellAccessibilityProps(isTableSemanticsEnabled)}
                         >
-                            <TextWithTooltip
-                                shouldShowTooltip
-                                numberOfLines={1}
-                                text={limitTypeLabel}
+                            <ExpensifyCardLimitTypeCell
+                                card={item.card}
+                                policyID={policyID}
+                                fundID={item.fundID}
+                                defaultLimitType={item.defaultLimitType}
+                                areApprovalsConfigured={item.areApprovalsConfigured}
+                                cardholderTimeZone={item.cardholder?.timezone?.selected}
+                                currency={item.currency}
+                                canEdit={item.canEdit}
                             />
                         </View>
                     )}
@@ -221,10 +236,11 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
                         ]}
                         {...getCellAccessibilityProps(isTableSemanticsEnabled)}
                     >
-                        <TextWithTooltip
-                            shouldShowTooltip
-                            numberOfLines={1}
-                            text={formattedLimit}
+                        <ExpensifyCardLimitCell
+                            card={item.card}
+                            fundID={item.fundID}
+                            currency={item.currency}
+                            canEdit={item.canEdit}
                         />
                         {shouldUseNarrowTableLayout && (
                             <Text

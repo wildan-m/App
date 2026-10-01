@@ -4,6 +4,7 @@ import type {OfflineWithFeedbackProps} from '@components/OfflineWithFeedback';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
+import {useEditingCellState} from '@components/TransactionItemRow/EditableCell';
 
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
 import useLocalize from '@hooks/useLocalize';
@@ -19,7 +20,7 @@ import CONST from '@src/CONST';
 
 import type {GestureResponderEvent, PressableStateCallbackType, ViewStyle} from 'react-native';
 
-import React from 'react';
+import React, {useRef} from 'react';
 import {View} from 'react-native';
 import Animated from 'react-native-reanimated';
 
@@ -92,6 +93,10 @@ export default function TableRow({
         listProps,
         shouldFooterRenderAsLastRow,
     } = useTableContext();
+    const {isEditingCell} = useEditingCellState();
+    // Set on mouse down when an inline-edited cell is open, so the press that blurs (and saves) the cell doesn't also activate the row.
+    // A ref is used because blur fires before onPress and resets isEditingCell.
+    const wasEditingCellOnMouseDownRef = useRef(false);
     const semanticRowID = useTableRowSemanticID();
     const semanticTableHasHeader = rendersColumnHeader(tableListMetadata);
     const isAccessibilityHidden = semanticRowID === null || ariaHidden === true;
@@ -234,6 +239,16 @@ export default function TableRow({
             return;
         }
 
+        if (wasEditingCellOnMouseDownRef.current) {
+            wasEditingCellOnMouseDownRef.current = false;
+            return;
+        }
+
+        // react-native-web fires onPress on Space for role="button" elements; suppress it while a cell is being edited.
+        if (isEditingCell) {
+            return;
+        }
+
         if (!selectionUsesNarrowLayout || !isMobileSelectionEnabled || !selectionEnabled) {
             onPress?.(event);
             return;
@@ -275,6 +290,13 @@ export default function TableRow({
                 role={interactive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
                 {...getRowAccessibilityProps(isTableSemanticsEnabled, rowIndex, false, semanticTableHasHeader)}
                 onMouseDown={(e) => {
+                    wasEditingCellOnMouseDownRef.current = isEditingCell;
+
+                    // Let the browser blur the cell being edited so it saves.
+                    if (isEditingCell) {
+                        return;
+                    }
+
                     const target = e?.target;
 
                     if (!(target instanceof HTMLElement)) {

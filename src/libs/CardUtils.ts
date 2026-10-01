@@ -27,7 +27,7 @@ import type {
     Transaction,
     WorkspaceCardsList,
 } from '@src/types/onyx';
-import type {UnassignedCard} from '@src/types/onyx/Card';
+import type {CardLimitType, UnassignedCard} from '@src/types/onyx/Card';
 import type {
     BankName,
     CardFeed,
@@ -509,6 +509,101 @@ function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY
         default:
             return 'workspace.card.issueNewCard.smartLimit';
     }
+}
+
+type ExpensifyCardLimitWarningTranslationPaths = 'workspace.expensifyCard.smartLimitWarning' | 'workspace.expensifyCard.monthlyLimitWarning' | 'workspace.expensifyCard.fixedLimitWarning';
+
+type ExpensifyCardLimitTypeWarningTranslationPaths = 'workspace.expensifyCard.changeCardSmartLimitTypeWarning' | 'workspace.expensifyCard.changeCardMonthlyLimitTypeWarning';
+
+/**
+ * Returns the warning shown before changing a card limit that leaves no available spend, based on the card's limit type.
+ */
+function getExpensifyCardLimitWarningTranslationKey(limitType: CardLimitType | undefined): ExpensifyCardLimitWarningTranslationPaths {
+    switch (limitType) {
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART:
+            return 'workspace.expensifyCard.smartLimitWarning';
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED:
+            return 'workspace.expensifyCard.fixedLimitWarning';
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY:
+            return 'workspace.expensifyCard.monthlyLimitWarning';
+        default:
+            return 'workspace.expensifyCard.fixedLimitWarning';
+    }
+}
+
+/**
+ * Returns the available spend a card would have with a new limit, keeping what was already spent against the current limit.
+ */
+function getExpensifyCardAvailableSpendForNewLimit(card: OnyxEntry<Card>, newLimit: number): number {
+    const currentLimit = card?.nameValuePairs?.unapprovedExpenseLimit ?? 0;
+    const currentSpend = currentLimit - (card?.availableSpend ?? 0);
+
+    return newLimit - currentSpend;
+}
+
+/**
+ * Returns the warning shown before changing a card's limit type, based on the type it is changing from.
+ */
+function getExpensifyCardLimitTypeWarningTranslationKey(initialLimitType: CardLimitType | undefined): ExpensifyCardLimitTypeWarningTranslationPaths {
+    return initialLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY || initialLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED
+        ? 'workspace.expensifyCard.changeCardSmartLimitTypeWarning'
+        : 'workspace.expensifyCard.changeCardMonthlyLimitTypeWarning';
+}
+
+/**
+ * Whether changing a card's limit type needs a confirmation first: the card's unapproved spend has reached its limit
+ * and the change is one that would immediately start declining transactions.
+ */
+function shouldConfirmExpensifyCardLimitTypeChange(card: OnyxEntry<Card>, initialLimitType: CardLimitType | undefined, newLimitType: CardLimitType): boolean {
+    if (!card?.unapprovedSpend || !card?.nameValuePairs?.unapprovedExpenseLimit) {
+        return false;
+    }
+
+    // Spends are coming as negative numbers from the backend and we need to make it positive for the correct expression.
+    const unapprovedSpend = Math.abs(card.unapprovedSpend);
+    const isUnapprovedSpendOverLimit = unapprovedSpend >= card.nameValuePairs.unapprovedExpenseLimit;
+
+    const validCombinations = [
+        [CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY, CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART],
+        [CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY],
+        [CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED, CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART],
+        [CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY],
+    ];
+    const isValidCombination = validCombinations.some(([limitType, selectedType]) => initialLimitType === limitType && newLimitType === selectedType);
+
+    return isValidCombination && isUnapprovedSpendOverLimit;
+}
+
+/**
+ * Whether the Fixed limit type can be picked for a card. It is hidden once a Monthly or Smart card has already spent its limit.
+ */
+function canSelectFixedExpensifyCardLimitType(card: OnyxEntry<Card>, initialLimitType: CardLimitType | undefined): boolean {
+    if (!card?.totalSpend || !card?.nameValuePairs?.unapprovedExpenseLimit) {
+        return true;
+    }
+
+    const totalSpend = Math.abs(card.totalSpend);
+    const isMonthlyOrSmart = initialLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY || initialLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART;
+
+    return !(isMonthlyOrSmart && totalSpend >= card.nameValuePairs.unapprovedExpenseLimit);
+}
+
+/**
+ * Returns a card's expiration dates as date strings in the cardholder's timezone, the format `updateExpensifyCardLimitType` expects.
+ * Without a timezone the dates are read in UTC, which is also what `updateExpensifyCardLimitType` falls back to.
+ */
+function getExpensifyCardValidityDates(card: OnyxEntry<Card>, timeZone: SelectedTimezone | undefined): {validFrom?: string; validThru?: string} {
+    const toDateString = (dateTime: string | undefined) => {
+        if (!dateTime) {
+            return undefined;
+        }
+        return timeZone ? DateUtils.formatUTCDateTimeToDateInTimezone(dateTime, timeZone) : DateUtils.formatWithUTCTimeZone(dateTime, CONST.DATE.FNS_FORMAT_STRING, undefined);
+    };
+
+    return {
+        validFrom: toDateString(card?.nameValuePairs?.validFrom),
+        validThru: toDateString(card?.nameValuePairs?.validThru),
+    };
 }
 
 /**
@@ -2306,6 +2401,12 @@ export {
     getCardDescription,
     getMCardNumberString,
     getTranslationKeyForLimitType,
+    getExpensifyCardLimitWarningTranslationKey,
+    getExpensifyCardAvailableSpendForNewLimit,
+    getExpensifyCardLimitTypeWarningTranslationKey,
+    shouldConfirmExpensifyCardLimitTypeChange,
+    canSelectFixedExpensifyCardLimitType,
+    getExpensifyCardValidityDates,
     getTranslationKeyForCardStatus,
     maskPin,
     getEligibleBankAccountsForCard,

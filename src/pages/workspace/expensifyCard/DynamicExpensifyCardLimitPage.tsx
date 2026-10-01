@@ -17,7 +17,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateExpensifyCardLimit} from '@libs/actions/Card';
-import {filterInactiveCardsForWorkspace} from '@libs/CardUtils';
+import {filterInactiveCardsForWorkspace, getExpensifyCardAvailableSpendForNewLimit, getExpensifyCardLimitWarningTranslationKey} from '@libs/CardUtils';
 import {convertToFrontendAmountAsString} from '@libs/CurrencyUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import {getFieldRequiredErrors} from '@libs/ValidationUtils';
@@ -33,9 +33,7 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/EditExpensifyCardLimitForm';
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-
-type ConfirmationWarningTranslationPaths = 'workspace.expensifyCard.smartLimitWarning' | 'workspace.expensifyCard.monthlyLimitWarning' | 'workspace.expensifyCard.fixedLimitWarning';
+import React, {useCallback, useEffect, useRef} from 'react';
 
 type DynamicExpensifyCardLimitPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.EXPENSIFY_CARD.DYNAMIC_EXPENSIFY_CARD_LIMIT>;
 
@@ -61,26 +59,9 @@ function DynamicExpensifyCardLimitPage({route}: DynamicExpensifyCardLimitPagePro
         cardRef.current = card;
     }, [card]);
 
-    const getPromptTextKey = useMemo((): ConfirmationWarningTranslationPaths => {
-        switch (card?.nameValuePairs?.limitType) {
-            case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART:
-                return 'workspace.expensifyCard.smartLimitWarning';
-            case CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED:
-                return 'workspace.expensifyCard.fixedLimitWarning';
-            case CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY:
-                return 'workspace.expensifyCard.monthlyLimitWarning';
-            default:
-                return 'workspace.expensifyCard.fixedLimitWarning';
-        }
-    }, [card?.nameValuePairs?.limitType]);
+    const getPromptTextKey = getExpensifyCardLimitWarningTranslationKey(card?.nameValuePairs?.limitType);
 
-    const getNewAvailableSpend = (newLimit: number) => {
-        const latestCard = cardRef.current;
-        const currentLimit = latestCard?.nameValuePairs?.unapprovedExpenseLimit ?? 0;
-        const currentSpend = currentLimit - (latestCard?.availableSpend ?? 0);
-
-        return newLimit - currentSpend;
-    };
+    const getNewAvailableSpend = (newLimit: number) => getExpensifyCardAvailableSpendForNewLimit(cardRef.current, newLimit);
 
     const goBack = useCallback(() => {
         Navigation.goBack(backPath, {compareParams: false});

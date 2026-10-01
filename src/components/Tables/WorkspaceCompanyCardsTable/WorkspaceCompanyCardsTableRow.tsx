@@ -4,6 +4,7 @@ import Icon from '@components/Icon';
 import type {TableData} from '@components/Table';
 import Table from '@components/Table';
 import {getCellAccessibilityProps, shouldUseTableSemantics} from '@components/Table/tableAccessibility';
+import EditableCardNameCell from '@components/Tables/EditableCardNameCell';
 import TextWithTooltip from '@components/TextWithTooltip';
 
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -33,6 +34,9 @@ type WorkspaceCompanyCardTableRowData = TableData &
         assignedCard?: Card;
         exportAccountTitle?: string;
         onDismissError?: () => void;
+
+        /** Saves a new card name, set only for assigned cards since unassigned cards have no name */
+        onSaveCardName?: (newCardName: string) => void;
     };
 
 type WorkspaceCompanyCardTableRowProps = {
@@ -77,7 +81,7 @@ function WorkspaceCompanyCardTableRow({
     const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
-    const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, isCardDeleted, onDismissError} = item;
+    const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, isCardDeleted, onDismissError, onSaveCardName} = item;
 
     const formattedCustomCardName = customCardName ?? '';
     const formattedCardDetails = formatMaskedCardName(cardName);
@@ -184,12 +188,22 @@ function WorkspaceCompanyCardTableRow({
                             style={[styles.flex1, styles.mnw0, styles.justifyContentCenter]}
                             {...getCellAccessibilityProps(isTableSemanticsEnabled)}
                         >
-                            <TextWithTooltip
-                                shouldShowTooltip
-                                numberOfLines={1}
-                                text={customCardName ?? ''}
-                                style={[styles.lh16, styles.optionDisplayName, styles.pre]}
-                            />
+                            {isAssigned && !!onSaveCardName ? (
+                                <EditableCardNameCell
+                                    name={customCardName ?? ''}
+                                    accessibilityLabel={translate('workspace.moreFeatures.companyCards.cardName')}
+                                    textStyle={[styles.lh16, styles.optionDisplayName, styles.pre]}
+                                    canEdit={canWriteCompanyCards && !isCardDeleted}
+                                    onSave={onSaveCardName}
+                                />
+                            ) : (
+                                <TextWithTooltip
+                                    shouldShowTooltip
+                                    numberOfLines={1}
+                                    text={customCardName ?? ''}
+                                    style={[styles.lh16, styles.optionDisplayName, styles.pre]}
+                                />
+                            )}
                         </View>
                     )}
 

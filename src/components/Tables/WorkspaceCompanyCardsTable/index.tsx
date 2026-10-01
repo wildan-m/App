@@ -19,8 +19,9 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
-import {resetFailedWorkspaceCompanyCardUnassignment} from '@libs/actions/CompanyCards';
+import {clearCompanyCardErrorField, resetFailedWorkspaceCompanyCardUnassignment, updateCompanyCardName} from '@libs/actions/CompanyCards';
 import {formatMaskedCardName, getCompanyCardCustomName, getDefaultCardName} from '@libs/CardUtils';
+import {getLatestErrorField} from '@libs/ErrorUtils';
 import {getConnectedIntegration} from '@libs/PolicyUtils';
 import tokenizedSearch from '@libs/tokenizedSearch';
 
@@ -33,6 +34,7 @@ import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 import type {ListRenderItemInfo} from '@shopify/flash-list';
@@ -274,12 +276,18 @@ function WorkspaceCompanyCardsTable({
         : (companyCardEntries ?? [])
               .map(({cardName, encryptedCardNumber, isAssigned, assignedCard}) => {
                   const cardholder = assignedCard?.accountID ? personalDetails?.[assignedCard.accountID] : undefined;
+                  const assignedCardID = assignedCard?.cardID ? String(assignedCard.cardID) : undefined;
+                  const savedCustomCardName = getCompanyCardCustomName(assignedCard?.cardID, sharedCardCustomNames, customCardNames);
+                  const cardErrors = isFeedConnectionBroken || assignedCard?.pendingFields?.lastScrape ? undefined : assignedCard?.errors;
+                  // A failed inline rename is stored on the card name field rather than the card, so surface it on the row too.
+                  const cardTitleErrors = getLatestErrorField(assignedCard?.nameValuePairs ?? {}, 'cardTitle');
+                  const hasCardTitleErrors = !isEmptyObject(cardTitleErrors);
 
                   return {
                       cardName,
                       keyForList: `${cardName}_${assignedCard?.cardID ?? 'unassigned'}_${encryptedCardNumber}`,
                       encryptedCardNumber,
-                      customCardName: getCompanyCardCustomName(assignedCard?.cardID, sharedCardCustomNames, customCardNames) ?? getDefaultCardName(cardholder?.displayName ?? ''),
+                      customCardName: savedCustomCardName ?? getDefaultCardName(cardholder?.displayName ?? ''),
                       isCardDeleted: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                       disabled: assignedCard?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                       isAssigned,
@@ -287,9 +295,18 @@ function WorkspaceCompanyCardsTable({
                       cardholder,
                       // Unassigned cards have no details page and so no Accounting section to match, hence no title.
                       exportAccountTitle: shouldShowExportAccountColumn && assignedCard ? getCardExportAccountTitle(cardExportSettings, assignedCard) : undefined,
-                      errors: isFeedConnectionBroken || assignedCard?.pendingFields?.lastScrape ? undefined : assignedCard?.errors,
+                      errors: hasCardTitleErrors ? {...cardErrors, ...cardTitleErrors} : cardErrors,
                       pendingAction: assignedCard?.pendingAction,
-                      onDismissError: () => resetFailedWorkspaceCompanyCardUnassignment(domainOrWorkspaceAccountID, bankName, assignedCard?.cardID),
+                      onDismissError: () => {
+                          if (hasCardTitleErrors && assignedCardID && bankName) {
+                              clearCompanyCardErrorField(domainOrWorkspaceAccountID, assignedCardID, bankName, 'cardTitle');
+                          }
+                          resetFailedWorkspaceCompanyCardUnassignment(domainOrWorkspaceAccountID, bankName, assignedCard?.cardID);
+                      },
+                      onSaveCardName:
+                          assignedCardID && bankName
+                              ? (newCardName: string) => updateCompanyCardName(domainOrWorkspaceAccountID, assignedCardID, newCardName, bankName, savedCustomCardName)
+                              : undefined,
                   };
               })
               .filter((item) => isOffline || item.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
