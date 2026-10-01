@@ -3,8 +3,8 @@ import setupSentry from '@src/setup/telemetry/setupSentry';
 import type {Integration} from '@sentry/core';
 
 /**
- * Sentry runs event processors in integration order, so registering `classCallCheckNoiseFilterIntegration`
- * before the `thirdPartyErrorFilterIntegration` that writes the tag it reads makes it inert. The native index
+ * Sentry runs event processors in integration order, so registering a noise filter before the
+ * `thirdPartyErrorFilterIntegration` that writes the tag it reads makes it inert. The native index
  * stubs both to `undefined`, hence the mock, which also lets us observe the order `setupSentry` builds.
  */
 jest.mock('@libs/telemetry/integrations', () => ({
@@ -16,6 +16,7 @@ jest.mock('@libs/telemetry/integrations', () => ({
     reportingObserverIntegration: undefined,
     thirdPartyErrorFilterIntegration: {name: 'ThirdPartyErrorsFilter'},
     classCallCheckNoiseFilterIntegration: {name: 'ClassCallCheckNoiseFilter'},
+    injectedScriptRecursionNoiseFilterIntegration: {name: 'InjectedScriptRecursionNoiseFilter'},
 }));
 
 jest.mock('@sentry/react-native', () => ({
@@ -41,6 +42,13 @@ describe('setupSentry integration order', () => {
         expect(names).toContain('ThirdPartyErrorsFilter');
         expect(names).toContain('ClassCallCheckNoiseFilter');
         expect(names.indexOf('ThirdPartyErrorsFilter')).toBeLessThan(names.indexOf('ClassCallCheckNoiseFilter'));
+    });
+
+    it('registers thirdPartyErrorFilter before injectedScriptRecursionNoiseFilter, whose predicate reads its tag', () => {
+        const names = initIntegrationNames();
+
+        expect(names).toContain('InjectedScriptRecursionNoiseFilter');
+        expect(names.indexOf('ThirdPartyErrorsFilter')).toBeLessThan(names.indexOf('InjectedScriptRecursionNoiseFilter'));
     });
 
     it('drops the integrations that are stubbed out on the current platform', () => {

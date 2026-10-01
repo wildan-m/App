@@ -18,6 +18,9 @@ const thirdPartyErrorFilterIntegration = undefined;
 // reads a tag only the web integration above sets. Stub for export shape parity; filtered out of the list here.
 const classCallCheckNoiseFilterIntegration = undefined;
 
+// Web-only for the same reason: GH #102044 is an injected inline script, and the predicate reads the same web-only tag.
+const injectedScriptRecursionNoiseFilterIntegration = undefined;
+
 export {
     navigationIntegration,
     tracingIntegration,
@@ -27,4 +30,5 @@ export {
     reportingObserverIntegration,
     thirdPartyErrorFilterIntegration,
     classCallCheckNoiseFilterIntegration,
+    injectedScriptRecursionNoiseFilterIntegration,
 };

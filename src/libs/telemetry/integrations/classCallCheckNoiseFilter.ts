@@ -69,4 +69,4 @@ const classCallCheckNoiseFilterIntegration: Integration = {
 };
 
 export default classCallCheckNoiseFilterIntegration;
-export {isClassCallCheckNoise, CLASS_CALL_CHECK_MESSAGE, THIRD_PARTY_CODE_TAG};
+export {isClassCallCheckNoise, ANONYMOUS_FILENAMES, CLASS_CALL_CHECK_MESSAGE, THIRD_PARTY_CODE_TAG};
