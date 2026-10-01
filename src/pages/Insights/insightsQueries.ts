@@ -5,6 +5,7 @@ import {buildQueryStringFromFilterFormValues, buildSearchQueryJSON, getRangeQuer
 import CONST from '@src/CONST';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {InsightsDashboard, InsightsDashboardID, InsightsGraphKey} from '@src/types/onyx';
+import type {InsightsScope} from '@src/types/onyx/SidePanel';
 
 import type {InsightsChartSpec} from './dashboardSpecs';
 import type {InsightsFilters} from './insightsFilters';
@@ -88,14 +89,26 @@ type InsightsQuery = {
     /** Hashes of the snapshots the graphs are stored under. */
     snapshotHashes: number[];
 
+    /** Dashboard and filters the response answers, sent to Concierge with questions about the dashboard so it reads the same data. */
+    scope: InsightsScope;
+
     headlineChart: InsightsChartQuery;
     supportingCharts: InsightsChartQuery[];
 };
 
+/** Builds the dashboard and filters a GetInsights request is made for, in the shape Concierge receives them as the Insights scope. */
+function buildInsightsScope(dashboard: InsightsDashboardID, filters: InsightsFilters, shouldIncludeComparisons: boolean): InsightsScope {
+    return {
+        searchKey: INSIGHTS_DASHBOARD_SPECS[dashboard].searchKey,
+        inputQuery: buildInsightsQueryString({...filters, compare: undefined}),
+        numberOfPeriods: shouldIncludeComparisons ? COMPARE_TYPICAL_PERIOD_COUNT : undefined,
+    };
+}
+
 /** Builds one request for the whole dashboard, naming each graph's snapshots by its chart's query hashes, and returns those chart queries to read the snapshots back with. */
 function buildInsightsJsonQuery(dashboard: InsightsDashboardID, filters: InsightsFilters, shouldIncludeComparisons: boolean): InsightsQuery | undefined {
-    const inputQuery = buildInsightsQueryString({...filters, compare: undefined});
-    const queryJSON = buildSearchQueryJSON(inputQuery);
+    const scope = buildInsightsScope(dashboard, filters, shouldIncludeComparisons);
+    const queryJSON = buildSearchQueryJSON(scope.inputQuery);
     if (!queryJSON) {
         return undefined;
     }
@@ -114,13 +127,14 @@ function buildInsightsJsonQuery(dashboard: InsightsDashboardID, filters: Insight
             hash: queryJSON.hash,
             groupBy: queryJSON.groupBy,
             filters: queryJSON.filters,
-            inputQuery,
-            searchKey: spec.searchKey,
+            inputQuery: scope.inputQuery,
+            searchKey: scope.searchKey,
             insightsHashes,
-            numberOfPeriods: shouldIncludeComparisons ? COMPARE_TYPICAL_PERIOD_COUNT : undefined,
+            numberOfPeriods: scope.numberOfPeriods,
         }),
         hash: queryJSON.hash,
         snapshotHashes: graphEntries.flatMap(([, hashes]) => Object.values(hashes).filter((hash): hash is number => hash !== undefined)),
+        scope,
         headlineChart,
         supportingCharts,
     };

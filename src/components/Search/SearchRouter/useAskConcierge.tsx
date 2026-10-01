@@ -13,6 +13,7 @@ import {createTaskFromMarkdown} from '@userActions/Task';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {SidePanelContext} from '@src/types/onyx';
 import type {FileObject} from '@src/types/utils/Attachment';
 
 /**
@@ -38,7 +39,10 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
 
     const shouldRespondInThread = targetReportID === conciergeReportID && isBetaEnabled(CONST.BETAS.CONCIERGE_RESPOND_IN_THREAD);
 
-    const askConcierge = (searchQuery: string) => {
+    /**
+     * @param sidePanelContext What the user is looking at, sent along so Concierge answers about it (e.g. the Insights scope).
+     */
+    const askConcierge = (searchQuery: string, sidePanelContext?: SidePanelContext) => {
         const trimmedQuery = searchQuery.trim();
         if (!trimmedQuery || !shouldShowAskConcierge) {
             return;
@@ -58,6 +62,7 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
             currentUserAccountID,
             shouldPlaySound: true,
             isInSidePanel,
+            sidePanelContext,
             delegateAccountID,
             conciergeReportID,
             conciergeThreadReportID,
