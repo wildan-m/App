@@ -7571,6 +7571,19 @@ const plainStyles = (theme: ThemeColors) =>
             gap: variables.insightsCardGap,
         } satisfies ViewStyle,
 
+        insightsAICardRow: (shouldUseNarrowLayout: boolean) =>
+            ({
+                flexDirection: shouldUseNarrowLayout ? 'column' : 'row',
+                gap: variables.insightsCardGap,
+            }) satisfies ViewStyle,
+
+        insightsAICard: (shouldUseNarrowLayout: boolean) =>
+            ({
+                flex: shouldUseNarrowLayout ? undefined : 1,
+                padding: shouldUseNarrowLayout ? 20 : 32,
+                gap: 8,
+            }) satisfies ViewStyle,
+
         insightsEmptyStateIllustration: {
             width: variables.insightsEmptyStateIllustrationSize,
             height: variables.insightsEmptyStateIllustrationSize,

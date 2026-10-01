@@ -25,10 +25,25 @@ type InsightsGraph = {
     averageSnapshotHash?: number;
 };
 
+/** An AI-generated insight about the dashboard's data, shown as a card above the headline chart */
+type InsightsCard = {
+    /** Short headline summarizing the insight */
+    title: string;
+
+    /** Sentences expanding on the headline */
+    description: string;
+
+    /** Message sent to Concierge when the card's Explain button is pressed */
+    explainPrompt: string;
+};
+
 /** What the backend returns for one dashboard and set of filters */
 type InsightsDashboard = {
     /** Snapshots the response filled, keyed by the graph slot each chart's spec declares */
     graphs?: Partial<Record<InsightsGraphKey, InsightsGraph>>;
+
+    /** AI insight cards generated for the same filters, in the order they are displayed */
+    aiInsights?: InsightsCard[];
 
     /** Whether the account has any expenses at all, regardless of the query, so an empty account can be told apart from filters that matched nothing */
     hasResults?: boolean;
@@ -42,5 +57,5 @@ type InsightsDashboard = {
     responseJsonCode?: number;
 };
 
-export type {InsightsDashboardID, InsightsGraphKey, InsightsSearchKey};
+export type {InsightsCard, InsightsDashboardID, InsightsGraphKey, InsightsSearchKey};
 export default InsightsDashboard;

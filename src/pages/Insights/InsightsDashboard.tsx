@@ -23,7 +23,7 @@ import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {InsightsDashboardID} from '@src/types/onyx';
+import type {InsightsCard, InsightsDashboardID} from '@src/types/onyx';
 
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useEffectEvent} from 'react';
@@ -32,6 +32,7 @@ import {View} from 'react-native';
 import type {InsightsFilters} from './insightsFilters';
 import type {InsightsDashboardChart, InsightsDashboardState} from './resolveDashboardState';
 
+import InsightsAICardRow from './aiCards/InsightsAICardRow';
 import InsightsChartWidget from './charts/InsightsChartWidget';
 import InsightsPageControls from './controls/InsightsPageControls';
 import INSIGHTS_DASHBOARD_SPECS, {getVisibleCharts} from './dashboardSpecs';
@@ -51,6 +52,9 @@ type InsightsDashboardContentProps = {
     /** Page-level filters every chart on the dashboard is narrowed by */
     filters: InsightsFilters;
 
+    /** AI insight cards shown above the headline chart, in their stored order */
+    aiInsights: InsightsCard[] | undefined;
+
     /** Called by the retry button to request the dashboard again */
     onRetry: () => void;
 
@@ -58,7 +62,7 @@ type InsightsDashboardContentProps = {
     onGroupByChange: (groupBy: InsightsFilters['groupBy']) => void;
 };
 
-function InsightsDashboardContent({state, headlineChart, supportingCharts, filters, onRetry, onGroupByChange}: InsightsDashboardContentProps) {
+function InsightsDashboardContent({state, headlineChart, supportingCharts, filters, aiInsights, onRetry, onGroupByChange}: InsightsDashboardContentProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -126,6 +130,7 @@ function InsightsDashboardContent({state, headlineChart, supportingCharts, filte
             addBottomSafeAreaPadding
         >
             <View style={styles.insightsDashboardLayout}>
+                <InsightsAICardRow cards={aiInsights} />
                 <InsightsChartWidget
                     chart={headlineChart.chart}
                     queryJSON={headlineChart.queryJSON}
@@ -228,6 +233,7 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
                 headlineChart={headlineChart}
                 supportingCharts={supportingCharts}
                 filters={filters}
+                aiInsights={dashboard?.aiInsights}
                 onRetry={requestDashboard}
                 onGroupByChange={(groupBy) => setFilters({groupBy})}
             />
