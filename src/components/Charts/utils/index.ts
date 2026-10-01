@@ -1,4 +1,4 @@
-import type {ChartDataPoint, LabelRotation, PieSlice} from '@components/Charts/types';
+import type {ChartDataPoint, LabelRotation, PieSlice, XAxisLabelMode} from '@components/Charts/types';
 import VictoryTheme, {CHART_Y_SCALE_HEIGHT, DIAGONAL_ANGLE_RADIAN_THRESHOLD, ELLIPSIS, LABEL_PADDING, LABEL_ROTATIONS, MAX_X_AXIS_LABEL_WIDTH, SIN_45} from '@components/Charts/VictoryTheme';
 
 import {isShareWorthDrawing} from '@libs/PercentageUtils';
@@ -9,6 +9,9 @@ import type {SkParagraph, SkParagraphBuilder, SkTypefaceFontProvider} from '@sho
 
 import {FontStyle, FontWeight, Skia} from '@shopify/react-native-skia';
 import {scaleLinear} from 'd3-scale';
+
+/** Upper bound for the bar inner padding ratio, so very narrow charts still draw a visible bar */
+const MAX_BAR_INNER_PADDING = 0.9;
 
 /** One reusable ParagraphBuilder per fontManager instance. Auto-GC'd when fontManager is released. */
 const builderCache = new WeakMap<SkTypefaceFontProvider, SkParagraphBuilder>();
@@ -271,6 +274,25 @@ function getXAxisLabel(point: ChartDataPoint): string {
     return point.shortLabel ?? point.label;
 }
 
+/** Blanks the x-axis labels a chart doesn't draw, so label measurement and layout only account for the ones that are shown. */
+function getXAxisLabelData(data: ChartDataPoint[], mode: XAxisLabelMode): ChartDataPoint[] {
+    if (mode === 'all') {
+        return data;
+    }
+
+    const lastIndex = data.length - 1;
+    return data.map((point, index) => (mode === 'edges' && (index === 0 || index === lastIndex) ? point : {...point, label: '', shortLabel: ''}));
+}
+
+/** Inner padding ratio that keeps a fixed pixel gap between bars, so bars take all the remaining width. */
+function getBarInnerPadding(plotWidth: number, barCount: number, gap: number): number {
+    if (plotWidth <= 0 || barCount <= 0) {
+        return 0;
+    }
+
+    return Math.min(gap / (plotWidth / barCount), MAX_BAR_INNER_PADDING);
+}
+
 /** Truncate `label` so its pixel width fits within `maxWidth`, adding ellipsis. */
 function truncateLabel(label: string, labelWidth: number, maxWidth: number, ellipsisWidth: number): string {
     if (labelWidth <= maxWidth) {
@@ -499,6 +521,8 @@ export {
     findSliceAtPosition,
     processDataIntoSlices,
     getXAxisLabel,
+    getXAxisLabelData,
+    getBarInnerPadding,
     truncateLabel,
     effectiveWidth,
     effectiveHeight,

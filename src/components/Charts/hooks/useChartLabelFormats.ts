@@ -30,6 +30,16 @@ export default function useChartLabelFormats({data, unit, unitPosition = 'left',
         return unitPosition === 'left' ? `${unitToDisplay}${separator}${formatted}` : `${formatted}${separator}${unitToDisplay}`;
     };
 
+    /** Condensed y-axis values ($25k, $1.5m), so the axis stays narrow at any magnitude */
+    const formatAxisValue = (value: number) => {
+        const formatted = numberFormat(value, {notation: 'compact', maximumFractionDigits: 1}).toLowerCase();
+        if (!unitToDisplay) {
+            return formatted;
+        }
+        const separator = unitToDisplay.length > 1 ? ' ' : '';
+        return unitPosition === 'left' ? `${unitToDisplay}${separator}${formatted}` : `${formatted}${separator}${unitToDisplay}`;
+    };
+
     const formatLabel = (value: number) => {
         const index = Math.round(value);
 
@@ -45,5 +55,6 @@ export default function useChartLabelFormats({data, unit, unitPosition = 'left',
     return {
         formatLabel,
         formatValue,
+        formatAxisValue,
     };
 }

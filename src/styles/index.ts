@@ -6809,22 +6809,26 @@ const staticStyles = (theme: ThemeColors) =>
             alignItems: 'center',
         },
         chartTooltipBox: {
-            backgroundColor: theme.heading,
-            borderRadius: variables.componentBorderRadiusSmall,
-            paddingVertical: 4,
-            paddingHorizontal: 8,
+            backgroundColor: theme.appBG,
+            borderColor: theme.border,
+            borderWidth: 1,
+            borderRadius: variables.componentBorderRadiusNormal,
+            padding: 12,
+            gap: 8,
         },
-        chartTooltipText: {
-            color: theme.textReversed,
-            fontSize: variables.fontSizeSmall,
-            lineHeight: variables.lineHeightSmall,
+        chartTooltipLabel: {
+            fontFamily: FontUtils.fontFamily.platform.EXP_NEUE_BOLD.fontFamily,
+            fontWeight: FontUtils.fontFamily.platform.EXP_NEUE_BOLD.fontWeight,
+            color: theme.text,
+            fontSize: variables.fontSizeLabel,
+            lineHeight: variables.lineHeightNormal,
             whiteSpace: 'nowrap',
         },
-        chartTooltipPointer: {
-            width: 0,
-            height: 0,
-            backgroundColor: theme.transparent,
-            borderStyle: 'solid',
+        chartTooltipText: {
+            color: theme.text,
+            fontSize: variables.fontSizeLabel,
+            lineHeight: variables.lineHeightNormal,
+            whiteSpace: 'nowrap',
         },
         chartContainer: {
             borderRadius: variables.componentBorderRadiusLarge,
@@ -6862,7 +6866,17 @@ const staticStyles = (theme: ThemeColors) =>
             height: 12,
         },
         chartInlineTable: {
-            marginTop: 20,
+            marginTop: 24,
+        },
+        insightsRowDot: {
+            borderRadius: '50%',
+            width: 20,
+            height: 20,
+        },
+        insightsRowAvatarRing: {
+            borderRadius: '50%',
+            borderWidth: 2,
+            borderColor: theme.border,
         },
         homeWidgetIconContainer: {
             width: variables.iconSizeExtraLarge,

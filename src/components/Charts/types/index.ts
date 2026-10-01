@@ -16,6 +16,9 @@ type ChartDataPoint = {
     /** The point's signed share of total spend, in percentage points */
     percentOfTotal?: number;
 
+    /** Number of expenses the point aggregates, shown in its tooltip */
+    count?: number;
+
     /** Query string for navigation when data point is clicked (optional) */
     onClickQuery?: string;
 };
@@ -29,6 +32,9 @@ type UnitWithFallback = {value: string; fallback: string};
 /** Position of the unit symbol relative to the formatted value. */
 type UnitPosition = 'left' | 'right';
 
+/** Which x-axis labels a cartesian chart draws: every bucket, only the first and last, or none */
+type XAxisLabelMode = 'all' | 'edges' | 'none';
+
 type ChartProps = {
     data: ChartDataPoint[];
     isLoading?: boolean;
@@ -40,6 +46,9 @@ type CartesianChartProps = ChartProps & {
 
     /** Position of the unit symbol relative to the value. Defaults to 'left'. */
     yAxisUnitPosition?: UnitPosition;
+
+    /** Which x-axis labels to draw. Defaults to every bucket. */
+    xAxisLabelMode?: XAxisLabelMode;
 };
 
 type PieSlice = {
@@ -75,4 +84,4 @@ type LabelRotation = ValueOf<typeof LABEL_ROTATIONS>;
 
 type ParagraphWithWidth = {para: SkParagraph | null; width: number};
 
-export type {ChartDataPoint, ChartProps, CartesianChartProps, LabelRotation, ParagraphWithWidth, PieSlice, UnitPosition, UnitWithFallback};
+export type {ChartDataPoint, ChartProps, CartesianChartProps, LabelRotation, ParagraphWithWidth, PieSlice, UnitPosition, UnitWithFallback, XAxisLabelMode};

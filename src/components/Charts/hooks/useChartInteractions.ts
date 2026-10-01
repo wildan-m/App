@@ -358,8 +358,8 @@ function useChartInteractions({
             });
 
     /**
-     * Tap gesture. Resolves the nearest data point entirely on the UI thread,
-     * then schedules handlePress on the JS thread if the cursor is over the target.
+     * Tap gesture. Resolves the nearest data point entirely on the UI thread, shows its tooltip
+     * (touch screens have no hover to show it), then schedules handlePress on the JS thread if the cursor is over the target.
      */
     const tapGesture = () =>
         Gesture.Tap().onEnd((e) => {
@@ -367,6 +367,7 @@ function useChartInteractions({
 
             const cursorX = normalizeChartCoordinate(e.x, coordinateScale);
             const cursorY = normalizeChartCoordinate(e.y, coordinateScale);
+            chartInteractionState.isActive.set(true);
             chartInteractionState.cursor.x.set(cursorX);
             chartInteractionState.cursor.y.set(cursorY);
             const ox = pointOX.get();
@@ -408,6 +409,12 @@ function useChartInteractions({
         };
     });
 
+    /** Canvas position of the matched data point, for charts that mark the active point */
+    const activePointPosition = useDerivedValue(() => ({
+        x: chartInteractionState.x.position.get(),
+        y: chartInteractionState.y.y.position.get(),
+    }));
+
     const customGestures = Gesture.Race(hoverGesture(), tapGesture());
 
     return {
@@ -426,6 +433,8 @@ function useChartInteractions({
         isCursorOverClickable,
         /** Raw tooltip positioning data */
         initialTooltipPosition,
+        /** Canvas position of the matched data point */
+        activePointPosition,
     };
 }
 

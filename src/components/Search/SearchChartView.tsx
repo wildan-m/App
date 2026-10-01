@@ -1,4 +1,5 @@
 import {BarChart, LineChart, PieChart} from '@components/Charts';
+import type {XAxisLabelMode} from '@components/Charts/types';
 
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
@@ -44,13 +45,34 @@ type SearchChartViewProps = {
 
     /** Style of the view around the chart, which the details below it don't share */
     chartContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Which x-axis labels a bar or line chart draws. Defaults to every bucket. */
+    xAxisLabelMode?: XAxisLabelMode;
+
+    /** Draws bars vertically on every layout, for charts whose items are labeled in the details below them */
+    shouldForceVerticalBars?: boolean;
+
+    /** Whether pressing a bar, point or slice opens the Spend page filtered to it. Defaults to true. */
+    isDrillDownEnabled?: boolean;
 };
 
 /**
  * Layer 3 component - dispatches to the appropriate chart type based on view parameter
  * and handles navigation/drill-down logic
  */
-function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, renderDetails, chartContainerStyle}: SearchChartViewProps) {
+function SearchChartView({
+    queryJSON,
+    view,
+    groupBy,
+    data,
+    isLoading,
+    color,
+    renderDetails,
+    chartContainerStyle,
+    xAxisLabelMode,
+    shouldForceVerticalBars,
+    isDrillDownEnabled = true,
+}: SearchChartViewProps) {
     const {preferredLocale} = useLocalize();
     const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyListActions();
     const {currentSearchKey} = useSearchQueryContext();
@@ -62,7 +84,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, rend
 
     const handleItemPress = (index: number) => {
         const item = rows.at(index)?.item;
-        if (!item || !queryJSON) {
+        if (!isDrillDownEnabled || !item || !queryJSON) {
             return;
         }
 
@@ -91,7 +113,9 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, rend
                 onBarPress={(dataPoint, index) => handleItemPress(index)}
                 yAxisUnit={unit}
                 yAxisUnitPosition={unitPosition}
+                xAxisLabelMode={xAxisLabelMode}
                 color={color}
+                shouldForceVertical={shouldForceVerticalBars}
             />
         ),
         [CONST.SEARCH.VIEW.LINE]: (
@@ -101,6 +125,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, color, rend
                 onPointPress={(dataPoint, index) => handleItemPress(index)}
                 yAxisUnit={unit}
                 yAxisUnitPosition={unitPosition}
+                xAxisLabelMode={xAxisLabelMode}
             />
         ),
         [CONST.SEARCH.VIEW.PIE]: (

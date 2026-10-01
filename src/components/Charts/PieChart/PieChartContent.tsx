@@ -219,6 +219,7 @@ function PieChartContent({data, isLoading, valueUnit, valueUnitPosition, onSlice
                             label={tooltipData.label}
                             amount={tooltipData.amount}
                             percentage={tooltipData.percentage}
+                            count={tooltipData.count}
                             chartWidth={canvasWidth}
                             initialTooltipPosition={tooltipPosition}
                         />

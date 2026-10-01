@@ -5,6 +5,9 @@ type BarChartProps = CartesianChartProps & {
 
     /** Color every bar is drawn in. Left out, each bar takes a different color from the palette by rank. */
     color?: string;
+
+    /** Forces vertical bars regardless of the layout, for charts that list their items outside the chart */
+    shouldForceVertical?: boolean;
 };
 
 /** Adds the wrapper-resolved orientation. Only the dispatcher receives `isHorizontal`. Callers and bodies use `BarChartProps`. */

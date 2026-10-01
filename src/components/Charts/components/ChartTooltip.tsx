@@ -1,7 +1,5 @@
-import VictoryTheme from '@components/Charts/VictoryTheme';
 import Text from '@components/Text';
 
-import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {ComponentRef} from 'react';
@@ -21,32 +19,31 @@ type ChartTooltipProps = {
     /** Optional percentage to display (e.g., "12%") */
     percentage?: string;
 
+    /** Optional expense count line (e.g., "841 expenses") */
+    count?: string;
+
     /** The width of the chart container */
     chartWidth: number;
 
     initialTooltipPosition: SharedValue<{x: number; y: number}>;
 };
 
-function getTooltipContent(label: string, amount: string, percentage?: string): string {
-    if (!amount) {
-        return label;
-    }
-
+function getAmountLine(amount: string, percentage?: string): string {
     if (!percentage) {
-        return `${label} • ${amount}`;
+        return amount;
     }
 
-    return `${label} • ${amount} (${percentage})`;
+    return `${amount} (${percentage})`;
 }
 
-function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosition}: ChartTooltipProps) {
-    const theme = useTheme();
+function ChartTooltip({label, amount, percentage, count, chartWidth, initialTooltipPosition}: ChartTooltipProps) {
     const styles = useThemeStyles();
 
     /** Shared value to store the measured width of the tooltip container */
     const tooltipMeasuredWidth = useSharedValue(0);
 
-    const content = getTooltipContent(label, amount, percentage);
+    const amountLine = amount ? getAmountLine(amount, percentage) : '';
+    const content = [label, amountLine, count].join('|');
 
     /**
      * Synchronously reset the width and hide the tooltip whenever the content changes.
@@ -90,21 +87,6 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
         };
     }, [initialTooltipPosition]);
 
-    /**
-     * Animated style for the pointer (triangle).
-     * Calculates the relative offset to keep the pointer pinned to the data point (initialX)
-     * even when the main container is clamped to the edges.
-     */
-    const pointerStyle = useAnimatedStyle(() => {
-        const {x} = initialTooltipPosition.get();
-
-        const relativeOffset = x - clampedCenter.get();
-
-        return {
-            transform: [{translateX: relativeOffset}],
-        };
-    }, [initialTooltipPosition]);
-
     return (
         <Animated.View
             style={tooltipStyle}
@@ -114,26 +96,28 @@ function ChartTooltip({label, amount, percentage, chartWidth, initialTooltipPosi
             <View style={styles.chartTooltipWrapper}>
                 <View style={styles.chartTooltipBox}>
                     <Text
-                        style={styles.chartTooltipText}
+                        style={styles.chartTooltipLabel}
                         numberOfLines={1}
                     >
-                        {content}
+                        {label}
                     </Text>
+                    {!!amountLine && (
+                        <Text
+                            style={styles.chartTooltipText}
+                            numberOfLines={1}
+                        >
+                            {amountLine}
+                        </Text>
+                    )}
+                    {!!count && (
+                        <Text
+                            style={styles.chartTooltipText}
+                            numberOfLines={1}
+                        >
+                            {count}
+                        </Text>
+                    )}
                 </View>
-                <Animated.View
-                    style={[
-                        styles.chartTooltipPointer,
-                        {
-                            borderLeftWidth: VictoryTheme.tooltip.pointerWidth / 2,
-                            borderRightWidth: VictoryTheme.tooltip.pointerWidth / 2,
-                            borderTopWidth: VictoryTheme.tooltip.pointerHeight,
-                            borderLeftColor: theme.transparent,
-                            borderRightColor: theme.transparent,
-                            borderTopColor: theme.heading,
-                        },
-                        pointerStyle,
-                    ]}
-                />
             </View>
         </Animated.View>
     );

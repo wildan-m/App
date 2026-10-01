@@ -1,3 +1,4 @@
+import type {XAxisLabelMode} from '@components/Charts/types';
 import {buildViewOnSpendQuery} from '@components/Search/chartDrillDown';
 import ChartEmptyState from '@components/Search/ChartEmptyState';
 import ChartErrorState from '@components/Search/ChartErrorState';
@@ -64,6 +65,14 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
     const isLoading = state === INSIGHTS_CHART_STATE.LOADING;
     const shouldShowTable = chart.view === CONST.SEARCH.VIEW.BAR || chart.view === CONST.SEARCH.VIEW.PIE;
 
+    // Ranking charts label their items in the list beneath them, and the line chart only has room for its first and last buckets on narrow layouts
+    let xAxisLabelMode: XAxisLabelMode = 'all';
+    if (shouldShowTable) {
+        xAxisLabelMode = 'none';
+    } else if (shouldUseNarrowLayout) {
+        xAxisLabelMode = 'edges';
+    }
+
     const groupByControl = onGroupByChange ? (
         <InsightsGroupByDropdown
             groupBy={filters.groupBy}
@@ -112,12 +121,15 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
                         isLoading={isLoading}
                         color={chart.color}
                         chartContainerStyle={shouldUseNarrowLayout ? styles.ph5 : styles.ph8}
+                        xAxisLabelMode={xAxisLabelMode}
+                        shouldForceVerticalBars
+                        // On narrow layouts a tap shows the tooltip, and drilling into Spend happens from the card's menu
+                        isDrillDownEnabled={!shouldUseNarrowLayout}
                         renderDetails={
                             shouldShowTable
                                 ? (rows) => (
                                       <InsightsDataTable
                                           rows={rows}
-                                          view={chart.view}
                                           groupBy={groupBy}
                                           isLoading={isLoading}
                                       />

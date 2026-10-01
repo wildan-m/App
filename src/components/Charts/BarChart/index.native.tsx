@@ -8,7 +8,8 @@ import BarChartContent from './BarChartContent';
 
 function BarChart(props: BarChartProps) {
     // Horizontal bars on wide layouts, vertical on narrow (mobile/RHP).
-    const {isHorizontal} = useBarChartOrientation();
+    const {isHorizontal: isLayoutHorizontal} = useBarChartOrientation();
+    const isHorizontal = isLayoutHorizontal && !props.shouldForceVertical;
 
     return (
         <BarChartContent
