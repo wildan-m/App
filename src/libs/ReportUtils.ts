@@ -11947,6 +11947,27 @@ function hasUpdatedTotal(report: OnyxInputOrEntry<Report>, policy: OnyxInputOrEn
 }
 
 /**
+ * Returns the total of the held transactions in the report currency, signed as it is displayed to the user.
+ * Returns undefined when a held transaction has no amount available in the report currency.
+ */
+function getHeldTransactionsTotal(iouReport: OnyxEntry<Report>, allReportTransactions: Transaction[], shouldExcludeNonReimbursables: boolean): number | undefined {
+    const isExpenseReportLocal = isExpenseReport(iouReport);
+    const heldTransactions = allReportTransactions.filter((transaction) => isOnHoldTransactionUtils(transaction) && (!shouldExcludeNonReimbursables || getReimbursable(transaction)));
+    const hasHeldTransactionWithoutReportCurrencyAmount = heldTransactions.some(
+        (transaction) => transaction.currency !== iouReport?.currency && (transaction.convertedAmount === undefined || transaction.convertedAmount === null),
+    );
+    if (hasHeldTransactionWithoutReportCurrencyAmount) {
+        return undefined;
+    }
+
+    return heldTransactions.reduce(
+        (heldTotal, transaction) =>
+            heldTotal + (transaction.currency === iouReport?.currency ? getTransactionAmount(transaction, isExpenseReportLocal) : getConvertedAmount(transaction, isExpenseReportLocal)),
+        0,
+    );
+}
+
+/**
  * Return held and full amount formatted with used currency
  */
 function getNonHeldAndFullAmount(
@@ -11974,8 +11995,13 @@ function getNonHeldAndFullAmount(
         unheldTotal = iouReport?.unheldTotal ?? unheldReimbursableTotal + (iouReport?.unheldNonReimbursableTotal ?? 0);
     }
 
-    const adjustedUnheldTotal = unheldTotal * coefficient;
     const adjustedTotal = total * coefficient;
+
+    // The report-level unheld totals can lag behind the transactions' hold state (e.g. for an approver when another user
+    // puts an expense on hold), so derive the unheld amount from the same transactions used to detect held expenses to keep
+    // both in sync. Fall back to the report fields when the held amounts can't be read in the report currency.
+    const heldTransactionsTotal = allReportTransactions.length > 0 ? getHeldTransactionsTotal(iouReport, allReportTransactions, shouldExcludeNonReimbursables) : undefined;
+    const adjustedUnheldTotal = heldTransactionsTotal !== undefined ? adjustedTotal - heldTransactionsTotal : unheldTotal * coefficient;
 
     // For the "approve unheld" option to be valid, we need:
     // 1. There should be held expenses

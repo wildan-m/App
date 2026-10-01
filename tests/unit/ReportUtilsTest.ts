@@ -25334,6 +25334,81 @@ describe('ReportUtils', () => {
             const result = getNonHeldAndFullAmount(expenseReport, true, [], convertToDisplayString);
             expect(result.nonHeldAmount).toContain('60.00');
         });
+
+        it('derives the non-held amount from the held transactions when the report unheld totals are stale', () => {
+            // Given an expense report whose unheld totals are still the pre-hold values, as seen by an approver
+            // who received the held transaction from another user's hold
+            const expenseReport: Report = {
+                ...createRandomReport(0, undefined),
+                reportID: '102333',
+                type: CONST.REPORT.TYPE.EXPENSE,
+                currency: CONST.CURRENCY.USD,
+                total: -300,
+                unheldTotal: -300,
+                nonReimbursableTotal: 0,
+                unheldNonReimbursableTotal: 0,
+                reimbursableTotal: -300,
+                unheldReimbursableTotal: -300,
+            };
+            const heldTransaction: Transaction = {
+                ...createRandomTransaction(1),
+                reportID: expenseReport.reportID,
+                amount: -100,
+                currency: CONST.CURRENCY.USD,
+                reimbursable: true,
+                comment: {hold: '1'},
+            };
+            const pendingTransaction: Transaction = {
+                ...createRandomTransaction(2),
+                reportID: expenseReport.reportID,
+                amount: -200,
+                currency: CONST.CURRENCY.USD,
+                reimbursable: true,
+                comment: {},
+            };
+            delete heldTransaction.modifiedAmount;
+            delete pendingTransaction.modifiedAmount;
+
+            for (const shouldExcludeNonReimbursables of [true, false]) {
+                // When computing the approve amounts with the report's live transactions
+                const result = getNonHeldAndFullAmount(expenseReport, shouldExcludeNonReimbursables, [heldTransaction, pendingTransaction], convertToDisplayString);
+                // Then the non-held amount excludes the held expense instead of repeating the full total
+                expect(result.fullAmount).toBe(convertToDisplayString(300, CONST.CURRENCY.USD));
+                expect(result.nonHeldAmount).toBe(convertToDisplayString(200, CONST.CURRENCY.USD));
+                expect(result.hasValidNonHeldAmount).toBe(true);
+            }
+        });
+
+        it('falls back to the report unheld totals when a held transaction has no amount in the report currency', () => {
+            // Given a held transaction in another currency that has no converted amount in the report currency
+            const expenseReport: Report = {
+                ...createRandomReport(0, undefined),
+                reportID: '102334',
+                type: CONST.REPORT.TYPE.EXPENSE,
+                currency: CONST.CURRENCY.USD,
+                total: -300,
+                unheldTotal: -200,
+                nonReimbursableTotal: 0,
+                unheldNonReimbursableTotal: 0,
+                reimbursableTotal: -300,
+                unheldReimbursableTotal: -200,
+            };
+            const heldTransaction: Transaction = {
+                ...createRandomTransaction(1),
+                reportID: expenseReport.reportID,
+                amount: -500,
+                currency: 'EUR',
+                reimbursable: true,
+                comment: {hold: '1'},
+            };
+            delete heldTransaction.convertedAmount;
+
+            // When computing the approve amounts
+            const result = getNonHeldAndFullAmount(expenseReport, false, [heldTransaction], convertToDisplayString);
+
+            // Then the report-level unheld total is used rather than an unconverted transaction amount
+            expect(result.nonHeldAmount).toBe(convertToDisplayString(200, CONST.CURRENCY.USD));
+        });
     });
 
     describe('hasExportError', () => {
