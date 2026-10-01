@@ -1156,6 +1156,8 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) =>
+            `Por favor, explícame el gráfico "${chartTitle}" de mi página de Insights. Muestra los resultados de esta búsqueda: ${chartQuery}`,
         viewOnSpend: 'Ver en Gastos',
         emptyState: {title: 'Nada que mostrar', subtitle: 'Prueba a ajustar tus criterios de arriba'},
         noExpensesState: {title: 'Ve adónde va tu dinero', subtitle: 'Una vez que tengas gastos, encontrarás tendencias de gasto, principales comercios y mucho más.'},

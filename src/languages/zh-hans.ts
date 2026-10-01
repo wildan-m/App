@@ -1114,6 +1114,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) => `请为我解释 Insights 页面上的“${chartTitle}”图表。它显示的是以下搜索的结果：${chartQuery}`,
         viewOnSpend: '在支出中查看',
         emptyState: {title: '没有可显示的内容', subtitle: '请尝试调整上面的条件'},
         noExpensesState: {title: '查看你的资金流向', subtitle: '添加报销后，您就能查看消费趋势、主要商家等更多信息。'},

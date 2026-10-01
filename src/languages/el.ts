@@ -1206,6 +1206,8 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) =>
+            `Παρακαλώ εξήγησέ μου το γράφημα «${chartTitle}» στη σελίδα Insights μου. Δείχνει τα αποτελέσματα αυτής της αναζήτησης: ${chartQuery}`,
         viewOnSpend: 'Προβολή στο Spend',
         emptyState: {title: 'Τίποτα προς εμφάνιση', subtitle: 'Δοκιμάστε να προσαρμόσετε τα κριτήριά σας παραπάνω'},
         noExpensesState: {title: 'Δείτε πού πηγαίνουν τα χρήματά σας', subtitle: 'Μόλις έχετε δαπάνες, θα βλέπετε τάσεις δαπανών, κορυφαίους εμπόρους και άλλα.'},

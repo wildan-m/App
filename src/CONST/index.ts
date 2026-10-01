@@ -9385,6 +9385,8 @@ const CONST = {
             CONTROL_GROUP_CURRENCY: 'Insights-ControlGroupCurrency',
             CONTROL_GROUP_BY: 'Insights-ControlGroupBy',
             CONTROL_COMPARE: 'Insights-ControlCompare',
+            EXPLAIN_CHART: 'Insights-ExplainChart',
+            EXPLAIN_CARD: 'Insights-ExplainCard',
         },
         EXPENSE_RULES: {
             TABLE_ROW: 'ExpenseRules-TableRow',
@@ -10208,6 +10210,10 @@ const CONST = {
             TOP_MERCHANTS: 'topMerchants',
             TOP_CATEGORIES: 'topCategories',
             TOP_SPENDERS: 'topSpenders',
+        },
+        EXPLAIN_BUTTON_VARIANT: {
+            CHART: 'chart',
+            CARD: 'card',
         },
     },
 

@@ -1148,6 +1148,8 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) =>
+            `Insights ページの「${chartTitle}」グラフについて説明してください。このグラフは次の検索結果を表示しています: ${chartQuery}`,
         viewOnSpend: '支出で表示',
         emptyState: {title: '表示するものはありません', subtitle: '上の条件を調整してみてください'},
         noExpensesState: {title: 'お金の使い道を確認する', subtitle: '経費が登録されると、支出の傾向や上位の加盟店など、さまざまな情報を確認できるようになります。'},

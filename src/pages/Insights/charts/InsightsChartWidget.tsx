@@ -19,6 +19,8 @@ import {INSIGHTS_CHART_STATE, resolveInsightsChartData} from '@libs/resolveInsig
 
 import InsightsGroupByDropdown from '@pages/Insights/controls/InsightsGroupByDropdown';
 import type {InsightsChartSpec} from '@pages/Insights/dashboardSpecs';
+import buildInsightsExplainPrompt from '@pages/Insights/explain/buildInsightsExplainPrompt';
+import InsightsExplainButton from '@pages/Insights/explain/InsightsExplainButton';
 import type {InsightsFilters} from '@pages/Insights/insightsFilters';
 
 import CONST from '@src/CONST';
@@ -71,6 +73,15 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
         />
     ) : null;
 
+    const explainButton =
+        state === INSIGHTS_CHART_STATE.READY ? (
+            <InsightsExplainButton
+                explainPrompt={buildInsightsExplainPrompt(chart, filters, translate)}
+                style={[styles.widgetHeaderExplainButtonWrapper, styles.mr2]}
+                testID={`insightsChartExplainButton-${chart.graphKey}`}
+            />
+        ) : null;
+
     const headerMenu =
         !!queryJSON && (state === INSIGHTS_CHART_STATE.READY || isLoading) ? (
             <WidgetHeaderMenu
@@ -91,8 +102,9 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
         <WidgetContainer
             title={translate(chart.titleKey)}
             titleRightContent={
-                !!groupByControl || !!headerMenu ? (
+                !!explainButton || !!groupByControl || !!headerMenu ? (
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                        {explainButton}
                         {groupByControl}
                         {headerMenu}
                     </View>

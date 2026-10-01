@@ -1181,6 +1181,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) => `Wyjaśnij mi wykres „${chartTitle}” na mojej stronie Insights. Pokazuje wyniki tego wyszukiwania: ${chartQuery}`,
         viewOnSpend: 'Zobacz w Wydatkach',
         emptyState: {title: 'Nic do wyświetlenia', subtitle: 'Spróbuj zmienić kryteria powyżej'},
         noExpensesState: {title: 'Zobacz, na co idą twoje pieniądze', subtitle: 'Gdy będziesz mieć wydatki, zobaczysz trendy w wydawaniu, najważniejszych sprzedawców i więcej.'},

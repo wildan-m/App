@@ -4295,6 +4295,12 @@ const staticStyles = (theme: ThemeColors) =>
             marginRight: (variables.widgetHeaderTitleLineHeight - variables.componentSizeNormal) / 2,
         },
 
+        widgetHeaderExplainButtonWrapper: {
+            // Like the menu button, the small button overflows the header instead of growing it, so headers with and without it keep the same height.
+            marginTop: (variables.widgetHeaderTitleLineHeight - variables.componentSizeSmall) / 2,
+            marginBottom: (variables.widgetHeaderTitleLineHeight - variables.componentSizeSmall) / 2,
+        },
+
         widgetItemSubtitle: {
             ...FontUtils.fontFamily.platform.EXP_NEUE,
             fontSize: variables.fontSizeLabel,

@@ -1253,6 +1253,7 @@ const translations = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) => `Please explain the "${chartTitle}" chart on my Insights page. It shows the results of this search: ${chartQuery}`,
         viewOnSpend: 'View on Spend',
         compare: {
             label: 'Compare',

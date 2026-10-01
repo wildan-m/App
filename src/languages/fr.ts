@@ -1163,6 +1163,8 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        explainChartPrompt: (chartTitle: string, chartQuery: string) =>
+            `Merci de m’expliquer le graphique « ${chartTitle} » de ma page Insights. Il affiche les résultats de cette recherche : ${chartQuery}`,
         viewOnSpend: 'Voir dans Dépenses',
         emptyState: {title: 'Rien à afficher', subtitle: 'Essayez de modifier vos critères ci-dessus'},
         noExpensesState: {
