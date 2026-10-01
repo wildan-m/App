@@ -1173,6 +1173,9 @@ const translations: TranslationDeepObject<typeof en> = {
     },
     insightsPage: {
         viewOnSpend: 'Voir dans Dépenses',
+        dashboards: {
+            compliance: 'Conformité',
+        },
         emptyState: {title: 'Rien à afficher', subtitle: 'Essayez de modifier vos critères ci-dessus'},
         noExpensesState: {
             title: 'Voyez où va votre argent',
