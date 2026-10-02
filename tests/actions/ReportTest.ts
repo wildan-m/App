@@ -3720,7 +3720,7 @@ describe('actions/Report', () => {
             await Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT, reportCollections);
 
             // When mark all reports as read
-            markAllMessagesAsRead(undefined, undefined, undefined);
+            markAllMessagesAsRead(undefined, undefined);
 
             await waitForBatchedUpdates();
 

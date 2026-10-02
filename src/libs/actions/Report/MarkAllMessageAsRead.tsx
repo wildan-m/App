@@ -28,6 +28,14 @@ Onyx.connectWithoutView({
     callback: (value) => (allReports = value),
 });
 
+// Read the derived attributes at execution time rather than taking a snapshot from the caller's render, so the
+// unread check below always uses the latest isEmpty flags no matter how long the confirmation flow took.
+let reportAttributesDerived: ReportAttributesDerivedValue['reports'] | undefined;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.DERIVED.REPORT_ATTRIBUTES,
+    callback: (value) => (reportAttributesDerived = value?.reports),
+});
+
 // The archived state is passed in by the caller (read via useOnyx with reportNameValuePairsArchivedSelector) rather
 // than subscribed to here, so this action stays a plain function and callers only re-render when the archived flags
 // actually change.
@@ -35,11 +43,7 @@ Onyx.connectWithoutView({
  * Marks every unread report as read. Pass `reportIDs` to limit it to a subset, e.g. only the reports listed under one
  * Inbox tab; when omitted, every unread report is marked read.
  */
-function markAllMessagesAsRead(
-    reportNameValuePairs: OnyxCollection<ReportNameValuePairsArchivedState>,
-    reportIDs: string[] | undefined,
-    reportAttributesDerived: ReportAttributesDerivedValue['reports'] | undefined,
-) {
+function markAllMessagesAsRead(reportNameValuePairs: OnyxCollection<ReportNameValuePairsArchivedState>, reportIDs: string[] | undefined) {
     if (isAnonymousUser()) {
         return;
     }
