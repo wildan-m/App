@@ -312,7 +312,10 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
         );
     }, [isWorkflowFromIntegration, workflowSourceName, navigateToWorkflowSourceSettings, styles.lh20, styles.mr5, styles.mt1, styles.textLabelSupportingEmptyValue, translate]);
 
-    const approvalOptionSubtitle = isWorkflowFromIntegration || !isSmartLimitEnabled ? approvalSubtitle : translate('workspace.moreFeatures.workflows.disableApprovalPrompt');
+    const areApprovalsEnabled = [CONST.POLICY.APPROVAL_MODE.BASIC, CONST.POLICY.APPROVAL_MODE.ADVANCED].some((approvalMode) => approvalMode === policy?.approvalMode);
+    // Smart Limit cards only prevent turning approvals off, so the lock applies only while approvals are enabled.
+    const areApprovalsLockedBySmartLimit = isSmartLimitEnabled && areApprovalsEnabled;
+    const approvalOptionSubtitle = isWorkflowFromIntegration || !areApprovalsLockedBySmartLimit ? approvalSubtitle : translate('workspace.moreFeatures.workflows.disableApprovalPrompt');
     const hasApprovalError = !!policy?.errorFields?.approvalMode;
 
     const getAddApprovalsToggleDisabledAction = () => {
@@ -326,7 +329,9 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
         <WorkflowsSectionCard
             title={translate('workflowsPage.addApprovalsTitle')}
             subtitle={approvalOptionSubtitle}
-            switchAccessibilityLabel={isSmartLimitEnabled ? translate('workspace.moreFeatures.workflows.disableApprovalPrompt') : translate('workflowsPage.addApprovalsDescription')}
+            switchAccessibilityLabel={
+                areApprovalsLockedBySmartLimit ? translate('workspace.moreFeatures.workflows.disableApprovalPrompt') : translate('workflowsPage.addApprovalsDescription')
+            }
             onToggle={(isEnabled: boolean) => {
                 if (!canWriteApprovals) {
                     showReadOnlyModal();
@@ -475,16 +480,11 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
                     )}
                 </>
             }
-            disabled={!canWriteApprovals || isSmartLimitEnabled || isDEWEnabled || isWorkflowFromIntegration}
+            disabled={!canWriteApprovals || areApprovalsLockedBySmartLimit || isDEWEnabled || isWorkflowFromIntegration}
             disabledAction={withApprovalsReadOnlyFallback(getAddApprovalsToggleDisabledAction())}
             showLockIcon={!canWriteApprovals}
             // Submit2026 workspaces have approval mode set to Advanced, but we want to show it here as off because configuring the advanced approvals is a paid feature.
-            isActive={
-                !isSubmitPolicyWorkspace &&
-                (isWorkflowFromIntegration ||
-                    isDEWEnabled ||
-                    (([CONST.POLICY.APPROVAL_MODE.BASIC, CONST.POLICY.APPROVAL_MODE.ADVANCED].some((approvalMode) => approvalMode === policy?.approvalMode) && !hasApprovalError) ?? false))
-            }
+            isActive={!isSubmitPolicyWorkspace && (isWorkflowFromIntegration || isDEWEnabled || (areApprovalsEnabled && !hasApprovalError))}
             pendingAction={policy?.pendingFields?.approvalMode}
             errors={getLatestErrorField(policy ?? {}, CONST.POLICY.COLLECTION_KEYS.APPROVAL_MODE)}
             onCloseError={() => clearPolicyErrorField(policyID, CONST.POLICY.COLLECTION_KEYS.APPROVAL_MODE)}
