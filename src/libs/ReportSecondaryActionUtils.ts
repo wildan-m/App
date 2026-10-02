@@ -9,6 +9,7 @@ import type {
     ReportMetadata,
     ReportNameValuePairs,
     Rule,
+    SingleExpenseReportView,
     Transaction,
     TransactionViolation,
 } from '@src/types/onyx';
@@ -17,6 +18,7 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
 import {areTransactionsEligibleForMerge} from './MergeTransactionUtils';
+import {isSingleTransactionReport} from './MoneyRequestReportUtils';
 import {wasPaidWithPolicyBankAccount} from './PolicyPaymentUtils';
 import {
     arePaymentsEnabled as arePaymentsEnabledUtils,
@@ -1027,6 +1029,7 @@ function getSecondaryReportActions({
     parentReport,
     isOffline,
     rules,
+    singleExpenseReportView,
 }: {
     currentUserLogin: string;
     currentUserAccountID: number;
@@ -1049,6 +1052,8 @@ function getSecondaryReportActions({
     /** TODO: Should be a required field in the future. Refactor issue: https://github.com/Expensify/App/issues/66407 */
     isOffline?: boolean;
     rules: OnyxCollection<Rule>;
+    /** How the user opens reports with a single expense (expense view or table view) */
+    singleExpenseReportView?: OnyxEntry<SingleExpenseReportView>;
 }): Array<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>> {
     const options: Array<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>> = [];
     const reportNameValuePairs = moveExpenseReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report.reportID}`];
@@ -1213,6 +1218,15 @@ function getSecondaryReportActions({
     const isApprovalEnabled = policy?.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL;
     if (isExpenseReportUtils(report) && isProcessingReportUtils(report) && isPolicyAdmin(policy) && isApprovalEnabled) {
         options.push(CONST.REPORT.SECONDARY_ACTIONS.CHANGE_APPROVER);
+    }
+
+    // Only single-expense reports can switch layouts; reports with more than one expense always use the table view.
+    if (isSingleTransactionReport(report, reportTransactions)) {
+        options.push(
+            singleExpenseReportView === CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE
+                ? CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW
+                : CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW,
+        );
     }
 
     options.push(CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS);

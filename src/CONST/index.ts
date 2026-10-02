@@ -1652,6 +1652,8 @@ const CONST = {
             DUPLICATE_EXPENSE: 'duplicateExpense',
             DUPLICATE_REPORT: 'duplicateReport',
             MOVE_EXPENSE: 'moveExpense',
+            SWITCH_TO_TABLE_VIEW: 'switchToTableView',
+            SWITCH_TO_EXPENSE_VIEW: 'switchToExpenseView',
         },
         PRIMARY_ACTIONS: {
             SUBMIT: 'submit',
@@ -2200,6 +2202,10 @@ const CONST = {
         LAYOUT_OPTION: {
             DETAILED: 'detailed',
             MATRIX: 'matrix',
+        },
+        SINGLE_EXPENSE_VIEW: {
+            EXPENSE: 'expense',
+            TABLE: 'table',
         },
     } as const,
     UNREPORTED_EXPENSES_PAGE_SIZE: 50,
@@ -9565,6 +9571,8 @@ const CONST = {
             PAY: 'MoreMenu-Pay',
             DUPLICATE_REPORT: 'MoreMenu-DuplicateReport',
             MOVE_EXPENSE: 'MoreMenu-MoveExpense',
+            SWITCH_TO_TABLE_VIEW: 'MoreMenu-SwitchToTableView',
+            SWITCH_TO_EXPENSE_VIEW: 'MoreMenu-SwitchToExpenseView',
         },
         REPORT_PREVIEW: {
             CARD: 'ReportPreview-Card',

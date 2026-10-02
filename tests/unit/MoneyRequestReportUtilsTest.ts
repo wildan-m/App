@@ -5,6 +5,7 @@ import {
     isBillableEnabledOnPolicy,
     isEveryReportTransactionSelected,
     isSelectableReportTransaction,
+    shouldDisplayReportTableView,
     shouldWaitForTransactions,
 } from '@libs/MoneyRequestReportUtils';
 
@@ -273,6 +274,26 @@ describe('MoneyRequestReportUtils', () => {
             const reportLoadingState: ReportLoadingState = {isLoadingInitialReportActions: false, hasOnceLoadedReportActions: false};
 
             expect(shouldWaitForTransactions(reportBaseMock, [], reportLoadingState, false, false)).toBe(true);
+        });
+    });
+
+    describe('shouldDisplayReportTableView', () => {
+        const report = createMock<Report>({reportID: 'tableViewReport', type: CONST.REPORT.TYPE.EXPENSE});
+        const singleTransaction = [createMock<Transaction>({transactionID: '1', reportID: 'tableViewReport'})];
+        const multipleTransactions = [...singleTransaction, createMock<Transaction>({transactionID: '2', reportID: 'tableViewReport'})];
+
+        it('uses the expense view for a single-expense report by default', () => {
+            expect(shouldDisplayReportTableView(report, singleTransaction)).toBe(false);
+            expect(shouldDisplayReportTableView(report, singleTransaction, CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.EXPENSE)).toBe(false);
+        });
+
+        it('uses the table view for a single-expense report when the user prefers it', () => {
+            expect(shouldDisplayReportTableView(report, singleTransaction, CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE)).toBe(true);
+        });
+
+        it('always uses the table view for a report with more than one expense', () => {
+            expect(shouldDisplayReportTableView(report, multipleTransactions)).toBe(true);
+            expect(shouldDisplayReportTableView(report, multipleTransactions, CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.EXPENSE)).toBe(true);
         });
     });
 });

@@ -126,6 +126,7 @@ function MoneyRequestReportView({report, reportIDFromRoute, reportLoadingState, 
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [conciergeChat] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
+    const [singleExpenseReportView] = useOnyx(ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW);
 
     const {reportActions: unfilteredReportActions} = usePaginatedReportActions(reportID);
 
@@ -158,10 +159,10 @@ function MoneyRequestReportView({report, reportIDFromRoute, reportLoadingState, 
     const shouldShowOpenReportLoadingSkeleton = !!(isReportLoadPending && reportActions.length === 0 && !isOffline) || shouldWaitForTransactions;
 
     const isEmptyTransactionReport = visibleTransactions?.length === 0 && transactionThreadReportID === undefined;
-    const shouldDisplayMoneyRequestActionsList = !!isEmptyTransactionReport || shouldDisplayReportTableView(report, visibleTransactions ?? []);
+    const shouldDisplayMoneyRequestActionsList = !!isEmptyTransactionReport || shouldDisplayReportTableView(report, visibleTransactions ?? [], singleExpenseReportView);
 
     const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
-    const shouldShowWideRHPReceipt = visibleTransactions.length === 1 && !isSmallScreenWidth && !!transactionThreadReport;
+    const shouldShowWideRHPReceipt = visibleTransactions.length === 1 && !isSmallScreenWidth && !!transactionThreadReport && !shouldDisplayMoneyRequestActionsList;
 
     const reportHeaderView = isTransactionThreadView ? (
         <MoneyRequestHeader

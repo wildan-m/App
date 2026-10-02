@@ -11,6 +11,7 @@ import {getSearchParamFromPath} from '@libs/Url';
 
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
@@ -82,13 +83,18 @@ function OneTransactionThreadRedirectHandler() {
     // set (Home "Recently added", "Review N flagged expenses", the duplicate review list) would dead-end mid-review.
     const [isSteppingThroughExpenses] = useOnyx(ONYXKEYS.TRANSACTION_THREAD_NAVIGATION_TRANSACTION_IDS, {selector: selectIsSteppingThroughExpenses});
 
+    // When the user opens single-expense reports in the table view, the thread is the drill-down from the table row
+    // (like on a multi-expense report) rather than a duplicate of the report, so redirecting would bounce them back.
+    const [singleExpenseReportView] = useOnyx(ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW);
+    const isSingleExpenseReportInTableView = singleExpenseReportView === CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE;
+
     // A message deep link points at an action inside the thread, so dropping the thread route would drop its anchor.
     const hasLinkedReportAction = !!route.params?.reportActionID;
 
     const referrer = route.name === SCREENS.REPORT ? route.params?.referrer : undefined;
     const backTo = route.params?.backTo;
 
-    const shouldRedirectToParentReport = !!parentReportID && isOneTransactionThread && !isSteppingThroughExpenses && !hasLinkedReportAction;
+    const shouldRedirectToParentReport = !!parentReportID && isOneTransactionThread && !isSteppingThroughExpenses && !hasLinkedReportAction && !isSingleExpenseReportInTableView;
 
     useEffect(() => {
         if (!isFocused || !shouldRedirectToParentReport || !parentReportID) {

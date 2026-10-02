@@ -1341,6 +1341,8 @@ const translations: TranslationDeepObject<typeof en> = {
         cancelPayment: '取消付款',
         cancelPaymentConfirmation: '你确定要取消此付款吗？',
         viewDetails: '查看详情',
+        switchToTableView: '切换到表格视图',
+        switchToExpenseView: '切换到报销视图',
         pending: '待处理',
         canceled: '已取消',
         posted: '已发布',

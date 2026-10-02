@@ -1378,6 +1378,8 @@ const translations: TranslationDeepObject<typeof en> = {
         cancelPayment: '支払いをキャンセル',
         cancelPaymentConfirmation: 'この支払いをキャンセルしてもよろしいですか？',
         viewDetails: '詳細を表示',
+        switchToTableView: 'テーブル表示に切り替え',
+        switchToExpenseView: '経費表示に切り替え',
         pending: '保留中',
         canceled: 'キャンセル済み',
         posted: '投稿日',

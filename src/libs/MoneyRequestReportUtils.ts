@@ -3,7 +3,7 @@ import type {TransactionListItemType} from '@components/Search/SearchList/ListIt
 import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 
 import CONST from '@src/CONST';
-import type {OriginalMessageIOU, Policy, Report, ReportAction, ReportLoadingState, Transaction} from '@src/types/onyx';
+import type {OriginalMessageIOU, Policy, Report, ReportAction, ReportLoadingState, SingleExpenseReportView, Transaction} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
@@ -166,10 +166,19 @@ function isSingleTransactionReport(report: OnyxEntry<Report>, transactions: Tran
  * Returns whether a "table" ReportView/MoneyRequestReportView should be used for the report.
  *
  * If report is a special "transaction thread" we want to use other Report views.
- * Likewise, if report has only 1 connected transaction, then we also use other views.
+ * Likewise, if report has only 1 connected transaction, then we also use other views,
+ * unless the user chose to open single-expense reports in the table view.
  */
-function shouldDisplayReportTableView(report: OnyxEntry<Report>, transactions: Transaction[]) {
-    return !isReportTransactionThread(report) && !isSingleTransactionReport(report, transactions);
+function shouldDisplayReportTableView(report: OnyxEntry<Report>, transactions: Transaction[], singleExpenseReportView?: OnyxEntry<SingleExpenseReportView>) {
+    if (isReportTransactionThread(report)) {
+        return false;
+    }
+
+    if (!isSingleTransactionReport(report, transactions)) {
+        return true;
+    }
+
+    return singleExpenseReportView === CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE;
 }
 
 function shouldWaitForTransactions(

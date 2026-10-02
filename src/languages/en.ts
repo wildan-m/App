@@ -1498,6 +1498,8 @@ const translations = {
         cancelPayment: 'Cancel payment',
         cancelPaymentConfirmation: 'Are you sure that you want to cancel this payment?',
         viewDetails: 'View details',
+        switchToTableView: 'Switch to table view',
+        switchToExpenseView: 'Switch to expense view',
         pending: 'Pending',
         canceled: 'Canceled',
         posted: 'Posted',

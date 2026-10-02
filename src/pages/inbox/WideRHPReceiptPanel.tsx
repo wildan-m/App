@@ -50,6 +50,7 @@ function WideRHPReceiptPanelGate() {
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`);
+    const [singleExpenseReportView] = useOnyx(ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW);
     const parentReportAction = useParentReportAction(report);
 
     const {reportActions: unfilteredReportActions} = usePaginatedReportActions(report?.reportID, routeParams?.reportActionID);
@@ -64,7 +65,11 @@ function WideRHPReceiptPanelGate() {
 
     const isMoneyRequestOrInvoiceReport = isMoneyRequestReport(report) || isInvoiceReport(report);
     const hasMultipleTransactions = (visibleTransactions?.length ?? 0) > 1;
-    const isConfirmedMultiTransactionReport = isMoneyRequestOrInvoiceReport && hasMultipleTransactions && shouldDisplayReportTableView(report, visibleTransactions ?? []);
+    const isSingleExpenseReportInTableView = singleExpenseReportView === CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE && visibleTransactions?.length === 1;
+    const isConfirmedMultiTransactionReport =
+        isMoneyRequestOrInvoiceReport &&
+        (hasMultipleTransactions || isSingleExpenseReportInTableView) &&
+        shouldDisplayReportTableView(report, visibleTransactions ?? [], singleExpenseReportView);
 
     const shouldShowWideRHP =
         !isConfirmedMultiTransactionReport &&

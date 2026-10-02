@@ -1427,6 +1427,8 @@ const translations: TranslationDeepObject<typeof en> = {
         cancelPayment: 'Anuluj płatność',
         cancelPaymentConfirmation: 'Czy na pewno chcesz anulować tę płatność?',
         viewDetails: 'Zobacz szczegóły',
+        switchToTableView: 'Przełącz na widok tabeli',
+        switchToExpenseView: 'Przełącz na widok wydatku',
         pending: 'Oczekujące',
         canceled: 'Anulowano',
         posted: 'Opublikowano',

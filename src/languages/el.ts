@@ -1441,6 +1441,8 @@ const translations: TranslationDeepObject<typeof en> = {
         cancelPayment: 'Ακύρωση πληρωμής',
         cancelPaymentConfirmation: 'Είστε βέβαιοι ότι θέλετε να ακυρώσετε αυτήν την πληρωμή;',
         viewDetails: 'Προβολή λεπτομερειών',
+        switchToTableView: 'Εναλλαγή σε προβολή πίνακα',
+        switchToExpenseView: 'Εναλλαγή σε προβολή δαπάνης',
         pending: 'Σε εκκρεμότητα',
         canceled: 'Ακυρώθηκε',
         posted: 'Καταχωρισμένο',

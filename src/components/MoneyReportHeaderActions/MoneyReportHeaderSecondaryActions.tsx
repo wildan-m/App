@@ -42,6 +42,7 @@ import useVerifyAccountAndResume from '@hooks/useVerifyAccountAndResume';
 
 import {generateDefaultWorkspaceName} from '@libs/actions/Policy/Policy';
 import {search} from '@libs/actions/Search';
+import {setNameValuePair} from '@libs/actions/User';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import getPlatform from '@libs/getPlatform';
 import {getTotalAmountForIOUReportPreviewButton} from '@libs/MoneyRequestReportUtils';
@@ -132,6 +133,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
     const [conciergeChat] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`);
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    const [singleExpenseReportView] = useOnyx(ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW);
     const [invoiceReceiverPolicy] = useOnyx(
         `${ONYXKEYS.COLLECTION.POLICY}${chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined}`,
         {},
@@ -310,7 +312,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
             ? sortPoliciesByName(activeAdminPolicies, localeCompare)
             : [];
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building', 'Table', 'Receipt']);
 
     // Build PAY action sub-items. Workspace-policy entries carry the policy as data and have no onSelected;
     // MoneyReportHeaderKYCDropdown picks them up via onSubItemSelected where triggerKYCFlow is in scope.
@@ -407,6 +409,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
               isChatReportArchived,
               isOffline,
               rules,
+              singleExpenseReportView,
           })
         : [];
 
@@ -419,6 +422,32 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.VIEW_DETAILS,
             onSelected: () => {
                 navigateToDetailsPage(moneyRequestReport, isInSidePanel);
+            },
+        },
+        [CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW]: {
+            value: CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW,
+            text: translate('iou.switchToTableView'),
+            icon: expensifyIcons.Table,
+            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SWITCH_TO_TABLE_VIEW,
+            onSelected: () => {
+                setNameValuePair(
+                    ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW,
+                    CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE,
+                    singleExpenseReportView ?? CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.EXPENSE,
+                );
+            },
+        },
+        [CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW]: {
+            value: CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW,
+            text: translate('iou.switchToExpenseView'),
+            icon: expensifyIcons.Receipt,
+            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SWITCH_TO_EXPENSE_VIEW,
+            onSelected: () => {
+                setNameValuePair(
+                    ONYXKEYS.NVP_SINGLE_EXPENSE_REPORT_VIEW,
+                    CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.EXPENSE,
+                    singleExpenseReportView ?? CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.EXPENSE,
+                );
             },
         },
         ...exportActionEntries,

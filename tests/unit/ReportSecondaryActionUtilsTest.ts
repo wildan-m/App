@@ -166,6 +166,43 @@ describe('getSecondaryAction', () => {
         ).toEqual(result);
     });
 
+    describe('single-expense view switch', () => {
+        const REPORT_ID = 'singleExpenseReport';
+        const getActions = (transactionCount: number, singleExpenseReportView?: ValueOf<typeof CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW>) =>
+            getSecondaryReportActions({
+                currentUserLogin: EMPLOYEE_EMAIL,
+                currentUserAccountID: EMPLOYEE_ACCOUNT_ID,
+                submitterLogin: '',
+                report: createMock<Report>({reportID: REPORT_ID}),
+                chatReport,
+                reportTransactions: Array.from({length: transactionCount}, (_, index) => createMock<Transaction>({transactionID: `${index}`, reportID: REPORT_ID})),
+                originalTransaction: createMock<Transaction>({}),
+                violations: {},
+                bankAccountList: {},
+                policy: createMock<Policy>({}),
+                rules: undefined,
+                singleExpenseReportView,
+            });
+
+        it('offers switching to the table view on a single-expense report by default', () => {
+            const result = getActions(1);
+            expect(result).toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW);
+            expect(result).not.toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW);
+        });
+
+        it('offers switching back to the expense view when the user prefers the table view', () => {
+            const result = getActions(1, CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE);
+            expect(result).toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW);
+            expect(result).not.toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW);
+        });
+
+        it('does not offer a view switch on reports with more than one expense', () => {
+            const result = getActions(2, CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW.TABLE);
+            expect(result).not.toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_TABLE_VIEW);
+            expect(result).not.toContain(CONST.REPORT.SECONDARY_ACTIONS.SWITCH_TO_EXPENSE_VIEW);
+        });
+    });
+
     it('includes DOWNLOAD_RECEIPTS when at least one transaction has a receipt', () => {
         const report = createMock<Report>({});
         const policy = createMock<Policy>({});

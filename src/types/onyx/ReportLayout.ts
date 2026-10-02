@@ -13,6 +13,9 @@ type ReportLayoutOption = ValueOf<typeof CONST.REPORT_LAYOUT.LAYOUT_OPTION>;
 /** Selection shown in the report group-by selector: a group-by field, or matrix for the "None" (ungrouped) option */
 type ReportLayoutSelection = ReportLayoutGroupBy | typeof CONST.REPORT_LAYOUT.LAYOUT_OPTION.MATRIX;
 
+/** How the user wants reports with a single expense to open: the single-expense view or the table view */
+type SingleExpenseReportView = ValueOf<typeof CONST.REPORT_LAYOUT.SINGLE_EXPENSE_VIEW>;
+
 /** Grouped transactions for display */
 type GroupedTransactions = {
     /** Display name of the group (category or tag name) */
@@ -31,4 +34,4 @@ type GroupedTransactions = {
     isExpanded: boolean;
 };
 
-export type {ReportLayoutGroupBy, ReportLayoutOption, ReportLayoutSelection, GroupedTransactions};
+export type {ReportLayoutGroupBy, ReportLayoutOption, ReportLayoutSelection, SingleExpenseReportView, GroupedTransactions};
