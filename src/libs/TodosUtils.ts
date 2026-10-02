@@ -8,7 +8,8 @@ import type {SearchKey} from './SearchKeyUtils';
 
 import {getLoginByAccountID} from './PersonalDetailsUtils';
 import {isGroupPolicy} from './PolicyUtils';
-import {isApproveAction, isExportAction, isPrimaryPayAction, isSubmitAction} from './ReportPrimaryActionUtils';
+import {isReportInExportTodo} from './ReportExportUtils';
+import {isApproveAction, isPrimaryPayAction, isSubmitAction} from './ReportPrimaryActionUtils';
 import {didCurrentUserPlaceHoldOnReportExpense, hasOnlyHeldExpenses, hasOnlyNonReimbursableTransactions, isArchivedReport, isOpenReport} from './ReportUtils';
 
 type CreateTodosReportsAndTransactionsParams = {
@@ -166,7 +167,7 @@ function reportMatchesTodoBucket(
             );
         case CONST.SEARCH.SEARCH_KEYS.EXPORT: {
             const reportActions = Object.values(allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.reportID}`] ?? []);
-            return isExportAction(report, login, policy, reportActions) && policy?.exporter === login;
+            return isReportInExportTodo(report, policy, login, reportActions);
         }
         default:
             return false;

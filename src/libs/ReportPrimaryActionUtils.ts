@@ -11,15 +11,12 @@ import {
     getManagerAccountID,
     getReimbursementChoice,
     getSubmitToAccountID,
-    getValidConnectedIntegration,
     hasDynamicExternalWorkflow,
-    hasIntegrationAutoSync,
     isArchivedOrPendingDeletePolicy,
     isGroupPolicy,
     isPaidGroupPolicy,
     isPolicyAdmin as isPolicyAdminPolicyUtils,
     isPolicyApprover,
-    isPreferredExporter,
     isSubmitAndClose,
     isSubmitPolicy,
     isSubmitterApproveBlockedOnSubmitWorkspace,
@@ -33,6 +30,7 @@ import {
     hasPendingDEWSubmit,
     isMoneyRequestAction,
 } from './ReportActionsUtils';
+import {isReportAwaitingExport} from './ReportExportUtils';
 import {
     canAddTransaction as canAddTransactionUtil,
     canHoldUnholdReportAction,
@@ -294,48 +292,7 @@ function isPrimaryPayAction({
 }
 
 function isExportAction(report: Report, currentUserLogin: string, policy?: Policy, reportActions?: ReportAction[]) {
-    if (!policy) {
-        return false;
-    }
-
-    const connectedIntegration = getValidConnectedIntegration(policy);
-    const isInvoiceReport = isInvoiceReportUtils(report);
-
-    if (!connectedIntegration || isInvoiceReport) {
-        return false;
-    }
-
-    const isAdmin = policy?.role === CONST.POLICY.ROLE.ADMIN;
-
-    const isReportExporter = isPreferredExporter(policy, currentUserLogin);
-    if (!isReportExporter && !isAdmin) {
-        return false;
-    }
-
-    const syncEnabled = hasIntegrationAutoSync(policy, connectedIntegration);
-    const isExported = isExportedUtil(reportActions, report);
-    if (isExported) {
-        return false;
-    }
-
-    const hasExportError = hasExportErrorUtil(reportActions, report);
-    if (syncEnabled && !hasExportError) {
-        return false;
-    }
-
-    if (report.isWaitingOnBankAccount) {
-        return false;
-    }
-
-    const isReportReimbursed = isSettled(report);
-    const isReportApproved = isReportApprovedUtils({report});
-    const isReportClosed = isClosedReportUtils(report);
-
-    if (isReportApproved || isReportReimbursed || isReportClosed) {
-        return true;
-    }
-
-    return false;
+    return isReportAwaitingExport(report, policy, currentUserLogin, reportActions);
 }
 
 /** TODO: isOffline should be a required field in the future. Refactor issue: https://github.com/Expensify/App/issues/66407 */

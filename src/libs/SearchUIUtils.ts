@@ -161,6 +161,7 @@ import {
     isSubmittedAndClosedAction,
     isWhisperActionTargetedToOthers,
 } from './ReportActionsUtils';
+import {isPolicyExporter} from './ReportExportUtils';
 import {getReportName} from './ReportNameUtils';
 import {isExportAction} from './ReportPrimaryActionUtils';
 import {
@@ -738,7 +739,7 @@ function getSuggestedSearchesVisibility(
         const isPayer = isPolicyPayer(policy, currentUserEmail);
         const isAdmin = policy.role === CONST.POLICY.ROLE.ADMIN;
         const isAuditor = policy.role === CONST.POLICY.ROLE.AUDITOR;
-        const isExporter = policy.exporter === currentUserEmail;
+        const isExporter = isPolicyExporter(policy, currentUserEmail);
 
         const isSubmittedTo =
             !!currentUserEmail && Object.values(policy.employeeList ?? {}).some((employee) => employee.submitsTo === currentUserEmail || employee.forwardsTo === currentUserEmail);

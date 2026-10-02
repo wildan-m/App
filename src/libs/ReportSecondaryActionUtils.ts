@@ -25,7 +25,6 @@ import {
     getManagerAccountID,
     getReimbursementChoice,
     getSubmitToAccountID,
-    getValidConnectedIntegration,
     hasDynamicExternalWorkflow,
     isArchivedOrPendingDeletePolicy,
     isGroupPolicy,
@@ -48,6 +47,7 @@ import {
     hasPendingDEWSubmit,
     isPayAction,
 } from './ReportActionsUtils';
+import {canUserExportReport} from './ReportExportUtils';
 import {getReportPrimaryAction, isPrimaryPayAction} from './ReportPrimaryActionUtils';
 import {
     canAddTransaction,
@@ -540,43 +540,7 @@ function isReceivedPaymentAction(report: Report, reportTransactions: Transaction
 }
 
 function isExportAction(currentUserLogin: string, report: Report, policy?: Policy): boolean {
-    if (!policy) {
-        return false;
-    }
-
-    const hasAccountingConnection = !!getValidConnectedIntegration(policy);
-    if (!hasAccountingConnection) {
-        return false;
-    }
-
-    const isInvoiceReport = isInvoiceReportUtils(report);
-
-    // We don't allow export to accounting for invoice reports in OD so we want to align with that here.
-    if (isInvoiceReport) {
-        return false;
-    }
-
-    const isExpenseReport = isExpenseReportUtils(report);
-
-    if (!isExpenseReport) {
-        return false;
-    }
-
-    const isReportApproved = isReportApprovedUtils({report});
-    const isReportClosed = isClosedReportUtils(report);
-    const isReportSettled = isSettled(report);
-    const isReportReimbursed = report.statusNum === CONST.REPORT.STATUS_NUM.REIMBURSED;
-    const isReportFinished = isReportApproved || isReportClosed || isReportReimbursed || isReportSettled;
-
-    // If the report is not in a finished state, don't show the export action
-    if (!isReportFinished) {
-        return false;
-    }
-
-    const hasAccountingExportPermission =
-        canMemberWrite(policy, currentUserLogin, CONST.POLICY.POLICY_FEATURE.ACCOUNTING) || canMemberWrite(policy, currentUserLogin, CONST.POLICY.POLICY_FEATURE.WORKFLOWS_PAYMENTS);
-
-    return hasAccountingExportPermission || isPreferredExporter(policy, currentUserLogin);
+    return canUserExportReport(report, policy, currentUserLogin);
 }
 
 function isMarkAsExportedAction(currentAccountID: number, currentUserLogin: string, report: Report, bankAccountList: OnyxEntry<BankAccountList>, policy?: Policy): boolean {
