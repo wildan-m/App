@@ -3184,6 +3184,26 @@ function buildDateRangeGroupQuery(queryJSON: SearchQueryJSON, dateRange: {start:
 
 /**
  * @private
+ * Decides whether a time bucket is still in progress: the bucket contains today and the query's date
+ * filters (intersected with the bucket's range the same way buildDateRangeGroupQuery does) also reach
+ * today. Returns the bucket's elapsed span (its clamped start through today) when it is, so the bucket
+ * can be presented as a partial period, and undefined for complete buckets.
+ */
+function getInProgressGroupRange(rawRange: {start: string; end: string}, queryJSON: SearchQueryJSON | undefined): {start: string; end: string} | undefined {
+    const today = format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
+    if (rawRange.start > today || rawRange.end < today) {
+        return undefined;
+    }
+    const dateFilters = queryJSON?.flatFilters.filter((filter) => filter.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE);
+    const {start, end} = adjustTimeRangeToDateFilters(rawRange, dateFilters);
+    if (start > today || end < today) {
+        return undefined;
+    }
+    return {start, end: today};
+}
+
+/**
+ * @private
  * Organizes data into List Sections grouped by member for display, for the TransactionGroupListItemType of Search Results.
  *
  * Do not use directly, use only via `getSections()` facade.
@@ -3480,6 +3500,7 @@ function getDaySections(
     data: OnyxTypes.SearchResults['data'],
     queryJSON: SearchQueryJSON | undefined,
     dateFnsLocale: DateFnsLocale | undefined,
+    translate: LocalizedTranslate,
 ): [TransactionDayGroupListItemType[], number, boolean] {
     const daySections: Record<string, TransactionDayGroupListItemType> = {};
     for (const key in data) {
@@ -3493,13 +3514,18 @@ function getDaySections(
         }
 
         const transactionsQueryJSON = queryJSON ? buildDateRangeGroupQuery(queryJSON, {start: dayGroup.day, end: dayGroup.day}).transactionsQueryJSON : undefined;
+        const inProgressRange = getInProgressGroupRange({start: dayGroup.day, end: dayGroup.day}, queryJSON);
+        const formattedDay = inProgressRange
+            ? translate('search.periodSoFar', {period: format(parse(dayGroup.day, CONST.DATE.FNS_FORMAT_STRING, new Date()), 'MMM d', {locale: dateFnsLocale})})
+            : DateUtils.formatToReadableString(dayGroup.day, dateFnsLocale);
         daySections[key] = {
             groupedBy: CONST.SEARCH.GROUP_BY.DAY,
             transactions: [],
             transactionsQueryJSON,
             ...dayGroup,
-            formattedDay: DateUtils.formatToReadableString(dayGroup.day, dateFnsLocale),
+            formattedDay,
             shortFormattedDay: DateUtils.getShortFormattedDayForSearch(dayGroup.day, dateFnsLocale),
+            ...(!!inProgressRange && {isInProgress: true}),
             keyForList: key,
         };
     }
@@ -3518,6 +3544,7 @@ function getMonthSections(
     data: OnyxTypes.SearchResults['data'],
     queryJSON: SearchQueryJSON | undefined,
     dateFnsLocale: DateFnsLocale | undefined,
+    translate: LocalizedTranslate,
 ): [TransactionMonthGroupListItemType[], number, boolean] {
     const monthSections: Record<string, TransactionMonthGroupListItemType> = {};
     for (const key in data) {
@@ -3526,9 +3553,13 @@ function getMonthSections(
             if (!('year' in monthGroup) || !('month' in monthGroup)) {
                 continue;
             }
-            const dateResult =
-                queryJSON && monthGroup.year && monthGroup.month ? buildDateRangeGroupQuery(queryJSON, DateUtils.getMonthDateRange(monthGroup.year, monthGroup.month)) : undefined;
+            const monthRange = DateUtils.getMonthDateRange(monthGroup.year, monthGroup.month);
+            const dateResult = queryJSON && monthGroup.year && monthGroup.month ? buildDateRangeGroupQuery(queryJSON, monthRange) : undefined;
             const transactionsQueryJSON = dateResult?.transactionsQueryJSON;
+            const inProgressRange = getInProgressGroupRange(monthRange, queryJSON);
+            const formattedMonth = inProgressRange
+                ? translate('search.periodSoFar', {period: DateUtils.getFormattedDateRangeForSearch(inProgressRange.start, inProgressRange.end, dateFnsLocale, false, true)})
+                : DateUtils.getFormattedMonthForSearch(monthGroup.year, monthGroup.month, dateFnsLocale);
 
             monthSections[key] = {
                 groupedBy: CONST.SEARCH.GROUP_BY.MONTH,
@@ -3536,9 +3567,10 @@ function getMonthSections(
                 transactionsQueryJSON,
                 keyForList: key,
                 ...monthGroup,
-                formattedMonth: DateUtils.getFormattedMonthForSearch(monthGroup.year, monthGroup.month, dateFnsLocale),
+                formattedMonth,
                 shortFormattedMonth: DateUtils.getShortFormattedMonthForSearch(monthGroup.year, monthGroup.month, dateFnsLocale),
                 sortKey: monthGroup.year * 100 + monthGroup.month,
+                ...(!!inProgressRange && {isInProgress: true}),
             };
         }
     }
@@ -3555,6 +3587,7 @@ function getWeekSections(
     data: OnyxTypes.SearchResults['data'],
     queryJSON: SearchQueryJSON | undefined,
     dateFnsLocale: DateFnsLocale | undefined,
+    translate: LocalizedTranslate,
 ): [TransactionWeekGroupListItemType[], number, boolean] {
     const weekSections: Record<string, TransactionWeekGroupListItemType> = {};
     for (const key in data) {
@@ -3568,7 +3601,12 @@ function getWeekSections(
             const transactionsQueryJSON = dateResult?.transactionsQueryJSON;
             const weekStart = dateResult?.start ?? rawRange.start;
             const weekEnd = dateResult?.end ?? rawRange.end;
-            const formattedWeek = DateUtils.getFormattedDateRangeForSearch(weekStart, weekEnd, dateFnsLocale);
+            const inProgressRange = getInProgressGroupRange(rawRange, queryJSON);
+            const formattedWeek = inProgressRange
+                ? translate('search.periodSoFar', {
+                      period: translate('search.weekOf', {date: format(parse(weekStart, CONST.DATE.FNS_FORMAT_STRING, new Date()), 'MMM d', {locale: dateFnsLocale})}),
+                  })
+                : DateUtils.getFormattedDateRangeForSearch(weekStart, weekEnd, dateFnsLocale);
             const shortFormattedWeek = DateUtils.getShortFormattedDateRangeForSearch(weekStart, weekEnd, dateFnsLocale);
 
             weekSections[key] = {
@@ -3578,6 +3616,7 @@ function getWeekSections(
                 ...weekGroup,
                 formattedWeek,
                 shortFormattedWeek,
+                ...(!!inProgressRange && {isInProgress: true}),
                 keyForList: key,
             };
         }
@@ -3591,7 +3630,12 @@ function getWeekSections(
  * Returns sections for year-grouped search results.
  * Do not use directly, use only via `getSections()` facade.
  */
-function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: SearchQueryJSON | undefined): [TransactionYearGroupListItemType[], number, boolean] {
+function getYearSections(
+    data: OnyxTypes.SearchResults['data'],
+    queryJSON: SearchQueryJSON | undefined,
+    dateFnsLocale: DateFnsLocale | undefined,
+    translate: LocalizedTranslate,
+): [TransactionYearGroupListItemType[], number, boolean] {
     const yearSections: Record<string, TransactionYearGroupListItemType> = {};
     for (const key in data) {
         if (isGroupEntry(key)) {
@@ -3599,9 +3643,12 @@ function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
             if (!('year' in yearGroup) || typeof yearGroup.year !== 'number') {
                 continue;
             }
-            const transactionsQueryJSON =
-                queryJSON && yearGroup.year !== undefined ? buildDateRangeGroupQuery(queryJSON, DateUtils.getYearDateRange(yearGroup.year))?.transactionsQueryJSON : undefined;
-            const formattedYear = String(yearGroup.year);
+            const yearRange = DateUtils.getYearDateRange(yearGroup.year);
+            const transactionsQueryJSON = queryJSON && yearGroup.year !== undefined ? buildDateRangeGroupQuery(queryJSON, yearRange)?.transactionsQueryJSON : undefined;
+            const inProgressRange = getInProgressGroupRange(yearRange, queryJSON);
+            const formattedYear = inProgressRange
+                ? translate('search.periodSoFar', {period: DateUtils.getFormattedDateRangeForSearch(inProgressRange.start, inProgressRange.end, dateFnsLocale, false, true)})
+                : String(yearGroup.year);
 
             yearSections[key] = {
                 groupedBy: CONST.SEARCH.GROUP_BY.YEAR,
@@ -3609,7 +3656,9 @@ function getYearSections(data: OnyxTypes.SearchResults['data'], queryJSON: Searc
                 transactionsQueryJSON,
                 ...yearGroup,
                 formattedYear,
+                shortFormattedYear: String(yearGroup.year),
                 sortKey: yearGroup.year,
+                ...(!!inProgressRange && {isInProgress: true}),
                 keyForList: key,
             };
         }
@@ -3623,6 +3672,7 @@ function getQuarterSections(
     data: OnyxTypes.SearchResults['data'],
     queryJSON: SearchQueryJSON | undefined,
     dateFnsLocale: DateFnsLocale | undefined,
+    translate: LocalizedTranslate,
 ): [TransactionQuarterGroupListItemType[], number, boolean] {
     const quarterSections: Record<string, TransactionQuarterGroupListItemType> = {};
     for (const key in data) {
@@ -3631,11 +3681,13 @@ function getQuarterSections(
             if (!('year' in quarterGroup) || typeof quarterGroup.year !== 'number' || !('quarter' in quarterGroup) || typeof quarterGroup.quarter !== 'number') {
                 continue;
             }
+            const quarterRange = DateUtils.getQuarterDateRange(quarterGroup.year, quarterGroup.quarter);
             const transactionsQueryJSON =
-                queryJSON && quarterGroup.year !== undefined && quarterGroup.quarter !== undefined
-                    ? buildDateRangeGroupQuery(queryJSON, DateUtils.getQuarterDateRange(quarterGroup.year, quarterGroup.quarter))?.transactionsQueryJSON
-                    : undefined;
-            const formattedQuarter = DateUtils.getFormattedQuarterForSearch(quarterGroup.year, quarterGroup.quarter, dateFnsLocale);
+                queryJSON && quarterGroup.year !== undefined && quarterGroup.quarter !== undefined ? buildDateRangeGroupQuery(queryJSON, quarterRange)?.transactionsQueryJSON : undefined;
+            const inProgressRange = getInProgressGroupRange(quarterRange, queryJSON);
+            const formattedQuarter = inProgressRange
+                ? translate('search.periodSoFar', {period: `Q${quarterGroup.quarter}`})
+                : DateUtils.getFormattedQuarterForSearch(quarterGroup.year, quarterGroup.quarter, dateFnsLocale);
             const shortFormattedQuarter = DateUtils.getShortFormattedQuarterForSearch(quarterGroup.year, quarterGroup.quarter, dateFnsLocale);
 
             quarterSections[key] = {
@@ -3646,6 +3698,7 @@ function getQuarterSections(
                 formattedQuarter,
                 shortFormattedQuarter,
                 sortKey: quarterGroup.year * 10 + quarterGroup.quarter, // Sort by year*10 + quarter (e.g., 20241, 20242, etc.)
+                ...(!!inProgressRange && {isInProgress: true}),
                 keyForList: key,
             };
         }
@@ -3731,15 +3784,15 @@ function getSections({
             case CONST.SEARCH.GROUP_BY.TAG:
                 return getTagSections(data, queryJSON, translate);
             case CONST.SEARCH.GROUP_BY.DAY:
-                return getDaySections(data, queryJSON, dateFnsLocale);
+                return getDaySections(data, queryJSON, dateFnsLocale, translate);
             case CONST.SEARCH.GROUP_BY.MONTH:
-                return getMonthSections(data, queryJSON, dateFnsLocale);
+                return getMonthSections(data, queryJSON, dateFnsLocale, translate);
             case CONST.SEARCH.GROUP_BY.WEEK:
-                return getWeekSections(data, queryJSON, dateFnsLocale);
+                return getWeekSections(data, queryJSON, dateFnsLocale, translate);
             case CONST.SEARCH.GROUP_BY.YEAR:
-                return getYearSections(data, queryJSON);
+                return getYearSections(data, queryJSON, dateFnsLocale, translate);
             case CONST.SEARCH.GROUP_BY.QUARTER:
-                return getQuarterSections(data, queryJSON, dateFnsLocale);
+                return getQuarterSections(data, queryJSON, dateFnsLocale, translate);
         }
     }
 

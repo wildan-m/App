@@ -95,6 +95,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     [CONST.SEARCH.GROUP_BY.YEAR]: {
         titleIconName: 'Calendar',
         getLabel: (item: GroupedItem) => (item as TransactionYearGroupListItemType).formattedYear ?? '',
+        getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.YEAR ? item.shortFormattedYear : undefined),
         getFilterQuery: (item: GroupedItem) => {
             const yearItem = item as TransactionYearGroupListItemType;
             const {start, end} = DateUtils.getYearDateRange(yearItem.year);

@@ -430,6 +430,9 @@ type TransactionDayGroupListItemType = TransactionGroupListItemType & {groupedBy
 
         /** Compact "day" value used where space is tight, e.g. chart axis labels */
         shortFormattedDay: string;
+
+        /** Whether the group's period contains today and is still accruing data */
+        isInProgress?: boolean;
     };
 
 type TransactionMonthGroupListItemType = TransactionGroupListItemType & {groupedBy: typeof CONST.SEARCH.GROUP_BY.MONTH} & SearchMonthGroup & {
@@ -439,6 +442,9 @@ type TransactionMonthGroupListItemType = TransactionGroupListItemType & {grouped
         shortFormattedMonth: string;
 
         sortKey: number;
+
+        /** Whether the group's period contains today and is still accruing data */
+        isInProgress?: boolean;
     };
 
 type TransactionWithdrawalIDGroupListItemType = TransactionGroupListItemType & {groupedBy: typeof CONST.SEARCH.GROUP_BY.WITHDRAWAL_ID} & SearchWithdrawalIDGroup & {
@@ -469,11 +475,20 @@ type TransactionWeekGroupListItemType = TransactionGroupListItemType & {groupedB
 
         /** Compact "week" value used where space is tight, e.g. chart axis labels */
         shortFormattedWeek: string;
+
+        /** Whether the group's period contains today and is still accruing data */
+        isInProgress?: boolean;
     };
 
 type TransactionYearGroupListItemType = TransactionGroupListItemType & {groupedBy: typeof CONST.SEARCH.GROUP_BY.YEAR} & SearchYearGroup & {
         formattedYear: string;
         sortKey: number;
+
+        /** Compact "year" value used where space is tight, e.g. chart axis labels */
+        shortFormattedYear?: string;
+
+        /** Whether the group's period contains today and is still accruing data */
+        isInProgress?: boolean;
     };
 
 type TransactionQuarterGroupListItemType = TransactionGroupListItemType & {groupedBy: typeof CONST.SEARCH.GROUP_BY.QUARTER} & SearchQuarterGroup & {
@@ -483,6 +498,9 @@ type TransactionQuarterGroupListItemType = TransactionGroupListItemType & {group
         shortFormattedQuarter: string;
 
         sortKey: number;
+
+        /** Whether the group's period contains today and is still accruing data */
+        isInProgress?: boolean;
     };
 
 type TransactionListItemProps<TItem extends ListItem> = ListItemProps<TItem> &

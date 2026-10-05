@@ -3,6 +3,7 @@ import AreaGradient from '@components/Charts/components/AreaGradient';
 import ChartTooltipLayer from '@components/Charts/components/ChartTooltipLayer';
 import ChartXAxisLabels from '@components/Charts/components/ChartXAxisLabels';
 import ChartYAxisLabels from '@components/Charts/components/ChartYAxisLabels';
+import DashedLineSegment from '@components/Charts/components/DashedLineSegment';
 import LeftFrameLine from '@components/Charts/components/LeftFrameLine';
 import ScatterPoints from '@components/Charts/components/ScatterPoints';
 import type {HitTestArgs} from '@components/Charts/hooks';
@@ -62,6 +63,9 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
         x: index,
         y: point.total,
     }));
+
+    // Only the final point can be in progress: the bucket containing today is the last one a date range that includes today produces
+    const inProgressIndex = data.length > 0 && data.at(data.length - 1)?.isInProgress ? data.length - 1 : -1;
 
     const handlePointPress = (index: number) => {
         if (index < 0 || index >= data.length) {
@@ -188,6 +192,7 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
                     points={args.points.y}
                     radius={DOT_RADIUS}
                     color={VictoryTheme.colors.defaultDot}
+                    hollowPointIndex={inProgressIndex >= 0 ? inProgressIndex : undefined}
                 />
                 {xAxisLabelHeight !== undefined && !!fontManager && (
                     <ChartXAxisLabels
@@ -279,21 +284,34 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
                         frame={{lineWidth: 0}}
                         data={chartData}
                     >
-                        {({points, yScale, yTicks}) => (
-                            <>
-                                <AreaGradient
-                                    points={points.y}
-                                    baselineY={yScale(Math.min(...yTicks))}
-                                    color={VictoryTheme.colors.default}
-                                />
-                                <Line
-                                    points={points.y}
-                                    color={VictoryTheme.colors.default}
-                                    strokeWidth={2}
-                                    curveType="linear"
-                                />
-                            </>
-                        )}
+                        {({points, yScale, yTicks}) => {
+                            // The in-progress point is excluded from the solid line and the area fill, and the segment
+                            // leading into it is drawn dashed, so a partial period doesn't read as a finished one
+                            const completedPoints = inProgressIndex < 0 ? points.y : points.y.slice(0, inProgressIndex);
+                            const inProgressSegmentPoints = inProgressIndex > 0 ? points.y.slice(inProgressIndex - 1, inProgressIndex + 1) : [];
+                            return (
+                                <>
+                                    <AreaGradient
+                                        points={completedPoints}
+                                        baselineY={yScale(Math.min(...yTicks))}
+                                        color={VictoryTheme.colors.default}
+                                    />
+                                    <Line
+                                        points={completedPoints}
+                                        color={VictoryTheme.colors.default}
+                                        strokeWidth={2}
+                                        curveType="linear"
+                                    />
+                                    {inProgressSegmentPoints.length > 0 && (
+                                        <DashedLineSegment
+                                            points={inProgressSegmentPoints}
+                                            color={VictoryTheme.colors.default}
+                                            strokeWidth={2}
+                                        />
+                                    )}
+                                </>
+                            );
+                        }}
                     </CartesianChart>
                 )}
                 <ChartTooltipLayer

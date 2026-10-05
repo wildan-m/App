@@ -16,6 +16,9 @@ type ChartDataPoint = {
     /** The point's signed share of total spend, in percentage points */
     percentOfTotal?: number;
 
+    /** Whether the point's period contains today and is still accruing data, so the chart renders it as partial */
+    isInProgress?: boolean;
+
     /** Query string for navigation when data point is clicked (optional) */
     onClickQuery?: string;
 };
