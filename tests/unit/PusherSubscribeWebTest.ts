@@ -165,6 +165,18 @@ describe('Pusher.subscribe on web', () => {
         }
     }
 
+    function goConnected() {
+        for (const callback of mockConnectionHandlers.get('state_change') ?? []) {
+            callback({previous: 'connecting', current: 'connected'});
+        }
+    }
+
+    function receiveConnectionMessage() {
+        for (const callback of mockConnectionHandlers.get('message') ?? []) {
+            callback({});
+        }
+    }
+
     beforeEach(async () => {
         await Pusher.init({
             appKey: CONFIG.PUSHER.APP_KEY,
@@ -521,6 +533,65 @@ describe('Pusher.subscribe on web', () => {
         channel?.completeHandshake();
 
         // Then the earlier socket's outage costs no sync on this one
+        expect(reconnect).not.toHaveBeenCalled();
+    });
+
+    it('should trigger a reconnect when the socket recovers from a silent death without going unavailable', async () => {
+        // Given a private user channel whose last inbound message is older than one activity check plus
+        // one pong window, because a socket that dies without a close frame (sleep, a network switch, a
+        // throttled tab) is only noticed by the activity check and reconnects without reaching unavailable
+        const accountID = '1';
+        const userChannel = `${CONST.PUSHER.PRIVATE_USER_CHANNEL_PREFIX}${accountID}${CONFIG.PUSHER.SUFFIX}`;
+        const lastInboundAt = 1_000_000;
+
+        PusherUtils.onPrivateUserChannelResubscribe(accountID);
+        PusherUtils.subscribeToPrivateUserChannelEvent(Pusher.TYPE.MULTIPLE_EVENTS, accountID, () => {});
+        await jest.runAllTimersAsync();
+
+        const channel = mockChannels.get(userChannel);
+        channel?.completeHandshake();
+        await jest.runAllTimersAsync();
+
+        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(lastInboundAt);
+        receiveConnectionMessage();
+
+        // When the socket reconnects after an inbound silence longer than a live connection allows
+        nowSpy.mockReturnValue(lastInboundAt + CONST.PUSHER.ACTIVITY_TIMEOUT_MS + CONST.PUSHER.PONG_TIMEOUT_MS + 1);
+        channel?.dropConnection();
+        goConnected();
+        channel?.startSubscription();
+        channel?.completeHandshake();
+
+        // Then the sync runs, because Pusher does not replay the events sent while the socket was dead
+        expect(reconnect).toHaveBeenCalledTimes(1);
+    });
+
+    it('should trigger no reconnect when the socket reconnects while its inbound traffic is recent', async () => {
+        // Given a private user channel on a socket that carried a message moments before the drop,
+        // because an overt close followed by a fast reconnect is the blip the skip was built for
+        const accountID = '1';
+        const userChannel = `${CONST.PUSHER.PRIVATE_USER_CHANNEL_PREFIX}${accountID}${CONFIG.PUSHER.SUFFIX}`;
+        const lastInboundAt = 1_000_000;
+
+        PusherUtils.onPrivateUserChannelResubscribe(accountID);
+        PusherUtils.subscribeToPrivateUserChannelEvent(Pusher.TYPE.MULTIPLE_EVENTS, accountID, () => {});
+        await jest.runAllTimersAsync();
+
+        const channel = mockChannels.get(userChannel);
+        channel?.completeHandshake();
+        await jest.runAllTimersAsync();
+
+        const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(lastInboundAt);
+        receiveConnectionMessage();
+
+        // When the socket reconnects a few seconds after its last inbound message
+        nowSpy.mockReturnValue(lastInboundAt + 5000);
+        channel?.dropConnection();
+        goConnected();
+        channel?.startSubscription();
+        channel?.completeHandshake();
+
+        // Then no sync runs, so the saved ReconnectApp volume of the blip skip is preserved
         expect(reconnect).not.toHaveBeenCalled();
     });
 });

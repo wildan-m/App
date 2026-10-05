@@ -45,6 +45,7 @@ Onyx.connectWithoutView({
 let socket: PusherWithAuthParams | null;
 let pusherSocketID: string | undefined;
 let hasUnclaimedOutage = false;
+let lastInboundMessageAt: number | undefined;
 const socketEventCallbacks: SocketEventCallback[] = [];
 let customAuthorizer: ChannelAuthorizerGenerator;
 
@@ -112,8 +113,26 @@ function init(args: Args): Promise<void> {
             callSocketEventCallbacks('disconnected');
         });
 
+        // pusher-js re-emits every inbound message here, pongs included, so this marks the last moment the socket provably carried data.
+        socket?.connection.bind('message', () => {
+            lastInboundMessageAt = Date.now();
+        });
+
         socket?.connection.bind('state_change', (states: States) => {
             hasUnclaimedOutage ||= states.current === 'unavailable';
+
+            // A live connection is never silent for longer than one activity check plus one pong window. A bigger inbound gap at
+            // reconnect means the socket died without a close frame (sleep, network switch, throttled tab) and recovered before
+            // reaching `unavailable`, and Pusher does not replay the events sent meanwhile, so the client must sync.
+            if (states.current === 'connected') {
+                const now = Date.now();
+                const silentGapMs = lastInboundMessageAt === undefined ? 0 : now - lastInboundMessageAt;
+                if (silentGapMs > CONST.PUSHER.ACTIVITY_TIMEOUT_MS + CONST.PUSHER.PONG_TIMEOUT_MS) {
+                    hasUnclaimedOutage = true;
+                    Log.info('[Pusher] Reconnected after a silent inbound gap, marking an outage to sync', false, {silentGapMs});
+                }
+                lastInboundMessageAt = now;
+            }
             callSocketEventCallbacks('state_change', states);
         });
     }).then(resolveInitPromise);
@@ -486,6 +505,7 @@ function disconnect() {
     socket = null;
     pusherSocketID = '';
     hasUnclaimedOutage = false;
+    lastInboundMessageAt = undefined;
     eventsBoundToChannels.clear();
     initPromise = new Promise((resolve) => {
         resolveInitPromise = resolve;
