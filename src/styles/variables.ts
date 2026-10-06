@@ -87,6 +87,7 @@ export default {
     iconSizeXSmall: 10,
     iconSizeExtraSmall: 12,
     iconSizeSemiSmall: 14,
+    reportHistoryStepIconContainerSize: 28,
     iconSizeSmall: 16,
     iconSizeMedium: 18,
     iconSizeNormal: 20,

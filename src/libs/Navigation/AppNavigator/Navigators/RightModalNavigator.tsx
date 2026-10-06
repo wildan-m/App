@@ -359,6 +359,10 @@ function RightModalNavigator({navigation, route}: RightModalNavigatorProps) {
                                 component={ModalStackNavigators.ReportChangeApproverModalStackNavigator}
                             />
                             <Stack.Screen
+                                name={SCREENS.RIGHT_MODAL.REPORT_HISTORY}
+                                component={ModalStackNavigators.ReportHistoryModalStackNavigator}
+                            />
+                            <Stack.Screen
                                 name={SCREENS.RIGHT_MODAL.REPORT_SETTINGS}
                                 component={ModalStackNavigators.ReportSettingsModalStackNavigator}
                             />

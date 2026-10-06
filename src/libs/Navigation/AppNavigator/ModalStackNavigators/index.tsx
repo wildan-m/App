@@ -31,6 +31,7 @@ import type {
     ReferralDetailsNavigatorParamList,
     ReportCardActivateNavigatorParamList,
     ReportChangeApproverParamList,
+    ReportHistoryParamList,
     ReportChangeWorkspaceNavigatorParamList,
     ReportDescriptionNavigatorParamList,
     ReportDetailsNavigatorParamList,
@@ -291,6 +292,10 @@ const ReportChangeApproverModalStackNavigator = createModalStackNavigator<Report
     [SCREENS.REPORT_CHANGE_APPROVER.DYNAMIC_ROOT]: () => require<ReactComponentModule>('../../../../pages/DynamicReportChangeApproverPage').default,
     [SCREENS.REPORT_CHANGE_APPROVER.ADD_APPROVER]: () => require<ReactComponentModule>('../../../../pages/ReportAddApproverPage').default,
     [SCREENS.REPORT_CHANGE_APPROVER.REASSIGN_APPROVER]: () => require<ReactComponentModule>('../../../../pages/ReportReassignApproverPage').default,
+});
+
+const ReportHistoryModalStackNavigator = createModalStackNavigator<ReportHistoryParamList>({
+    [SCREENS.REPORT_HISTORY.DYNAMIC_ROOT]: () => require<ReactComponentModule>('../../../../pages/DynamicReportHistoryPage').default,
 });
 
 const ReportSettingsModalStackNavigator = createModalStackNavigator<ReportSettingsNavigatorParamList>({
@@ -1501,6 +1506,7 @@ export {
     ReferralModalStackNavigator,
     ReportCardActivateStackNavigator,
     ReportChangeApproverModalStackNavigator,
+    ReportHistoryModalStackNavigator,
     ReportChangeWorkspaceModalStackNavigator,
     ChronosScheduleOOOModalStackNavigator,
     ReportDescriptionModalStackNavigator,

@@ -5587,6 +5587,22 @@ const staticStyles = (theme: ThemeColors) =>
             minHeight: variables.componentSizeSmall,
         },
 
+        reportHistoryStepIconContainer: {
+            width: variables.reportHistoryStepIconContainerSize,
+            height: variables.reportHistoryStepIconContainerSize,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+
+        reportHistoryConnectorLine: {
+            width: 1,
+            height: 12,
+            marginVertical: 2,
+            alignSelf: 'flex-start',
+            marginLeft: variables.reportHistoryStepIconContainerSize / 2,
+            backgroundColor: theme.border,
+        },
+
         // The layer BulkActionBar floats in. It covers its container so the bar can center itself over the table, and
         // passes touches through everywhere except the bar itself.
         bulkActionBarLayer: {

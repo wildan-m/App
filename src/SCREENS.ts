@@ -321,6 +321,7 @@ const SCREENS = {
         ADD_EXISTING_EXPENSE: 'AddExistingExpense',
         SCHEDULE_CALL: 'ScheduleCall',
         REPORT_CHANGE_APPROVER: 'Report_Change_Approver',
+        REPORT_HISTORY: 'Report_History',
         MERGE_TRANSACTION: 'MergeTransaction',
         REPORT_CARD_ACTIVATE: 'Report_Card_Activate',
         DOMAIN: 'Domain',
@@ -1181,6 +1182,9 @@ const SCREENS = {
         DYNAMIC_ROOT: 'Dynamic_Report_Change_Approver_Root',
         ADD_APPROVER: 'Report_Change_Approver_Add_Approver',
         REASSIGN_APPROVER: 'Report_Change_Approver_Reassign_Approver',
+    },
+    REPORT_HISTORY: {
+        DYNAMIC_ROOT: 'Dynamic_Report_History_Root',
     },
     TEST_TOOLS_MODAL: {
         ROOT: 'TestToolsModal_Root',

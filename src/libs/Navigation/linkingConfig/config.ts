@@ -2259,6 +2259,11 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.REPORT_CHANGE_APPROVER.REASSIGN_APPROVER]: ROUTES.REPORT_CHANGE_APPROVER_REASSIGN_APPROVER.route,
                     },
                 },
+                [SCREENS.RIGHT_MODAL.REPORT_HISTORY]: {
+                    screens: {
+                        [SCREENS.REPORT_HISTORY.DYNAMIC_ROOT]: DYNAMIC_ROUTES.REPORT_HISTORY.path,
+                    },
+                },
                 [SCREENS.RIGHT_MODAL.EXPENSE_REPORT]: ROUTES.EXPENSE_REPORT_RHP.route,
                 [SCREENS.RIGHT_MODAL.AGENT_REPORT]: ROUTES.AGENT_REPORT.route,
                 [SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT]: ROUTES.SEARCH_MONEY_REQUEST_REPORT.route,
