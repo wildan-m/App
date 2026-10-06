@@ -60,7 +60,8 @@ function buildReportHistoryEntries(
     for (const action of sortedActions) {
         const accountID = action.actorAccountID;
         if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CREATED)) {
-            entries.push({key: action.reportActionID, type: REPORT_HISTORY_STEP.CREATED, accountID, created: action.created, isFuture: false});
+            // Prefer the report owner: the CREATED action's actor can be an account without personal details (e.g. an old or system account)
+            entries.push({key: action.reportActionID, type: REPORT_HISTORY_STEP.CREATED, accountID: report?.ownerAccountID ?? accountID, created: action.created, isFuture: false});
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.SUBMITTED) || isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.SUBMITTED_AND_CLOSED)) {
             entries.push({key: action.reportActionID, type: REPORT_HISTORY_STEP.SUBMITTED, accountID, created: action.created, isFuture: false});
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.APPROVED)) {
