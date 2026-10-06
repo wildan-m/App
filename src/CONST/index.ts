@@ -125,7 +125,8 @@ type UnofferedOnboardingAccountingConnection =
     | typeof CONST.POLICY.CONNECTIONS.NAME.DUALENTRY
     | typeof CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE
     // Covered by the Microsoft Dynamics option, and still behind the BUSINESS_CENTRAL beta.
-    | typeof CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL;
+    | typeof CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL
+    | typeof CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS;
 
 type UnhandledAccountingConnection = Exclude<TupleToUnion<typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES>, OnboardingAccountingOption | UnofferedOnboardingAccountingConnection>;
 
@@ -3998,6 +3999,47 @@ const CONST = {
         EMPLOYEE: 'employee',
     },
 
+    ZOHO_BOOKS_CONFIG: {
+        ORGANIZATION_ID: 'organizationID',
+        ENABLE_NEW_CATEGORIES: 'enableNewCategories',
+        SYNC_TAX_RATES: 'syncTaxRates',
+        EXPORTER: 'exporter',
+        EXPORT_DATE: 'exportDate',
+        REIMBURSABLE: 'reimbursable',
+        NON_REIMBURSABLE: 'nonReimbursable',
+        CREDIT_CARD_ACCOUNT_ID: 'creditCardAccountID',
+        DEFAULT_VENDORID: 'defaultVendorID',
+        TRAVEL_BILLING_PAYABLE_ACCOUNT_ID: 'travelInvoicingPayableAccountID',
+        ACCOUNTING_METHOD: 'accountingMethod',
+        AUTO_SYNC: 'autoSync',
+        SYNC_REIMBURSED_REPORTS: 'syncReimbursedReports',
+        BILL_PAYMENT_ACCOUNT_ID: 'billPaymentAccountID',
+        SYNC_EXPENSIFY_CARD_SETTLEMENTS: 'syncExpensifyCardSettlements',
+        SETTLEMENTS_BANK_ACCOUNT_ID: 'settlementsBankAccountID',
+        SYNC_TRAVEL_BILLING_SETTLEMENTS: 'syncTravelInvoicingSettlements',
+        TRAVEL_BILLING_SETTLEMENTS_BANK_ACCOUNT_ID: 'travelInvoicingSettlementsBankAccountID',
+        TAG_MAPPING_PREFIX: 'tagMapping_',
+    },
+
+    ZOHO_BOOKS_MAPPING_VALUE: {
+        NONE: 'NONE',
+        TAG: 'TAG',
+    },
+
+    ZOHO_BOOKS_EXPORT_REIMBURSABLE: {
+        VENDOR_BILL: 'VENDOR_BILL',
+    },
+
+    ZOHO_BOOKS_EXPORT_NON_REIMBURSABLE: {
+        JOURNAL_ENTRY: 'JOURNAL_ENTRY',
+    },
+
+    ZOHO_BOOKS_EXPORT_DATE: {
+        LAST_EXPENSE: 'LAST_EXPENSE',
+        REPORT_EXPORTED: 'REPORT_EXPORTED',
+        REPORT_SUBMITTED: 'REPORT_SUBMITTED',
+    },
+
     BUSINESS_CENTRAL_CONFIG: {
         COMPANY_ID: 'companyID',
         ENABLE_NEW_CATEGORIES: 'enableNewCategories',
@@ -4823,6 +4865,7 @@ const CONST = {
                 DUALENTRY: 'dualEntry',
                 CAMPFIRE: 'campfire',
                 BUSINESS_CENTRAL: 'businessCentral',
+                ZOHO_BOOKS: 'zohoBooks',
                 GUSTO: 'gusto',
                 ZENEFITS: 'zenefits',
                 MERGE_HR: 'merge_hris',
@@ -4843,6 +4886,7 @@ const CONST = {
                 DUALENTRY: 'dualentry',
                 CAMPFIRE: 'campfire',
                 BUSINESS_CENTRAL: 'business-central',
+                ZOHO_BOOKS: 'zoho-books',
                 GUSTO: 'gusto',
                 ZENEFITS: 'zenefits',
                 MERGE_HR: 'merge-hr',
@@ -4859,6 +4903,7 @@ const CONST = {
                 dualEntry: 'DualEntry',
                 campfire: 'Campfire',
                 businessCentral: 'Dynamics 365 Business Central',
+                zohoBooks: 'Zoho Books',
                 gusto: 'Gusto',
                 billCom: 'Bill.com',
                 zenefits: 'TriNet',
@@ -4885,6 +4930,7 @@ const CONST = {
                     this.NAME.DUALENTRY,
                     this.NAME.CAMPFIRE,
                     this.NAME.BUSINESS_CENTRAL,
+                    this.NAME.ZOHO_BOOKS,
                 ] as const;
             },
             // The `origin` the backend stamps on a report field imported by an accounting integration. These values
@@ -4901,6 +4947,7 @@ const CONST = {
                     [this.NAME.DUALENTRY]: 'dualentry',
                     [this.NAME.CAMPFIRE]: 'campfire',
                     [this.NAME.BUSINESS_CENTRAL]: 'businessCentral',
+                    [this.NAME.ZOHO_BOOKS]: 'zohoBooks',
                 } as const;
             },
             get HR_CONNECTION_NAMES() {
@@ -5021,6 +5068,12 @@ const CONST = {
                 CAMPFIRE_SYNC_PAYMENTS: 'campfireSyncPayments',
                 CAMPFIRE_SYNC_CARD_SETTLEMENTS: 'campfireSyncCardSettlements',
                 CAMPFIRE_SYNC_TRAVEL_SETTLEMENTS: 'campfireSyncTravelSettlements',
+                ZOHO_BOOKS_SYNC_TITLE: 'zohoBooksSyncTitle',
+                ZOHO_BOOKS_SYNC_CONNECTION: 'zohoBooksSyncConnection',
+                ZOHO_BOOKS_SYNC_IMPORT_DATA: 'zohoBooksSyncImportData',
+                ZOHO_BOOKS_SYNC_PAYMENTS: 'zohoBooksSyncPayments',
+                ZOHO_BOOKS_SYNC_CARD_SETTLEMENTS: 'zohoBooksSyncCardSettlements',
+                ZOHO_BOOKS_SYNC_TRAVEL_SETTLEMENTS: 'zohoBooksSyncTravelSettlements',
                 BUSINESS_CENTRAL_SYNC_TITLE: 'businessCentralSyncTitle',
                 BUSINESS_CENTRAL_SYNC_CONNECTION: 'businessCentralSyncConnection',
                 BUSINESS_CENTRAL_SYNC_IMPORT_DATA: 'businessCentralSyncImportData',

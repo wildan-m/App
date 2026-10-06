@@ -2512,6 +2512,232 @@ type CampfireConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
 >;
 
 /**
+ * An organization configured in Zoho Books.
+ */
+type ZohoBooksOrganization = {
+    /** Unique identifier of the organization */
+    id: string;
+
+    /** Name of the organization */
+    name: string;
+
+    /** Number of locations configured in the organization. Multi-location organizations are not supported yet. */
+    locationCount: number;
+};
+
+/**
+ * Account retrieved from Zoho Books.
+ */
+type ZohoBooksAccount = {
+    /** Unique identifier of the account */
+    id: string;
+
+    /** Name of the account */
+    name: string;
+
+    /** Raw Zoho Books account type */
+    accountType: string;
+};
+
+/**
+ * Reporting tag retrieved from Zoho Books.
+ */
+type ZohoBooksTag = {
+    /** Unique identifier of the reporting tag, also the key of its entry in `tagMappings` */
+    id: string;
+
+    /** Name of the reporting tag */
+    name: string;
+};
+
+/**
+ * Tax rate retrieved from Zoho Books.
+ */
+type ZohoBooksTaxRate = {
+    /** Unique identifier of the tax rate */
+    id: string;
+
+    /** Name of the tax rate */
+    name: string;
+
+    /** Percentage applied by the tax rate */
+    percentage: number;
+};
+
+/**
+ * Vendor retrieved from Zoho Books.
+ */
+type ZohoBooksVendor = {
+    /** Unique identifier of the vendor */
+    id: string;
+
+    /** Name of the vendor */
+    name: string;
+
+    /** Email address associated with the vendor */
+    email?: string;
+};
+
+/**
+ * Connection data retrieved from Zoho Books.
+ */
+type ZohoBooksConnectionData = {
+    /** Collection of eligible organizations in Zoho Books. */
+    organizations?: ZohoBooksOrganization[];
+
+    /** Accounts available in Zoho Books. */
+    accounts?: ZohoBooksAccount[];
+
+    /** Reporting tags available in Zoho Books. */
+    tags?: ZohoBooksTag[];
+
+    /** Tax rates available in Zoho Books. */
+    taxRates?: ZohoBooksTaxRate[];
+
+    /** Vendors available in Zoho Books. */
+    vendors?: ZohoBooksVendor[];
+};
+
+/**
+ * Coding configuration used when exporting data to Zoho Books.
+ */
+type ZohoBooksCoding = {
+    /**
+     * Mapping of Zoho Books reporting tag IDs to their configured mapping behavior.
+     */
+    tagMappings?: Record<string, ValueOf<typeof CONST.ZOHO_BOOKS_MAPPING_VALUE>>;
+
+    /** Whether tax rates should be synchronized from Zoho Books. */
+    syncTaxRates: boolean;
+};
+
+/** Offline feedback key for reporting tag mapping */
+type ZohoBooksCodingTagMappingsOfflineFeedbackKey = `${typeof CONST.ZOHO_BOOKS_CONFIG.TAG_MAPPING_PREFIX}${string}`;
+
+/**
+ * Offline feedback keys for `ZohoBooksCoding`
+ */
+type ZohoBooksCodingOfflineFeedbackKeys = keyof Omit<ZohoBooksCoding, 'tagMappings'> | ZohoBooksCodingTagMappingsOfflineFeedbackKey;
+
+/**
+ * Available dates that can be used as the export date.
+ */
+type ZohoBooksExportDate = ValueOf<typeof CONST.ZOHO_BOOKS_EXPORT_DATE>;
+
+/**
+ * Export strategy for reimbursable expenses.
+ */
+type ZohoBooksExportReimbursable = ValueOf<typeof CONST.ZOHO_BOOKS_EXPORT_REIMBURSABLE>;
+
+/**
+ * Export strategy for company card expenses.
+ */
+type ZohoBooksExportNonReimbursable = ValueOf<typeof CONST.ZOHO_BOOKS_EXPORT_NON_REIMBURSABLE>;
+
+/**
+ * Export configuration for sending accounting data to Zoho Books.
+ */
+type ZohoBooksExport = {
+    /** Identifier of the export implementation to use. */
+    exporter: string;
+
+    /** Date source used when generating exported transactions. */
+    exportDate: ZohoBooksExportDate;
+
+    /** Export behavior for reimbursable expenses. */
+    reimbursable: ZohoBooksExportReimbursable;
+
+    /** Export behavior for company card expenses. */
+    nonReimbursable: ZohoBooksExportNonReimbursable;
+
+    /** Account used when exporting company card expenses. */
+    creditCardAccountID: string;
+
+    /** Default vendor used when exporting transactions. */
+    defaultVendorID: string;
+
+    /** Payable account used when exporting travel billings. */
+    travelInvoicingPayableAccountID: string;
+
+    /** Accounting method used during export. */
+    accountingMethod: ValueOf<typeof COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD>;
+};
+
+/**
+ * Offline feedback keys for `ZohoBooksExport`
+ */
+type ZohoBooksExportOfflineFeedbackKeys = keyof ZohoBooksExport;
+
+/**
+ * Automatic synchronization settings for Zoho Books.
+ */
+type ZohoBooksAutoSync = {
+    /** Whether automatic synchronization is enabled. */
+    enabled: boolean;
+
+    /** Unique identifier of the automatic synchronization job. */
+    jobID?: string | null;
+};
+
+/**
+ * Synchronization settings for importing and updating data in Zoho Books.
+ */
+type ZohoBooksSync = {
+    /** Whether reimbursed expense reports should be synchronized. */
+    syncReimbursedReports: boolean;
+
+    /** Account code used for bill payment transactions. */
+    billPaymentAccountID: string;
+
+    /** Whether Expensify Card settlement transactions should be synchronized. */
+    syncExpensifyCardSettlements: boolean;
+
+    /** Bank account used for Expensify Card settlements. */
+    settlementsBankAccountID: string;
+
+    /** Whether travel billing settlement transactions should be synchronized. */
+    syncTravelInvoicingSettlements: boolean;
+
+    /** Bank account used for travel billing settlements. */
+    travelInvoicingSettlementsBankAccountID: string;
+};
+
+/**
+ * Connection config for Zoho Books.
+ */
+type ZohoBooksConnectionsConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
+    {
+        /** The ID of the selected organization in Zoho Books */
+        organizationID: string;
+
+        /** Whether the connection has been configured */
+        isConfigured: boolean;
+
+        /** Whether to enable a new Expense Category into Expensify */
+        enableNewCategories: boolean;
+
+        /** Coding settings */
+        coding?: ZohoBooksCoding;
+
+        /** Export settings */
+        export?: ZohoBooksExport;
+
+        /** Auto-sync settings */
+        autoSync?: ZohoBooksAutoSync;
+
+        /** Sync settings */
+        sync?: ZohoBooksSync;
+
+        /** Collection of errors coming from BE */
+        errors?: OnyxCommon.Errors;
+
+        /** Collection of form field errors  */
+        errorFields?: OnyxCommon.ErrorFields;
+    },
+    ZohoBooksCodingOfflineFeedbackKeys | ZohoBooksExportOfflineFeedbackKeys | keyof ZohoBooksAutoSync | keyof ZohoBooksSync
+>;
+
+/**
  * A company (legal entity) reachable with the Business Central connection's credentials.
  */
 type BusinessCentralCompany = {
@@ -3029,6 +3255,9 @@ type Connections = {
 
     /** Business Central integration connection */
     [CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL]: Connection<BusinessCentralConnectionData, BusinessCentralConnectionsConfig>;
+
+    /** Zoho Books integration connection */
+    [CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS]: Connection<ZohoBooksConnectionData, ZohoBooksConnectionsConfig>;
 
     /** Gusto integration connection */
     [CONST.POLICY.CONNECTIONS.NAME.GUSTO]: Connection<GustoConnectionData, GustoConnectionConfig>;
@@ -3886,6 +4115,15 @@ export type {
     CampfireExport,
     CampfireAutoSync,
     CampfireSync,
+    ZohoBooksConnectionsConfig,
+    ZohoBooksOrganization,
+    ZohoBooksCoding,
+    ZohoBooksExportDate,
+    ZohoBooksVendor,
+    ZohoBooksAccount,
+    ZohoBooksExport,
+    ZohoBooksAutoSync,
+    ZohoBooksSync,
     BusinessCentralCompany,
     BusinessCentralCoding,
     BusinessCentralExport,

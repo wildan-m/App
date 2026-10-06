@@ -100,6 +100,8 @@ export type {default as UpdateCampfireSettlementsAccountParams} from './UpdateCa
 export type {default as UpdateCampfireSyncTravelInvoicingSettlementsParams} from './UpdateCampfireSyncTravelInvoicingSettlementsParams';
 export type {default as UpdateCampfireTravelInvoicingSettlementsAccountParams} from './UpdateCampfireTravelInvoicingSettlementsAccountParams';
 export type {default as UpdateCampfireTravelInvoicingPayableAccountParams} from './UpdateCampfireTravelInvoicingPayableAccountParams';
+export type {default as SyncPolicyToZohoBooksParams} from './SyncPolicyToZohoBooksParams';
+export type {default as UpdateZohoBooksOrganizationParams} from './UpdateZohoBooksOrganizationParams';
 export type {default as SyncPolicyToBusinessCentralParams} from './SyncPolicyToBusinessCentralParams';
 export type {default as UpdateBusinessCentralCompanyParams} from './UpdateBusinessCentralCompanyParams';
 export type {default as UpdateBusinessCentralEnableNewCategoriesParams} from './UpdateBusinessCentralEnableNewCategoriesParams';

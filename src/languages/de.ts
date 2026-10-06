@@ -7511,6 +7511,18 @@ Der Control-Tarif beginnt bei 9 $ pro aktivem Mitglied und Monat.`,
                             return 'Kartenausgleiche werden synchronisiert';
                         case 'campfireSyncTravelSettlements':
                             return 'Reiseabrechnungen werden synchronisiert';
+                        case 'zohoBooksSyncTitle':
+                            return 'Zoho Books-Daten werden synchronisiert';
+                        case 'zohoBooksSyncConnection':
+                            return 'Verbindung zu Zoho Books wird initialisiert';
+                        case 'zohoBooksSyncImportData':
+                            return 'Daten werden geladen';
+                        case 'zohoBooksSyncPayments':
+                            return 'Lieferantenzahlungen werden synchronisiert';
+                        case 'zohoBooksSyncCardSettlements':
+                            return 'Kartenausgleiche werden synchronisiert';
+                        case 'zohoBooksSyncTravelSettlements':
+                            return 'Reiseabrechnungen werden synchronisiert';
                         case 'businessCentralSyncTitle':
                             return 'Dynamics 365 Business Central-Daten werden synchronisiert';
                         case 'businessCentralSyncConnection':
@@ -7560,6 +7572,7 @@ Der Control-Tarif beginnt bei 9 $ pro aktivem Mitglied und Monat.`,
             syncTravelInvoicingSettlementsNoAccountTooltip: 'Zum Aktivieren legen Sie ein Konto für Ihre Exporte fest.',
             syncTravelInvoicingSettlementsNoAutoSyncTooltip: 'Zum Entsperren automatische Synchronisierung aktivieren.',
             campfire: 'Campfire',
+            zohoBooks: 'Zoho Books',
             businessCentral: 'Dynamics 365 Business Central',
             qboConnectionExpiring: ({date}: {date: string}) => `Ihre QuickBooks Online-Verbindung läuft am ${date} ab.`,
             qboConnectionExpired: ({date}: {date: string}) => `Ihre QuickBooks Online-Verbindung ist am ${date} abgelaufen.`,

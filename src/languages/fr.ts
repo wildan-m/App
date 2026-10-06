@@ -7530,6 +7530,18 @@ Le forfait Control commence à 9 $ par Membre actif et par mois.`,
                             return 'Synchronisation des règlements de carte';
                         case 'campfireSyncTravelSettlements':
                             return 'Synchronisation des règlements de voyage';
+                        case 'zohoBooksSyncTitle':
+                            return 'Synchronisation des données Zoho Books';
+                        case 'zohoBooksSyncConnection':
+                            return 'Initialisation de la connexion à Zoho Books';
+                        case 'zohoBooksSyncImportData':
+                            return 'Chargement des données';
+                        case 'zohoBooksSyncPayments':
+                            return 'Synchronisation des paiements fournisseurs';
+                        case 'zohoBooksSyncCardSettlements':
+                            return 'Synchronisation des règlements de carte';
+                        case 'zohoBooksSyncTravelSettlements':
+                            return 'Synchronisation des règlements de voyage';
                         case 'businessCentralSyncTitle':
                             return 'Synchronisation des données Dynamics 365 Business Central';
                         case 'businessCentralSyncConnection':
@@ -7579,6 +7591,7 @@ Le forfait Control commence à 9 $ par Membre actif et par mois.`,
             syncTravelInvoicingSettlementsNoAccountTooltip: 'Pour le déverrouiller, définissez un compte pour vos exports.',
             syncTravelInvoicingSettlementsNoAutoSyncTooltip: 'Pour le déverrouiller, activez la synchronisation automatique.',
             campfire: 'Campfire',
+            zohoBooks: 'Zoho Books',
             businessCentral: 'Dynamics 365 Business Central',
             qboConnectionExpiring: ({date}: {date: string}) => `Votre connexion QuickBooks Online expire le ${date}.`,
             qboConnectionExpired: ({date}: {date: string}) => `Votre connexion à QuickBooks Online a expiré le ${date}.`,

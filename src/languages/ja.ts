@@ -7381,6 +7381,18 @@ Control プランは、アクティブメンバー1人あたり月額 $9 から�
                             return 'カード精算を同期しています';
                         case 'campfireSyncTravelSettlements':
                             return '出張精算を同期しています';
+                        case 'zohoBooksSyncTitle':
+                            return 'Zoho Books データを同期しています';
+                        case 'zohoBooksSyncConnection':
+                            return 'Zoho Books への接続を初期化しています';
+                        case 'zohoBooksSyncImportData':
+                            return 'データを読み込んでいます';
+                        case 'zohoBooksSyncPayments':
+                            return '仕入先への支払いを同期しています';
+                        case 'zohoBooksSyncCardSettlements':
+                            return 'カード精算を同期しています';
+                        case 'zohoBooksSyncTravelSettlements':
+                            return '出張精算を同期しています';
                         case 'businessCentralSyncTitle':
                             return 'Dynamics 365 Business Central データを同期しています';
                         case 'businessCentralSyncConnection':
@@ -7429,6 +7441,7 @@ Control プランは、アクティブメンバー1人あたり月額 $9 から�
             syncTravelInvoicingSettlementsNoAccountTooltip: 'ロックを解除するには、エクスポート用の口座を設定してください。',
             syncTravelInvoicingSettlementsNoAutoSyncTooltip: 'ロックを解除するには、自動同期を有効にしてください。',
             campfire: 'Campfire',
+            zohoBooks: 'Zoho Books',
             businessCentral: 'Dynamics 365 Business Central',
             qboConnectionExpiring: ({date}: {date: string}) => `QuickBooks Online との接続は ${date} に有効期限が切れます。`,
             qboConnectionExpired: ({date}: {date: string}) => `QuickBooks Online との接続は ${date} に期限切れになりました。`,

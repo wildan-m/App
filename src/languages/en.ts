@@ -7573,6 +7573,7 @@ const translations = {
             rillet: 'Rillet',
             dualEntry: 'DualEntry',
             campfire: 'Campfire',
+            zohoBooks: 'Zoho Books',
             businessCentral: 'Dynamics 365 Business Central',
             sap: 'SAP',
             oracle: 'Oracle',
@@ -7834,6 +7835,18 @@ const translations = {
                         case 'campfireSyncCardSettlements':
                             return 'Syncing card settlements';
                         case 'campfireSyncTravelSettlements':
+                            return 'Syncing travel settlements';
+                        case 'zohoBooksSyncTitle':
+                            return 'Syncing Zoho Books data';
+                        case 'zohoBooksSyncConnection':
+                            return 'Initializing connection to Zoho Books';
+                        case 'zohoBooksSyncImportData':
+                            return 'Loading data';
+                        case 'zohoBooksSyncPayments':
+                            return 'Syncing vendor payments';
+                        case 'zohoBooksSyncCardSettlements':
+                            return 'Syncing card settlements';
+                        case 'zohoBooksSyncTravelSettlements':
                             return 'Syncing travel settlements';
                         case 'businessCentralSyncTitle':
                             return 'Syncing Dynamics 365 Business Central data';

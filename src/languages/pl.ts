@@ -7477,6 +7477,18 @@ Plan Control zaczyna się od 9 USD za aktywnego członka miesięcznie.`,
                             return 'Synchronizowanie rozliczeń karty';
                         case 'campfireSyncTravelSettlements':
                             return 'Synchronizowanie rozliczeń podróży';
+                        case 'zohoBooksSyncTitle':
+                            return 'Synchronizowanie danych Zoho Books';
+                        case 'zohoBooksSyncConnection':
+                            return 'Inicjowanie połączenia z Zoho Books';
+                        case 'zohoBooksSyncImportData':
+                            return 'Wczytywanie danych';
+                        case 'zohoBooksSyncPayments':
+                            return 'Synchronizowanie płatności dla dostawców';
+                        case 'zohoBooksSyncCardSettlements':
+                            return 'Synchronizowanie rozliczeń karty';
+                        case 'zohoBooksSyncTravelSettlements':
+                            return 'Synchronizowanie rozliczeń podróży';
                         case 'businessCentralSyncTitle':
                             return 'Synchronizowanie danych Dynamics 365 Business Central';
                         case 'businessCentralSyncConnection':
@@ -7525,6 +7537,7 @@ Plan Control zaczyna się od 9 USD za aktywnego członka miesięcznie.`,
             syncTravelInvoicingSettlementsNoAccountTooltip: 'Aby odblokować, ustaw konto dla swoich eksportów.',
             syncTravelInvoicingSettlementsNoAutoSyncTooltip: 'Aby odblokować, włącz automatyczną synchronizację.',
             campfire: 'Campfire',
+            zohoBooks: 'Zoho Books',
             businessCentral: 'Dynamics 365 Business Central',
             qboConnectionExpiring: ({date}: {date: string}) => `Twoje połączenie z QuickBooks Online wygaśnie ${date}.`,
             qboConnectionExpired: ({date}: {date: string}) => `Twoje połączenie z QuickBooks Online wygasło ${date}.`,
