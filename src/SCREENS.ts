@@ -754,6 +754,7 @@ const SCREENS = {
             CAMPFIRE_EXPENSIFY_CARD_SETTLEMENT_ACCOUNT: 'Policy_Accounting_Campfire_Expensify_Card_Settlement_Account',
             CAMPFIRE_TRAVEL_BILLING_SETTLEMENT_ACCOUNT: 'Policy_Accounting_Campfire_Travel_Invoicing_Settlement_Account',
             CAMPFIRE_TRAVEL_BILLING_PAYABLE_ACCOUNT: 'Policy_Accounting_Campfire_Travel_Invoicing_Payable_Account',
+            ZOHO_BOOKS_IMPORT: 'Policy_Accounting_Zoho_Books_Import',
             BUSINESS_CENTRAL_PREREQUISITES: 'Policy_Accounting_Business_Central_Prerequisites',
             BUSINESS_CENTRAL_SETUP: 'Policy_Accounting_Business_Central_Setup',
             BUSINESS_CENTRAL_COMPANY_SELECTOR: 'Policy_Accounting_Business_Central_Company_Selector',

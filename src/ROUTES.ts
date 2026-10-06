@@ -5189,6 +5189,10 @@ const ROUTES = {
         route: 'workspaces/:policyID/accounting/campfire/advanced/travel-invoicing-payable-account',
         getRoute: (policyID: string) => `workspaces/${policyID}/accounting/campfire/advanced/travel-invoicing-payable-account` as const,
     },
+    POLICY_ACCOUNTING_ZOHO_BOOKS_IMPORT: {
+        route: 'workspaces/:policyID/accounting/zoho-books/import',
+        getRoute: (policyID: string) => `workspaces/${policyID}/accounting/zoho-books/import` as const,
+    },
     POLICY_ACCOUNTING_BUSINESS_CENTRAL_PREREQUISITES: {
         route: 'workspaces/:policyID/accounting/business-central/prerequisites',
         getRoute: (policyID: string) => `workspaces/${policyID}/accounting/business-central/prerequisites` as const,

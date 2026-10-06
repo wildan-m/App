@@ -612,6 +612,9 @@ const WRITE_COMMANDS = {
     UPDATE_CAMPFIRE_TRAVEL_INVOICING_SETTLEMENTS_ACCOUNT: 'UpdateCampfireTravelInvoicingSettlementsAccount',
     UPDATE_CAMPFIRE_TRAVEL_INVOICING_PAYABLE_ACCOUNT: 'UpdateCampfireTravelInvoicingPayableAccount',
     UPDATE_ZOHO_BOOKS_ORGANIZATION: 'UpdateZohoBooksOrganization',
+    UPDATE_ZOHO_BOOKS_ENABLE_NEW_CATEGORIES: 'UpdateZohoBooksEnableNewCategories',
+    UPDATE_ZOHO_BOOKS_TAG_MAPPING: 'UpdateZohoBooksTagMapping',
+    UPDATE_ZOHO_BOOKS_SYNC_TAX_RATES: 'UpdateZohoBooksSyncTaxRates',
 
     SET_PROMO_CODE: 'User_SetPromoCode',
     REQUEST_TAX_EXEMPTION: 'RequestTaxExemption',
@@ -1335,6 +1338,9 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.UPDATE_CAMPFIRE_TRAVEL_INVOICING_SETTLEMENTS_ACCOUNT]: Parameters.UpdateCampfireTravelInvoicingSettlementsAccountParams;
     [WRITE_COMMANDS.UPDATE_CAMPFIRE_TRAVEL_INVOICING_PAYABLE_ACCOUNT]: Parameters.UpdateCampfireTravelInvoicingPayableAccountParams;
     [WRITE_COMMANDS.UPDATE_ZOHO_BOOKS_ORGANIZATION]: Parameters.UpdateZohoBooksOrganizationParams;
+    [WRITE_COMMANDS.UPDATE_ZOHO_BOOKS_ENABLE_NEW_CATEGORIES]: Parameters.UpdateZohoBooksEnableNewCategoriesParams;
+    [WRITE_COMMANDS.UPDATE_ZOHO_BOOKS_TAG_MAPPING]: Parameters.UpdateZohoBooksTagMappingParams;
+    [WRITE_COMMANDS.UPDATE_ZOHO_BOOKS_SYNC_TAX_RATES]: Parameters.UpdateZohoBooksSyncTaxRatesParams;
 
     [WRITE_COMMANDS.UPGRADE_TO_CORPORATE]: Parameters.UpgradeToCorporateParams;
     [WRITE_COMMANDS.DOWNGRADE_TO_TEAM]: Parameters.DowngradeToTeamParams;

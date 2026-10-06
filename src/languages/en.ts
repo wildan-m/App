@@ -6420,6 +6420,13 @@ const translations = {
                 label: 'Travel Invoicing payable account',
             },
         },
+        zohoBooks: {
+            importDescription: 'Choose which coding configurations to import from Zoho Books.',
+            accountTypesDescription: 'Your Zoho Books chart of accounts will import as categories.',
+            enableNewAccountsTitle: 'Enable newly imported accounts',
+            enableNewAccountsDescription: 'New Zoho Books accounts will be available as categories.',
+            reportingTagsImport: 'Choose which Zoho Books reporting tags import as tags',
+        },
         businessCentral: {
             businessCentralSetup: 'Dynamics 365 Business Central setup',
             prerequisitesTitle: 'Before you connect...',
