@@ -743,6 +743,9 @@ const ONYXKEYS = {
     /** Tracks whether the "My expenses" saved search has been seeded for this account */
     NVP_HAS_SEEDED_MY_EXPENSES_SEARCH: 'nvp_hasSeededMyExpensesSearch',
 
+    /** Tracks whether this account has ever had a rejected expense, which permanently unlocks the "Rejected" suggested search */
+    NVP_HAS_SEEN_REJECTED_EXPENSE: 'nvp_hasSeenRejectedExpense',
+
     /** Stores the information about the recent searches */
     RECENT_SEARCHES: 'nvp_recentSearches',
 
@@ -1663,6 +1666,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.SAVED_SEARCHES]: OnyxTypes.SaveSearch;
     [ONYXKEYS.SEARCH_FILTERS]: OnyxTypes.SearchFilters;
     [ONYXKEYS.NVP_HAS_SEEDED_MY_EXPENSES_SEARCH]: boolean;
+    [ONYXKEYS.NVP_HAS_SEEN_REJECTED_EXPENSE]: boolean;
     [ONYXKEYS.SEARCH_CONTEXT]: OnyxTypes.SearchContext;
     [ONYXKEYS.SEARCH_FOOTER_CONVERSION]: OnyxTypes.SearchFooterConversion;
     // eslint-disable-next-line @typescript-eslint/no-deprecated -- the key stays typed while the migration still reads it

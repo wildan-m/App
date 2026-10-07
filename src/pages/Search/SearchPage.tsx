@@ -7,6 +7,7 @@ import useDocumentTitle from '@hooks/useDocumentTitle';
 import useEndSubmitNavigationSpans from '@hooks/useEndSubmitNavigationSpans';
 import useHasFilterBars from '@hooks/useHasFilterBars';
 import useLocalize from '@hooks/useLocalize';
+import useMarkRejectedExpenseSearchAsSeen from '@hooks/useMarkRejectedExpenseSearchAsSeen';
 import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
 import {PaymentContextProvider} from '@hooks/usePaymentContext';
 import usePrevious from '@hooks/usePrevious';
@@ -53,6 +54,7 @@ function SearchPage({route}: SearchPageProps) {
 
     useSearchPageSetup(currentSearchQueryJSON);
     useSeedMyExpensesSearch();
+    useMarkRejectedExpenseSearchAsSeen();
     useReleaseOptionListCaches();
 
     // Adjust state during rendering rather than in a useEffect: the value is consumed in the same

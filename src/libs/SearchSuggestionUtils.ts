@@ -50,6 +50,7 @@ const SEARCH_TYPE_MENU_ICON_NAMES = [
     'Document',
     'Pencil',
     'ThumbsUp',
+    'ThumbsDown',
     'CheckCircle',
 ] as const satisfies readonly ExpensifyIconName[];
 
@@ -175,6 +176,29 @@ function getSuggestedSearches(
             type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
             icon: 'Document',
             searchQuery: buildCannedSearchQuery({type: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT}),
+            get searchQueryJSON() {
+                return buildSearchQueryJSON(this.searchQuery);
+            },
+            get hash() {
+                return this.searchQueryJSON?.hash ?? CONST.DEFAULT_NUMBER_ID;
+            },
+            get similarSearchHash() {
+                return this.searchQueryJSON?.similarSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+            },
+            get recentSearchHash() {
+                return this.searchQueryJSON?.recentSearchHash ?? CONST.DEFAULT_NUMBER_ID;
+            },
+        },
+        [CONST.SEARCH.SEARCH_KEYS.REJECTED]: {
+            key: CONST.SEARCH.SEARCH_KEYS.REJECTED,
+            translationPath: 'search.tabs.rejected',
+            type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+            icon: 'ThumbsDown',
+            searchQuery: buildQueryStringFromFilterFormValues({
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                status: [CONST.SEARCH.STATUS.EXPENSE.REJECTED],
+                from: [`${accountID}`],
+            }),
             get searchQueryJSON() {
                 return buildSearchQueryJSON(this.searchQuery);
             },

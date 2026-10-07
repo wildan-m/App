@@ -7935,6 +7935,7 @@ const CONST = {
                 DONE: 'done',
                 PAID: 'paid',
                 DELETED: 'deleted',
+                REJECTED: 'rejected',
             },
             EXPENSE_REPORT: {
                 DRAFTS: 'drafts',
@@ -8312,6 +8313,7 @@ const CONST = {
         SEARCH_KEYS: {
             EXPENSES: 'expenses',
             REPORTS: 'reports',
+            REJECTED: 'rejected',
             SUBMIT: 'submit',
             APPROVE: 'approve',
             PAY: 'pay',

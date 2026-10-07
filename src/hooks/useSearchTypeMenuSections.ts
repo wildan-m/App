@@ -72,6 +72,7 @@ const useSearchTypeMenuSections = (isScreenFocused = true) => {
     // Classic category rules stored on POLICY_CATEGORIES. No selector: mapping this collection would still be
     // large, and shallowEqual on the raw references is cheaper than deepEqual of a transformed copy.
     const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
+    const [hasSeenRejectedExpense] = useOnyx(ONYXKEYS.NVP_HAS_SEEN_REJECTED_EXPENSE);
 
     // A report awaiting the current user's approval makes the "Needs approval" suggested search relevant even when they
     // are not part of the policy's approval workflow (e.g. an approver chosen manually on a single report).
@@ -122,6 +123,7 @@ const useSearchTypeMenuSections = (isScreenFocused = true) => {
                 isTrackIntentUser: isTrackIntentUser ?? false,
                 hasReportAwaitingApproval,
                 policyCategories: allPolicyCategories,
+                hasSeenRejectedExpense: hasSeenRejectedExpense ?? false,
             }),
         [
             currentUserLoginAndAccountID?.email,
@@ -137,6 +139,7 @@ const useSearchTypeMenuSections = (isScreenFocused = true) => {
             isTrackIntentUser,
             hasReportAwaitingApproval,
             allPolicyCategories,
+            hasSeenRejectedExpense,
         ],
     );
 

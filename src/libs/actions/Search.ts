@@ -22,6 +22,7 @@ import type {
     QueueExportSearchItemsToCSVParams,
     QueueExportSearchWithTemplateParams,
     ReportExportParams,
+    SetNameValuePairParams,
     SubmitReportParams,
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
@@ -963,6 +964,27 @@ function seedMyExpensesSearch(currentUserAccountID: number, searchName: string, 
     ];
 
     write(WRITE_COMMANDS.SAVE_SEARCH, {jsonQuery, savedSearchID: queryJSON.hash.toString(), newName: searchName}, {optimisticData, failureData, successData});
+}
+
+/**
+ * Permanently unlocks the "Rejected" suggested search in the Search LHN. The NVP is intentionally never unset,
+ * so the entry keeps showing even after the user no longer has any rejected expenses.
+ */
+function markRejectedExpenseSearchAsSeen() {
+    const parameters: SetNameValuePairParams = {
+        name: ONYXKEYS.NVP_HAS_SEEN_REJECTED_EXPENSE,
+        value: true,
+    };
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.NVP_HAS_SEEN_REJECTED_EXPENSE>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.NVP_HAS_SEEN_REJECTED_EXPENSE,
+            value: true,
+        },
+    ];
+
+    write(WRITE_COMMANDS.SET_NAME_VALUE_PAIR, parameters, {optimisticData});
 }
 
 function deleteSavedSearch(savedSearchID: string) {
@@ -2606,6 +2628,7 @@ function setOptimisticDataForTransactionThreadPreview(
 
 export {
     saveSearch,
+    markRejectedExpenseSearchAsSeen,
     seedMyExpensesSearch,
     search,
     getFooterConvertedAmounts,

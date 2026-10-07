@@ -10095,6 +10095,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             expenseReports: 'Notes de frais',
             reports: 'Notes de frais',
             expenses: 'Dépenses',
+            rejected: 'Rejetées',
             submit: 'Brouillons',
             approve: 'Nécessite une approbation',
             pay: 'Prêt à payer',

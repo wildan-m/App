@@ -10002,6 +10002,7 @@ const translations = {
             expenseReports: 'Expense reports',
             reports: 'Reports',
             expenses: 'Expenses',
+            rejected: 'Rejected',
             submit: 'Drafts',
             approve: 'Needs approval',
             pay: 'Ready to pay',

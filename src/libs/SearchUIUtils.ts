@@ -706,6 +706,7 @@ function getSuggestedSearchesVisibility(
     hasReportAwaitingApproval = false,
     isTrackIntentUser = false,
     policyCategories?: OnyxCollection<OnyxTypes.PolicyCategories>,
+    hasSeenRejectedExpense = false,
 ): {visibility: Record<ValueOf<typeof CONST.SEARCH.SEARCH_KEYS>, boolean>; hasEligibleGroupPolicies: boolean; shouldShowExpensifyCard: boolean} {
     let shouldShowSubmitSuggestion = false;
     let shouldShowPaySuggestion = false;
@@ -797,6 +798,9 @@ function getSuggestedSearchesVisibility(
         visibility: {
             [CONST.SEARCH.SEARCH_KEYS.EXPENSES]: true,
             [CONST.SEARCH.SEARCH_KEYS.REPORTS]: true,
+            // Sticky: the NVP is set the first time the user ever has a rejected expense and is never unset,
+            // so the entry stays visible even after the rejected expenses are fixed or resubmitted.
+            [CONST.SEARCH.SEARCH_KEYS.REJECTED]: hasSeenRejectedExpense,
             [CONST.SEARCH.SEARCH_KEYS.SUBMIT]: shouldShowSubmitSuggestion,
             [CONST.SEARCH.SEARCH_KEYS.PAY]: shouldShowPaySuggestion,
             [CONST.SEARCH.SEARCH_KEYS.APPROVE]: shouldShowApproveSuggestion,
@@ -4695,6 +4699,7 @@ type TypeMenuSectionsParams = {
     isTrackIntentUser: boolean;
     hasReportAwaitingApproval?: boolean;
     policyCategories?: OnyxCollection<OnyxTypes.PolicyCategories>;
+    hasSeenRejectedExpense?: boolean;
 };
 
 function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuSection[] {
@@ -4712,6 +4717,7 @@ function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuS
         isTrackIntentUser,
         hasReportAwaitingApproval = false,
         policyCategories,
+        hasSeenRejectedExpense = false,
     } = params;
     const typeMenuSections: SearchTypeMenuSection[] = [];
 
@@ -4719,7 +4725,16 @@ function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuS
         visibility: suggestedSearchesVisibility,
         hasEligibleGroupPolicies,
         shouldShowExpensifyCard,
-    } = getSuggestedSearchesVisibility(currentUserEmail, cardFeedsByPolicy, policies, defaultExpensifyCard, hasReportAwaitingApproval, isTrackIntentUser, policyCategories);
+    } = getSuggestedSearchesVisibility(
+        currentUserEmail,
+        cardFeedsByPolicy,
+        policies,
+        defaultExpensifyCard,
+        hasReportAwaitingApproval,
+        isTrackIntentUser,
+        policyCategories,
+        hasSeenRejectedExpense,
+    );
     const suggestedSearches = getSuggestedSearches(currentUserAccountID, defaultCardFeed?.id, shouldShowExpensifyCard, activeExpensifyCardFeedID);
     const hasAnyPolicyWithWorkflowsEnabled = Object.values(policies ?? {}).some((policy) => policy?.areWorkflowsEnabled);
     const isTrackIntentWithWorkflowsDisabled = isTrackIntentUser && !hasAnyPolicyWithWorkflowsEnabled;
@@ -4736,6 +4751,9 @@ function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuS
         }
         if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.REPORTS]) {
             expenseReportsSection.menuItems.push(suggestedSearches[CONST.SEARCH.SEARCH_KEYS.REPORTS]);
+        }
+        if (suggestedSearchesVisibility[CONST.SEARCH.SEARCH_KEYS.REJECTED]) {
+            expenseReportsSection.menuItems.push(suggestedSearches[CONST.SEARCH.SEARCH_KEYS.REJECTED]);
         }
 
         if (!isTrackIntentWithWorkflowsDisabled) {
