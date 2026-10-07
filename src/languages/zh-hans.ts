@@ -6088,6 +6088,12 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             },
             deletedCard: '已删除的卡片',
             assignNewCards: {title: '分配新卡', description: '从您的银行获取可分配的最新银行卡'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: '强制是',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: '强制关',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: '不强制（默认报销）',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: '不要强制（默认为不可报销）',
+            },
         },
         expensifyCard: {
             issueAndManageCards: '发放并管理您的 Expensify 卡',
@@ -6420,6 +6426,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 statementCloseDateTitle: '账单结算日',
                 statementCloseDateDescription: '请告诉我们您的信用卡账单结算日期，我们会在 Expensify 中创建一份相应的对账单。',
                 exportAccount: '导出账户',
+                reimbursableTitle: '可报销',
+                reimbursableDescription: '选择此卡片流水中的报销类型。仅适用于新交易。',
             },
             workflows: {
                 title: '工作流程',

@@ -5475,6 +5475,14 @@ const CONST = {
             LAST_BUSINESS_DAY_OF_MONTH: 'LAST_BUSINESS_DAY_OF_MONTH',
             CUSTOM_DAY_OF_MONTH: 'CUSTOM_DAY_OF_MONTH',
         },
+        FORCE_REIMBURSABLE: {
+            FORCE_YES: 'force_yes',
+            FORCE_NO: 'force_no',
+            DEFAULT_YES: 'default_yes',
+            DEFAULT_NO: 'default_no',
+            /** Legacy value still stored on some feeds. It behaves like DEFAULT_NO. */
+            LEGACY_NONE: 'none',
+        },
         CARD_NAME: {
             CASH: '__CASH__',
         },

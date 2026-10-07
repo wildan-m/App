@@ -38,6 +38,7 @@ import type {
     CompanyCardFeedWithDomainID,
     CompanyCardFeedWithNumber,
     CompanyFeeds,
+    ForceReimbursable,
     NonConnectableBankName,
 } from '@src/types/onyx/CardFeeds';
 import type {CardFeedErrors} from '@src/types/onyx/DerivedValues';
@@ -892,6 +893,20 @@ function isCSVUploadFeed(feed: string | undefined): boolean {
     }
     const lowerFeed = feed.toLowerCase();
     return lowerFeed.startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV) || lowerFeed.startsWith(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV_CLASSIC);
+}
+
+/**
+ * Returns the feed's Reimbursable setting as one of the four options admins can pick.
+ * A missing value means the default (Force No), and the legacy `none` value behaves like "Do Not Force (Defaults to Non-Reimbursable)", the same as in Classic.
+ */
+function getFeedForceReimbursable(forceReimbursable: ForceReimbursable | undefined): Exclude<ForceReimbursable, typeof CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.LEGACY_NONE> {
+    if (!forceReimbursable) {
+        return CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO;
+    }
+    if (forceReimbursable === CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.LEGACY_NONE) {
+        return CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO;
+    }
+    return forceReimbursable;
 }
 
 /**
@@ -2540,6 +2555,7 @@ export {
     hasCompanyCardFeeds,
     isCustomFeed,
     isCSVUploadFeed,
+    getFeedForceReimbursable,
     isCSVFeedOrExpensifyCard,
     getBankCardDetailsImage,
     getSelectedFeed,

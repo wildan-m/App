@@ -537,6 +537,7 @@ export type {default as SetCompanyCardTransactionLiability} from './SetCompanyCa
 export type {default as OpenPolicyCompanyCardsFeedParams} from './OpenPolicyCompanyCardsFeedParams';
 export type {default as OpenPolicyAddCardFeedPageParams} from './OpenPolicyAddCardFeedPageParams';
 export type {default as SetFeedStatementPeriodEndDayParams} from './SetFeedStatementPeriodEndDayParams';
+export type {default as SetFeedForceReimbursableParams} from './SetFeedForceReimbursableParams';
 export type {default as AssignCompanyCardParams} from './AssignCompanyCardParams';
 export type {default as UnassignCardParams} from './UnassignCardParams';
 export type {default as SyncCardParams} from './SyncCardParams';

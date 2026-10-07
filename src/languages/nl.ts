@@ -6295,6 +6295,12 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             },
             deletedCard: 'Verwijderde kaart',
             assignNewCards: {title: 'Nieuwe kaarten toewijzen', description: 'Haal de nieuwste kaarten op om toe te wijzen vanuit je bank'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Geforceerd ja',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Niet afdwingen',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Niet forceren (standaard Vergoedbaar)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Niet afdwingen (standaard op niet-vergoedbaar)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Geef Expensify Kaarten uit en beheer ze',
@@ -6654,6 +6660,8 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 statementCloseDateTitle: 'Sluitingsdatum afschrift',
                 statementCloseDateDescription: 'Laat ons weten wanneer je creditcardafschrift wordt afgesloten, dan maken wij een bijpassend afschrift in Expensify aan.',
                 exportAccount: 'Account exporteren',
+                reimbursableTitle: 'Vergoedbaar',
+                reimbursableDescription: 'Kies of uitgaven van deze kaartfeed declarabel zijn. Geldt alleen voor nieuwe transacties.',
             },
             workflows: {
                 title: 'Workflows',

@@ -6299,6 +6299,12 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             },
             deletedCard: 'Carta eliminata',
             assignNewCards: {title: 'Assegna nuove carte', description: 'Ottieni le ultime carte da assegnare dalla tua banca'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Forza Sì',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Forza disattivata',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Non forzare (predefinito: rimborsabile)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Non forzare (predefinito su non rimborsabile)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Emetti e gestisci le tue Carte Expensify',
@@ -6669,6 +6675,8 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 statementCloseDateTitle: 'Data di chiusura dell’estratto conto',
                 statementCloseDateDescription: 'Facci sapere quando si chiude l’estratto conto della tua carta e creeremo un estratto conto corrispondente in Expensify.',
                 exportAccount: 'Esporta conto',
+                reimbursableTitle: 'Rimborsabile',
+                reimbursableDescription: 'Scegli se le spese da questo flusso carta sono rimborsabili. Si applica solo alle nuove transazioni.',
             },
             workflows: {
                 title: 'Flussi di lavoro',

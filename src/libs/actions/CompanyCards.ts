@@ -12,6 +12,7 @@ import type {
     OpenPolicyExpensifyCardsPageParams,
     RequestFeedSetupParams,
     SetCompanyCardExportAccountParams,
+    SetFeedForceReimbursableParams,
     SetFeedStatementPeriodEndDayParams,
     UpdateCardTransactionStartDateParams,
     UpdateCompanyCardNameParams,
@@ -40,6 +41,7 @@ import type {
     CompanyCardFeed,
     CompanyCardFeedWithDomainID,
     CompanyCardFeedWithNumber,
+    ForceReimbursable,
     StatementPeriodEnd,
     StatementPeriodEndDay,
 } from '@src/types/onyx/CardFeeds';
@@ -1249,6 +1251,89 @@ function setFeedStatementPeriodEndDay(
     });
 }
 
+function setFeedForceReimbursable(
+    policyID: string,
+    bankName: CompanyCardFeedWithNumber,
+    domainAccountID: number,
+    newForceReimbursable: ForceReimbursable,
+    oldForceReimbursable: ForceReimbursable | undefined,
+) {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
+            value: {
+                settings: {
+                    companyCards: {
+                        [bankName]: {
+                            forceReimbursable: newForceReimbursable,
+                            pendingFields: {
+                                forceReimbursable: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                            },
+                            errorFields: {
+                                forceReimbursable: null,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
+            value: {
+                settings: {
+                    companyCards: {
+                        [bankName]: {
+                            pendingFields: {
+                                forceReimbursable: null,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`,
+            value: {
+                settings: {
+                    companyCards: {
+                        [bankName]: {
+                            forceReimbursable: oldForceReimbursable ?? null,
+                            pendingFields: {
+                                forceReimbursable: null,
+                            },
+                            errorFields: {
+                                forceReimbursable: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    ];
+
+    const parameters: SetFeedForceReimbursableParams = {
+        policyID,
+        bankName,
+        domainAccountID,
+        forceReimbursable: newForceReimbursable,
+    };
+
+    API.write(WRITE_COMMANDS.SET_FEED_FORCE_REIMBURSABLE, parameters, {
+        optimisticData,
+        successData,
+        failureData,
+    });
+}
+
 function importCSVCompanyCards({
     policyID,
     domainAccountID,
@@ -1501,6 +1586,7 @@ export {
     clearAssignCardStepAndData,
     openPolicyAddCardFeedPage,
     setFeedStatementPeriodEndDay,
+    setFeedForceReimbursable,
     importCSVCompanyCards,
     clearErrorField,
     clearAssignCardErrors,

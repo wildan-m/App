@@ -19,8 +19,17 @@ import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useVerifyAccountAndResume from '@hooks/useVerifyAccountAndResume';
 
-import {deleteWorkspaceCompanyCardFeed, setAddNewCompanyCardStepAndData, setWorkspaceCompanyCardTransactionLiability} from '@libs/actions/CompanyCards';
-import {getCompanyCardFeed, getCompanyFeeds, getCustomOrFormattedFeedName, getDomainOrWorkspaceAccountID, getSelectedFeed, isCSVUploadFeed, isDirectFeed} from '@libs/CardUtils';
+import {clearErrorField, deleteWorkspaceCompanyCardFeed, setAddNewCompanyCardStepAndData, setWorkspaceCompanyCardTransactionLiability} from '@libs/actions/CompanyCards';
+import {
+    getCompanyCardFeed,
+    getCompanyFeeds,
+    getCustomOrFormattedFeedName,
+    getDomainOrWorkspaceAccountID,
+    getFeedForceReimbursable,
+    getSelectedFeed,
+    isCSVUploadFeed,
+    isDirectFeed,
+} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -92,6 +101,17 @@ function WorkspaceCompanyCardsSettingsPage({
         Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_SETTINGS_STATEMENT_CLOSE_DATE.getRoute(policyID));
     };
 
+    const navigateToChangeReimbursable = () => {
+        Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_SETTINGS_REIMBURSABLE.getRoute(policyID));
+    };
+
+    const clearReimbursableError = () => {
+        if (!feed) {
+            return;
+        }
+        clearErrorField(feed, domainOrWorkspaceAccountID, 'forceReimbursable');
+    };
+
     const deleteCompanyCardFeed = () => {
         Navigation.goBack(undefined, {
             afterTransition: () => {
@@ -159,6 +179,20 @@ function WorkspaceCompanyCardsSettingsPage({
                                 onPress={navigateToChangeStatementCloseDate}
                             >
                                 {!!selectedFeedData?.errorFields?.statementPeriodEndDay && <MenuItem.BrickRoadIndicator status={CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR} />}
+                            </MenuItemField>
+                        </OfflineWithFeedback>
+                        <OfflineWithFeedback
+                            pendingAction={selectedFeedData?.pendingFields?.forceReimbursable}
+                            errors={selectedFeedData?.errorFields?.forceReimbursable}
+                            onClose={clearReimbursableError}
+                            errorRowStyles={[styles.mh5]}
+                        >
+                            <MenuItemField
+                                value={translate(`workspace.companyCards.forceReimbursable.${getFeedForceReimbursable(selectedFeedData?.forceReimbursable)}`)}
+                                name={translate('workspace.moreFeatures.companyCards.reimbursableTitle')}
+                                onPress={navigateToChangeReimbursable}
+                            >
+                                {!!selectedFeedData?.errorFields?.forceReimbursable && <MenuItem.BrickRoadIndicator status={CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR} />}
                             </MenuItemField>
                         </OfflineWithFeedback>
                         <View style={[styles.mv3, styles.mh5]}>

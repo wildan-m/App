@@ -6625,6 +6625,13 @@ const translations = {
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.LAST_BUSINESS_DAY_OF_MONTH]: 'Last business day of the month',
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.CUSTOM_DAY_OF_MONTH]: 'Custom day of month',
             },
+            // @context Options for whether expenses imported from a company card feed are reimbursable. "Force" means the employee can't change it; "Do Not Force" means it is only the default.
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Force Yes',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Force No',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Do Not Force (Defaults to Reimbursable)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Do Not Force (Defaults to Non-Reimbursable)',
+            },
             assign: 'Assign',
             assignCard: 'Assign card',
             findCompanyCard: 'Find company card',
@@ -7033,6 +7040,8 @@ const translations = {
                 expensifyCardBannerSubtitle: 'Enjoy cash back on every US purchase, up to 50% off your Expensify bill, unlimited virtual cards, and so much more.',
                 expensifyCardBannerLearnMoreButton: 'Learn more',
                 statementCloseDateTitle: 'Statement close date',
+                reimbursableTitle: 'Reimbursable',
+                reimbursableDescription: 'Choose whether expenses from this card feed are reimbursable. Applies to new transactions only.',
                 statementCloseDateDescription: 'Let us know when your card statement closes, and we’ll create a matching statement in Expensify.',
             },
             workflows: {

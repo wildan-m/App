@@ -6348,6 +6348,12 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             },
             deletedCard: 'Gelöschte Karte',
             assignNewCards: {title: 'Neue Karten zuweisen', description: 'Holen Sie die neuesten Karten zum Zuweisen von Ihrer Bank'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Ja erzwingen',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Erzwingen Aus',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Nicht erzwingen (standardmäßig erstattungsfähig)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Nicht erzwingen (Standard: Nicht erstattungsfähig)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Geben Sie Expensify Karten aus und verwalten Sie sie',
@@ -6707,6 +6713,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 statementCloseDateTitle: 'Abrechnungsschlussdatum',
                 statementCloseDateDescription: 'Teile uns mit, wann dein Kreditkartenkontoauszug abgeschlossen wird, und wir erstellen einen passenden Auszug in Expensify.',
                 exportAccount: 'Konto exportieren',
+                reimbursableTitle: 'Erstattungsfähig',
+                reimbursableDescription: 'Wählen Sie, ob Ausgaben aus diesem Kartenfeed erstattungsfähig sind. Gilt nur für neue Transaktionen.',
             },
             workflows: {
                 title: 'Workflows',

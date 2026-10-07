@@ -6318,6 +6318,12 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             },
             deletedCard: 'Usunięta karta',
             assignNewCards: {title: 'Przydziel nowe karty', description: 'Pobierz z banku najnowsze karty do przypisania'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Wymuś „Tak”',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Wymuś Nie',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Nie wymuszaj (domyślnie podlegające zwrotowi)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Nie wymuszaj (domyślnie jako niepodlegające zwrotowi)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Wydawaj i zarządzaj Kartami Expensify',
@@ -6678,6 +6684,8 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 statementCloseDateTitle: 'Data zamknięcia zestawienia',
                 statementCloseDateDescription: 'Daj nam znać, kiedy kończy się okres rozliczeniowy Twojej karty, a utworzymy w Expensify pasujące zestawienie.',
                 exportAccount: 'Eksportuj konto',
+                reimbursableTitle: 'Podlegające zwrotowi',
+                reimbursableDescription: 'Wybierz, czy wydatki z tego źródła danych karty podlegają zwrotowi. Dotyczy tylko nowych transakcji.',
             },
             workflows: {
                 title: 'Przepływy pracy',

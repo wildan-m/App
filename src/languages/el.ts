@@ -6453,6 +6453,12 @@ _Για πιο αναλυτικές οδηγίες, [επισκεφθείτε τ
                 title: 'Ανάθεση νέων καρτών',
                 description: 'Λάβετε τις πιο πρόσφατες κάρτες προς ανάθεση από την τράπεζά σας',
             },
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Εξαναγκασμός σε Ναι',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Εξαναγκασμός όχι',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Να μην επιβάλλεται (προεπιλογή σε αποζημιώσιμη)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Να μην επιβάλλεται (προεπιλογή: μη αποζημιώσιμες)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Έκδοση και διαχείριση των Καρτών Expensify',
@@ -6825,6 +6831,8 @@ _Για πιο αναλυτικές οδηγίες, [επισκεφθείτε τ
                 statementCloseDateTitle: 'Ημερομηνία λήξης κατάστασης λογαριασμού',
                 statementCloseDateDescription: 'Ενημερώστε μας πότε κλείνει το αντίγραφο κίνησης της κάρτας σας και θα δημιουργήσουμε ένα αντίστοιχο αντίγραφο κίνησης στο Expensify.',
                 exportAccount: 'Εξαγωγή λογαριασμού',
+                reimbursableTitle: 'Επιστρέψιμη',
+                reimbursableDescription: 'Επιλέξτε αν οι δαπάνες από αυτήν την πηγή κάρτας είναι επιστρεπτέες. Ισχύει μόνο για νέες συναλλαγές.',
             },
             workflows: {
                 title: 'Ροές εργασιών',

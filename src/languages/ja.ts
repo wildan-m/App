@@ -6230,6 +6230,12 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             },
             deletedCard: '削除されたカード',
             assignNewCards: {title: '新しいカードを割り当てる', description: '銀行から割り当て可能な最新のカードを取得します'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: '強制的に「はい」',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: '強制しない',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: '強制しない（デフォルトは立替精算対象）',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: '強制しない（デフォルトは非払い戻し）',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Expensify カードを発行して管理する',
@@ -6580,6 +6586,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 statementCloseDateTitle: '取引明細書の締め日',
                 statementCloseDateDescription: 'カード明細の締め日を教えていただければ、Expensify 内に対応する明細を作成します。',
                 exportAccount: 'アカウントを書き出す',
+                reimbursableTitle: '精算対象',
+                reimbursableDescription: 'このカードフィードからの経費を立替精算対象にするかどうかを選択します。新しい取引にのみ適用されます。',
             },
             workflows: {
                 title: 'ワークフロー',

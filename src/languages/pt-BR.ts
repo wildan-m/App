@@ -6294,6 +6294,12 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             },
             deletedCard: 'Cartão excluído',
             assignNewCards: {title: 'Atribuir novos cartões', description: 'Obtenha do seu banco os cartões mais recentes para atribuir'},
+            forceReimbursable: {
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_YES]: 'Forçar sim',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.FORCE_NO]: 'Forçar não',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_YES]: 'Não forçar (padrão: reembolsável)',
+                [CONST.COMPANY_CARDS.FORCE_REIMBURSABLE.DEFAULT_NO]: 'Não forçar (padrão é não reembolsável)',
+            },
         },
         expensifyCard: {
             issueAndManageCards: 'Emita e gerencie seus Cartões Expensify',
@@ -6656,6 +6662,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 statementCloseDateTitle: 'Data de fechamento do extrato',
                 statementCloseDateDescription: 'Informe quando o seu fechamento da fatura do cartão ocorrer e criaremos uma fatura correspondente no Expensify.',
                 exportAccount: 'Exportar conta',
+                reimbursableTitle: 'Reembolsável',
+                reimbursableDescription: 'Escolha se as despesas deste feed de cartão são reembolsáveis. Isso se aplica apenas a novas transações.',
             },
             workflows: {
                 title: 'Fluxos de trabalho',
