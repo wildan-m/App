@@ -1,33 +1,32 @@
 import FeatureTraining from '@components/FeatureTraining';
 import FeatureTrainingModal from '@components/FeatureTrainingModal';
+import type {ModalProps} from '@components/Modal/Global/ModalContext';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
-import React from 'react';
-
-import {useMultiScanActions, useMultiScanState} from './MultiScanContext';
+import React, {useRef} from 'react';
 
 /**
- * Self-contained educational modal for multi-scan. Reads visibility from state context, dismiss from actions context.
- * Renders nothing when context is absent or popup is hidden.
+ * Educational modal for multi-scan, shown through the global modal stack.
+ * Resolves with CONFIRM when the user presses the confirm button, and with CLOSE when it is dismissed any other way
+ * (backdrop, Escape, Back). The stack entry is only removed once the close animation has finished.
  */
-function MultiScanEducationalModal() {
-    const {showEducationalPopup} = useMultiScanState();
-    const {dismissEducationalPopup} = useMultiScanActions();
+function MultiScanEducationalModal({closeModal}: ModalProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan']);
-
-    if (!showEducationalPopup || !dismissEducationalPopup) {
-        return null;
-    }
+    const isConfirmedRef = useRef(false);
 
     return (
         <FeatureTrainingModal
             modalInnerContainerStyle={styles.pt0}
-            onConfirm={dismissEducationalPopup}
+            onConfirm={() => {
+                isConfirmedRef.current = true;
+            }}
+            onClose={() => closeModal({action: isConfirmedRef.current ? ModalActions.CONFIRM : ModalActions.CLOSE})}
         >
             <FeatureTraining.Illustration
                 image={lazyIllustrations.MultiScan}
