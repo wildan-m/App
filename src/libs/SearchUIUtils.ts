@@ -2908,6 +2908,9 @@ function getReportSections({
                     isActionColumnWide: hasDeletedTransaction,
                     isAllScanning: false,
                     ...avatarProps,
+                    // Report errors are summarized inside the row's description and shown in full on the report's submit action,
+                    // so they must not be rendered again as separate error rows below the report row.
+                    errors: undefined,
                 };
 
                 if (isIOUReport) {

@@ -17,7 +17,14 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import REPORT_LINK_ROUTE_PARAMS from '@libs/Navigation/reportLinkRouteParams';
 import type {ReportsSplitNavigatorParamList} from '@libs/Navigation/types';
-import {getLatestConciergeFeedbackActionID, getOneTransactionThreadReportID, hasNextActionMadeBySameActor} from '@libs/ReportActionsUtils';
+import {
+    getLatestConciergeFeedbackActionID,
+    getOneTransactionThreadReportID,
+    hasNextActionMadeBySameActor,
+    isDynamicExternalWorkflowSubmitFailedAction,
+    isSubmittedAction,
+    isSubmittedAndClosedAction,
+} from '@libs/ReportActionsUtils';
 import {
     canUserPerformWriteAction,
     chatIncludesChronosWithID,
@@ -153,6 +160,11 @@ function MoneyRequestReportActionsListContent({reportIDFromRoute, onLayout}: Mon
     const latestConciergeFeedbackActionID =
         conciergeFeedbackForReportActionID || isDraftPendingCompletion || hasNewerActions ? undefined : getLatestConciergeFeedbackActionID(visibleReportActionsNewestFirst, reportActionIDs);
 
+    // Report-level errors (e.g. a failed submit) are shown in full, and dismissed, on the latest submit action rather than as a separate error row
+    const latestSubmitActionID = visibleReportActionsNewestFirst.find(
+        (action) => isSubmittedAction(action) || isSubmittedAndClosedAction(action) || isDynamicExternalWorkflowSubmitFailedAction(action),
+    )?.reportActionID;
+
     const {onStartReached, onEndReached} = useMoneyRequestReportPagination({
         reportID,
         reportActions,
@@ -253,13 +265,14 @@ function MoneyRequestReportActionsListContent({reportIDFromRoute, onLayout}: Mon
                         isHarvestCreatedExpenseReport={shouldShowHarvestCreatedAction}
                         shouldDisableContextMenuForConciergeDraft={shouldDisableContextMenuForConciergeDraft}
                         isLatestConciergeFeedbackAction={!!latestConciergeFeedbackActionID && latestConciergeFeedbackActionID === reportAction.reportActionID}
+                        reportErrors={!!latestSubmitActionID && latestSubmitActionID === reportAction.reportActionID ? report?.errors : undefined}
                     />
                 </ReportActionPositionContextProvider>
             </ReportActionScrollToNewestContext.Provider>
         );
     };
 
-    const reportActionsExtraData = [draftReportActionID, isDraftPendingCompletion, latestConciergeFeedbackActionID];
+    const reportActionsExtraData = [draftReportActionID, isDraftPendingCompletion, latestConciergeFeedbackActionID, latestSubmitActionID, report?.errors];
 
     /**
      * Runs when the FlatList finishes laying out

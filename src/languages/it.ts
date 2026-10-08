@@ -10898,6 +10898,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName: string) => `${fieldName} è obbligatorio`,
         reportContainsExpensesWithViolations: 'Il report contiene spese con violazioni.',
+        reportFailedToSubmit: 'Impossibile inviare il report a causa di errori.',
     },
     violationDismissal: {
         rter: {

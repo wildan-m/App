@@ -3,6 +3,7 @@ import {isChatThread} from '@libs/ReportUtils';
 
 import CONST from '@src/CONST';
 import type {Report, ReportAction} from '@src/types/onyx';
+import type {Errors} from '@src/types/onyx/OnyxCommon';
 
 import type {OnyxEntry} from 'react-native-onyx';
 
@@ -52,6 +53,9 @@ type ReportActionsListItemRendererProps = {
 
     /** Whether context menu should be disabled for the active Concierge draft */
     shouldDisableContextMenuForConciergeDraft?: boolean;
+
+    /** Report-level errors (e.g. a failed submit) to show, and dismiss, on this action */
+    reportErrors?: Errors;
 };
 
 function ReportActionsListItemRenderer({
@@ -72,6 +76,7 @@ function ReportActionsListItemRenderer({
     isHarvestCreatedExpenseReport = false,
     shouldDisableContextMenuForConciergeDraft = false,
     isLatestConciergeFeedbackAction = false,
+    reportErrors,
 }: ReportActionsListItemRendererProps) {
     const originalMessage = useMemo(() => getOriginalMessage(reportAction), [reportAction]);
 
@@ -182,6 +187,7 @@ function ReportActionsListItemRenderer({
             isHarvestCreatedExpenseReport={isHarvestCreatedExpenseReport}
             shouldDisplayContextMenu={!shouldDisableContextMenuForConciergeDraft}
             isLatestConciergeFeedbackAction={isLatestConciergeFeedbackAction}
+            reportErrors={reportErrors}
         />
     );
 }

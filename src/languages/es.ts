@@ -11146,6 +11146,7 @@ ${reportName}`,
     reportViolations: {
         [CONST.REPORT_VIOLATIONS.FIELD_REQUIRED]: (fieldName) => `${fieldName} es obligatorio`,
         reportContainsExpensesWithViolations: 'El informe contiene gastos con violaciones.',
+        reportFailedToSubmit: 'El informe no se pudo enviar debido a errores.',
     },
     violationDismissal: {
         rter: {

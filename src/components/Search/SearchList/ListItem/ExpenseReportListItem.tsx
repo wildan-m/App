@@ -44,6 +44,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {personalDetailsLoginSelector} from '@src/selectors/PersonalDetails';
 import {isActionLoadingSelector} from '@src/selectors/ReportMetaData';
 import type {Policy, Report} from '@src/types/onyx';
+import {isEmptyValueObject} from '@src/types/utils/EmptyObject';
 
 import {isTrackIntentUserSelector} from '@selectors/Onboarding';
 import {transactionViolationsByIDsSelector} from '@selectors/TransactionViolations';
@@ -415,6 +416,10 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
         : !!reportItem.hasVisibleViolations;
     const hasVisibleReportViolations = hasLiveTransactions ? liveHasVisibleViolations : fallbackHasVisibleViolations;
     const hasAnyVisibleViolations = hasVisibleReportViolations || hasSyncedMissingAttendeesViolation;
+    const shouldShowViolationsSentence = hasAnyVisibleViolations && shouldShowViolationDescription;
+
+    // Report errors (e.g. a failed submit) are summarized here as one sentence; the full, dismissible error lives on the report's submit action
+    const hasReportErrors = !isEmptyValueObject(reportForViolations?.errors);
 
     const getDescription = useMemo(() => {
         if (reportItem?.isRejectedReport) {
@@ -431,7 +436,11 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
                 </View>
             );
         }
-        if (!hasAnyVisibleViolations || !shouldShowViolationDescription) {
+        const descriptionSentences = [
+            ...(shouldShowViolationsSentence ? [translate('reportViolations.reportContainsExpensesWithViolations')] : []),
+            ...(hasReportErrors ? [translate('reportViolations.reportFailedToSubmit')] : []),
+        ];
+        if (descriptionSentences.length === 0) {
             return;
         }
         return (
@@ -443,15 +452,13 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
                     width={12}
                     height={12}
                 />
-                <Text style={[isLargeScreenWidth ? styles.textMicro : styles.mutedNormalTextLabel, {color: theme.textError}]}>
-                    {translate('reportViolations.reportContainsExpensesWithViolations')}
-                </Text>
+                <Text style={[isLargeScreenWidth ? styles.textMicro : styles.mutedNormalTextLabel, {color: theme.textError}]}>{descriptionSentences.join(' ')}</Text>
             </View>
         );
     }, [
         reportItem?.isRejectedReport,
-        hasAnyVisibleViolations,
-        shouldShowViolationDescription,
+        shouldShowViolationsSentence,
+        hasReportErrors,
         styles.flexRow,
         styles.alignItemsCenter,
         styles.mt2,

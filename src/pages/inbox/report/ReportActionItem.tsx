@@ -71,7 +71,7 @@ import AttachmentModalContext from '@pages/media/AttachmentModalScreen/Attachmen
 
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
-import {expandURLPreview} from '@userActions/Report';
+import {clearReportErrors, expandURLPreview} from '@userActions/Report';
 import {clearErrorWithOriginalTransactionError} from '@userActions/Transaction';
 
 import CONST from '@src/CONST';
@@ -154,6 +154,9 @@ type ReportActionItemProps = {
 
     linkedTransactionRouteError?: Errors;
 
+    /** Report-level errors (e.g. a failed submit) to show, and dismiss, on this action */
+    reportErrors?: Errors;
+
     /** Whether to show border for MoneyRequestReportPreviewContent */
     shouldShowBorder?: boolean;
 
@@ -185,6 +188,7 @@ function ReportActionItem({
     shouldShowBorder,
     shouldHighlight = false,
     isHarvestCreatedExpenseReport = false,
+    reportErrors,
 }: ReportActionItemProps) {
     const reportID = report?.reportID ?? action?.reportID;
     const originalReportID = useOriginalReportID(report?.reportID, action);
@@ -292,6 +296,9 @@ function ReportActionItem({
             clearErrorWithOriginalTransactionError(transactionIDToDismiss, originalTransactionID, isOriginalTransactionSplitContainer);
         }
         clearAllRelatedReportActionErrors(reportID, action, originalReportID, isOffline);
+        if (reportErrors) {
+            clearReportErrors(reportID);
+        }
     };
 
     const showDismissReceiptErrorModal = async () => {
@@ -309,7 +316,7 @@ function ReportActionItem({
     };
 
     const onClose = () => {
-        const errors = linkedTransactionRouteError ?? getLatestErrorMessageField(action as OnyxDataWithErrors);
+        const errors = linkedTransactionRouteError ?? {...getLatestErrorMessageField(action as OnyxDataWithErrors), ...reportErrors};
         const errorEntries = Object.entries(errors ?? {});
         const errorMessages = mapValues(Object.fromEntries(errorEntries), (error) => error);
         const hasReceiptError = Object.values(errorMessages).some((error) => isReceiptError(error));
@@ -615,7 +622,7 @@ function ReportActionItem({
                                                     hasDraft ? undefined : (action.pendingAction ?? (action.isOptimisticAction ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : undefined))
                                                 }
                                                 shouldHideOnDelete={!isDeletedParentAction}
-                                                errors={(linkedTransactionRouteError ?? !isOnSearch) ? getLatestErrorMessageField(action as OnyxDataWithErrors) : {}}
+                                                errors={(linkedTransactionRouteError ?? !isOnSearch) ? {...getLatestErrorMessageField(action as OnyxDataWithErrors), ...reportErrors} : {}}
                                                 errorRowStyles={[styles.ml10, styles.mr2]}
                                                 needsOffscreenAlphaCompositing={isMoneyRequestAction(action)}
                                                 shouldDisableStrikeThrough
