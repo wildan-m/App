@@ -690,6 +690,7 @@ describe('useSearchBulkActions - Download report', () => {
     });
 
     it('should not reopen the statement modal when the statement key arrives after the modal was closed', async () => {
+        // Given a statement request that has not returned its statement key yet
         let resolveRequest: (response: {statementKey: string}) => void = () => {};
         jest.mocked(getExpensifyCardStatementPDF).mockReturnValueOnce(
             new Promise((resolve) => {
@@ -715,7 +716,7 @@ describe('useSearchBulkActions - Download report', () => {
         });
         expect(getOpenStatementModal()?.statementParams.statementKey).toBeUndefined();
 
-        // The user cancels while the statement is still being generated.
+        // When the user cancels while the statement is still being generated, and the key arrives afterwards
         await hideOpenStatementModal();
         expect(mockClearSelectedTransactions).toHaveBeenCalledTimes(1);
 
@@ -724,6 +725,7 @@ describe('useSearchBulkActions - Download report', () => {
             await Promise.resolve();
         });
 
+        // Then the late response does not put the closed modal back on the stack
         expect(mockStatementModals.size).toBe(0);
     });
 
@@ -753,8 +755,8 @@ describe('useSearchBulkActions - Download report', () => {
             expect(result.current.isDownloadErrorModalVisible).toBe(true);
         });
         expect(mockStatementModals.size).toBe(0);
-        // The selection is kept so the download-error modal, which renders inside the bulk-action bar, stays mounted.
-        expect(mockClearSelectedTransactions).not.toHaveBeenCalled();
+        // Closing the statement modal on failure clears the selection, as unmounting the inline modal did before.
+        expect(mockClearSelectedTransactions).toHaveBeenCalled();
     });
 
     it('should not let a stale failed request close the modal for a newer export', async () => {

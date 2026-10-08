@@ -953,27 +953,20 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         // Each export gets its own entry on the global modal stack, so a response can only ever update its own modal.
         const modalID = `${CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_STATEMENT_PDF}-${requestID}`;
         let isModalOpen = true;
-        let didFail = false;
 
         // Only surface the failure while this is still the latest export, so a superseded request can't close a newer modal.
         const showStatementError = () => {
             if (requestID !== expensifyCardStatementRequestIDRef.current) {
                 return;
             }
-            didFail = true;
             closeExpensifyCardStatementPDFDownloadModal(modalID);
             setIsDownloadErrorModalVisible(true);
         };
 
+        // Clear the selection once the statement modal has closed (after download, cancel or failure), like the other bulk
+        // actions clear once their flow is done.
         showExpensifyCardStatementPDFDownloadModal(modalID, {statementParams}).then(() => {
             isModalOpen = false;
-            if (didFail) {
-                // Keep the selection on failure so the download-error modal, which renders inside the selection-gated
-                // bulk-action bar, stays mounted.
-                return;
-            }
-            // Clear the selection once the statement modal has finished hiding (after download or cancel), like the
-            // other bulk actions clear once their flow is done.
             clearSelectedTransactions();
         });
         getExpensifyCardStatementPDF(statementParams.policyID, statementParams.feedCountry, entryIDs)
