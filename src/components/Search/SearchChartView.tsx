@@ -34,6 +34,9 @@ type SearchChartViewProps = {
     /** The groupBy parameter */
     groupBy: SearchGroupBy;
 
+    /** Whether each point plots the spend from the first group through its own, instead of the group's own total */
+    isRunningTotal?: boolean;
+
     /** Grouped transaction data from search results */
     data: GroupedItem[];
 
@@ -53,7 +56,7 @@ type SearchChartViewProps = {
  * Layer 3 component - dispatches to the appropriate chart type based on view parameter
  * and handles navigation/drill-down logic
  */
-function SearchChartView({queryJSON, view, groupBy, data, isLoading, shouldShowGroupLabels = true, renderDetails, chartContainerStyle}: SearchChartViewProps) {
+function SearchChartView({queryJSON, view, groupBy, isRunningTotal = false, data, isLoading, shouldShowGroupLabels = true, renderDetails, chartContainerStyle}: SearchChartViewProps) {
     const {preferredLocale, translate, dateFnsLocale} = useLocalize();
     const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyListActions();
     const {currentSearchKey} = useSearchQueryContext();
@@ -68,6 +71,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, shouldShowG
         getLabel,
         getShortLabel,
         getCurrencyDecimals,
+        isRunningTotal,
         getInProgressLabel: (item) => getInProgressBucketLabel({groupBy, item, today, dateFnsLocale, dateFilterRange, translate}),
     });
     const points = rows.map((row) => row.point);

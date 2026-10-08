@@ -17,22 +17,45 @@ import React from 'react';
 
 import INSIGHTS_CONTROL_ANCHOR_ALIGNMENT from './insightsControls';
 
+/** Menu value of the running total, which plots by a bucket of its own rather than naming one */
+const RUNNING_TOTAL_OPTION = 'runningTotal';
+
+type InsightsGroupByOption = InsightsFilters['groupBy'] | typeof RUNNING_TOTAL_OPTION;
+
 type InsightsGroupByDropdownProps = {
     /** Time bucket the headline chart aggregates into */
     groupBy: InsightsFilters['groupBy'];
 
-    onChange: (groupBy: InsightsFilters['groupBy']) => void;
+    /** Whether the headline chart plots the running total, which the pill shows in place of the bucket */
+    isRunningTotal?: boolean;
+
+    onChange: (update: Partial<Pick<InsightsFilters, 'groupBy' | 'isRunningTotal'>>) => void;
 };
 
-function InsightsGroupByDropdown({groupBy, onChange}: InsightsGroupByDropdownProps) {
+function InsightsGroupByDropdown({groupBy, isRunningTotal, onChange}: InsightsGroupByDropdownProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
-    const items: Array<SingleSelectItem<InsightsFilters['groupBy']>> = INSIGHTS_GROUP_BY_OPTIONS.map((option) => ({
-        text: translate(`search.filters.groupBy.${option}`),
-        value: option,
-    }));
-    const selectedItem = items.find((item) => item.value === groupBy);
+    const items: Array<SingleSelectItem<InsightsGroupByOption>> = [
+        ...INSIGHTS_GROUP_BY_OPTIONS.map((option) => ({
+            text: translate(`search.filters.groupBy.${option}`),
+            value: option,
+        })),
+        {
+            text: translate('insightsPage.runningTotal'),
+            value: RUNNING_TOTAL_OPTION,
+            shouldShowDividerAbove: true,
+        },
+    ];
+    const selectedItem = items.find((item) => item.value === (isRunningTotal ? RUNNING_TOTAL_OPTION : groupBy));
+
+    const onSelect = (value: InsightsGroupByOption) => {
+        if (value === RUNNING_TOTAL_OPTION) {
+            onChange({isRunningTotal: true});
+            return;
+        }
+        onChange({groupBy: value, isRunningTotal: undefined});
+    };
 
     const label = translate('search.display.groupBy');
 
@@ -43,7 +66,7 @@ function InsightsGroupByDropdown({groupBy, onChange}: InsightsGroupByDropdownPro
             value={selectedItem}
             defaultValue={DEFAULT_INSIGHTS_FILTERS.groupBy}
             closeOverlay={closeOverlay}
-            onChange={(item) => onChange(item?.value ?? DEFAULT_INSIGHTS_FILTERS.groupBy)}
+            onChange={(item) => onSelect(item?.value ?? DEFAULT_INSIGHTS_FILTERS.groupBy)}
         />
     );
 

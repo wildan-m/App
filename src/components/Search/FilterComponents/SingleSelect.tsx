@@ -21,6 +21,9 @@ type SingleSelectItem<T> = {
     text: string;
     value: T;
     searchableText?: string;
+
+    /** Whether a divider separates this row from the rows above it */
+    shouldShowDividerAbove?: boolean;
 };
 
 type SingleSelectProps<T> = SearchFilterCommonProps<SingleSelectItem<T> | undefined> & {
@@ -108,7 +111,7 @@ function SingleSelectImpl({
                 text: item.text,
                 keyForList: item.value,
                 isSelected: item.value === selectedItem?.value,
-                itemStyle: {minHeight: rowHeight},
+                itemStyle: [{minHeight: rowHeight}, item.shouldShowDividerAbove && styles.borderTop],
             })),
             noResultsFound: false,
         };

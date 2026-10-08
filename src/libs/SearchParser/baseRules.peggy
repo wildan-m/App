@@ -109,6 +109,7 @@ columns = "columns"i {
 }
 view = "view"i {return "view"}
 compare = "compare"i {return "compare"}
+runningTotal = "runningTotal"i {return "runningTotal"}
 
 // Value transformation rules
 values

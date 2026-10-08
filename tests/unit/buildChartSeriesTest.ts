@@ -43,6 +43,22 @@ const getLabel = (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_B
 const getCurrencyDecimals = () => 2;
 
 describe('buildChartSeries', () => {
+    it('plots the total so far at each point for a running total, letting credits lower the line', () => {
+        // Given quarters with own totals of $100, $300, a $50 net credit and $150, arriving as cents
+        const data = [quarterGroup(1, 10000), quarterGroup(2, 30000), quarterGroup(3, -5000), quarterGroup(4, 15000)];
+
+        // When the series is built as a running total
+        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.LINE, getLabel, getCurrencyDecimals, isRunningTotal: true});
+
+        // Then each point is the spend from the first quarter through its own, the credit lowers the line without being
+        // clamped, and the last point is the total for the whole range
+        expect(rows.map((row) => row.point.total)).toEqual([100, 400, 350, 500]);
+        expect(rows.map((row) => row.point.percentOfTotal)).toEqual([20, 80, 70, 100]);
+
+        // And each point still points at its own quarter, so pressing it opens that period's expenses only
+        expect(rows.map((row) => row.item)).toEqual(data);
+    });
+
     it('turns group totals in cents into plotted values, keeping the search order', () => {
         // Given merchant groups whose totals arrive from the search as cents
         const data = [merchantGroup('Person', 480000, 12), merchantGroup('Target', 190000, 41)];

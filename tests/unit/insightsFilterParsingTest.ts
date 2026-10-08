@@ -83,6 +83,26 @@ describe('insightsFilterParsing', () => {
             expect(parsed.groupBy).toBe(CONST.SEARCH.GROUP_BY.DAY);
         });
 
+        it('reads back a dashboard showing the running total', () => {
+            // Given a dashboard whose Spend over time chart shows the running total
+            const filters: InsightsFilters = {...FILTERS, isRunningTotal: true};
+
+            // When its stored query is read back
+            const parsed = parseInsightsFilters(buildInsightsQueryString(filters));
+
+            // Then the running total survives the round trip, alongside the bucket picked before it
+            expect(parsed.isRunningTotal).toBe(true);
+            expect(parsed.groupBy).toBe(CONST.SEARCH.GROUP_BY.MONTH);
+        });
+
+        it('reads no running total out of a dashboard that plots each period on its own', () => {
+            // Given a dashboard that never picked the running total, and one whose stored flag isn't true
+            // When each stored query is read back
+            // Then neither turns the running total on
+            expect(parseInsightsFilters(buildInsightsQueryString(FILTERS)).isRunningTotal).toBeUndefined();
+            expect(parseInsightsFilters('groupBy:month groupCurrency:USD date:year-to-date runningTotal:false').isRunningTotal).toBeUndefined();
+        });
+
         it('ignores a group-by no Insights chart offers', () => {
             // Given a query grouped by a dimension rather than a time bucket
             const parsed = parseInsightsFilters('groupBy:category groupCurrency:USD date:year-to-date');

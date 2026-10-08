@@ -20,6 +20,7 @@ import {INSIGHTS_CHART_STATE, resolveInsightsChartData} from '@libs/resolveInsig
 import InsightsGroupByDropdown from '@pages/Insights/controls/InsightsGroupByDropdown';
 import type {InsightsChartSpec} from '@pages/Insights/dashboardSpecs';
 import type {InsightsFilters} from '@pages/Insights/insightsFilters';
+import {getInsightsTimeGroupBy} from '@pages/Insights/insightsFilters';
 
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -48,7 +49,7 @@ type InsightsChartWidgetProps = {
     onRetry: () => void;
 
     /** Shows a group-by control in the chart's header when set */
-    onGroupByChange?: (groupBy: InsightsFilters['groupBy']) => void;
+    onGroupByChange?: (update: Partial<Pick<InsightsFilters, 'groupBy' | 'isRunningTotal'>>) => void;
 };
 
 function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGroupByChange}: InsightsChartWidgetProps) {
@@ -60,13 +61,16 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
     const {isOffline} = useNetwork();
     const sortedData = useGroupedItems(snapshot, queryJSON);
     const {data, state} = resolveInsightsChartData({snapshot, queryJSON, sortedData, isOffline});
-    const groupBy = chart.groupBy ?? filters.groupBy;
+    const groupBy = chart.groupBy ?? getInsightsTimeGroupBy(filters);
+    // Only the chart that follows the page's group-by plots over time, so the ranking charts never accumulate
+    const isRunningTotal = !chart.groupBy && !!filters.isRunningTotal;
     const isLoading = state === INSIGHTS_CHART_STATE.LOADING;
     const shouldShowTable = chart.view === CONST.SEARCH.VIEW.BAR || chart.view === CONST.SEARCH.VIEW.PIE;
 
     const groupByControl = onGroupByChange ? (
         <InsightsGroupByDropdown
             groupBy={filters.groupBy}
+            isRunningTotal={isRunningTotal}
             onChange={onGroupByChange}
         />
     ) : null;
@@ -109,6 +113,7 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
                         queryJSON={queryJSON}
                         view={chart.view}
                         groupBy={groupBy}
+                        isRunningTotal={isRunningTotal}
                         data={data}
                         isLoading={isLoading}
                         chartContainerStyle={cardPaddingHorizontal}

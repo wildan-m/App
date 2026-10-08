@@ -1164,6 +1164,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        runningTotal: 'Total cumulé',
         viewOnSpend: 'Voir dans Dépenses',
         emptyState: {title: 'Rien à afficher', subtitle: 'Essayez de modifier vos critères ci-dessus'},
         noExpensesState: {

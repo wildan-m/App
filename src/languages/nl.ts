@@ -1162,6 +1162,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        runningTotal: 'Lopend totaal',
         viewOnSpend: 'Bekijken in Uitgaven',
         emptyState: {title: 'Niets om weer te geven', subtitle: 'Probeer je criteria hierboven aan te passen'},
         noExpensesState: {title: 'Zie waar je geld naartoe gaat', subtitle: 'Zodra je uitgaven hebt, zie je bestedingspatronen, topverkopers en meer.'},

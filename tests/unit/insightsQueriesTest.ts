@@ -176,6 +176,53 @@ describe('insightsQueries', () => {
         });
     });
 
+    describe('running total', () => {
+        it('plots a running total by day for a Date range of up to 62 days', () => {
+            // Given a dashboard showing the running total over a 62-day range, with a weekly bucket picked before
+            const filters: InsightsFilters = {...FILTERS, groupBy: CONST.SEARCH.GROUP_BY.WEEK, date: {from: '2026-01-01', to: '2026-03-03'}, isRunningTotal: true};
+
+            // When the headline chart's query is built
+            const chartQueryJSON = buildSearchQueryJSON(applyInsightsFilters(SPEND_SPEC.headlineChart, filters));
+
+            // Then it groups by day, the bucket the running total picks for a short range
+            expect(chartQueryJSON?.groupBy).toBe(CONST.SEARCH.GROUP_BY.DAY);
+        });
+
+        it('plots a running total by month for a Date range longer than 62 days', () => {
+            // Given a dashboard showing the running total over a 63-day range
+            const filters: InsightsFilters = {...FILTERS, groupBy: CONST.SEARCH.GROUP_BY.DAY, date: {from: '2026-01-01', to: '2026-03-04'}, isRunningTotal: true};
+
+            // When the headline chart's query is built
+            const chartQueryJSON = buildSearchQueryJSON(applyInsightsFilters(SPEND_SPEC.headlineChart, filters));
+
+            // Then it groups by month
+            expect(chartQueryJSON?.groupBy).toBe(CONST.SEARCH.GROUP_BY.MONTH);
+        });
+
+        it('does not request the dashboard again when the running total plots by the bucket already on screen', () => {
+            // Given a year-to-date dashboard grouped by month
+            const perPeriod = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.SPEND, FILTERS, true);
+
+            // When it switches to the running total, which plots a range that long by month too
+            const runningTotal = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.SPEND, {...FILTERS, isRunningTotal: true}, true);
+
+            // Then the request and every chart's snapshot stay the same, since the running total is drawn from the same rows
+            expect(runningTotal?.jsonQuery).toBe(perPeriod?.jsonQuery);
+            expect(runningTotal?.snapshotHashes).toEqual(perPeriod?.snapshotHashes);
+        });
+
+        it('leaves the ranking charts grouped the way they declare', () => {
+            // Given a dashboard showing the running total over a short range
+            const filters: InsightsFilters = {...FILTERS, date: {from: '2026-01-01', to: '2026-01-31'}, isRunningTotal: true};
+
+            // When the supporting charts' queries are built
+            const groupBys = SPEND_SPEC.supportingCharts.map((chart) => buildSearchQueryJSON(applyInsightsFilters(chart, filters))?.groupBy);
+
+            // Then each keeps its own group-by
+            expect(groupBys).toEqual(SPEND_SPEC.supportingCharts.map((chart) => chart.groupBy));
+        });
+    });
+
     describe('applyInsightsFilters', () => {
         it('keeps what the chart declares and adds the page filters', () => {
             // Given a supporting chart, which declares its own view, grouping, sorting and limit

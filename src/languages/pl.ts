@@ -1184,6 +1184,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     insightsPage: {
+        runningTotal: 'Suma narastająca',
         viewOnSpend: 'Zobacz w Wydatkach',
         emptyState: {title: 'Nic do wyświetlenia', subtitle: 'Spróbuj zmienić kryteria powyżej'},
         noExpensesState: {title: 'Zobacz, na co idą twoje pieniądze', subtitle: 'Gdy będziesz mieć wydatki, zobaczysz trendy w wydawaniu, najważniejszych sprzedawców i więcej.'},

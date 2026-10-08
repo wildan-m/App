@@ -8201,6 +8201,7 @@ const CONST = {
             COLUMNS: 'columns',
             LIMIT: 'limit',
             COMPARE: 'compare',
+            RUNNING_TOTAL: 'runningTotal',
         },
         VIEW: {
             TABLE: 'table',

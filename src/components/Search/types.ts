@@ -418,6 +418,9 @@ type SearchQueryAST = {
     groupColumns?: SearchColumnType[];
     limit?: number;
     compare?: SearchCompareMode;
+
+    /** Whether the time-based chart plots each period's running total instead of its own total */
+    runningTotal?: boolean;
 };
 
 type SearchQueryJSON = {

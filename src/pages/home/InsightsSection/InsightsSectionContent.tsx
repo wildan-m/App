@@ -38,7 +38,7 @@ function InsightsSectionContent() {
     const {isBetaEnabled} = usePermissions();
     const isInsightsPageEnabled = isBetaEnabled(CONST.BETAS.INSIGHTS_PAGE);
 
-    const {configs: insightConfigs, isResolved: isConfigResolved} = useHomeInsightConfigs();
+    const {configs: insightConfigs, isResolved: isConfigResolved, isRunningTotal: isSpendOverTimeRunningTotal} = useHomeInsightConfigs();
     const [selectedKey, selectedKeyMetadata] = useOnyx(ONYXKEYS.NVP_HOME_SELECTED_INSIGHT);
 
     // The persisted key can name an insight the user is no longer eligible for, so fall back to the first option.
@@ -96,6 +96,7 @@ function InsightsSectionContent() {
                         queryJSON={queryJSON}
                         view={view}
                         groupBy={groupBy}
+                        isRunningTotal={isSpendOverTimeRunningTotal && config.key === CONST.INSIGHTS.GRAPH.SPEND_OVER_TIME}
                         data={data}
                         isLoading={state === INSIGHTS_CHART_STATE.LOADING}
                         shouldShowGroupLabels={!isInsightsPageEnabled}

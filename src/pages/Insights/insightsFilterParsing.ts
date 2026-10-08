@@ -46,6 +46,10 @@ function parseCompare(queryJSON: SearchQueryJSON): Pick<InsightsFilters, 'compar
     return queryJSON.compare ? {compare: queryJSON.compare} : undefined;
 }
 
+function parseRunningTotal(queryJSON: SearchQueryJSON): Pick<InsightsFilters, 'isRunningTotal'> | undefined {
+    return queryJSON.runningTotal ? {isRunningTotal: true} : undefined;
+}
+
 /** Reads a dashboard's stored selections. Anything the query doesn't carry is left out, so the caller's defaults show through. */
 function parseInsightsFilters(query: string | undefined): Partial<InsightsFilters> {
     const queryJSON = query ? buildSearchQueryJSON(query) : undefined;
@@ -59,6 +63,7 @@ function parseInsightsFilters(query: string | undefined): Partial<InsightsFilter
         ...parseGroupCurrency(queryJSON),
         ...parseGroupBy(queryJSON),
         ...parseCompare(queryJSON),
+        ...parseRunningTotal(queryJSON),
     };
 }
 

@@ -10,6 +10,7 @@ import type {InsightsChartSpec} from './dashboardSpecs';
 import type {InsightsFilters} from './insightsFilters';
 
 import INSIGHTS_DASHBOARD_SPECS from './dashboardSpecs';
+import {getInsightsTimeGroupBy} from './insightsFilters';
 
 /** How many periods before the selected date range the Average mode spans (Typical on the ranking charts) */
 const COMPARE_TYPICAL_PERIOD_COUNT = 1;
@@ -36,13 +37,14 @@ function buildFilterFormValues(filters: InsightsFilters): Partial<SearchAdvanced
 
 /** Builds the dashboard-wide query the whole page is narrowed by. */
 function buildInsightsQueryString(filters: InsightsFilters): SearchQueryString {
-    return buildQueryStringFromFilterFormValues({...buildFilterFormValues(filters), groupBy: filters.groupBy, compare: filters.compare});
+    const queryString = buildQueryStringFromFilterFormValues({...buildFilterFormValues(filters), groupBy: filters.groupBy, compare: filters.compare});
+    return filters.isRunningTotal ? `${queryString} ${CONST.SEARCH.SYNTAX_ROOT_KEYS.RUNNING_TOTAL}:true` : queryString;
 }
 
 /** Builds a chart's query with the page's filters applied. */
 function applyInsightsFilters(chart: InsightsChartSpec, filters: InsightsFilters, compare?: SearchCompareMode): SearchQueryString {
     return buildQueryStringFromFilterFormValues(
-        {...buildFilterFormValues(filters), groupBy: chart.groupBy ?? filters.groupBy, view: chart.view, compare},
+        {...buildFilterFormValues(filters), groupBy: chart.groupBy ?? getInsightsTimeGroupBy(filters), view: chart.view, compare},
         {sortBy: chart.sortBy, sortOrder: chart.sortOrder, limit: chart.limit},
     );
 }
@@ -94,7 +96,8 @@ type InsightsQuery = {
 
 /** Builds one request for the whole dashboard, naming each graph's snapshots by its chart's query hashes, and returns those chart queries to read the snapshots back with. */
 function buildInsightsJsonQuery(dashboard: InsightsDashboardID, filters: InsightsFilters, shouldIncludeComparisons: boolean): InsightsQuery | undefined {
-    const inputQuery = buildInsightsQueryString({...filters, compare: undefined});
+    // A running total is drawn from the same rows as the bucket it plots by, so only that bucket reaches the request
+    const inputQuery = buildInsightsQueryString({...filters, groupBy: getInsightsTimeGroupBy(filters), compare: undefined, isRunningTotal: undefined});
     const queryJSON = buildSearchQueryJSON(inputQuery);
     if (!queryJSON) {
         return undefined;

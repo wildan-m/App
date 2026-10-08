@@ -27,6 +27,9 @@ type BuildChartSeriesParams = {
 
     /** Returns the label of a group whose period hasn't ended yet, or undefined for a finished one */
     getInProgressLabel?: (item: GroupedItem) => string | undefined;
+
+    /** Whether each point plots the total of every group up to and including its own, in the order the groups are given */
+    isRunningTotal?: boolean;
 };
 
 /** Pie colors follow the slice ranking rather than the array order. Groups the donut leaves out get no color. */
@@ -46,8 +49,26 @@ function getSliceColorsByDataIndex(data: ChartDataPoint[]): Array<string | undef
 }
 
 /** This is the single place group totals are turned into plotted values. */
-function buildChartSeries({data, view, getLabel, getShortLabel, getCurrencyDecimals, getInProgressLabel}: BuildChartSeriesParams): SearchChartDataRow[] {
-    const rows = data.map((item) => {
+/** Turns each point's own total into the total so far. Credits lower the line, nothing is clamped. Each row keeps its own group, so pressing a point still opens that period's expenses. */
+function accumulateRunningTotals(rows: SearchChartDataRow[]): SearchChartDataRow[] {
+    const rangeTotal = rows.reduce((sum, row) => sum + row.point.total, 0);
+    let runningTotal = 0;
+
+    return rows.map((row) => {
+        runningTotal += row.point.total;
+        return {
+            ...row,
+            point: {
+                ...row.point,
+                total: runningTotal,
+                percentOfTotal: rangeTotal === 0 ? undefined : (runningTotal / rangeTotal) * 100,
+            },
+        };
+    });
+}
+
+function buildChartSeries({data, view, getLabel, getShortLabel, getCurrencyDecimals, getInProgressLabel, isRunningTotal = false}: BuildChartSeriesParams): SearchChartDataRow[] {
+    const ownTotalRows = data.map((item) => {
         const decimals = getCurrencyDecimals(item.currency ?? CONST.CURRENCY.USD);
         const label = StringUtils.normalize(getLabel(item));
         const shortLabel = getShortLabel?.(item);
@@ -66,6 +87,7 @@ function buildChartSeries({data, view, getLabel, getShortLabel, getCurrencyDecim
 
         return {point, item};
     });
+    const rows = isRunningTotal ? accumulateRunningTotals(ownTotalRows) : ownTotalRows;
 
     const pieColors = view === CONST.SEARCH.VIEW.PIE ? getSliceColorsByDataIndex(rows.map((row) => row.point)) : undefined;
 

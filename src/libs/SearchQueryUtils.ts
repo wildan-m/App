@@ -1012,6 +1012,10 @@ function getCachedSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQue
             result.compare = undefined;
         }
 
+        // The grammar reads every root key value as text, so the flag is only set when the query spells it as true
+        const runningTotalValue: unknown = result.runningTotal;
+        result.runningTotal = runningTotalValue === true || runningTotalValue === 'true' ? true : undefined;
+
         const {primaryHash, recentSearchHash, similarSearchHash} = getQueryHashes(result);
         result.hash = primaryHash;
         result.recentSearchHash = recentSearchHash;

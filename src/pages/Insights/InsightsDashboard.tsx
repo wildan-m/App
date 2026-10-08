@@ -55,8 +55,8 @@ type InsightsDashboardContentProps = {
     /** Called by the retry button to request the dashboard again */
     onRetry: () => void;
 
-    /** Changes the time bucket the headline chart aggregates into */
-    onGroupByChange: (groupBy: InsightsFilters['groupBy']) => void;
+    /** Changes the time bucket the headline chart aggregates into, or switches it to the running total */
+    onGroupByChange: (update: Partial<Pick<InsightsFilters, 'groupBy' | 'isRunningTotal'>>) => void;
 };
 
 function InsightsDashboardContent({state, headlineChart, supportingCharts, filters, onRetry, onGroupByChange}: InsightsDashboardContentProps) {
@@ -231,7 +231,7 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
                 supportingCharts={supportingCharts}
                 filters={filters}
                 onRetry={requestDashboard}
-                onGroupByChange={(groupBy) => setFilters({groupBy})}
+                onGroupByChange={setFilters}
             />
         </ScreenWrapper>
     );
