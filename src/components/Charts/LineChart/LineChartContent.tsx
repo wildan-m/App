@@ -1,4 +1,5 @@
 import ActivityIndicator from '@components/ActivityIndicator';
+import VerticalBarChartContentBody from '@components/Charts/BarChart/VerticalBarChartContent';
 import ActivePointIndicator from '@components/Charts/components/ActivePointIndicator';
 import AreaGradient from '@components/Charts/components/AreaGradient';
 import ChartGridLines from '@components/Charts/components/ChartGridLines';
@@ -347,6 +348,22 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
 }
 
 function LineChartContent(props: LineChartProps) {
+    const {onPointPress, ...chartProps} = props;
+
+    // A line needs at least two points, so a lone point is drawn as a single bar in the line's color instead.
+    if (props.data.length === 1) {
+        return (
+            <ChartFontsProvider>
+                <VerticalBarChartContentBody
+                    {...chartProps}
+                    onBarPress={onPointPress}
+                    color={VictoryTheme.colors.default}
+                    shouldMarkInProgressBar
+                />
+            </ChartFontsProvider>
+        );
+    }
+
     return (
         <ChartFontsProvider>
             <LineChartContentBody {...props} />

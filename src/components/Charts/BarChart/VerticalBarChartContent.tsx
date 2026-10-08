@@ -15,7 +15,7 @@ import {
     useLabelHitTesting,
 } from '@components/Charts/hooks';
 import {getBarLayout, getXAxisLabel, getYAxisLabelWidth} from '@components/Charts/utils';
-import VictoryTheme, {CHART_CONTENT_MIN_HEIGHT, GLYPH_PADDING} from '@components/Charts/VictoryTheme';
+import VictoryTheme, {CHART_CONTENT_MIN_HEIGHT, DASH_INTERVALS, GLYPH_PADDING} from '@components/Charts/VictoryTheme';
 
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -25,6 +25,7 @@ import variables from '@styles/variables';
 import type {LayoutChangeEvent} from 'react-native';
 import type {CartesianChartRenderArg, ChartBounds, PointsArray, Scale} from 'victory-native';
 
+import {DashPathEffect, RoundedRect} from '@shopify/react-native-skia';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import {GestureDetector} from 'react-native-gesture-handler';
@@ -33,7 +34,7 @@ import {Bar, CartesianChart} from 'victory-native';
 
 import type BarChartProps from './types';
 
-function VerticalBarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left', onBarPress, shouldShowLabels = true}: BarChartProps) {
+function VerticalBarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left', onBarPress, shouldShowLabels = true, color, shouldMarkInProgressBar = false}: BarChartProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const fontManager = useChartFontManager();
@@ -149,16 +150,39 @@ function VerticalBarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosit
         cursor: isCursorOverClickable.get() ? 'pointer' : 'auto',
     }));
 
-    const renderBar = (point: PointsArray[number], chartBounds: ChartBounds) => {
+    const renderBar = (point: PointsArray[number], chartBounds: ChartBounds, yScale: Scale) => {
         const dataIndex = Number(point.xValue);
         const dataPoint = data.at(dataIndex);
+        const barColor = color ?? VictoryTheme.colors.getColor(dataIndex);
+
+        // Like the dashed segment and hollow dot of a line chart's in-progress point, an in-progress bar is outlined, not filled.
+        if (shouldMarkInProgressBar && dataPoint?.isInProgress && typeof point.y === 'number') {
+            const strokeWidth = VictoryTheme.line.strokeWidth;
+            const baselineY = yScale(0);
+            return (
+                <RoundedRect
+                    key={`bar-${dataPoint.label}`}
+                    x={point.x - barLayout.barWidth / 2 + strokeWidth / 2}
+                    y={Math.min(point.y, baselineY) + strokeWidth / 2}
+                    width={Math.max(0, barLayout.barWidth - strokeWidth)}
+                    height={Math.max(0, Math.abs(baselineY - point.y) - strokeWidth)}
+                    r={BAR_CORNER_RADIUS}
+                    color={barColor}
+                    // eslint-disable-next-line react/style-prop-object -- Skia's paint style, not a React Native style
+                    style="stroke"
+                    strokeWidth={strokeWidth}
+                >
+                    <DashPathEffect intervals={DASH_INTERVALS} />
+                </RoundedRect>
+            );
+        }
 
         return (
             <Bar
                 key={`bar-${dataPoint?.label}`}
                 points={[point]}
                 chartBounds={chartBounds}
-                color={VictoryTheme.colors.getColor(dataIndex)}
+                color={barColor}
                 barWidth={barLayout.barWidth}
                 barCount={data.length}
                 roundedCorners={{topLeft: BAR_CORNER_RADIUS, topRight: BAR_CORNER_RADIUS, bottomLeft: BAR_CORNER_RADIUS, bottomRight: BAR_CORNER_RADIUS}}
@@ -269,7 +293,7 @@ function VerticalBarChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosit
                                     chartBounds={chartBounds}
                                     color={theme.border}
                                 />
-                                {points.y.map((point) => renderBar(point, chartBounds))}
+                                {points.y.map((point) => renderBar(point, chartBounds, yScale))}
                             </>
                         )}
                     </CartesianChart>
