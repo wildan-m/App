@@ -5,8 +5,10 @@ import type {MeasurableInput, SelectionListWithSectionsHandle} from '@components
 
 import useAttendees from '@hooks/useAttendees';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getCategoryDescriptionHint, isCategoryDescriptionRequired} from '@libs/CategoryUtils';
 import {isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseUtil} from '@libs/IOUUtils';
 import {shouldShowConfirmationDate} from '@libs/MoneyRequestUtils';
@@ -16,6 +18,7 @@ import {getCategory, getCurrency, getMerchant, getRateID, hasValidModifiedAmount
 
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
+import ONYXKEYS from '@src/ONYXKEYS';
 
 import {useIsFocused} from '@react-navigation/native';
 import {useCallback, useEffect, useRef, useState} from 'react';
@@ -88,6 +91,8 @@ function useConfirmationListDataWithPolicy({
 
     const transactionReport = useTransactionReportForConfirmation(transaction?.reportID);
     const {policy, policyForMovingExpenses, policyCategories, policyTags, policyTagLists, shouldSelectPolicy} = policyData;
+    const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    const policyCategoriesWithFieldRequirements = applyFieldRequirementRulesToCategories(policyCategories, rules, policy?.id);
 
     const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseUtil(action);
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
@@ -189,7 +194,7 @@ function useConfirmationListDataWithPolicy({
     const isCategoryRequired = !!policy?.requiresCategory && !isTypeInvoice;
 
     const areRulesEnabled = arePolicyRulesEnabled(policy, policyCategories);
-    const isDescriptionRequired = isCategoryDescriptionRequired(policyCategories, iouCategory, areRulesEnabled);
+    const isDescriptionRequired = isCategoryDescriptionRequired(policyCategoriesWithFieldRequirements, iouCategory, areRulesEnabled);
 
     // Only show the hint when the expense goes to a workspace with Rules on, matching when categories are shown,
     // so a track expense in Self DM doesn't pick up the hint from the fallback default workspace.
@@ -237,7 +242,7 @@ function useConfirmationListDataWithPolicy({
         policy,
         policyTags,
         policyTagLists,
-        policyCategories,
+        policyCategories: policyCategoriesWithFieldRequirements,
         selectedParticipants,
         currentUserPersonalDetails,
         isEditingSplitBill,

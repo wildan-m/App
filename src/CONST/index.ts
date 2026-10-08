@@ -236,6 +236,7 @@ const RULE_TRIGGERS = {
     REPORT_SUBMIT: 'ReportSubmit',
     REPORT_APPROVE: 'ReportApprove',
     CREATE_TRANSACTION: 'CreateTransaction',
+    UPDATE_TRANSACTION: 'UpdateTransaction',
 } as const;
 
 const EMAIL = {
@@ -8927,6 +8928,7 @@ const CONST = {
             FORWARD_TO: 'ForwardTo',
             APPROVE_REPORT: 'ApproveReport',
             SET: 'Set',
+            REQUIRE_FIELD: 'RequireField',
         },
         APPROVAL_WORKFLOW: {
             /** A rule firing only on these is an approval workflow rather than an expense default. */
@@ -8946,6 +8948,22 @@ const CONST = {
             },
             /** Every expense default rule is created with the same priority, per the rules engine spec */
             PRIORITY: 10000,
+        },
+        FIELD_REQUIREMENT: {
+            /** Transaction lifecycle events a field requirement rule fires on */
+            TRIGGERS: [RULE_TRIGGERS.CREATE_TRANSACTION, RULE_TRIGGERS.UPDATE_TRANSACTION],
+            /** Expense fields a `RequireField` action can require */
+            FIELD: {
+                DESCRIPTION: 'description',
+                RECEIPT: 'receipt',
+                ITEMIZED_RECEIPT: 'itemizedReceipt',
+                ATTENDEES: 'attendees',
+            },
+            /** Fields a field requirement rule filters on */
+            FILTER: {
+                CATEGORY: 'category',
+                AMOUNT: 'amount',
+            },
         },
     },
 

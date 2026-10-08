@@ -21,6 +21,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import Tab from '@libs/actions/Tab';
 import {clearDraftRequireFieldsRule, setDraftRequireFieldsRule, updateDraftRequireFieldsRule} from '@libs/actions/User';
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isAttendeeTrackingEnabled} from '@libs/PolicyUtils';
@@ -83,7 +84,10 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
     const categorySettingsBackPath = useCategoryRuleCreateBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_RULES_REQUIRE_FIELDS_NEW.path);
 
     const [form] = useOnyx(ONYXKEYS.FORMS.REQUIRE_FIELDS_RULE_FORM);
-    const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
+    const [storedPolicyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
+    const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    // The editor reads the current requirements from the rules collection; saving still goes through `policyData`.
+    const policyCategories = applyFieldRequirementRulesToCategories(storedPolicyCategories, rules, policyID);
     const [shouldShowError, setShouldShowError] = useState(false);
     const [touchedFields, setTouchedFields] = useState<Set<RequireFieldsRuleSettingFieldKey>>(() => new Set());
     // Edit-only: fields the user deselected that still have an active category override to remove on save.
@@ -207,11 +211,11 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
     }, [category, categoryName, form, initialCategoryName, isEditing]);
 
     const fetchPolicyData = useCallback(() => {
-        if (!policy?.areCategoriesEnabled || policyCategories) {
+        if (!policy?.areCategoriesEnabled || storedPolicyCategories) {
             return;
         }
         openPolicyCategoriesPage(policyID);
-    }, [policyID, policy?.areCategoriesEnabled, policyCategories]);
+    }, [policyID, policy?.areCategoriesEnabled, storedPolicyCategories]);
 
     useNetwork({onReconnect: fetchPolicyData});
 

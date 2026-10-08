@@ -4,6 +4,7 @@ import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 
 import {convertAttendeesToArray, getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {isPersonalCard} from '@libs/CardUtils';
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
 import DateUtils from '@libs/DateUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
@@ -47,6 +48,7 @@ import type {
 } from '@src/types/onyx';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {Unit} from '@src/types/onyx/Policy';
+import type Rule from '@src/types/onyx/Rule';
 import type {RuleFilterNode} from '@src/types/onyx/RuleFilters';
 import type {ReceiptError, ReceiptErrors} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
@@ -689,6 +691,7 @@ const ViolationsUtils = {
         ownerLogin: ownerLoginParam,
         isVendorMatchingBetaEnabled,
         policyVendors: policyVendorsParam,
+        rules,
     }: {
         updatedTransaction: Transaction;
         transactionViolations: TransactionViolation[];
@@ -706,6 +709,8 @@ const ViolationsUtils = {
         /** Undefined while the account betas are still loading, which leaves the inactive vendor violation untouched */
         isVendorMatchingBetaEnabled: boolean | undefined;
         policyVendors?: OnyxEntry<PolicyVendors>;
+        /** The `rules_` collection, which the category field requirements are read from */
+        rules?: OnyxCollection<Rule>;
     }): OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS> {
         const isScanning = TransactionUtils.isScanning(updatedTransaction);
         const isScanRequest = TransactionUtils.isScanRequest(updatedTransaction);
@@ -938,8 +943,10 @@ const ViolationsUtils = {
         const canCalculateAmountViolations = policy.outputCurrency === currency;
 
         const categoryName = updatedTransaction.category;
-        const categoryMaxAmountNoReceipt = policyCategories[categoryName ?? '']?.maxAmountNoReceipt;
-        const categoryMaxAmountNoItemizedReceipt = policyCategories[categoryName ?? '']?.maxAmountNoItemizedReceipt;
+        // Field requirements are read from the rules collection, the rest of the category settings from the category itself.
+        const categoryFieldRequirements = applyFieldRequirementRulesToCategories(policyCategories, rules, policy.id)?.[categoryName ?? ''];
+        const categoryMaxAmountNoReceipt = categoryFieldRequirements?.maxAmountNoReceipt;
+        const categoryMaxAmountNoItemizedReceipt = categoryFieldRequirements?.maxAmountNoItemizedReceipt;
         const maxAmountNoReceipt = policy.maxExpenseAmountNoReceipt;
         const maxAmountNoItemizedReceipt = policy.maxExpenseAmountNoItemizedReceipt;
         // Amount is stored with opposite sign (negative for expenses), so we negate it to get the actual expense amount
@@ -1007,7 +1014,7 @@ const ViolationsUtils = {
             canCalculateAmountViolations && !isInvoiceTransaction && typeof categoryOverLimit === 'number' && amountForCategoryLimitCheck > categoryOverLimit && isControlPolicy;
         const shouldShowMissingComment =
             !isInvoiceTransaction &&
-            policyCategories?.[categoryName ?? '']?.areCommentsRequired &&
+            categoryFieldRequirements?.areCommentsRequired &&
             !updatedTransaction.comment?.comment &&
             isControlPolicy &&
             arePolicyRulesEnabled(policy, policyCategories);
@@ -1033,7 +1040,7 @@ const ViolationsUtils = {
         const shouldShowMissingAttendees =
             !isInvoiceTransaction &&
             isAttendeeTrackingEnabled &&
-            !!policyCategories?.[categoryName ?? '']?.areAttendeesRequired &&
+            !!categoryFieldRequirements?.areAttendeesRequired &&
             isControlPolicy &&
             (attendees.length === 0 || attendeesMinusOwnerCount === 0);
 

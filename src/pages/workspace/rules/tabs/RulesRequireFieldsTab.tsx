@@ -12,6 +12,7 @@ import usePolicyData from '@hooks/usePolicyData';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getRequireFieldsTableData} from '@libs/RequireFieldsRulesUtils';
 
@@ -42,11 +43,12 @@ function RulesRequireFieldsTab({policyID, canWriteRules, selectedKeys, onSelecti
     const policyData = usePolicyData(policyID);
     const {convertToDisplayString} = useCurrencyListActions();
     const [policyCategoriesOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
+    const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
     const arePolicyCategoriesLoading = !!policy?.areCategoriesEnabled && policyCategoriesOnyx === undefined;
 
     const requireFieldsTableData = getRequireFieldsTableData({
         policy,
-        policyCategories: arePolicyCategoriesLoading ? undefined : policyData.categories,
+        policyCategories: arePolicyCategoriesLoading ? undefined : applyFieldRequirementRulesToCategories(policyData.categories, rules, policyID),
         translate,
         convertToDisplayString,
         localeCompare,

@@ -24,10 +24,12 @@ import usePermissions from '@hooks/usePermissions';
 import usePersonalDetailByLogin from '@hooks/usePersonalDetailByLogin';
 import usePolicyData from '@hooks/usePolicyData';
 import usePolicyFeatureWriteAccess from '@hooks/usePolicyFeatureWriteAccess';
+import useRulesPrefetch from '@hooks/useRulesPrefetch';
 import useScreenBoundDynamicRoute from '@hooks/useScreenBoundDynamicRoute';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import getCategoryContextualRules from '@libs/CategoryContextualRulesUtils';
+import {applyFieldRequirementRulesToCategory, getCategoryFieldRequirementsFromRules} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getCategoryApproverRule, getDecodedCategoryName} from '@libs/CategoryUtils';
 import {getLatestErrorMessageField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -78,12 +80,14 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
     const decodedCategoryName = getDecodedCategoryName(policyCategory?.name ?? '');
     const categoryRulesEnabled = arePolicyRulesEnabled(policy, policyCategories);
 
+    const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    useRulesPrefetch();
     const contextualRules = !policyCategory
         ? []
         : getCategoryContextualRules({
               policy,
               policyCategories,
-              category: policyCategory,
+              category: rules ? applyFieldRequirementRulesToCategory(policyCategory, getCategoryFieldRequirementsFromRules(rules, policyID)[policyCategory.name]) : policyCategory,
               categoryName: policyCategory.name,
               translate,
               convertToDisplayString,

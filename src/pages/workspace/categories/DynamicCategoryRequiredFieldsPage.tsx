@@ -9,8 +9,10 @@ import Text from '@components/Text';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useRulesPrefetch from '@hooks/useRulesPrefetch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -44,7 +46,10 @@ function DynamicCategoryRequiredFieldsPage({
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const decodedCategoryName = getDecodedCategoryName(categoryName);
 
-    const policyCategory = policyCategories?.[categoryName];
+    const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
+    useRulesPrefetch();
+    // Requirements are read from the rules collection; the toggles below still write through the category commands.
+    const policyCategory = applyFieldRequirementRulesToCategories(policyCategories, rules, policyID)?.[categoryName];
     const areCommentsRequired = policyCategory?.areCommentsRequired ?? false;
     const areAttendeesRequired = policyCategory?.areAttendeesRequired ?? false;
     return (

@@ -34,6 +34,7 @@ import type {ViolationField} from '@hooks/useViolations';
 import {initDraftSplitExpenseDataForEdit, removeSplitExpenseField, updateSplitExpenseDraftField, updateSplitExpenseField} from '@libs/actions/IOU/SplitExpenseItems';
 import {openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import {openPolicyTagsPage} from '@libs/actions/Policy/Tag';
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getDecodedLeafCategoryName, isCategoryDescriptionRequired, isCategoryMissing} from '@libs/CategoryUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -197,7 +198,11 @@ function DynamicSplitExpenseEditPage({route}: DynamicSplitExpenseEditPageProps) 
     const categoryValue = getDecodedLeafCategoryName(splitExpenseDraftTransactionDetails?.category ?? '');
     const derivedCurrentReportName = useDerivedReportNameByReportID(currentReport?.reportID);
     const reportName = getReportName(currentReport, derivedCurrentReportName) || parentReport?.reportName;
-    const isDescriptionRequired = isCategoryDescriptionRequired(policyCategories, splitExpenseDraftTransactionDetails?.category, arePolicyRulesEnabled(effectivePolicy, policyCategories));
+    const isDescriptionRequired = isCategoryDescriptionRequired(
+        applyFieldRequirementRulesToCategories(policyCategories, rules, effectivePolicyID),
+        splitExpenseDraftTransactionDetails?.category,
+        arePolicyRulesEnabled(effectivePolicy, policyCategories),
+    );
 
     // Mirror MoneyRequestView's `shouldShowTag`, plus always surface the row when the original
     // (parent) transaction carried a tag — same rationale as `shouldShowCategory` above: workspace

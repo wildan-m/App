@@ -20,6 +20,7 @@ import {deleteExpensifyCardRule} from '@libs/actions/Card';
 import {deletePolicyCategoryTaxes, openPolicyCategoriesPage} from '@libs/actions/Policy/Category';
 import {openPolicyExpensifyCardsPage} from '@libs/actions/Policy/Policy';
 import {deleteMerchantRule} from '@libs/actions/Policy/Rules';
+import {applyFieldRequirementRulesToCategories} from '@libs/CategoryFieldRequirementRulesUtils';
 import {getCategoryNameFromTaxRuleKey, isCategoryTaxRuleKey} from '@libs/CategoryTaxRulesUtils';
 import {deleteFlagForReviewRule, getFlagForReviewTableData} from '@libs/FlagForReviewRulesUtils';
 import {getExpenseDefaultsTableData, isMerchantTypeRuleKey} from '@libs/MerchantTypeRulesUtils';
@@ -166,7 +167,7 @@ function useRulesTableBulkActions({policyID, activeTab, selectedRuleKeysByTab, c
 
     const requireFieldsTableData = getRequireFieldsTableData({
         policy,
-        policyCategories: arePolicyCategoriesLoading ? undefined : policyData.categories,
+        policyCategories: arePolicyCategoriesLoading ? undefined : applyFieldRequirementRulesToCategories(policyData.categories, rules, policyID),
         translate,
         convertToDisplayString,
         localeCompare,
