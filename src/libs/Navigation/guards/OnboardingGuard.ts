@@ -31,6 +31,7 @@ type OnboardingCompanySize = ValueOf<typeof CONST.ONBOARDING_COMPANY_SIZE>;
 type OnboardingPurpose = ValueOf<typeof CONST.ONBOARDING_CHOICES>;
 
 const JOIN_WORKSPACE_TASK_SCREENS = new Set<string>([SCREENS.ONBOARDING.WORK_EMAIL, SCREENS.ONBOARDING.WORK_EMAIL_VALIDATION, SCREENS.ONBOARDING.WORKSPACES]);
+const SHARE_SCREENS = new Set<string>(Object.values(SCREENS.SHARE));
 
 /**
  * Module-level Onyx subscriptions for OnboardingGuard
@@ -160,6 +161,20 @@ function isCurrentlyOnTwoFactorSetupRoute(state: NavigationState): boolean {
     return isTwoFactorSetupScreen(getDeepestFocusedScreen(state)?.name);
 }
 
+/**
+ * A native share (e.g. an image shared into the app from the device gallery) is a flow the user started explicitly,
+ * so it takes precedence over onboarding: navigation into the share navigator, and navigation while it is the
+ * focused root route, must not be redirected into onboarding. useOnboardingFlowRouter starts onboarding once the
+ * share flow is no longer focused.
+ */
+function isShareFlowActive(state: NavigationState, action: NavigationAction): boolean {
+    if (state.routes[state.index]?.name === NAVIGATORS.SHARE_MODAL_NAVIGATOR) {
+        return true;
+    }
+
+    return (action.payload as {name?: string} | undefined)?.name === NAVIGATORS.SHARE_MODAL_NAVIGATOR || SHARE_SCREENS.has(getActionPayloadScreenName(action) ?? '');
+}
+
 function shouldPreventReset(state: NavigationState, action: NavigationAction) {
     if (action.type !== CONST.NAVIGATION_ACTIONS.RESET || !action?.payload) {
         return false;
@@ -264,6 +279,10 @@ const OnboardingGuard: NavigationGuard = {
         if (CONFIG.SKIP_ONBOARDING && isNavigatingToOnboardingFlowWithReplaceAction(action)) {
             Log.info('[OnboardingGuard] SKIP_ONBOARDING: redirecting REPLACE into onboarding to home');
             return {type: 'REDIRECT', route: ROUTES.HOME};
+        }
+
+        if (isShareFlowActive(state, action)) {
+            return {type: 'ALLOW'};
         }
 
         const skipOnboardingConfig = CONFIG.SKIP_ONBOARDING;

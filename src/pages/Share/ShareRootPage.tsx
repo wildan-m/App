@@ -100,7 +100,17 @@ function ShareRootPage() {
 
     const handleProcessFiles = useCallback(() => {
         ShareActionHandler.processFiles((processedFiles) => {
-            const tempFile = Array.isArray(processedFiles) ? processedFiles.at(0) : (JSON.parse(processedFiles) as ShareTempFile);
+            let tempFile: ShareTempFile | undefined;
+            try {
+                tempFile = Array.isArray(processedFiles) ? processedFiles.at(0) : (JSON.parse(processedFiles) as ShareTempFile);
+            } catch (error) {
+                // The native module reports a missing or unreadable share as a plain string (e.g. "No data found"), not JSON.
+                // Surface it instead of throwing inside the callback, which would leave the page on its loading skeleton.
+                Log.warn('[ShareRootPage] Failed to parse the shared file', {error, processedFiles});
+                setErrorTitle(translate('attachmentPicker.attachmentError'));
+                setErrorMessage(translate('attachmentPicker.errorWhileSelectingAttachment'));
+                return;
+            }
             if (errorTitle) {
                 return;
             }

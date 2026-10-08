@@ -788,6 +788,45 @@ describe('OnboardingGuard', () => {
         });
     });
 
+    describe('native share exception', () => {
+        const shareFocusedState: NavigationState = {
+            key: 'root',
+            index: 1,
+            routeNames: [SCREENS.HOME, NAVIGATORS.SHARE_MODAL_NAVIGATOR],
+            routes: [
+                {key: 'home', name: SCREENS.HOME},
+                {key: 'share', name: NAVIGATORS.SHARE_MODAL_NAVIGATOR},
+            ],
+            stale: false,
+            type: 'root',
+        };
+
+        beforeEach(async () => {
+            // Given a brand-new user who signed in from a native share and has not completed the guided setup flow
+            await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {hasCompletedGuidedSetupFlow: false});
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {isFromPublicDomain: true});
+            await waitForBatchedUpdates();
+        });
+
+        it('should ALLOW navigating into the share flow instead of redirecting to onboarding', () => {
+            const result = OnboardingGuard.evaluate(mockState, {type: 'NAVIGATE', payload: {name: NAVIGATORS.SHARE_MODAL_NAVIGATOR}}, authenticatedContext);
+
+            expect(result.type).toBe('ALLOW');
+        });
+
+        it('should ALLOW navigation inside the share flow while it is focused', () => {
+            const result = OnboardingGuard.evaluate(shareFocusedState, {type: 'NAVIGATE', payload: {name: SCREENS.SHARE.SHARE_DETAILS}}, authenticatedContext);
+
+            expect(result.type).toBe('ALLOW');
+        });
+
+        it('should still redirect to onboarding once the share flow is no longer focused', () => {
+            const result = OnboardingGuard.evaluate(mockState, mockAction, authenticatedContext);
+
+            expect(result.type).toBe('REDIRECT');
+        });
+    });
+
     describe('copilot session', () => {
         it('should return ALLOW and skip onboarding when acting as a copilot', async () => {
             await Onyx.merge(ONYXKEYS.NVP_ONBOARDING, {hasCompletedGuidedSetupFlow: false});

@@ -3,6 +3,7 @@ import {useInitialURLState} from '@components/InitialURLContextProvider';
 import AccountUtils from '@libs/AccountUtils';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
 import Navigation from '@libs/Navigation/Navigation';
+import navigationRef from '@libs/Navigation/navigationRef';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {isLoggingInAsNewUser} from '@libs/SessionUtils';
 import {hasSecureLinkKey} from '@libs/Url';
@@ -11,9 +12,12 @@ import {completeHybridAppOnboarding} from '@userActions/Welcome';
 import {buildOnboardingFlowParams, startOnboardingFlow} from '@userActions/Welcome/OnboardingFlow';
 
 import CONFIG from '@src/CONFIG';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+
+import type {NavigationState} from '@react-navigation/native';
 
 import {isSingleNewDotEntrySelector} from '@selectors/HybridApp';
 import {hasCompletedGuidedSetupFlowSelector, tryNewDotOnyxSelector, wasInvitedToNewDotSelector} from '@selectors/Onboarding';
@@ -21,7 +25,12 @@ import {emailSelector} from '@selectors/Session';
 import {useCallback, useEffect} from 'react';
 
 import useOnyx from './useOnyx';
+import useRootNavigationState from './useRootNavigationState';
 import useShouldSuppressPromotionalUI from './useShouldSuppressPromotionalUI';
+
+function isShareFlowFocused(state: NavigationState | undefined): boolean {
+    return state?.routes.at(state.index)?.name === NAVIGATORS.SHARE_MODAL_NAVIGATOR;
+}
 
 /**
  * Hook to handle redirection to the onboarding flow based on the user's onboarding status
@@ -62,6 +71,10 @@ function useOnboardingFlowRouter() {
 
     const isOnboardingCompleted = hasCompletedGuidedSetupFlowSelector(onboardingValues);
 
+    // A native share (e.g. an image shared from the device gallery, possibly before signing in) is restored on top of the app
+    // right after sign-in. Subscribing to it re-runs the effect below once the share flow is closed, so onboarding is deferred, not skipped.
+    const isSharing = useRootNavigationState(isShareFlowFocused);
+
     useEffect(() => {
         // This should delay opening the onboarding modal so it does not interfere with the ongoing ReportScreen params changes
 
@@ -76,6 +89,11 @@ function useOnboardingFlowRouter() {
                 // Re-read the active route here too: on a cold-launch deep link the render-time check can run before navigation
                 // is ready, so the render-time isVisitingSecureLink may be stale when this transition callback fires.
                 if (getIsVisitingSecureLink()) {
+                    return;
+                }
+
+                // Don't cover the share flow the user explicitly started with onboarding; it resumes once the share flow is closed.
+                if (isSharing) {
                     return;
                 }
 
@@ -134,6 +152,10 @@ function useOnboardingFlowRouter() {
                 // isNavigationReady ensures navigation is ready, which is critical during fresh login.
                 if (isOnboardingCompleted === false) {
                     Navigation.isNavigationReady().then(() => {
+                        // The share route can be restored after this transition callback was scheduled, so re-check the live state.
+                        if (isShareFlowFocused(navigationRef.getRootState())) {
+                            return;
+                        }
                         startOnboardingFlow(buildOnboardingFlowParams(account, onboardingValues, onboardingCompanySize, onboardingPurposeSelected, onboardingInitialPath));
                     });
                 }
@@ -165,6 +187,7 @@ function useOnboardingFlowRouter() {
         isOnboardingCompleted,
         shouldSuppressPromotionalUI,
         getIsVisitingSecureLink,
+        isSharing,
     ]);
 
     return {
