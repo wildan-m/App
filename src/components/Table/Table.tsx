@@ -1,19 +1,12 @@
-import MenuItemAction from '@components/MenuItem/presets/MenuItemAction';
-import Modal from '@components/Modal';
 import useScrollToFocusedInput from '@components/SelectionList/hooks/useScrollToFocusedInput';
 
-import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
 import useKeyboardState from '@hooks/useKeyboardState';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
-import useLocalize from '@hooks/useLocalize';
 import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useVerticalScrollbarWidth from '@hooks/useVerticalScrollbarWidth';
 
 import {turnOffMobileSelectionMode, turnOnMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
-import getPlatform from '@libs/getPlatform';
 import {canMeasureText} from '@libs/measureTextWidth';
-import {acquireBackgroundInputFocusSuppression} from '@libs/ModalFocusManager';
 
 import CONST from '@src/CONST';
 
@@ -21,8 +14,7 @@ import type {FlashListRef} from '@shopify/flash-list';
 import type {ReactElement} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 
-import React, {useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState} from 'react';
-import {View} from 'react-native';
+import React, {useImperativeHandle, useMemo, useRef, useState} from 'react';
 
 import type {TableListMetadata} from './buildTableListData';
 import type {TableContextValue} from './TableContext';
@@ -283,7 +275,6 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
     onSortingChange,
     ...listProps
 }: TableProps<DataType, ColumnKey, FilterKey>) {
-    const {translate} = useLocalize();
     const isGlobalMobileSelectionEnabled = useMobileSelectionMode();
 
     // A table whose only purpose is picking rows is always in selection mode, so it shows its checkboxes from the
@@ -303,9 +294,7 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
 
         turnOffMobileSelectionMode();
     };
-    const icons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
-    const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, addOfflineIndicatorBottomSafeAreaPadding: false});
 
     if (!columns || columns.length === 0) {
         throw new Error('Table columns must be provided');
@@ -337,11 +326,7 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
     });
     const sortedData = sortMiddleware(searchedData);
 
-    const {
-        methods: selectionMethods,
-        mobileSelectionModalRowKey,
-        middleware: selectionMiddleware,
-    } = useSelection<DataType>({
+    const {methods: selectionMethods, middleware: selectionMiddleware} = useSelection<DataType>({
         data: sortedData,
         originalSelectableCount,
         currentFilters,
@@ -360,10 +345,6 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
     const processedData = highlightMiddleware(selectionData);
 
     const listRef = useRef<FlashListRef<DataType>>(null);
-    const releaseBackgroundInputFocusSuppressionRef = useRef<(() => void) | null>(null);
-    const mobileSelectionModalRowKeyRef = useRef(mobileSelectionModalRowKey);
-    const [shouldSubmitMobileSelection, setShouldSubmitMobileSelection] = useState(false);
-    const [shouldSkipMobileSelectionFocusRestore, setShouldSkipMobileSelectionFocusRestore] = useState(false);
     // Keeps the table search input visible above the keyboard when it is focused inside the
     // scrolling list (native only; the web variant of the hook is a no-op).
     const {isKeyboardShown} = useKeyboardState();
@@ -461,44 +442,6 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
     // In that case the data exists but nothing is shown, so we surface the empty state instead of a blank body.
     const isDefaultViewEmpty = processedData.length === 0 && originalDataLength > 0 && !hasActiveSearchString && !hasActiveFilters;
 
-    const handleMobileSelectionPress = () => {
-        if (!mobileSelectionModalRowKey) {
-            return;
-        }
-
-        const shouldSuppressFocusRestore = getPlatform() === CONST.PLATFORM.IOS;
-        if (shouldSuppressFocusRestore && !releaseBackgroundInputFocusSuppressionRef.current) {
-            releaseBackgroundInputFocusSuppressionRef.current = acquireBackgroundInputFocusSuppression();
-        }
-        setShouldSkipMobileSelectionFocusRestore(shouldSuppressFocusRestore);
-        setShouldSubmitMobileSelection(true);
-    };
-
-    useLayoutEffect(() => {
-        mobileSelectionModalRowKeyRef.current = mobileSelectionModalRowKey;
-    }, [mobileSelectionModalRowKey]);
-
-    useLayoutEffect(() => {
-        if (!shouldSubmitMobileSelection || !mobileSelectionModalRowKey) {
-            return;
-        }
-
-        setMobileSelectionModeEnabled(true);
-        selectionMethods.handleSingleRowSelection(mobileSelectionModalRowKey);
-        selectionMethods.setMobileSelectionModalRowKey(null);
-        // This should only run when the user confirms the selection, so setMobileSelectionModeEnabled is left out of
-        // the dependencies below. It is redefined on every render, which would otherwise run this again straight away.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mobileSelectionModalRowKey, selectionMethods, shouldSkipMobileSelectionFocusRestore, shouldSubmitMobileSelection]);
-
-    useEffect(
-        () => () => {
-            releaseBackgroundInputFocusSuppressionRef.current?.();
-            releaseBackgroundInputFocusSuppressionRef.current = null;
-        },
-        [],
-    );
-
     // eslint-disable-next-line react/jsx-no-constructed-context-values
     const contextValue: TableContextValue<DataType, ColumnKey, FilterKey> = {
         title,
@@ -567,33 +510,6 @@ function Table<DataType extends TableData, ColumnKey extends string = string, Fi
             >
                 {renderedChildren}
             </TableSemanticContainer>
-
-            <Modal
-                shouldPreventScrollOnFocus
-                isVisible={!!mobileSelectionModalRowKey}
-                type={CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED}
-                restoreFocusType={shouldSkipMobileSelectionFocusRestore ? CONST.MODAL.RESTORE_FOCUS_TYPE.DELETE : undefined}
-                onClose={() => tableMethods.setMobileSelectionModalRowKey(null)}
-                enableEdgeToEdgeBottomSafeAreaPadding
-                onModalHide={() => {
-                    if (mobileSelectionModalRowKeyRef.current) {
-                        return;
-                    }
-                    releaseBackgroundInputFocusSuppressionRef.current?.();
-                    releaseBackgroundInputFocusSuppressionRef.current = null;
-                    setShouldSubmitMobileSelection(false);
-                    setShouldSkipMobileSelectionFocusRestore(false);
-                }}
-            >
-                <View style={bottomSafeAreaPaddingStyle}>
-                    <MenuItemAction
-                        icon={icons.CheckSquare}
-                        title={translate('common.select')}
-                        onPress={handleMobileSelectionPress}
-                        testID={CONST.SELECTION_LIST_WITH_MODAL_TEST_ID}
-                    />
-                </View>
-            </Modal>
         </TableContext.Provider>
     );
 }

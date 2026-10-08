@@ -26,6 +26,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Onyx from 'react-native-onyx';
+import getOnyxValue from 'tests/utils/getOnyxValue';
 import waitForBatchedUpdatesWithAct from 'tests/utils/waitForBatchedUpdatesWithAct';
 
 type TestInstance = ReturnType<typeof screen.getByTestId>;
@@ -3090,6 +3091,134 @@ describe('Table', () => {
 
             fireEvent.changeText(screen.getByTestId('search-input'), '');
             expect(screen.getByTestId('selected-keys')).toHaveTextContent(/^$/);
+        });
+    });
+
+    describe('mobile long-press selection menu', () => {
+        const NARROW_LAYOUT = {
+            shouldUseNarrowLayout: true,
+            isSmallScreenWidth: true,
+            isInNarrowPaneModal: false,
+            isExtraSmallScreenHeight: false,
+            isMediumScreenWidth: false,
+            isLargeScreenWidth: false,
+            isExtraLargeScreenWidth: false,
+            isExtraSmallScreenWidth: false,
+            isSmallScreen: true,
+            onboardingIsMediumOrLargerScreenWidth: false,
+            isInLandscapeMode: false,
+        } as ResponsiveLayoutResult;
+
+        const renderLongPressableRow = ({item, index}: ListRenderItemInfo<TestItem>) => (
+            <Table.Row
+                interactive
+                rowIndex={index}
+                disabled={item.disabled}
+                accessibilityLabel={item.name}
+                testID={`row-${item.id}`}
+            >
+                <Text>{item.name}</Text>
+            </Table.Row>
+        );
+
+        function LongPressTable({data = mockData, isTableMounted = true}: {data?: TestItem[]; isTableMounted?: boolean}) {
+            const [selectedKeys, setSelectedKeys] = React.useState<string[]>([]);
+            const props = createDefaultProps();
+            return (
+                <ModalProvider>
+                    <Text testID="selected-keys">{[...selectedKeys].sort().join(',')}</Text>
+                    {isTableMounted && (
+                        <Table<TestItem, TestColumnKey>
+                            data={data}
+                            columns={props.columns}
+                            renderItem={renderLongPressableRow}
+                            keyExtractor={props.keyExtractor}
+                            selectionEnabled
+                            selectedKeys={selectedKeys}
+                            onRowSelectionChange={setSelectedKeys}
+                        >
+                            <Table.Body />
+                        </Table>
+                    )}
+                </ModalProvider>
+            );
+        }
+
+        const getSelectMenuItem = () => screen.queryByTestId(CONST.SELECTION_LIST_WITH_MODAL_TEST_ID);
+
+        beforeAll(() => {
+            Onyx.init({keys: ONYXKEYS});
+        });
+
+        beforeEach(() => {
+            jest.mocked(useResponsiveLayout).mockReturnValue(NARROW_LAYOUT);
+        });
+
+        afterEach(async () => {
+            await act(async () => {
+                await Onyx.clear();
+            });
+            jest.mocked(useResponsiveLayout).mockReturnValue({...NARROW_LAYOUT, shouldUseNarrowLayout: false, isSmallScreenWidth: false, isSmallScreen: false});
+        });
+
+        it('opens the global menu on a long press and selects the same row once "Select" is pressed', async () => {
+            // Given a selectable table on a narrow layout, with no menu mounted until a row asks for it
+            render(<LongPressTable />);
+            await waitForBatchedUpdatesWithAct();
+            expect(getSelectMenuItem()).toBeNull();
+
+            // When the user long-presses the second row
+            fireEvent(screen.getByTestId('row-2'), 'longPress');
+            await waitForBatchedUpdatesWithAct();
+
+            // Then the "Select" menu is shown from the global modal stack, with the table's test ID kept on its action
+            expect(getSelectMenuItem()).toBeOnTheScreen();
+            expect(screen.getByTestId('selected-keys')).toHaveTextContent(/^$/);
+
+            // When the user confirms with "Select"
+            const selectMenuItem = getSelectMenuItem();
+            if (!selectMenuItem) {
+                throw new Error('Expected the "Select" menu item to be rendered');
+            }
+            // The menu row ignores presses that carry no event, so hand it one like a real tap would
+            fireEvent.press(selectMenuItem, {nativeEvent: {}});
+            await waitForBatchedUpdatesWithAct();
+
+            // Then selection mode is turned on, only the long-pressed row is selected, and the menu goes away
+            expect(await getOnyxValue(ONYXKEYS.RAM_ONLY_MOBILE_SELECTION_MODE)).toBe(true);
+            expect(screen.getByTestId('selected-keys')).toHaveTextContent(/^2$/);
+            expect(getSelectMenuItem()).toBeNull();
+        });
+
+        it('does not open the menu when a disabled row is long-pressed', async () => {
+            // Given a table whose second row is disabled
+            const dataWithDisabledRow = mockData.map((item) => (item.keyForList === '2' ? {...item, disabled: true} : item));
+            render(<LongPressTable data={dataWithDisabledRow} />);
+            await waitForBatchedUpdatesWithAct();
+
+            // When the user long-presses the disabled row
+            fireEvent(screen.getByTestId('row-2'), 'longPress');
+            await waitForBatchedUpdatesWithAct();
+
+            // Then no menu is shown and nothing is selected, because a disabled row can't enter selection mode
+            expect(getSelectMenuItem()).toBeNull();
+            expect(screen.getByTestId('selected-keys')).toHaveTextContent(/^$/);
+        });
+
+        it('closes the menu when the table unmounts while it is open', async () => {
+            // Given the menu was opened from a row
+            const {rerender} = render(<LongPressTable />);
+            await waitForBatchedUpdatesWithAct();
+            fireEvent(screen.getByTestId('row-3'), 'longPress');
+            await waitForBatchedUpdatesWithAct();
+            expect(getSelectMenuItem()).toBeOnTheScreen();
+
+            // When the table goes away while the menu is still open
+            rerender(<LongPressTable isTableMounted={false} />);
+            await waitForBatchedUpdatesWithAct();
+
+            // Then the menu is taken off the global stack too, since it now lives outside the table's tree
+            expect(getSelectMenuItem()).toBeNull();
         });
     });
 });

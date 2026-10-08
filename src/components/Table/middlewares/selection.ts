@@ -1,17 +1,20 @@
 import type {TableData, TableRow} from '@components/Table/types';
 
 import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
+import useMobileSelectionMenuModal from '@hooks/useMobileSelectionMenuModal';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useShiftRangeSelection from '@hooks/useShiftRangeSelection';
 
 import {applyShiftRangeBatchToKeySet} from '@libs/shiftRangeSelection';
 
-import type {Dispatch, SetStateAction} from 'react';
+import CONST from '@src/CONST';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useId, useRef} from 'react';
 
 import type {MiddlewareHookResult} from './types';
+
+const MOBILE_SELECTION_MENU_ID_PREFIX = 'table-mobile-selection-menu-';
 
 type UseSelectionProps<DataType extends TableData> = {
     data: DataType[];
@@ -59,14 +62,11 @@ type SelectionMethods = {
     /** Clear all of the currently selected rows in the table */
     clearSelection: () => void;
 
-    /** Set whether or not the mobile selection modal is visible */
-    setMobileSelectionModalRowKey: Dispatch<SetStateAction<string | null>>;
+    /** Opens the mobile "Select" menu for a long-pressed row. Confirming it turns on selection mode and selects that row */
+    showMobileSelectionMenu: (keyForList: string) => void;
 };
 
-type UseSelectionResult<DataType extends TableData> = MiddlewareHookResult<DataType, SelectionMethods, TableRow<DataType>> & {
-    /** Whether or not the mobile selection modal is visible */
-    mobileSelectionModalRowKey: string | null;
-};
+type UseSelectionResult<DataType extends TableData> = MiddlewareHookResult<DataType, SelectionMethods, TableRow<DataType>>;
 
 export default function useSelection<DataType extends TableData>({
     data,
@@ -88,9 +88,11 @@ export default function useSelection<DataType extends TableData>({
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const selectionUsesNarrowLayout = shouldEnableSelectionInNarrowPaneModal ? isSmallScreenWidth : shouldUseNarrowLayout;
 
-    // When a user long-presses a row on mobile, store the key of the row that will be selected if
-    // the user confirms the selection
-    const [mobileSelectionModalRowKey, setMobileSelectionModalRowKey] = useState<string | null>(null);
+    const {showMobileSelectionMenu: showGlobalMobileSelectionMenu, closeModalByID} = useMobileSelectionMenuModal();
+
+    // One ID per table, so a second long press updates the open menu instead of stacking another one, and the menu
+    // can be taken down when the table goes away
+    const mobileSelectionMenuID = `${MOBILE_SELECTION_MENU_ID_PREFIX}${useId()}`;
 
     const selectableKeys = data.filter((item) => !item.disabled && !item.isSelectionDisabled).map((item) => item.keyForList);
     const selectedKeySet = new Set(selectedKeys);
@@ -213,19 +215,41 @@ export default function useSelection<DataType extends TableData>({
         rangeApi.applyShiftClick(item, true);
     };
 
+    // The menu lives on the global modal stack and keeps the callback it was opened with, so it selects the row through
+    // the latest handler rather than one that still sees the data and selection from the moment of the long press
+    const handleSingleRowSelectionRef = useRef(handleSingleRowSelection);
+    useEffect(() => {
+        handleSingleRowSelectionRef.current = handleSingleRowSelection;
+    });
+
+    const showMobileSelectionMenu = (keyForList: string) => {
+        showGlobalMobileSelectionMenu({
+            id: mobileSelectionMenuID,
+            onSelect: () => handleSingleRowSelectionRef.current(keyForList),
+            testID: CONST.SELECTION_LIST_WITH_MODAL_TEST_ID,
+            shouldSuppressBackgroundFocusOnSelect: true,
+        });
+    };
+
+    // The menu is no longer part of the table's tree, so close it if the table unmounts while it is open
+    const closeModalByIDRef = useRef(closeModalByID);
+    useEffect(() => {
+        closeModalByIDRef.current = closeModalByID;
+    }, [closeModalByID]);
+    useEffect(() => () => closeModalByIDRef.current(mobileSelectionMenuID), [mobileSelectionMenuID]);
+
     const middleware = () => {
         return tableRowData;
     };
 
     return {
         middleware,
-        mobileSelectionModalRowKey,
         methods: {
             handleSelectAll,
             handleMultipleRowSelection,
             handleSingleRowSelection,
             clearSelection,
-            setMobileSelectionModalRowKey,
+            showMobileSelectionMenu,
         },
     };
 }

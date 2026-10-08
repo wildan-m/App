@@ -294,7 +294,7 @@ export default function TableRow({
             return;
         }
 
-        tableMethods.setMobileSelectionModalRowKey(item.keyForList);
+        tableMethods.showMobileSelectionMenu(item.keyForList);
     };
 
     // Snapshot at pointer down because blur clears isEditingCell before onPress.
