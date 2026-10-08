@@ -47,7 +47,6 @@ import {canResolveTransactionCard} from '@libs/CardUtils';
 import {getConnectionCompanyID} from '@libs/CopyPolicySettingsUtils';
 import deferModalPresentationAfterPopoverDismiss from '@libs/deferModalPresentationAfterPopoverDismiss';
 import {getExpensifyCardStatementParamsFromFeed, getExpensifyCardStatementSelection} from '@libs/ExpensifyCardStatementUtils';
-import type {ExpensifyCardStatementParams} from '@libs/ExpensifyCardStatementUtils';
 import Log from '@libs/Log';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -145,6 +144,7 @@ import useDefaultExpensePolicy from './useDefaultExpensePolicy';
 import useDelegateAccountID from './useDelegateAccountID';
 import useDeleteTransactions from './useDeleteTransactions';
 import useDuplicateTransactionsAndViolations from './useDuplicateTransactionsAndViolations';
+import useExpensifyCardStatementPDFDownloadModal from './useExpensifyCardStatementPDFDownloadModal';
 import useIsVendorColumnAvailable from './useIsVendorColumnAvailable';
 import {useMemoizedLazyExpensifyIcons} from './useLazyAsset';
 import useLoadSearchCardData from './useLoadSearchCardData';
@@ -667,12 +667,11 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isDownloadErrorModalVisible, setIsDownloadErrorModalVisible] = useState(false);
-    const [isExpensifyCardStatementPDFModalVisible, setIsExpensifyCardStatementPDFModalVisible] = useState(false);
-    const [expensifyCardStatementPDFParams, setExpensifyCardStatementPDFParams] = useState<ExpensifyCardStatementParams | undefined>(undefined);
     const [isExpensifyCardStatementMultiFeedAlertVisible, setIsExpensifyCardStatementMultiFeedAlertVisible] = useState(false);
     const {showConfirmModal} = useConfirmModal();
     const openSearchReportSubmitToPopover = useOpenSearchReportSubmitToPopover();
     const {showReportPDFDownloadModal} = useReportPDFDownloadModal();
+    const {showExpensifyCardStatementPDFDownloadModal, closeExpensifyCardStatementPDFDownloadModal} = useExpensifyCardStatementPDFDownloadModal();
     const [isHoldEducationalModalVisible, setIsHoldEducationalModalVisible] = useState(false);
     const [rejectModalAction, setRejectModalAction] = useState<ValueOf<
         typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD | typeof CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT
@@ -951,19 +950,32 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         const statementParams = getExpensifyCardStatementParamsFromFeed(feed);
         const {entryIDs} = statementParams;
         const requestID = ++expensifyCardStatementRequestIDRef.current;
+        // Each export gets its own entry on the global modal stack, so a response can only ever update its own modal.
+        const modalID = `${CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_STATEMENT_PDF}-${requestID}`;
+        let isModalOpen = true;
+        let didFail = false;
 
         // Only surface the failure while this is still the latest export, so a superseded request can't close a newer modal.
         const showStatementError = () => {
             if (requestID !== expensifyCardStatementRequestIDRef.current) {
                 return;
             }
-            setIsExpensifyCardStatementPDFModalVisible(false);
-            setExpensifyCardStatementPDFParams(undefined);
+            didFail = true;
+            closeExpensifyCardStatementPDFDownloadModal(modalID);
             setIsDownloadErrorModalVisible(true);
         };
 
-        setExpensifyCardStatementPDFParams(statementParams);
-        setIsExpensifyCardStatementPDFModalVisible(true);
+        showExpensifyCardStatementPDFDownloadModal(modalID, {statementParams}).then(() => {
+            isModalOpen = false;
+            if (didFail) {
+                // Keep the selection on failure so the download-error modal, which renders inside the selection-gated
+                // bulk-action bar, stays mounted.
+                return;
+            }
+            // Clear the selection once the statement modal has finished hiding (after download or cancel), like the
+            // other bulk actions clear once their flow is done.
+            clearSelectedTransactions();
+        });
         getExpensifyCardStatementPDF(statementParams.policyID, statementParams.feedCountry, entryIDs)
             ?.then((response) => {
                 const statementKey = response?.statementKey;
@@ -977,13 +989,14 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 // Sync the modal to the server's cache key, but only while this is still the latest export. The
                 // entryIDs alone are not enough: a cancel + re-scope + re-export of the same settlement can produce
                 // a stale earlier response with matching entryIDs but a different scope, so gate on the request id.
-                if (requestID !== expensifyCardStatementRequestIDRef.current) {
+                // Also skip it once the modal has closed: showing an ID that is no longer on the stack would open it again.
+                if (requestID !== expensifyCardStatementRequestIDRef.current || !isModalOpen) {
                     return;
                 }
-                setExpensifyCardStatementPDFParams((currentParams) => (currentParams ? {...currentParams, statementKey} : currentParams));
+                showExpensifyCardStatementPDFDownloadModal(modalID, {statementParams: {...statementParams, statementKey}});
             })
             .catch(showStatementError);
-    }, [isOffline]);
+    }, [isOffline, showExpensifyCardStatementPDFDownloadModal, closeExpensifyCardStatementPDFDownloadModal, clearSelectedTransactions]);
     const firstTransactionID = selectedTransactionsKeys.at(0);
     const firstTransaction =
         (firstTransactionID ? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${firstTransactionID}`] : undefined) ??
@@ -3328,14 +3341,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         setIsDownloadErrorModalVisible(false);
     }, [setIsDownloadErrorModalVisible]);
 
-    const handleExpensifyCardStatementPDFModalHide = useCallback(() => {
-        setExpensifyCardStatementPDFParams(undefined);
-        // Clear the selection when the statement modal closes (after download or failure), like the other bulk
-        // actions clear once their flow is done. Done on hide, not on trigger, because the modal renders inside
-        // the selection-gated bulk-action bar and would unmount if the selection cleared while it was open.
-        clearSelectedTransactions();
-    }, [clearSelectedTransactions]);
-
     const handleExpensifyCardStatementMultiFeedAlertClose = useCallback(() => {
         setIsExpensifyCardStatementMultiFeedAlertVisible(false);
     }, []);
@@ -3378,10 +3383,6 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         emptyReportsCount,
         handleOfflineModalClose,
         handleDownloadErrorModalClose,
-        isExpensifyCardStatementPDFModalVisible,
-        setIsExpensifyCardStatementPDFModalVisible,
-        expensifyCardStatementPDFParams,
-        handleExpensifyCardStatementPDFModalHide,
         isExpensifyCardStatementMultiFeedAlertVisible,
         handleExpensifyCardStatementMultiFeedAlertClose,
         dismissModalAndUpdateUseHold,

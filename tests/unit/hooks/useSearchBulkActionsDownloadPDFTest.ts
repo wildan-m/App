@@ -11,6 +11,7 @@ import {getExpensifyCardStatementPDF} from '@libs/actions/CompanyCards';
 import {exportReportsToPDF} from '@libs/actions/Export';
 import {exportReportToPDF} from '@libs/actions/Report';
 import {getExpensifyCardStatementSelection} from '@libs/ExpensifyCardStatementUtils';
+import type {ExpensifyCardStatementParams} from '@libs/ExpensifyCardStatementUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -81,6 +82,50 @@ jest.mock('@hooks/useLocalize', () => ({
         formatPhoneNumber: (phone: string) => phone,
     }),
 }));
+
+// Stand-in for the global modal stack: tracks each open statement modal by its stack ID, updates its props when it is
+// shown again with the same ID, and resolves its promise when it is closed, like ModalProvider does.
+type MockStatementModal = {statementParams: ExpensifyCardStatementParams; promise: Promise<{action: string}>; resolve: (value: {action: string}) => void};
+const mockStatementModals = new Map<string, MockStatementModal>();
+
+function mockShowStatementModal(id: string, {statementParams}: {statementParams: ExpensifyCardStatementParams}) {
+    const openModal = mockStatementModals.get(id);
+    if (openModal) {
+        openModal.statementParams = statementParams;
+        return openModal.promise;
+    }
+    const {promise, resolve} = Promise.withResolvers<{action: string}>();
+    mockStatementModals.set(id, {statementParams, promise, resolve});
+    return promise;
+}
+
+function mockCloseStatementModal(id: string) {
+    mockStatementModals.get(id)?.resolve({action: 'CLOSE'});
+    mockStatementModals.delete(id);
+}
+
+jest.mock('@hooks/useExpensifyCardStatementPDFDownloadModal', () => ({
+    __esModule: true,
+    default: () => ({
+        showExpensifyCardStatementPDFDownloadModal: mockShowStatementModal,
+        closeExpensifyCardStatementPDFDownloadModal: mockCloseStatementModal,
+    }),
+}));
+
+function getOpenStatementModal() {
+    return [...mockStatementModals.values()].at(-1);
+}
+
+/** Closes the open statement modal the way the wrapper does once its hide animation has finished. */
+async function hideOpenStatementModal() {
+    const id = [...mockStatementModals.keys()].at(-1);
+    await act(async () => {
+        if (id) {
+            mockCloseStatementModal(id);
+        }
+        await Promise.resolve();
+    });
+}
 
 const mockClearSelectedTransactions = jest.fn();
 let mockSelectedTransactions: SelectedTransactions = {};
@@ -234,6 +279,7 @@ describe('useSearchBulkActions - Download report', () => {
 
     beforeEach(async () => {
         jest.clearAllMocks();
+        mockStatementModals.clear();
         mockIsOffline = false;
         await Onyx.clear();
         mockSelectedTransactions = {};
@@ -633,14 +679,52 @@ describe('useSearchBulkActions - Download report', () => {
 
         expect(getExpensifyCardStatementPDF).toHaveBeenCalledTimes(1);
         expect(getExpensifyCardStatementPDF).toHaveBeenCalledWith('policy1', 'US', [123]);
-        expect(result.current.isExpensifyCardStatementPDFModalVisible).toBe(true);
-        // The selection is kept while the modal is open (the modal renders inside the selection-gated bar), then
-        // cleared when the modal hides.
+        // The modal is opened on the global stack with the statement params, then picks up the server's statement key.
+        expect(mockStatementModals.size).toBe(1);
+        expect(getOpenStatementModal()?.statementParams.entryIDs).toEqual([123]);
+        expect(getOpenStatementModal()?.statementParams.statementKey).toBe('statement-key');
+        // The selection is kept while the modal is open, then cleared once it has finished hiding.
         expect(mockClearSelectedTransactions).not.toHaveBeenCalled();
-        act(() => {
-            result.current.handleExpensifyCardStatementPDFModalHide();
-        });
+        await hideOpenStatementModal();
         expect(mockClearSelectedTransactions).toHaveBeenCalled();
+    });
+
+    it('should not reopen the statement modal when the statement key arrives after the modal was closed', async () => {
+        let resolveRequest: (response: {statementKey: string}) => void = () => {};
+        jest.mocked(getExpensifyCardStatementPDF).mockReturnValueOnce(
+            new Promise((resolve) => {
+                resolveRequest = resolve;
+            }),
+        );
+        const groupKey = `${CONST.SEARCH.GROUP_PREFIX}123`;
+        mockSelectedTransactions = {
+            txn0: makeSelectedTransaction({groupKey, reportID: undefined}),
+        };
+        mockCurrentSearchResults = makeCurrentSearchResults({
+            [groupKey]: makeSettlementGroup(),
+        });
+
+        const {result} = renderHookWithProvider(() => useSearchBulkActions({queryJSON: expensifyCardStatementQueryJSON}));
+
+        await waitFor(() => {
+            expect(getDownloadStatementPDFOption(result.current.headerButtonsOptions)).toBeDefined();
+        });
+
+        await act(async () => {
+            await getDownloadStatementPDFOption(result.current.headerButtonsOptions)?.onSelected?.();
+        });
+        expect(getOpenStatementModal()?.statementParams.statementKey).toBeUndefined();
+
+        // The user cancels while the statement is still being generated.
+        await hideOpenStatementModal();
+        expect(mockClearSelectedTransactions).toHaveBeenCalledTimes(1);
+
+        await act(async () => {
+            resolveRequest({statementKey: 'statement-key'});
+            await Promise.resolve();
+        });
+
+        expect(mockStatementModals.size).toBe(0);
     });
 
     it('should surface the error modal when the statement PDF request fails', async () => {
@@ -668,8 +752,9 @@ describe('useSearchBulkActions - Download report', () => {
         await waitFor(() => {
             expect(result.current.isDownloadErrorModalVisible).toBe(true);
         });
-        expect(result.current.isExpensifyCardStatementPDFModalVisible).toBe(false);
-        expect(result.current.expensifyCardStatementPDFParams).toBeUndefined();
+        expect(mockStatementModals.size).toBe(0);
+        // The selection is kept so the download-error modal, which renders inside the bulk-action bar, stays mounted.
+        expect(mockClearSelectedTransactions).not.toHaveBeenCalled();
     });
 
     it('should not let a stale failed request close the modal for a newer export', async () => {
@@ -691,7 +776,7 @@ describe('useSearchBulkActions - Download report', () => {
             .mockReturnValueOnce(Promise.resolve({statementKey: 'statement-key-456'}));
 
         mockSelectedTransactions = {firstTxn: makeSelectedTransaction({groupKey: firstGroupKey, reportID: undefined})};
-        const {result} = renderHookWithProvider(() => useSearchBulkActions({queryJSON: expensifyCardStatementQueryJSON}));
+        const {result, rerender} = renderHookWithProvider(() => useSearchBulkActions({queryJSON: expensifyCardStatementQueryJSON}));
         await waitFor(() => {
             expect(getDownloadStatementPDFOption(result.current.headerButtonsOptions)).toBeDefined();
         });
@@ -701,10 +786,9 @@ describe('useSearchBulkActions - Download report', () => {
             await getDownloadStatementPDFOption(result.current.headerButtonsOptions)?.onSelected?.();
         });
         mockSelectedTransactions = {secondTxn: makeSelectedTransaction({groupKey: secondGroupKey, reportID: undefined})};
-        // Re-render so the hook picks up the new selection, then start the second export.
-        act(() => {
-            result.current.handleExpensifyCardStatementPDFModalHide();
-        });
+        // Close the first modal and re-render so the hook picks up the new selection, then start the second export.
+        await hideOpenStatementModal();
+        rerender({});
         await waitFor(() => {
             expect(getDownloadStatementPDFOption(result.current.headerButtonsOptions)).toBeDefined();
         });
@@ -719,8 +803,9 @@ describe('useSearchBulkActions - Download report', () => {
         });
 
         expect(result.current.isDownloadErrorModalVisible).toBe(false);
-        expect(result.current.isExpensifyCardStatementPDFModalVisible).toBe(true);
-        expect(result.current.expensifyCardStatementPDFParams?.entryIDs).toEqual([456]);
+        expect(mockStatementModals.size).toBe(1);
+        expect(getOpenStatementModal()?.statementParams.entryIDs).toEqual([456]);
+        expect(getOpenStatementModal()?.statementParams.statementKey).toBe('statement-key-456');
     });
 
     it('should open the multi-feed alert instead of requesting a statement PDF', async () => {
@@ -809,7 +894,7 @@ describe('useSearchBulkActions - Download report', () => {
             [secondGroupKey]: makeSettlementGroup({entryID: 456, count: 2, total: 2000, accountNumber: '5678', debitPosted: '2026-05-30'}),
         });
 
-        const {result} = renderHookWithProvider(() => useSearchBulkActions({queryJSON: expensifyCardStatementQueryJSON}));
+        const {result, rerender} = renderHookWithProvider(() => useSearchBulkActions({queryJSON: expensifyCardStatementQueryJSON}));
 
         await waitFor(() => {
             expect(getDownloadStatementPDFOption(result.current.headerButtonsOptions)).toBeDefined();
@@ -833,9 +918,8 @@ describe('useSearchBulkActions - Download report', () => {
             secondTxn1: makeSelectedTransaction({groupKey: secondGroupKey, reportID: undefined}),
         };
 
-        act(() => {
-            result.current.handleExpensifyCardStatementPDFModalHide();
-        });
+        await hideOpenStatementModal();
+        rerender({});
 
         await act(async () => {
             await snapshottedOnSelected?.();
