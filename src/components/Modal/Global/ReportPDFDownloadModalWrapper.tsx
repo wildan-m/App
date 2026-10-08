@@ -8,9 +8,12 @@ import {ModalActions} from './ModalContext';
 
 type ReportPDFDownloadModalWrapperProps = ModalProps & {
     reportID: string;
+
+    /** Called when the modal is dismissed while the PDF is still generating (e.g. Submit via PDF retracts the submit). */
+    onCancel?: () => void;
 };
 
-function ReportPDFDownloadModalWrapper({closeModal, reportID}: ReportPDFDownloadModalWrapperProps) {
+function ReportPDFDownloadModalWrapper({closeModal, reportID, onCancel}: ReportPDFDownloadModalWrapperProps) {
     const [isVisible, setIsVisible] = useState(true);
 
     return (
@@ -18,6 +21,7 @@ function ReportPDFDownloadModalWrapper({closeModal, reportID}: ReportPDFDownload
             reportID={reportID}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
+            onCancel={onCancel}
             onModalHide={() => {
                 if (isVisible) {
                     return;

@@ -308,8 +308,9 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
                 if (!moneyRequestReport?.reportID) {
                     return;
                 }
-                onPDFModalOpen?.();
+                // Prime the PDF-filename NVP before the modal mounts, so a filename left over from an earlier download isn't auto-downloaded again.
                 exportReportToPDF({reportID: moneyRequestReport.reportID});
+                onPDFModalOpen?.();
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS]: {
