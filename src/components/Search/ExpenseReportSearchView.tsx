@@ -74,7 +74,6 @@ function ExpenseReportSearchView({
         userBillingGracePeriodEnds,
         ownerBillingGracePeriodEnd,
         onLongPressRow,
-        modal,
         handleSelectRow,
         scrollToListIndex,
     } = useSearchListViewState({data, isMobileSelectionModeEnabled, onSelectRow, shouldPreventLongPressRow: false});
@@ -169,7 +168,6 @@ function ExpenseReportSearchView({
                 contentContainerStyle={contentContainerStyle}
                 newTransactions={newTransactions}
             />
-            {modal}
         </SearchListViewLayout>
     );
 }

@@ -1,11 +1,8 @@
-import MenuItemAction from '@components/MenuItem/presets/MenuItemAction';
-import Modal from '@components/Modal';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import {useSearchRowSelectionActions} from '@components/Search/SearchContext';
 import type {SearchListItem, TransactionListItemType} from '@components/Search/SearchList/ListItem/types';
 
-import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
-import useLocalize from '@hooks/useLocalize';
+import useMobileSelectionMenuModal from '@hooks/useMobileSelectionMenuModal';
 
 import {turnOnMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import navigationRef from '@libs/Navigation/navigationRef';
@@ -13,8 +10,9 @@ import navigationRef from '@libs/Navigation/navigationRef';
 import CONST from '@src/CONST';
 
 import {useRoute} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
-import {View} from 'react-native';
+import {useEffect, useId, useRef} from 'react';
+
+const MOBILE_SELECTION_MENU_ID_PREFIX = 'search-row-mobile-selection-menu-';
 
 type UseRowLongPressMenuParams = {
     /** Whether long press should be suppressed entirely. */
@@ -32,90 +30,76 @@ type UseRowLongPressMenuParams = {
 type UseRowLongPressMenuResult = {
     /** The resolved long-press handler to hand to each row (mobile-mode toggle vs open-menu). */
     onLongPressRow: (item: SearchListItem, itemTransactions?: TransactionListItemType[]) => void;
-
-    /** The bottom-docked "select" menu element. Render it as a sibling of the list. */
-    modal: React.JSX.Element;
 };
 
 /**
  * Owns the row long-press affordance: in mobile selection mode a long press toggles the row, otherwise
- * it opens a bottom-docked menu whose single action turns on selection mode for the pressed row.
+ * it opens the bottom-docked "Select" menu on the global modal stack. Once that menu closes after "Select"
+ * was pressed, selection mode is turned on for the pressed row.
  * Extracted from SearchList so ExpenseFlatSearchView can reuse it. Must be used inside
  * SearchWriteActionsProvider so `toggle` resolves to the real action rather than the no-op default.
  */
 function useRowLongPressMenu({shouldPreventLongPressRow, isSmallScreenWidth, isMobileSelectionModeEnabled}: UseRowLongPressMenuParams): UseRowLongPressMenuResult {
-    const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
     const {toggle} = useSearchRowSelectionActions();
     const route = useRoute();
-    const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, addOfflineIndicatorBottomSafeAreaPadding: false});
+    const {showMobileSelectionMenu, closeModalByID} = useMobileSelectionMenuModal();
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [longPressedItem, setLongPressedItem] = useState<SearchListItem>();
-    const [longPressedItemTransactions, setLongPressedItemTransactions] = useState<TransactionListItemType[]>();
+    // One ID per list, so a second long press updates the open menu instead of stacking another one, and the menu
+    // can be taken down when the list goes away
+    const mobileSelectionMenuID = `${MOBILE_SELECTION_MENU_ID_PREFIX}${useId()}`;
 
-    const handleLongPressRowInMobileSelectionMode = (item: SearchListItem, itemTransactions?: TransactionListItemType[]) => {
+    // The menu resolves after its close animation, so select the row through the latest `toggle` rather than the one
+    // that still sees the data and selection from the moment of the long press
+    const toggleRef = useRef(toggle);
+    useEffect(() => {
+        toggleRef.current = toggle;
+    });
+
+    // The menu is no longer part of the list's tree, so close it if the list unmounts while it is open
+    const closeModalByIDRef = useRef(closeModalByID);
+    useEffect(() => {
+        closeModalByIDRef.current = closeModalByID;
+    });
+    useEffect(() => () => closeModalByIDRef.current(mobileSelectionMenuID), [mobileSelectionMenuID]);
+
+    const shouldIgnoreLongPress = (item: SearchListItem) => {
         const currentRoute = navigationRef.current?.getCurrentRoute();
         if (currentRoute && route.key !== currentRoute.key) {
-            return;
+            return true;
         }
 
-        if (shouldPreventLongPressRow || !isSmallScreenWidth || item?.isDisabled || item?.isDisabledCheckbox || item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
+        return shouldPreventLongPressRow || !isSmallScreenWidth || item?.isDisabled || item?.isDisabledCheckbox || item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+    };
+
+    const handleLongPressRowInMobileSelectionMode = (item: SearchListItem, itemTransactions?: TransactionListItemType[]) => {
+        if (shouldIgnoreLongPress(item)) {
             return;
         }
 
         toggle(item, itemTransactions);
     };
 
-    const handleLongPressRow = useCallback(
-        (item: SearchListItem, itemTransactions?: TransactionListItemType[]) => {
-            const currentRoute = navigationRef.current?.getCurrentRoute();
-            if (currentRoute && route.key !== currentRoute.key) {
-                return;
-            }
-
-            if (shouldPreventLongPressRow || !isSmallScreenWidth || item?.isDisabled || item?.isDisabledCheckbox || item.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
-                return;
-            }
-
-            setLongPressedItem(item);
-            setLongPressedItemTransactions(itemTransactions);
-            setIsModalVisible(true);
-        },
-        [route.key, shouldPreventLongPressRow, isSmallScreenWidth],
-    );
-
-    const turnOnSelectionMode = useCallback(() => {
-        turnOnMobileSelectionMode();
-        setIsModalVisible(false);
-
-        if (longPressedItem) {
-            toggle(longPressedItem, longPressedItemTransactions);
+    const handleLongPressRow = (item: SearchListItem, itemTransactions?: TransactionListItemType[]) => {
+        if (shouldIgnoreLongPress(item)) {
+            return;
         }
-    }, [longPressedItem, toggle, longPressedItemTransactions]);
+
+        showMobileSelectionMenu({
+            id: mobileSelectionMenuID,
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.SELECTION_MODE_MENU_ITEM,
+        }).then(({action}) => {
+            if (action !== ModalActions.CONFIRM) {
+                return;
+            }
+
+            turnOnMobileSelectionMode();
+            toggleRef.current(item, itemTransactions);
+        });
+    };
 
     const onLongPressRow = isMobileSelectionModeEnabled ? handleLongPressRowInMobileSelectionMode : handleLongPressRow;
 
-    const modal = (
-        <Modal
-            isVisible={isModalVisible}
-            type={CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED}
-            onClose={() => setIsModalVisible(false)}
-            shouldPreventScrollOnFocus
-            enableEdgeToEdgeBottomSafeAreaPadding
-        >
-            <View style={bottomSafeAreaPaddingStyle}>
-                <MenuItemAction
-                    title={translate('common.select')}
-                    icon={expensifyIcons.CheckSquare}
-                    onPress={turnOnSelectionMode}
-                    sentryLabel={CONST.SENTRY_LABEL.SEARCH.SELECTION_MODE_MENU_ITEM}
-                />
-            </View>
-        </Modal>
-    );
-
-    return {onLongPressRow, modal};
+    return {onLongPressRow};
 }
 
 export default useRowLongPressMenu;

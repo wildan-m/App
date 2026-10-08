@@ -77,7 +77,6 @@ function ExpenseFlatSearchView({
         ownerBillingGracePeriodEnd,
         handleUndelete,
         onLongPressRow,
-        modal,
         handleSelectRow,
         scrollToListIndex,
     } = useSearchListViewState({data, isMobileSelectionModeEnabled, onSelectRow, shouldPreventLongPressRow: false});
@@ -180,7 +179,6 @@ function ExpenseFlatSearchView({
                 isAttendeesEnabledForMovingPolicy={isAttendeesEnabledForMovingPolicy}
                 nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
             />
-            {modal}
         </SearchListViewLayout>
     );
 }
