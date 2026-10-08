@@ -7,7 +7,8 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {InsightsFilters} from '@pages/Insights/insightsFilters';
-import DEFAULT_INSIGHTS_FILTERS, {INSIGHTS_GROUP_BY_OPTIONS} from '@pages/Insights/insightsFilters';
+import DEFAULT_INSIGHTS_FILTERS from '@pages/Insights/insightsFilters';
+import {getNearestInsightsGroupBy} from '@pages/Insights/insightsGroupBy';
 
 import variables from '@styles/variables';
 
@@ -21,18 +22,23 @@ type InsightsGroupByDropdownProps = {
     /** Time bucket the headline chart aggregates into */
     groupBy: InsightsFilters['groupBy'];
 
+    /** Time buckets that fit the page's date range */
+    options: Array<InsightsFilters['groupBy']>;
+
     onChange: (groupBy: InsightsFilters['groupBy']) => void;
 };
 
-function InsightsGroupByDropdown({groupBy, onChange}: InsightsGroupByDropdownProps) {
+function InsightsGroupByDropdown({groupBy, options, onChange}: InsightsGroupByDropdownProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
-    const items: Array<SingleSelectItem<InsightsFilters['groupBy']>> = INSIGHTS_GROUP_BY_OPTIONS.map((option) => ({
+    const items: Array<SingleSelectItem<InsightsFilters['groupBy']>> = options.map((option) => ({
         text: translate(`search.filters.groupBy.${option}`),
         value: option,
     }));
     const selectedItem = items.find((item) => item.value === groupBy);
+    // Reset lands on the page default, or the nearest bucket to it when the date range rules the default out
+    const defaultGroupBy = getNearestInsightsGroupBy(options, DEFAULT_INSIGHTS_FILTERS.groupBy);
 
     const label = translate('search.display.groupBy');
 
@@ -41,9 +47,9 @@ function InsightsGroupByDropdown({groupBy, onChange}: InsightsGroupByDropdownPro
             label={label}
             items={items}
             value={selectedItem}
-            defaultValue={DEFAULT_INSIGHTS_FILTERS.groupBy}
+            defaultValue={defaultGroupBy}
             closeOverlay={closeOverlay}
-            onChange={(item) => onChange(item?.value ?? DEFAULT_INSIGHTS_FILTERS.groupBy)}
+            onChange={(item) => onChange(item?.value ?? defaultGroupBy)}
         />
     );
 

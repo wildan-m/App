@@ -45,6 +45,31 @@ async function getStoredQuery(): Promise<string | undefined> {
 describe('useInsightsFilters', () => {
     beforeAll(() => {
         Onyx.init({keys: ONYXKEYS});
+
+        // Pins today to October, so the year to date is long enough to group by month. Only the clock is faked, so Onyx and waitFor keep running.
+        jest.useFakeTimers({
+            now: new Date(2026, 9, 8),
+            doNotFake: [
+                'nextTick',
+                'setImmediate',
+                'clearImmediate',
+                'setTimeout',
+                'clearTimeout',
+                'setInterval',
+                'clearInterval',
+                'queueMicrotask',
+                'requestAnimationFrame',
+                'cancelAnimationFrame',
+                'requestIdleCallback',
+                'cancelIdleCallback',
+                'hrtime',
+                'performance',
+            ],
+        });
+    });
+
+    afterAll(() => {
+        jest.useRealTimers();
     });
 
     beforeEach(async () => {
@@ -70,12 +95,12 @@ describe('useInsightsFilters', () => {
     });
 
     it('opens on the stored selections where the user has made one', async () => {
-        // Given a dashboard last left on a single workspace, grouped by quarter, in USD
+        // Given a dashboard last left on a single workspace, grouped by week, in USD
         await setUpActivePolicy('PLN');
         const stored: InsightsFilters = {
             date: {preset: CONST.SEARCH.DATE_PRESETS.LAST_MONTH},
             policyIDs: ['A1'],
-            groupBy: CONST.SEARCH.GROUP_BY.QUARTER,
+            groupBy: CONST.SEARCH.GROUP_BY.WEEK,
             groupCurrency: 'USD',
         };
         await Onyx.merge(ONYXKEYS.SEARCH_FILTERS, {[SPEND_SEARCH_KEY]: {query: buildInsightsQueryString(stored)}});
@@ -126,7 +151,7 @@ describe('useInsightsFilters', () => {
         await setUpActivePolicy('PLN');
         await Onyx.merge(ONYXKEYS.SEARCH_FILTERS, {
             [SPEND_SEARCH_KEY]: {
-                query: buildInsightsQueryString({date: {preset: CONST.SEARCH.DATE_PRESETS.LAST_MONTH}, policyIDs: ['A1'], groupBy: CONST.SEARCH.GROUP_BY.MONTH, groupCurrency: 'USD'}),
+                query: buildInsightsQueryString({date: {preset: CONST.SEARCH.DATE_PRESETS.LAST_12_MONTHS}, policyIDs: ['A1'], groupBy: CONST.SEARCH.GROUP_BY.MONTH, groupCurrency: 'USD'}),
             },
         });
         await waitForBatchedUpdates();
@@ -140,6 +165,70 @@ describe('useInsightsFilters', () => {
         });
 
         // Then the stored query carries the new bucket and everything the other controls had already narrowed
-        expect(await getStoredQuery()).toBe('groupBy:quarter groupCurrency:USD policyID:A1 date:last-month');
+        expect(await getStoredQuery()).toBe('groupBy:quarter groupCurrency:USD policyID:A1 date:last-12-months');
+    });
+
+    it('moves a stored bucket the date range rules out to the nearest one, on opening and when the date changes', async () => {
+        // Given a dashboard saved grouped by quarter over the last 12 months
+        await setUpActivePolicy('PLN');
+        await Onyx.merge(ONYXKEYS.SEARCH_FILTERS, {
+            [SPEND_SEARCH_KEY]: {
+                query: buildInsightsQueryString({date: {preset: CONST.SEARCH.DATE_PRESETS.LAST_12_MONTHS}, policyIDs: [], groupBy: CONST.SEARCH.GROUP_BY.QUARTER, groupCurrency: 'USD'}),
+            },
+        });
+        await waitForBatchedUpdates();
+        const {result} = renderHook(() => useInsightsFilters(CONST.INSIGHTS.DASHBOARD.SPEND));
+        await waitFor(() => expect(result.current.isResolved).toBe(true));
+        expect(result.current.filters.groupBy).toBe(CONST.SEARCH.GROUP_BY.QUARTER);
+
+        // When the date changes to this month, which only allows days and weeks
+        await act(async () => {
+            result.current.setFilters({date: {preset: CONST.SEARCH.DATE_PRESETS.THIS_MONTH}});
+            await waitForBatchedUpdates();
+        });
+
+        // Then weeks, the closest bucket to quarters, is what's shown and saved
+        expect(result.current.filters.groupBy).toBe(CONST.SEARCH.GROUP_BY.WEEK);
+        expect(await getStoredQuery()).toBe('groupBy:week groupCurrency:USD date:this-month');
+    });
+
+    it('opens a stored bucket the date range rules out on the nearest one, so Home shows the same grouping', async () => {
+        // Given a dashboard stored grouped by quarter over this month, from before the options followed the date range
+        await setUpActivePolicy('PLN');
+        await Onyx.merge(ONYXKEYS.SEARCH_FILTERS, {
+            [SPEND_SEARCH_KEY]: {
+                query: buildInsightsQueryString({date: {preset: CONST.SEARCH.DATE_PRESETS.THIS_MONTH}, policyIDs: [], groupBy: CONST.SEARCH.GROUP_BY.QUARTER, groupCurrency: 'USD'}),
+            },
+        });
+        await waitForBatchedUpdates();
+
+        // When the filters resolve, as they do for both the Insights page and Home's widget
+        const {result} = renderHook(() => useInsightsFilters(CONST.INSIGHTS.DASHBOARD.SPEND));
+        await waitFor(() => expect(result.current.isResolved).toBe(true));
+
+        // Then the grouping in use is weeks, one the Group by menu offers for this month
+        expect(result.current.filters.groupBy).toBe(CONST.SEARCH.GROUP_BY.WEEK);
+    });
+
+    it('keeps the stored bucket for a single day, which has no buckets to pick from', async () => {
+        // Given a dashboard stored grouped by quarter over the last 12 months
+        await setUpActivePolicy('PLN');
+        await Onyx.merge(ONYXKEYS.SEARCH_FILTERS, {
+            [SPEND_SEARCH_KEY]: {
+                query: buildInsightsQueryString({date: {preset: CONST.SEARCH.DATE_PRESETS.LAST_12_MONTHS}, policyIDs: [], groupBy: CONST.SEARCH.GROUP_BY.QUARTER, groupCurrency: 'USD'}),
+            },
+        });
+        await waitForBatchedUpdates();
+        const {result} = renderHook(() => useInsightsFilters(CONST.INSIGHTS.DASHBOARD.SPEND));
+        await waitFor(() => expect(result.current.isResolved).toBe(true));
+
+        // When the date changes to a single custom day
+        await act(async () => {
+            result.current.setFilters({date: {on: '2026-10-01'}});
+            await waitForBatchedUpdates();
+        });
+
+        // Then the saved bucket is left as it was
+        expect(result.current.filters.groupBy).toBe(CONST.SEARCH.GROUP_BY.QUARTER);
     });
 });

@@ -117,11 +117,12 @@ describe('Insights controls', () => {
     });
 
     it('applies the grouping the user picks', async () => {
-        // Given the headline chart grouped by month
+        // Given the headline chart grouped by month, over a range that allows weeks, months and quarters
         const onChange = jest.fn();
         renderWithProviders(
             <InsightsGroupByDropdown
                 groupBy={CONST.SEARCH.GROUP_BY.MONTH}
+                options={[CONST.SEARCH.GROUP_BY.WEEK, CONST.SEARCH.GROUP_BY.MONTH, CONST.SEARCH.GROUP_BY.QUARTER]}
                 onChange={onChange}
             />,
         );
@@ -137,11 +138,12 @@ describe('Insights controls', () => {
     });
 
     it('resets the grouping to month', async () => {
-        // Given the headline chart grouped by quarter
+        // Given the headline chart grouped by quarter, over a range that allows weeks, months and quarters
         const onChange = jest.fn();
         renderWithProviders(
             <InsightsGroupByDropdown
                 groupBy={CONST.SEARCH.GROUP_BY.QUARTER}
+                options={[CONST.SEARCH.GROUP_BY.WEEK, CONST.SEARCH.GROUP_BY.MONTH, CONST.SEARCH.GROUP_BY.QUARTER]}
                 onChange={onChange}
             />,
         );
@@ -153,6 +155,46 @@ describe('Insights controls', () => {
 
         // Then the chart goes back to the default monthly buckets
         expect(onChange).toHaveBeenCalledWith(CONST.SEARCH.GROUP_BY.MONTH);
+    });
+
+    it('offers only the groupings that fit the date range', async () => {
+        // Given the headline chart over a month, which only allows days and weeks
+        renderWithProviders(
+            <InsightsGroupByDropdown
+                groupBy={CONST.SEARCH.GROUP_BY.WEEK}
+                options={[CONST.SEARCH.GROUP_BY.DAY, CONST.SEARCH.GROUP_BY.WEEK]}
+                onChange={jest.fn()}
+            />,
+        );
+
+        // When the user opens the control
+        await openPill(/: Week$/);
+
+        // Then the groupings that don't fit the range are left out of the list
+        expect(screen.getByText(/^(Day|search\.filters\.groupBy\.day)$/)).toBeTruthy();
+        expect(screen.queryByText(/^(Month|search\.filters\.groupBy\.month)$/)).toBeNull();
+        expect(screen.queryByText(/^(Quarter|search\.filters\.groupBy\.quarter)$/)).toBeNull();
+        expect(screen.queryByText(/^(Year|search\.filters\.groupBy\.year)$/)).toBeNull();
+    });
+
+    it('resets the grouping to the nearest one to month when the date range rules month out', async () => {
+        // Given the headline chart grouped by day, over a month that only allows days and weeks
+        const onChange = jest.fn();
+        renderWithProviders(
+            <InsightsGroupByDropdown
+                groupBy={CONST.SEARCH.GROUP_BY.DAY}
+                options={[CONST.SEARCH.GROUP_BY.DAY, CONST.SEARCH.GROUP_BY.WEEK]}
+                onChange={onChange}
+            />,
+        );
+
+        // When the user resets the control
+        await openPill(/: Day$/);
+        fireEvent.press(screen.getByText(RESET));
+        await waitForBatchedUpdatesWithAct();
+
+        // Then the chart moves to weeks, the closest offered grouping to the default monthly buckets
+        expect(onChange).toHaveBeenCalledWith(CONST.SEARCH.GROUP_BY.WEEK);
     });
 
     it('resets Workspace to every workspace', async () => {

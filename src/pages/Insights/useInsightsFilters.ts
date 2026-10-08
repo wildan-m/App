@@ -13,6 +13,7 @@ import type {InsightsFilters} from './insightsFilters';
 import INSIGHTS_DASHBOARD_SPECS from './dashboardSpecs';
 import {parseInsightsFilters} from './insightsFilterParsing';
 import DEFAULT_INSIGHTS_FILTERS from './insightsFilters';
+import {getInsightsGroupByForDate} from './insightsGroupBy';
 import {buildInsightsQueryString} from './insightsQueries';
 
 type UseInsightsFiltersResult = {
@@ -40,10 +41,13 @@ function useInsightsFilters(dashboard: InsightsDashboardID): UseInsightsFiltersR
         ...DEFAULT_INSIGHTS_FILTERS,
         groupCurrency: activePolicy?.outputCurrency ?? CONST.CURRENCY.USD,
     };
-    const filters: InsightsFilters = {...defaultFilters, ...parseInsightsFilters(storedQuery)};
+    const storedFilters: InsightsFilters = {...defaultFilters, ...parseInsightsFilters(storedQuery)};
+    // A time bucket saved before the date range changed moves to the nearest one the range allows, here and on Home alike
+    const filters: InsightsFilters = {...storedFilters, groupBy: getInsightsGroupByForDate(storedFilters.date, storedFilters.groupBy)};
 
     const setFilters = (update: Partial<InsightsFilters>) => {
-        setInsightsFilters(searchKey, buildInsightsQueryString({...filters, ...update}));
+        const nextFilters = {...filters, ...update};
+        setInsightsFilters(searchKey, buildInsightsQueryString({...nextFilters, groupBy: getInsightsGroupByForDate(nextFilters.date, nextFilters.groupBy)}));
     };
 
     return {
