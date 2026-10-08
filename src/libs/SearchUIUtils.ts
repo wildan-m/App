@@ -3495,6 +3495,11 @@ function getYearOfDate(date: string): number {
     return getYear(parse(date, CONST.DATE.FNS_FORMAT_STRING, new Date()));
 }
 
+/** Whether a yyyy-MM-dd date falls outside the current year, so its short chart label needs the year */
+function isDateOutsideCurrentYear(date: string): boolean {
+    return getYearOfDate(date) !== getYear(new Date());
+}
+
 /**
  * Organizes data into list sections grouped by day.
  */
@@ -3504,7 +3509,6 @@ function getDaySections(
     dateFnsLocale: DateFnsLocale | undefined,
 ): [TransactionDayGroupListItemType[], number, boolean] {
     const daySections: Record<string, TransactionDayGroupListItemType> = {};
-    const shouldShowShortLabelYear = doGroupsSpanMultipleYears(data);
     for (const key in data) {
         if (!isGroupEntry(key)) {
             continue;
@@ -3522,7 +3526,7 @@ function getDaySections(
             transactionsQueryJSON,
             ...dayGroup,
             formattedDay: DateUtils.formatToReadableString(dayGroup.day, dateFnsLocale),
-            shortFormattedDay: DateUtils.getShortFormattedDayForSearch(dayGroup.day, dateFnsLocale, shouldShowShortLabelYear),
+            shortFormattedDay: DateUtils.getShortFormattedDayForSearch(dayGroup.day, dateFnsLocale, isDateOutsideCurrentYear(dayGroup.day)),
             keyForList: key,
         };
     }
@@ -3599,11 +3603,10 @@ function getWeekSections(
         }
     }
 
-    // Years come from the week as trimmed to the date filter, so a filter starting Jan 1 doesn't count the days before it
-    const shouldShowShortLabelYear = new Set(Object.values(weeks).flatMap(({weekStart, weekEnd}) => [getYearOfDate(weekStart), getYearOfDate(weekEnd)])).size > 1;
     for (const [key, {weekGroup, weekStart, weekEnd, transactionsQueryJSON}] of Object.entries(weeks)) {
         const formattedWeek = DateUtils.getFormattedDateRangeForSearch(weekStart, weekEnd, dateFnsLocale);
-        const shortFormattedWeek = DateUtils.getShortFormattedDateRangeForSearch(weekStart, weekEnd, dateFnsLocale, shouldShowShortLabelYear);
+        // The axis label is just the week's start, as trimmed to the date filter, so a range starting mid-week labels its first week with the range's start
+        const shortFormattedWeek = DateUtils.getShortFormattedDayForSearch(weekStart, dateFnsLocale, isDateOutsideCurrentYear(weekStart));
 
         weekSections[key] = {
             groupedBy: CONST.SEARCH.GROUP_BY.WEEK,

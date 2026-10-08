@@ -115,6 +115,9 @@ const SIN_45 = Math.sin(Math.PI / 4);
 /** Minimum gap between adjacent labels (px) */
 const LABEL_PADDING = 4;
 
+/** Minimum clear space between adjacent labels when a time-based chart labels only every Nth point (px) */
+const STEPPED_LABEL_GAP = 24;
+
 const ELLIPSIS = '...';
 
 /** Minimum visible characters (excluding ellipsis) for truncation to be worthwhile */
@@ -142,6 +145,7 @@ export {
     LABEL_ROTATIONS,
     SIN_45,
     LABEL_PADDING,
+    STEPPED_LABEL_GAP,
     ELLIPSIS,
     MIN_TRUNCATED_CHARS,
     DIAGONAL_ANGLE_RADIAN_THRESHOLD,

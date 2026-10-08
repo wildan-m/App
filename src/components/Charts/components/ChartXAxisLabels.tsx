@@ -47,6 +47,9 @@ type ChartXAxisLabelsProps = {
 
     /** Y-pixel coordinate of the bottom edge of the chart plot area. */
     chartBoundsBottom: number;
+
+    /** Width of the canvas. When set, horizontal labels near its edges shift inward instead of being cut off. */
+    canvasWidth?: number;
 };
 
 function ChartXAxisLabels({
@@ -63,6 +66,7 @@ function ChartXAxisLabels({
     labelColor,
     xScale,
     chartBoundsBottom,
+    canvasWidth,
 }: ChartXAxisLabelsProps) {
     const angleRad = (Math.abs(labelRotation) * Math.PI) / 180;
     const truncatedLabels = (() => {
@@ -100,11 +104,13 @@ function ChartXAxisLabels({
         const renderWidth = paraData.width;
 
         if (angleRad === 0) {
+            const centeredX = tickX - renderWidth / 2;
+            const labelX = canvasWidth === undefined ? centeredX : Math.max(0, Math.min(centeredX, canvasWidth - renderWidth));
             return (
                 <Paragraph
                     key={`x-label-${label}-${tickX}`}
                     paragraph={paraData.para}
-                    x={tickX - renderWidth / 2}
+                    x={labelX}
                     y={labelY - ascent}
                     width={renderWidth + GLYPH_PADDING}
                 />

@@ -1,6 +1,6 @@
 import type {ChartDataPoint, LabelRotation} from '@components/Charts/types';
 import {edgeLabelsFit, edgeMaxLabelWidth, effectiveHeight, effectiveWidth, maxVisibleCount} from '@components/Charts/utils';
-import {LABEL_PADDING, LABEL_ROTATIONS, SIN_45} from '@components/Charts/VictoryTheme';
+import {LABEL_PADDING, LABEL_ROTATIONS, SIN_45, STEPPED_LABEL_GAP} from '@components/Charts/VictoryTheme';
 
 import type {SkTypefaceFontProvider} from '@shopify/react-native-skia';
 
@@ -30,6 +30,12 @@ type LabelLayoutConfig = {
 
     /** Measurements of the label text. */
     measurements: ReturnType<typeof useChartLabelMeasurements>;
+
+    /** Every how many points labels may be drawn, smallest first. When set, labels stay horizontal and only every Nth point is labeled instead of rotating to fit them all. */
+    labelSteps?: number[];
+
+    /** Whether only the first and last points are labeled. Only applies together with `labelSteps`. */
+    shouldLabelOnlyEdges?: boolean;
 };
 
 const EMPTY_LAYOUT = {
@@ -44,7 +50,17 @@ const EMPTY_LAYOUT = {
     ellipsisWidth: 0,
 };
 
-function useChartLabelLayout({data, fontManager, tickSpacing, labelAreaWidth, firstTickLeftSpace = Infinity, lastTickRightSpace = Infinity, measurements}: LabelLayoutConfig) {
+function useChartLabelLayout({
+    data,
+    fontManager,
+    tickSpacing,
+    labelAreaWidth,
+    firstTickLeftSpace = Infinity,
+    lastTickRightSpace = Infinity,
+    measurements,
+    labelSteps,
+    shouldLabelOnlyEdges = false,
+}: LabelLayoutConfig) {
     // Phase 1: font/data measurements — stable across geometry-only changes (resize).
 
     // Phase 2: layout decisions + label truncation.
@@ -55,6 +71,24 @@ function useChartLabelLayout({data, fontManager, tickSpacing, labelAreaWidth, fi
     }
 
     const {lineHeight, labelWidths, maxLabelWidth, firstLabelWidth, lastLabelWidth, minTruncatedWidth, firstMinTrunc, lastMinTrunc, ellipsisWidth} = measurements;
+
+    // Time-based charts label the first point and every Nth point after it, using the smallest step whose
+    // spacing leaves a clear gap between neighboring labels, so labels stay horizontal and are never truncated.
+    if (labelSteps && labelSteps.length > 0) {
+        const largestStep = labelSteps.at(-1) ?? 1;
+        const fittingStep = labelSteps.find((step) => step * tickSpacing >= maxLabelWidth + STEPPED_LABEL_GAP) ?? largestStep;
+        return {
+            labelRotation: LABEL_ROTATIONS.HORIZONTAL,
+            labelSkipInterval: shouldLabelOnlyEdges ? Math.max(1, data.length - 1) : fittingStep,
+            labelMaxWidths: data.map(() => Infinity),
+            truncatedLabelWidths: labelWidths,
+            xAxisLabelHeight: lineHeight,
+            regularLabelMaxWidth: Infinity,
+            firstLabelMaxWidth: Infinity,
+            lastLabelMaxWidth: Infinity,
+            ellipsisWidth,
+        };
+    }
 
     // With a single data point there are no adjacent labels to overlap, so edge constraints
     // based on canvas boundaries are irrelevant for the rotation decision.

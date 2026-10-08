@@ -31,6 +31,9 @@ type ChartGroupByConfig = {
 
     /** Returns the dates a time-based group covers, as yyyy-MM-dd strings */
     getDateRange?: (item: GroupedItem) => {start: string; end: string} | undefined;
+
+    /** Every how many points a time-based line chart may label its x-axis, smallest first */
+    xAxisLabelSteps?: number[];
 };
 
 /**
@@ -75,6 +78,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
         getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? item.shortFormattedDay : undefined),
         getFilterQuery: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? `date>=${item.day} date<=${item.day}` : ''),
         getDateRange: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? {start: item.day, end: item.day} : undefined),
+        xAxisLabelSteps: [1, 2, 7, 14],
     },
     [CONST.SEARCH.GROUP_BY.MONTH]: {
         titleIconName: 'Calendar',
@@ -86,6 +90,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
             return `date>=${start} date<=${end}`;
         },
         getDateRange: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.MONTH ? DateUtils.getMonthDateRange(item.year, item.month) : undefined),
+        xAxisLabelSteps: [1, 2, 3, 6],
     },
     [CONST.SEARCH.GROUP_BY.WEEK]: {
         titleIconName: 'Calendar',
@@ -97,6 +102,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
             return `date>=${start} date<=${end}`;
         },
         getDateRange: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.WEEK ? DateUtils.getWeekDateRange(item.week) : undefined),
+        xAxisLabelSteps: [1, 2, 4],
     },
     [CONST.SEARCH.GROUP_BY.YEAR]: {
         titleIconName: 'Calendar',
@@ -107,6 +113,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
             return `date>=${start} date<=${end}`;
         },
         getDateRange: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.YEAR ? DateUtils.getYearDateRange(item.year) : undefined),
+        xAxisLabelSteps: [1, 2, 5],
     },
     [CONST.SEARCH.GROUP_BY.QUARTER]: {
         titleIconName: 'Calendar',
@@ -118,6 +125,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
             return `date>=${start} date<=${end}`;
         },
         getDateRange: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER ? DateUtils.getQuarterDateRange(item.year, item.quarter) : undefined),
+        xAxisLabelSteps: [1, 2, 4],
     },
 };
 

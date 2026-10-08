@@ -58,7 +58,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, shouldShowG
     const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyListActions();
     const {currentSearchKey} = useSearchQueryContext();
 
-    const {getLabel, getShortLabel, getFilterQuery} = CHART_GROUP_BY_CONFIG[groupBy];
+    const {getLabel, getShortLabel, getFilterQuery, xAxisLabelSteps} = CHART_GROUP_BY_CONFIG[groupBy];
 
     const today = format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
     const dateFilterRange = queryJSON ? getDateFilterRange(queryJSON) : {};
@@ -113,6 +113,7 @@ function SearchChartView({queryJSON, view, groupBy, data, isLoading, shouldShowG
                 onPointPress={(dataPoint, index) => handleItemPress(index)}
                 yAxisUnit={unit}
                 yAxisUnitPosition={unitPosition}
+                xAxisLabelSteps={xAxisLabelSteps}
             />
         ),
         [CONST.SEARCH.VIEW.PIE]: (

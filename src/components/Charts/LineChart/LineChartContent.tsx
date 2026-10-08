@@ -19,6 +19,7 @@ import {
 import {getDomainPaddingForEdgeSpace, getXAxisLabel, getYAxisLabelWidth, labelOverhang} from '@components/Charts/utils';
 import VictoryTheme, {CHART_CONTENT_MIN_HEIGHT, DASH_INTERVALS, GLYPH_PADDING, LABEL_PADDING, LABEL_ROTATIONS, SIN_45} from '@components/Charts/VictoryTheme';
 
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -38,11 +39,16 @@ import type {CartesianChartProps, ChartDataPoint} from '..';
 
 type LineChartProps = CartesianChartProps & {
     onPointPress?: (dataPoint: ChartDataPoint, index: number) => void;
+
+    /** Every how many points the x-axis may be labeled, smallest first. When set, labels stay horizontal and only every Nth point is labeled. */
+    xAxisLabelSteps?: number[];
 };
 
-function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left', onPointPress}: LineChartProps) {
+function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = 'left', onPointPress, xAxisLabelSteps}: LineChartProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const hasLabelSteps = !!xAxisLabelSteps?.length;
     const fontManager = useChartFontManager();
     const [chartWidth, setChartWidth] = useState(0);
     const [plotAreaWidth, setPlotAreaWidth] = useState(0);
@@ -94,7 +100,8 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
     const chartPaddingRight = yAxisLabelWidth + GLYPH_PADDING;
 
     const domainPadding = (() => {
-        if (!firstLabelWidth || !lastLabelWidth) {
+        // Stepped labels shift inward at the canvas edges, so the plot doesn't need to make room for them.
+        if (hasLabelSteps || !firstLabelWidth || !lastLabelWidth) {
             return VictoryTheme.line.domainPadding;
         }
         const labelsExceedTickSpacing = tickSpacing > 0 && maxLabelWidth + LABEL_PADDING > tickSpacing;
@@ -126,6 +133,8 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
         firstTickLeftSpace: boundsLeft + domainPadding.left * paddingScale,
         lastTickRightSpace: chartWidth > 0 ? chartWidth - boundsRight + domainPadding.right * paddingScale : 0,
         measurements,
+        labelSteps: xAxisLabelSteps,
+        shouldLabelOnlyEdges: shouldUseNarrowLayout,
     });
 
     const originalLabels = data.map(getXAxisLabel);
@@ -238,6 +247,7 @@ function LineChartContentBody({data, isLoading, yAxisUnit, yAxisUnitPosition = '
                         labelColor={theme.icon}
                         xScale={args.xScale}
                         chartBoundsBottom={chartBoundsBottom}
+                        canvasWidth={hasLabelSteps ? args.canvasSize.width : undefined}
                     />
                 )}
                 {!!fontManager && (

@@ -3728,6 +3728,9 @@ describe('SearchUIUtils', () => {
         });
 
         it('should build a day section with an exact-day transaction query', () => {
+            // The short day label leaves out the year only for days in the current year
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2026-10-09T12:00:00Z'));
             const parsedQuery = buildSearchQueryJSON('type:expense group-by:day');
             if (!parsedQuery) {
                 throw new Error('Failed to parse day-grouped search query');
@@ -3749,6 +3752,7 @@ describe('SearchUIUtils', () => {
                 reportAttributesDerivedValue: {},
                 queryJSON: {...parsedQuery},
             });
+            jest.useRealTimers();
             expect(sections).toHaveLength(1);
             expect(sections.at(0)).toEqual(
                 expect.objectContaining({
@@ -4024,73 +4028,118 @@ describe('SearchUIUtils', () => {
             expect(result.map((item) => item.formattedMonth)).toEqual(['January 2026', 'June 2026']);
         });
 
-        it('should leave the year out of short week labels when every week falls in the same year', () => {
-            // Given weeks that all fall in 2026
-            const dataInOneYear: OnyxTypes.SearchResults['data'] = {
-                personalDetailsList: {},
-                [`${CONST.SEARCH.GROUP_PREFIX}2026-01-25` as const]: {week: '2026-01-25', count: 5, currency: 'USD', total: 250},
-                [`${CONST.SEARCH.GROUP_PREFIX}2026-02-01` as const]: {week: '2026-02-01', count: 3, currency: 'USD', total: 75},
-            };
+        // Short day and week labels only show the year for dates outside the current year, so the clock is frozen in 2026
+        describe('short day and week labels with frozen clock', () => {
+            beforeEach(() => {
+                jest.useFakeTimers();
+                jest.setSystemTime(new Date('2026-10-09T12:00:00Z'));
+            });
 
-            // When the week sections are built
-            const [result] = getSectionsByType(
-                SearchUIUtils.getSections({
-                    dateFnsLocale: undefined,
-                    type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-                    data: dataInOneYear,
-                    currentAccountID: 2074551,
-                    currentUserEmail: '',
-                    translate: translateLocal,
-                    formatPhoneNumber,
-                    bankAccountList: {},
-                    rules: undefined,
-                    groupBy: CONST.SEARCH.GROUP_BY.WEEK,
-                    conciergeReportID: undefined,
-                    convertToDisplayString,
-                    reportAttributesDerivedValue: {},
-                }),
-                SearchUIUtils.isTransactionWeekGroupListItemType,
-            );
+            afterEach(() => {
+                jest.useRealTimers();
+            });
 
-            // Then the short labels show only the date range, without the year
-            expect(result.map((item) => item.shortFormattedWeek)).toEqual(['Jan 25 - 31', 'Feb 1 - 7']);
-        });
+            it('should label each week with its start date, without the year in the current year', () => {
+                // Given weeks that all fall in 2026
+                const dataInOneYear: OnyxTypes.SearchResults['data'] = {
+                    personalDetailsList: {},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2026-01-25` as const]: {week: '2026-01-25', count: 5, currency: 'USD', total: 250},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2026-02-01` as const]: {week: '2026-02-01', count: 3, currency: 'USD', total: 75},
+                };
 
-        it('should leave the year out of short week labels when the date filter trims the first week to the new year', () => {
-            // Given a search starting Jan 1, whose first week starts in December but only shows its 2026 days
-            const parsedQuery = buildSearchQueryJSON('type:expense group-by:week date>=2026-01-01');
-            if (!parsedQuery) {
-                throw new Error('Expected a parsed query');
-            }
-            const data: OnyxTypes.SearchResults['data'] = {
-                personalDetailsList: {},
-                [`${CONST.SEARCH.GROUP_PREFIX}2025-12-28` as const]: {week: '2025-12-28', count: 5, currency: 'USD', total: 250},
-                [`${CONST.SEARCH.GROUP_PREFIX}2026-01-04` as const]: {week: '2026-01-04', count: 3, currency: 'USD', total: 75},
-            };
+                // When the week sections are built
+                const [result] = getSectionsByType(
+                    SearchUIUtils.getSections({
+                        dateFnsLocale: undefined,
+                        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                        data: dataInOneYear,
+                        currentAccountID: 2074551,
+                        currentUserEmail: '',
+                        translate: translateLocal,
+                        formatPhoneNumber,
+                        bankAccountList: {},
+                        rules: undefined,
+                        groupBy: CONST.SEARCH.GROUP_BY.WEEK,
+                        conciergeReportID: undefined,
+                        convertToDisplayString,
+                        reportAttributesDerivedValue: {},
+                    }),
+                    SearchUIUtils.isTransactionWeekGroupListItemType,
+                );
 
-            // When the week sections are built
-            const [result] = getSectionsByType(
-                SearchUIUtils.getSections({
-                    dateFnsLocale: undefined,
-                    type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-                    data,
-                    currentAccountID: 2074551,
-                    currentUserEmail: '',
-                    translate: translateLocal,
-                    formatPhoneNumber,
-                    bankAccountList: {},
-                    rules: undefined,
-                    groupBy: CONST.SEARCH.GROUP_BY.WEEK,
-                    conciergeReportID: undefined,
-                    convertToDisplayString,
-                    reportAttributesDerivedValue: {},
-                    queryJSON: parsedQuery,
-                }),
-                SearchUIUtils.isTransactionWeekGroupListItemType,
-            );
+                // Then the short labels show only each week's start date, while the full labels, used by the tooltip, keep the range
+                expect(result.map((item) => item.shortFormattedWeek)).toEqual(['Jan 25', 'Feb 1']);
+                expect(result.map((item) => item.formattedWeek)).toEqual(['Jan 25 - Jan 31, 2026', 'Feb 1 - Feb 7, 2026']);
+            });
 
-            // Then the December days don't count, so no label shows the year
-            expect(result.map((item) => item.shortFormattedWeek)).toEqual(['Jan 1 - 3', 'Jan 4 - 10']);
+            it('should label the first week with the date filter start when the range starts mid-week', () => {
+                // Given a search starting Jan 1, whose first week starts in December but only shows its 2026 days
+                const parsedQuery = buildSearchQueryJSON('type:expense group-by:week date>=2026-01-01');
+                if (!parsedQuery) {
+                    throw new Error('Expected a parsed query');
+                }
+                const data: OnyxTypes.SearchResults['data'] = {
+                    personalDetailsList: {},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2025-12-28` as const]: {week: '2025-12-28', count: 5, currency: 'USD', total: 250},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2026-01-04` as const]: {week: '2026-01-04', count: 3, currency: 'USD', total: 75},
+                };
+
+                // When the week sections are built
+                const [result] = getSectionsByType(
+                    SearchUIUtils.getSections({
+                        dateFnsLocale: undefined,
+                        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                        data,
+                        currentAccountID: 2074551,
+                        currentUserEmail: '',
+                        translate: translateLocal,
+                        formatPhoneNumber,
+                        bankAccountList: {},
+                        rules: undefined,
+                        groupBy: CONST.SEARCH.GROUP_BY.WEEK,
+                        conciergeReportID: undefined,
+                        convertToDisplayString,
+                        reportAttributesDerivedValue: {},
+                        queryJSON: parsedQuery,
+                    }),
+                    SearchUIUtils.isTransactionWeekGroupListItemType,
+                );
+
+                // Then the first label is the filter's start date rather than the December week start
+                expect(result.map((item) => item.shortFormattedWeek)).toEqual(['Jan 1', 'Jan 4']);
+            });
+
+            it('should add the year to short day labels only for days outside the current year', () => {
+                // Given days on both sides of New Year
+                const data: OnyxTypes.SearchResults['data'] = {
+                    personalDetailsList: {},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2025-12-28` as const]: {day: '2025-12-28', count: 5, currency: 'USD', total: 250},
+                    [`${CONST.SEARCH.GROUP_PREFIX}2026-01-02` as const]: {day: '2026-01-02', count: 3, currency: 'USD', total: 75},
+                };
+
+                // When the day sections are built
+                const [result] = getSectionsByType(
+                    SearchUIUtils.getSections({
+                        dateFnsLocale: undefined,
+                        type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                        data,
+                        currentAccountID: 2074551,
+                        currentUserEmail: '',
+                        translate: translateLocal,
+                        formatPhoneNumber,
+                        bankAccountList: {},
+                        rules: undefined,
+                        groupBy: CONST.SEARCH.GROUP_BY.DAY,
+                        conciergeReportID: undefined,
+                        convertToDisplayString,
+                        reportAttributesDerivedValue: {},
+                    }),
+                    SearchUIUtils.isTransactionDayGroupListItemType,
+                );
+
+                // Then only the day from last year shows the year
+                expect(result.map((item) => item.shortFormattedDay)).toEqual(['Dec 28, ’25', 'Jan 2']);
+            });
         });
 
         it('should calculate sortKey correctly for month groups', () => {
@@ -4745,7 +4794,7 @@ describe('SearchUIUtils', () => {
                     total: 250,
                     groupedBy: CONST.SEARCH.GROUP_BY.WEEK,
                     formattedWeek: 'Jan 25 - Jan 31, 2026',
-                    shortFormattedWeek: 'Jan 25 - 31, ’26',
+                    shortFormattedWeek: 'Jan 25',
                     transactions: [],
                     transactionsQueryJSON: undefined,
                     keyForList: 'group_2026-01-25',
@@ -4757,30 +4806,34 @@ describe('SearchUIUtils', () => {
                     total: 75,
                     groupedBy: CONST.SEARCH.GROUP_BY.WEEK,
                     formattedWeek: 'Dec 21 - Dec 27, 2025',
-                    shortFormattedWeek: 'Dec 21 - 27, ’25',
+                    shortFormattedWeek: 'Dec 21, ’25',
                     transactions: [],
                     transactionsQueryJSON: undefined,
                     keyForList: 'group_2025-12-21',
                 },
             ];
 
-            expect(
-                SearchUIUtils.getSections({
-                    dateFnsLocale: undefined,
-                    type: CONST.SEARCH.DATA_TYPES.EXPENSE,
-                    data: searchResultsGroupByWeek.data,
-                    currentAccountID: 2074551,
-                    currentUserEmail: '',
-                    translate: translateLocal,
-                    formatPhoneNumber,
-                    bankAccountList: {},
-                    rules: undefined,
-                    groupBy: CONST.SEARCH.GROUP_BY.WEEK,
-                    conciergeReportID: undefined,
-                    convertToDisplayString,
-                    reportAttributesDerivedValue: {},
-                })[0],
-            ).toStrictEqual(transactionWeekGroupListItems);
+            // The short week label leaves out the year only for weeks starting in the current year
+            jest.useFakeTimers();
+            jest.setSystemTime(new Date('2026-10-09T12:00:00Z'));
+            const [sections] = SearchUIUtils.getSections({
+                dateFnsLocale: undefined,
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE,
+                data: searchResultsGroupByWeek.data,
+                currentAccountID: 2074551,
+                currentUserEmail: '',
+                translate: translateLocal,
+                formatPhoneNumber,
+                bankAccountList: {},
+                rules: undefined,
+                groupBy: CONST.SEARCH.GROUP_BY.WEEK,
+                conciergeReportID: undefined,
+                convertToDisplayString,
+                reportAttributesDerivedValue: {},
+            });
+            jest.useRealTimers();
+
+            expect(sections).toStrictEqual(transactionWeekGroupListItems);
         });
 
         it('should format week dates correctly', () => {
