@@ -1201,6 +1201,7 @@ const transactionReportGroupListItems = createMock<Array<TransactionReportGroupL
         paidByAvatar: undefined,
         paidByAccountID: undefined,
         formattedPaidBy: '',
+        paid: '',
         stateNum: 0,
         statusNum: 0,
         to: emptyPersonalDetails,
@@ -1333,6 +1334,7 @@ const transactionReportGroupListItems = createMock<Array<TransactionReportGroupL
         paidByAvatar: undefined,
         paidByAccountID: undefined,
         formattedPaidBy: '',
+        paid: '',
         stateNum: 1,
         statusNum: 1,
         to: {
@@ -1471,6 +1473,7 @@ const transactionReportGroupListItems = createMock<Array<TransactionReportGroupL
         paidByAvatar: undefined,
         paidByAccountID: undefined,
         formattedPaidBy: '',
+        paid: '',
         stateNum: 1,
         statusNum: 1,
         total: 4400,
@@ -1695,6 +1698,7 @@ const transactionReportGroupListItems = createMock<Array<TransactionReportGroupL
         paidByAvatar: undefined,
         paidByAccountID: undefined,
         formattedPaidBy: '',
+        paid: '',
         stateNum: 0,
         statusNum: 0,
         to: emptyPersonalDetails,
@@ -7655,7 +7659,7 @@ describe('SearchUIUtils', () => {
                 expect(item?.firstApproverAccountID).toBeUndefined();
             });
 
-            it('should populate paidBy from a snapshot payment action on a paid report', () => {
+            it('should populate paidBy/paid from a snapshot payment action on a paid report', () => {
                 const data = makeReportFilterTestData(
                     {type: CONST.REPORT.TYPE.EXPENSE, stateNum: CONST.REPORT.STATE_NUM.APPROVED, statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED},
                     {},
@@ -7673,9 +7677,10 @@ describe('SearchUIUtils', () => {
                 const [sections] = callGetReportSections(data);
                 const item = sections.find((s) => s.keyForList === rptFilterReportID);
                 expect(item?.paidByAccountID).toBe(approverAccountID);
+                expect(item?.paid).toBe('2024-12-22 09:30:00');
             });
 
-            it('should populate paidBy from a live pay action missing from the snapshot (pay from Search)', () => {
+            it('should populate paidBy/paid from a live pay action missing from the snapshot (pay from Search)', () => {
                 const data = makeReportFilterTestData({type: CONST.REPORT.TYPE.EXPENSE, stateNum: CONST.REPORT.STATE_NUM.APPROVED, statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED});
                 const [sections] = callGetReportSections(data, {
                     reportActions: {
@@ -7693,6 +7698,7 @@ describe('SearchUIUtils', () => {
                 });
                 const item = sections.find((s) => s.keyForList === rptFilterReportID);
                 expect(item?.paidByAccountID).toBe(approverAccountID);
+                expect(item?.paid).toBe('2024-12-22 09:30:00');
             });
 
             it('should leave paidBy blank when the submitter marked the payment as received', () => {
@@ -7727,6 +7733,7 @@ describe('SearchUIUtils', () => {
                 const item = sections.find((s) => s.keyForList === rptFilterReportID);
                 expect(item?.paidByAccountID).toBeUndefined();
                 expect(item?.formattedPaidBy).toBe('');
+                expect(item?.paid).toBe('');
             });
 
             it('should ignore payment actions at or before the latest reimbursement cancellation', () => {
@@ -7753,6 +7760,7 @@ describe('SearchUIUtils', () => {
                 );
                 const item = sections.find((s) => s.keyForList === rptFilterReportID);
                 expect(item?.paidByAccountID).toBeUndefined();
+                expect(item?.paid).toBe('');
             });
 
             it('should use the first approval after the latest UNAPPROVED action when the report was re-approved', () => {

@@ -356,6 +356,7 @@ const expenseReportColumnNamesToSortingProperty: ExpenseReportSorting = {
     [CONST.SEARCH.TABLE_COLUMNS.FIRST_APPROVER]: 'formattedFirstApprover' as const,
     [CONST.SEARCH.TABLE_COLUMNS.FIRST_APPROVED]: 'firstApproved' as const,
     [CONST.SEARCH.TABLE_COLUMNS.PAID_BY]: 'formattedPaidBy' as const,
+    [CONST.SEARCH.TABLE_COLUMNS.PAID]: 'paid' as const,
     [CONST.SEARCH.TABLE_COLUMNS.EXPORTED]: 'exported' as const,
     [CONST.SEARCH.TABLE_COLUMNS.STATUS]: 'formattedStatus' as const,
     [CONST.SEARCH.TABLE_COLUMNS.PAID_STATUS]: 'formattedPaidStatus' as const,
@@ -2834,7 +2835,7 @@ function getReportSections({
                 const formattedTo = !shouldShowBlankTo ? temporaryGetDisplayNameOrDefault({passedPersonalDetails: toDetails, translate, formatPhoneNumber}) : '';
                 const formattedFirstApprover = firstApproverAccountID ? temporaryGetDisplayNameOrDefault({passedPersonalDetails: firstApproverDetails, translate, formatPhoneNumber}) : '';
 
-                // The paid-by user is the actor on the latest payment action. It stays blank until the report is paid.
+                // The paid-by user and paid date come from the latest payment action. Both stay blank until the report is paid.
                 const lastReimbursedAction =
                     reportItem.statusNum === CONST.REPORT.STATUS_NUM.REIMBURSED
                         ? getLastPaidAction(lastReimbursedActionByReportID.get(reportItem.reportID), actions, reportItem.ownerAccountID)
@@ -2842,6 +2843,7 @@ function getReportSections({
                 const paidByAccountID = lastReimbursedAction?.actorAccountID;
                 const paidByDetails = paidByAccountID ? mergedPersonalDetails?.[paidByAccountID] : undefined;
                 const formattedPaidBy = paidByAccountID ? temporaryGetDisplayNameOrDefault({passedPersonalDetails: paidByDetails, translate, formatPhoneNumber}) : '';
+                const paid = lastReimbursedAction?.created ?? '';
 
                 const formattedStatus = getReportStatusTranslation({stateNum: reportItem.stateNum, statusNum: reportItem.statusNum, translate});
                 const formattedPaidStatus = getReportStatusTooltipTranslation({stateNum: reportItem.stateNum, statusNum: reportItem.statusNum, translate});
@@ -2890,6 +2892,7 @@ function getReportSections({
                     paidByAvatar: paidByDetails?.avatar,
                     paidByAccountID,
                     formattedPaidBy,
+                    paid,
                     formattedFrom,
                     formattedTo,
                     formattedStatus,
@@ -4462,6 +4465,8 @@ function getSearchColumnTranslationKey(column: SearchSortBy, type?: SearchDataTy
             return 'search.filters.firstApproved';
         case CONST.SEARCH.TABLE_COLUMNS.PAID_BY:
             return 'search.filters.paidBy';
+        case CONST.SEARCH.TABLE_COLUMNS.PAID:
+            return 'search.filters.paid';
         case CONST.SEARCH.TABLE_COLUMNS.POSTED:
             return 'search.filters.posted';
         case CONST.SEARCH.TABLE_COLUMNS.EXPORTED:

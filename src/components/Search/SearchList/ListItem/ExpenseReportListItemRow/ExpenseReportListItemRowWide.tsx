@@ -125,6 +125,15 @@ function ExpenseReportListItemRowWide({
                 )}
             </View>
         ),
+        [CONST.SEARCH.TABLE_COLUMNS.PAID]: (
+            <View style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.PAID)]}>
+                <DateCell
+                    date={item.paid ?? ''}
+                    showTooltip
+                    isLargeScreenWidth
+                />
+            </View>
+        ),
         [CONST.SEARCH.TABLE_COLUMNS.EXPORTED]: (
             <View style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.EXPORTED, {isExportedColumnWide: item.shouldShowYearExported})]}>
                 <DateCell
