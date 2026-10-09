@@ -283,6 +283,7 @@ const getExpenseReportHeaders = (profileIcon?: IconAsset): SearchColumnConfig[] 
     {
         columnName: CONST.SEARCH.TABLE_COLUMNS.PAID,
         translationKey: 'search.filters.paid',
+        isColumnSortable: false,
     },
     {
         columnName: CONST.SEARCH.TABLE_COLUMNS.EXPORTED,

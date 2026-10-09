@@ -356,7 +356,6 @@ const expenseReportColumnNamesToSortingProperty: ExpenseReportSorting = {
     [CONST.SEARCH.TABLE_COLUMNS.FIRST_APPROVER]: 'formattedFirstApprover' as const,
     [CONST.SEARCH.TABLE_COLUMNS.FIRST_APPROVED]: 'firstApproved' as const,
     [CONST.SEARCH.TABLE_COLUMNS.PAID_BY]: 'formattedPaidBy' as const,
-    [CONST.SEARCH.TABLE_COLUMNS.PAID]: 'paid' as const,
     [CONST.SEARCH.TABLE_COLUMNS.EXPORTED]: 'exported' as const,
     [CONST.SEARCH.TABLE_COLUMNS.STATUS]: 'formattedStatus' as const,
     [CONST.SEARCH.TABLE_COLUMNS.PAID_STATUS]: 'formattedPaidStatus' as const,
@@ -462,6 +461,8 @@ const nonSortableColumns = new Set<SearchColumnType>([
     CONST.SEARCH.TABLE_COLUMNS.IN,
     CONST.SEARCH.TABLE_COLUMNS.AVATAR,
     CONST.SEARCH.TABLE_COLUMNS.VIOLATIONS,
+    // The paid date is derived on the frontend from report actions, and the Search API doesn't accept it as a sortBy value.
+    CONST.SEARCH.TABLE_COLUMNS.PAID,
 ]);
 
 function isValidTaskStatus(status: unknown): status is ValueOf<typeof CONST.SEARCH.STATUS.TASK> {
