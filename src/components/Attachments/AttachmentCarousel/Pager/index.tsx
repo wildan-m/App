@@ -6,6 +6,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {ForwardedRef, SetStateAction} from 'react';
 import type {NativeSyntheticEvent} from 'react-native';
+import type {PageScrollStateChangedNativeEvent, PagerViewOnPageSelectedEvent} from 'react-native-pager-view';
 
 import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
@@ -62,6 +63,21 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
 
     const isPagerScrolling = useSharedValue(false);
 
+    /** Whether the user is currently dragging the pager */
+    const isDraggingRef = useRef(false);
+
+    /** Whether the user started a drag whose page selection has not been fully reported yet */
+    const isUserPageChangePendingRef = useRef(false);
+
+    /** Whether a page was selected while the current drag was still in progress */
+    const didSelectPageWhileDraggingRef = useRef(false);
+
+    /** The page requested through the imperative `setPage` handle, whose selection should be forwarded */
+    const requestedPageRef = useRef<number | null>(null);
+
+    /** The page the pager was moved back to after an unrequested page change, whose selection should be ignored */
+    const restoredPageRef = useRef<number | null>(null);
+
     const activePage = useSharedValue(initialPage);
     const [activePageIndex, setActivePageIndex] = useState(initialPage);
 
@@ -109,6 +125,60 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
         [handleTap, onSwipeDown, handleScaleChange, onAttachmentError],
     );
 
+    const handlePageScrollStateChanged = (event: PageScrollStateChangedNativeEvent) => {
+        const {pageScrollState} = event.nativeEvent;
+
+        if (pageScrollState === 'dragging') {
+            isDraggingRef.current = true;
+            isUserPageChangePendingRef.current = true;
+            didSelectPageWhileDraggingRef.current = false;
+            requestedPageRef.current = null;
+            restoredPageRef.current = null;
+            return;
+        }
+
+        if (pageScrollState !== 'idle') {
+            return;
+        }
+
+        isDraggingRef.current = false;
+
+        // When the page was not selected during the drag, the selection can still arrive after the pager settles, so keep expecting it
+        if (didSelectPageWhileDraggingRef.current) {
+            isUserPageChangePendingRef.current = false;
+        }
+    };
+
+    const handlePageSelected = (event: PagerViewOnPageSelectedEvent) => {
+        const {position} = event.nativeEvent;
+
+        if (position === requestedPageRef.current) {
+            requestedPageRef.current = null;
+            onPageSelected?.(event);
+            return;
+        }
+
+        if (position === restoredPageRef.current) {
+            restoredPageRef.current = null;
+            return;
+        }
+
+        if (position === initialPage || isUserPageChangePendingRef.current) {
+            if (isDraggingRef.current) {
+                didSelectPageWhileDraggingRef.current = true;
+            } else {
+                isUserPageChangePendingRef.current = false;
+            }
+            onPageSelected?.(event);
+            return;
+        }
+
+        // The page changed without a swipe or a programmatic request. On iOS this happens when the pager's frame changes
+        // (e.g. on device rotation or when the keyboard shows), so move the pager back to the current page instead of navigating away.
+        restoredPageRef.current = initialPage;
+        pagerRef.current?.setPageWithoutAnimation(initialPage);
+    };
+
     const animatedProps = useAnimatedProps(() => ({
         scrollEnabled: isScrollEnabled.get(),
     }));
@@ -121,6 +191,8 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
         ref,
         () => ({
             setPage: (selectedPage) => {
+                requestedPageRef.current = selectedPage;
+                restoredPageRef.current = null;
                 pagerRef.current?.setPage(selectedPage);
             },
         }),
@@ -148,7 +220,8 @@ function AttachmentCarouselPager({items, activeAttachmentID, initialPage, setSho
                         pageMargin={40}
                         offscreenPageLimit={1}
                         onPageScroll={pageScrollHandler}
-                        onPageSelected={onPageSelected}
+                        onPageSelected={handlePageSelected}
+                        onPageScrollStateChanged={handlePageScrollStateChanged}
                         style={styles.flex1}
                         initialPage={initialPage}
                         animatedProps={animatedProps}

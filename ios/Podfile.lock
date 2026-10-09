@@ -2161,7 +2161,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (9.0.4):
+  - react-native-pager-view (9.0.6):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
