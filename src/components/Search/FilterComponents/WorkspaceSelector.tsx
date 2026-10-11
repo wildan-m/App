@@ -221,6 +221,7 @@ function WorkspaceSelector({value = [], selectionListTextInputStyle, selectionLi
                     sections={sections}
                     ListItem={MultiSelectListItem}
                     onSelectRow={updateSelectedItems}
+                    titleNumberOfLines={CONST.SEARCH_FILTER_LIST_MAX_TITLE_LINES}
                     shouldPreventDefaultFocusOnSelectRow={false}
                     shouldShowTextInput={shouldShowWorkspaceSearchInput}
                     shouldShowLoadingPlaceholder={isLoadingOnyxValue(policiesResult) || !ready}

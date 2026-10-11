@@ -470,6 +470,8 @@ const CONST = {
 
     TRANSACTION_TAG_AND_CATEGORY_PICKER_MAX_TITLE_LINES: 5,
 
+    SEARCH_FILTER_LIST_MAX_TITLE_LINES: 3,
+
     AUTO_AUTH_STATE: {
         NOT_STARTED: 'not-started',
         SIGNING_IN: 'signing-in',

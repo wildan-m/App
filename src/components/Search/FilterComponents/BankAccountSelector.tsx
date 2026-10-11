@@ -180,6 +180,7 @@ function BankAccountSelector({value = [], selectionListTextInputStyle, selection
                     sections={sections}
                     ListItem={MultiSelectListItem}
                     onSelectRow={updateSelection}
+                    titleNumberOfLines={CONST.SEARCH_FILTER_LIST_MAX_TITLE_LINES}
                     shouldPreventDefaultFocusOnSelectRow={false}
                     shouldShowTextInput={shouldShowSearchInput}
                     textInputOptions={textInputOptions}

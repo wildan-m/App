@@ -202,6 +202,7 @@ function MultiSelect<T extends string>({
                     data={listData}
                     ListItem={MultiSelectListItem}
                     onSelectRow={updateSelectedItems}
+                    titleNumberOfLines={CONST.SEARCH_FILTER_LIST_MAX_TITLE_LINES}
                     textInputOptions={textInputOptions}
                     style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
                     footerContent={footerContent}

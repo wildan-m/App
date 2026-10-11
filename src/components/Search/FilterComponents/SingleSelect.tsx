@@ -13,6 +13,8 @@ import moveInitialSelectionToTop from '@libs/SelectionListOrderUtils';
 
 import variables from '@styles/variables';
 
+import CONST from '@src/CONST';
+
 import React, {Activity, useState} from 'react';
 
 import ListFilterWrapper from './ListFilterViewWrapper';
@@ -155,6 +157,7 @@ function SingleSelectImpl({
                     shouldSingleExecuteRowSelect
                     ListItem={SingleSelectListItem}
                     onSelectRow={updateSelectedItem}
+                    titleNumberOfLines={CONST.SEARCH_FILTER_LIST_MAX_TITLE_LINES}
                     textInputOptions={textInputOptions}
                     style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
                     shouldUpdateFocusedIndex
