@@ -44,6 +44,7 @@ import {
 } from '@libs/ReportUtils';
 import {
     getChildTransactions,
+    hasTransactionBeenRejected,
     hasValidModifiedAmount,
     isDistanceRequest as isDistanceRequestTransactionUtils,
     isOnHold,
@@ -169,16 +170,25 @@ function rescaleSnapshotGroupAmount<T extends OnyxTypes.Transaction>(transaction
 
 /**
  * Whether any of the given splits still lives on a report that hasn't been submitted yet.
+ * Splits that were rejected out of their report don't count: they keep their split link, but collapsing the split into them is not possible.
  */
 function hasEditableSplitExpenseLeft(
     splitExpenses: SplitExpense[],
     allTransactionsList: OnyxCollection<OnyxTypes.Transaction>,
     allReportsList: OnyxCollection<OnyxTypes.Report>,
     searchReportsData: SearchResultDataType | undefined,
+    transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>,
 ): boolean {
     return splitExpenses.some((expense) => {
         const transactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${expense.transactionID}` as const;
-        const liveReportID = allTransactionsList?.[transactionKey]?.reportID ?? searchReportsData?.[transactionKey]?.reportID ?? expense.reportID;
+        const liveTransaction = allTransactionsList?.[transactionKey];
+        // Rejecting an expense clears its reportID optimistically, and the backend then flags the re-homed expense as rejected
+        const wasRejectedOutOfReport =
+            (!!liveTransaction && !liveTransaction.reportID) || hasTransactionBeenRejected(transactionViolations?.[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${expense.transactionID}`]);
+        if (wasRejectedOutOfReport) {
+            return false;
+        }
+        const liveReportID = liveTransaction?.reportID ?? searchReportsData?.[transactionKey]?.reportID ?? expense.reportID;
         const reportKey = `${ONYXKEYS.COLLECTION.REPORT}${liveReportID}` as const;
         const statusNum = allReportsList?.[reportKey]?.statusNum ?? searchReportsData?.[reportKey]?.statusNum ?? CONST.REPORT.STATUS_NUM.OPEN;
         return statusNum < CONST.REPORT.STATUS_NUM.SUBMITTED;
@@ -305,7 +315,7 @@ function updateSplitTransactions({
 
     const isCreationOfSplits = allChildTransactions.length === 0;
     const currentSnapshotDataForSplits = allSnapshots?.[`${ONYXKEYS.COLLECTION.SNAPSHOT}${searchContext?.currentSearchHash}`]?.data;
-    const hasEditableSplitExpensesLeft = hasEditableSplitExpenseLeft(splitExpenses, allTransactionsList, allReportsList, currentSnapshotDataForSplits);
+    const hasEditableSplitExpensesLeft = hasEditableSplitExpenseLeft(splitExpenses, allTransactionsList, allReportsList, currentSnapshotDataForSplits, transactionViolations);
     const isReverseSplitOperation = splitExpenses.length === 1 && allChildTransactions.length > 0 && hasEditableSplitExpensesLeft;
 
     let splitThreadComments: OnyxTypes.ReportAction[] = [];
