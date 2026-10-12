@@ -10,16 +10,22 @@ index f36a1e3..7edb8fe 100644
  import android.view.ViewGroup
  import android.view.ViewStructure
  import android.view.WindowManager
-@@ -343,6 +344,8 @@ public class ReactModalHostView(context: ThemedReactContext) :
+@@ -343,6 +344,14 @@ public class ReactModalHostView(context: ThemedReactContext) :
      if (currentActivity?.isFinishing == false) {
        newDialog.show()
        updateSystemAppearance()
 +      // Activity and dialog insets can settle after attach; re-sync so nav icon style matches.
-+      window.decorView.post { updateSystemAppearance() }
++      // The dialog can already be dismissed by the time this posted runnable executes, so only
++      // re-sync while this dialog is still the one being shown.
++      window.decorView.post {
++        if (dialog === newDialog && newDialog.isShowing) {
++          updateSystemAppearance()
++        }
++      }
        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
        (context as ThemedReactContext).onExtraWindowCreate(window)
      }
-@@ -392,7 +395,16 @@ public class ReactModalHostView(context: ThemedReactContext) :
+@@ -392,7 +401,16 @@ public class ReactModalHostView(context: ThemedReactContext) :
  
        // Navigation bar cannot be translucent without status bar being translucent too
        if (navigationBarTranslucent) {
@@ -37,7 +43,7 @@ index f36a1e3..7edb8fe 100644
        } else {
          dialogWindow.disableEdgeToEdge()
          dialogWindow.setStatusBarTranslucency(statusBarTranslucent)
-@@ -413,6 +425,10 @@ public class ReactModalHostView(context: ThemedReactContext) :
+@@ -413,6 +431,10 @@ public class ReactModalHostView(context: ThemedReactContext) :
        // window manager
        FLog.e(TAG, "ReactModalHostView: error while setting window flags: ", e.message)
      }
@@ -48,7 +54,7 @@ index f36a1e3..7edb8fe 100644
    }
  
    /**
-@@ -439,8 +455,21 @@ public class ReactModalHostView(context: ThemedReactContext) :
+@@ -439,8 +461,21 @@ public class ReactModalHostView(context: ThemedReactContext) :
              WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
        }
  

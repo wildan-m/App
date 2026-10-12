@@ -144,9 +144,9 @@
 
 ### [react-native+0.86.0+019+fix-modal-transparent-navigation-bar.patch](react-native+0.86.0+019+fix-modal-transparent-navigation-bar.patch)
 
-- Reason: This patch fixes an issue where it is not possible to enable a transparent navigation bar on Android
+- Reason: This patch fixes an issue where it is not possible to enable a transparent navigation bar on Android. The deferred `updateSystemAppearance()` re-sync posted in `showOrUpdate()` is guarded so it does not run once the dialog has been dismissed, which otherwise crashes with "dialog must exist when we call updateProperties"
 - Upstream PR/issue: 🛑
-- E/App issue: [#69005](https://github.com/Expensify/App/issues/69005)
+- E/App issue: [#69005](https://github.com/Expensify/App/issues/69005), [#103778](https://github.com/Expensify/App/issues/103778)
 - PR introducing patch: [#69004](https://github.com/Expensify/App/pull/69004)
 
 ### [react-native+0.86.0+021+perf-increase-initial-heap-size.patch](react-native+0.86.0+021+perf-increase-initial-heap-size.patch)
