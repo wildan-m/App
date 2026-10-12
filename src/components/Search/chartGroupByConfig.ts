@@ -16,9 +16,15 @@ import type {
 } from './SearchList/ListItem/types';
 import type {GroupedItem, SearchGroupBy} from './types';
 
+/** Calendar unit of a time-based grouping's buckets */
+type ChartBucketUnit = 'day' | 'week' | 'month' | 'quarter' | 'year';
+
 type ChartGroupByConfig = {
     /** Name of the icon rendered next to the chart title */
     titleIconName: 'Users' | 'CreditCard' | 'Send' | 'Folder' | 'Basket' | 'Tag' | 'Calendar';
+
+    /** Calendar unit of a time-based grouping's buckets, used to pair compared periods' buckets by position. Unset for ranking groupings. */
+    bucketUnit?: ChartBucketUnit;
 
     /** Returns the full label for a group */
     getLabel: (item: GroupedItem) => string;
@@ -71,6 +77,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     },
     [CONST.SEARCH.GROUP_BY.DAY]: {
         titleIconName: 'Calendar',
+        bucketUnit: 'day',
         getLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? item.formattedDay : ''),
         getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? item.shortFormattedDay : undefined),
         getFilterQuery: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.DAY ? `date>=${item.day} date<=${item.day}` : ''),
@@ -78,6 +85,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     },
     [CONST.SEARCH.GROUP_BY.MONTH]: {
         titleIconName: 'Calendar',
+        bucketUnit: 'month',
         getLabel: (item: GroupedItem) => (item as TransactionMonthGroupListItemType).formattedMonth ?? '',
         getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.MONTH ? item.shortFormattedMonth : undefined),
         getFilterQuery: (item: GroupedItem) => {
@@ -89,6 +97,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     },
     [CONST.SEARCH.GROUP_BY.WEEK]: {
         titleIconName: 'Calendar',
+        bucketUnit: 'week',
         getLabel: (item: GroupedItem) => (item as TransactionWeekGroupListItemType).formattedWeek ?? '',
         getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.WEEK ? item.shortFormattedWeek : undefined),
         getFilterQuery: (item: GroupedItem) => {
@@ -100,6 +109,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     },
     [CONST.SEARCH.GROUP_BY.YEAR]: {
         titleIconName: 'Calendar',
+        bucketUnit: 'year',
         getLabel: (item: GroupedItem) => (item as TransactionYearGroupListItemType).formattedYear ?? '',
         getFilterQuery: (item: GroupedItem) => {
             const yearItem = item as TransactionYearGroupListItemType;
@@ -110,6 +120,7 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
     },
     [CONST.SEARCH.GROUP_BY.QUARTER]: {
         titleIconName: 'Calendar',
+        bucketUnit: 'quarter',
         getLabel: (item: GroupedItem) => (item as TransactionQuarterGroupListItemType).formattedQuarter ?? '',
         getShortLabel: (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER ? item.shortFormattedQuarter : undefined),
         getFilterQuery: (item: GroupedItem) => {
@@ -122,3 +133,4 @@ const CHART_GROUP_BY_CONFIG: Record<SearchGroupBy, ChartGroupByConfig> = {
 };
 
 export default CHART_GROUP_BY_CONFIG;
+export type {ChartBucketUnit};

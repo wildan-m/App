@@ -1,4 +1,5 @@
 import {TOOLTIP_BAR_GAP} from '@components/Charts/hooks';
+import type {TooltipRow} from '@components/Charts/hooks/useTooltipData';
 import Text from '@components/Text';
 
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,14 +22,11 @@ import ChartTooltipAnchor from './ChartTooltipAnchor';
 import ChartTooltipPortal from './ChartTooltipPortal';
 
 type ChartTooltipProps = {
-    /** Label text (e.g., "Airfare", "Amazon") */
-    label: string;
+    /** The active point's label (e.g., "Airfare", "Amazon") */
+    title: string;
 
-    /** Formatted amount (e.g., "$1,820.00") */
-    amount: string;
-
-    /** Optional percentage to display (e.g., "12%") */
-    percentage?: string;
+    /** One row per plotted series, drawn under the title */
+    rows: TooltipRow[];
 
     /** Optional translated expense count (e.g., "841 expenses") */
     expenseCount?: string;
@@ -45,15 +43,16 @@ type ChartTooltipProps = {
     onChartMoved?: (deltaX: number, deltaY: number) => void;
 };
 
-function getAmountContent(amount: string, percentage?: string): string {
-    if (!amount || !percentage) {
-        return amount;
+function getRowContent(row: TooltipRow): string {
+    const amountContent = row.amount && row.percentage ? `${row.amount} (${row.percentage})` : row.amount;
+    if (!amountContent) {
+        return row.label ?? '';
     }
 
-    return `${amount} (${percentage})`;
+    return row.label ? `${row.label} • ${amountContent}` : amountContent;
 }
 
-function ChartTooltip({label, amount, percentage, expenseCount, chartWidth, initialTooltipPosition, isVisible, onChartMoved}: ChartTooltipProps) {
+function ChartTooltip({title, rows, expenseCount, chartWidth, initialTooltipPosition, isVisible, onChartMoved}: ChartTooltipProps) {
     const styles = useThemeStyles();
     const {windowWidth, windowHeight} = useWindowDimensions();
 
@@ -72,8 +71,8 @@ function ChartTooltip({label, amount, percentage, expenseCount, chartWidth, init
     /** JS mirror of isVisible, which turns the anchor's position tracking on and off */
     const [isShown, setIsShown] = useState(false);
 
-    const amountContent = getAmountContent(amount, percentage);
-    const content = [label, amountContent, expenseCount].join('|');
+    const rowContents = rows.map(getRowContent);
+    const content = [title, ...rowContents, expenseCount].join('|');
 
     const tooltipWrapperRef = useRef<ComponentRef<typeof View>>(null);
 
@@ -165,8 +164,21 @@ function ChartTooltip({label, amount, percentage, expenseCount, chartWidth, init
                     onLayout={updateMeasuredSize}
                 >
                     <View style={[styles.chartTooltipBox, {minWidth: Math.min(variables.chartTooltipMinWidth, chartWidth), maxWidth: chartWidth}]}>
-                        <Text style={styles.chartTooltipTitle}>{label}</Text>
-                        {!!amountContent && <Text style={styles.chartTooltipText}>{amountContent}</Text>}
+                        <Text style={styles.chartTooltipTitle}>{title}</Text>
+                        {rows.map((row, index) => {
+                            const rowContent = rowContents.at(index);
+                            if (!rowContent) {
+                                return null;
+                            }
+                            return (
+                                <Text
+                                    key={row.key}
+                                    style={styles.chartTooltipText}
+                                >
+                                    {rowContent}
+                                </Text>
+                            );
+                        })}
                         {!!expenseCount && <Text style={styles.chartTooltipText}>{expenseCount}</Text>}
                     </View>
                 </Animated.View>

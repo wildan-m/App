@@ -54,9 +54,8 @@ function VictoryChartCartesianInteractive() {
                 <VictoryChartCartesian onRenderArgs={syncBarPositions} />
                 {!!activeTooltipData && hasTooltipLabels && chartWidth > 0 && (
                     <ChartTooltip
-                        label={activeTooltipData.label}
-                        amount={activeTooltipData.amount}
-                        percentage={activeTooltipData.percentage}
+                        title={activeTooltipData.label}
+                        rows={[{key: 'value', amount: activeTooltipData.amount, percentage: activeTooltipData.percentage}]}
                         chartWidth={chartWidth * coordinateScale}
                         initialTooltipPosition={initialTooltipPosition}
                         isVisible={isTooltipActive}

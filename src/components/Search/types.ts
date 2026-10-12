@@ -481,8 +481,11 @@ type SearchChartDataRow = {
     /** The point plotted on the chart */
     point: ChartDataPoint;
 
-    /** The grouped search result the point was built from */
+    /** The grouped search result the point was built from. A point only the comparison dataset covers holds its comparison row here too. */
     item: GroupedItem;
+
+    /** Comparison dataset's row paired with `item` */
+    comparisonItem?: GroupedItem;
 
     /** Palette color the chart assigns this group */
     color?: string;

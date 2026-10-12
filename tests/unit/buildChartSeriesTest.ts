@@ -1,7 +1,7 @@
 import type {ChartDataPoint} from '@components/Charts/types';
 import {processDataIntoSlices} from '@components/Charts/utils';
 import VictoryTheme from '@components/Charts/VictoryTheme';
-import {buildChartSeries, getSliceColorsByDataIndex} from '@components/Search/buildChartSeries';
+import {buildChartSeries, CHART_SERIES_KEY, getSliceColorsByDataIndex} from '@components/Search/buildChartSeries';
 import type {TransactionMerchantGroupListItemType, TransactionQuarterGroupListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {GroupedItem} from '@components/Search/types';
 
@@ -23,15 +23,15 @@ function merchantGroup(merchant: string, total: number, count = 1, percentOfTota
 }
 
 /** A grouped quarter result, the shape of group the search still returns without a share of the total. */
-function quarterGroup(quarter: number, total: number): TransactionQuarterGroupListItemType {
+function quarterGroup(quarter: number, total: number, year = 2026): TransactionQuarterGroupListItemType {
     return {
         groupedBy: CONST.SEARCH.GROUP_BY.QUARTER,
-        year: 2026,
+        year,
         quarter,
-        formattedQuarter: `Q${quarter} 2026`,
+        formattedQuarter: `Q${quarter} ${year}`,
         shortFormattedQuarter: `Q${quarter}`,
         sortKey: quarter,
-        keyForList: `group_2026_Q${quarter}`,
+        keyForList: `group_${year}_Q${quarter}`,
         count: 1,
         total,
         currency: CONST.CURRENCY.USD,
@@ -40,6 +40,7 @@ function quarterGroup(quarter: number, total: number): TransactionQuarterGroupLi
 }
 
 const getLabel = (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.MERCHANT ? (item.formattedMerchant ?? '') : '');
+const quarterLabel = (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER ? item.formattedQuarter : '');
 const getCurrencyDecimals = () => 2;
 
 describe('buildChartSeries', () => {
@@ -48,12 +49,24 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Person', 480000, 12), merchantGroup('Target', 190000, 41)];
 
         // When the series is built for a bar chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.BAR, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.BAR, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then every value is scaled down to the currency unit, because the chart axis reads in dollars, not cents,
         // and the rows stay in the order the search returned so the chart and the inline table line up row for row
         expect(rows.map((row) => row.point.label)).toEqual(['Person', 'Target']);
-        expect(rows.map((row) => row.point.total)).toEqual([4800, 1900]);
+        expect(rows.map((row) => row.point.values[CHART_SERIES_KEY.PRIMARY])).toEqual([4800, 1900]);
+    });
+
+    it('emits one primary series when nothing is compared', () => {
+        // Given merchant groups and no comparison dataset
+        const data = [merchantGroup('Person', 480000)];
+
+        // When the series is built
+        const {series} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.BAR, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
+
+        // Then only the primary series is declared, because the charts read the plotted datasets off this list
+        // and a phantom second entry would make them reserve room for a series with no values
+        expect(series).toEqual([{key: CHART_SERIES_KEY.PRIMARY}]);
     });
 
     it('keeps each row pointing at the group it was built from', () => {
@@ -61,7 +74,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Person', 480000), merchantGroup('Target', 190000)];
 
         // When the series is built for a line chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.LINE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.LINE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then each row still references its own group object, because pressing a row has to open that group's
         // transactions and a copied object would lose the identity the rest of Search matches on
@@ -74,9 +87,10 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Coffee Shop', 42000)];
 
         // When the series is built with a group-by that offers a shortened label
-        const rows = buildChartSeries({
-            data,
+        const {rows} = buildChartSeries({
+            rows: data,
             view: CONST.SEARCH.VIEW.BAR,
+            groupBy: CONST.SEARCH.GROUP_BY.MERCHANT,
             getLabel,
             getShortLabel: () => 'Coffee',
             getCurrencyDecimals,
@@ -92,7 +106,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Person', 480000), merchantGroup('Target', 190000)];
 
         // When the series is built for a line chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.LINE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.LINE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then no row carries a color, because a line chart draws one continuous stroke and the inline table
         // must not show color swatches that nothing on the canvas corresponds to
@@ -104,7 +118,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Person', 190000), merchantGroup('Target', 480000)];
 
         // When the series is built for a bar chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.BAR, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.BAR, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then colors follow the array order rather than the totals, because that is how the bar canvas assigns
         // them and the inline table swatches have to match what is drawn
@@ -116,7 +130,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Small', 10000), merchantGroup('Large', 900000), merchantGroup('Medium', 50000)];
 
         // When the series is built for a pie chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.PIE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.PIE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then each row takes the palette color of its slice, because the pie canvas sorts slices by size before
         // coloring them, so `Large` gets the first color regardless of sitting second in the array
@@ -130,7 +144,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Refund', -900000), merchantGroup('Target', 190000)];
 
         // When the series is built for a pie chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.PIE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.PIE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then the refund is ranked first, because the pie draws slices sized by absolute value and ranking on the
         // signed total would push the biggest slice to the end of the palette
@@ -143,7 +157,7 @@ describe('buildChartSeries', () => {
         const data = [merchantGroup('Person', 480000, 12, 71.6), merchantGroup('Target', 190000, 41, 28.4)];
 
         // When the series is built for a pie chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.PIE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.PIE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then the point carries the backend share untouched, because the chart tooltip and the inline table both
         // read it from here and recomputing it in either place is what let them disagree
@@ -155,7 +169,7 @@ describe('buildChartSeries', () => {
         const data = [quarterGroup(1, 75000), quarterGroup(2, 25000)];
 
         // When the series is built for a line chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.LINE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.LINE, groupBy: CONST.SEARCH.GROUP_BY.QUARTER, getLabel, getCurrencyDecimals});
 
         // Then the point carries no share, because the only share we quote is the one the search measured against
         // its own total, and a share derived from the groups on hand would disagree with it as soon as the
@@ -168,7 +182,7 @@ describe('buildChartSeries', () => {
         const data: GroupedItem[] = [];
 
         // When the series is built for a pie chart
-        const rows = buildChartSeries({data, view: CONST.SEARCH.VIEW.PIE, getLabel, getCurrencyDecimals});
+        const {rows} = buildChartSeries({rows: data, view: CONST.SEARCH.VIEW.PIE, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
 
         // Then there is nothing to plot, because the empty state is the view's job and the chart must not be handed
         // placeholder rows to draw
@@ -178,12 +192,12 @@ describe('buildChartSeries', () => {
     it('relabels the group still collecting expenses, keeping its axis label', () => {
         // Given two quarter groups, the last of which is still in progress
         const data = [quarterGroup(3, 100000), quarterGroup(4, 20000)];
-        const quarterLabel = (item: GroupedItem) => (item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER ? item.formattedQuarter : '');
 
         // When the series is built with a label for the in-progress group
-        const rows = buildChartSeries({
-            data,
+        const {rows} = buildChartSeries({
+            rows: data,
             view: CONST.SEARCH.VIEW.LINE,
+            groupBy: CONST.SEARCH.GROUP_BY.QUARTER,
             getLabel: quarterLabel,
             getCurrencyDecimals,
             getInProgressLabel: (item) => (item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER && item.quarter === 4 ? 'Q4 so far' : undefined),
@@ -194,15 +208,93 @@ describe('buildChartSeries', () => {
         expect(rows.at(1)?.point.label).toBe('Q4 so far');
         expect(rows.at(1)?.point.shortLabel).toBe('Q4 2026');
     });
+
+    it('declares both series, carrying each period color, when a comparison is passed', () => {
+        // Given a comparison dataset with a color per period
+        const data = [merchantGroup('Person', 480000)];
+        const comparison = {
+            rows: [merchantGroup('Person', 100000)],
+            primaryPeriod: {range: {start: '2026-10-01', end: '2026-10-31'}, color: '#0b1b34'},
+            comparisonPeriod: {range: {start: '2026-09-01', end: '2026-09-30'}, color: '#8b9c8f'},
+        };
+
+        // When the series is built
+        const {series} = buildChartSeries({rows: data, comparison, view: CONST.SEARCH.VIEW.BAR, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
+
+        // Then both series are declared primary-first with their period colors, because the charts draw the
+        // datasets in this order and color them off this metadata
+        expect(series).toEqual([
+            {key: CHART_SERIES_KEY.PRIMARY, color: '#0b1b34'},
+            {key: CHART_SERIES_KEY.COMPARISON, color: '#8b9c8f'},
+        ]);
+    });
+
+    it('pairs ranking groups by their identity and merges both values onto one point', () => {
+        // Given the same merchant appearing in both periods, next to merchants only one period has
+        const data = [merchantGroup('Person', 480000), merchantGroup('Target', 190000)];
+        const comparisonTarget = merchantGroup('Target', 100000);
+        const comparison = {
+            rows: [comparisonTarget, merchantGroup('Starbucks', 50000)],
+            primaryPeriod: {range: {start: '2026-10-01', end: '2026-10-31'}},
+            comparisonPeriod: {range: {start: '2026-09-01', end: '2026-09-30'}},
+        };
+
+        // When the series is built with the comparison
+        const {rows} = buildChartSeries({rows: data, comparison, view: CONST.SEARCH.VIEW.BAR, groupBy: CONST.SEARCH.GROUP_BY.MERCHANT, getLabel, getCurrencyDecimals});
+
+        // Then the shared merchant carries both periods' values on one point and keeps a handle on the comparison
+        // row, because the tooltip and the details table need both periods of the same group together
+        const target = rows.find((row) => row.point.label === 'Target');
+        expect(target?.point.values).toEqual({[CHART_SERIES_KEY.PRIMARY]: 1900, [CHART_SERIES_KEY.COMPARISON]: 1000});
+        expect(target?.comparisonItem).toBe(comparisonTarget);
+
+        // And a merchant only the primary period has keeps a primary-only point
+        const person = rows.find((row) => row.point.label === 'Person');
+        expect(person?.point.values).toEqual({[CHART_SERIES_KEY.PRIMARY]: 4800});
+
+        // And a merchant only the comparison period has is still plotted, labeled by its own row, because dropping
+        // it would hide spend the compared period actually had
+        const starbucks = rows.find((row) => row.point.label === 'Starbucks');
+        expect(starbucks?.point.values).toEqual({[CHART_SERIES_KEY.COMPARISON]: 500});
+    });
+
+    it('pairs time buckets by their offset from each period start, in chronological order', () => {
+        // Given this year's quarters compared against last year's, where the search returned only the buckets
+        // holding expenses: last year misses Q2 and this year misses Q3
+        const data = [quarterGroup(1, 75000, 2026), quarterGroup(2, 25000, 2026)];
+        const lastYearQ1 = quarterGroup(1, 50000, 2025);
+        const comparison = {
+            rows: [lastYearQ1, quarterGroup(3, 30000, 2025)],
+            primaryPeriod: {range: {start: '2026-01-01', end: '2026-12-31'}},
+            comparisonPeriod: {range: {start: '2025-01-01', end: '2025-12-31'}},
+        };
+
+        // When the series is built with the comparison
+        const {rows} = buildChartSeries({rows: data, comparison, view: CONST.SEARCH.VIEW.LINE, groupBy: CONST.SEARCH.GROUP_BY.QUARTER, getLabel: quarterLabel, getCurrencyDecimals});
+
+        // Then buckets pair by position within their own period, not by calendar date, because "Q1 this year
+        // against Q1 last year" is the comparison being drawn
+        expect(rows.at(0)?.point.values).toEqual({[CHART_SERIES_KEY.PRIMARY]: 750, [CHART_SERIES_KEY.COMPARISON]: 500});
+        expect(rows.at(0)?.comparisonItem).toBe(lastYearQ1);
+
+        // And both periods' bucket names ride along for the tooltip, which names each series' row by its own dates
+        expect(rows.at(0)?.point.seriesLabels).toEqual({[CHART_SERIES_KEY.PRIMARY]: 'Q1 2026', [CHART_SERIES_KEY.COMPARISON]: 'Q1 2025'});
+
+        // And buckets missing on either side still plot in chronological position: Q2 with only this year's value,
+        // Q3 with only last year's, because a gap in one period must not shift the other period's points
+        expect(rows.at(1)?.point.values).toEqual({[CHART_SERIES_KEY.PRIMARY]: 250});
+        expect(rows.at(2)?.point.values).toEqual({[CHART_SERIES_KEY.COMPARISON]: 300});
+        expect(rows.at(2)?.point.label).toBe('Q3 2025');
+    });
 });
 
 describe('getSliceColorsByDataIndex', () => {
     it('agrees with the colors the pie canvas draws for the same data', () => {
         // Given points whose totals are out of order, so slice rank and array index differ
         const points: ChartDataPoint[] = [
-            {label: 'Small', total: 100},
-            {label: 'Large', total: 9000},
-            {label: 'Medium', total: 500},
+            {label: 'Small', values: {[CHART_SERIES_KEY.PRIMARY]: 100}},
+            {label: 'Large', values: {[CHART_SERIES_KEY.PRIMARY]: 9000}},
+            {label: 'Medium', values: {[CHART_SERIES_KEY.PRIMARY]: 500}},
         ];
 
         // When the colors are resolved back to the order the data came in
@@ -210,7 +302,7 @@ describe('getSliceColorsByDataIndex', () => {
 
         // Then every color matches the slice the canvas actually draws for that point, because the inline table and
         // the pie are colored by two separate code paths and a mismatch would silently mislabel the legend
-        const slices = processDataIntoSlices(points, {centerX: 100, centerY: 100, radius: 100, innerRadius: 60});
+        const slices = processDataIntoSlices(points, CHART_SERIES_KEY.PRIMARY, {centerX: 100, centerY: 100, radius: 100, innerRadius: 60});
         for (const slice of slices) {
             expect(colors.at(slice.originalIndex)).toBe(slice.color);
         }
@@ -219,8 +311,8 @@ describe('getSliceColorsByDataIndex', () => {
     it('leaves a group the donut does not draw without a color', () => {
         // Given a group whose share the table prints as ~0%, so the donut leaves its slice out
         const points: ChartDataPoint[] = [
-            {label: 'Large', total: 10000, percentOfTotal: 99.99},
-            {label: 'Sliver', total: 1, percentOfTotal: 0.01},
+            {label: 'Large', values: {[CHART_SERIES_KEY.PRIMARY]: 10000}, percentOfTotal: 99.99},
+            {label: 'Sliver', values: {[CHART_SERIES_KEY.PRIMARY]: 1}, percentOfTotal: 0.01},
         ];
 
         // When the colors are resolved back to the order the data came in
@@ -236,9 +328,9 @@ describe('getSliceColorsByDataIndex', () => {
         // Given a dropped group that is not the smallest slice by absolute value, so ranking before dropping would
         // hand the drawn slices the wrong palette entries
         const points: ChartDataPoint[] = [
-            {label: 'Spend', total: 5000, percentOfTotal: 5000},
-            {label: 'Rounding', total: 400, percentOfTotal: 0.01},
-            {label: 'Refund', total: -4900, percentOfTotal: -4900},
+            {label: 'Spend', values: {[CHART_SERIES_KEY.PRIMARY]: 5000}, percentOfTotal: 5000},
+            {label: 'Rounding', values: {[CHART_SERIES_KEY.PRIMARY]: 400}, percentOfTotal: 0.01},
+            {label: 'Refund', values: {[CHART_SERIES_KEY.PRIMARY]: -4900}, percentOfTotal: -4900},
         ];
 
         // When the colors are resolved back to the order the data came in
@@ -246,7 +338,7 @@ describe('getSliceColorsByDataIndex', () => {
 
         // Then the two drawn groups take the first two palette entries, matching what the canvas colors them,
         // because `processDataIntoSlices` colors by position among the slices it actually draws
-        const slices = processDataIntoSlices(points, {centerX: 100, centerY: 100, radius: 100, innerRadius: 60});
+        const slices = processDataIntoSlices(points, CHART_SERIES_KEY.PRIMARY, {centerX: 100, centerY: 100, radius: 100, innerRadius: 60});
         for (const slice of slices) {
             expect(colors.at(slice.originalIndex)).toBe(slice.color);
         }

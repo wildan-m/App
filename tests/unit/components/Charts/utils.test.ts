@@ -263,20 +263,20 @@ describe('findSliceAtPosition', () => {
 
 describe('processDataIntoSlices', () => {
     it('returns empty array for empty data', () => {
-        expect(processDataIntoSlices([], {centerX: 0, centerY: 0, radius: 0, innerRadius: 0})).toEqual([]);
+        expect(processDataIntoSlices([], 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0})).toEqual([]);
     });
 
     it('returns empty array when all values are zero', () => {
         const data: ChartDataPoint[] = [
-            {label: 'A', total: 0},
-            {label: 'B', total: 0},
+            {label: 'A', values: {primary: 0}},
+            {label: 'B', values: {primary: 0}},
         ];
-        expect(processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0})).toEqual([]);
+        expect(processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0})).toEqual([]);
     });
 
     it('creates a single slice covering 360 degrees for one data point', () => {
-        const data: ChartDataPoint[] = [{label: 'Only', total: 100}];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0}, -90);
+        const data: ChartDataPoint[] = [{label: 'Only', values: {primary: 100}}];
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0}, -90);
 
         expect(slices).toHaveLength(1);
         expect(slices.at(0)?.label).toBe('Only');
@@ -288,26 +288,26 @@ describe('processDataIntoSlices', () => {
     });
 
     it('uses the provided startAngle for the first slice', () => {
-        const data: ChartDataPoint[] = [{label: 'Only', total: 100}];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0}, 45);
+        const data: ChartDataPoint[] = [{label: 'Only', values: {primary: 100}}];
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0}, 45);
 
         expect(slices.at(0)?.startAngle).toBe(45);
         expect(slices.at(0)?.endAngle).toBe(405);
     });
 
     it('defaults to VictoryTheme.pie.startAngle when no startAngle is provided', () => {
-        const data: ChartDataPoint[] = [{label: 'Only', total: 100}];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const data: ChartDataPoint[] = [{label: 'Only', values: {primary: 100}}];
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         expect(slices.at(0)?.startAngle).toBe(VictoryTheme.pie.startAngle);
     });
 
     it('sorts slices by absolute value descending', () => {
         const data: ChartDataPoint[] = [
-            {label: 'Small', total: 10},
-            {label: 'Large', total: 90},
+            {label: 'Small', values: {primary: 10}},
+            {label: 'Large', values: {primary: 90}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         expect(slices.at(0)?.label).toBe('Large');
         expect(slices.at(1)?.label).toBe('Small');
@@ -315,10 +315,10 @@ describe('processDataIntoSlices', () => {
 
     it('treats negative values as positive for slice sizing', () => {
         const data: ChartDataPoint[] = [
-            {label: 'Positive', total: 75},
-            {label: 'Negative', total: -25},
+            {label: 'Positive', values: {primary: 75}},
+            {label: 'Negative', values: {primary: -25}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         expect(slices).toHaveLength(2);
         expect(slices.at(0)?.value).toBe(75);
@@ -329,11 +329,11 @@ describe('processDataIntoSlices', () => {
 
     it('preserves originalIndex mapping after sorting', () => {
         const data: ChartDataPoint[] = [
-            {label: 'Small', total: 10},
-            {label: 'Medium', total: 50},
-            {label: 'Large', total: 100},
+            {label: 'Small', values: {primary: 10}},
+            {label: 'Medium', values: {primary: 50}},
+            {label: 'Large', values: {primary: 100}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         expect(slices.at(0)?.originalIndex).toBe(2); // Large was at index 2
         expect(slices.at(1)?.originalIndex).toBe(1); // Medium was at index 1
@@ -342,11 +342,11 @@ describe('processDataIntoSlices', () => {
 
     it('produces angles that sum to 360 degrees', () => {
         const data: ChartDataPoint[] = [
-            {label: 'A', total: 33},
-            {label: 'B', total: 33},
-            {label: 'C', total: 34},
+            {label: 'A', values: {primary: 33}},
+            {label: 'B', values: {primary: 33}},
+            {label: 'C', values: {primary: 34}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         const totalSweep = slices.reduce((sum, s) => sum + (s.endAngle - s.startAngle), 0);
         expect(totalSweep).toBeCloseTo(360, 5);
@@ -354,11 +354,11 @@ describe('processDataIntoSlices', () => {
 
     it('chains consecutive angles without gaps', () => {
         const data: ChartDataPoint[] = [
-            {label: 'A', total: 50},
-            {label: 'B', total: 30},
-            {label: 'C', total: 20},
+            {label: 'A', values: {primary: 50}},
+            {label: 'B', values: {primary: 30}},
+            {label: 'C', values: {primary: 20}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
 
         for (let i = 1; i < slices.length; i++) {
             expect(slices.at(i)?.startAngle).toBeCloseTo(slices.at(i - 1)?.endAngle ?? 0, 10);
@@ -367,12 +367,12 @@ describe('processDataIntoSlices', () => {
 
     it('assigns distinct colors from the chart palette', () => {
         const data: ChartDataPoint[] = [
-            {label: 'A', total: 40},
-            {label: 'B', total: 30},
-            {label: 'C', total: 20},
-            {label: 'D', total: 10},
+            {label: 'A', values: {primary: 40}},
+            {label: 'B', values: {primary: 30}},
+            {label: 'C', values: {primary: 20}},
+            {label: 'D', values: {primary: 10}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 0, centerY: 0, radius: 0, innerRadius: 0});
         const colors = slices.map((s) => s.color);
         const uniqueColors = new Set(colors);
 
@@ -383,10 +383,10 @@ describe('processDataIntoSlices', () => {
         // Two equal slices from -90° produce mid-angles 0° (right) and 180° (left).
         // tooltipRadius = (innerRadius + radius) / 2 = (60 + 100) / 2 = 80.
         const data: ChartDataPoint[] = [
-            {label: 'Right', total: 50},
-            {label: 'Left', total: 50},
+            {label: 'Right', values: {primary: 50}},
+            {label: 'Left', values: {primary: 50}},
         ];
-        const slices = processDataIntoSlices(data, {centerX: 200, centerY: 150, radius: 100, innerRadius: 60}, -90);
+        const slices = processDataIntoSlices(data, 'primary', {centerX: 200, centerY: 150, radius: 100, innerRadius: 60}, -90);
 
         expect(slices.at(0)?.tooltipPosition.x).toBeCloseTo(280, 5);
         expect(slices.at(0)?.tooltipPosition.y).toBeCloseTo(150, 5);
