@@ -10241,6 +10241,11 @@ const translations = {
             editMultipleDescription: 'Changes will be set for all selected expenses and will override any previously set values.',
             approve: 'Approve',
             pay: 'Pay',
+            bankPayExclusionModal: {
+                title: ({accountLabel}: {accountLabel?: string}) => (accountLabel ? `Pay with ${accountLabel}` : 'Pay with bank account'),
+                description: "These reports won't be paid with the bank account because all expenses on them are non-reimbursable. You can manually mark them as paid if preferred.",
+                confirmText: 'Got it',
+            },
             delete: 'Delete',
             hold: 'Hold',
             unhold: 'Remove hold',

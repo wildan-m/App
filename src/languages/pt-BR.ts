@@ -9923,6 +9923,12 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             editMultipleDescription: 'As alterações serão aplicadas a todas as despesas selecionadas e substituirão quaisquer valores definidos anteriormente.',
             approve: 'Aprovar',
             pay: 'Pagar',
+            bankPayExclusionModal: {
+                title: ({accountLabel}: {accountLabel?: string}) => (accountLabel ? `Pagar com ${accountLabel}` : 'Pagar com conta bancária'),
+                description:
+                    'Esses relatórios não serão pagos com a conta bancária porque todas as despesas deles são não reembolsáveis. Se preferir, você pode marcá-los manualmente como pagos.',
+                confirmText: 'Entendi',
+            },
             delete: 'Excluir',
             hold: 'Reter',
             unhold: 'Remover bloqueio',

@@ -44,6 +44,7 @@ import {
 } from '@libs/actions/Search';
 import initSplitExpense from '@libs/actions/SplitExpenses';
 import {setNameValuePair} from '@libs/actions/User';
+import {getLastFourDigits} from '@libs/BankAccountUtils';
 import {canResolveTransactionCard} from '@libs/CardUtils';
 import {getConnectionCompanyID} from '@libs/CopyPolicySettingsUtils';
 import deferModalPresentationAfterPopoverDismiss from '@libs/deferModalPresentationAfterPopoverDismiss';
@@ -830,7 +831,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const selectedBulkCurrency = payScopedReports.at(0)?.currency ?? Object.values(selectedTransactions).at(0)?.currency;
     const totalFormattedAmount = getTotalFormattedAmount(convertToDisplayString, payScopedReports, selectedTransactions, selectedBulkCurrency);
 
-    const onlyShowPayElsewhere = useMemo(() => {
+    const {onlyShowPayElsewhere, markAsPaidOnlyReportIDs} = useMemo(() => {
         const selectedCurrencies =
             payScopedReports.length > 0
                 ? payScopedReports.map((report) => report.currency).filter(Boolean)
@@ -838,16 +839,23 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                       .map((transaction) => transaction.currency)
                       .filter(Boolean);
         if (new Set(selectedCurrencies).size > 1) {
-            return true;
+            return {onlyShowPayElsewhere: true, markAsPaidOnlyReportIDs: []};
         }
 
         const firstPolicyID = payScopedPolicyIDs.at(0);
         const selectedPolicy = firstPolicyID ? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.POLICY}${firstPolicyID}`] : undefined;
         const transactionsByReportID = getTransactionsByReportID(currentSearchResults?.data ?? {});
-        // Bulk pay pays whole reports, and a selection can hold reports, single expenses or both, so every report behind it has to agree on the payment type
+        // Bulk pay pays whole reports, and a selection can hold reports, single expenses or both, so every report behind it is classified:
+        // a report that can only be marked as paid (e.g. all of its expenses are non-reimbursable) is excluded from a bank payment and
+        // listed in a modal, and the bank options are dropped entirely only when no report in the selection can be paid with a bank account.
         const reportIDsToCheck = [...new Set([...payScopedReportIDs, ...selectedTransactionReportIDs])];
-        return reportIDsToCheck.some((reportID) => {
+        let hasBankPayableReport = false;
+        const markAsPaidOnly: string[] = [];
+        for (const reportID of reportIDsToCheck) {
             const report = currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
+            if (!report) {
+                continue;
+            }
             const chatReportID = report?.chatReportID;
             const chatReport = chatReportID ? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${chatReportID}`] : undefined;
             const invoiceReceiverPolicyID = chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined;
@@ -855,9 +863,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             const isChatReportArchived = isArchivedReport(chatReportID ? currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${chatReportID}`] : undefined);
             // The snapshot can hold a row whose expenses never reached Onyx, where an empty list reads as a report that can't be paid, so prefer the snapshot and fall back to Onyx
             const reportTransactions = transactionsByReportID.get(reportID);
-            return (
-                report &&
-                !canIOUBePaid(
+            if (
+                canIOUBePaid(
                     report,
                     chatReport,
                     selectedPolicy,
@@ -868,7 +875,12 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                     false,
                     isChatReportArchived,
                     invoiceReceiverPolicy,
-                ) &&
+                )
+            ) {
+                hasBankPayableReport = true;
+                continue;
+            }
+            if (
                 canIOUBePaid(
                     report,
                     chatReport,
@@ -881,8 +893,11 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                     isChatReportArchived,
                     invoiceReceiverPolicy,
                 )
-            );
-        });
+            ) {
+                markAsPaidOnly.push(reportID);
+            }
+        }
+        return {onlyShowPayElsewhere: markAsPaidOnly.length > 0 && !hasBankPayableReport, markAsPaidOnlyReportIDs: markAsPaidOnly};
     }, [
         payScopedPolicyIDs,
         currentSearchResults?.data,
@@ -1555,6 +1570,10 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         delegateAccountID,
     ]);
 
+    // Declared before onBulkPaySelected so the exclusion modal's confirm handler can re-enter the latest
+    // callback (the modal outlives the render the callback was created in).
+    const onBulkPaySelectedRef = useRef<(paymentMethod?: PaymentMethodType, additionalData?: BulkPaySelectionData) => void>(undefined);
+
     const onBulkPaySelected = useCallback(
         (paymentMethod?: PaymentMethodType, additionalData?: BulkPaySelectionData) => {
             if (!hash) {
@@ -1596,11 +1615,50 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 return;
             }
 
-            const activeRoute = Navigation.getActiveRoute();
             const searchData = searchResults?.data;
+
+            // A bank payment can't pay reports that can only be marked as paid (e.g. every expense on them is
+            // non-reimbursable), so they are excluded from it. Before paying, list them in a modal; confirming
+            // re-enters with the acknowledgement set, and the exclusion set drops them from the payment below.
+            // "Pay elsewhere" marks the whole selection as paid, so nothing is excluded there.
+            const excludedReportIDs = markAsPaidOnlyReportIDs.filter((reportID) => {
+                const excludedCandidateReport = getReportFromSearchSnapshot(reportID, searchData, allReports);
+                const effectivePaymentMethod =
+                    paymentMethod ??
+                    getLastPolicyPaymentMethod(excludedCandidateReport?.policyID, personalPolicyID, lastPaymentMethods, getReportType(excludedCandidateReport), isIOUReportUtil(reportID));
+                return effectivePaymentMethod !== CONST.IOU.PAYMENT_TYPE.ELSEWHERE;
+            });
+            if (excludedReportIDs.length > 0 && !additionalData?.isExclusionAcknowledged) {
+                const excludedReportNames = excludedReportIDs
+                    .map((reportID) => getReportFromSearchSnapshot(reportID, searchData, allReports)?.reportName)
+                    .filter((reportName): reportName is string => !!reportName);
+                const paymentAccountNumber = expenseReportBankAccountID ? bankAccountList?.[expenseReportBankAccountID]?.accountData?.accountNumber : undefined;
+                const paymentAccountLabel = paymentAccountNumber ? `x${getLastFourDigits(paymentAccountNumber)}` : undefined;
+                // Presented after the popover dismisses for the same iOS freeze reason as the offline modal above.
+                deferModalPresentationAfterPopoverDismiss(() => {
+                    showConfirmModal({
+                        title: translate('search.bulkActions.bankPayExclusionModal.title', {accountLabel: paymentAccountLabel}),
+                        subtitle: translate('search.bulkActions.bankPayExclusionModal.description'),
+                        prompt: excludedReportNames.map((reportName) => `${CONST.DOT_SEPARATOR} ${reportName}`).join('\n'),
+                        confirmText: translate('search.bulkActions.bankPayExclusionModal.confirmText'),
+                        shouldShowCancelButton: false,
+                        shouldEnablePromptScroll: true,
+                    }).then((result) => {
+                        if (result.action !== ModalActions.CONFIRM) {
+                            return;
+                        }
+                        onBulkPaySelectedRef.current?.(paymentMethod, {...additionalData, isExclusionAcknowledged: true});
+                    });
+                });
+                return;
+            }
+            const excludedReportIDSet = new Set(excludedReportIDs);
+            const optionsToPay = selectedOptions.filter((item) => !item.reportID || !excludedReportIDSet.has(item.reportID));
+
+            const activeRoute = Navigation.getActiveRoute();
             const policyExpenseChatReportActions = getAllPolicyExpenseChatReportActions(allReports, allReportActions);
 
-            for (const item of selectedOptions) {
+            for (const item of optionsToPay) {
                 const itemPolicyID = item.policyID;
                 const itemReportID = item.reportID;
                 if (!itemReportID) {
@@ -1680,21 +1738,25 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             }
             const itemsToPay =
                 selectedReports.length > 0
-                    ? payableSelectedReports.map((report) => ({
-                          reportID: report.reportID,
-                          amount: report.total,
-                          policyID: report.policyID,
-                          chatReportID: report.chatReportID,
-                      }))
-                    : Object.values(selectedTransactions).map((transaction) => {
-                          const transactionReport = getReportFromSearchSnapshot(transaction.reportID, searchData, allReports) ?? transaction.report;
-                          return {
-                              reportID: transaction.reportID,
-                              amount: transaction.amount,
-                              policyID: transaction.policyID,
-                              chatReportID: transactionReport?.chatReportID ?? transactionReport?.parentReportID,
-                          };
-                      });
+                    ? payableSelectedReports
+                          .filter((report) => !report.reportID || !excludedReportIDSet.has(report.reportID))
+                          .map((report) => ({
+                              reportID: report.reportID,
+                              amount: report.total,
+                              policyID: report.policyID,
+                              chatReportID: report.chatReportID,
+                          }))
+                    : Object.values(selectedTransactions)
+                          .filter((transaction) => !excludedReportIDSet.has(transaction.reportID))
+                          .map((transaction) => {
+                              const transactionReport = getReportFromSearchSnapshot(transaction.reportID, searchData, allReports) ?? transaction.report;
+                              return {
+                                  reportID: transaction.reportID,
+                                  amount: transaction.amount,
+                                  policyID: transaction.policyID,
+                                  chatReportID: transactionReport?.chatReportID ?? transactionReport?.parentReportID,
+                              };
+                          });
 
             let paidReportCount = 0;
             for (const item of itemsToPay) {
@@ -1881,10 +1943,13 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             conciergeChat,
             getCurrencyDecimals,
             rules,
+            markAsPaidOnlyReportIDs,
+            bankAccountList,
+            showConfirmModal,
+            translate,
         ],
     );
 
-    const onBulkPaySelectedRef = useRef(onBulkPaySelected);
     useEffect(() => {
         onBulkPaySelectedRef.current = onBulkPaySelected;
     });

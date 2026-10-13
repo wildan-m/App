@@ -9958,6 +9958,12 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             editMultipleDescription: 'Le modifiche verranno applicate a tutte le spese selezionate e sovrascriveranno qualsiasi valore impostato in precedenza.',
             approve: 'Approva',
             pay: 'Paga',
+            bankPayExclusionModal: {
+                title: ({accountLabel}: {accountLabel?: string}) => (accountLabel ? `Paga con ${accountLabel}` : 'Paga con conto bancario'),
+                description:
+                    'Questi report non verranno pagati con il conto bancario perché tutte le loro spese non sono rimborsabili. Se preferisci, puoi contrassegnarli manualmente come pagati.',
+                confirmText: 'Capito',
+            },
             delete: 'Elimina',
             hold: 'Metti in attesa',
             unhold: 'Rimuovi blocco',

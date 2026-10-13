@@ -10030,6 +10030,12 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             editMultipleDescription: 'Les modifications seront définies pour toutes les dépenses sélectionnées et remplaceront toutes les valeurs définies précédemment.',
             approve: 'Approuver',
             pay: 'Payer',
+            bankPayExclusionModal: {
+                title: ({accountLabel}: {accountLabel?: string}) => (accountLabel ? `Payer avec ${accountLabel}` : 'Payer avec le compte bancaire'),
+                description:
+                    'Ces rapports ne seront pas payés avec le compte bancaire car toutes leurs dépenses sont non remboursables. Vous pouvez les marquer manuellement comme payés si vous préférez.',
+                confirmText: 'Compris',
+            },
             delete: 'Supprimer',
             hold: 'En attente',
             unhold: 'Supprimer la mise en attente',

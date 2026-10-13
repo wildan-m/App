@@ -156,6 +156,8 @@ type BulkPaySelectionData = {
     bankAccountID?: number;
     payAsBusiness?: boolean;
     paymentMethod?: string;
+    /** Whether the user has already confirmed the modal listing the reports a bank payment excludes */
+    isExclusionAcknowledged?: boolean;
 };
 
 type SortOrder = ValueOf<typeof CONST.SEARCH.SORT_ORDER>;

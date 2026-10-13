@@ -10006,6 +10006,12 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             editMultipleDescription: 'Änderungen werden für alle ausgewählten Ausgaben übernommen und überschreiben alle zuvor festgelegten Werte.',
             approve: 'Genehmigen',
             pay: 'Bezahlen',
+            bankPayExclusionModal: {
+                title: ({accountLabel}: {accountLabel?: string}) => (accountLabel ? `Mit ${accountLabel} bezahlen` : 'Mit Bankkonto bezahlen'),
+                description:
+                    'Diese Berichte werden nicht über das Bankkonto bezahlt, da alle ihre Ausgaben nicht erstattungsfähig sind. Sie können sie bei Bedarf manuell als bezahlt markieren.',
+                confirmText: 'Verstanden',
+            },
             delete: 'Löschen',
             hold: 'Warteschleife',
             unhold: 'Zurückhalten aufheben',
