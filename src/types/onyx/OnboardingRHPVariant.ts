@@ -4,7 +4,7 @@
  * @description 'rhpConciergeDm' - Admin of workspace with Concierge DM
  * @description 'rhpAdminsRoom' - Admin of workspace with the admins room
  * @description 'rhpHomePage' - Navigate to Home page with Concierge Anywhere accessible in #admins room
- * @description 'trackExpensesWithConcierge' - Track workspace admins land on Home page with Concierge side panel (desktop) or Concierge chat (mobile)
+ * @description 'trackExpensesWithConcierge' - Track workspace admins land on Home page with the side panel closed
  * @description 'inboxAdminsBespoke' - Bespoke welcome message delivered in #admins room instead of onboarding tasks
  * @description 'homePageNoRHP' - Land on Home with the side panel closed, at every company size. Opening Concierge shows the Concierge DM
  */

@@ -173,15 +173,29 @@ describe('useAutoCreateSubmitWorkspace', () => {
         expect(setOnboardingPolicyIDSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('navigates to the submit workspace page after completing onboarding', async () => {
+    it('lands on Home without a policy ID after completing onboarding', async () => {
         // Given a user completing the EMPLOYER onboarding flow
 
         // When autoCreateSubmitWorkspace finishes setting up the workspace
         const {result} = renderHook(() => useAutoCreateSubmitWorkspace());
         await result.current('John', 'Doe');
 
-        // Then the user should be navigated to the newly created Submit workspace
-        // so they land on their workspace immediately after onboarding
+        // Then the workspace is created, but navigation receives no policy ID, so the user lands on Home with the
+        // side panel closed and Home's Getting started is the only onboarding surface, matching the other intents
+        expect(createWorkspaceSpy).toHaveBeenCalledTimes(1);
+        expect(navigateSpy).toHaveBeenCalledTimes(1);
+        expect(navigateSpy).toHaveBeenCalledWith(undefined, expect.any(Boolean));
+    });
+
+    it('navigates to the newly created Submit workspace for an already-onboarded caller', async () => {
+        // Given an already-onboarded user (the Submit plan welcome modal passes shouldCompleteOnboarding = false)
+
+        // When autoCreateSubmitWorkspace creates the workspace without re-running onboarding
+        const {result} = renderHook(() => useAutoCreateSubmitWorkspace());
+        await result.current('John', 'Doe', false);
+
+        // Then the user is still taken to the new Submit workspace, since only the onboarding landing changed
+        expect(completeOnboardingSpy).not.toHaveBeenCalled();
         expect(navigateSpy).toHaveBeenCalledTimes(1);
         expect(navigateSpy).toHaveBeenCalledWith(MOCK_POLICY_ID, expect.any(Boolean));
     });
@@ -313,8 +327,7 @@ describe('useAutoCreateSubmitWorkspace', () => {
         const {result} = renderHook(() => useAutoCreateSubmitWorkspace());
         await result.current('Jane', 'Smith');
 
-        // Then the navigation still receives no policy ID, preserving the pre-existing onboarding
-        // behavior (landing on Home) so this fix stays scoped to already-onboarded callers
+        // Then the navigation still receives no policy ID, so onboarding callers land on Home
         expect(createWorkspaceSpy).not.toHaveBeenCalled();
         expect(navigateSpy).toHaveBeenCalledTimes(1);
         expect(navigateSpy).toHaveBeenCalledWith(undefined, expect.any(Boolean));

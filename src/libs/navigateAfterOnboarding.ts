@@ -86,25 +86,17 @@ function navigateAfterOnboarding(
 ) {
     setDisableDismissOnEscape(false);
 
-    // On mobile (small screen), Track workspace admins with the trackExpensesWithConcierge variant
-    // should navigate directly to the Concierge DM (which contains onboarding tasks).
-    // This check is outside shouldOpenRHPVariant because that function returns false on native
-    // (Side Panel doesn't exist on native), but we still need to navigate to Concierge on mobile.
     const navigationOptions = options?.afterTransition ? {afterTransition: options.afterTransition} : undefined;
     const variantOverride = options?.variantOverride;
     const variant = variantOverride ?? onboardingRHPVariant;
 
-    // The homePageNoRHP arm of the onboarding experiment lands on Home without opening the side panel, at every company size,
-    // so it is handled before the variants that are limited to micro companies or that open the side panel.
-    if (variant === CONST.ONBOARDING_RHP_VARIANT.HOME_PAGE_NO_RHP) {
+    // The homePageNoRHP arm of the onboarding experiment and the Track intents (trackExpensesWithConcierge) land on Home without opening
+    // the side panel, at every company size and screen size, because Home's Getting started already covers their onboarding.
+    // They are handled before the variants that are limited to micro companies or that open the side panel.
+    if (variant === CONST.ONBOARDING_RHP_VARIANT.HOME_PAGE_NO_RHP || variant === CONST.ONBOARDING_RHP_VARIANT.TRACK_EXPENSES_WITH_CONCIERGE) {
         if (!isReportTopmostSplitNavigator()) {
             Navigation.navigate(ROUTES.HOME, navigationOptions);
         }
-        return;
-    }
-
-    if (isSmallScreenWidth && variant === CONST.ONBOARDING_RHP_VARIANT.TRACK_EXPENSES_WITH_CONCIERGE) {
-        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(conciergeReportID), navigationOptions);
         return;
     }
 
@@ -157,7 +149,9 @@ function navigateAfterOnboardingWithMicrotaskQueue(
 }
 
 /**
- * After creating or joining a Submit workspace during onboarding, navigate to Spend > Expenses
+ * Navigates after a Submit workspace is set up for the user.
+ * Without a policyID (every onboarding entry point), the user lands on Home with the side panel closed, where Getting started covers the Submit intent.
+ * With a policyID (already-onboarded callers such as the Submit plan welcome modal), the user goes to Spend > Expenses
  * with the side panel open so the #admins room is visible in Concierge Anywhere.
  */
 function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, shouldUseNarrowLayout = false) {

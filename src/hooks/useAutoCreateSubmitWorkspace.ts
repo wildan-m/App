@@ -122,11 +122,11 @@ function useAutoCreateSubmitWorkspace() {
             setOnboardingAdminsChatReportID();
             setOnboardingPolicyID();
 
-            // Already-onboarded callers (the Submit plan welcome modal) can reach this point with no workspace
-            // created and no onboarding policy ID when an editable Submit workspace already exists. Navigate to
-            // that existing workspace instead of falling back to Home. Onboarding callers keep the current
-            // behavior since they complete onboarding with `newPolicyID` and should land accordingly.
-            let policyIDForNavigation = newPolicyID;
+            // Onboarding callers land on Home with the side panel closed, where Getting started already covers the
+            // Submit intent, so they navigate without a policy ID. Already-onboarded callers (the Submit plan welcome
+            // modal) go to the workspace they just created, or, when an editable Submit workspace already exists and
+            // none was created, to that existing workspace instead of falling back to Home.
+            let policyIDForNavigation = shouldCompleteOnboarding ? undefined : newPolicyID;
             if (!policyIDForNavigation && !shouldCompleteOnboarding) {
                 policyIDForNavigation = existingSubmitPolicyID;
             }
