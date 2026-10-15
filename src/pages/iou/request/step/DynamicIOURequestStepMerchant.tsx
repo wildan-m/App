@@ -1,6 +1,7 @@
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
+import {useSearchQueryContext} from '@components/Search/SearchContext';
 import TextInput from '@components/TextInput';
 
 import useAllTransactionViolations from '@hooks/useAllTransactionViolations';
@@ -95,6 +96,7 @@ function DynamicIOURequestStepMerchant({
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const {isOffline} = useNetwork();
+    const {currentSearchHash} = useSearchQueryContext();
 
     const isMerchantFieldRequired = isMerchantRequired(report, transaction);
 
@@ -152,6 +154,7 @@ function DynamicIOURequestStepMerchant({
             updateMoneyRequestMerchant({
                 isVendorMatchingBetaEnabled,
                 transactionID,
+                transaction,
                 transactionThreadReport: report,
                 parentReport,
                 iouReportOwnerLogin,
@@ -163,6 +166,7 @@ function DynamicIOURequestStepMerchant({
                 currentUserEmailParam,
                 isASAPSubmitBetaEnabled,
                 isOffline,
+                hash: currentSearchHash,
                 delegateAccountID,
                 reportPolicyTags,
                 isTrackIntentUser,
