@@ -8,16 +8,20 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import CountrySelectionList from '@pages/settings/Wallet/CountrySelectionList';
 
-import {clearReimbursementAccount, clearReimbursementAccountDraft, navigateToBankAccountRoute, updateReimbursementAccountDraft} from '@userActions/ReimbursementAccount';
+import {startWithdrawalAccountSetupForCountry} from '@userActions/ReimbursementAccount';
 
 import type {Country} from '@src/CONST';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
 
 import React, {useMemo, useState} from 'react';
 
-function CountrySelection() {
+type CountrySelectionProps = {
+    /** Australian accounts can also pay outside Expensify with ABA files, so the page asks how they want to pay first */
+    onAustraliaSelected: () => void;
+};
+
+function CountrySelection({onAustraliaSelected}: CountrySelectionProps) {
     const [country] = useOnyx(ONYXKEYS.COUNTRY);
     const personalPolicy = usePersonalPolicy();
     const {translate} = useLocalize();
@@ -68,11 +72,12 @@ function CountrySelection() {
             setShouldShowError(true);
             return;
         }
+        if (selectedCountry === CONST.COUNTRY.AU) {
+            onAustraliaSelected();
+            return;
+        }
         startWithLoading(() => {
-            clearReimbursementAccount();
-            clearReimbursementAccountDraft();
-            updateReimbursementAccountDraft({country: selectedCountry as Country, currency: CONST.BBA_COUNTRY_CURRENCY_MAP[selectedCountry]});
-            navigateToBankAccountRoute({backTo: ROUTES.SETTINGS_BANK_ACCOUNT_PURPOSE});
+            startWithdrawalAccountSetupForCountry(selectedCountry as Country);
         });
     };
 

@@ -7,6 +7,13 @@ import useLocalize from '@hooks/useLocalize';
 
 import Navigation from '@navigation/Navigation';
 
+import AUReimbursementIntentPage from '@pages/ReimbursementAccount/ABA/AUReimbursementIntentPage';
+
+import {startWithdrawalAccountSetupForCountry} from '@userActions/ReimbursementAccount';
+
+import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
+
 import React, {useState} from 'react';
 
 import BankAccountPurpose from './substeps/BankAccountPurpose';
@@ -15,17 +22,35 @@ import CountrySelection from './substeps/CountrySelection';
 function BankAccountPurposePage() {
     const {translate} = useLocalize();
     const [showCountrySelection, setShowCountrySelection] = useState(false);
+    const [showAUReimbursementIntent, setShowAUReimbursementIntent] = useState(false);
 
     const showCountrySelectionStep = () => {
         setShowCountrySelection(true);
     };
 
     const handleBackButtonPress = () => {
-        if (showCountrySelection) {
+        if (showAUReimbursementIntent) {
+            setShowAUReimbursementIntent(false);
+        } else if (showCountrySelection) {
             setShowCountrySelection(false);
         } else {
             Navigation.goBack();
         }
+    };
+
+    const renderStep = () => {
+        if (showAUReimbursementIntent) {
+            return (
+                <AUReimbursementIntentPage
+                    onPayViaExpensify={() => startWithdrawalAccountSetupForCountry(CONST.COUNTRY.AU)}
+                    onPayViaABA={() => Navigation.navigate(ROUTES.BANK_ACCOUNT_ABA_WITHDRAWAL_DETAILS.getRoute())}
+                />
+            );
+        }
+        if (showCountrySelection) {
+            return <CountrySelection onAustraliaSelected={() => setShowAUReimbursementIntent(true)} />;
+        }
+        return <BankAccountPurpose showCountrySelectionStep={showCountrySelectionStep} />;
     };
 
     return (
@@ -42,7 +67,7 @@ function BankAccountPurposePage() {
                         shouldDisplayHelpButton={false}
                     />
                 </CollapsibleHeaderOnKeyboardGroupMember>
-                {showCountrySelection ? <CountrySelection /> : <BankAccountPurpose showCountrySelectionStep={showCountrySelectionStep} />}
+                {renderStep()}
             </CollapsibleHeaderOnKeyboardGroup>
         </ScreenWrapper>
     );

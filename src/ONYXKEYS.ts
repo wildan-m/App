@@ -53,6 +53,9 @@ const ONYXKEYS = {
     /** Boolean flag set whenever we are searching for reports in the server */
     RAM_ONLY_IS_SEARCHING_FOR_REPORTS: 'isSearchingForReports',
 
+    /** Whether the ABA withdrawal account just submitted was created, so the setup flow can show its success page */
+    RAM_ONLY_IS_ABA_WITHDRAWAL_ACCOUNT_CREATED: 'isABAWithdrawalAccountCreated',
+
     /** Whether the reimbursement countries needed by the collect deposit account flow are still loading */
     RAM_ONLY_IS_LOADING_DEPOSIT_ACCOUNT_SETUP: 'isLoadingDepositAccountSetup',
 
@@ -1220,6 +1223,8 @@ const ONYXKEYS = {
         PERSONAL_DETAILS_FORM_DRAFT: 'personalDetailsFormDraft',
         COLLECT_DEPOSIT_ACCOUNT_FORM: 'collectDepositAccountForm',
         COLLECT_DEPOSIT_ACCOUNT_FORM_DRAFT: 'collectDepositAccountFormDraft',
+        ABA_WITHDRAWAL_ACCOUNT_FORM: 'abaWithdrawalAccountForm',
+        ABA_WITHDRAWAL_ACCOUNT_FORM_DRAFT: 'abaWithdrawalAccountFormDraft',
         INTERNATIONAL_BANK_ACCOUNT_FORM: 'internationalBankAccountForm',
         INTERNATIONAL_BANK_ACCOUNT_FORM_DRAFT: 'internationalBankAccountFormDraft',
         DYNAMIC_FORM_LIST_ITEM_FORM: 'dynamicFormListItemForm',
@@ -1567,6 +1572,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.ONBOARDING_WORK_EMAIL_FORM]: FormTypes.OnboardingWorkEmailForm;
     [ONYXKEYS.FORMS.MERGE_ACCOUNT_DETAILS_FORM]: FormTypes.MergeAccountDetailsForm;
     [ONYXKEYS.FORMS.COLLECT_DEPOSIT_ACCOUNT_FORM]: FormTypes.CollectDepositAccountForm;
+    [ONYXKEYS.FORMS.ABA_WITHDRAWAL_ACCOUNT_FORM]: FormTypes.ABAWithdrawalAccountForm;
     [ONYXKEYS.FORMS.INTERNATIONAL_BANK_ACCOUNT_FORM]: FormTypes.InternationalBankAccountForm;
     [ONYXKEYS.FORMS.DYNAMIC_FORM_LIST_ITEM_FORM]: FormTypes.DynamicFormListItemForm;
     [ONYXKEYS.FORMS.WORKSPACE_PER_DIEM_FORM]: FormTypes.WorkspacePerDiemForm;
@@ -1896,6 +1902,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.ONBOARDING_ADMINS_CHAT_REPORT_ID]: string;
     [ONYXKEYS.ONBOARDING_LAST_VISITED_PATH]: string;
     [ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS]: boolean;
+    [ONYXKEYS.RAM_ONLY_IS_ABA_WITHDRAWAL_ACCOUNT_CREATED]: boolean;
     [ONYXKEYS.RAM_ONLY_IS_LOADING_DEPOSIT_ACCOUNT_SETUP]: boolean;
     [ONYXKEYS.RAM_ONLY_SEARCH_RESULT_REPORT_IDS]: string[] | null;
     [ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_USERS]: boolean;

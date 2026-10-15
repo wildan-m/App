@@ -5957,6 +5957,10 @@ const CONST = {
         };
     },
     REGEX: {
+        /** BSB of an Australian bank account, with or without the hyphen between the two 3-digit groups */
+        ABA_BSB_NUMBER: /^\d{3}-?\d{3}$/,
+        ABA_ACCOUNT_NUMBER: /^\d{5,9}$/,
+        ABA_BANK_USER_ID: /^\d{1,6}$/,
         SPECIAL_CHARS_WITHOUT_NEWLINE: /((?!\n)[()-\s\t])/g,
         DIGITS_AND_PLUS: /^\+?[0-9]*$/,
         ALPHABETIC_AND_LATIN_CHARS: /^[\p{Script=Latin} ]*$/u,

@@ -1172,6 +1172,7 @@ const SCREENS = {
     REIMBURSEMENT_ACCOUNT: 'ReimbursementAccount',
     REIMBURSEMENT_ACCOUNT_USD: 'Reimbursement_Account_USD',
     REIMBURSEMENT_ACCOUNT_NON_USD: 'Reimbursement_Account_Non_USD',
+    REIMBURSEMENT_ACCOUNT_ABA_WITHDRAWAL_DETAILS: 'Reimbursement_Account_ABA_Withdrawal_Details',
     REIMBURSEMENT_ACCOUNT_ENTER_SIGNER_INFO: 'Reimbursement_Account_Signer_Info',
     DYNAMIC_REFERRAL_DETAILS: 'Dynamic_Referral_Details',
     SHARE: {

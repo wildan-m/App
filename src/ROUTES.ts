@@ -2351,6 +2351,10 @@ const ROUTES = {
             return getUrlWithBackToParam(routeWithSource, backTo);
         },
     },
+    BANK_ACCOUNT_ABA_WITHDRAWAL_DETAILS: {
+        route: 'bank-account/new/aba-withdrawal-details',
+        getRoute: (policyID?: string) => `bank-account/new/aba-withdrawal-details${policyID ? `?policyID=${policyID}` : ''}` as const,
+    },
     BANK_ACCOUNT_NON_USD_SETUP: {
         route: 'bank-account/new/global/:page?/:subPage?/:action?',
 

@@ -1,7 +1,9 @@
 import mapCurrencyToCountry from '@libs/mapCurrencyToCountry';
 
 import CONST from '@src/CONST';
+import type {Country} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type {ReimbursementAccountForm} from '@src/types/form';
 import type ReimbursementAccount from '@src/types/onyx/ReimbursementAccount';
 import type {ACHData, ReimbursementAccountSubStep} from '@src/types/onyx/ReimbursementAccount';
@@ -11,6 +13,7 @@ import type {ValueOf} from 'type-fest';
 
 import Onyx from 'react-native-onyx';
 
+import {navigateToBankAccountRoute} from './navigation';
 import resetNonUSDBankAccount from './resetNonUSDBankAccount';
 import resetUSDBankAccount from './resetUSDBankAccount';
 
@@ -45,6 +48,14 @@ function clearReimbursementAccountDraft() {
 
 function clearReimbursementAccount() {
     Onyx.set(ONYXKEYS.REIMBURSEMENT_ACCOUNT, CONST.REIMBURSEMENT_ACCOUNT.DEFAULT_DATA);
+}
+
+/** Starts a fresh business bank account setup for the country picked in the wallet's withdrawal account flow */
+function startWithdrawalAccountSetupForCountry(country: Country) {
+    clearReimbursementAccount();
+    clearReimbursementAccountDraft();
+    updateReimbursementAccountDraft({country, currency: CONST.BBA_COUNTRY_CURRENCY_MAP[country]});
+    navigateToBankAccountRoute({backTo: ROUTES.SETTINGS_BANK_ACCOUNT_PURPOSE});
 }
 
 /**
@@ -139,4 +150,5 @@ export {
     resetReimbursementAccount,
     cancelChangingToNewBankAccount,
     prepareNewBankAccountSetup,
+    startWithdrawalAccountSetupForCountry,
 };
