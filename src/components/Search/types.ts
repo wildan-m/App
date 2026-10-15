@@ -30,6 +30,7 @@ import type {
     TransactionTagGroupListItemType,
     TransactionWeekGroupListItemType,
     TransactionWithdrawalIDGroupListItemType,
+    TransactionWorkflowStageGroupListItemType,
     TransactionYearGroupListItemType,
 } from './SearchList/ListItem/types';
 
@@ -475,7 +476,8 @@ type GroupedItem =
     | TransactionMonthGroupListItemType
     | TransactionWeekGroupListItemType
     | TransactionYearGroupListItemType
-    | TransactionQuarterGroupListItemType;
+    | TransactionQuarterGroupListItemType
+    | TransactionWorkflowStageGroupListItemType;
 
 type SearchChartDataRow = {
     /** The point plotted on the chart */

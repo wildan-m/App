@@ -33,6 +33,7 @@ import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
 import {getExportFileName} from '@libs/fileDownload/FileUtils';
 import HttpUtils from '@libs/HttpUtils';
+import isInsightsOnlyGroupBy from '@libs/isInsightsOnlyGroupBy';
 import Log from '@libs/Log';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
@@ -1261,11 +1262,13 @@ function handlePreventSearchAPI(hash: number | undefined) {
 }
 
 /**
- * Builds the backend-facing query from a client queryJSON: strips client-only fields and rewrites client-side-sorted
- * columns to a backend-supported date sort.
+ * Builds the backend-facing query from a client queryJSON: strips client-only fields, drops Insights-only group-bys Spend
+ * can't render (so a typed `group-by:workflow-stage` searches ungrouped), and rewrites client-side-sorted columns to a
+ * backend-supported date sort.
  */
 function getBackendQueryJSON(queryJSON: Readonly<SearchQueryJSON>) {
-    const {flatFilters, limit, ...queryJSONWithoutFlatFilters} = queryJSON;
+    const {flatFilters, limit, ...queryJSONWithClientGroupBy} = queryJSON;
+    const queryJSONWithoutFlatFilters = isInsightsOnlyGroupBy(queryJSONWithClientGroupBy.groupBy) ? {...queryJSONWithClientGroupBy, groupBy: undefined} : queryJSONWithClientGroupBy;
     const backendQueryJSON = shouldUseBackendDateSortFallback(queryJSON.sortBy)
         ? {
               ...queryJSONWithoutFlatFilters,

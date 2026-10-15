@@ -7760,6 +7760,17 @@ const CONST = {
             WEEK: 'week',
             YEAR: 'year',
             QUARTER: 'quarter',
+            WORKFLOW_STAGE: 'workflow-stage',
+        },
+        /** Group-bys only Insights charts can render. Spend never suggests them and treats a typed one as no group-by. */
+        get INSIGHTS_ONLY_GROUP_BYS() {
+            return [this.GROUP_BY.WORKFLOW_STAGE] as const;
+        },
+        /** Stages of the report workflow that `group-by:workflow-stage` reports an average duration for, in workflow order */
+        WORKFLOW_STAGES: {
+            CREATED_SUBMITTED: 'created-submitted',
+            SUBMITTED_APPROVED: 'submitted-approved',
+            APPROVED_PAID: 'approved-paid',
         },
         /**
          * Single source of truth for which transaction-level columns are available in each column-picker surface:

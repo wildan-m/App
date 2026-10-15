@@ -7,6 +7,7 @@ import {getBankAccountSearchLabel, isFilterableBankAccount} from '@libs/BankAcco
 import {getCardFeedsForDisplay} from '@libs/CardFeedUtils';
 import {getCardDescription, isCard, isCardHiddenFromSearch} from '@libs/CardUtils';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
+import isInsightsOnlyGroupBy from '@libs/isInsightsOnlyGroupBy';
 import type {GetOptionsConfig, OptionList} from '@libs/OptionsListUtils';
 import {getSearchOptions} from '@libs/OptionsListUtils';
 import {getAllTaxRates, getCleanedTagName, getExpensifyTeamExclusions, shouldShowPolicy} from '@libs/PolicyUtils';
@@ -77,7 +78,10 @@ type UseAutocompleteSuggestionsParams = {
 
 // Static autocomplete lists derived from CONST values, computed once at module load
 const DATA_TYPE_VALUES = Object.values(CONST.SEARCH.DATA_TYPES);
-const GROUP_BY_FRIENDLY_VALUES = Object.values(CONST.SEARCH.GROUP_BY).map((value) => getUserFriendlyValue(value));
+// Insights-only group-bys (e.g. workflow-stage) can't be rendered by Spend, so they are never suggested
+const GROUP_BY_FRIENDLY_VALUES = Object.values(CONST.SEARCH.GROUP_BY)
+    .filter((value) => !isInsightsOnlyGroupBy(value))
+    .map((value) => getUserFriendlyValue(value));
 const VIEW_FRIENDLY_VALUES = Object.values(CONST.SEARCH.VIEW).map((value) => getUserFriendlyValue(value));
 const EXPENSE_TYPE_FRIENDLY_VALUES = Object.values(CONST.SEARCH.TRANSACTION_TYPE).map((value) => getUserFriendlyValue(value));
 const RECEIPT_TYPE_FRIENDLY_VALUES = CONST.SEARCH.SELECTABLE_RECEIPT_TYPES.map((value) => getUserFriendlyValue(value));

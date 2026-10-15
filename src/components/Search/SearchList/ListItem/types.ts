@@ -36,6 +36,7 @@ import type {
     SearchTransactionAction,
     SearchWeekGroup,
     SearchWithdrawalIDGroup,
+    SearchWorkflowStageGroup,
     SearchYearGroup,
 } from '@src/types/onyx/SearchResults';
 import type Transaction from '@src/types/onyx/Transaction';
@@ -494,6 +495,11 @@ type TransactionQuarterGroupListItemType = TransactionGroupListItemType & {group
         sortKey: number;
     };
 
+type TransactionWorkflowStageGroupListItemType = TransactionGroupListItemType & {groupedBy: typeof CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE} & SearchWorkflowStageGroup & {
+        /** Translated name of the workflow stage, e.g. "Submitted to approved" */
+        formattedWorkflowStage: string;
+    };
+
 type TransactionListItemProps<TItem extends ListItem> = ListItemProps<TItem> &
     SearchListActionProps & {
         /** Whether the item's action is loading */
@@ -623,6 +629,7 @@ export type {
     TransactionWeekGroupListItemType,
     TransactionYearGroupListItemType,
     TransactionQuarterGroupListItemType,
+    TransactionWorkflowStageGroupListItemType,
     TransactionWithdrawalIDGroupListItemType,
     TransactionGroupListItemProps,
     TransactionGroupListExpandedProps,

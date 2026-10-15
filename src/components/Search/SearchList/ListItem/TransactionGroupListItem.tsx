@@ -482,6 +482,8 @@ function TransactionGroupListItemImpl({
                     isExpanded={isExpanded}
                 />
             ),
+            // Workflow stages only feed Insights charts, Spend never lists them
+            [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: null,
         };
 
         if (searchType === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT) {

@@ -10272,6 +10272,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 [CONST.SEARCH.GROUP_BY.WEEK]: 'Semaine',
                 [CONST.SEARCH.GROUP_BY.YEAR]: 'Année',
                 [CONST.SEARCH.GROUP_BY.QUARTER]: 'Trimestre',
+                [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Étape du workflow',
             },
             feed: 'Fil',
             withdrawalType: {
@@ -10329,6 +10330,12 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             [CONST.SEARCH.GROUP_BY.WEEK]: 'Semaines',
             [CONST.SEARCH.GROUP_BY.YEAR]: 'Années',
             [CONST.SEARCH.GROUP_BY.QUARTER]: 'Trimestres',
+            [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Étapes du workflow',
+        },
+        workflowStages: {
+            [CONST.SEARCH.WORKFLOW_STAGES.CREATED_SUBMITTED]: 'De créé à soumis',
+            [CONST.SEARCH.WORKFLOW_STAGES.SUBMITTED_APPROVED]: 'De soumis à approuvé',
+            [CONST.SEARCH.WORKFLOW_STAGES.APPROVED_PAID]: 'De approuvé à payé',
         },
         moneyRequestReport: {emptyStateTitle: 'Aucune dépense pour l’instant', accessPlaceHolder: 'Ouvrir pour plus de détails'},
         noCategory: 'Aucune catégorie',

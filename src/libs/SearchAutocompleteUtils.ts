@@ -8,6 +8,7 @@ import type {MarkdownRange} from '@expensify/react-native-live-markdown';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {SharedValue} from 'react-native-reanimated/lib/typescript/commonTypes';
 
+import isInsightsOnlyGroupBy from './isInsightsOnlyGroupBy';
 import {getTagNamesFromTagsLists} from './PolicyUtils';
 import {parse} from './SearchParser/autocompleteParser';
 import {getUserFriendlyKey, getUserFriendlyValue} from './SearchQueryUtils';
@@ -141,7 +142,10 @@ function getAutocompleteQueryWithComma(prevQuery: string, newQuery: string) {
 const userFriendlyExpenseTypeList = Object.values(CONST.SEARCH.TRANSACTION_TYPE).map((value) => getUserFriendlyValue(value));
 const userFriendlyReceiptTypeList = Object.values(CONST.SEARCH.RECEIPT_TYPE).map((value) => getUserFriendlyValue(value));
 const userFriendlyTransactionStatusList = Object.values(CONST.SEARCH.TRANSACTION_STATUS).map((value) => getUserFriendlyValue(value));
-const userFriendlyGroupByList = Object.values(CONST.SEARCH.GROUP_BY).map((value) => getUserFriendlyValue(value));
+// Insights-only group-bys (e.g. workflow-stage) are left out so Spend doesn't highlight them as valid
+const userFriendlyGroupByList = Object.values(CONST.SEARCH.GROUP_BY)
+    .filter((value) => !isInsightsOnlyGroupBy(value))
+    .map((value) => getUserFriendlyValue(value));
 const userFriendlyViewList = Object.values(CONST.SEARCH.VIEW).map((value) => getUserFriendlyValue(value));
 const userFriendlyStatusList = Object.values({
     ...CONST.SEARCH.STATUS.EXPENSE,

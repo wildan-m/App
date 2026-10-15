@@ -10493,6 +10493,7 @@ const translations = {
                 [CONST.SEARCH.GROUP_BY.WEEK]: 'Week',
                 [CONST.SEARCH.GROUP_BY.YEAR]: 'Year',
                 [CONST.SEARCH.GROUP_BY.QUARTER]: 'Quarter',
+                [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Workflow stage',
             },
             feed: 'Feed',
             transactionStatus: {
@@ -10556,6 +10557,12 @@ const translations = {
             [CONST.SEARCH.GROUP_BY.WEEK]: 'Weeks',
             [CONST.SEARCH.GROUP_BY.YEAR]: 'Years',
             [CONST.SEARCH.GROUP_BY.QUARTER]: 'Quarters',
+            [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Workflow stages',
+        },
+        workflowStages: {
+            [CONST.SEARCH.WORKFLOW_STAGES.CREATED_SUBMITTED]: 'Created to submitted',
+            [CONST.SEARCH.WORKFLOW_STAGES.SUBMITTED_APPROVED]: 'Submitted to approved',
+            [CONST.SEARCH.WORKFLOW_STAGES.APPROVED_PAID]: 'Approved to paid',
         },
         moneyRequestReport: {
             emptyStateTitle: 'No expenses yet',

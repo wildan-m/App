@@ -9,6 +9,6 @@ describe('chartGroupByConfig', () => {
     it('uses the explicit exact operator for merchant drill-downs', () => {
         const item = createMock<TransactionMerchantGroupListItemType>({merchant: 'I'});
 
-        expect(CHART_GROUP_BY_CONFIG[CONST.SEARCH.GROUP_BY.MERCHANT].getFilterQuery(item)).toBe('merchant="I"');
+        expect(CHART_GROUP_BY_CONFIG[CONST.SEARCH.GROUP_BY.MERCHANT].getFilterQuery?.(item)).toBe('merchant="I"');
     });
 });

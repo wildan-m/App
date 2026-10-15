@@ -10246,6 +10246,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                 [CONST.SEARCH.GROUP_BY.WEEK]: 'Woche',
                 [CONST.SEARCH.GROUP_BY.YEAR]: 'Jahr',
                 [CONST.SEARCH.GROUP_BY.QUARTER]: 'Quartal',
+                [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Workflow-Phase',
             },
             feed: 'Feed',
             withdrawalType: {
@@ -10303,6 +10304,12 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             [CONST.SEARCH.GROUP_BY.WEEK]: 'Wochen',
             [CONST.SEARCH.GROUP_BY.YEAR]: 'Jahre',
             [CONST.SEARCH.GROUP_BY.QUARTER]: 'Quartale',
+            [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: 'Workflow-Phasen',
+        },
+        workflowStages: {
+            [CONST.SEARCH.WORKFLOW_STAGES.CREATED_SUBMITTED]: 'Erstellt bis eingereicht',
+            [CONST.SEARCH.WORKFLOW_STAGES.SUBMITTED_APPROVED]: 'Eingereicht bis genehmigt',
+            [CONST.SEARCH.WORKFLOW_STAGES.APPROVED_PAID]: 'Genehmigt bis bezahlt',
         },
         moneyRequestReport: {emptyStateTitle: 'Noch keine Ausgaben', accessPlaceHolder: 'Für Details öffnen'},
         noCategory: 'Keine Kategorie',

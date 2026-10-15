@@ -26,6 +26,7 @@ import type {
     TransactionTagGroupListItemType,
     TransactionWeekGroupListItemType,
     TransactionWithdrawalIDGroupListItemType,
+    TransactionWorkflowStageGroupListItemType,
     TransactionYearGroupListItemType,
 } from '@components/Search/SearchList/ListItem/types';
 import {GROUP_ITEM_TYPES} from '@components/Search/SearchList/ListItem/types';
@@ -90,6 +91,7 @@ import type {
     SearchTransactionAction,
     SearchWeekGroup,
     SearchWithdrawalIDGroup,
+    SearchWorkflowStageGroup,
     SearchYearGroup,
 } from '@src/types/onyx/SearchResults';
 import type IconAsset from '@src/types/utils/IconAsset';
@@ -120,6 +122,7 @@ import {getCategoryGLCode, getDecodedCategoryName} from './CategoryUtils';
 import DateUtils from './DateUtils';
 import getIOUPayerAndReceiver from './getIOUPayerAndReceiver';
 import interceptAnonymousUser from './interceptAnonymousUser';
+import isInsightsOnlyGroupBy from './isInsightsOnlyGroupBy';
 import memoize from './memoize';
 import isSearchTopmostFullScreenRoute from './Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from './Navigation/Navigation';
@@ -280,6 +283,7 @@ type TransactionMonthGroupSorting = ColumnSortMapping<TransactionMonthGroupListI
 type TransactionWeekGroupSorting = ColumnSortMapping<TransactionWeekGroupListItemType>;
 type TransactionYearGroupSorting = ColumnSortMapping<TransactionYearGroupListItemType>;
 type TransactionQuarterGroupSorting = ColumnSortMapping<TransactionQuarterGroupListItemType>;
+type TransactionWorkflowStageGroupSorting = ColumnSortMapping<TransactionWorkflowStageGroupListItemType>;
 
 type GetReportSectionsParams = {
     data: OnyxTypes.SearchResults['data'];
@@ -449,6 +453,12 @@ const transactionQuarterGroupColumnNamesToSortingProperty: TransactionQuarterGro
     ...transactionGroupBaseSortingProperties,
 };
 
+const transactionWorkflowStageGroupColumnNamesToSortingProperty: TransactionWorkflowStageGroupSorting = {
+    ...transactionGroupBaseSortingProperties,
+};
+
+const WORKFLOW_STAGE_ORDER: ReadonlyArray<ValueOf<typeof CONST.SEARCH.WORKFLOW_STAGES>> = Object.values(CONST.SEARCH.WORKFLOW_STAGES);
+
 type TaskStatusPredicate = (taskReport?: OnyxTypes.Report | SearchTask) => boolean;
 
 const taskStatusActionMapping: Record<string, TaskStatusPredicate> = {
@@ -603,6 +613,7 @@ type GetSectionsResult = [
         | TransactionWeekGroupListItemType[]
         | TransactionYearGroupListItemType[]
         | TransactionQuarterGroupListItemType[]
+        | TransactionWorkflowStageGroupListItemType[]
     ),
     number,
     boolean,
@@ -960,6 +971,10 @@ function isTransactionYearGroupListItemType(item: ListItem): item is Transaction
 
 function isTransactionQuarterGroupListItemType(item: ListItem): item is TransactionQuarterGroupListItemType {
     return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.QUARTER;
+}
+
+function isTransactionWorkflowStageGroupListItemType(item: ListItem): item is TransactionWorkflowStageGroupListItemType {
+    return isTransactionGroupListItemType(item) && 'groupedBy' in item && item.groupedBy === CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE;
 }
 
 /**
@@ -3710,6 +3725,38 @@ function getQuarterSections(
     return [quarterSectionsValues, quarterSectionsValues.length, hasDeletedTransactionInData(data)];
 }
 
+function isWorkflowStage(value: unknown): value is ValueOf<typeof CONST.SEARCH.WORKFLOW_STAGES> {
+    return WORKFLOW_STAGE_ORDER.some((stage) => stage === value);
+}
+
+/**
+ * Returns sections for workflow-stage-grouped search results. These rows only feed Insights charts, so they carry no drill-in query.
+ * Do not use directly, use only via `getSections()` facade.
+ */
+function getWorkflowStageSections(data: OnyxTypes.SearchResults['data'], translate: LocalizedTranslate): [TransactionWorkflowStageGroupListItemType[], number, boolean] {
+    const workflowStageSections: TransactionWorkflowStageGroupListItemType[] = [];
+    for (const key in data) {
+        if (!isGroupEntry(key)) {
+            continue;
+        }
+        const group = data[key];
+        if (!('workflowStage' in group) || !isWorkflowStage(group.workflowStage) || typeof group.averageDuration !== 'number') {
+            continue;
+        }
+        const workflowStageGroup: SearchWorkflowStageGroup = group;
+
+        workflowStageSections.push({
+            groupedBy: CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE,
+            transactions: [],
+            ...workflowStageGroup,
+            formattedWorkflowStage: translate(`search.workflowStages.${workflowStageGroup.workflowStage}`),
+            keyForList: key,
+        });
+    }
+
+    return [workflowStageSections, workflowStageSections.length, hasDeletedTransactionInData(data)];
+}
+
 /**
  * Organizes data into appropriate list sections for display based on the type of search results.
  */
@@ -3795,6 +3842,8 @@ function getSections({
                 return getYearSections(data, queryJSON);
             case CONST.SEARCH.GROUP_BY.QUARTER:
                 return getQuarterSections(data, queryJSON, dateFnsLocale);
+            case CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE:
+                return getWorkflowStageSections(data, translate);
         }
     }
 
@@ -3829,6 +3878,23 @@ function createGroupSortFunction<T extends TransactionGroupListItemType>(
     return (data, localeCompare, sortBy, sortOrder) => getSortedData(data as T[], localeCompare, columnMapping, (a, b) => defaultComparator(a, b, localeCompare), sortBy, sortOrder);
 }
 
+/**
+ * Workflow stages have no group column of their own, so unless a total/count column is picked they are ordered by
+ * average duration in the requested order, ties keeping the stages' workflow order.
+ */
+const sortWorkflowStageGroups: GroupBySortFunction = (data, localeCompare, sortBy, sortOrder) => {
+    const workflowStageGroups = data.filter(isTransactionWorkflowStageGroupListItemType);
+    const isGLCodeSort = sortBy === CONST.SEARCH.SORT_BY_COLUMNS.CATEGORY_GL_CODE || sortBy === CONST.SEARCH.SORT_BY_COLUMNS.TAG_GL_CODE;
+    if (sortBy && sortOrder && !isGLCodeSort && transactionWorkflowStageGroupColumnNamesToSortingProperty[sortBy]) {
+        return getSortedData(workflowStageGroups, localeCompare, transactionWorkflowStageGroupColumnNamesToSortingProperty, () => 0, sortBy, sortOrder);
+    }
+
+    const direction = sortOrder === CONST.SEARCH.SORT_ORDER.DESC ? -1 : 1;
+    return workflowStageGroups.sort(
+        (a, b) => direction * (a.averageDuration - b.averageDuration) || WORKFLOW_STAGE_ORDER.indexOf(a.workflowStage) - WORKFLOW_STAGE_ORDER.indexOf(b.workflowStage),
+    );
+};
+
 const groupBySortFunction: Record<SearchGroupBy, GroupBySortFunction> = {
     [CONST.SEARCH.GROUP_BY.FROM]: createGroupSortFunction<TransactionMemberGroupListItemType>(transactionMemberGroupColumnNamesToSortingProperty, (a, b, lc) =>
         lc(a.formattedFrom ?? '', b.formattedFrom ?? ''),
@@ -3853,6 +3919,7 @@ const groupBySortFunction: Record<SearchGroupBy, GroupBySortFunction> = {
     [CONST.SEARCH.GROUP_BY.WEEK]: createGroupSortFunction<TransactionWeekGroupListItemType>(transactionWeekGroupColumnNamesToSortingProperty, (a, b, lc) => lc(a.week, b.week)),
     [CONST.SEARCH.GROUP_BY.YEAR]: createGroupSortFunction<TransactionYearGroupListItemType>(transactionYearGroupColumnNamesToSortingProperty, (a, b) => a.year - b.year),
     [CONST.SEARCH.GROUP_BY.QUARTER]: createGroupSortFunction<TransactionQuarterGroupListItemType>(transactionQuarterGroupColumnNamesToSortingProperty, (a, b) => a.sortKey - b.sortKey),
+    [CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE]: sortWorkflowStageGroups,
 };
 
 const groupByRequiredColumns: Partial<Record<SearchGroupBy, SearchColumnType[]>> = {
@@ -5085,8 +5152,14 @@ function isSearchDataLoaded(searchResults: SearchResults | undefined, queryJSON:
     return hasResolved && searchResults?.search?.type === queryJSON?.type && hasMatchingHash;
 }
 
+/**
+ * Returns the group-by Spend can render, treating unknown and Insights-only values (e.g. a typed `group-by:workflow-stage`) as no group-by.
+ */
 function getValidGroupBy(groupBy: string | undefined): ValueOf<typeof CONST.SEARCH.GROUP_BY> | undefined {
-    return groupBy && Object.values(CONST.SEARCH.GROUP_BY).includes(groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) ? (groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) : undefined;
+    if (!groupBy || isInsightsOnlyGroupBy(groupBy)) {
+        return undefined;
+    }
+    return Object.values(CONST.SEARCH.GROUP_BY).includes(groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) ? (groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) : undefined;
 }
 
 function getStatusOptions(translate: LocalizedTranslate, type: SearchDataTypes) {
@@ -6574,7 +6647,7 @@ function getColumnsToShow({
         ];
     }
 
-    if (!isExpenseReportView && groupBy) {
+    if (!isExpenseReportView && groupBy && !isInsightsOnlyGroupBy(groupBy)) {
         const customColumns = {
             [CONST.SEARCH.GROUP_BY.CARD]: CONST.SEARCH.GROUP_CUSTOM_COLUMNS.CARD,
             [CONST.SEARCH.GROUP_BY.FROM]: CONST.SEARCH.GROUP_CUSTOM_COLUMNS.FROM,
@@ -7417,6 +7490,7 @@ export {
     isTransactionWeekGroupListItemType,
     isTransactionYearGroupListItemType,
     isTransactionQuarterGroupListItemType,
+    isTransactionWorkflowStageGroupListItemType,
     isGroupedItemArray,
     isGroupEntry,
     isReportEntry,

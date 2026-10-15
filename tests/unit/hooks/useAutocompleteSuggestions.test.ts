@@ -359,6 +359,22 @@ describe('useAutocompleteSuggestions', () => {
         expect(result.current.at(0)?.filterKey).toBe(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TYPE);
     });
 
+    it('does not suggest Insights-only group-bys', () => {
+        // Given the user is typing a group-by value in Spend that would match both a regular group-by and workflow stage
+        parseForAutocomplete.mockReturnValue({
+            autocomplete: {key: CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY, value: 'w'},
+            ranges: [],
+        });
+
+        // When the suggestions are built
+        const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, autocompleteQueryValue: 'group-by:w'}));
+
+        // Then the regular group-bys are offered but workflow stage, which only Insights charts can render, is not
+        const suggestedGroupBys = result.current.map((suggestion) => suggestion.text);
+        expect(suggestedGroupBys).toContain(CONST.SEARCH.GROUP_BY.WEEK);
+        expect(suggestedGroupBys).not.toContain(CONST.SEARCH.GROUP_BY.WORKFLOW_STAGE);
+    });
+
     it('excludes already autocompleted keys from results', () => {
         parseForAutocomplete.mockReturnValue({
             autocomplete: {key: CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG, value: ''},

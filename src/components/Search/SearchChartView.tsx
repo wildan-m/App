@@ -98,7 +98,7 @@ function SearchChartView({
 
     const handleItemPress = (dataPoint: ChartDataPoint, index: number) => {
         const item = rows.at(index)?.item;
-        if (!item || !queryJSON) {
+        if (!item || !queryJSON || !getFilterQuery) {
             return;
         }
 
@@ -110,7 +110,8 @@ function SearchChartView({
         Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query, searchKey: currentSearchKey}));
     };
 
-    const onItemPress = shouldDrillDownOnPress ? handleItemPress : undefined;
+    // Groups without a filter query (e.g. workflow stages) can't be drilled into, so their points aren't pressable
+    const onItemPress = shouldDrillDownOnPress && getFilterQuery ? handleItemPress : undefined;
 
     const firstItem = data.at(0);
     const currency = sanitizeCurrencyCode(firstItem?.currency ?? CONST.CURRENCY.USD);

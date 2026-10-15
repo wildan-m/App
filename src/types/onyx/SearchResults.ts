@@ -282,6 +282,15 @@ type SearchQuarterGroup = SearchGroupBase & {
     quarter: number;
 };
 
+/** Model of a workflow stage group search result, reported by Insights */
+type SearchWorkflowStageGroup = SearchGroupBase & {
+    /** Workflow stage the group covers */
+    workflowStage: ValueOf<typeof CONST.SEARCH.WORKFLOW_STAGES>;
+
+    /** Average time, in seconds, reports spent in the stage */
+    averageDuration: number;
+};
+
 /** SearchResultDataType */
 type SearchResultDataType = PrefixedRecord<typeof ONYXKEYS.COLLECTION.TRANSACTION, Transaction> &
     Partial<Record<typeof ONYXKEYS.PERSONAL_DETAILS_LIST, Record<string, PersonalDetails> | undefined>> &
@@ -304,6 +313,7 @@ type SearchResultDataType = PrefixedRecord<typeof ONYXKEYS.COLLECTION.TRANSACTIO
         | SearchWeekGroup
         | SearchYearGroup
         | SearchQuarterGroup
+        | SearchWorkflowStageGroup
     >;
 
 /** Model of search results */
@@ -339,4 +349,5 @@ export type {
     SearchWeekGroup,
     SearchYearGroup,
     SearchQuarterGroup,
+    SearchWorkflowStageGroup,
 };
