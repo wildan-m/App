@@ -20,6 +20,7 @@ const SPEND_SPEC = INSIGHTS_DASHBOARD_SPECS[CONST.INSIGHTS.DASHBOARD.SPEND];
 
 type InsightsPayload = {
     hash: number;
+    type: string;
     groupBy: string;
     inputQuery: string;
 };
@@ -62,6 +63,7 @@ describe('insightsQueries', () => {
             const queryJSON = payload?.inputQuery ? buildSearchQueryJSON(payload.inputQuery) : undefined;
             expect(payload).toEqual({
                 hash: queryJSON?.hash,
+                type: CONST.SEARCH.DATA_TYPES.EXPENSE,
                 searchKey: CONST.INSIGHTS.SEARCH_KEY.SPEND,
                 inputQuery: payload?.inputQuery,
                 groupBy: filters.groupBy,
@@ -175,6 +177,77 @@ describe('insightsQueries', () => {
             expect(parsePayload(allWorkspaces)?.inputQuery).not.toContain('policyID');
             expect(parsePayload(twoWorkspaces)?.inputQuery).toContain('policyID:A1,B2');
             expect(parsePayload(twoWorkspaces)).toEqual(expect.objectContaining({insightsHashes: buildExpectedHashes(filters)}));
+        });
+    });
+
+    describe('dashboards that aggregate reports', () => {
+        const EFFICIENCY_SPEC = INSIGHTS_DASHBOARD_SPECS[CONST.INSIGHTS.DASHBOARD.EFFICIENCY];
+
+        it('requests the Efficiency dashboard as an expense-report search', () => {
+            // Given the Efficiency dashboard, which measures reports rather than expenses
+            const filters: InsightsFilters = {...FILTERS, policyIDs: ['A1']};
+
+            // When its request is built
+            const request = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.EFFICIENCY, filters, true);
+
+            // Then the payload, the dashboard hash and the type its snapshots are stored as all name expense reports
+            const payload = parsePayload(request);
+            expect(payload?.type).toBe(CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT);
+            expect(request?.queryType).toBe(CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT);
+            expect(request?.hash).toBe(buildSearchQueryJSON(buildInsightsQueryString({...filters, compare: undefined}, CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT))?.hash);
+        });
+
+        it('keeps the group-by and view of every chart query when it searches reports', () => {
+            // Given the Efficiency dashboard grouped by quarter
+            const filters: InsightsFilters = {...FILTERS, groupBy: CONST.SEARCH.GROUP_BY.QUARTER};
+
+            // When its request is built
+            const request = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.EFFICIENCY, filters, true);
+
+            // Then each chart query is a report search that still aggregates the way its chart plots, so the snapshot it reads is the one the response fills and its loaded check passes
+            for (const {chart, queryJSON} of [request?.headlineChart, ...(request?.supportingCharts ?? [])].filter((chartQuery) => !!chartQuery)) {
+                expect(queryJSON?.type).toBe(CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT);
+                expect(queryJSON?.groupBy).toBe(chart.groupBy ?? CONST.SEARCH.GROUP_BY.QUARTER);
+                expect(queryJSON?.view).toBe(chart.view);
+            }
+        });
+
+        it('names snapshots apart from the same charts searching expenses', () => {
+            // Given the same filters on a dashboard of reports and on one of expenses
+            const reportHashes = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.EFFICIENCY, FILTERS, true)?.snapshotHashes;
+            const expenseHashes = new Set(
+                [EFFICIENCY_SPEC.headlineChart, ...EFFICIENCY_SPEC.supportingCharts].flatMap((chart) =>
+                    [undefined, CONST.SEARCH.COMPARE.PREVIOUS_PERIOD, CONST.SEARCH.COMPARE.AVERAGE].map(
+                        (compare) => buildSearchQueryJSON(applyInsightsFilters(chart, FILTERS, compare))?.hash,
+                    ),
+                ),
+            );
+
+            // When their snapshot hashes are compared
+            // Then none of the report snapshots reuses an expense snapshot, so expense rows are never read as report rows
+            expect(reportHashes?.length).toBeGreaterThan(0);
+            expect(reportHashes?.some((hash) => expenseHashes.has(hash))).toBe(false);
+        });
+
+        it('keeps searching expenses on the dashboards that aggregate expenses', () => {
+            // Given the Spend dashboard
+            // When its request is built
+            const request = buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.SPEND, FILTERS, true);
+
+            // Then it still searches expenses, under the same hashes as before the type was named
+            expect(request?.queryType).toBe(CONST.SEARCH.DATA_TYPES.EXPENSE);
+            expect(request?.headlineChart.queryJSON?.hash).toBe(buildSearchQueryJSON(applyInsightsFilters(SPEND_SPEC.headlineChart, FILTERS))?.hash);
+        });
+
+        it('leaves the type out of the filters the backend stores for the dashboard', () => {
+            // Given the Efficiency dashboard
+            const filters: InsightsFilters = {...FILTERS, policyIDs: ['A1']};
+
+            // When its request is built
+            const payload = parsePayload(buildInsightsJsonQuery(CONST.INSIGHTS.DASHBOARD.EFFICIENCY, filters, true));
+
+            // Then the stored filters are the user's selections only, the same string the page saves for them
+            expect(payload?.inputQuery).toBe(buildInsightsQueryString(filters));
         });
     });
 

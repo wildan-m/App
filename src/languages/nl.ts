@@ -1172,6 +1172,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'Bekijken in Uitgaven',
         dashboards: {
+            efficiency: 'Efficiëntie',
             compliance: 'Naleving',
         },
         emptyState: {title: 'Niets om weer te geven', subtitle: 'Probeer je criteria hierboven aan te passen'},
@@ -1478,6 +1479,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Als u geen website hebt, kunt u in plaats daarvan het LinkedIn-profiel of een socialmediaprofiel van uw bedrijf opgeven.',
         invalidDomainError: 'Je hebt een ongeldig domein ingevoerd. Voer een geldig domein in om door te gaan.',
         publicDomainError: 'Je hebt een openbaar domein ingevoerd. Voer om door te gaan een privé‑domein in.',
+        reportCount: () => {
+            return {
+                one: '1 rapport',
+                other: (count: number) => `${count} rapporten`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 uitgave',

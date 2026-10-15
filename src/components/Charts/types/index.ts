@@ -1,5 +1,7 @@
 import type {LABEL_ROTATIONS} from '@components/Charts/VictoryTheme';
 
+import type CONST from '@src/CONST';
+
 import type {SkParagraph} from '@shopify/react-native-skia';
 import type {NonEmptyTuple, ValueOf} from 'type-fest';
 
@@ -25,7 +27,7 @@ type ChartDataPoint = {
     /** Color of the point's bar or slice. Left out, the chart's default color. */
     color?: string;
 
-    /** Number of expenses in this point */
+    /** Number of rows (expenses, or reports on a report chart) in this point */
     count?: number;
 
     /** Marks a time-based point whose period hasn't ended yet, so its total is still changing. Only a line chart's last point is drawn differently. */
@@ -41,6 +43,9 @@ type UnitWithFallback = {value: string; fallback: string};
 /** Position of the unit symbol relative to the formatted value. */
 type UnitPosition = 'left' | 'right';
 
+/** What a data point's count is a count of, which the tooltip names. */
+type ChartCountUnit = ValueOf<typeof CONST.INSIGHTS.COUNT_UNIT>;
+
 type ChartProps = {
     data: ChartDataPoint[];
 
@@ -48,6 +53,9 @@ type ChartProps = {
     series: NonEmptyTuple<ChartSeries>;
 
     isLoading?: boolean;
+
+    /** What each point's count is a count of in the tooltip. Defaults to expenses. */
+    countUnit?: ChartCountUnit;
 };
 
 type CartesianChartProps = ChartProps & {
@@ -91,4 +99,4 @@ type LabelRotation = ValueOf<typeof LABEL_ROTATIONS>;
 
 type ParagraphWithWidth = {para: SkParagraph | null; width: number};
 
-export type {CartesianChartProps, ChartDataPoint, ChartProps, ChartSeries, LabelRotation, ParagraphWithWidth, PieSlice, UnitPosition, UnitWithFallback};
+export type {CartesianChartProps, ChartCountUnit, ChartDataPoint, ChartProps, ChartSeries, LabelRotation, ParagraphWithWidth, PieSlice, UnitPosition, UnitWithFallback};

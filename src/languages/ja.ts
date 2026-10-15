@@ -1161,6 +1161,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: '支出で表示',
         dashboards: {
+            efficiency: '効率',
             compliance: 'コンプライアンス',
         },
         emptyState: {title: '表示するものはありません', subtitle: '上の条件を調整してみてください'},
@@ -1463,6 +1464,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'ウェブサイトがない場合は、代わりに自社のLinkedInまたはソーシャルメディアのプロフィールを入力できます。',
         invalidDomainError: '無効なドメインが入力されています。続行するには、有効なドメインを入力してください。',
         publicDomainError: '公開ドメインが入力されています。続行するには、プライベートドメインを入力してください。',
+        reportCount: () => {
+            return {
+                one: '1件のレポート',
+                other: (count: number) => `${count}件のレポート`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1件の経費',

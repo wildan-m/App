@@ -5,6 +5,7 @@ import {buildQueryStringFromFilterFormValues, buildSearchQueryJSON, getRangeQuer
 import CONST from '@src/CONST';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {InsightsDashboard, InsightsDashboardID, InsightsGraphKey} from '@src/types/onyx';
+import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 
 import type {InsightsChartSpec} from './dashboardSpecs';
 import type {InsightsFilters} from './insightsFilters';
@@ -35,16 +36,27 @@ function buildFilterFormValues(filters: InsightsFilters): Partial<SearchAdvanced
     };
 }
 
-/** Builds the dashboard-wide query the whole page is narrowed by. */
-function buildInsightsQueryString(filters: InsightsFilters): SearchQueryString {
-    return buildQueryStringFromFilterFormValues({...buildFilterFormValues(filters), groupBy: filters.groupBy, compare: filters.compare});
+/**
+ * Narrows a query to the type of rows a dashboard aggregates. Leaves it as is when no type is given, which searches expenses.
+ * The type is added once the query is built, since building it from form values for a report search would drop the group-by, view and limit every chart needs.
+ */
+function applyQueryType(query: SearchQueryString, queryType: SearchDataTypes | undefined): SearchQueryString {
+    return queryType ? `${CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE}:${queryType} ${query}` : query;
 }
 
-/** Builds a chart's query with the page's filters applied. */
-function applyInsightsFilters(chart: InsightsChartSpec, filters: InsightsFilters, compare?: SearchCompareMode): SearchQueryString {
-    return buildQueryStringFromFilterFormValues(
-        {...buildFilterFormValues(filters), groupBy: chart.groupBy ?? getQueryGroupBy(filters), view: chart.view, compare},
-        {sortBy: chart.sortBy, sortOrder: chart.sortOrder, limit: chart.limit},
+/** Builds the dashboard-wide query the whole page is narrowed by. The stored filters leave the type out, since it belongs to the dashboard rather than to the user's selections. */
+function buildInsightsQueryString(filters: InsightsFilters, queryType?: SearchDataTypes): SearchQueryString {
+    return applyQueryType(buildQueryStringFromFilterFormValues({...buildFilterFormValues(filters), groupBy: filters.groupBy, compare: filters.compare}), queryType);
+}
+
+/** Builds a chart's query with the page's filters applied, searching the dashboard's type of rows. */
+function applyInsightsFilters(chart: InsightsChartSpec, filters: InsightsFilters, compare?: SearchCompareMode, queryType?: SearchDataTypes): SearchQueryString {
+    return applyQueryType(
+        buildQueryStringFromFilterFormValues(
+            {...buildFilterFormValues(filters), groupBy: chart.groupBy ?? getQueryGroupBy(filters), view: chart.view, compare},
+            {sortBy: chart.sortBy, sortOrder: chart.sortOrder, limit: chart.limit},
+        ),
+        queryType,
     );
 }
 
@@ -61,7 +73,12 @@ type InsightsGraphHashes = {
 type InsightsGraphHashEntry = [InsightsGraphKey, InsightsGraphHashes];
 
 /** Returns the chart's graph slot paired with the hashes its current period, previous period and average are stored under. */
-function buildSnapshotHashEntry({chart, queryJSON}: InsightsChartQuery, filters: InsightsFilters, shouldIncludeComparisons: boolean): InsightsGraphHashEntry | undefined {
+function buildSnapshotHashEntry(
+    {chart, queryJSON}: InsightsChartQuery,
+    filters: InsightsFilters,
+    shouldIncludeComparisons: boolean,
+    queryType: SearchDataTypes,
+): InsightsGraphHashEntry | undefined {
     const snapshotHash = queryJSON?.hash;
     if (!snapshotHash) {
         return undefined;
@@ -70,8 +87,8 @@ function buildSnapshotHashEntry({chart, queryJSON}: InsightsChartQuery, filters:
         return [chart.graphKey, {snapshotHash}];
     }
 
-    const previousPeriodSnapshotHash = buildSearchQueryJSON(applyInsightsFilters(chart, filters, CONST.SEARCH.COMPARE.PREVIOUS_PERIOD))?.hash;
-    const averageSnapshotHash = buildSearchQueryJSON(applyInsightsFilters(chart, filters, CONST.SEARCH.COMPARE.AVERAGE))?.hash;
+    const previousPeriodSnapshotHash = buildSearchQueryJSON(applyInsightsFilters(chart, filters, CONST.SEARCH.COMPARE.PREVIOUS_PERIOD, queryType))?.hash;
+    const averageSnapshotHash = buildSearchQueryJSON(applyInsightsFilters(chart, filters, CONST.SEARCH.COMPARE.AVERAGE, queryType))?.hash;
     if (!previousPeriodSnapshotHash || !averageSnapshotHash) {
         return undefined;
     }
@@ -89,31 +106,37 @@ type InsightsQuery = {
     /** Hashes of the snapshots the graphs are stored under. */
     snapshotHashes: number[];
 
+    /** Type of the rows every snapshot holds, which the snapshots are stored as so their loaded checks match the chart queries */
+    queryType: SearchDataTypes;
+
     headlineChart: InsightsChartQuery;
     supportingCharts: InsightsChartQuery[];
 };
 
 /** Builds one request for the whole dashboard, naming each graph's snapshots by its chart's query hashes, and returns those chart queries to read the snapshots back with. */
 function buildInsightsJsonQuery(dashboard: InsightsDashboardID, filters: InsightsFilters, shouldIncludeComparisons: boolean): InsightsQuery | undefined {
+    const spec = INSIGHTS_DASHBOARD_SPECS[dashboard];
+    const {queryType} = spec;
+
     // The backend saves inputQuery as the dashboard's filters, so it keeps the Group by the user picked, not the one fitted to the date range
     const inputQuery = buildInsightsQueryString({...filters, compare: undefined});
-    const queryJSON = buildSearchQueryJSON(buildInsightsQueryString({...filters, groupBy: getQueryGroupBy(filters), compare: undefined}));
+    const queryJSON = buildSearchQueryJSON(buildInsightsQueryString({...filters, groupBy: getQueryGroupBy(filters), compare: undefined}, queryType));
     if (!queryJSON) {
         return undefined;
     }
 
-    const spec = INSIGHTS_DASHBOARD_SPECS[dashboard];
-    const buildChartQuery = (chart: InsightsChartSpec): InsightsChartQuery => ({chart, queryJSON: buildSearchQueryJSON(applyInsightsFilters(chart, filters))});
+    const buildChartQuery = (chart: InsightsChartSpec): InsightsChartQuery => ({chart, queryJSON: buildSearchQueryJSON(applyInsightsFilters(chart, filters, undefined, queryType))});
     const headlineChart = buildChartQuery(spec.headlineChart);
     const supportingCharts = spec.supportingCharts.map(buildChartQuery);
     const graphEntries = [headlineChart, ...supportingCharts]
-        .map((chartQuery) => buildSnapshotHashEntry(chartQuery, filters, shouldIncludeComparisons))
+        .map((chartQuery) => buildSnapshotHashEntry(chartQuery, filters, shouldIncludeComparisons, queryType))
         .filter((entry): entry is InsightsGraphHashEntry => !!entry);
     const insightsHashes: InsightsDashboard['graphs'] = Object.fromEntries(graphEntries);
 
     return {
         jsonQuery: JSON.stringify({
             hash: queryJSON.hash,
+            type: queryJSON.type,
             groupBy: queryJSON.groupBy,
             filters: queryJSON.filters,
             inputQuery,
@@ -123,6 +146,7 @@ function buildInsightsJsonQuery(dashboard: InsightsDashboardID, filters: Insight
         }),
         hash: queryJSON.hash,
         snapshotHashes: graphEntries.flatMap(([, hashes]) => Object.values(hashes).filter((hash): hash is number => hash !== undefined)),
+        queryType,
         headlineChart,
         supportingCharts,
     };

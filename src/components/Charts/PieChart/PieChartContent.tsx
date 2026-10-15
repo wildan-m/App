@@ -41,7 +41,7 @@ type PieChartCanvasProps = Omit<PieChartProps, 'isLoading'> & {
     chartWidth: number;
 };
 
-function PieChartCanvas({data, series, valueUnit, valueUnitPosition, onSlicePress, shouldShowLegend = true, chartWidth}: PieChartCanvasProps) {
+function PieChartCanvas({data, series, valueUnit, valueUnitPosition, onSlicePress, shouldShowLegend = true, chartWidth, countUnit}: PieChartCanvasProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
@@ -260,6 +260,7 @@ function PieChartCanvas({data, series, valueUnit, valueUnitPosition, onSlicePres
                         initialTooltipPosition={tooltipPosition}
                         onChartMoved={onChartMoved}
                         onDismiss={onTooltipDismiss}
+                        countUnit={countUnit}
                     />
                 </Animated.View>
             </GestureDetector>

@@ -1218,6 +1218,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'Προβολή στο Spend',
         dashboards: {
+            efficiency: 'Αποδοτικότητα',
             compliance: 'Συμμόρφωση',
         },
         emptyState: {title: 'Τίποτα προς εμφάνιση', subtitle: 'Δοκιμάστε να προσαρμόσετε τα κριτήριά σας παραπάνω'},
@@ -1525,6 +1526,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Αν δεν έχετε ιστοσελίδα, μπορείτε αντί γι’ αυτό να δώσετε το προφίλ της εταιρείας σας στο LinkedIn ή σε κάποιο μέσο κοινωνικής δικτύωσης.',
         invalidDomainError: 'Έχετε εισαγάγει μη έγκυρο τομέα. Για να συνεχίσετε, παρακαλούμε εισαγάγετε έναν έγκυρο τομέα.',
         publicDomainError: 'Έχετε εισαγάγει ένα δημόσιο domain. Για να συνεχίσετε, παρακαλούμε εισαγάγετε ένα ιδιωτικό domain.',
+        reportCount: () => {
+            return {
+                one: '1 αναφορά',
+                other: (count: number) => `${count} αναφορές`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 δαπάνη',

@@ -1174,6 +1174,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'Voir dans Dépenses',
         dashboards: {
+            efficiency: 'Efficacité',
             compliance: 'Conformité',
         },
         emptyState: {title: 'Rien à afficher', subtitle: 'Essayez de modifier vos critères ci-dessus'},
@@ -1486,6 +1487,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Si vous n’avez pas de site web, vous pouvez indiquer à la place le profil LinkedIn ou le profil sur les réseaux sociaux de votre entreprise.',
         invalidDomainError: 'Vous avez saisi un domaine invalide. Pour continuer, veuillez saisir un domaine valide.',
         publicDomainError: 'Vous avez saisi un domaine public. Pour continuer, veuillez saisir un domaine privé.',
+        reportCount: () => {
+            return {
+                one: '1 note de frais',
+                other: (count: number) => `${count} notes de frais`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 dépense',

@@ -1173,6 +1173,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'In Ausgaben anzeigen',
         dashboards: {
+            efficiency: 'Effizienz',
             compliance: 'Compliance',
         },
         emptyState: {title: 'Nichts anzuzeigen', subtitle: 'Versuchen Sie, Ihre Kriterien oben anzupassen'},
@@ -1480,6 +1481,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Wenn Sie keine Website haben, können Sie stattdessen das LinkedIn- oder Social-Media-Profil Ihres Unternehmens angeben.',
         invalidDomainError: 'Du hast eine ungültige Domain eingegeben. Um fortzufahren, gib bitte eine gültige Domain ein.',
         publicDomainError: 'Sie haben eine öffentliche Domain eingegeben. Um fortzufahren, geben Sie bitte eine private Domain ein.',
+        reportCount: () => {
+            return {
+                one: '1 Bericht',
+                other: (count: number) => `${count} Berichte`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 Ausgabe',

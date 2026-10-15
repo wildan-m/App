@@ -31,8 +31,8 @@ type ChartTooltipProps = {
     /** Optional percentage to display (e.g., "12%") */
     percentage?: string;
 
-    /** Optional translated expense count (e.g., "841 expenses") */
-    expenseCount?: string;
+    /** Optional translated count of what the point aggregates (e.g., "841 expenses" or "12 reports") */
+    countLabel?: string;
 
     /** The width of the chart container as displayed in the window */
     chartWidth: number;
@@ -70,7 +70,7 @@ function ChartTooltip({
     label,
     amount,
     percentage,
-    expenseCount,
+    countLabel,
     chartWidth,
     initialTooltipPosition,
     isVisible,
@@ -200,7 +200,7 @@ function ChartTooltip({
                     >
                         <Text style={styles.chartTooltipTitle}>{label}</Text>
                         {!!amountContent && <Text style={styles.chartTooltipText}>{amountContent}</Text>}
-                        {!!expenseCount && <Text style={styles.chartTooltipText}>{expenseCount}</Text>}
+                        {!!countLabel && <Text style={styles.chartTooltipText}>{countLabel}</Text>}
                     </View>
                 </Animated.View>
             </ChartTooltipPortal>

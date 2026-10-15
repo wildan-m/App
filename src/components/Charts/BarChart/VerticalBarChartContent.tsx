@@ -35,7 +35,7 @@ import type {BarChartContentProps} from './types';
 
 type VerticalBarChartCanvasProps = Omit<BarChartProps, 'isLoading'> & CartesianCanvasInputs;
 
-function VerticalBarChartCanvas({data, series, yAxisUnit, yAxisUnitPosition = 'left', onBarPress, shouldShowLabels = true, chartWidth, fontManager}: VerticalBarChartCanvasProps) {
+function VerticalBarChartCanvas({data, series, yAxisUnit, yAxisUnitPosition = 'left', onBarPress, shouldShowLabels = true, chartWidth, fontManager, countUnit}: VerticalBarChartCanvasProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -256,6 +256,7 @@ function VerticalBarChartCanvas({data, series, yAxisUnit, yAxisUnitPosition = 'l
                     initialTooltipPosition={initialTooltipPosition}
                     onChartMoved={onChartMoved}
                     onDismiss={onTooltipDismiss}
+                    countUnit={countUnit}
                 />
             </Animated.View>
         </GestureDetector>

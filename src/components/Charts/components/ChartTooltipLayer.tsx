@@ -1,5 +1,5 @@
 import {useTooltipData} from '@components/Charts/hooks';
-import type {ChartDataPoint, ChartSeries} from '@components/Charts/types';
+import type {ChartCountUnit, ChartDataPoint, ChartSeries} from '@components/Charts/types';
 
 import type {DerivedValue, SharedValue} from 'react-native-reanimated';
 import type {NonEmptyTuple} from 'type-fest';
@@ -36,13 +36,16 @@ type ChartTooltipLayerProps = {
 
     /** Hides a tooltip pinned by a touch tap, passed only while it is pinned */
     onDismiss?: () => void;
+
+    /** What each point's count is a count of */
+    countUnit?: ChartCountUnit;
 };
 
 /**
  * Renders the chart tooltip in an isolated subtree so that hover-driven state changes
  * (active index, visibility) only re-render this lightweight component, not the chart itself.
  */
-function ChartTooltipLayer({matchedIndex, isTooltipActive, data, series, formatValue, chartWidth, initialTooltipPosition, onChartMoved, onDismiss}: ChartTooltipLayerProps) {
+function ChartTooltipLayer({matchedIndex, isTooltipActive, data, series, formatValue, chartWidth, initialTooltipPosition, onChartMoved, onDismiss, countUnit}: ChartTooltipLayerProps) {
     const [activeDataIndex, setActiveDataIndex] = useState(-1);
 
     // Set from the content's layout, since on native a value set during render can reach the UI thread before the new content is mounted
@@ -56,7 +59,7 @@ function ChartTooltipLayer({matchedIndex, isTooltipActive, data, series, formatV
     );
 
     const isContentCurrent = useDerivedValue(() => matchedIndex.get() === laidOutIndex.get());
-    const tooltipData = useTooltipData(activeDataIndex, data, series, formatValue);
+    const tooltipData = useTooltipData(activeDataIndex, data, series, formatValue, countUnit);
 
     if (!tooltipData) {
         return null;
@@ -67,7 +70,7 @@ function ChartTooltipLayer({matchedIndex, isTooltipActive, data, series, formatV
             label={tooltipData.label}
             amount={tooltipData.amount}
             percentage={tooltipData.percentage}
-            expenseCount={tooltipData.expenseCount}
+            countLabel={tooltipData.countLabel}
             chartWidth={chartWidth}
             initialTooltipPosition={initialTooltipPosition}
             isVisible={isTooltipActive}

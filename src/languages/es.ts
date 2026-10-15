@@ -1168,6 +1168,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'Ver en Gastos',
         dashboards: {
+            efficiency: 'Eficiencia',
             compliance: 'Cumplimiento',
         },
         emptyState: {title: 'Nada que mostrar', subtitle: 'Prueba a ajustar tus criterios de arriba'},
@@ -1470,6 +1471,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Si no tiene un sitio web, puede proporcionar el perfil de LinkedIn o de las redes sociales de su empresa.',
         invalidDomainError: 'Ha introducido un dominio no válido. Para continuar, introduzca un dominio válido.',
         publicDomainError: 'Ha introducido un dominio público. Para continuar, introduzca un dominio privado.',
+        reportCount: () => {
+            return {
+                one: '1 informe',
+                other: (count: number) => `${count} informes`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 gasto',

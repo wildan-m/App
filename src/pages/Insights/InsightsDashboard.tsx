@@ -1,5 +1,6 @@
 import BlockingView from '@components/BlockingViews/BlockingView';
 import FullPageErrorView from '@components/BlockingViews/FullPageErrorView';
+import type {ChartCountUnit} from '@components/Charts';
 import NAVIGATION_TABS from '@components/Navigation/NavigationTabBar/NAVIGATION_TABS';
 import TabBarBottomContent from '@components/Navigation/TabBarBottomContent';
 import TopBar from '@components/Navigation/TopBar';
@@ -20,11 +21,13 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {getInsights} from '@libs/actions/Insights';
+import Navigation from '@libs/Navigation/Navigation';
 
 import variables from '@styles/variables';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type {InsightsDashboardID} from '@src/types/onyx';
 
 import {useIsFocused} from '@react-navigation/native';
@@ -36,7 +39,7 @@ import type {InsightsDashboardChart, InsightsDashboardState} from './resolveDash
 
 import InsightsChartWidget from './charts/InsightsChartWidget';
 import InsightsPageControls from './controls/InsightsPageControls';
-import INSIGHTS_DASHBOARD_SPECS, {getAccessibleDashboards, getVisibleCharts} from './dashboardSpecs';
+import INSIGHTS_DASHBOARD_SPECS, {getAccessibleDashboards, getFallbackDashboardID, getVisibleCharts} from './dashboardSpecs';
 import buildInsightsJsonQuery from './insightsQueries';
 import InsightsTabSelector from './InsightsTabSelector';
 import {getDashboardState, INSIGHTS_DASHBOARD_STATE} from './resolveDashboardState';
@@ -59,9 +62,15 @@ type InsightsDashboardContentProps = {
 
     /** Changes the time bucket the headline chart aggregates into */
     onGroupByChange: (groupBy: InsightsFilters['groupBy']) => void;
+
+    /** What the charts' counts are a count of, named in their tooltips */
+    countUnit?: ChartCountUnit;
+
+    /** Whether the charts' points and menus open Search for what they plot */
+    supportsDrillIn?: boolean;
 };
 
-function InsightsDashboardContent({state, headlineChart, supportingCharts, filters, onRetry, onGroupByChange}: InsightsDashboardContentProps) {
+function InsightsDashboardContent({state, headlineChart, supportingCharts, filters, onRetry, onGroupByChange, countUnit, supportsDrillIn}: InsightsDashboardContentProps) {
     const styles = useThemeStyles();
     const {pageGutter} = useLayoutSpacing();
     const theme = useTheme();
@@ -139,6 +148,8 @@ function InsightsDashboardContent({state, headlineChart, supportingCharts, filte
                     filters={filters}
                     onRetry={onRetry}
                     onGroupByChange={onGroupByChange}
+                    countUnit={countUnit}
+                    supportsDrillIn={supportsDrillIn}
                 />
                 <View style={styles.insightsChartGrid(shouldUseNarrowLayout)}>
                     {columns.map((columnCharts, columnIndex) => (
@@ -155,6 +166,8 @@ function InsightsDashboardContent({state, headlineChart, supportingCharts, filte
                                     snapshot={snapshot}
                                     filters={filters}
                                     onRetry={onRetry}
+                                    countUnit={countUnit}
+                                    supportsDrillIn={supportsDrillIn}
                                 />
                             ))}
                         </View>
@@ -182,7 +195,7 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
         if (!query || !jsonQuery || hash === undefined || isOffline) {
             return;
         }
-        getInsights(dashboardID, hash, jsonQuery, query.snapshotHashes);
+        getInsights(dashboardID, hash, jsonQuery, query.snapshotHashes, query.queryType);
     };
 
     const onRequestConditionsChanged = useEffectEvent(() => {
@@ -197,7 +210,7 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
     }, [dashboardID, jsonQuery, hash, isFocused, isOffline]);
 
     const [dashboard] = useOnyx(`${ONYXKEYS.COLLECTION.INSIGHTS}${dashboardID}_${hash}`);
-    const {headlineChart: headlineSpec, supportingCharts: supportingSpecs} = INSIGHTS_DASHBOARD_SPECS[dashboardID];
+    const {headlineChart: headlineSpec, supportingCharts: supportingSpecs, countUnit, supportsDrillIn} = INSIGHTS_DASHBOARD_SPECS[dashboardID];
     const eligibleCharts = getVisibleCharts(supportingSpecs, policies, filters.policyIDs, login);
     // Until the filters resolve, the charts have no query to read data for, so they show their loading state
     const visibleChartQueries = query
@@ -211,6 +224,22 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
     const [headlineChart, ...supportingCharts] = charts;
     const state = getDashboardState(dashboard, isOffline, charts);
     const accessibleDashboardIDs = getAccessibleDashboards(policies, filters.policyIDs, login, isBetaEnabled);
+    const fallbackDashboardID = getFallbackDashboardID(dashboardID, accessibleDashboardIDs);
+
+    // Scoping a dashboard to workspaces none of which give access to it leaves the route pointing at a dashboard the user can't see, so it's replaced with one they can
+    const onDashboardOutOfScope = useEffectEvent(() => {
+        if (!fallbackDashboardID) {
+            return;
+        }
+        Navigation.navigate(ROUTES.INSIGHTS.getRoute(fallbackDashboardID), {forceReplace: true});
+    });
+
+    useEffect(() => {
+        if (!isFocused || !isResolved || !fallbackDashboardID) {
+            return;
+        }
+        onDashboardOutOfScope();
+    }, [fallbackDashboardID, isFocused, isResolved]);
 
     return (
         <ScreenWrapper
@@ -243,6 +272,8 @@ function InsightsDashboard({dashboardID}: {dashboardID: InsightsDashboardID}) {
                 filters={filters}
                 onRetry={requestDashboard}
                 onGroupByChange={(groupBy) => setFilters({groupBy})}
+                countUnit={countUnit}
+                supportsDrillIn={supportsDrillIn}
             />
         </ScreenWrapper>
     );

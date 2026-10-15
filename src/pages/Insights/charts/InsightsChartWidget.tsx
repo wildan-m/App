@@ -1,3 +1,4 @@
+import type {ChartCountUnit} from '@components/Charts';
 import {buildViewOnSpendQuery} from '@components/Search/chartDrillDown';
 import ChartEmptyState from '@components/Search/ChartEmptyState';
 import ChartErrorState from '@components/Search/ChartErrorState';
@@ -50,9 +51,15 @@ type InsightsChartWidgetProps = {
 
     /** Shows a group-by control in the chart's header when set */
     onGroupByChange?: (groupBy: InsightsFilters['groupBy']) => void;
+
+    /** What each point's count is a count of in the tooltip */
+    countUnit?: ChartCountUnit;
+
+    /** Whether pressing a point opens Search filtered to it and the header menu offers to view the chart on Spend */
+    supportsDrillIn?: boolean;
 };
 
-function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGroupByChange}: InsightsChartWidgetProps) {
+function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGroupByChange, countUnit, supportsDrillIn = true}: InsightsChartWidgetProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {cardPaddingHorizontal, cardPaddingBottom} = useLayoutSpacing();
@@ -77,7 +84,7 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
         ) : null;
 
     const headerMenu =
-        !!queryJSON && (state === INSIGHTS_CHART_STATE.READY || isLoading) ? (
+        supportsDrillIn && !!queryJSON && (state === INSIGHTS_CHART_STATE.READY || isLoading) ? (
             <WidgetHeaderMenu
                 size={CONST.BUTTON_SIZE.SMALL}
                 testID={`insightsChartMenu-${chart.graphKey}`}
@@ -119,6 +126,8 @@ function InsightsChartWidget({chart, queryJSON, snapshot, filters, onRetry, onGr
                         chartContainerStyle={cardPaddingHorizontal}
                         shouldShowSinglePointAsBar
                         shouldShowGroupLabels={false}
+                        shouldDrillDownOnPress={supportsDrillIn}
+                        countUnit={countUnit}
                         renderDetails={
                             shouldShowTable
                                 ? ({rows}) => (

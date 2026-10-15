@@ -1194,6 +1194,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: 'Zobacz w Wydatkach',
         dashboards: {
+            efficiency: 'Efektywność',
             compliance: 'Zgodność',
         },
         emptyState: {title: 'Nic do wyświetlenia', subtitle: 'Spróbuj zmienić kryteria powyżej'},
@@ -1512,6 +1513,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: 'Jeśli nie masz strony internetowej, możesz zamiast niej podać profil swojej firmy na LinkedIn lub w mediach społecznościowych.',
         invalidDomainError: 'Wprowadzone domena jest nieprawidłowa. Aby kontynuować, wprowadź prawidłową domenę.',
         publicDomainError: 'Wprowadziłeś domenę publiczną. Aby kontynuować, wprowadź domenę prywatną.',
+        reportCount: () => {
+            return {
+                one: '1 raport',
+                other: (count: number) => `${count} raporty`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 wydatek',

@@ -1,5 +1,6 @@
 /** Declares the charts each Insights dashboard renders and how they map to backend graph slots and search views. */
 
+import type {ChartCountUnit} from '@components/Charts';
 import type {ChartView, SearchGroupBy} from '@components/Search/types';
 
 import {isPolicyEligibleForTopCategories, isPolicyEligibleForTopSpenders} from '@libs/SearchUIUtils';
@@ -7,6 +8,7 @@ import {isPolicyEligibleForTopCategories, isPolicyEligibleForTopSpenders} from '
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type {Beta, InsightsDashboardID, InsightsGraphKey, InsightsSearchKey, Policy} from '@src/types/onyx';
+import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 
 import type {OnyxCollection} from 'react-native-onyx';
 
@@ -32,6 +34,15 @@ type InsightsDashboardSpec = {
     /** Identifies the dashboard to the backend. */
     searchKey: InsightsSearchKey;
 
+    /** Type of the rows the dashboard's queries aggregate, which its snapshots are stored and checked as */
+    queryType: SearchDataTypes;
+
+    /** What a data point's count is a count of, named in the chart tooltips. Defaults to expenses. */
+    countUnit?: ChartCountUnit;
+
+    /** Whether a chart's points open Search filtered to them and its menu offers to view it on Spend. Defaults to true. */
+    supportsDrillIn?: boolean;
+
     /** Label of the dashboard's tab in the dashboard selector */
     labelKey: TranslationPaths;
 
@@ -51,6 +62,7 @@ type InsightsDashboardSpec = {
 const INSIGHTS_DASHBOARD_SPECS: Record<InsightsDashboardID, InsightsDashboardSpec> = {
     [CONST.INSIGHTS.DASHBOARD.SPEND]: {
         searchKey: CONST.INSIGHTS.SEARCH_KEY.SPEND,
+        queryType: CONST.SEARCH.DATA_TYPES.EXPENSE,
         labelKey: 'common.spend',
         headlineChart: {
             graphKey: CONST.INSIGHTS.GRAPH.SPEND_OVER_TIME,
@@ -89,8 +101,25 @@ const INSIGHTS_DASHBOARD_SPECS: Record<InsightsDashboardID, InsightsDashboardSpe
             },
         ],
     },
+    [CONST.INSIGHTS.DASHBOARD.EFFICIENCY]: {
+        searchKey: CONST.INSIGHTS.SEARCH_KEY.EFFICIENCY,
+        // Efficiency measures how reports move through approval, so it counts reports rather than expenses
+        queryType: CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT,
+        countUnit: CONST.INSIGHTS.COUNT_UNIT.REPORT,
+        supportsDrillIn: false,
+        labelKey: 'insightsPage.dashboards.efficiency',
+        beta: CONST.BETAS.INSIGHTS_EFFICIENCY,
+        isPolicyEligible: canViewAllPolicyData,
+        headlineChart: {
+            graphKey: CONST.INSIGHTS.GRAPH.SPEND_OVER_TIME,
+            titleKey: 'search.spendOverTime',
+            view: CONST.SEARCH.VIEW.LINE,
+        },
+        supportingCharts: [],
+    },
     [CONST.INSIGHTS.DASHBOARD.COMPLIANCE]: {
         searchKey: CONST.INSIGHTS.SEARCH_KEY.COMPLIANCE,
+        queryType: CONST.SEARCH.DATA_TYPES.EXPENSE,
         labelKey: 'insightsPage.dashboards.compliance',
         beta: CONST.BETAS.INSIGHTS_COMPLIANCE,
         isPolicyEligible: canViewAllPolicyData,
@@ -129,6 +158,14 @@ function getAccessibleDashboards(policies: OnyxCollection<Policy>, policyIDs: st
     });
 }
 
-export {getAccessibleDashboards, getVisibleCharts};
+/** Returns the dashboard to show instead when the given one is not accessible in the current scope, the first accessible one in declaration order. */
+function getFallbackDashboardID(dashboardID: InsightsDashboardID, accessibleDashboardIDs: InsightsDashboardID[]): InsightsDashboardID | undefined {
+    if (accessibleDashboardIDs.includes(dashboardID)) {
+        return undefined;
+    }
+    return accessibleDashboardIDs.at(0);
+}
+
+export {getAccessibleDashboards, getFallbackDashboardID, getVisibleCharts};
 export type {InsightsChartSpec, InsightsDashboardSpec};
 export default INSIGHTS_DASHBOARD_SPECS;

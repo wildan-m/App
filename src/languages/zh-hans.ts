@@ -1126,6 +1126,7 @@ const translations: TranslationDeepObject<typeof en> = {
     insightsPage: {
         viewOnSpend: '在支出中查看',
         dashboards: {
+            efficiency: '效率',
             compliance: '合规',
         },
         emptyState: {title: '没有可显示的内容', subtitle: '请尝试调整上面的条件'},
@@ -1422,6 +1423,12 @@ const translations: TranslationDeepObject<typeof en> = {
         yourCompanyWebsiteNote: '如果您没有公司网站，可以改为提供公司的 LinkedIn 或社交媒体主页。',
         invalidDomainError: '您输入的域名无效。若要继续，请输入有效的域名。',
         publicDomainError: '您输入的是公共域名。若要继续，请输入私有域名。',
+        reportCount: () => {
+            return {
+                one: '1 份报告',
+                other: (count: number) => `${count} 份报告`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 笔报销',

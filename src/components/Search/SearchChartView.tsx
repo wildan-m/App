@@ -1,5 +1,5 @@
 import {BarChart, LineChart, PieChart} from '@components/Charts';
-import type {ChartDataPoint} from '@components/Charts';
+import type {ChartCountUnit, ChartDataPoint} from '@components/Charts';
 
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
@@ -56,6 +56,9 @@ type SearchChartViewProps = {
 
     /** Style of the view around the chart, which the details below it don't share */
     chartContainerStyle?: StyleProp<ViewStyle>;
+
+    /** What each point's count is a count of in the tooltip. Defaults to expenses. */
+    countUnit?: ChartCountUnit;
 };
 
 /**
@@ -73,6 +76,7 @@ function SearchChartView({
     shouldShowSinglePointAsBar = false,
     renderDetails,
     chartContainerStyle,
+    countUnit,
 }: SearchChartViewProps) {
     const {preferredLocale, translate, dateFnsLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -127,6 +131,7 @@ function SearchChartView({
                 data={points}
                 series={series}
                 isLoading={isLoading}
+                countUnit={countUnit}
                 onBarPress={onItemPress}
                 yAxisUnit={unit}
                 yAxisUnitPosition={unitPosition}
@@ -139,6 +144,7 @@ function SearchChartView({
                     data={points}
                     series={series}
                     isLoading={isLoading}
+                    countUnit={countUnit}
                     onBarPress={onItemPress}
                     yAxisUnit={unit}
                     yAxisUnitPosition={unitPosition}
@@ -148,6 +154,7 @@ function SearchChartView({
                     data={points}
                     series={series}
                     isLoading={isLoading}
+                    countUnit={countUnit}
                     onPointPress={onItemPress}
                     labelSteps={labelSteps}
                     yAxisUnit={unit}
@@ -159,6 +166,7 @@ function SearchChartView({
                 data={points}
                 series={series}
                 isLoading={isLoading}
+                countUnit={countUnit}
                 onSlicePress={onItemPress}
                 valueUnit={unit.value}
                 valueUnitPosition={unitPosition}

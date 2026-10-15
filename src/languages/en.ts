@@ -1302,6 +1302,7 @@ const translations = {
     insightsPage: {
         viewOnSpend: 'View on Spend',
         dashboards: {
+            efficiency: 'Efficiency',
             compliance: 'Compliance',
         },
         compare: {
@@ -1612,6 +1613,12 @@ const translations = {
         yourCompanyWebsiteNote: "If you don't have a website, you can provide your company's LinkedIn or social media profile instead.",
         invalidDomainError: 'You have entered an invalid domain. To continue, please enter a valid domain.',
         publicDomainError: 'You have entered a public domain. To continue, please enter a private domain.',
+        reportCount: () => {
+            return {
+                one: '1 report',
+                other: (count: number) => `${count} reports`,
+            };
+        },
         expenseCount: () => {
             return {
                 one: '1 expense',

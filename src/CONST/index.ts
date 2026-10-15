@@ -1202,6 +1202,7 @@ const CONST = {
         REPORT_MERGE: 'reportMerge',
         INSIGHTS_PAGE: 'insightsPage',
         INSIGHTS_COMPARE: 'insightsCompare',
+        INSIGHTS_EFFICIENCY: 'insightsEfficiency',
         INSIGHTS_COMPLIANCE: 'insightsCompliance',
         PAYMENT_HISTORY: 'paymentHistory',
         UNIFIED_CONNECTIONS: 'unifiedConnections',
@@ -10625,11 +10626,18 @@ const CONST = {
     INSIGHTS: {
         DASHBOARD: {
             SPEND: 'spend',
+            EFFICIENCY: 'efficiency',
             COMPLIANCE: 'compliance',
         },
         SEARCH_KEY: {
             SPEND: 'insightsSpend',
+            EFFICIENCY: 'insightsEfficiency',
             COMPLIANCE: 'insightsCompliance',
+        },
+        // What each data point's count is a count of, which the chart tooltips name
+        COUNT_UNIT: {
+            EXPENSE: 'expense',
+            REPORT: 'report',
         },
         GRAPH: {
             SPEND_OVER_TIME: 'spendOverTime',
