@@ -1,3 +1,5 @@
+import useABADepositPolicyID from '@hooks/useABADepositPolicyID';
+import useLoadDepositAccountSetup from '@hooks/useLoadDepositAccountSetup';
 import useOnyx from '@hooks/useOnyx';
 
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
@@ -20,7 +22,15 @@ function CountrySelection({isEditing, onNext, onMove, formValues, fieldsMap}: Cu
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector});
     const [selectedCountry, setSelectedCountry] = useState(formValues.bankCountry || '');
 
+    // Loads the workspaces' withdrawal accounts, which decide whether an Australian account only needs ABA details.
+    useLoadDepositAccountSetup();
+    const abaDepositPolicyID = useABADepositPolicyID();
+
     const onCountrySelected = useCallback(() => {
+        if (selectedCountry === CONST.COUNTRY.AU && abaDepositPolicyID) {
+            Navigation.navigate(ROUTES.SETTINGS_ABA_DEPOSIT_ACCOUNT);
+            return;
+        }
         if (COUNTRIES_US_BANK_FLOW.includes(selectedCountry)) {
             if (isUserValidated) {
                 Navigation.navigate(ROUTES.SETTINGS_ADD_US_BANK_ACCOUNT_ENTRY_POINT);
@@ -35,7 +45,7 @@ function CountrySelection({isEditing, onNext, onMove, formValues, fieldsMap}: Cu
         }
         fetchCorpayFields(selectedCountry);
         onMove(CONST.CORPAY_FIELDS.INDEXES.MAPPING.BANK_ACCOUNT_DETAILS, false);
-    }, [fieldsMap, formValues.bankCountry, onMove, isUserValidated, onNext, selectedCountry]);
+    }, [abaDepositPolicyID, fieldsMap, formValues.bankCountry, onMove, isUserValidated, onNext, selectedCountry]);
 
     const countries = useMemo(() => Object.keys(CONST.ALL_COUNTRIES).filter((countryISO) => !CONST.CORPAY_FIELDS.EXCLUDED_COUNTRIES.includes(countryISO)), []);
 

@@ -8,6 +8,7 @@ import type {
     BankAccountHandlePlaidErrorParams,
     ConnectBankAccountParams,
     CreateCollectOnlyDepositAccountParams,
+    CreateDepositABAAccountParams,
     DeletePaymentBankAccountParams,
     EnableGlobalReimbursementsForUSDBankAccountParams,
     FinishCorpayBankAccountOnboardingParams,
@@ -109,6 +110,58 @@ function createCollectOnlyDepositAccount(parameters: CreateCollectOnlyDepositAcc
     };
 
     API.write(WRITE_COMMANDS.CREATE_COLLECT_ONLY_DEPOSIT_ACCOUNT, parameters, onyxData);
+}
+
+/** Clears what a previous ABA deposit account submission left behind, so the form opens fresh */
+function resetABADepositAccountSetup() {
+    Onyx.merge(ONYXKEYS.PERSONAL_BANK_ACCOUNT, {shouldShowSuccess: false});
+    Onyx.merge(ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM, {errors: null});
+}
+
+/** Creates a deposit account that an employer paying through ABA files reimburses from their own bank. */
+function createDepositABAAccount(parameters: CreateDepositABAAccountParams) {
+    const onyxData: OnyxData<typeof ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM | typeof ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM_DRAFT | typeof ONYXKEYS.PERSONAL_BANK_ACCOUNT> = {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM,
+                value: {isLoading: true, errors: null},
+            },
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PERSONAL_BANK_ACCOUNT,
+                value: {shouldShowSuccess: false},
+            },
+        ],
+        successData: [
+            {
+                onyxMethod: Onyx.METHOD.SET,
+                key: ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM_DRAFT,
+                value: null,
+            },
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.PERSONAL_BANK_ACCOUNT,
+                value: {shouldShowSuccess: true},
+            },
+        ],
+        failureData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM,
+                value: {errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
+            },
+        ],
+        finallyData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM,
+                value: {isLoading: false},
+            },
+        ],
+    };
+
+    API.write(WRITE_COMMANDS.CREATE_DEPOSIT_ABA_ACCOUNT, parameters, onyxData);
 }
 
 export {
@@ -2074,5 +2127,7 @@ export {
     pressLockedBankAccount,
     uploadUserKYBDocs,
     createCollectOnlyDepositAccount,
+    createDepositABAAccount,
+    resetABADepositAccountSetup,
     openDepositAccountSetup,
 };

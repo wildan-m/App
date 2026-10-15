@@ -364,6 +364,10 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                             path: ROUTES.SETTINGS_COLLECT_DEPOSIT_ACCOUNT.route,
                             exact: true,
                         },
+                        [SCREENS.SETTINGS.ABA_DEPOSIT_ACCOUNT]: {
+                            path: ROUTES.SETTINGS_ABA_DEPOSIT_ACCOUNT,
+                            exact: true,
+                        },
                         [SCREENS.SETTINGS.ADD_US_BANK_ACCOUNT]: {
                             path: ROUTES.SETTINGS_ADD_US_BANK_ACCOUNT.route,
                             exact: true,

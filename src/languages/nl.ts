@@ -3977,6 +3977,14 @@ ${amount} voor ${merchant} - ${date}`,
         getReimbursedDescription: 'Door werkgever of anderen',
         makePayments: 'Betalingen doen',
         makePaymentsDescription: 'Betaal uitgaven of geef Expensify Kaarten uit',
+        abaDeposit: {
+            bsbNumber: 'BSB-nummer',
+            billingAddress: 'Factuuradres',
+            error: {
+                bsbNumber: 'Voer een geldig BSB-nummer in met de notatie xxx-xxx.',
+                accountNumber: 'Voer een geldig rekeningnummer van 5 tot 9 cijfers in.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Om een bankrekening te koppelen, <a href="${contactMethodRoute}">voeg eerst een e-mailadres toe als je primaire login</a> en probeer het daarna opnieuw. Je kunt je telefoonnummer toevoegen als secundaire login.`,
         hasBeenThrottledError: 'Er is een fout opgetreden bij het toevoegen van je bankrekening. Wacht een paar minuten en probeer het opnieuw.',

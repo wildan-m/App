@@ -3996,6 +3996,14 @@ ${amount} für ${merchant} – ${date}`,
         getReimbursedDescription: 'Vom Arbeitgeber oder anderen',
         makePayments: 'Zahlungen tätigen',
         makePaymentsDescription: 'Spesen bezahlen oder Expensify Karten ausgeben',
+        abaDeposit: {
+            bsbNumber: 'BSB-Nummer',
+            billingAddress: 'Rechnungsadresse',
+            error: {
+                bsbNumber: 'Bitte gib eine gültige BSB-Nummer im Format xxx-xxx ein.',
+                accountNumber: 'Bitte gib eine gültige Kontonummer mit 5 bis 9 Ziffern ein.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Um ein Bankkonto zu verknüpfen, bitte <a href="${contactMethodRoute}">füge eine E-Mail-Adresse als deine primäre Anmeldung hinzu</a> und versuche es erneut. Du kannst deine Telefonnummer als sekundäre Anmeldung hinzufügen.`,
         hasBeenThrottledError: 'Beim Hinzufügen Ihres Bankkontos ist ein Fehler aufgetreten. Bitte warten Sie ein paar Minuten und versuchen Sie es erneut.',

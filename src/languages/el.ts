@@ -4044,6 +4044,14 @@ ${amount} για ${merchant} - ${date}`,
         getReimbursedDescription: 'Από τον εργοδότη ή άλλους',
         makePayments: 'Πραγματοποιήστε πληρωμές',
         makePaymentsDescription: 'Πληρώστε έξοδα ή εκδώστε Κάρτες Expensify',
+        abaDeposit: {
+            bsbNumber: 'Αριθμός BSB',
+            billingAddress: 'Διεύθυνση χρέωσης',
+            error: {
+                bsbNumber: 'Εισαγάγετε έναν έγκυρο αριθμό BSB με τη μορφή xxx-xxx.',
+                accountNumber: 'Εισαγάγετε έναν έγκυρο αριθμό λογαριασμού με 5 έως 9 ψηφία.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Για να συνδέσετε έναν τραπεζικό λογαριασμό, παρακαλούμε <a href="${contactMethodRoute}">προσθέστε ένα email ως κύρια είσοδό σας</a> και δοκιμάστε ξανά. Μπορείτε να προσθέσετε τον αριθμό τηλεφώνου σας ως δευτερεύουσα είσοδο.`,
         hasBeenThrottledError: 'Παρουσιάστηκε σφάλμα κατά την προσθήκη του τραπεζικού σας λογαριασμού. Παρακαλούμε περιμένετε μερικά λεπτά και δοκιμάστε ξανά.',

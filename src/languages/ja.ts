@@ -3944,6 +3944,14 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
         getReimbursedDescription: '雇用主または他の人から',
         makePayments: '支払いを行う',
         makePaymentsDescription: '経費の支払いまたは Expensify カードの発行',
+        abaDeposit: {
+            bsbNumber: 'BSB番号',
+            billingAddress: '請求先住所',
+            error: {
+                bsbNumber: 'xxx-xxx 形式の有効な BSB 番号を入力してください。',
+                accountNumber: '5〜9 桁の有効な口座番号を入力してください。',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `銀行口座を連携するには、まず<a href="${contactMethodRoute}">メールアドレスをプライマリログインとして追加</a>してから、もう一度お試しください。電話番号はセカンダリログインとして追加できます。`,
         hasBeenThrottledError: '銀行口座の追加中にエラーが発生しました。数分待ってから、もう一度お試しください。',

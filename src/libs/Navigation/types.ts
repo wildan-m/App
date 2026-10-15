@@ -274,6 +274,7 @@ type SettingsNavigatorParamList = {
         subPage?: string;
         action?: 'edit';
     };
+    [SCREENS.SETTINGS.ABA_DEPOSIT_ACCOUNT]: undefined;
     [SCREENS.SETTINGS.ADD_US_BANK_ACCOUNT]: {
         subPage?: string;
 

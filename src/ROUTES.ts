@@ -2538,6 +2538,7 @@ const ROUTES = {
             return `settings/wallet/collect-deposit-account${subPagePart}${actionPart}` as const;
         },
     },
+    SETTINGS_ABA_DEPOSIT_ACCOUNT: 'settings/wallet/aba-deposit-account',
     SETTINGS_ADD_US_BANK_ACCOUNT: {
         route: 'settings/wallet/add-us-bank-account/:subPage?/:action?',
         getRoute: (subPage?: string, action?: 'edit') => {

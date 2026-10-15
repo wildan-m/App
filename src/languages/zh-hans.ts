@@ -3853,6 +3853,14 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         getReimbursedDescription: '由雇主或其他人报销',
         makePayments: '进行付款',
         makePaymentsDescription: '支付报销款或发放 Expensify 卡',
+        abaDeposit: {
+            bsbNumber: 'BSB 号码',
+            billingAddress: '账单地址',
+            error: {
+                bsbNumber: '请输入格式为 xxx-xxx 的有效 BSB 号码。',
+                accountNumber: '请输入 5 到 9 位数字的有效账号。',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `要连接银行账户，请先<a href="${contactMethodRoute}">添加一个邮箱作为您的主要登录方式</a>，然后重试。您可以将手机号添加为次要登录方式。`,
         hasBeenThrottledError: '添加您的银行账户时出错。请稍等几分钟后重试。',

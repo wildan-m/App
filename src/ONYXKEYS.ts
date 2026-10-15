@@ -1220,6 +1220,8 @@ const ONYXKEYS = {
         PERSONAL_DETAILS_FORM_DRAFT: 'personalDetailsFormDraft',
         COLLECT_DEPOSIT_ACCOUNT_FORM: 'collectDepositAccountForm',
         COLLECT_DEPOSIT_ACCOUNT_FORM_DRAFT: 'collectDepositAccountFormDraft',
+        ABA_DEPOSIT_ACCOUNT_FORM: 'abaDepositAccountForm',
+        ABA_DEPOSIT_ACCOUNT_FORM_DRAFT: 'abaDepositAccountFormDraft',
         INTERNATIONAL_BANK_ACCOUNT_FORM: 'internationalBankAccountForm',
         INTERNATIONAL_BANK_ACCOUNT_FORM_DRAFT: 'internationalBankAccountFormDraft',
         DYNAMIC_FORM_LIST_ITEM_FORM: 'dynamicFormListItemForm',
@@ -1567,6 +1569,7 @@ type OnyxFormValuesMapping = {
     [ONYXKEYS.FORMS.ONBOARDING_WORK_EMAIL_FORM]: FormTypes.OnboardingWorkEmailForm;
     [ONYXKEYS.FORMS.MERGE_ACCOUNT_DETAILS_FORM]: FormTypes.MergeAccountDetailsForm;
     [ONYXKEYS.FORMS.COLLECT_DEPOSIT_ACCOUNT_FORM]: FormTypes.CollectDepositAccountForm;
+    [ONYXKEYS.FORMS.ABA_DEPOSIT_ACCOUNT_FORM]: FormTypes.ABADepositAccountForm;
     [ONYXKEYS.FORMS.INTERNATIONAL_BANK_ACCOUNT_FORM]: FormTypes.InternationalBankAccountForm;
     [ONYXKEYS.FORMS.DYNAMIC_FORM_LIST_ITEM_FORM]: FormTypes.DynamicFormListItemForm;
     [ONYXKEYS.FORMS.WORKSPACE_PER_DIEM_FORM]: FormTypes.WorkspacePerDiemForm;

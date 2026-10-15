@@ -1,4 +1,7 @@
+import useABADepositPolicyID from '@hooks/useABADepositPolicyID';
+
 import {getLocalCurrencies} from '@libs/BankAccountFields';
+import Navigation from '@libs/Navigation/Navigation';
 
 import type CustomSubPageProps from '@pages/settings/Wallet/CollectDepositAccount/types';
 import CountrySelectionList from '@pages/settings/Wallet/CountrySelectionList';
@@ -7,6 +10,7 @@ import {setDraftValues} from '@userActions/FormActions';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import INPUT_IDS from '@src/types/form/CollectDepositAccountForm';
 
 import React, {useState} from 'react';
@@ -14,8 +18,15 @@ import React, {useState} from 'react';
 function CountrySelection({isEditing, onNext, onMove, formValues}: CustomSubPageProps) {
     const previousCountry = formValues[INPUT_IDS.BANK_COUNTRY] || '';
     const [selectedCountry, setSelectedCountry] = useState(previousCountry);
+    const abaDepositPolicyID = useABADepositPolicyID();
 
     const confirmCountry = () => {
+        // An employer paying through ABA files only needs the ABA details, not the fields collected for Australia here.
+        if (selectedCountry === CONST.COUNTRY.AU && abaDepositPolicyID) {
+            Navigation.navigate(ROUTES.SETTINGS_ABA_DEPOSIT_ACCOUNT);
+            return;
+        }
+
         const hasCountryChanged = selectedCountry !== previousCountry;
         // Countries with a single currency have nothing to pick, so default it and let the details step move on.
         const [firstCurrency] = getLocalCurrencies(selectedCountry);

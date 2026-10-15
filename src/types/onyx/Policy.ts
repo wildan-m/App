@@ -3707,6 +3707,15 @@ type AgentRule = {
     errors?: OnyxCommon.Errors;
 };
 
+/** Withdrawal account a policy reimburses from in one country */
+type PolicyReimbursementCountry = {
+    /** Extra details of the withdrawal account */
+    additionalData?: {
+        /** Whether the account is only used to export ABA payment files, so the employer pays from their own bank */
+        isForABA?: boolean;
+    };
+};
+
 /** Model of policy data */
 type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
     {
@@ -3797,7 +3806,7 @@ type Policy = OnyxCommon.OnyxValueWithOfflineFeedback<
             enabled?: boolean;
 
             /** Countries (keyed by ISO code) where the company has a withdrawal account it can reimburse from */
-            countries?: Record<string, unknown>;
+            countries?: Record<string, PolicyReimbursementCountry | undefined>;
         };
 
         /** The set reimburser for the policy */

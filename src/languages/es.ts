@@ -3907,6 +3907,14 @@ ${amount} para ${merchant} - ${date}`,
         getReimbursedDescription: 'Por tu empleador u otras personas',
         makePayments: 'Hacer pagos',
         makePaymentsDescription: 'Pagar gastos o emitir Tarjetas Expensify',
+        abaDeposit: {
+            bsbNumber: 'Número BSB',
+            billingAddress: 'Dirección de facturación',
+            error: {
+                bsbNumber: 'Introduce un número BSB válido con el formato xxx-xxx.',
+                accountNumber: 'Introduce un número de cuenta válido de 5 a 9 dígitos.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute) =>
             `Para añadir una cuenta bancaria verificada, <a href="${contactMethodRoute}">asegúrate de que tu nombre de usuario principal sea un correo electrónico válido</a> y vuelve a intentarlo. Puedes añadir tu número de teléfono como nombre de usuario secundario.`,
         hasBeenThrottledError: 'Se ha producido un error al intentar añadir tu cuenta bancaria. Por favor, espera unos minutos e inténtalo de nuevo.',

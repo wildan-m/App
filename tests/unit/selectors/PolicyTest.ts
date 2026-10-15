@@ -5,6 +5,7 @@ import type {Policy} from '@src/types/onyx';
 import type {OnyxCollection} from 'react-native-onyx';
 
 import {
+    createABADepositPolicyIDSelector,
     isCollectingDepositAccountsSelector,
     createIsInternationalCountrySelector,
     activeAdminPoliciesSelector,
@@ -730,5 +731,64 @@ describe('createIsInternationalCountrySelector', () => {
         // When the employee adds a GB account
         // Then wire details are collected, because that workspace cannot pay anyone domestically
         expect(createIsInternationalCountrySelector('GB')(policies)).toBe(true);
+    });
+});
+
+describe('createABADepositPolicyIDSelector', () => {
+    const abaReimbursement = {countries: {AU: {additionalData: {isForABA: true}}}};
+    const nonABAReimbursement = {countries: {AU: {additionalData: {}}}};
+
+    it('returns the default workspace when it pays Australian accounts through ABA files', () => {
+        // Given a default workspace with an ABA withdrawal account and another workspace without one
+        const policies: OnyxCollection<Policy> = {
+            policy1: buildSelectorPolicy(1, {reimbursement: abaReimbursement}),
+            policy2: buildSelectorPolicy(2, {reimbursement: nonABAReimbursement}),
+        };
+
+        // Then the default workspace decides that only the ABA details are collected
+        expect(createABADepositPolicyIDSelector('1')(policies)).toBe('1');
+    });
+
+    it('returns nothing when the default workspace does not pay through ABA files', () => {
+        // Given a default workspace without an ABA withdrawal account, even though another workspace has one
+        const policies: OnyxCollection<Policy> = {
+            policy1: buildSelectorPolicy(1, {reimbursement: abaReimbursement}),
+            policy2: buildSelectorPolicy(2, {reimbursement: nonABAReimbursement}),
+        };
+
+        // Then the existing setup flow is kept, because the default workspace is the one reimbursing the user
+        expect(createABADepositPolicyIDSelector('2')(policies)).toBeUndefined();
+    });
+
+    it('falls back to the only workspace when the default is not a workspace', () => {
+        // Given a user whose default is their personal policy and who belongs to a single ABA workspace
+        const policies: OnyxCollection<Policy> = {
+            personal: {...createRandomPolicy(9, CONST.POLICY.TYPE.PERSONAL), pendingAction: undefined},
+            policy1: buildSelectorPolicy(1, {reimbursement: abaReimbursement}),
+        };
+
+        // Then that workspace decides how the account is set up
+        expect(createABADepositPolicyIDSelector('9')(policies)).toBe('1');
+        expect(createABADepositPolicyIDSelector(undefined)(policies)).toBe('1');
+    });
+
+    it('returns nothing when there is no default and several workspaces', () => {
+        // Given two ABA workspaces and no default among them
+        const policies: OnyxCollection<Policy> = {
+            policy1: buildSelectorPolicy(1, {reimbursement: abaReimbursement}),
+            policy2: buildSelectorPolicy(2, {reimbursement: abaReimbursement}),
+        };
+
+        // Then there is no single workspace to decide with, so the existing setup flow is kept
+        expect(createABADepositPolicyIDSelector(undefined)(policies)).toBeUndefined();
+    });
+
+    it('returns nothing before the withdrawal accounts are loaded', () => {
+        // Given a default workspace whose reimbursement countries have not been fetched yet
+        const policies: OnyxCollection<Policy> = {
+            policy1: buildSelectorPolicy(1, {}),
+        };
+
+        expect(createABADepositPolicyIDSelector('1')(policies)).toBeUndefined();
     });
 });

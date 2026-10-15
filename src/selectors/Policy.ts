@@ -19,6 +19,7 @@ import {
     isPolicyAdmin,
     isArchivedOrPendingDeletePolicy,
     isArchivedPolicy,
+    isGroupPolicy,
     isTimeTrackingEnabled,
     shouldShowPolicy,
 } from '@libs/PolicyUtils';
@@ -85,6 +86,19 @@ const createIsInternationalCountrySelector =
         Object.values(policies ?? {}).some(
             (policy) => !!policy?.isCollectDepositAccountsEnabled && !isArchivedOrPendingDeletePolicy(policy) && !(countryISO in (policy.reimbursement?.countries ?? {})),
         );
+
+/**
+ * The workspace whose Australian withdrawal account decides how the user's deposit account is set up: their default
+ * workspace, or their only workspace when the default is not one. Returns its ID only when that withdrawal account
+ * pays through ABA files, which means the employer only needs the account details to reimburse from their own bank.
+ */
+const createABADepositPolicyIDSelector =
+    (activePolicyID: string | undefined) =>
+    (policies: OnyxCollection<Policy>): string | undefined => {
+        const groupPolicies = Object.values(policies ?? {}).filter((policy): policy is Policy => !!policy && isGroupPolicy(policy) && !isArchivedOrPendingDeletePolicy(policy));
+        const defaultPolicy = groupPolicies.find((policy) => policy.id === activePolicyID) ?? (groupPolicies.length === 1 ? groupPolicies.at(0) : undefined);
+        return defaultPolicy?.reimbursement?.countries?.[CONST.COUNTRY.AU]?.additionalData?.isForABA ? defaultPolicy.id : undefined;
+    };
 
 /**
  * Creates a selector returning only the IDs of policies eligible as copy-settings targets, so
@@ -611,5 +625,6 @@ export {
     isAdminForPolicyByIDSelector,
     isCollectingDepositAccountsSelector,
     createIsInternationalCountrySelector,
+    createABADepositPolicyIDSelector,
 };
 export type {ReusablePolicyConnectionName};

@@ -100,6 +100,7 @@ export type {WorkspaceConfirmationForm} from './WorkspaceConfirmationForm';
 export type {MoneyRequestTimeForm} from './MoneyRequestTimeForm';
 export type {MoneyRequestSubrateForm} from './MoneyRequestSubrateForm';
 export type {CollectDepositAccountForm} from './CollectDepositAccountForm';
+export type {ABADepositAccountForm} from './ABADepositAccountForm';
 export type {InternationalBankAccountForm} from './InternationalBankAccountForm';
 export type {DynamicFormListItemForm} from './DynamicFormListItemForm';
 export type {WorkspacePerDiemForm} from './WorkspacePerDiemForm';

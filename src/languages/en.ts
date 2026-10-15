@@ -4161,6 +4161,14 @@ const translations = {
         getReimbursedDescription: 'By employer or others',
         makePayments: 'Make payments',
         makePaymentsDescription: 'Pay expenses or issue Expensify Cards',
+        abaDeposit: {
+            bsbNumber: 'BSB number',
+            billingAddress: 'Billing address',
+            error: {
+                bsbNumber: 'Please enter a valid BSB number in the format xxx-xxx.',
+                accountNumber: 'Please enter a valid account number of 5 to 9 digits.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `To connect a bank account, please <a href="${contactMethodRoute}">add an email as your primary login</a> and try again. You can add your phone number as a secondary login.`,
         hasBeenThrottledError: 'An error occurred while adding your bank account. Please wait a few minutes and try again.',

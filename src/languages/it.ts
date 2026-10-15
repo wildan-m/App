@@ -3975,6 +3975,14 @@ ${amount} per ${merchant} - ${date}`,
         getReimbursedDescription: 'Dal datore di lavoro o altri',
         makePayments: 'Effettuare pagamenti',
         makePaymentsDescription: 'Paga le spese o emetti Carte Expensify',
+        abaDeposit: {
+            bsbNumber: 'Numero BSB',
+            billingAddress: 'Indirizzo di fatturazione',
+            error: {
+                bsbNumber: 'Inserisci un numero BSB valido nel formato xxx-xxx.',
+                accountNumber: 'Inserisci un numero di conto valido di 5-9 cifre.',
+            },
+        },
         hasPhoneLoginError: (contactMethodRoute: string) =>
             `Per collegare un conto bancario, <a href="${contactMethodRoute}">aggiungi un’email come accesso principale</a> e riprova. Puoi aggiungere il tuo numero di telefono come accesso secondario.`,
         hasBeenThrottledError: 'Si è verificato un errore durante l’aggiunta del tuo conto bancario. Attendi qualche minuto e riprova.',
