@@ -50,11 +50,13 @@ class MainApplication : MultiDexApplication(), ReactApplication {
 
         // Plaid's LinkActivity calls setRequestedOrientation(PORTRAIT) in its own onCreate(),
         // which forces the UI to portrait even when the device is in landscape. We override it
-        // here so Plaid can render in whichever orientation the device is actually in.
+        // here so Plaid renders in whichever orientation the device is in when the flow opens,
+        // and lock it there: Plaid's web UI does not handle rotating mid-flow (the focused input
+        // ends up hidden behind the keyboard and the cursor drifts while typing).
         registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity.javaClass.name == "com.plaid.internal.link.LinkActivity") {
-                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LOCKED
                 }
             }
             override fun onActivityStarted(activity: Activity) {}
