@@ -6,8 +6,10 @@ import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelect
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useInitialValue from '@hooks/useInitialValue';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePersonalDetailSearchSelector from '@hooks/usePersonalDetailSearchSelector';
+import useSearchUserFilters from '@hooks/useSearchUserFilters';
 import useShouldFooterBeInsideList from '@hooks/useShouldFooterBeInsideList';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -34,10 +36,10 @@ function UserSelector({value = [], isNegatable, policyID, selectionListTextInput
     const styles = useThemeStyles();
     const shouldFooterBeInsideList = useShouldFooterBeInsideList();
     const {translate} = useLocalize();
+    const {isOffline} = useNetwork();
     const personalDetails = usePersonalDetails();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const shouldFocusInputOnScreenFocus = autoFocus && canFocusInputOnScreenFocus();
-    const [isSearchingForReports] = useOnyx(ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const initialSelectedAccountIDs = value.reduce<Set<string>>((acc, id) => {
         const participant = personalDetails?.[id];
@@ -87,7 +89,14 @@ function UserSelector({value = [], isNegatable, policyID, selectionListTextInput
         return logins.size ? logins : undefined;
     })();
 
-    const {searchTerm, setSearchTerm, selectedOptions, availableOptions, totalOptionsCount, toggleSelection, areOptionsInitialized} = usePersonalDetailSearchSelector({
+    // The selected workspaces scope the server lookup the same way workspaceMemberLogins scopes the local options.
+    const policyIDs = policyID?.value?.length
+        ? getAllPolicyValues(policyID, ONYXKEYS.COLLECTION.POLICY, policies)
+              .map((policy) => policy.id)
+              .join(',')
+        : '';
+
+    const {searchTerm, debouncedSearchTerm, setSearchTerm, selectedOptions, availableOptions, totalOptionsCount, toggleSelection, areOptionsInitialized} = usePersonalDetailSearchSelector({
         selectionMode: CONST.SEARCH_SELECTOR.SELECTION_MODE_MULTI,
         initialSelected: initialSelectedAccountIDs,
         excludeLogins: CONST.EXPENSIFY_EMAILS_OBJECT,
@@ -99,6 +108,10 @@ function UserSelector({value = [], isNegatable, policyID, selectionListTextInput
         onSelectionChange: onChange,
         shouldKeepSelectedInAvailableOptions: true,
     });
+
+    // Only some personal details are loaded locally, so people are also looked up on the server as the user types.
+    // The results are merged into personal details, which feeds them straight back into the options above.
+    const {isSearching, isLoadingMore, loadMore} = useSearchUserFilters(debouncedSearchTerm, policyIDs);
 
     // The current user and selected public-profile users without a login are excluded from personalDetails, so include them in the list when present.
     const availablePersonalDetails = availableOptions.currentUserOption ? [availableOptions.currentUserOption, ...availableOptions.personalDetails] : availableOptions.personalDetails;
@@ -113,14 +126,16 @@ function UserSelector({value = [], isNegatable, policyID, selectionListTextInput
         initialSelectedValues,
     );
 
-    const headerMessage = listData.length === 0 ? translate('common.noResultsFound') : undefined;
+    const headerMessage = listData.length === 0 && !isSearching ? translate('common.noResultsFound') : undefined;
 
     const selectUser = (option: OptionData) => {
         toggleSelection(option);
     };
 
-    const isLoadingNewOptions = !!isSearchingForReports;
-    const shouldShowSearchInput = totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
+    const isLoadingNewOptions = isSearching || isLoadingMore;
+
+    // While online the search input is always shown, because people that aren't loaded locally can only be reached by searching for them.
+    const shouldShowSearchInput = !isOffline || totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
     const textInputOptions = shouldShowSearchInput
         ? {
@@ -149,6 +164,7 @@ function UserSelector({value = [], isNegatable, policyID, selectionListTextInput
                 onSelectRow={selectUser}
                 shouldUpdateFocusedIndex
                 isLoadingNewOptions={isLoadingNewOptions}
+                onEndReached={loadMore}
                 shouldShowLoadingPlaceholder={!areOptionsInitialized || !ready}
                 style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
                 footerContent={footer}

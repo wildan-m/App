@@ -7630,6 +7630,7 @@ const CONST = {
     SEARCH: {
         RESULTS_PAGE_SIZE: 50,
         TAG_FILTER_PAGE_SIZE: 200,
+        USER_FILTER_PAGE_SIZE: 50,
         EXITING_ANIMATION_DURATION: 200,
         ME: 'me',
         // Null byte can't appear in a query, so it's safe to join query parts with it
