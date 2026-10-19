@@ -33,8 +33,10 @@ function SearchAdvancedFiltersBase() {
         >
             <HeaderWithBackButton title={translate('search.filtersHeader')} />
             <FilterList
+                style={styles.flex1}
                 contentContainerStyle={[styles.pb5]}
                 type={currentDraftFilters.type}
+                shouldDisableSearchAutoFocus
                 onPress={(filterKey) => Navigation.navigate(ROUTES.SEARCH_ADVANCED_FILTERS_CONTENT.getRoute(filterKey))}
             />
             <View style={[isInLandscapeMode ? [styles.flexRow, styles.gap2] : [styles.gap3], styles.ph5, styles.pb5]}>

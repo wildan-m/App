@@ -1,8 +1,10 @@
 import Icon from '@components/Icon';
 import {PressableWithFeedback} from '@components/Pressable';
 import ScrollView from '@components/ScrollView';
+import FilterSearchInput from '@components/SelectionList/components/TextInput';
 import SpacerView from '@components/SpacerView';
 import Text from '@components/Text';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -21,7 +23,7 @@ import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 
 import type {StyleProp, ViewStyle} from 'react-native';
 
-import React from 'react';
+import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 
 type ItemCallback = (filter: SearchFilter['key']) => void;
@@ -36,6 +38,9 @@ type FilterListProps = FilterItemCallbacks & {
     selectedFilter?: SearchFilter['key'];
     style?: StyleProp<ViewStyle>;
     contentContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Whether the filter search input should skip its default autofocus. Set on the full-screen page so the keyboard doesn't cover the list on mobile. */
+    shouldDisableSearchAutoFocus?: boolean;
 
     /** Called as the cursor travels over the list. Web only - it reports the movement inside a row, which `onHoverIn` only reports entering. */
     onPointerMove?: (event: {clientX: number; clientY: number}) => void;
@@ -108,40 +113,71 @@ function FilterItem({filterKey, isSelected, type, onPress, onHoverIn, onFocus}: 
     );
 }
 
-function FilterList({type, selectedFilter, style, contentContainerStyle, onHoverIn, onFocus, onPress, onPointerMove, onPointerLeave}: FilterListProps) {
+function FilterList({type, selectedFilter, style, contentContainerStyle, shouldDisableSearchAutoFocus = false, onHoverIn, onFocus, onPress, onPointerMove, onPointerLeave}: FilterListProps) {
     const styles = useThemeStyles();
+    const {translate} = useLocalize();
     const typeFiltersKeys = useAdvancedSearchFilters(type);
+    const [searchText, setSearchText] = useState('');
+    const searchInputRef = useRef<BaseTextInputRef | null>(null);
+
+    const normalizedSearchText = searchText.trim().toLowerCase();
+    const visibleSections = normalizedSearchText
+        ? typeFiltersKeys
+              .map((section) => section.filter((filterKey) => translate(getFilterViewLabelKey(filterKey, type)).toLowerCase().includes(normalizedSearchText)))
+              .filter((section) => section.length > 0)
+        : typeFiltersKeys;
+    const visibleFiltersCount = visibleSections.reduce((count, section) => count + section.length, 0);
+
+    const focusSearchInput = () => {
+        searchInputRef.current?.focus();
+    };
 
     return (
-        <ScrollView
-            style={[style]}
-            contentContainerStyle={[contentContainerStyle]}
-            showsVerticalScrollIndicator={false}
-            onMouseMove={onPointerMove}
-            onMouseLeave={onPointerLeave}
-        >
-            {typeFiltersKeys.map((section, index) => (
-                <View key={`${section.at(0)}`}>
-                    {index !== 0 && (
-                        <SpacerView
-                            shouldShow
-                            style={[styles.reportHorizontalRule]}
-                        />
-                    )}
-                    {section.map((item) => (
-                        <FilterItem
-                            key={item}
-                            filterKey={item}
-                            type={type}
-                            isSelected={item === selectedFilter}
-                            onHoverIn={onHoverIn}
-                            onFocus={onFocus}
-                            onPress={onPress}
-                        />
-                    ))}
-                </View>
-            ))}
-        </ScrollView>
+        <View style={style}>
+            <FilterSearchInput
+                ref={searchInputRef}
+                options={{
+                    label: translate('search.filters.searchPlaceholder'),
+                    value: searchText,
+                    onChangeText: setSearchText,
+                    disableAutoFocus: shouldDisableSearchAutoFocus,
+                    headerMessage: visibleFiltersCount === 0 ? translate('common.noResultsFound') : undefined,
+                }}
+                shouldShowTextInput
+                dataLength={visibleFiltersCount}
+                onFocusChange={() => {}}
+                focusTextInput={focusSearchInput}
+            />
+            <ScrollView
+                style={styles.flex1}
+                contentContainerStyle={[contentContainerStyle]}
+                showsVerticalScrollIndicator={false}
+                onMouseMove={onPointerMove}
+                onMouseLeave={onPointerLeave}
+            >
+                {visibleSections.map((section, index) => (
+                    <View key={`${section.at(0)}`}>
+                        {index !== 0 && (
+                            <SpacerView
+                                shouldShow
+                                style={[styles.reportHorizontalRule]}
+                            />
+                        )}
+                        {section.map((item) => (
+                            <FilterItem
+                                key={item}
+                                filterKey={item}
+                                type={type}
+                                isSelected={item === selectedFilter}
+                                onHoverIn={onHoverIn}
+                                onFocus={onFocus}
+                                onPress={onPress}
+                            />
+                        ))}
+                    </View>
+                ))}
+            </ScrollView>
+        </View>
     );
 }
 

@@ -10475,6 +10475,7 @@ const translations = {
             status: 'Status',
             keyword: 'Keyword',
             keywords: 'Keywords',
+            searchPlaceholder: 'Search filters',
             limit: 'Limit',
             limitDescription: 'Set a limit for the results of your search.',
             currency: 'Currency',
