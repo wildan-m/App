@@ -7,7 +7,9 @@ import rsbuildFinal from './rsbuild.config.ts';
 const main: StorybookConfig = {
     stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
     addons: ['@storybook/addon-a11y', '@storybook/addon-docs'],
-    staticDirs: ['./public', {from: '../assets/css', to: 'css'}, {from: '../assets/fonts/web', to: 'fonts'}],
+    // The manager links the copied `css/fonts.css`, whose `url()` values are relative to its source
+    // location (`assets/css`), so the fonts are served under `fonts/web` to match.
+    staticDirs: ['./public', {from: '../assets/css', to: 'css'}, {from: '../assets/fonts/web', to: 'fonts/web'}],
     core: {},
 
     managerHead: (head) => `

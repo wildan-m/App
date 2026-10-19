@@ -13,6 +13,9 @@
     <meta property="og:title" content="New Expensify">
     <meta property="og:description" content="Corporate cards, reimbursements, receipt scanning, invoicing, and bill pay.">
     <meta property="og:image" content="https://new.expensify.com/og-preview-image.png">
+    <!-- The /fonts/ URLs below are rewritten at build time to the content-hashed files the bundler
+         emits for fonts.css (see config/rsbuild/RspackInlineFontUrlPlugin.ts), so the splash screen's
+         fonts start downloading while the HTML is parsed without shipping a second copy of them. -->
     <style>
         @font-face {
             font-family: Expensify Neue;
@@ -27,7 +30,6 @@
             src: url('/fonts/ExpensifyNeue-Bold.woff2') format('woff2');
         }
     </style>
-    <link rel="stylesheet" type="text/css" href="/css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="/css/pdf.css" />
     <!-- Do not index the staging site -->
     <% if (isStaging) { %>

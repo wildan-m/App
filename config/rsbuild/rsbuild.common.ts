@@ -28,6 +28,8 @@ import CustomVersionFilePlugin from './CustomVersionFilePlugin.ts';
 // @ts-expect-error -- Can't use .ts extensions without allowImportingTsExtensions in tsconfig
 import ModuleInitTimingPlugin from './ModuleInitTimingPlugin.ts';
 // @ts-expect-error -- Can't use .ts extensions without allowImportingTsExtensions in tsconfig
+import RspackInlineFontUrlPlugin from './RspackInlineFontUrlPlugin.ts';
+// @ts-expect-error -- Can't use .ts extensions without allowImportingTsExtensions in tsconfig
 import RspackPreloadPlugin from './RspackPreloadPlugin.ts';
 
 const require = createRequire(import.meta.url);
@@ -369,7 +371,9 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                 // which can only classify frames when it did.
                 __SENTRY_APPLICATION_KEY_STAMPED__: !!sentryWebpackPlugin,
             },
-            entry: {main: './index.js'},
+            // `web/index.js` imports the font stylesheet (so the bundler emits each font once, under a
+            // content-hashed URL) and then the shared `index.js`, which native builds consume directly.
+            entry: {main: './web/index.js'},
         },
         output: {
             target: 'web',
@@ -410,8 +414,11 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                 {from: 'web/robots.txt'},
                 {from: 'assets/images/expensify-app-icon.svg'},
                 {from: 'web/manifest.json'},
-                {from: 'assets/css', to: 'css'},
-                {from: 'assets/fonts/web', to: 'fonts'},
+                // `fonts.css` is imported from the web entry instead, so its `url()` values resolve to the
+                // content-hashed font files the charts also import — copying it (or the fonts it used to
+                // point at) verbatim would ship every font a second time under a fixed-name URL.
+                // See https://github.com/Expensify/App/issues/104392.
+                {from: 'assets/css', to: 'css', globOptions: {ignore: ['**/fonts.css']}},
                 {from: 'assets/sounds', to: 'sounds'},
                 {from: 'assets/pdfs', to: 'pdfs'},
                 {from: 'node_modules/react-pdf/dist/Page/AnnotationLayer.css', to: 'css/AnnotationLayer.css'},
@@ -564,6 +571,13 @@ const getCommonConfiguration = async ({file = '.env', platform = 'web', isDevSer
                         rel: 'prefetch',
                         as: 'fetch',
                         fileWhitelist: [/\.lottie$/],
+                        htmlPlugin: HtmlPlugin,
+                    }),
+                    // Rewrite the splash screen's inline @font-face URLs in `web/index.html` to the
+                    // content-hashed files emitted for `fonts.css`, so the two Expensify Neue faces still
+                    // start downloading while the HTML is parsed, from the only copy of each font we ship.
+                    new RspackInlineFontUrlPlugin({
+                        fonts: ['ExpensifyNeue-Regular.woff2', 'ExpensifyNeue-Bold.woff2'],
                         htmlPlugin: HtmlPlugin,
                     }),
                     new rspack.ProvidePlugin({process: 'process/browser'}),
