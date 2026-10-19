@@ -41,6 +41,7 @@ import useExportedToFilterOptions from './useExportedToFilterOptions';
 import useLoadSearchCategoryData from './useLoadSearchCategoryData';
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
+import usePermissions from './usePermissions';
 import useSortedReportActionsData from './useSortedReportActionsData';
 
 type AutocompleteItemData = {
@@ -92,6 +93,7 @@ const EXPENSE_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.EXPENSE);
 const EXPENSE_REPORT_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.EXPENSE_REPORT);
 const INVOICE_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.INVOICE);
 const TRIP_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.TRIP);
+const TRIP_LEGACY_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.TRIP_LEGACY);
 const TASK_STATUS_VALUES = Object.values(CONST.SEARCH.STATUS.TASK);
 const DEFAULT_STATUS_VALUES = Object.values({
     ...CONST.SEARCH.STATUS.EXPENSE,
@@ -127,6 +129,8 @@ function useAutocompleteSuggestions({
     autocompleteSubstitutions,
 }: UseAutocompleteSuggestionsParams): AutocompleteItemData[] {
     const {localeCompare, dateFnsLocale, formatPhoneNumber} = useLocalize();
+    const {isBetaEnabled} = usePermissions();
+    const isTravelApprovalEnabled = isBetaEnabled(CONST.BETAS.TRAVEL_APPROVAL);
     const {convertToDisplayString, convertToDisplayStringWithoutCurrency} = useCurrencyListActions();
     const [allPolicyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
     const [allRecentCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES);
@@ -375,8 +379,10 @@ function useAutocompleteSuggestions({
                 switch (currentType) {
                     case CONST.SEARCH.DATA_TYPES.EXPENSE:
                     case CONST.SEARCH.DATA_TYPES.INVOICE:
-                    case CONST.SEARCH.DATA_TYPES.TRIP:
                         return GROUP_BY_FRIENDLY_VALUES;
+                    case CONST.SEARCH.DATA_TYPES.TRIP:
+                        // Group-by is no longer offered for trips once the TRAVEL_APPROVAL beta is on
+                        return isTravelApprovalEnabled ? [] : GROUP_BY_FRIENDLY_VALUES;
                     default:
                         return [];
                 }
@@ -406,7 +412,7 @@ function useAutocompleteSuggestions({
                         suggestedStatuses = INVOICE_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.TRIP:
-                        suggestedStatuses = TRIP_STATUS_VALUES;
+                        suggestedStatuses = isTravelApprovalEnabled ? TRIP_STATUS_VALUES : TRIP_LEGACY_STATUS_VALUES;
                         break;
                     case CONST.SEARCH.DATA_TYPES.TASK:
                         suggestedStatuses = TASK_STATUS_VALUES;

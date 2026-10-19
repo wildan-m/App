@@ -10272,6 +10272,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             reportField: (name: string, value: string) => `${name} ist ${value}`,
             current: 'Aktuell',
             past: 'Vergangenes',
+            upcoming: 'Bevorstehend',
+            canceled: 'Storniert',
             submitted: 'Eingereicht',
             approved: 'Genehmigt',
             anyApproval: 'Jede Genehmigung',

@@ -19,6 +19,7 @@ import {useCurrencyListState} from './useCurrencyList';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useExportedToFilterOptions from './useExportedToFilterOptions';
 import useOnyx from './useOnyx';
+import usePermissions from './usePermissions';
 
 function policiesSelector(policies: OnyxCollection<Policy>): OnyxCollection<Policy> {
     if (!policies) {
@@ -56,6 +57,7 @@ const useFilterFormValues = (queryJSON?: SearchQueryJSON) => {
     const personalDetails = usePersonalDetails();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {currencyList} = useCurrencyListState();
+    const {isBetaEnabled} = usePermissions();
 
     const [userCardList] = useOnyx(ONYXKEYS.CARD_LIST);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: policiesSelector});
@@ -83,6 +85,7 @@ const useFilterFormValues = (queryJSON?: SearchQueryJSON) => {
               exportedToFilterOptions,
               currentUserPersonalDetails.accountID,
               bankAccountList,
+              isBetaEnabled(CONST.BETAS.TRAVEL_APPROVAL),
           )
         : getEmptyObject<Partial<SearchAdvancedFiltersForm>>();
 

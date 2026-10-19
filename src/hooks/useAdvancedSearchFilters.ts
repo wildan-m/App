@@ -14,6 +14,7 @@ import {emailSelector} from '@selectors/Session';
 
 import useLocalize from './useLocalize';
 import useOnyx from './useOnyx';
+import usePermissions from './usePermissions';
 import useWorkspaceList from './useWorkspaceList';
 
 /**
@@ -209,6 +210,12 @@ const typeFiltersKeys = {
     ],
 };
 
+// With the TRAVEL_APPROVAL beta on, trips offer only Status, Date, Workspace and From (To is added later by Approve Travel R4.2)
+const tripFiltersKeysWithTravelApproval = [
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE, CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID],
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE],
+];
+
 function shouldDisplayFilter(numberOfFilters: number, isFeatureEnabled: boolean, singlePolicyCondition = false): boolean {
     return (numberOfFilters !== 0 || singlePolicyCondition) && isFeatureEnabled;
 }
@@ -315,6 +322,7 @@ function shouldDisplayCardFilterSelector(cardList: OnyxEntry<CardList>) {
 }
 
 function useAdvancedSearchFilters(type: SearchDataTypes | undefined) {
+    const {isBetaEnabled} = usePermissions();
     const [shouldDisplayCardFilter] = useOnyx(ONYXKEYS.DERIVED.PERSONAL_AND_WORKSPACE_CARD_LIST, {selector: shouldDisplayCardFilterSelector});
     const [policies = getEmptyObject<NonNullable<OnyxCollection<Policy>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: advancedSearchPoliciesSelector});
     const [policyDerived] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: policyDerivedSelector});
@@ -335,7 +343,10 @@ function useAdvancedSearchFilters(type: SearchDataTypes | undefined) {
         currentType = CONST.SEARCH.DATA_TYPES.EXPENSE;
     }
 
-    return typeFiltersKeys[currentType]
+    const currentTypeFiltersKeys =
+        currentType === CONST.SEARCH.DATA_TYPES.TRIP && isBetaEnabled(CONST.BETAS.TRAVEL_APPROVAL) ? tripFiltersKeysWithTravelApproval : typeFiltersKeys[currentType];
+
+    return currentTypeFiltersKeys
         .map((section) =>
             section
                 .map((key) => {

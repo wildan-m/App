@@ -540,11 +540,31 @@ function getInvoiceStatusOptions(translate: LocalizedTranslate): Array<MultiSele
     ];
 }
 
-function getTripStatusOptions(translate: LocalizedTranslate): Array<MultiSelectItem<SingularSearchStatus>> {
-    return [
-        {text: translate('search.filters.current'), value: CONST.SEARCH.STATUS.TRIP.CURRENT},
-        {text: translate('search.filters.past'), value: CONST.SEARCH.STATUS.TRIP.PAST},
+type TripStatusOptionsConfig = {
+    /** Whether the TRAVEL_APPROVAL beta is enabled, which switches trips from current/past to upcoming/done/canceled */
+    isTravelApprovalEnabled?: boolean;
+
+    /** Return both the new and the legacy statuses, for resolving the display label of any stored value */
+    shouldShowAllStatuses?: boolean;
+};
+
+function getTripStatusOptions(translate: LocalizedTranslate, options?: TripStatusOptionsConfig): Array<MultiSelectItem<SingularSearchStatus>> {
+    const newStatusOptions: Array<MultiSelectItem<SingularSearchStatus>> = [
+        {text: translate('search.filters.upcoming'), value: CONST.SEARCH.STATUS.TRIP.UPCOMING},
+        {text: translate('iou.done'), value: CONST.SEARCH.STATUS.TRIP.DONE},
+        {text: translate('search.filters.canceled'), value: CONST.SEARCH.STATUS.TRIP.CANCELED},
     ];
+    const legacyStatusOptions: Array<MultiSelectItem<SingularSearchStatus>> = [
+        {text: translate('search.filters.current'), value: CONST.SEARCH.STATUS.TRIP_LEGACY.CURRENT},
+        {text: translate('search.filters.past'), value: CONST.SEARCH.STATUS.TRIP_LEGACY.PAST},
+    ];
+
+    // For resolving display labels we accept every value that can occur in a stored query, old or new
+    if (options?.shouldShowAllStatuses) {
+        return [...newStatusOptions, ...legacyStatusOptions];
+    }
+
+    return options?.isTravelApprovalEnabled ? newStatusOptions : legacyStatusOptions;
 }
 
 function getTaskStatusOptions(translate: LocalizedTranslate): Array<MultiSelectItem<SingularSearchStatus>> {
@@ -5094,12 +5114,12 @@ function getValidGroupBy(groupBy: string | undefined): ValueOf<typeof CONST.SEAR
     return groupBy && Object.values(CONST.SEARCH.GROUP_BY).includes(groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) ? (groupBy as ValueOf<typeof CONST.SEARCH.GROUP_BY>) : undefined;
 }
 
-function getStatusOptions(translate: LocalizedTranslate, type: SearchDataTypes) {
+function getStatusOptions(translate: LocalizedTranslate, type: SearchDataTypes, tripStatusOptionsConfig?: TripStatusOptionsConfig) {
     switch (type) {
         case CONST.SEARCH.DATA_TYPES.INVOICE:
             return getInvoiceStatusOptions(translate);
         case CONST.SEARCH.DATA_TYPES.TRIP:
-            return getTripStatusOptions(translate);
+            return getTripStatusOptions(translate, tripStatusOptionsConfig);
         case CONST.SEARCH.DATA_TYPES.TASK:
             return getTaskStatusOptions(translate);
         case CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT:
@@ -6022,7 +6042,7 @@ function getDisplayValue(
         if (!status?.length) {
             return;
         }
-        const statusOptions = getStatusOptions(translate, type);
+        const statusOptions = getStatusOptions(translate, type, {shouldShowAllStatuses: true});
         return statusOptions
             .filter((option) => status.includes(option.value))
             .map((option) => option.text)
@@ -6325,6 +6345,7 @@ function getMultiSelectFilterOptions(
     filterKey: SearchAdvancedFiltersKey,
     type: SearchDataTypes,
     translate: LocalizedTranslate,
+    isTravelApprovalEnabled?: boolean,
     policies?: OnyxCollection<OnyxTypes.Policy>,
     policyCategories?: OnyxCollection<OnyxTypes.PolicyCategories>,
 ) {
@@ -6351,7 +6372,7 @@ function getMultiSelectFilterOptions(
     }
 
     if (filterKey === FILTER_KEYS.STATUS) {
-        return type ? getStatusOptions(translate, type) : [];
+        return type ? getStatusOptions(translate, type, {isTravelApprovalEnabled}) : [];
     }
 
     if (filterKey === FILTER_KEYS.WITHDRAWAL_STATUS) {

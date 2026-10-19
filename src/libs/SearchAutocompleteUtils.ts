@@ -147,6 +147,8 @@ const userFriendlyStatusList = Object.values({
     ...CONST.SEARCH.STATUS.EXPENSE,
     ...CONST.SEARCH.STATUS.INVOICE,
     ...CONST.SEARCH.STATUS.TRIP,
+    // Legacy trip statuses stay valid so saved searches that still use them are not highlighted as errors
+    ...CONST.SEARCH.STATUS.TRIP_LEGACY,
     ...CONST.SEARCH.STATUS.TASK,
 }).map((value) => getUserFriendlyValue(value));
 

@@ -8,6 +8,7 @@ import type {SearchQueryJSON} from '@components/Search/types';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -45,6 +46,7 @@ type DisplayPopupProps = {
 
 function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayPopupProps) {
     const {translate} = useLocalize();
+    const {isBetaEnabled} = usePermissions();
     const styles = useThemeStyles();
     const {isLargeScreenWidth, isSmallScreenWidth} = useResponsiveLayout(); // eslint-disable-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Columns']);
@@ -74,7 +76,8 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
         };
 
         const isExpenseType = queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE;
-        const isTripType = queryJSON.type === CONST.SEARCH.DATA_TYPES.TRIP;
+        // Group-by is no longer offered for trips once the TRAVEL_APPROVAL beta is on
+        const shouldShowTripGroupBy = queryJSON.type === CONST.SEARCH.DATA_TYPES.TRIP && !isBetaEnabled(CONST.BETAS.TRAVEL_APPROVAL);
         const sortByValue = queryJSON.sortBy;
         const sortOrderValue = queryJSON.sortOrder;
         const groupByValue = searchAdvancedFilters[CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY];
@@ -90,7 +93,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
                     sentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_SORT_BY}
                     value={`${translate(getSearchColumnTranslationKey(sortByValue, queryJSON.type))} ${CONST.DOT_SEPARATOR} ${translate(`search.filters.sortOrder.${sortOrderValue}`)}`}
                 />
-                {(isExpenseType || isTripType) && (
+                {(isExpenseType || shouldShowTripGroupBy) && (
                     <MenuItemField
                         name={translate('search.display.groupBy')}
                         onPress={() => setSelectedDisplayFilter(CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY)}

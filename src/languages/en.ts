@@ -10523,6 +10523,8 @@ const translations = {
             reportField: (name: string, value: string) => `${name} is ${value}`,
             current: 'Current',
             past: 'Past',
+            upcoming: 'Upcoming',
+            canceled: 'Canceled',
             submitted: 'Submitted',
             approved: 'Approved',
             anyApproval: 'Any approval',

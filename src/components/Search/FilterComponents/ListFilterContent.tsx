@@ -3,6 +3,7 @@ import Text from '@components/Text';
 
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {isFilterNegatable} from '@libs/SearchQueryUtils';
@@ -137,6 +138,7 @@ function HasMultiSelectListFilterContent({value = [], type = CONST.SEARCH.DATA_T
 
 function MultiSelectListFilterContent({baseFilterKey, value = [], type = CONST.SEARCH.DATA_TYPES.EXPENSE, selectionListStyle, footer, onChange}: MultiSelectListFilterContentProps) {
     const {translate} = useLocalize();
+    const {isBetaEnabled} = usePermissions();
 
     if (baseFilterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS) {
         return (
@@ -150,7 +152,7 @@ function MultiSelectListFilterContent({baseFilterKey, value = [], type = CONST.S
         );
     }
 
-    const items = getMultiSelectFilterOptions(baseFilterKey, type, translate);
+    const items = getMultiSelectFilterOptions(baseFilterKey, type, translate, isBetaEnabled(CONST.BETAS.TRAVEL_APPROVAL));
     const multiSelectValues = items.filter((item) => (value as string[]).includes(item.value));
 
     return (

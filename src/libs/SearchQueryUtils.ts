@@ -167,6 +167,11 @@ const VALID_IS_TYPES = new Set(Object.values(CONST.SEARCH.IS_VALUES));
 const VALID_WITHDRAWAL_TYPES = new Set(Object.values(CONST.SEARCH.WITHDRAWAL_TYPE));
 const VALID_WITHDRAWAL_STATUSES = new Set<string>(Object.values(CONST.SEARCH.SETTLEMENT_STATUS));
 const VALID_PAID_STATUSES = new Set<string>(Object.values(CONST.SEARCH.PAID_STATUS));
+// Legacy trip statuses map onto the TRAVEL_APPROVAL ones so saved searches keep working
+const LEGACY_TRIP_STATUS_MAP: Record<string, string> = {
+    [CONST.SEARCH.STATUS.TRIP_LEGACY.CURRENT]: CONST.SEARCH.STATUS.TRIP.UPCOMING,
+    [CONST.SEARCH.STATUS.TRIP_LEGACY.PAST]: CONST.SEARCH.STATUS.TRIP.DONE,
+};
 const VALID_FOOTER_COUNTS = new Set<string>(Object.values(CONST.SEARCH.FOOTER_COUNT));
 const VALID_FOOTER_TOTALS = new Set<string>(Object.values(CONST.SEARCH.FOOTER_TOTAL));
 const FOOTER_FILTER_KEYS = new Set<SearchFilterKey>([
@@ -1820,6 +1825,7 @@ function buildFilterFormValuesFromQuery(
     exportedToFilterOptions?: string[],
     currentUserAccountID?: number,
     bankAccountList?: OnyxTypes.BankAccountList,
+    isTravelApprovalEnabled?: boolean,
 ) {
     const filters = queryJSON.flatFilters;
     const filtersForm = {} as Partial<SearchAdvancedFiltersForm>;
@@ -1838,7 +1844,9 @@ function buildFilterFormValuesFromQuery(
         const isNegated = filterList.some((item) => item.operator === CONST.SEARCH.SYNTAX_OPERATORS.NOT_EQUAL_TO);
 
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID || filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS) {
-            filtersForm[addNegation(filterKey, isNegated)] = filterValues;
+            // Saved searches may still carry the legacy trip statuses; with the TRAVEL_APPROVAL beta on they mean upcoming and done
+            const shouldMapLegacyTripStatuses = filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS && queryJSON.type === CONST.SEARCH.DATA_TYPES.TRIP && isTravelApprovalEnabled;
+            filtersForm[addNegation(filterKey, isNegated)] = shouldMapLegacyTripStatuses ? filterValues.map((value) => LEGACY_TRIP_STATUS_MAP[value] ?? value) : filterValues;
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID || filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID) {
             filtersForm[addNegation(filterKey, isNegated)] = filterValues.join(',');

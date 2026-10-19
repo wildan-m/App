@@ -10302,6 +10302,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             reportField: (name: string, value: string) => `${name} est ${value}`,
             current: 'Actuel',
             past: 'Passé',
+            upcoming: 'À venir',
+            canceled: 'Annulé',
             submitted: 'Soumis',
             approved: 'Approuvé',
             anyApproval: 'Toute approbation',

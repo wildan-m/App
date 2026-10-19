@@ -1213,6 +1213,7 @@ const CONST = {
         COMPANY_AGENTS: 'companyAgents',
         RESIZABLE_TABLE_COLUMNS: 'resizableTableColumns',
         DESCRIBE_RULE: 'describeRule',
+        TRAVEL_APPROVAL: 'travelApproval',
     },
     BUTTON_STATES: {
         DEFAULT: 'default',
@@ -8192,6 +8193,12 @@ const CONST = {
                 PAID: 'paid',
             },
             TRIP: {
+                UPCOMING: 'upcoming',
+                DONE: 'done',
+                CANCELED: 'canceled',
+            },
+            // Pre-TRAVEL_APPROVAL trip statuses. Saved searches and older app versions still send these; they mean UPCOMING and DONE.
+            TRIP_LEGACY: {
                 CURRENT: 'current',
                 PAST: 'past',
             },
