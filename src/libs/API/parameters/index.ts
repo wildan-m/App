@@ -623,6 +623,8 @@ export type {default as QueueExpensifyCardForBillingParams} from './QueueExpensi
 export type {default as GetCorpayOnboardingFieldsParams} from './GetCorpayOnboardingFieldsParams';
 export type {SaveCorpayOnboardingCompanyDetailsParams} from './SaveCorpayOnboardingCompanyDetailsParams';
 export type {default as AcceptSpotnanaTermsParams} from './AcceptSpotnanaTermsParams';
+export type {default as ApproveTravelBookingsParams} from './ApproveTravelBookingsParams';
+export type {default as RejectTravelBookingParams} from './RejectTravelBookingParams';
 export type {default as SaveCorpayOnboardingBeneficialOwnerParams} from './SaveCorpayOnboardingBeneficialOwnerParams';
 export type {default as DeleteAppReportParams} from './DeleteAppReportParams';
 export type {default as MergeReportsParams} from './MergeReportsParams';

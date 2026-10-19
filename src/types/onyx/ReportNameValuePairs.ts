@@ -8,6 +8,26 @@ import type * as OnyxCommon from './OnyxCommon';
 import type {TripData} from './TripData';
 
 /**
+ * Approval state of a single travel booking (PNR) in a trip room
+ */
+type TripBookingApprovalState = {
+    /** Current approval state of the booking */
+    approvalState?: ValueOf<typeof CONST.TRAVEL.BOOKING_APPROVAL_STATE>;
+
+    /** Account IDs of the users who can approve the booking */
+    approverAccountIDs?: number[];
+
+    /** Deadline for the approval decision, in ISO 8601 format */
+    deadline?: string;
+
+    /** Pending action while an approval decision is in flight */
+    pendingAction?: OnyxCommon.PendingAction;
+
+    /** Errors from a failed approval decision */
+    errors?: OnyxCommon.Errors;
+};
+
+/**
  * Model for scheduled called on the report
  */
 type CalendlyCall = {
@@ -108,6 +128,9 @@ type ReportNameValuePairs = OnyxCommon.OnyxValueWithOfflineFeedback<{
         tripID: string;
 
         payload?: TripData;
+
+        /** Approval state of the trip's bookings, keyed by PNR ID */
+        bookingApprovalState?: Record<string, TripBookingApprovalState>;
     };
 
     /** Title field configuration copied from policy - presence indicates auto-generated names are allowed */
@@ -163,4 +186,4 @@ type ReportNameValuePairsCollectionDataSet = CollectionDataSet<typeof ONYXKEYS.C
 
 export default ReportNameValuePairs;
 
-export type {ReportNameValuePairsCollectionDataSet, CalendlyCall};
+export type {ReportNameValuePairsCollectionDataSet, CalendlyCall, TripBookingApprovalState};

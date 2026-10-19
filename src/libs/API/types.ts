@@ -753,6 +753,8 @@ const WRITE_COMMANDS = {
     ENABLE_GLOBAL_REIMBURSEMENTS_FOR_USD_BANK_ACCOUNT: 'EnableGlobalReimbursementsForUSDBankAccount',
     REOPEN_REPORT: 'ReopenReport',
     TRAVEL_SIGNUP_REQUEST: 'RequestTravelAccess',
+    APPROVE_TRAVEL_BOOKINGS: 'ApproveTravelBookings',
+    REJECT_TRAVEL_BOOKING: 'RejectTravelBooking',
     SET_VACATION_DELEGATE: 'SetVacationDelegate',
     DELETE_VACATION_DELEGATE: 'DeleteVacationDelegate',
     IMPORT_PLAID_ACCOUNTS: 'ImportPlaidAccounts',
@@ -1580,6 +1582,8 @@ type WriteCommandParameters = {
     // Change transaction report
     [WRITE_COMMANDS.CHANGE_TRANSACTIONS_REPORT]: Parameters.ChangeTransactionsReportParams;
     [WRITE_COMMANDS.TRAVEL_SIGNUP_REQUEST]: null;
+    [WRITE_COMMANDS.APPROVE_TRAVEL_BOOKINGS]: Parameters.ApproveTravelBookingsParams;
+    [WRITE_COMMANDS.REJECT_TRAVEL_BOOKING]: Parameters.RejectTravelBookingParams;
     [WRITE_COMMANDS.ASSIGN_REPORT_TO_ME]: Parameters.AssignReportToMeParams;
     [WRITE_COMMANDS.ADD_REPORT_APPROVER]: Parameters.AddReportApproverParams;
     [WRITE_COMMANDS.REQUEST_UNLOCK_ACCOUNT]: Parameters.LockAccountParams;

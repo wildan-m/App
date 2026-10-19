@@ -434,4 +434,77 @@ function getGroupPendingDeleteOnyxUpdate(hash: number | undefined, groupKeys: Se
     };
 }
 
-export {getGroupPendingDeleteOnyxUpdate, getSearchOnyxUpdate, shouldOptimisticallyUpdateSearch};
+type TravelDecisionSearchOnyxUpdateParams = {
+    /** Report ID of the trip room the decision was made in */
+    tripRoomReportID: string;
+
+    /** Name-value-pairs merge applied optimistically (the new booking approval state) */
+    optimisticReportNameValuePairs: NullishDeep<OnyxTypes.ReportNameValuePairs>;
+
+    /** Name-value-pairs merge applied when the request fails (the previous booking approval state) */
+    failureReportNameValuePairs: NullishDeep<OnyxTypes.ReportNameValuePairs>;
+
+    /** Report merge applied optimistically (e.g. clearing hasOutstandingChildRequest) */
+    optimisticReport?: NullishDeep<OnyxTypes.Report>;
+
+    /** Report merge applied when the request fails */
+    failureReport?: NullishDeep<OnyxTypes.Report>;
+};
+
+/**
+ * Fans a travel booking decision out into every loaded Spend snapshot whose recorded query is a trip
+ * search, so an open trip table flips the booking's status optimistically and restores it on failure.
+ *
+ * Trip rows render from the trip room's report and name-value pairs rather than from a transaction,
+ * so unlike `getSearchOnyxUpdate` this merges those two keys. Only snapshots that already exist are
+ * patched: a decision changes rows that are already loaded, it never adds one.
+ */
+function getTravelDecisionSearchOnyxUpdate({
+    tripRoomReportID,
+    optimisticReportNameValuePairs,
+    failureReportNameValuePairs,
+    optimisticReport,
+    failureReport,
+}: TravelDecisionSearchOnyxUpdateParams): {
+    optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>>;
+    failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>>;
+} {
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>> = [];
+    const writtenHashes = new Set<number>();
+
+    const buildSnapshotData = (reportNameValuePairs: NullishDeep<OnyxTypes.ReportNameValuePairs>, report?: NullishDeep<OnyxTypes.Report>): NullishDeep<SearchResultDataType> => {
+        const snapshotData: NullishDeep<SearchResultDataType> = {};
+        snapshotData[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${tripRoomReportID}`] = reportNameValuePairs;
+        if (report) {
+            snapshotData[`${ONYXKEYS.COLLECTION.REPORT}${tripRoomReportID}`] = report;
+        }
+        return snapshotData;
+    };
+
+    for (const snapshot of Object.values(getAllSnapshots() ?? {})) {
+        const inputQuery = snapshot?.search?.inputQuery;
+        if (!inputQuery) {
+            continue;
+        }
+        const queryJSON = buildSearchQueryJSON(inputQuery);
+        if (!queryJSON || queryJSON.type !== CONST.SEARCH.DATA_TYPES.TRIP || writtenHashes.has(queryJSON.hash)) {
+            continue;
+        }
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${queryJSON.hash}` as const,
+            value: {data: buildSnapshotData(optimisticReportNameValuePairs, optimisticReport)},
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${queryJSON.hash}` as const,
+            value: {data: buildSnapshotData(failureReportNameValuePairs, failureReport)},
+        });
+        writtenHashes.add(queryJSON.hash);
+    }
+
+    return {optimisticData, failureData};
+}
+
+export {getGroupPendingDeleteOnyxUpdate, getSearchOnyxUpdate, getTravelDecisionSearchOnyxUpdate, shouldOptimisticallyUpdateSearch};

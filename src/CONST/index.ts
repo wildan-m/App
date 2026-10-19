@@ -9398,6 +9398,13 @@ const CONST = {
 
     TRAVEL: {
         DEFAULT_DOMAIN: 'domain',
+        BOOKING_APPROVAL_STATE: {
+            OUTSTANDING: 'outstanding',
+            APPROVED: 'approved',
+            REJECTED: 'rejected',
+            CANCELED: 'canceled',
+            NOT_REQUIRED: 'notRequired',
+        },
         STEPS: {
             GET_STARTED_TRAVEL: 'GetStartedTravel',
             BOOK_OR_MANAGE_YOUR_TRIP: 'BookOrManageYourTrip',
