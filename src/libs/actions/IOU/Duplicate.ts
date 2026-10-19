@@ -526,11 +526,6 @@ function resolveDuplicates({
     const failureHoldTransactionActions: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION>> = [];
 
     for (const transaction of transactionList) {
-        const iouAction = getIOUActionForTransactions([transaction.transactionID], allReportActionsList?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction.reportID}`]).at(0);
-        if (!iouAction) {
-            continue;
-        }
-
         const createdReportAction = buildOptimisticHoldReportAction(delegateAccountID);
         reportActionIDList.push(createdReportAction.reportActionID);
         resolvedTransactionIDList.push(transaction.transactionID);
@@ -553,7 +548,10 @@ function resolveDuplicates({
             },
         });
 
-        const transactionThreadReportID = transactionThreadReportIDMap[transaction.transactionID] ?? iouAction.childReportID;
+        // The IOU action is only needed to find the thread for the optimistic hold action. Its report actions are often not loaded
+        // (e.g. an admin who never opened the submitter's report), so it must not drop the duplicate from the request.
+        const iouAction = getIOUActionForTransactions([transaction.transactionID], allReportActionsList?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction.reportID}`]).at(0);
+        const transactionThreadReportID = transactionThreadReportIDMap[transaction.transactionID] ?? iouAction?.childReportID;
         if (!transactionThreadReportID) {
             continue;
         }

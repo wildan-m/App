@@ -1458,8 +1458,76 @@ describe('actions/Duplicate', () => {
                 ]),
             );
 
-            // Then: Verify the duplicate with no IOU action is skipped from the server payload
-            expect(writeSpy).toHaveBeenCalledWith(WRITE_COMMANDS.RESOLVE_DUPLICATES, expect.objectContaining({transactionIDList: [], reportActionIDList: []}), expect.objectContaining({}));
+            // Then: Verify the duplicate with no loaded IOU action is still sent to the server, so the violation cleared
+            // optimistically above is also resolved on the backend instead of coming back on the next update
+            expect(writeSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.RESOLVE_DUPLICATES,
+                expect.objectContaining({transactionIDList: [duplicate1ID], reportActionIDList: [expect.any(String)]}),
+                expect.objectContaining({}),
+            );
+
+            // Then: Verify the duplicate is still optimistically put on hold
+            const updatedDuplicate = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${duplicate1ID}`);
+            expect(updatedDuplicate?.comment?.hold).toBeDefined();
+        });
+
+        it('should send duplicates whose report actions were never loaded, as for an admin resolving another member report', async () => {
+            // Given: A kept transaction whose report actions are loaded and a duplicate on another member's report the admin never
+            // opened, so neither its report actions nor its transaction thread are in Onyx
+            const reportID = 'report123';
+            const otherReportID = 'otherReport456';
+            const mainTransactionID = 'main123';
+            const duplicate1ID = 'dup456';
+            const mainChildReportID = 'mainChild123';
+
+            const mainTransaction = createMockTransaction(mainTransactionID, reportID, 150);
+            const duplicateTransaction = createMockTransaction(duplicate1ID, otherReportID, 150);
+            const mainViolations = createMockViolations();
+            const duplicateViolations = createMockViolations();
+            const mainIouAction = createMockIouAction(mainTransactionID, 'mainAction123', mainChildReportID);
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${mainTransactionID}`, mainTransaction);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${duplicate1ID}`, duplicateTransaction);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${mainTransactionID}`, mainViolations);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${duplicate1ID}`, duplicateViolations);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {mainAction123: mainIouAction});
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${mainChildReportID}`, {});
+            await waitForBatchedUpdates();
+
+            // When: The admin confirms the review
+            resolveDuplicates({
+                transaction: mainTransaction,
+                transactionList: [duplicateTransaction],
+                created: '2024-01-01 12:00:00',
+                merchant: 'Updated Merchant',
+                amount: 150,
+                currency: CONST.CURRENCY.EUR,
+                category: 'Travel',
+                comment: 'Updated comment',
+                billable: true,
+                reimbursable: false,
+                tag: 'UpdatedProject',
+                receiptID: 123,
+                reportID,
+                transactionThreadReportIDMap: {},
+                delegateAccountID: undefined,
+                allTransactionViolations: {
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${mainTransactionID}`]: mainViolations,
+                    [`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${duplicate1ID}`]: duplicateViolations,
+                },
+                allReportActionsList: {[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`]: {mainAction123: mainIouAction}},
+            });
+            await waitForBatchedUpdates();
+
+            // Then: The request carries every duplicate whose violation was cleared optimistically, with one hold action ID each,
+            // so the backend resolves the same set and the duplicate violation does not come back to block Submit
+            const [command, parameters] = getRequiredWriteCall(writeSpy.mock.calls, 0);
+            expect(command).toBe(WRITE_COMMANDS.RESOLVE_DUPLICATES);
+            expect(parameters).toMatchObject({transactionID: mainTransactionID, transactionIDList: [duplicate1ID]});
+            expect(parameters).toHaveProperty('reportActionIDList', [expect.any(String)]);
+
+            const updatedDuplicateViolations = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${duplicate1ID}`);
+            expect(updatedDuplicateViolations).not.toEqual(expect.arrayContaining([expect.objectContaining({name: CONST.VIOLATIONS.DUPLICATED_TRANSACTION})]));
         });
 
         it('should still resolve duplicates when the held duplicate transaction thread is missing', async () => {
