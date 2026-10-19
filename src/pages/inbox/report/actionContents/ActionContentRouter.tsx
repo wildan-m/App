@@ -1,3 +1,4 @@
+import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import RenderHTML from '@components/RenderHTML';
 import CreatedReportForUnapprovedTransactionsAction from '@components/ReportActionItem/CreatedReportForUnapprovedTransactionsAction';
 import CreateHarvestReportAction from '@components/ReportActionItem/CreateHarvestReportAction';
@@ -15,6 +16,7 @@ import UnreportedTransactionAction from '@components/ReportActionItem/Unreported
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useReportScrollManager from '@hooks/useReportScrollManager';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -32,6 +34,7 @@ import {
     getRenamedAction,
     getReportActionHtml,
     getSettlementAccountLockedMessage,
+    getTravelBookingDecisionMessage,
     getTravelNudgeMessage,
     getTravelUpdateMessage,
     isActionableCardFraudAlert,
@@ -169,6 +172,7 @@ function ActionContentRouter({
     const {translate, formatTravelDate} = useLocalize();
     const styles = useThemeStyles();
     const {email: currentUserEmail} = useCurrentUserPersonalDetails();
+    const reportScrollManager = useReportScrollManager();
 
     const [originalReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`, {selector: getStableReportSelector});
     const [policyRole] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(report?.policyID)}`, {selector: policyRoleSelector});
@@ -400,6 +404,23 @@ function ActionContentRouter({
             <ReportActionItemBasicMessage message="">
                 <RenderHTML html={`<comment><muted-text>${getTravelUpdateMessage(translate, action, formatTravelDate)}</muted-text></comment>`} />
             </ReportActionItemBasicMessage>
+        );
+    }
+    if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.TRAVEL_BOOKING_DECISION)) {
+        const bookingDecisionMessage = getTravelBookingDecisionMessage(translate, action);
+        return (
+            // Tapping the decision message brings the booking cards back into view. In the inverted report list
+            // the end is the top of the trip room, where TripSummary renders the reservation cards.
+            <PressableWithoutFeedback
+                accessibilityLabel={bookingDecisionMessage}
+                role={CONST.ROLE.BUTTON}
+                onPress={() => reportScrollManager.scrollToEnd()}
+            >
+                <ReportActionItemBasicMessage message="">
+                    {/* The helper returns plain text, so encode it before it becomes HTML — booking names can contain markup-significant characters. */}
+                    <RenderHTML html={`<comment><muted-text>${Str.htmlEncode(bookingDecisionMessage)}</muted-text></comment>`} />
+                </ReportActionItemBasicMessage>
+            </PressableWithoutFeedback>
         );
     }
     if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.CONCIERGE_AUTO_SELECT_DISTANCE_RATE)) {

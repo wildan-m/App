@@ -1915,6 +1915,7 @@ const CONST = {
                 TASK_COMPLETED: 'TASKCOMPLETED',
                 TASK_EDITED: 'TASKEDITED',
                 TASK_REOPENED: 'TASKREOPENED',
+                TRAVEL_BOOKING_DECISION: 'TRAVELBOOKINGDECISION',
                 TRAVEL_NUDGE: 'TRAVELNUDGE',
                 TRAVEL_UPDATE: 'TRAVEL_TRIP_ROOM_UPDATE',
                 TRIP_PREVIEW: 'TRIPPREVIEW',
@@ -9438,6 +9439,10 @@ const CONST = {
             BOOKING_OTHER_UPDATE: 'BOOKING_OTHER_UPDATE',
             REFUND: 'REFUND',
             EXCHANGE: 'EXCHANGE',
+        },
+        BOOKING_DECISION: {
+            APPROVED: 'approved',
+            REJECTED: 'rejected',
         },
         /**
          * The Travel Billing feed type constant.

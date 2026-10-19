@@ -4678,6 +4678,10 @@ ${amount} para ${merchant} - ${date}`,
             confirmText: 'Entendido',
             conciergeMessage: ({domain}) => `Hubo un error habilitando viajes para el dominio: ${domain}. Por favor, revisa y habilita los viajes para este dominio.`,
         },
+        bookingDecision: {
+            approved: (bookingName) => `aprobó ${bookingName}`,
+            rejected: (bookingName) => `rechazó ${bookingName}`,
+        },
         updates: {
             bookingTicketed: (airlineCode, origin, destination, startDate, confirmationID = '') =>
                 `Tu vuelo ${airlineCode} (${origin} → ${destination}) para el ${startDate} ha sido reservado. Código de confirmación: ${confirmationID}`,

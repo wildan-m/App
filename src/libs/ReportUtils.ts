@@ -521,6 +521,11 @@ type OptimisticApprovedReportAction = Pick<
     | 'delegateAccountID'
 >;
 
+type OptimisticTravelBookingDecisionReportAction = Pick<
+    ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.TRAVEL_BOOKING_DECISION>,
+    'actionName' | 'actorAccountID' | 'automatic' | 'avatar' | 'isAttachmentOnly' | 'originalMessage' | 'message' | 'person' | 'reportActionID' | 'shouldShow' | 'created' | 'pendingAction'
+>;
+
 type OptimisticUnapprovedReportAction = Pick<
     ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.UNAPPROVED>,
     | 'actionName'
@@ -8679,6 +8684,55 @@ function buildOptimisticApprovedReportAction(
 }
 
 /**
+ * Builds an optimistic TRAVEL_BOOKING_DECISION report action with a randomly generated reportActionID.
+ * It is shown in the trip room when an approver approves or rejects a travel booking.
+ */
+function buildOptimisticTravelBookingDecisionReportAction(
+    decision: ValueOf<typeof CONST.TRAVEL.BOOKING_DECISION>,
+    reservationType: ValueOf<typeof CONST.RESERVATION_TYPE>,
+    bookingName: string,
+    transactionID: string,
+    sequenceIndex: number,
+    currentUserAccountID: number,
+): OptimisticTravelBookingDecisionReportAction {
+    const decisionText =
+        decision === CONST.TRAVEL.BOOKING_DECISION.REJECTED ? translateLocal('travel.bookingDecision.rejected', bookingName) : translateLocal('travel.bookingDecision.approved', bookingName);
+
+    return {
+        actionName: CONST.REPORT.ACTIONS.TYPE.TRAVEL_BOOKING_DECISION,
+        actorAccountID: currentUserAccountID,
+        automatic: false,
+        avatar: getCurrentUserAvatar(),
+        isAttachmentOnly: false,
+        originalMessage: {
+            decision,
+            reservationType,
+            bookingName,
+            transactionID,
+            sequenceIndex,
+        },
+        message: [
+            {
+                type: CONST.REPORT.MESSAGE.TYPE.COMMENT,
+                html: decisionText,
+                text: decisionText,
+            },
+        ],
+        person: [
+            {
+                style: 'strong',
+                text: getCurrentUserDisplayNameOrEmail(),
+                type: 'TEXT',
+            },
+        ],
+        reportActionID: rand64(),
+        shouldShow: true,
+        created: DateUtils.getDBTime(),
+        pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+    };
+}
+
+/**
  * Builds an optimistic APPROVED report action with a randomly generated reportActionID.
  */
 function buildOptimisticUnapprovedReportAction(
@@ -15256,6 +15310,7 @@ export {
     buildConciergeGreetingReportAction,
     buildOptimisticAddCommentReportAction,
     buildOptimisticApprovedReportAction,
+    buildOptimisticTravelBookingDecisionReportAction,
     buildOptimisticCreatedReportForUnapprovedAction,
     buildOptimisticUnapprovedReportAction,
     buildOptimisticCancelPaymentReportAction,

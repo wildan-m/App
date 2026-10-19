@@ -2606,6 +2606,14 @@ function getTravelUpdateMessage(
     }
 }
 
+function getTravelBookingDecisionMessage(translate: LocalizedTranslate, action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.TRAVEL_BOOKING_DECISION>): string {
+    const details = getOriginalMessage(action);
+    if (details?.decision === CONST.TRAVEL.BOOKING_DECISION.REJECTED) {
+        return translate('travel.bookingDecision.rejected', details.bookingName);
+    }
+    return translate('travel.bookingDecision.approved', details?.bookingName ?? '');
+}
+
 function getDynamicExternalWorkflowSubmitFailedActionMessage(translate: LocalizedTranslate, action: ReportAction): string {
     if (!isDynamicExternalWorkflowSubmitFailedAction(action)) {
         return '';
@@ -5726,6 +5734,7 @@ export {
     getWorkspaceCustomUnitUpdatedMessage,
     getRoomChangeLogMessage,
     getActionableCard3DSTransactionApprovalMessage,
+    getTravelBookingDecisionMessage,
     getTravelNudgeMessage,
     shouldShowActivateCard,
     isRejectedAction,

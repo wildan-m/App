@@ -1097,6 +1097,24 @@ type UpdateOperationType = {
     operation: ValueOf<typeof CONST.TRAVEL.UPDATE_OPERATION_TYPE>;
 };
 
+/** Model of a `travel booking decision` report action */
+type OriginalMessageTravelBookingDecision = {
+    /** Whether the booking was approved or rejected */
+    decision: ValueOf<typeof CONST.TRAVEL.BOOKING_DECISION>;
+
+    /** Type of the decided reservation */
+    reservationType: ValueOf<typeof CONST.RESERVATION_TYPE>;
+
+    /** Short human-readable descriptor of the booking, for example the flight route or the hotel name */
+    bookingName: string;
+
+    /** ID of the trip transaction that holds the decided reservation */
+    transactionID: string;
+
+    /** Index of the decided reservation within the transaction's reservation list */
+    sequenceIndex: number;
+};
+
 /** Model of the `deleted transaction` report action */
 type OriginalMessageDeletedTransaction = {
     /** The merchant of the transaction */
@@ -1762,6 +1780,7 @@ type OriginalMessageMap = {
     [CONST.REPORT.ACTIONS.TYPE.TASK_EDITED]: never;
     [CONST.REPORT.ACTIONS.TYPE.TASK_REOPENED]: never;
     [CONST.REPORT.ACTIONS.TYPE.TAKE_CONTROL]: OriginalMessageTakeControl;
+    [CONST.REPORT.ACTIONS.TYPE.TRAVEL_BOOKING_DECISION]: OriginalMessageTravelBookingDecision;
     [CONST.REPORT.ACTIONS.TYPE.TRAVEL_NUDGE]: OriginalMessageTravelNudge;
     [CONST.REPORT.ACTIONS.TYPE.TRAVEL_UPDATE]: OriginalMessageTravelUpdate;
     [CONST.REPORT.ACTIONS.TYPE.UNAPPROVED]: OriginalMessageUnapproved;

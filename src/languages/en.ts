@@ -4943,6 +4943,10 @@ const translations = {
             confirmText: 'Got it',
             conciergeMessage: ({domain}: {domain: string}) => `Travel enablement failed for domain: ${domain}. Please review and enable travel for this domain.`,
         },
+        bookingDecision: {
+            approved: (bookingName: string) => `approved ${bookingName}`,
+            rejected: (bookingName: string) => `rejected ${bookingName}`,
+        },
         updates: {
             bookingTicketed: (airlineCode: string, origin: string, destination: string, startDate: string, confirmationID = '') =>
                 `Your flight ${airlineCode} (${origin} → ${destination}) on ${startDate} has been booked. Confirmation code: ${confirmationID}`,
