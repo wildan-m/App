@@ -11905,6 +11905,7 @@ ${reportName}`,
             hasMissingInvoiceBankAccount: 'Falta la cuenta bancaria de la factura',
             hasUnresolvedCardFraudAlert: 'Tiene una alerta de fraude de tarjeta sin resolver',
             hasDEWApproveFailed: 'La aprobación DEW ha fallado',
+            hasBookingAwaitingApproval: 'Tiene una reserva pendiente de aprobación',
         },
         reasonRBR: {
             hasErrors: 'Tiene errores en los datos o las acciones del informe',

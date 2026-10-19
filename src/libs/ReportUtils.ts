@@ -1731,6 +1731,20 @@ function isTripRoom(report: OnyxEntry<Report>): boolean {
     return isChatReport(report) && getChatType(report) === CONST.REPORT.CHAT_TYPE.TRIP_ROOM;
 }
 
+/**
+ * Whether the trip in the given trip room's name-value pairs has at least one booking still waiting on the given
+ * user's approval decision: the booking is outstanding, its decision deadline hasn't passed, and the user is one
+ * of its approvers.
+ */
+function hasBookingAwaitingApprovalFromUser(tripData: ReportNameValuePairs['tripData'], accountID: number): boolean {
+    return Object.values(tripData?.bookingApprovalState ?? {}).some(
+        (booking) =>
+            booking?.approvalState === CONST.TRAVEL.BOOKING_APPROVAL_STATE.OUTSTANDING &&
+            !!booking.approverAccountIDs?.includes(accountID) &&
+            (!booking.deadline || new Date(booking.deadline).getTime() > Date.now()),
+    );
+}
+
 function isIndividualInvoiceRoom(report: OnyxEntry<Report>): boolean {
     return isInvoiceRoom(report) && report?.invoiceReceiver?.type === CONST.REPORT.INVOICE_RECEIVER_TYPE.INDIVIDUAL;
 }
@@ -3550,6 +3564,18 @@ function getIOUReportActionWithBadge(
     let earliestAction: ReportAction | undefined;
 
     for (const action of Object.values(chatReportActions ?? {})) {
+        // A trip preview makes the chat a badge candidate too: when its trip room's booking approval state holds a
+        // booking waiting on the current user, the chat carries the Approve badge for it, competing in the same
+        // earliest-action race as the report previews below — which is why a chat with both an expense and a trip
+        // needing approval still shows a single badge.
+        if (isTripPreview(action) && !isDeletedAction(action)) {
+            const tripRoomNameValuePairs = allReportNameValuePair?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${action.childReportID}`];
+            if (hasBookingAwaitingApprovalFromUser(tripRoomNameValuePairs?.tripData, currentUserAccountID) && (!earliestAction || isOlderReportAction(action, earliestAction))) {
+                earliestAction = action;
+                actionBadge = CONST.REPORT.ACTION_BADGE.APPROVE;
+            }
+            continue;
+        }
         if (action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW || isDeletedAction(action)) {
             continue;
         }
@@ -5106,6 +5132,22 @@ function getReasonAndReportActionThatRequiresAttention({
 
     if (isReportArchived) {
         return null;
+    }
+
+    // A trip room whose booking is waiting on the current user's approval carries its own Approve badge, but only
+    // when the approver can't already see the badge on the parent workspace chat (they aren't a participant there).
+    // When they are, the chat carries it instead, through its trip preview in getIOUReportActionWithBadge.
+    if (isTripRoom(optionOrReport)) {
+        const tripRoomNameValuePairs = allReportNameValuePair?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${optionOrReport.reportID}`];
+        if (hasBookingAwaitingApprovalFromUser(tripRoomNameValuePairs?.tripData, currentUserAccountID)) {
+            const parentChat = reports ? reports[`${ONYXKEYS.COLLECTION.REPORT}${optionOrReport.parentReportID}`] : getReportOrDraftReport(optionOrReport.parentReportID);
+            if (!parentChat?.participants?.[currentUserAccountID]) {
+                return {
+                    reason: CONST.REQUIRES_ATTENTION_REASONS.HAS_BOOKING_AWAITING_APPROVAL,
+                    actionBadge: CONST.REPORT.ACTION_BADGE.APPROVE,
+                };
+            }
+        }
     }
 
     // CARD_LIST only holds the current user's cards, so a card match also limits the green dot to the cardholder.

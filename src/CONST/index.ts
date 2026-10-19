@@ -9243,6 +9243,7 @@ const CONST = {
         HAS_MISSING_INVOICE_BANK_ACCOUNT: 'hasMissingInvoiceBankAccount',
         HAS_UNRESOLVED_CARD_FRAUD_ALERT: 'hasUnresolvedCardFraudAlert',
         HAS_DEW_APPROVE_FAILED: 'hasDEWApproveFailed',
+        HAS_BOOKING_AWAITING_APPROVAL: 'hasBookingAwaitingApproval',
     },
 
     CARD_FRAUD_ALERT_RESOLUTION: {
@@ -9398,6 +9399,13 @@ const CONST = {
 
     TRAVEL: {
         DEFAULT_DOMAIN: 'domain',
+        BOOKING_APPROVAL_STATE: {
+            OUTSTANDING: 'outstanding',
+            APPROVED: 'approved',
+            REJECTED: 'rejected',
+            CANCELED: 'canceled',
+            NOT_REQUIRED: 'notRequired',
+        },
         STEPS: {
             GET_STARTED_TRAVEL: 'GetStartedTravel',
             BOOK_OR_MANAGE_YOUR_TRIP: 'BookOrManageYourTrip',
