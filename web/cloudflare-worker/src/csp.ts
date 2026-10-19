@@ -2,6 +2,7 @@
 const NONCE_PLACEHOLDER = 'nonce-random-value';
 
 type CSPOptions = {
+    connectSrcHosts?: string[];
     fontSrcHosts?: string[];
     frameSrcHosts?: string[];
     scriptSrcHashes?: string[];
@@ -17,7 +18,7 @@ const INLINE_SCRIPT_HASHES = [
     'sha256-ZC4Ihfl+1sv3E25DQh090ITQKwffxiocyA9C1vaePKU=',
 ];
 
-function buildCSP({fontSrcHosts = [], frameSrcHosts = [], scriptSrcHashes = []}: CSPOptions): string {
+function buildCSP({connectSrcHosts = [], fontSrcHosts = [], frameSrcHosts = [], scriptSrcHashes = []}: CSPOptions): string {
     const csp: Record<string, string[]> = {
         'default-src': ["'self'", 'https://assets.onfido.com'],
         'script-src': [
@@ -53,6 +54,7 @@ function buildCSP({fontSrcHosts = [], frameSrcHosts = [], scriptSrcHashes = []}:
         ],
         'connect-src': [
             "'self'",
+            ...connectSrcHosts,
             'blob: *.onfido.com',
             'data:',
             'https://*.analytics.google.com',
@@ -161,6 +163,20 @@ const STAGING_CSP = buildCSP({
     scriptSrcHashes: INLINE_SCRIPT_HASHES,
 });
 
+// Used by `npm run web` (see config/rsbuild/rsbuild.config.ts), where the Worker proxies the rsbuild dev server.
+const DEVELOPMENT_CSP = buildCSP({
+    connectSrcHosts: [
+        // The rsbuild HMR WebSocket, which connects to the Worker's origin on any port.
+        'wss://dev.new.expensify.com:*',
+        // The API proxy (web/proxy.ts). API requests normally stay same-origin and are forwarded by the dev
+        // server, but direct requests to the proxy must not be blocked either.
+        'http://localhost:9000',
+    ],
+    fontSrcHosts: ["'self'"],
+    frameSrcHosts: ['new-expensify:'],
+    scriptSrcHashes: INLINE_SCRIPT_HASHES,
+});
+
 const PRODUCTION_CSP = buildCSP({
     fontSrcHosts: ["'self'", 'https://www.expensify.com'],
     frameSrcHosts: ['new-expensify://new.expensify.com'],
@@ -168,7 +184,12 @@ const PRODUCTION_CSP = buildCSP({
 });
 
 function getCSP(environment: Env['ENVIRONMENT'], nonce: string): string {
-    const csp = environment === 'staging' ? STAGING_CSP : PRODUCTION_CSP;
+    let csp = PRODUCTION_CSP;
+    if (environment === 'staging') {
+        csp = STAGING_CSP;
+    } else if (environment === 'development') {
+        csp = DEVELOPMENT_CSP;
+    }
     return csp.replace(NONCE_PLACEHOLDER, `nonce-${nonce}`);
 }
 

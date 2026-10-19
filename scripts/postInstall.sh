@@ -31,6 +31,11 @@ rm -rf "$ROOT_DIR/web/static"
 # Apply packages using patch-package
 bun scripts/applyPatches.ts
 
+# Install the Cloudflare Worker's dependencies, so `npm run web` can serve the app through it
+# (see web/cloudflare-worker/README.md).
+echo -e "\n${GREEN}Installing Cloudflare Worker dependencies!${NC}"
+(cd "$ROOT_DIR/web/cloudflare-worker" && npm ci)
+
 # `@typescript/old` (pulled in by `@typescript/typescript6`) also ships a `tsc` bin.
 # npm's last-writer-wins linking can point `node_modules/.bin/tsc` at TypeScript 6.
 # Force the TypeScript 7 native compiler, so `npx tsc` is the compiler `npm run typecheck` runs.

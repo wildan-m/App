@@ -24,11 +24,19 @@ The CSP lives in [`src/csp.ts`](src/csp.ts). The `ENVIRONMENT` variable in [`wra
 
 ## Running it locally
 
-`wrangler dev` runs the Worker in workerd, the same runtime Cloudflare uses, and serves `dist/` exactly as a deploy would. No Cloudflare account or credentials are needed.
+### In development (`npm run web`)
+
+`npm run web` runs the Worker automatically: `web/startWebWorker.ts` starts it in workerd via `wrangler dev` (the `development` environment in [`wrangler.jsonc`](wrangler.jsonc)) on `https://dev.new.expensify.com:8082`, in front of the rsbuild dev server. Instead of serving a build from `ASSETS`, the Worker proxies the dev server, so hot reload keeps working while every local session gets the same security headers, per-request nonces and routing as staging and production. The development CSP in [`src/csp.ts`](src/csp.ts) additionally allows what only local development needs: the HMR WebSocket and the API proxy on `localhost:9000`.
+
+Set `USE_CLOUDFLARE_WORKER=false` to skip the Worker and serve the rsbuild dev server directly on port 8082, as `npm run web` did before.
+
+### Serving a real build
+
+`wrangler dev` run from this directory runs the Worker in workerd, the same runtime Cloudflare uses, and serves `dist/` exactly as a deploy would. No Cloudflare account or credentials are needed.
 
 ### 1. Install
 
-This package has its own dependencies. They are not installed by the root `npm install`.
+This package's dependencies are installed by the root `npm install` (see `scripts/postInstall.sh`). To install them by hand:
 
 ```bash
 cd web/cloudflare-worker

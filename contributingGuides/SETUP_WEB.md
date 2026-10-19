@@ -29,6 +29,7 @@ If you already generated certificates before the Webpack → Rsbuild migration, 
 ### Development Server
 - To run the **development web app**: `npm run web`
 - Changes applied to Javascript will be applied automatically via Rsbuild as configured in `config/rsbuild/rsbuild.config.ts`
+- The app is served through the NewDot Cloudflare Worker (`web/cloudflare-worker`), which runs locally in workerd via `wrangler dev` and proxies the Rsbuild dev server. Local development therefore uses the same CSP, security headers and SPA routing as staging and production. Set `USE_CLOUDFLARE_WORKER=false` to serve the Rsbuild dev server directly, without the Worker.
 
 ### Production Build
 To build and run the production web build locally:
@@ -58,6 +59,7 @@ Creating an `.env` file is not necessary. We advise external contributors agains
 - `EXPENSIFY_PARTNER_PASSWORD` - Another constant used for the app when authenticating. (This is OK to be public)
 - `PUSHER_APP_KEY` - Key used to authenticate with Pusher.com
 - `USE_WEB_PROXY`⚠️- Used in web development, it starts a server along the local development server to proxy requests to the backend. External contributors should set this to `true` otherwise they'll have CORS errors. If you don't want to start the proxy server set this explicitly to `false`
+- `USE_CLOUDFLARE_WORKER` - Used in web development. By default `npm run web` serves the app through the NewDot Cloudflare Worker (`web/cloudflare-worker`), which applies the same CSP and security headers as staging and production. Set this to `false` to serve the Rsbuild dev server directly, without the Worker.
 
 ### Optional Performance Variables
 - `CAPTURE_METRICS` (optional) - Set this to `true` to capture performance metrics and see them in Flipper. See [PERFORMANCE.md](contributingGuides/PERFORMANCE.md#performance-metrics-opt-in-on-local-release-builds) for more information

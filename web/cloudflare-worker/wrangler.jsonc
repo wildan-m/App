@@ -32,6 +32,17 @@
     // Routes are managed in Cloudflare, not here: syncing routes needs zone access, and the CI deploy token can only
     // edit the test-staging and staging Workers.
     "env": {
+        // `npm run web` (web/startWebWorker.ts). Never deployed: instead of serving a build from ASSETS, the Worker
+        // proxies the rsbuild dev server, so hot reload keeps working while the CSP and headers match production.
+        "development": {
+            "name": "new-expensify-assets-development",
+            "vars": {
+                "ENVIRONMENT": "development",
+                // Where the rsbuild dev server listens (config/rsbuild/rsbuild.config.ts). web/startWebWorker.ts
+                // overrides this with `--var` when WEB_INTERNAL_PORT is set.
+                "DEV_SERVER_ORIGIN": "http://localhost:8083",
+            },
+        },
         // Serves a staging build on test-staging.new.expensify.com, a hostname nobody else uses.
         "test-staging": {
             "name": "test-staging-new-expensify-assets",

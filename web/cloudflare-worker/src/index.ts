@@ -42,6 +42,11 @@ function buildAssetRequest(request: Request, url: URL): Request {
     return new Request(assetURL, request);
 }
 
+/** In development (`npm run web`), the Worker proxies the rsbuild dev server instead of serving a build from ASSETS. */
+function buildDevServerRequest(request: Request, url: URL, devServerOrigin: string): Request {
+    return new Request(new URL(url.pathname + url.search, devServerOrigin), request);
+}
+
 function setSecurityHeaders(headers: Headers, environment: Env['ENVIRONMENT'], nonce: string) {
     headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     headers.set('Content-Security-Policy', getCSP(environment, nonce));
@@ -86,7 +91,14 @@ export default {
         const nonce = generateNonce();
         const isNavigation = request.headers.get('Sec-Fetch-Mode') === 'navigate';
         const isAASAPath = url.pathname === AASA_PATH || url.pathname === LEGACY_AASA_PATH;
-        let assetResponse = await env.ASSETS.fetch(buildAssetRequest(request, url));
+        const devServerOrigin = env.ENVIRONMENT === 'development' ? env.DEV_SERVER_ORIGIN : undefined;
+
+        // The rsbuild HMR WebSocket. A 101 can't be rebuilt with new headers, so it passes through untouched.
+        if (devServerOrigin && request.headers.get('Upgrade') === 'websocket') {
+            return fetch(buildDevServerRequest(request, url, devServerOrigin));
+        }
+
+        let assetResponse = devServerOrigin ? await fetch(buildDevServerRequest(request, url, devServerOrigin)) : await env.ASSETS.fetch(buildAssetRequest(request, url));
 
         // The SPA fallback answers every miss with index.html. A browser asking for a missing chunk needs the file from
         // an earlier build, or a real 404.
