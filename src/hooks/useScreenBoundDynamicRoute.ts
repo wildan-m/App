@@ -1,17 +1,12 @@
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
+import isRouteInState from '@libs/Navigation/helpers/isRouteInState';
 import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
 
 import type {Route} from '@src/ROUTES';
 
-import type {NavigationState, PartialState} from '@react-navigation/native';
-
 import {NavigationRouteContext, useFocusEffect} from '@react-navigation/native';
 import {useContext, useState} from 'react';
-
-function isRouteInState(state: NavigationState | PartialState<NavigationState> | undefined, key: string): boolean {
-    return !!state?.routes.some((route) => route.key === key || isRouteInState(route.state, key));
-}
 
 /**
  * Builds dynamic routes against the screen that owns the component, seeding the base from the matched path until focus

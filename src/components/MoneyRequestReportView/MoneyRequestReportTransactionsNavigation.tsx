@@ -12,6 +12,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import {openReport, setOptimisticTransactionThread} from '@libs/actions/Report';
 import {clearActiveTransactionIDs} from '@libs/actions/TransactionThreadNavigation';
+import isRouteInState from '@libs/Navigation/helpers/isRouteInState';
 import type {RightModalNavigatorParamList} from '@libs/Navigation/types';
 import {getExpenseCreationTransactionID} from '@libs/ReportActionsUtils';
 import {findSelfDMReportID, isOneTransactionReport} from '@libs/ReportUtils';
@@ -30,9 +31,9 @@ import getEmptyArray from '@src/types/utils/getEmptyArray';
 import type {GestureResponderEvent} from 'react-native';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 
-import {findFocusedRoute, useIsFocused} from '@react-navigation/native';
+import {findFocusedRoute, NavigationRouteContext, useIsFocused} from '@react-navigation/native';
 import {guidedSetupAndTourStatusSelector} from '@selectors/Onboarding';
-import React, {startTransition, useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {startTransition, useCallback, useContext, useEffect, useMemo, useRef} from 'react';
 import {View} from 'react-native';
 
 const CAROUSEL_PRESERVING_SCREENS = [
@@ -98,6 +99,7 @@ function MoneyRequestReportTransactionsNavigation({currentTransactionID, isFromR
 
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
+    const routeKey = useContext(NavigationRouteContext)?.key;
 
     const currentTransactionIndex = transactionIDsList.findIndex((id) => id === currentTransactionID);
 
@@ -204,17 +206,23 @@ function MoneyRequestReportTransactionsNavigation({currentTransactionID, isFromR
 
     /**
      * We clear the sibling transactionThreadIDs when unmounting this component
-     * only when the mount actually goes to a different SCREEN (and not a different version of the same SCREEN)
+     * only when the mount actually goes to a different SCREEN (and not a different version of the same SCREEN).
+     * The header can also remount while its screen is still in the stack (e.g. the thread report is swapped after a
+     * sync while a modal is on top), and the focused route is then the modal, so the screen's own presence decides it.
      */
     useEffect(() => {
         return () => {
-            const focusedRoute = findFocusedRoute(navigationRef.getRootState());
+            const rootState = navigationRef.getRootState();
+            const focusedRoute = findFocusedRoute(rootState);
             if (focusedRoute?.name && (CAROUSEL_PRESERVING_SCREENS as readonly string[]).includes(focusedRoute.name)) {
+                return;
+            }
+            if (routeKey && isRouteInState(rootState, routeKey)) {
                 return;
             }
             clearActiveTransactionIDs();
         };
-    }, []);
+    }, [routeKey]);
 
     const stageSiblingPress = (transactionID: string | undefined, parentReportID: string | undefined) => {
         // Offline there is no fetch to wait for, so the caller resolves the sibling with what it already has.
