@@ -330,7 +330,7 @@ function transferWalletBalance(paymentMethod: PaymentMethod) {
         },
     ];
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.WALLET_TRANSFER>> = [
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.WALLET_TRANSFER | typeof ONYXKEYS.USER_WALLET>> = [
         {
             onyxMethod: 'merge',
             key: ONYXKEYS.WALLET_TRANSFER,
@@ -338,6 +338,14 @@ function transferWalletBalance(paymentMethod: PaymentMethod) {
                 loading: false,
                 shouldShowSuccess: true,
                 paymentMethodType: paymentMethod.accountType,
+            },
+        },
+        {
+            // The whole available balance is transferred, so the wallet is empty once the transfer succeeds
+            onyxMethod: 'merge',
+            key: ONYXKEYS.USER_WALLET,
+            value: {
+                currentBalance: 0,
             },
         },
     ];
