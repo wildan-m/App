@@ -7,6 +7,7 @@ import WorkerPool from '../../utils/WorkerPool';
 import Processor from '../Processor';
 
 const RULES_SUPPRESSED_BY_REACT_COMPILER = new Set(['react/jsx-no-constructed-context-values', 'rulesdir/no-inline-useOnyx-selector']);
+const MANUAL_MEMOIZATION_RULE = 'rulesdir/no-manual-memoization';
 const EXHAUSTIVE_DEPS_USECALLBACK_USEMEMO_PATTERN = /\buseCallback\(\) Hook\b|\buseMemo\(\) Hook\b/;
 const CACHE_DIR = 'node_modules/.cache/react-compiler';
 const REACT_COMPILER_FINGERPRINT_FILES = [
@@ -30,6 +31,10 @@ function isSuppressibleMessage(message: LintMessage): boolean {
         return true;
     }
     return message.ruleID === 'react-hooks/exhaustive-deps' && EXHAUSTIVE_DEPS_USECALLBACK_USEMEMO_PATTERN.test(message.message);
+}
+
+function isManualMemoizationMessage(message: LintMessage): boolean {
+    return message.ruleID === MANUAL_MEMOIZATION_RULE;
 }
 
 function shouldSkipCompiler(filename: string): boolean {
@@ -127,8 +132,9 @@ async function checkCandidatesWithPool(candidates: Candidate[], checkBoth: Compi
 
 /**
  * Drop suppressible React-Compiler-redundant messages, but only after both
- * compilers memoize the file. Files with no suppressible message are skipped
- * entirely (~60× fewer compiler invocations than the ESLint processor).
+ * compilers memoize the file, and keep rulesdir/no-manual-memoization messages
+ * only for files both compilers memoize. Files with no affected message are
+ * skipped entirely (~60× fewer compiler invocations than the ESLint processor).
  *
  * Cache is one file per compiler fingerprint and content hash so concurrent
  * writes of the same key are benign and need no lock.
@@ -154,8 +160,11 @@ async function filterReactCompilerMessages(
     checkBoth?: CompilerCheck,
     workerCount = navigator.hardwareConcurrency || 4,
 ): Promise<LintMessage[]> {
+    // Manual memoization is never an error in files the compiler check skips (tests, node_modules).
+    const relevantMessages = messages.filter((message) => !(isManualMemoizationMessage(message) && shouldSkipCompiler(message.filePath)));
+
     const byFile = new Map<string, LintMessage[]>();
-    for (const message of messages) {
+    for (const message of relevantMessages) {
         const list = byFile.get(message.filePath) ?? [];
         list.push(message);
         byFile.set(message.filePath, list);
@@ -166,13 +175,13 @@ async function filterReactCompilerMessages(
         if (shouldSkipCompiler(filename)) {
             continue;
         }
-        if (fileMessages.some(isSuppressibleMessage)) {
+        if (fileMessages.some((message) => isSuppressibleMessage(message) || isManualMemoizationMessage(message))) {
             candidateNames.push(filename);
         }
     }
 
     if (candidateNames.length === 0) {
-        return messages;
+        return relevantMessages;
     }
 
     const uncached: Candidate[] = [];
@@ -219,7 +228,12 @@ async function filterReactCompilerMessages(
         }),
     );
 
-    return messages.filter((message) => {
+    return relevantMessages.filter((message) => {
+        // Inverse of the suppression below: manual memoization is only an error in files both
+        // compilers memoize; everywhere else (including the conservative fallback) it stays allowed.
+        if (isManualMemoizationMessage(message)) {
+            return memoized.get(message.filePath) === true;
+        }
         if (!memoized.get(message.filePath)) {
             return true;
         }
@@ -228,5 +242,13 @@ async function filterReactCompilerMessages(
 }
 
 export default ReactCompilerFilter;
-export {EXHAUSTIVE_DEPS_USECALLBACK_USEMEMO_PATTERN, filterReactCompilerMessages, isSuppressibleMessage, RULES_SUPPRESSED_BY_REACT_COMPILER, shouldPersistCompilerCache};
+export {
+    EXHAUSTIVE_DEPS_USECALLBACK_USEMEMO_PATTERN,
+    filterReactCompilerMessages,
+    isManualMemoizationMessage,
+    isSuppressibleMessage,
+    MANUAL_MEMOIZATION_RULE,
+    RULES_SUPPRESSED_BY_REACT_COMPILER,
+    shouldPersistCompilerCache,
+};
 export type {CompilerCheck};

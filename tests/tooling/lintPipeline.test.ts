@@ -167,6 +167,37 @@ describe('filterReactCompilerMessages', () => {
         expect(result).toEqual(messages);
     });
 
+    it('keeps manual memoization messages when both compilers memoize the file', async () => {
+        const messages = [makeMessage({ruleID: 'rulesdir/no-manual-memoization'}), makeMessage({ruleID: 'no-console'})];
+        const result = await filterReactCompilerMessages(messages, '/tmp', () => true);
+        expect(result.map((message) => message.ruleID)).toEqual(['rulesdir/no-manual-memoization', 'no-console']);
+    });
+
+    it('drops manual memoization messages when either compiler skips memoization', async () => {
+        const messages = [makeMessage({ruleID: 'rulesdir/no-manual-memoization'}), makeMessage({ruleID: 'no-console'})];
+        const result = await filterReactCompilerMessages(messages, '/tmp', () => false);
+        expect(result.map((message) => message.ruleID)).toEqual(['no-console']);
+    });
+
+    it('drops manual memoization messages when the compiler check throws', async () => {
+        const messages = [makeMessage({ruleID: 'rulesdir/no-manual-memoization'})];
+        const result = await filterReactCompilerMessages(messages, '/tmp', () => {
+            throw new Error('compiler boom');
+        });
+        expect(result).toEqual([]);
+    });
+
+    it('never flags manual memoization in files the compiler check skips', async () => {
+        let called = 0;
+        const messages = [makeMessage({filePath: '/tmp/tests/file.ts', ruleID: 'rulesdir/no-manual-memoization'})];
+        const result = await filterReactCompilerMessages(messages, '/tmp', () => {
+            called++;
+            return true;
+        });
+        expect(called).toBe(0);
+        expect(result).toEqual([]);
+    });
+
     it('does not persist fallback compiler failures to cache', () => {
         expect(shouldPersistCompilerCache({filename: 'a.tsx', bothMemoized: false, cacheable: false})).toBe(false);
         expect(shouldPersistCompilerCache({filename: 'a.tsx', bothMemoized: false, cacheable: true})).toBe(true);

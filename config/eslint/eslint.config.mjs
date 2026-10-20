@@ -315,6 +315,7 @@ const config = defineConfig([
             'rulesdir/no-layout-spacing-conditional': 'error',
             'rulesdir/no-direct-personal-details-list': 'error',
             'rulesdir/require-locale-for-localized-date-format': 'error',
+            'rulesdir/no-manual-memoization': 'error',
             'rulesdir/prefer-narrow-hook-dependencies': [
                 'error',
                 {
