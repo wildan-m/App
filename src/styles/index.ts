@@ -2996,6 +2996,11 @@ const staticStyles = (theme: ThemeColors) =>
             width: '100%',
         },
 
+        // Shorter header bar for mobile web in landscape — see useIsMobileWebLandscape.
+        headerBarCompact: {
+            height: variables.contentHeaderCompactHeight,
+        },
+
         reportSearchHeaderBar: {
             justifyContent: 'center',
             display: 'flex',
