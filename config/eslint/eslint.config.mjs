@@ -619,6 +619,20 @@ const config = defineConfig([
         },
         rules: {
             '@typescript-eslint/no-deprecated': ['error', {allow: ['translateFn']}],
+
+            // Override the base config from eslint-config-expensify to ignore primitive-typed
+            // left operands (string/number/boolean/bigint). For those, `||` and `??` differ on
+            // falsy values ('' / 0 / false) and the choice is intentional, so the rule should
+            // only report cases where the two operators are provably equivalent.
+            // See STYLE.md "Accessing Object Properties and Default Values".
+            '@typescript-eslint/prefer-nullish-coalescing': [
+                'error',
+                {
+                    ignoreIfStatements: true,
+                    ignorePrimitives: true,
+                    ignoreTernaryTests: true,
+                },
+            ],
         },
     },
 

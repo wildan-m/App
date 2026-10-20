@@ -783,8 +783,6 @@ function startSplitBill({
     const splits: Split[] = [{email: currentUserEmailForIOUSplit, accountID: currentUserAccountID}];
 
     for (const participant of participants) {
-        // Disabling this line since participant.login can be an empty string
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         const email = participant.isOwnPolicyExpenseChat ? '' : addSMSDomainIfPhoneNumber(participant.login || participant.text || '').toLowerCase();
         const accountID = participant.isOwnPolicyExpenseChat ? 0 : Number(participant.accountID);
         if (email === currentUserEmailForIOUSplit) {
@@ -806,11 +804,7 @@ function startSplitBill({
                 buildPersonalDetailsUpdate({
                     [accountID]: {
                         accountID,
-                        // Disabling this line since participant.displayName can be an empty string
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                         displayName: formatPhoneNumber(participant.displayName || email),
-                        // Disabling this line since participant.login can be an empty string
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                         login: participant.login || participant.text,
                         isOptimisticPersonalDetail: true,
                     },
@@ -1917,8 +1911,6 @@ function createSplitsAndOnyxData({
             ? {
                   [accountID]: {
                       accountID,
-                      // Disabling this line since participant.displayName can be an empty string
-                      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                       displayName: formatPhoneNumber(participant.displayName || email),
                       login: participant.login,
                       isOptimisticPersonalDetail: true,

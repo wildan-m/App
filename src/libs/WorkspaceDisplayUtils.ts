@@ -15,7 +15,6 @@ function getWorkspaceAddressStreetLines(addressStreet: CompanyAddress['addressSt
     const trimmedStreetLineTwo = addressStreet2?.trim();
     return {
         streetLineOne: legacyStreetLineOne?.trim() ?? '',
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- nullish coalescing cannot be used if explicit line 2 can be an empty string
         streetLineTwo: trimmedStreetLineTwo || legacyStreetLineTwo?.trim() || '',
     };
 }

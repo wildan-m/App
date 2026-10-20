@@ -878,19 +878,26 @@ const modifiedArray = someArray.filter(filterFunc).map(mapFunc);
 
 ## Accessing Object Properties and Default Values
 
-Use optional chaining (`?.`) to safely access object properties and nullish coalescing (`??`) to short circuit null or undefined values that are not guaranteed to exist in a consistent way throughout the codebase. Don't use the `lodashGet()` function. eslint: [`no-restricted-imports`](https://eslint.org/docs/latest/rules/no-restricted-imports)
+Use optional chaining (`?.`) to safely access object properties. Don't use the `lodashGet()` function. eslint: [`no-restricted-imports`](https://eslint.org/docs/latest/rules/no-restricted-imports)
+
+When providing a default value, choose the operator based on which values should use the fallback:
+
+- Use nullish coalescing (`??`) when only `null` or `undefined` should fall back to the default. This is the right choice when a falsy value such as `''`, `0`, or `false` is valid data that must be preserved.
+- Use logical OR (`||`) when falsy values should also use the fallback — for example, when an empty string means "not set" and should be replaced by the default.
 
 ```ts
 // BAD
 import lodashGet from "lodash/get";
 const name = lodashGet(user, "name", "default name");
 
-// BAD
-const name = user?.name || "default name";
-
-// GOOD
+// GOOD: only null/undefined fall back — an existing (even empty) name is kept
 const name = user?.name ?? "default name";
+
+// GOOD: an empty name should also show the default
+const name = user?.name || "default name";
 ```
+
+The `@typescript-eslint/prefer-nullish-coalescing` rule is configured with `ignorePrimitives: true`, so it only reports `||` when the left side cannot be a falsy primitive (where `||` and `??` are provably equivalent). When the left side is a string, number, or boolean, both operators are allowed — pick the one that matches the intended behavior.
 
 ## JSDocs
 

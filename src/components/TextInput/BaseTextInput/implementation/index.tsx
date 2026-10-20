@@ -111,8 +111,6 @@ function BaseTextInput({
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
 
-    // Disabling this line for safeness as nullish coalescing works only if value is undefined or null
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const initialValue = value || defaultValue || '';
     const initialActiveLabel = !!forceActiveLabel || initialValue.length > 0 || !!prefixCharacter || !!suffixCharacter;
 
@@ -328,7 +326,6 @@ function BaseTextInput({
     const shouldAddPaddingBottom = isMultiline || (autoGrowHeight && !isAutoGrowHeightMarkdown && textInputHeight > variables.componentSizeLarge);
     const hasLabel = !!label?.length;
     const isReadOnly = inputProps.readOnly ?? inputProps.disabled;
-    // Disabling this line for safeness as nullish coalescing works only if the value is undefined or null, and errorText can be an empty string
 
     const inputHelpText = errorText || hint;
     const newPlaceholder = !!prefixCharacter || !!suffixCharacter || isFocused || !hasLabel || (hasLabel && forceActiveLabel) ? placeholder : undefined;
