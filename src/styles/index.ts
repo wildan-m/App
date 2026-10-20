@@ -1562,6 +1562,16 @@ const staticStyles = (theme: ThemeColors) =>
             marginTop: CONST.CHAT_FOOTER_SECONDARY_ROW_PADDING,
         },
 
+        /**
+         * The secondary row reserves a fixed height so that the typing indicator appearing and disappearing never
+         * shifts the compose box. On mobile web in landscape that costs 25pt of scarce vertical space for a row that
+         * is empty most of the time, so there it collapses to its content and accepts the shift instead.
+         */
+        chatItemComposeSecondaryRowCompact: {
+            marginTop: 0,
+            marginBottom: CONST.CHAT_FOOTER_SECONDARY_ROW_PADDING,
+        },
+
         chatItemComposeSecondaryRowSubText: {
             color: theme.textSupporting,
             ...FontUtils.fontFamily.platform.EXP_NEUE,
@@ -2026,6 +2036,25 @@ const staticStyles = (theme: ThemeColors) =>
             boxShadow: theme.shadow,
         },
 
+        /**
+         * Back button that floats over the report actions while the report header is scrolled away — see
+         * CollapsibleHeaderOnScroll. It overlaps the list, which is painted after it, so it needs a z-index to stay
+         * on top and a background of its own to stay legible over a message.
+         */
+        floatingReportBackButton: {
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            zIndex: 1,
+            height: variables.componentSizeNormal,
+            width: variables.componentSizeNormal,
+            borderRadius: variables.componentBorderRadiusCircle,
+            backgroundColor: theme.buttonDefaultBG,
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: theme.shadow,
+        },
+
         floatingSecondaryActionButton: {
             backgroundColor: theme.buttonDefaultBG,
             height: variables.componentSizeLarge,
@@ -2313,6 +2342,11 @@ const staticStyles = (theme: ThemeColors) =>
             paddingRight: 20,
         },
 
+        // Shorter report header for mobile web in landscape — see useIsMobileWebLandscape.
+        appContentHeaderCompact: {
+            height: variables.contentHeaderCompactHeight,
+        },
+
         appContentHeaderTitle: {
             alignItems: 'center',
             flexDirection: 'row',
@@ -2322,6 +2356,11 @@ const staticStyles = (theme: ThemeColors) =>
             alignItems: 'center',
             justifyContent: 'center',
             paddingRight: 10,
+        },
+
+        // Kept in sync with appContentHeaderCompact so the back button doesn't outgrow the compact header.
+        LHNToggleCompact: {
+            height: variables.contentHeaderCompactHeight,
         },
 
         chatContentScrollView: {
