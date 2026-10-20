@@ -1,5 +1,7 @@
 import NavigationTabBar from '@components/Navigation/NavigationTabBar';
 
+import useIsFloatingTabBarHiddenForKeyboard from '@hooks/useIsFloatingTabBarHiddenForKeyboard';
+import useIsMobileWebLandscape from '@hooks/useIsMobileWebLandscape';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -15,8 +17,12 @@ import type TabBarBottomContentProps from './types';
 function TabBarBottomContent({selectedTab}: TabBarBottomContentProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
+    const isMobileWebLandscape = useIsMobileWebLandscape();
+    // The copy is anchored to the screen's bottom edge, so it rides up above the soft keyboard just like the
+    // navigator's bar — hide it under the same conditions so the bar doesn't linger over the focused input.
+    const isCoveredByKeyboard = useIsFloatingTabBarHiddenForKeyboard(isMobileWebLandscape);
 
-    if (!shouldUseNarrowLayout) {
+    if (!shouldUseNarrowLayout || isCoveredByKeyboard) {
         return null;
     }
 
