@@ -2,6 +2,7 @@ import {useFullScreenLoaderActions} from '@components/FullScreenLoaderContext';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 
+import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation';
 import useFilesValidation from '@hooks/useFilesValidation';
 import {precacheReceiptImage} from '@hooks/useLocalReceiptThumbnail';
 import useOnyx from '@hooks/useOnyx';
@@ -9,6 +10,7 @@ import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransaction
 
 import type {ReceiptCaptureSource} from '@libs/telemetry/ReceiptObservability';
 import {getPickerCaptureSource} from '@libs/telemetry/ReceiptObservability';
+import {hasReceipt} from '@libs/TransactionUtils';
 
 import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types';
 import buildReceiptFiles from '@pages/iou/request/step/IOURequestStepScan/utils/buildReceiptFiles';
@@ -70,6 +72,12 @@ function ScanGlobalCreateInner({reportID, transactionID, transaction}: ScanGloba
 
     useScanFileReadabilityCheck(transactions, draftTransactionIDs ?? [], disableMultiScan);
 
+    // A captured receipt lives only on the flow's draft transactions until the expense is created, so leaving the
+    // flow (or switching tabs) while any draft carries one would silently lose it.
+    const {suppressDiscardPrompt} = useDiscardChangesConfirmation({
+        getHasUnsavedChanges: () => transactions.some((item) => hasReceipt(item)),
+    });
+
     const processReceipts = (files: FileObject[], captureSource: ReceiptCaptureSource) => {
         const receiptFiles = buildReceiptFiles({
             files,
@@ -92,6 +100,8 @@ function ScanGlobalCreateInner({reportID, transactionID, transaction}: ScanGloba
             return;
         }
 
+        // Advancing within the flow is an intentional navigation, not a discard.
+        suppressDiscardPrompt(true);
         navigateGlobalCreate(
             receiptFiles.map((rf: ReceiptFile) => rf.transactionID),
             isMultiScanEnabled,
@@ -103,6 +113,7 @@ function ScanGlobalCreateInner({reportID, transactionID, transaction}: ScanGloba
         if (ids.length === 0) {
             return;
         }
+        suppressDiscardPrompt(true);
         navigateGlobalCreate(ids, isMultiScanEnabled);
     };
 

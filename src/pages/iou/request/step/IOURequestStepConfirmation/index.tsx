@@ -14,6 +14,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import useBlockDistanceRequest from '@hooks/useBlockDistanceRequest';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation';
 import useFetchRoute from '@hooks/useFetchRoute';
 import useFilesValidation from '@hooks/useFilesValidation';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -459,11 +460,20 @@ function IOURequestStepConfirmationContent({
         };
     }, []);
 
+    // Receipt attachment and the per-field setters mark user work on the flow's drafts. Only creation flows guard:
+    // a moved/categorized/shared tracked expense reaches this page carrying real values without any edit made here.
+    const {suppressDiscardPrompt} = useDiscardChangesConfirmation({
+        getHasUnsavedChanges: () =>
+            action === CONST.IOU.ACTION.CREATE &&
+            transactions.some((item) => hasReceipt(item) || !!item.isAmountSet || !!item.isMerchantSet || !!item.isCreatedSet || !!item.category || !!item.tag || !!item.comment?.comment),
+    });
+
     const handleSendMoney = useCallback(
         (paymentMethod: PaymentMethodType | undefined) => {
             if (isConfirmed) {
                 return;
             }
+            suppressDiscardPrompt(true);
 
             if (paymentMethod !== CONST.IOU.PAYMENT_TYPE.ELSEWHERE && paymentMethod !== CONST.IOU.PAYMENT_TYPE.EXPENSIFY) {
                 sendMoney(paymentMethod);
@@ -503,10 +513,24 @@ function IOURequestStepConfirmationContent({
                 },
             });
         },
-        [currentUserPersonalDetails.accountID, destinationReportID, isConfirmed, optimisticP2PDestinationReportID, setIsConfirmed, participants, report, sendMoney, transaction?.receipt],
+        [
+            currentUserPersonalDetails.accountID,
+            destinationReportID,
+            isConfirmed,
+            optimisticP2PDestinationReportID,
+            setIsConfirmed,
+            participants,
+            report,
+            sendMoney,
+            suppressDiscardPrompt,
+            transaction?.receipt,
+        ],
     );
 
     const navigateBack = useCallback(() => {
+        // The header back arrow returns to the previous step of the same flow with the draft intact, so it must not
+        // trigger the discard prompt; only gestures that exit the flow should.
+        suppressDiscardPrompt(true);
         // User is explicitly abandoning the flow - cancel any active telemetry span.
         // The orchestrator never calls navigateBack (it uses dismissModal), so this
         // reliably distinguishes user-initiated back from programmatic dismiss.
@@ -588,6 +612,7 @@ function IOURequestStepConfirmationContent({
         participantsAutoAssignedFromRoute,
         backTo,
         backToReport,
+        suppressDiscardPrompt,
         // usePreMountDestination compiles under React Compiler, so cleanupPreMount has a stable identity (it closes over refs
         // only) - this dep does not churn navigateBack per render.
         cleanupPreMount,
@@ -777,7 +802,11 @@ function IOURequestStepConfirmationContent({
                                     isParticipantPickerVisible={isParticipantPickerVisible}
                                     onOpenParticipantPicker={openParticipantPicker}
                                     onToggleBillable={setBillable}
-                                    onConfirm={onConfirm}
+                                    onConfirm={() => {
+                                        // Submitting leaves the flow on purpose - the discard prompt must not intercept it.
+                                        suppressDiscardPrompt(true);
+                                        onConfirm();
+                                    }}
                                     onSendMoney={handleSendMoney}
                                     showRemoveExpenseConfirmModal={() => {
                                         confirmRemoveCurrentTransaction();

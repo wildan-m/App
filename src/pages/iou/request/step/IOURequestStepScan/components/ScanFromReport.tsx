@@ -2,6 +2,7 @@ import {useFullScreenLoaderActions} from '@components/FullScreenLoaderContext';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 
+import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation';
 import useFilesValidation from '@hooks/useFilesValidation';
 import {precacheReceiptImage} from '@hooks/useLocalReceiptThumbnail';
 import useOnyx from '@hooks/useOnyx';
@@ -10,6 +11,7 @@ import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransaction
 import {navigateToConfirmationPage} from '@libs/IOUUtils';
 import type {ReceiptCaptureSource} from '@libs/telemetry/ReceiptObservability';
 import {getPickerCaptureSource} from '@libs/telemetry/ReceiptObservability';
+import {hasReceipt} from '@libs/TransactionUtils';
 
 import type {ReceiptFile} from '@pages/iou/request/step/IOURequestStepScan/types';
 import buildReceiptFiles from '@pages/iou/request/step/IOURequestStepScan/utils/buildReceiptFiles';
@@ -56,7 +58,15 @@ function ScanFromReport({report, iouType, reportID, transactionID, transaction, 
 
     useScanFileReadabilityCheck(transactions, draftTransactionIDs ?? [], disableMultiScan);
 
+    // A captured receipt lives only on the flow's draft transactions until the expense is created, so leaving the
+    // flow (or switching tabs) while any draft carries one would silently lose it.
+    const {suppressDiscardPrompt} = useDiscardChangesConfirmation({
+        getHasUnsavedChanges: () => transactions.some((item) => hasReceipt(item)),
+    });
+
     const navigateFromReport = (fileTransactionIDs: string[]) => {
+        // Advancing within the flow is an intentional navigation, not a discard.
+        suppressDiscardPrompt(true);
         startScanProcessSpan(isMultiScanEnabled);
         setMultipleMoneyRequestParticipantsFromReport(fileTransactionIDs, report, currentUserPersonalDetails.accountID).then(() =>
             navigateToConfirmationPage(iouType, transactionID, reportID, backToReport),
