@@ -1128,9 +1128,8 @@ const ContextMenuActions: ContextMenuAction[] = [
                         formatPhoneNumber,
                         movedFromReportName: undefined,
                     });
-                    // Convert HTML to markdown for clipboard copy to preserve links and formatting
-                    const modifyExpenseMessage = Parser.htmlToMarkdown(modifyExpenseMessageWithHTML);
-                    Clipboard.setString(modifyExpenseMessage);
+                    // Copy the HTML so rich destinations keep links and formatting, while plain text stays free of Markdown syntax
+                    setClipboardMessage(modifyExpenseMessageWithHTML);
                 } else if (isReimbursementDeQueuedOrCanceledAction(reportAction)) {
                     const displayMessage = getReimbursementDeQueuedOrCanceledActionMessage(translate, formatPhoneNumber, reportAction, report?.ownerAccountID, convertToDisplayString);
                     Clipboard.setString(displayMessage);

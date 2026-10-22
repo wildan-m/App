@@ -201,3 +201,11 @@
 - E/App issue: https://github.com/Expensify/App/issues/97472
 - Sentry: https://expensify.sentry.io/issues/APP-8PG
 - PR introducing patch: https://github.com/Expensify/App/pull/98015
+
+### [@shopify+flash-list+2.3.2+017+defer-sort-during-text-selection.patch](@shopify+flash-list+2.3.2+017+defer-sort-during-text-selection.patch)
+
+- Reason: Keeps a desktop drag text selection stable on web. Patch `011` re-sorts the web render entries by data index after `SORT_DELAY_MS`, and the only gate that postpones that timer is `isScrolling()`. Row focus on `mousedown` and the scroll caused by dragging near the list edge both schedule the sort, so once scrolling pauses while the mouse button is still held, React moves the row nodes with `insertBefore`, the selection's anchor/focus nodes are detached and the browser collapses the selection. The patch tracks whether the primary pointer is held down and extends the deferred sort's gate so it also waits while a pointer drag is in progress or while a non-collapsed document selection intersects the list container. The pending sort simply re-arms and commits once the drag ends and the selection is cleared. Recycling, virtualization, keyboard navigation and screen-reader order are unchanged.
+- Files changed: `dist/recyclerview/ViewHolderCollection.js`
+- Upstream PR/issue: N/A (patch `011` is App-specific)
+- E/App issue: https://github.com/Expensify/App/issues/104772
+- PR introducing patch: TBD

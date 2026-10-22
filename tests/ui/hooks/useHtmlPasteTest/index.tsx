@@ -306,6 +306,27 @@ describe('useHtmlPaste - handlePastePlainText', () => {
         expect(textInputRef.current?.textContent).toBe('Normal Text. ![1f389@2x.png](blob:https://new.expensify.com/123) Bold');
     });
 
+    it('falls back to the plain text flavor when the HTML flavor is empty', async () => {
+        // Given a clipboard that advertises text/html but whose HTML has no content
+        const clipboardData = createMock<DataTransfer>({
+            getData: (type: string) => (type === 'text/plain' ? 'plain text wins' : ''),
+            files: [],
+            items: [],
+            types: ['text/html', 'text/plain'],
+        });
+        const event = Object.assign(new Event('paste', {bubbles: true, cancelable: true}), {clipboardData});
+        mockWindowSelection('');
+
+        renderHook(() => useHtmlPaste(textInputRef, undefined, true));
+        await waitForBatchedUpdatesWithAct();
+
+        // When the user pastes into the composer
+        act(() => document.dispatchEvent(event));
+
+        // Then the valid plain text is pasted instead of nothing
+        expect(textInputElement.textContent).toBe('plain text wins');
+    });
+
     it('does not replace normal images whose alt text is an emoji shortcode', async () => {
         // Given a normal web image has an emoji-like alt value but no Slack metadata, so alt text alone must not classify it as a Slack emoji.
         const html = '<p>Copy image below:</p><img src="https://example.com/image.png" alt=":smile:">';
@@ -409,7 +430,7 @@ describe('useHtmlPaste DOM insertion boundaries', () => {
         document.body.replaceChildren();
     });
 
-    it.each(['input', 'textarea'] as const)('uses %s setRangeText with the existing length arithmetic and focusin dispatch', (tagName) => {
+    it.each(['input', 'textarea'] as const)('uses %s setRangeText counting the replaced selection as available length and dispatches focusin', (tagName) => {
         // Given the actual RN Web host category, augmented with its isFocused command.
         const input = Object.assign(document.createElement(tagName), {isFocused: () => true});
         input.value = 'abcd';
@@ -429,9 +450,9 @@ describe('useHtmlPaste DOM insertion boundaries', () => {
         // When a long paste replaces the selected span.
         act(() => paste(event));
 
-        // Then truncation uses the pre-existing whole-value length and retains focus/scroll scheduling.
-        expect(setRangeText).toHaveBeenCalledWith('WO');
-        expect(input.value).toBe('aWOd');
+        // Then the two replaced characters are available again, so four characters fit, and focus/scroll scheduling is retained.
+        expect(setRangeText).toHaveBeenCalledWith('WORD');
+        expect(input.value).toBe('aWORDd');
         expect(focusIn).toHaveBeenCalledTimes(1);
         expect(frames).toHaveBeenCalledTimes(1);
     });
@@ -478,6 +499,36 @@ describe('useHtmlPaste DOM insertion boundaries', () => {
         expect(focusIn).toHaveBeenCalledTimes(1);
         expect(input.scrollLeft).toBe(90);
         expect(input.scrollTop).toBe(190);
+    });
+
+    it('lets a contenteditable paste replace a selection when the composer is already at the length limit', () => {
+        // Given a composer that is full, with part of its text selected
+        const input = Object.assign(document.createElement('div'), {isFocused: () => true});
+        input.setAttribute('contenteditable', 'true');
+        input.textContent = 'abcde';
+        document.body.appendChild(input);
+        const textNode = input.firstChild;
+        if (!textNode) {
+            throw new Error('Expected composer text node');
+        }
+        const range = document.createRange();
+        range.setStart(textNode, 1);
+        range.setEnd(textNode, 4);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        jest.spyOn(globalThis, 'requestAnimationFrame').mockImplementation(() => 1);
+        const {result} = renderHook(() => useHtmlPaste({current: input}, undefined, false, 5));
+        const paste = result.current?.handlePastePlainText;
+        if (!paste) {
+            throw new Error('Expected plaintext paste interface');
+        }
+
+        // When a longer text is pasted over the three selected characters
+        act(() => paste(createMock<ClipboardEvent>({clipboardData: {getData: () => 'WORD'}})));
+
+        // Then the selected characters are replaced and only the freed length is used
+        expect(input.textContent).toBe('aWORe');
     });
 
     it('does not attempt DOM insertion for absent, native or non-editable div refs', () => {

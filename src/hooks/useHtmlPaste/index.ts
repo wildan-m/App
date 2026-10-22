@@ -18,22 +18,15 @@ import type UseHtmlPaste from './types';
 const insertAtCaret = (target: HTMLElement, insertedText: string, maxLength: number) => {
     const currentText = target.textContent ?? '';
 
-    let availableLength = maxLength - currentText.length;
-    if (availableLength <= 0) {
-        return;
-    }
-
-    let text = insertedText;
-
     const selection = window.getSelection();
     if (selection?.rangeCount) {
         const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
-        availableLength -= selectedText.length;
+        // The selected text is replaced by the pasted text, so its length is available again.
+        const availableLength = maxLength - currentText.length + range.toString().length;
         if (availableLength <= 0) {
             return;
         }
-        text = text.slice(0, availableLength);
+        const text = insertedText.slice(0, availableLength);
         range.deleteContents();
 
         const node = document.createTextNode(text);
@@ -141,7 +134,11 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, isActive
                 if (textInputHTMLElement.hasAttribute('contenteditable')) {
                     insertAtCaret(textInputHTMLElement, text, maxLength);
                 } else if (textInputHTMLElement instanceof HTMLInputElement || textInputHTMLElement instanceof HTMLTextAreaElement) {
-                    const availableLength = maxLength - (textInputHTMLElement.value?.length ?? 0);
+                    const selectedLength = (textInputHTMLElement.selectionEnd ?? 0) - (textInputHTMLElement.selectionStart ?? 0);
+                    const availableLength = maxLength - (textInputHTMLElement.value?.length ?? 0) + selectedLength;
+                    if (availableLength <= 0) {
+                        return;
+                    }
                     textInputHTMLElement.setRangeText(text.slice(0, availableLength));
                 } else {
                     return;
@@ -184,9 +181,14 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, isActive
      * @param {String} html - pasted HTML
      */
     const handlePastedHTML = useCallback(
-        (html: string) => {
+        (html: string): boolean => {
             // Built here rather than in render so it costs nothing until a paste actually happens.
-            paste(Parser.htmlToMarkdown(html, {reportIDToName: buildReportIDToNameMap(reports), accountIDToName: buildAccountIDToNameMap(personalDetailsList)}));
+            const markdown = Parser.htmlToMarkdown(html, {reportIDToName: buildReportIDToNameMap(reports), accountIDToName: buildAccountIDToNameMap(personalDetailsList)});
+            if (!markdown) {
+                return false;
+            }
+            paste(markdown);
+            return true;
         },
         [paste, reports, personalDetailsList],
     );
@@ -235,10 +237,10 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, isActive
 
             const TEXT_HTML = 'text/html';
 
-            // If paste contains HTML
-            if (event.clipboardData?.types?.includes(TEXT_HTML)) {
-                const pastedHTML = event.clipboardData.getData(TEXT_HTML);
+            const pastedHTML = event.clipboardData?.types?.includes(TEXT_HTML) ? event.clipboardData.getData(TEXT_HTML) : '';
 
+            // If paste contains HTML. Empty or unsupported HTML falls back to the plain text flavor below.
+            if (pastedHTML) {
                 // Native markdown input adds this wrapper and styling when copied, so preserve its original plain text.
                 if (pastedHTML.startsWith('<p dir="ltr">')) {
                     handlePastePlainText(event);
@@ -261,8 +263,9 @@ const useHtmlPaste: UseHtmlPaste = (textInputRef, preHtmlPasteCallback, isActive
                     emojiImageReplacements.set(image, emojiText);
                 }
 
-                handlePastedHTML(replaceEmojiImagesInHTML(pastedHTML, embeddedImages, emojiImageReplacements));
-                return;
+                if (handlePastedHTML(replaceEmojiImagesInHTML(pastedHTML, embeddedImages, emojiImageReplacements))) {
+                    return;
+                }
             }
             handlePastePlainText(event);
         },

@@ -23,10 +23,7 @@ type NullableObject<T> = {[K in keyof T]: T[K] | null};
 
 type OriginalSelection = ComposerSelection | NullableObject<AnchorSelection>;
 
-const canSetHtml: CanSetHtml =
-    () =>
-    (...args: ClipboardItems) =>
-        navigator?.clipboard?.write([...args]);
+const canSetHtml: CanSetHtml = () => typeof navigator?.clipboard?.write === 'function' && typeof ClipboardItem !== 'undefined';
 
 /**
  * Deprecated method to write the content as HTML to clipboard.
@@ -103,12 +100,13 @@ function setHTMLSync(html: string, text: string) {
  * Writes the content as HTML if the web client supports it.
  */
 const setHtml: SetHtml = (html: string, text: string) => {
-    if (!html || !text) {
+    if (!html) {
         return;
     }
 
     if (!canSetHtml()) {
-        throw new Error('clipboard.write is not supported on this platform, thus HTML cannot be copied.');
+        Clipboard.setString(text);
+        return;
     }
 
     if (CONST.BROWSER.SAFARI === Browser.getBrowser()) {
@@ -122,13 +120,16 @@ const setHtml: SetHtml = (html: string, text: string) => {
             .replaceAll(/<mention-report reportID="(\d+)" *\/>/gi, '<mention-report reportID="$1"></mention-report>')
             .replaceAll(/<mention-user accountID="(\d+)" *\/>/gi, '<mention-user accountID="$1"></mention-user>');
 
-        navigator.clipboard.write([
-            new ClipboardItem({
-                /* eslint-disable @typescript-eslint/naming-convention */
-                'text/html': new Blob([htmlNonClosingTags], {type: 'text/html'}),
-                'text/plain': new Blob([text], {type: 'text/plain'}),
-            }),
-        ]);
+        navigator.clipboard
+            .write([
+                new ClipboardItem({
+                    /* eslint-disable @typescript-eslint/naming-convention */
+                    'text/html': new Blob([htmlNonClosingTags], {type: 'text/html'}),
+                    'text/plain': new Blob([text], {type: 'text/plain'}),
+                }),
+            ])
+            // Writing HTML can be rejected (permissions, unsupported MIME type), so keep at least the plain text.
+            .catch(() => Clipboard.setString(text));
     }
 };
 

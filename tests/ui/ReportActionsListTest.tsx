@@ -111,7 +111,6 @@ const defaultSidePanelState: ReturnType<typeof useSidePanelState> = {
     sidePanelTranslateX: {current: null} as React.RefObject<never>,
 };
 
-jest.mock('@hooks/useCopySelectionHelper', () => jest.fn());
 jest.mock('@hooks/useCurrentUserPersonalDetails', () => jest.fn());
 jest.mock('@hooks/useLoadReportActions', () =>
     jest.fn(() => ({
