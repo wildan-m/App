@@ -34,7 +34,16 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {clearCompanyCardErrorField} from '@libs/actions/CompanyCards';
 import {openPolicyExpensifyCardsPage} from '@libs/actions/Policy/Policy';
 import navigateToCardTransactions from '@libs/CardNavigationUtils';
-import {getAllCardsForWorkspace, getCardFeedTextColor, getCardHintText, getCardFeedWithDomainID, getTranslationKeyForLimitType, isCardFrozen, maskCard} from '@libs/CardUtils';
+import {
+    getAllCardsForWorkspace,
+    getCardFeedTextColor,
+    getCardFeedWithDomainID,
+    getCardHintText,
+    getNextQuarterlyLimitResetDate,
+    getTranslationKeyForLimitType,
+    isCardFrozen,
+    maskCard,
+} from '@libs/CardUtils';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -160,7 +169,10 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
     const exportMenuItem = getExportMenuItem(connectedIntegration, policyID, translate, styles, policy, card);
     const translationForLimitType = getTranslationKeyForLimitType(card?.nameValuePairs?.limitType);
     const remainingLimitHintTranslationKey = getLimitHintTranslationKey(card?.nameValuePairs?.limitType);
-    const remainingLimitHint = remainingLimitHintTranslationKey ? translate(remainingLimitHintTranslationKey, formattedAvailableSpendAmount) : undefined;
+    let remainingLimitHint = remainingLimitHintTranslationKey ? translate(remainingLimitHintTranslationKey, formattedAvailableSpendAmount) : undefined;
+    if (card?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY) {
+        remainingLimitHint = translate('cardPage.quarterlyLimit.title', formattedAvailableSpendAmount, getNextQuarterlyLimitResetDate(dateFnsLocale));
+    }
     const canWriteExpensifyCard = canMemberWrite(policy, currentUserLogin, CONST.POLICY.POLICY_FEATURE.EXPENSIFY_CARD);
     const canEditSpendRules = canWriteExpensifyCard && arePolicyRulesEnabled(policy, policyCategories);
     const isDeactivated = card?.state === CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED;

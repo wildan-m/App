@@ -2889,6 +2889,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: 'Maandlimiet',
             title: (formattedLimit: string) => `Je kunt met deze kaart tot ${formattedLimit} per maand uitgeven. De limiet wordt op de 1e dag van elke kalendermaand opnieuw ingesteld.`,
         },
+        quarterlyLimit: {
+            name: 'Kwartaallimiet',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `Je kunt met deze kaart tot ${formattedLimit} per kwartaal uitgeven. De limiet wordt gereset op de 1e dag van elk kalenderkwartaal, de volgende keer op ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Nummer van virtuele kaart',
         travelCardCvv: 'Reiskaart-CVV',
         physicalCardNumber: 'Fysiek kaartnummer',
@@ -6546,6 +6551,7 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
             smartLimitWarning: (limit: number | string) =>
                 `Als je de limiet van deze kaart wijzigt naar ${limit}, worden nieuwe transacties geweigerd totdat je meer uitgaven op de kaart goedkeurt.`,
             monthlyLimitWarning: (limit: number | string) => `Als je de limiet van deze kaart wijzigt naar ${limit}, worden nieuwe transacties tot volgende maand geweigerd.`,
+            quarterlyLimitWarning: (limit: number | string) => `Als je de limiet van deze kaart wijzigt naar ${limit}, worden nieuwe transacties tot het volgende kwartaal geweigerd.`,
             fixedLimitWarning: (limit: number | string) => `Als je de limiet van deze kaart wijzigt naar ${limit}, worden nieuwe transacties geweigerd.`,
             changeCardLimitType: 'Type kaartlimiet wijzigen',
             changeLimitType: 'Limiettype wijzigen',
@@ -6553,6 +6559,8 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 `Als je het limiettype van deze kaart wijzigt naar Slimme limiet, worden nieuwe transacties geweigerd omdat de onbevestigde limiet van ${limit} al is bereikt.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `Als je het limiettype van deze kaart wijzigt naar Maandelijks, worden nieuwe transacties geweigerd omdat de maandelijkse limiet van ${limit} al is bereikt.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `Als je het limiettype van deze kaart wijzigt naar Per kwartaal, worden nieuwe transacties geweigerd omdat de kwartaallimiet van ${limit} al is bereikt.`,
             addShippingDetails: 'Verzendgegevens toevoegen',
             addPersonalDetails: 'Persoonlijke gegevens toevoegen',
             issuedCard: (assignee: string) => `heeft ${assignee} een Expensify Kaart uitgegeven! De kaart wordt binnen 2-3 werkdagen bezorgd.`,
@@ -7345,6 +7353,8 @@ Het Control-abonnement begint bij $9 per actieve deelnemer per maand.`,
                     `<muted-text-label>Tot een bepaald bedrag uitgeven voordat goedkeuring vereist is. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Schakel goedkeuringen in</a>` : 'Schakel goedkeuringen in'} om deze optie te selecteren.</muted-text-label>`,
                 monthly: 'Maandelijks',
                 monthlyDescription: 'Geef per maand tot een bepaald bedrag uit',
+                quarterly: 'Per kwartaal',
+                quarterlyDescription: 'Geef per kwartaal tot een bepaald bedrag uit',
                 fixedAmount: 'Vast bedrag',
                 fixedAmountDescription: 'Eénmalig tot een bepaald bedrag uitgeven',
                 setLimit: 'Stel een limiet in',

@@ -2922,6 +2922,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: 'Limit miesięczny',
             title: (formattedLimit: string) => `Możesz wydawać do ${formattedLimit} miesięcznie na tej karcie. Limit zostanie zresetowany pierwszego dnia każdego miesiąca kalendarzowego.`,
         },
+        quarterlyLimit: {
+            name: 'Limit kwartalny',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `Możesz wydać do ${formattedLimit} tą kartą w każdym kwartale. Limit będzie resetowany pierwszego dnia każdego kwartału kalendarzowego, następnym razem ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Numer karty wirtualnej',
         travelCardCvv: 'Kod CVV karty podróżnej',
         physicalCardNumber: 'Numer fizycznej karty',
@@ -6570,6 +6575,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             changeLimit: 'Zmień limit',
             smartLimitWarning: (limit: number | string) => `Jeśli zmienisz limit tej karty na ${limit}, nowe transakcje będą odrzucane, dopóki nie zaakceptujesz na niej kolejnych wydatków.`,
             monthlyLimitWarning: (limit: number | string) => `Jeśli zmienisz limit tej karty na ${limit}, nowe transakcje będą odrzucane aż do następnego miesiąca.`,
+            quarterlyLimitWarning: (limit: number | string) => `Jeśli zmienisz limit tej karty na ${limit}, nowe transakcje będą odrzucane aż do następnego kwartału.`,
             fixedLimitWarning: (limit: number | string) => `Jeśli zmienisz limit tej karty na ${limit}, nowe transakcje zostaną odrzucone.`,
             changeCardLimitType: 'Zmień typ limitu karty',
             changeLimitType: 'Zmień typ limitu',
@@ -6577,6 +6583,8 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 `Jeśli zmienisz typ limitu tej karty na Smart Limit, nowe transakcje zostaną odrzucone, ponieważ niezatwierdzony limit ${limit} został już osiągnięty.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `Jeśli zmienisz typ limitu tej karty na miesięczny, nowe transakcje zostaną odrzucone, ponieważ miesięczny limit ${limit} został już osiągnięty.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `Jeśli zmienisz typ limitu tej karty na Kwartalny, nowe transakcje będą odrzucane, ponieważ kwartalny limit ${limit} został już osiągnięty.`,
             addShippingDetails: 'Dodaj dane wysyłki',
             addPersonalDetails: 'Dodaj dane osobowe',
             issuedCard: (assignee: string) => `przydzielono osobie ${assignee} Kartę Expensify! Karta dotrze w ciągu 2–3 dni roboczych.`,
@@ -7371,6 +7379,8 @@ Plan Control zaczyna się od 9 USD za aktywnego członka miesięcznie.`,
                     `<muted-text-label>Wydawaj do określonej kwoty przed wymaganiem zatwierdzenia. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Włącz zatwierdzanie</a>` : 'Włącz zatwierdzanie'}, aby wybrać tę opcję.</muted-text-label>`,
                 monthly: 'Miesięcznie',
                 monthlyDescription: 'Wydawaj do określonej kwoty miesięcznie',
+                quarterly: 'Kwartalny',
+                quarterlyDescription: 'Wydawaj do określonej kwoty kwartalnie',
                 fixedAmount: 'Stała kwota',
                 fixedAmountDescription: 'Wydaj jednorazowo do określonej kwoty',
                 setLimit: 'Ustaw limit',

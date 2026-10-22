@@ -126,7 +126,7 @@ function DynamicExpensifyCardLimitTypePage({route}: WorkspaceEditCardLimitTypePa
         if (shouldConfirmExpensifyCardLimitTypeChange(card, typeSelected, defaultLimitType)) {
             showConfirmModal({
                 title: translate('workspace.expensifyCard.changeCardLimitType'),
-                prompt: translate(getExpensifyCardLimitTypeChangeWarningKey(initialLimitType), convertToDisplayString(card?.nameValuePairs?.unapprovedExpenseLimit, currency)),
+                prompt: translate(getExpensifyCardLimitTypeChangeWarningKey(initialLimitType, typeSelected), convertToDisplayString(card?.nameValuePairs?.unapprovedExpenseLimit, currency)),
                 confirmText: translate('workspace.expensifyCard.changeLimitType'),
                 cancelText: translate('common.cancel'),
                 buttonVariant: CONST.BUTTON_VARIANT.DANGER,
@@ -176,6 +176,14 @@ function DynamicExpensifyCardLimitTypePage({route}: WorkspaceEditCardLimitTypePa
         description: translate('workspace.card.issueNewCard.monthlyDescription'),
         keyForList: CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
         isSelected: typeSelected === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
+    });
+
+    data.push({
+        value: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+        label: translate('workspace.card.issueNewCard.quarterly'),
+        description: translate('workspace.card.issueNewCard.quarterlyDescription'),
+        keyForList: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+        isSelected: typeSelected === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
     });
 
     if (visibleLimitTypes.includes(CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED)) {

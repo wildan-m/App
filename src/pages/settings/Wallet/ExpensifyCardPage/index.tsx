@@ -41,6 +41,7 @@ import {
     getCardHintText,
     getCardOrFeedCurrency,
     getDomainCards,
+    getNextQuarterlyLimitResetDate,
     getTranslationKeyForLimitType,
     isCardFrozen,
     isCardPendingDigitalWalletApproval,
@@ -193,7 +194,10 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const formattedAvailableSpendAmount = convertToDisplayString(currentCard?.availableSpend, currency);
     const {limitTitleKey} = getLimitTypeTranslationKeys(currentCard?.nameValuePairs?.limitType);
     const currentCardLimitTypeTranslationKey = getTranslationKeyForLimitType(currentCard?.nameValuePairs?.limitType);
-    const remainingLimitHint = limitTitleKey ? translate(limitTitleKey, formattedAvailableSpendAmount) : undefined;
+    let remainingLimitHint = limitTitleKey ? translate(limitTitleKey, formattedAvailableSpendAmount) : undefined;
+    if (currentCard?.nameValuePairs?.limitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY) {
+        remainingLimitHint = translate('cardPage.quarterlyLimit.title', formattedAvailableSpendAmount, getNextQuarterlyLimitResetDate(dateFnsLocale));
+    }
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
 

@@ -187,7 +187,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
             showConfirmModal({
                 title: translate('workspace.expensifyCard.changeCardLimitType'),
                 prompt: translate(
-                    getExpensifyCardLimitTypeChangeWarningKey(latestCard.nameValuePairs?.limitType ?? defaultLimitType),
+                    getExpensifyCardLimitTypeChangeWarningKey(latestCard.nameValuePairs?.limitType ?? defaultLimitType, newLimitType),
                     convertToDisplayString(latestCard.nameValuePairs?.unapprovedExpenseLimit, settlementCurrency),
                 ),
                 confirmText: translate('workspace.expensifyCard.changeLimitType'),

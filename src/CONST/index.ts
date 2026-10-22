@@ -5731,6 +5731,7 @@ const CONST = {
         LIMIT_TYPES: {
             SMART: 'smart',
             MONTHLY: 'monthly',
+            QUARTERLY: 'quarterly',
             FIXED: 'fixed',
             SINGLE_USE: 'singleUse',
         },

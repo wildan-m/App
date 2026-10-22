@@ -2862,6 +2862,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: '月ごとの上限',
             title: (formattedLimit: string) => `このカードでは月あたり最大 ${formattedLimit} まで利用できます。利用限度額は毎月、暦月の1日目にリセットされます。`,
         },
+        quarterlyLimit: {
+            name: '四半期上限',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `このカードでは四半期ごとに最大${formattedLimit}まで利用できます。上限は各暦四半期の初日にリセットされ、次回は${nextResetDate}です。`,
+        },
         virtualCardNumber: 'バーチャルカード番号',
         travelCardCvv: 'トラベルカードのCVV',
         physicalCardNumber: 'プラスチックカード番号',
@@ -6478,6 +6483,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
             changeLimit: '上限を変更',
             smartLimitWarning: (limit: number | string) => `このカードの利用限度額を${limit}に変更すると、カード上の経費をさらに承認するまで、新しい取引は承認されません。`,
             monthlyLimitWarning: (limit: number | string) => `このカードの上限を${limit}に変更すると、来月まで新規取引は承認されません。`,
+            quarterlyLimitWarning: (limit: number | string) => `このカードの上限を${limit}に変更すると、次の四半期まで新規取引は承認されません。`,
             fixedLimitWarning: (limit: number | string) => `このカードの利用限度額を${limit}に変更すると、新しい取引は拒否されます。`,
             changeCardLimitType: 'カード上限タイプを変更',
             changeLimitType: '上限タイプを変更',
@@ -6485,6 +6491,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 `このカードの上限タイプをSmart Limitに変更すると、未承認の上限額 ${limit} にすでに達しているため、新しい取引は拒否されます。`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `このカードの限度額タイプを「月次」に変更すると、すでに月間限度額 ${limit} に達しているため、新しい取引は拒否されます。`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `このカードの限度額タイプを「四半期」に変更すると、すでに四半期の限度額 ${limit} に達しているため、新しい取引は拒否されます。`,
             addShippingDetails: '配送先の詳細を追加',
             addPersonalDetails: '個人情報を追加',
             issuedCard: (assignee: string) => `${assignee} に Expensify カードを発行しました。カードは 2〜3 営業日以内に到着します。`,
@@ -7271,6 +7279,8 @@ Control プランは、アクティブメンバー1人あたり月額 $9 から�
                     `<muted-text-label>承認が必要になる前に、一定額まで支出できます。このオプションを選択するには${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">承認を有効化</a>` : '承認を有効化'}してください。</muted-text-label>`,
                 monthly: '毎月',
                 monthlyDescription: '毎月、一定額まで利用する',
+                quarterly: '四半期',
+                quarterlyDescription: '四半期ごとに、一定額まで利用する',
                 fixedAmount: '固定額',
                 fixedAmountDescription: '一度だけ上限額まで利用する',
                 setLimit: '上限を設定',

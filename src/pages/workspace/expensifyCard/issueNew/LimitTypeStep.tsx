@@ -139,6 +139,13 @@ function LimitTypeStep({policy, stepNames, startStepIndex}: LimitTypeStepProps) 
                 isSelected: typeSelected === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
             },
             {
+                value: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+                label: translate('workspace.card.issueNewCard.quarterly'),
+                description: translate('workspace.card.issueNewCard.quarterlyDescription'),
+                keyForList: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+                isSelected: typeSelected === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+            },
+            {
                 value: CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED,
                 label: translate('workspace.card.issueNewCard.fixedAmount'),
                 description: translate('workspace.card.issueNewCard.fixedAmountDescription'),

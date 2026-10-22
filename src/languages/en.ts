@@ -3054,6 +3054,11 @@ const translations = {
             name: 'Monthly limit',
             title: (formattedLimit: string) => `You can spend up to ${formattedLimit} on this card per month. The limit will reset on the 1st day of each calendar month.`,
         },
+        quarterlyLimit: {
+            name: 'Quarterly limit',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `You can spend up to ${formattedLimit} on this card per quarter. The limit will reset on the 1st day of each calendar quarter, next on ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Virtual card number',
         travelCardCvv: 'Travel card CVV',
         physicalCardNumber: 'Physical card number',
@@ -6997,6 +7002,7 @@ const translations = {
             changeLimit: 'Change limit',
             smartLimitWarning: (limit: number | string) => `If you change this card’s limit to ${limit}, new transactions will be declined until you approve more expenses on the card.`,
             monthlyLimitWarning: (limit: number | string) => `If you change this card’s limit to ${limit}, new transactions will be declined until next month.`,
+            quarterlyLimitWarning: (limit: number | string) => `If you change this card’s limit to ${limit}, new transactions will be declined until next quarter.`,
             fixedLimitWarning: (limit: number | string) => `If you change this card’s limit to ${limit}, new transactions will be declined.`,
             changeCardLimitType: 'Change card limit type',
             changeLimitType: 'Change limit type',
@@ -7004,6 +7010,8 @@ const translations = {
                 `If you change this card's limit type to Smart Limit, new transactions will be declined because the ${limit} unapproved limit has already been reached.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `If you change this card's limit type to Monthly, new transactions will be declined because the ${limit} monthly limit has already been reached.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `If you change this card's limit type to Quarterly, new transactions will be declined because the ${limit} quarterly limit has already been reached.`,
             addShippingDetails: 'Add shipping details',
             addPersonalDetails: 'Add personal details',
             issuedCard: (assignee: string) => `issued ${assignee} an Expensify Card! The card will arrive in 2-3 business days.`,
@@ -7811,6 +7819,8 @@ const translations = {
                     `<muted-text-label>Spend up to a certain amount before requiring approval. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Enable approvals</a>` : 'Enable approvals'} to select this option.</muted-text-label>`,
                 monthly: 'Monthly',
                 monthlyDescription: 'Limit renews monthly',
+                quarterly: 'Quarterly',
+                quarterlyDescription: 'Limit renews quarterly',
                 fixedAmount: 'Fixed amount',
                 fixedAmountDescription: 'Spend until the limit is reached',
                 setLimit: 'Set a limit',

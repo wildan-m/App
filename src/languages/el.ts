@@ -2952,6 +2952,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: 'Μηνιαίο όριο',
             title: (formattedLimit: string) => `Μπορείτε να ξοδεύετε έως ${formattedLimit} με αυτήν την κάρτα κάθε μήνα. Το όριο θα επανέρχεται την 1η ημέρα κάθε ημερολογιακού μήνα.`,
         },
+        quarterlyLimit: {
+            name: 'Τριμηνιαίο όριο',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `Μπορείτε να ξοδέψετε έως ${formattedLimit} με αυτήν την κάρτα ανά τρίμηνο. Το όριο θα επαναφέρεται την 1η ημέρα κάθε ημερολογιακού τριμήνου, την επόμενη φορά στις ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Αριθμός εικονικής κάρτας',
         travelCardCvv: 'CVV ταξιδιωτικής κάρτας',
         physicalCardNumber: 'Αριθμός φυσικής κάρτας',
@@ -6709,6 +6714,7 @@ _Για πιο αναλυτικές οδηγίες, [επισκεφθείτε τ
             smartLimitWarning: (limit: number | string) =>
                 `Αν αλλάξετε το όριο αυτής της κάρτας σε ${limit}, νέες συναλλαγές θα απορρίπτονται μέχρι να εγκρίνετε περισσότερες δαπάνες στην κάρτα.`,
             monthlyLimitWarning: (limit: number | string) => `Αν αλλάξετε το όριο αυτής της κάρτας σε ${limit}, οι νέες συναλλαγές θα απορρίπτονται μέχρι τον επόμενο μήνα.`,
+            quarterlyLimitWarning: (limit: number | string) => `Αν αλλάξετε το όριο αυτής της κάρτας σε ${limit}, οι νέες συναλλαγές θα απορρίπτονται μέχρι το επόμενο τρίμηνο.`,
             fixedLimitWarning: (limit: number | string) => `Αν αλλάξετε το όριο αυτής της κάρτας σε ${limit}, οι νέες συναλλαγές θα απορρίπτονται.`,
             changeCardLimitType: 'Αλλαγή τύπου ορίου κάρτας',
             changeLimitType: 'Αλλαγή τύπου ορίου',
@@ -6716,6 +6722,8 @@ _Για πιο αναλυτικές οδηγίες, [επισκεφθείτε τ
                 `Αν αλλάξετε τον τύπο ορίου αυτής της κάρτας σε έξυπνο όριο, οι νέες συναλλαγές θα απορρίπτονται επειδή το μη εγκεκριμένο όριο ${limit} έχει ήδη φτάσει.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `Αν αλλάξετε τον τύπο ορίου αυτής της κάρτας σε μηνιαίο, οι νέες συναλλαγές θα απορρίπτονται επειδή το μηνιαίο όριο των ${limit} έχει ήδη εξαντληθεί.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `Αν αλλάξετε τον τύπο ορίου αυτής της κάρτας σε Τριμηνιαίο, οι νέες συναλλαγές θα απορρίπτονται επειδή το τριμηνιαίο όριο των ${limit} έχει ήδη επιτευχθεί.`,
             addShippingDetails: 'Προσθέστε στοιχεία αποστολής',
             addPersonalDetails: 'Προσθέστε προσωπικά στοιχεία',
             issuedCard: (assignee: string) => `εκδώσατε στην/στον ${assignee} μία Κάρτα Expensify! Η κάρτα θα φτάσει σε 2-3 εργάσιμες ημέρες.`,
@@ -7534,6 +7542,8 @@ _Για πιο αναλυτικές οδηγίες, [επισκεφθείτε τ
                     `<muted-text-label>Ξοδέψτε έως ένα συγκεκριμένο ποσό πριν απαιτείται έγκριση. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Ενεργοποιήστε τις εγκρίσεις</a>` : 'Ενεργοποιήστε τις εγκρίσεις'} για να επιλέξετε αυτήν την επιλογή.</muted-text-label>`,
                 monthly: 'Μηνιαίως',
                 monthlyDescription: 'Το όριο ανανεώνεται μηνιαία',
+                quarterly: 'Τριμηνιαίο',
+                quarterlyDescription: 'Το όριο ανανεώνεται κάθε τρίμηνο',
                 fixedAmount: 'Σταθερό ποσό',
                 fixedAmountDescription: 'Ξοδέψτε μέχρι να φτάσετε το όριο',
                 setLimit: 'Ορίστε ένα όριο',

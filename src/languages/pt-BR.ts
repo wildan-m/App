@@ -2880,6 +2880,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: 'Limite mensal',
             title: (formattedLimit: string) => `Você pode gastar até ${formattedLimit} neste cartão por mês. O limite será reiniciado no 1º dia de cada mês do calendário.`,
         },
+        quarterlyLimit: {
+            name: 'Limite trimestral',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `Você pode gastar até ${formattedLimit} com este cartão por trimestre. O limite será redefinido no 1º dia de cada trimestre civil, o próximo em ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Número do cartão virtual',
         travelCardCvv: 'CVV do cartão de viagem',
         physicalCardNumber: 'Número do cartão físico',
@@ -6544,6 +6549,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             smartLimitWarning: (limit: number | string) =>
                 `Se você alterar o limite deste cartão para ${limit}, novas transações serão recusadas até que você aprove mais despesas no cartão.`,
             monthlyLimitWarning: (limit: number | string) => `Se você alterar o limite deste cartão para ${limit}, novas transações serão recusadas até o próximo mês.`,
+            quarterlyLimitWarning: (limit: number | string) => `Se você alterar o limite deste cartão para ${limit}, novas transações serão recusadas até o próximo trimestre.`,
             fixedLimitWarning: (limit: number | string) => `Se você mudar o limite deste cartão para ${limit}, novas transações serão recusadas.`,
             changeCardLimitType: 'Alterar tipo de limite do cartão',
             changeLimitType: 'Alterar tipo de limite',
@@ -6551,6 +6557,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 `Se você alterar o tipo de limite deste cartão para Limite Inteligente, novas transações serão recusadas porque o limite não aprovado de ${limit} já foi atingido.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `Se você alterar o tipo de limite deste cartão para Mensal, novas transações serão recusadas porque o limite mensal de ${limit} já foi atingido.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `Se você alterar o tipo de limite deste cartão para Trimestral, novas transações serão recusadas porque o limite trimestral de ${limit} já foi atingido.`,
             addShippingDetails: 'Adicionar detalhes de envio',
             addPersonalDetails: 'Adicionar dados pessoais',
             issuedCard: (assignee: string) => `emitiu um Cartão Expensify para ${assignee}! O cartão chegará em 2-3 dias úteis.`,
@@ -7347,6 +7355,8 @@ O plano Control começa em US$ 9 por membro ativo por mês.`,
                     `<muted-text-label>Gaste até um determinado valor antes de exigir aprovação. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Ative as aprovações</a>` : 'Ative as aprovações'} para selecionar esta opção.</muted-text-label>`,
                 monthly: 'Mensal',
                 monthlyDescription: 'Gastar até um determinado valor por mês',
+                quarterly: 'Trimestral',
+                quarterlyDescription: 'Gastar até um determinado valor por trimestre',
                 fixedAmount: 'Valor fixo',
                 fixedAmountDescription: 'Gaste até um determinado valor uma vez',
                 setLimit: 'Definir um limite',

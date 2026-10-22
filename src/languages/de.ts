@@ -2897,6 +2897,11 @@ const translations: TranslationDeepObject<typeof en> = {
             name: 'Monatliches Limit',
             title: (formattedLimit: string) => `Sie können mit dieser Karte bis zu ${formattedLimit} pro Monat ausgeben. Das Limit wird am 1. Tag eines jeden Kalendermonats zurückgesetzt.`,
         },
+        quarterlyLimit: {
+            name: 'Quartalslimit',
+            title: (formattedLimit: string, nextResetDate: string) =>
+                `Du kannst mit dieser Karte bis zu ${formattedLimit} pro Quartal ausgeben. Das Limit wird am 1. Tag jedes Kalenderquartals zurückgesetzt, das nächste Mal am ${nextResetDate}.`,
+        },
         virtualCardNumber: 'Virtuelle Kartennummer',
         travelCardCvv: 'Reisekarten-CVV',
         physicalCardNumber: 'Nummer der physischen Karte',
@@ -6602,6 +6607,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             smartLimitWarning: (limit: number | string) =>
                 `Wenn du das Limit dieser Karte auf ${limit} änderst, werden neue Transaktionen abgelehnt, bis du weitere Ausgaben auf der Karte genehmigst.`,
             monthlyLimitWarning: (limit: number | string) => `Wenn du das Limit dieser Karte auf ${limit} änderst, werden neue Transaktionen bis zum nächsten Monat abgelehnt.`,
+            quarterlyLimitWarning: (limit: number | string) => `Wenn du das Limit dieser Karte auf ${limit} änderst, werden neue Transaktionen bis zum nächsten Quartal abgelehnt.`,
             fixedLimitWarning: (limit: number | string) => `Wenn du das Limit dieser Karte auf ${limit} änderst, werden neue Transaktionen abgelehnt.`,
             changeCardLimitType: 'Kartentyp für Limit ändern',
             changeLimitType: 'Limittyp ändern',
@@ -6609,6 +6615,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 `Wenn Sie den Limittyp dieser Karte auf Smart Limit ändern, werden neue Transaktionen abgelehnt, da das nicht genehmigte Limit von ${limit} bereits erreicht wurde.`,
             changeCardMonthlyLimitTypeWarning: (limit: number | string) =>
                 `Wenn Sie den Limittyp dieser Karte auf Monatlich ändern, werden neue Transaktionen abgelehnt, da das monatliche Limit von ${limit} bereits erreicht wurde.`,
+            changeCardQuarterlyLimitTypeWarning: (limit: number | string) =>
+                `Wenn du den Limittyp dieser Karte auf Vierteljährlich änderst, werden neue Transaktionen abgelehnt, weil das Quartalslimit von ${limit} bereits erreicht wurde.`,
             addShippingDetails: 'Versanddetails hinzufügen',
             addPersonalDetails: 'Persönliche Daten hinzufügen',
             issuedCard: (assignee: string) => `hat ${assignee} eine Expensify Karte ausgestellt! Die Karte wird in 2–3 Werktagen ankommen.`,
@@ -7405,6 +7413,8 @@ Der Control-Tarif beginnt bei 9 $ pro aktivem Mitglied und Monat.`,
                     `<muted-text-label>Bis zu einem bestimmten Betrag ausgeben, bevor eine Genehmigung erforderlich ist. ${workspaceWorkflowsLink ? `<a href="${workspaceWorkflowsLink}">Aktiviere Genehmigungen</a>` : 'Aktiviere Genehmigungen'}, um diese Option auszuwählen.</muted-text-label>`,
                 monthly: 'Monatlich',
                 monthlyDescription: 'Bis zu einem bestimmten Betrag pro Monat ausgeben',
+                quarterly: 'Vierteljährlich',
+                quarterlyDescription: 'Bis zu einem bestimmten Betrag pro Quartal ausgeben',
                 fixedAmount: 'Fester Betrag',
                 fixedAmountDescription: 'Bis zu einem bestimmten Betrag einmal ausgeben',
                 setLimit: 'Limit festlegen',

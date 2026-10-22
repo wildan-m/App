@@ -143,6 +143,13 @@ function WorkspaceExpensifyCardLimitTypePickerModal({
             keyForList: CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
             isSelected: selectedLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY,
         },
+        {
+            value: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+            text: translate('workspace.card.issueNewCard.quarterly'),
+            alternateText: translate('workspace.card.issueNewCard.quarterlyDescription'),
+            keyForList: CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+            isSelected: selectedLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY,
+        },
         ...(visibleLimitTypes.includes(CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED)
             ? [
                   {

@@ -52,7 +52,7 @@ import type {Locale as DateFnsLocale} from 'date-fns';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {TupleToUnion, ValueOf} from 'type-fest';
 
-import {format, fromUnixTime, isBefore} from 'date-fns';
+import {addQuarters, format, fromUnixTime, isBefore, startOfQuarter} from 'date-fns';
 import groupBy from 'lodash/groupBy';
 import lodashSortBy from 'lodash/sortBy';
 
@@ -552,6 +552,8 @@ function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY
             return 'workspace.card.issueNewCard.fixedAmount';
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY:
             return 'workspace.card.issueNewCard.monthly';
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY:
+            return 'workspace.card.issueNewCard.quarterly';
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.SINGLE_USE:
             return 'workspace.card.issueNewCard.singleUse';
         default:
@@ -560,19 +562,31 @@ function getTranslationKeyForLimitType(limitType: ValueOf<typeof CONST.EXPENSIFY
 }
 
 /**
- * Switching from Monthly or Fixed to Smart, or from Smart or Fixed to Monthly, can start
- * declining new spend when unapproved spend is already at the limit.
+ * Quarterly limits reset on the first day of each calendar quarter (January 1, April 1, July 1 and October 1),
+ * so the next reset is the start of the quarter after `now`.
+ */
+function getNextQuarterlyLimitResetDate(dateFnsLocale: DateFnsLocale | undefined, now: Date = new Date()): string {
+    return format(startOfQuarter(addQuarters(now, 1)), CONST.DATE.MONTH_DAY_YEAR_FORMAT, {locale: dateFnsLocale});
+}
+
+/**
+ * Switching from Monthly, Quarterly or Fixed to Smart, from Smart or Fixed to Monthly, or from Smart, Monthly or Fixed
+ * to Quarterly can start declining new spend when unapproved spend is already at the limit.
  */
 const EXPENSIFY_CARD_LIMIT_TYPE_CHANGE_CONFIRMATION_COMBINATIONS: Array<[CardLimitType, CardLimitType]> = [
     [CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY, CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART],
+    [CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY, CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART],
     [CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY],
     [CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED, CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART],
     [CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY],
+    [CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART, CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY],
+    [CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY, CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY],
+    [CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED, CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY],
 ];
 
 /**
  * Whether Fixed should be offered when editing an Expensify card's limit type.
- * Hidden when a monthly or Smart card has already spent its full unapproved limit.
+ * Hidden when a monthly, quarterly or Smart card has already spent its full unapproved limit.
  * `fallbackLimitType` is the policy default, used when the card has no `limitType` yet.
  */
 function shouldShowExpensifyCardFixedLimitType(card?: Card, fallbackLimitType?: CardLimitType): boolean {
@@ -581,7 +595,11 @@ function shouldShowExpensifyCardFixedLimitType(card?: Card, fallbackLimitType?: 
     }
 
     const currentLimitType = card.nameValuePairs.limitType ?? fallbackLimitType;
-    if (currentLimitType !== CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY && currentLimitType !== CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART) {
+    if (
+        currentLimitType !== CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY &&
+        currentLimitType !== CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY &&
+        currentLimitType !== CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART
+    ) {
         return true;
     }
 
@@ -589,10 +607,10 @@ function shouldShowExpensifyCardFixedLimitType(card?: Card, fallbackLimitType?: 
 }
 
 /**
- * Smart and Monthly are always offered. Fixed is hidden once spend is already at the limit, and Single Use only exists on virtual cards.
+ * Smart, Monthly and Quarterly are always offered. Fixed is hidden once spend is already at the limit, and Single Use only exists on virtual cards.
  */
 function getVisibleExpensifyCardLimitTypes(card: Card | undefined, policy: OnyxEntry<Policy>): CardLimitType[] {
-    const limitTypes: CardLimitType[] = [CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY];
+    const limitTypes: CardLimitType[] = [CONST.EXPENSIFY_CARD.LIMIT_TYPES.SMART, CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY, CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY];
     if (shouldShowExpensifyCardFixedLimitType(card, getDefaultExpensifyCardLimitType(policy))) {
         limitTypes.push(CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED);
     }
@@ -622,19 +640,33 @@ function shouldConfirmExpensifyCardLimitTypeChange(card: Card | undefined, newLi
 
 /**
  * Warning copy for a limit-type change that would start declining transactions.
- * Monthly and Fixed warn about switching to Smart; every other current type warns about Monthly.
+ * Switching to Quarterly warns about Quarterly. Otherwise Monthly, Quarterly and Fixed warn about switching to Smart;
+ * every other current type warns about Monthly.
  */
 function getExpensifyCardLimitTypeChangeWarningKey(
     currentLimitType: CardLimitType | undefined,
-): 'workspace.expensifyCard.changeCardSmartLimitTypeWarning' | 'workspace.expensifyCard.changeCardMonthlyLimitTypeWarning' {
-    if (currentLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY || currentLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED) {
+    newLimitType?: CardLimitType,
+): 'workspace.expensifyCard.changeCardSmartLimitTypeWarning' | 'workspace.expensifyCard.changeCardMonthlyLimitTypeWarning' | 'workspace.expensifyCard.changeCardQuarterlyLimitTypeWarning' {
+    if (newLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY) {
+        return 'workspace.expensifyCard.changeCardQuarterlyLimitTypeWarning';
+    }
+
+    if (
+        currentLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY ||
+        currentLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY ||
+        currentLimitType === CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED
+    ) {
         return 'workspace.expensifyCard.changeCardSmartLimitTypeWarning';
     }
 
     return 'workspace.expensifyCard.changeCardMonthlyLimitTypeWarning';
 }
 
-type ExpensifyCardLimitChangeWarningKey = 'workspace.expensifyCard.smartLimitWarning' | 'workspace.expensifyCard.monthlyLimitWarning' | 'workspace.expensifyCard.fixedLimitWarning';
+type ExpensifyCardLimitChangeWarningKey =
+    | 'workspace.expensifyCard.smartLimitWarning'
+    | 'workspace.expensifyCard.monthlyLimitWarning'
+    | 'workspace.expensifyCard.quarterlyLimitWarning'
+    | 'workspace.expensifyCard.fixedLimitWarning';
 
 /**
  * Remaining spend after applying `newLimit` in cents. Current spend is
@@ -657,6 +689,8 @@ function getExpensifyCardLimitChangeWarningKey(limitType: CardLimitType | undefi
             return 'workspace.expensifyCard.smartLimitWarning';
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.MONTHLY:
             return 'workspace.expensifyCard.monthlyLimitWarning';
+        case CONST.EXPENSIFY_CARD.LIMIT_TYPES.QUARTERLY:
+            return 'workspace.expensifyCard.quarterlyLimitWarning';
         case CONST.EXPENSIFY_CARD.LIMIT_TYPES.FIXED:
         default:
             return 'workspace.expensifyCard.fixedLimitWarning';
@@ -2571,6 +2605,7 @@ export {
     getCardFeedTextColor,
     getDefaultExpensifyCardLimitType,
     getDisplayedExpensifyCardLimitType,
+    getNextQuarterlyLimitResetDate,
     shouldShowExpensifyCardFixedLimitType,
     shouldConfirmExpensifyCardLimitTypeChange,
     getExpensifyCardLimitTypeChangeWarningKey,
