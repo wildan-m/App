@@ -17,6 +17,7 @@ import type {
     SetPolicyCategoryMaxAmountParams,
     SetPolicyCategoryReceiptsAndItemizedReceiptRequiredParams,
     SetPolicyCategoryReceiptsRequiredParams,
+    SetPolicyMemberCategoryVisibilityParams,
     SetPolicyShowCategoryGLCodesParams,
     SetWorkspaceCategoryDescriptionHintParams,
     UpdatePolicyCategoryGLCodeParams,
@@ -2103,6 +2104,99 @@ function setPolicyCategoryAttendeesRequired(policyID: string, categoryName: stri
     API.write(WRITE_COMMANDS.SET_POLICY_CATEGORY_ATTENDEES_REQUIRED, parameters, onyxData);
 }
 
+/**
+ * Saves which categories the given members can use. Categories in `categories` stay (or become) visible to those
+ * members; every other enabled category is restricted away from them. A category whose `visibleTo` is null is
+ * visible to everyone, so restricting it away pins it to every member in `policyMemberAccountIDs` except the
+ * restricted ones first.
+ */
+function setPolicyMemberCategoryVisibility(policyID: string, accountIDs: number[], categories: string[], policyCategories: PolicyCategories, policyMemberAccountIDs: number[]) {
+    const optimisticCategories: PartialDeep<PolicyCategories> = {};
+    const successCategories: PartialDeep<PolicyCategories> = {};
+    const failureCategories: PartialDeep<PolicyCategories> = {};
+
+    for (const policyCategory of Object.values(policyCategories)) {
+        if (!policyCategory.enabled) {
+            continue;
+        }
+
+        const previousVisibleTo = policyCategory.visibleTo ?? null;
+        const isVisibleToMembers = categories.includes(policyCategory.name);
+
+        let newVisibleTo: number[] | null;
+        if (isVisibleToMembers) {
+            // A category visible to everyone stays that way; otherwise the members join its list.
+            newVisibleTo = previousVisibleTo === null ? null : [...new Set([...previousVisibleTo, ...accountIDs])];
+        } else {
+            // A category visible to everyone becomes visible to every member except the ones being restricted away from it.
+            newVisibleTo = (previousVisibleTo ?? policyMemberAccountIDs).filter((memberAccountID) => !accountIDs.includes(memberAccountID));
+        }
+
+        const isUnchanged =
+            previousVisibleTo === null || newVisibleTo === null
+                ? previousVisibleTo === newVisibleTo
+                : previousVisibleTo.length === newVisibleTo.length && newVisibleTo.every((memberAccountID) => previousVisibleTo.includes(memberAccountID));
+        if (isUnchanged) {
+            continue;
+        }
+
+        optimisticCategories[policyCategory.name] = {
+            visibleTo: newVisibleTo,
+            pendingFields: {
+                visibleTo: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+            },
+        };
+        successCategories[policyCategory.name] = {
+            pendingFields: {
+                visibleTo: null,
+            },
+        };
+        failureCategories[policyCategory.name] = {
+            visibleTo: previousVisibleTo,
+            errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.people.updateCategoryVisibilityFailureMessage'),
+            pendingFields: {
+                visibleTo: null,
+            },
+        };
+    }
+
+    if (Object.keys(optimisticCategories).length === 0) {
+        return;
+    }
+
+    const onyxData: OnyxData<typeof ONYXKEYS.COLLECTION.POLICY_CATEGORIES> = {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`,
+                value: optimisticCategories,
+            },
+        ],
+        successData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`,
+                value: successCategories,
+            },
+        ],
+        failureData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: `${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`,
+                value: failureCategories,
+            },
+        ],
+    };
+
+    const parameters: SetPolicyMemberCategoryVisibilityParams = {
+        policyID,
+        accountIDs: JSON.stringify(accountIDs),
+        categories: JSON.stringify(categories),
+    };
+
+    API.write(WRITE_COMMANDS.SET_POLICY_MEMBER_CATEGORY_VISIBILITY, parameters, onyxData);
+}
+
 export {
     clearCategoryErrors,
     deletePolicyCategoryTax,
@@ -2130,6 +2224,7 @@ export {
     setPolicyCategoryItemizedReceiptsRequired,
     setPolicyCategoryTax,
     setPolicyCategoryTaxes,
+    setPolicyMemberCategoryVisibility,
     setPolicyCustomUnitDefaultCategory,
     setWorkspaceCategoryDescriptionHint,
     setWorkspaceCategoryEnabled,

@@ -114,6 +114,16 @@ function getEnabledCategoriesCount(policyCategories: PolicyCategories | undefine
     return Object.values(policyCategories).filter((policyCategory) => policyCategory.enabled).length;
 }
 
+/**
+ * Returns the names of the enabled categories the given member can use. A category whose `visibleTo` is null or
+ * undefined is visible to every member; otherwise it is visible only to the account IDs it lists.
+ */
+function getMemberVisibleCategoryNames(policyCategories: PolicyCategories | undefined, accountID: number): string[] {
+    return Object.values(policyCategories ?? {})
+        .filter((policyCategory) => policyCategory.enabled && (!policyCategory.visibleTo || policyCategory.visibleTo.includes(accountID)))
+        .map((policyCategory) => policyCategory.name);
+}
+
 function isCategoryMissing(category: string | undefined): boolean {
     if (!category) {
         return true;
@@ -309,6 +319,7 @@ export {
     getCategoryDefaultTaxRate,
     updateCategoryInMccGroup,
     getEnabledCategoriesCount,
+    getMemberVisibleCategoryNames,
     isCategoryMissing,
     isCategoryDescriptionRequired,
     getCategoryDescriptionHint,
