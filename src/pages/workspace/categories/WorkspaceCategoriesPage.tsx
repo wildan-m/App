@@ -39,7 +39,7 @@ import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 import {isConnectionInProgress, isConnectionUnverified} from '@libs/actions/connections';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {renameCategoryInline} from '@libs/actions/Policy/InlineEdit';
-import {getCategoryApproverRule, getDecodedCategoryName} from '@libs/CategoryUtils';
+import {getCategoryApproverRule, getDecodedCategoryName, getMembersWithoutVisibleCategories} from '@libs/CategoryUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
@@ -192,6 +192,41 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
         });
     }, [showConfirmModal, translate]);
 
+    const getMemberAccountIDsToEmails = useCallback(() => {
+        const accountIDsToEmails = new Map<number, string>();
+        for (const email of Object.keys(policy?.employeeList ?? {})) {
+            const accountID = employeePersonalDetails[email]?.accountID;
+            if (accountID) {
+                accountIDsToEmails.set(accountID, email);
+            }
+        }
+        return accountIDsToEmails;
+    }, [employeePersonalDetails, policy?.employeeList]);
+
+    const showCannotDisableCategoryForMembersModal = useCallback(
+        (accountIDs: number[], isBulkDisable: boolean) => {
+            const accountIDsToEmails = getMemberAccountIDsToEmails();
+            const emails = accountIDs.map((accountID) => accountIDsToEmails.get(accountID)).filter((email): email is string => !!email);
+            const shownEmails = emails.slice(0, 3);
+            const remainingCount = emails.length - shownEmails.length;
+            const promptLines = [
+                translate(isBulkDisable ? 'workspace.categories.cannotDisableCategoryForMembers.descriptionBulk' : 'workspace.categories.cannotDisableCategoryForMembers.description'),
+                '',
+                ...shownEmails.map((email) => `• ${email}`),
+            ];
+            if (remainingCount > 0) {
+                promptLines.push(translate('workspace.categories.cannotDisableCategoryForMembers.andMore', {count: remainingCount}));
+            }
+            showConfirmModal({
+                title: translate('workspace.categories.cannotDisableCategoryForMembers.title'),
+                prompt: promptLines.join('\n'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
+        },
+        [getMemberAccountIDsToEmails, showConfirmModal, translate],
+    );
+
     const updateWorkspaceCategoryEnabled = useCallback(
         (value: boolean, categoryName: string) => {
             if (!canWriteCategories) {
@@ -215,6 +250,14 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                 setupCategoriesAndTagsParentReportAction,
                 policyHasTags,
                 reviewWorkspaceSettingsTaskData: getReviewWorkspaceSettingsTaskCompletion(),
+            }).then((response) => {
+                // The server rejects the disable when stale local data hid members this would leave without
+                // visible categories (e.g. another admin changed visibility); show them the same modal.
+                const rejectedAccountIDs = response ? response.additionalData?.accountIDs : undefined;
+                if (!rejectedAccountIDs || rejectedAccountIDs.length === 0) {
+                    return;
+                }
+                showCannotDisableCategoryForMembersModal(rejectedAccountIDs, false);
             });
         },
         [
@@ -235,6 +278,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
             canWriteCategories,
             showReadOnlyModal,
             getReviewWorkspaceSettingsTaskCompletion,
+            showCannotDisableCategoryForMembersModal,
         ],
     );
 
@@ -261,9 +305,26 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                 return;
             }
 
+            if (!enabled) {
+                const membersWithoutCategories = getMembersWithoutVisibleCategories(policyCategories, [category.name], [...getMemberAccountIDsToEmails().keys()]);
+                if (membersWithoutCategories.length > 0) {
+                    showCannotDisableCategoryForMembersModal(membersWithoutCategories, false);
+                    return;
+                }
+            }
+
             updateWorkspaceCategoryEnabled(enabled, category.name);
         },
-        [canWriteCategories, policy, policyCategories, showCannotDeleteOrDisableLastCategoryModal, showReadOnlyModal, updateWorkspaceCategoryEnabled],
+        [
+            canWriteCategories,
+            policy,
+            policyCategories,
+            getMemberAccountIDsToEmails,
+            showCannotDeleteOrDisableLastCategoryModal,
+            showCannotDisableCategoryForMembersModal,
+            showReadOnlyModal,
+            updateWorkspaceCategoryEnabled,
+        ],
     );
 
     const categories = Object.values(policyCategories ?? {});
@@ -551,6 +612,11 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                             showCannotDeleteOrDisableLastCategoryModal();
                             return;
                         }
+                        const membersWithoutCategories = getMembersWithoutVisibleCategories(policyCategories, Object.keys(categoriesToDisable), [...getMemberAccountIDsToEmails().keys()]);
+                        if (membersWithoutCategories.length > 0) {
+                            showCannotDisableCategoryForMembersModal(membersWithoutCategories, true);
+                            return;
+                        }
                         clearTableSelection();
                         setWorkspaceCategoryEnabled({
                             isVendorMatchingBetaEnabled,
@@ -569,6 +635,14 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                             setupCategoriesAndTagsParentReportAction,
                             policyHasTags,
                             reviewWorkspaceSettingsTaskData: getReviewWorkspaceSettingsTaskCompletion(),
+                        }).then((response) => {
+                            // Same stale-data safety net as the single-category toggle: the server lists the
+                            // members the rejected disable would have left without visible categories.
+                            const rejectedAccountIDs = response ? response.additionalData?.accountIDs : undefined;
+                            if (!rejectedAccountIDs || rejectedAccountIDs.length === 0) {
+                                return;
+                            }
+                            showCannotDisableCategoryForMembersModal(rejectedAccountIDs, true);
                         });
                     },
                 });

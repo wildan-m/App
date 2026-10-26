@@ -6640,6 +6640,14 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 title: 'Kan niet alle categorieën verwijderen of uitschakelen',
                 description: `Minstens één categorie moet ingeschakeld blijven, omdat je werkruimte categorieën vereist.`,
             },
+            cannotDisableCategoryForMembers: {
+                title: 'Categorie kan niet worden uitgeschakeld',
+                description:
+                    'Elk lid heeft minstens één categorie nodig om uit te kiezen, en deze leden kunnen alleen deze gebruiken. Geef ze eerst toegang tot een andere categorie en probeer het dan opnieuw.',
+                descriptionBulk:
+                    'Elk lid heeft minstens één categorie nodig om uit te kiezen, en deze leden kunnen alleen deze categorieën gebruiken. Geef ze eerst toegang tot een andere categorie en probeer het dan opnieuw.',
+                andMore: ({count}: {count: number}) => `en ${count} meer`,
+            },
         },
         moreFeatures: {
             subtitle: 'Gebruik de schakelaars hieronder om meer functies in te schakelen terwijl je groeit. Elke functie verschijnt in het navigatiemenu voor verdere aanpassing.',

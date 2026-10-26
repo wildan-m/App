@@ -21,7 +21,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnboardingTaskInformation from '@hooks/useOnboardingTaskInformation';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
-import usePersonalDetailByLogin from '@hooks/usePersonalDetailByLogin';
+import usePersonalDetailByLogin, {usePersonalDetailsByLogins} from '@hooks/usePersonalDetailByLogin';
 import usePolicyData from '@hooks/usePolicyData';
 import usePolicyFeatureWriteAccess from '@hooks/usePolicyFeatureWriteAccess';
 import useReviewWorkspaceSettingsTaskCompletion from '@hooks/useReviewWorkspaceSettingsTaskCompletion';
@@ -29,7 +29,7 @@ import useScreenBoundDynamicRoute from '@hooks/useScreenBoundDynamicRoute';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import getCategoryContextualRules from '@libs/CategoryContextualRulesUtils';
-import {getCategoryApproverRule, getDecodedCategoryName} from '@libs/CategoryUtils';
+import {getCategoryApproverRule, getDecodedCategoryName, getMembersWithoutVisibleCategories} from '@libs/CategoryUtils';
 import {getLatestErrorMessageField} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -74,6 +74,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
     const {environmentURL} = useEnvironment();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {isOffline} = useNetwork();
+    const employeePersonalDetails = usePersonalDetailsByLogins(Object.keys(policy?.employeeList ?? {}));
 
     const policyCategory = policyCategories?.[categoryName] ?? Object.values(policyCategories).find((category) => category.previousCategoryName === categoryName);
     const decodedCategoryName = getDecodedCategoryName(policyCategory?.name ?? '');
@@ -142,10 +143,43 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
         });
     };
 
+    const showCannotDisableCategoryForMembersModal = (accountIDs: number[]) => {
+        const accountIDsToEmails = new Map<number, string>();
+        for (const email of Object.keys(policy?.employeeList ?? {})) {
+            const accountID = employeePersonalDetails[email]?.accountID;
+            if (accountID) {
+                accountIDsToEmails.set(accountID, email);
+            }
+        }
+        const emails = accountIDs.map((accountID) => accountIDsToEmails.get(accountID)).filter((email): email is string => !!email);
+        const shownEmails = emails.slice(0, 3);
+        const remainingCount = emails.length - shownEmails.length;
+        const promptLines = [translate('workspace.categories.cannotDisableCategoryForMembers.description'), '', ...shownEmails.map((email) => `• ${email}`)];
+        if (remainingCount > 0) {
+            promptLines.push(translate('workspace.categories.cannotDisableCategoryForMembers.andMore', {count: remainingCount}));
+        }
+        showConfirmModal({
+            title: translate('workspace.categories.cannotDisableCategoryForMembers.title'),
+            prompt: promptLines.join('\n'),
+            confirmText: translate('common.buttonConfirm'),
+            shouldShowCancelButton: false,
+        });
+    };
+
     const updateWorkspaceCategoryEnabled = (value: boolean) => {
         if (shouldPreventDisableOrDelete) {
             showCannotDeleteOrDisableLastCategoryModal();
             return;
+        }
+        if (!value) {
+            const memberAccountIDs = Object.keys(policy?.employeeList ?? {})
+                .map((email) => employeePersonalDetails[email]?.accountID)
+                .filter((accountID): accountID is number => !!accountID);
+            const membersWithoutCategories = getMembersWithoutVisibleCategories(policyData.categories, [policyCategory.name], memberAccountIDs);
+            if (membersWithoutCategories.length > 0) {
+                showCannotDisableCategoryForMembersModal(membersWithoutCategories);
+                return;
+            }
         }
         setWorkspaceCategoryEnabled({
             isVendorMatchingBetaEnabled,
@@ -164,6 +198,14 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
             setupCategoriesAndTagsParentReportAction,
             policyHasTags,
             reviewWorkspaceSettingsTaskData: getReviewWorkspaceSettingsTaskCompletion(),
+        }).then((response) => {
+            // The server rejects the disable when stale local data hid members this would leave without
+            // visible categories (e.g. another admin changed visibility); show them the same modal.
+            const rejectedAccountIDs = response ? response.additionalData?.accountIDs : undefined;
+            if (!rejectedAccountIDs || rejectedAccountIDs.length === 0) {
+                return;
+            }
+            showCannotDisableCategoryForMembersModal(rejectedAccountIDs);
         });
     };
 

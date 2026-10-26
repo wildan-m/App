@@ -6648,6 +6648,14 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 title: 'Impossibile eliminare o disattivare tutte le categorie',
                 description: `Almeno una categoria deve rimanere abilitata perché il tuo spazio di lavoro richiede le categorie.`,
             },
+            cannotDisableCategoryForMembers: {
+                title: 'Impossibile disattivare la categoria',
+                description:
+                    'Ogni membro deve avere almeno una categoria tra cui scegliere, e questi membri possono usare solo questa. Concedi loro prima l’accesso a un’altra categoria, poi riprova.',
+                descriptionBulk:
+                    'Ogni membro deve avere almeno una categoria tra cui scegliere, e questi membri possono usare solo queste categorie. Concedi loro prima l’accesso a un’altra categoria, poi riprova.',
+                andMore: ({count}: {count: number}) => `e altri ${count}`,
+            },
         },
         moreFeatures: {
             subtitle:

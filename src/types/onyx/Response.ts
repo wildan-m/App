@@ -71,6 +71,12 @@ type Response<TKey extends OnyxKey> = {
     /** Commands data */
     data?: Data;
 
+    /** Extra command payload. SetWorkspaceCategoriesEnabled rejections list the members a disable would leave without visible categories. */
+    additionalData?: {
+        /** Account IDs of the members affected by the rejected command */
+        accountIDs?: number[];
+    };
+
     /** Used to pass error type for error handling purposes */
     type?: string;
 

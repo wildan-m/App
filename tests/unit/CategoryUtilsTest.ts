@@ -7,6 +7,7 @@ import {
     getCategoryNameError,
     getDecodedFullCategoryName,
     getDecodedLeafCategoryName,
+    getMembersWithoutVisibleCategories,
     hasAnyCategoryGLCode,
     hasAnyCategoryRules,
     isCategoryDescriptionRequired,
@@ -646,5 +647,114 @@ describe('getCategoryDefaultTaxRate', () => {
             tax: {field_id_TAX: {externalID: 'id_TAX_B'}},
         };
         expect(getCategoryDefaultTaxRate([tagNamedAfterTheCategory], 'Travel', 'id_TAX_DEFAULT')).toBe('id_TAX_DEFAULT');
+    });
+});
+
+describe('getMembersWithoutVisibleCategories', () => {
+    const buildCategories = (categories: Array<{name: string; enabled: boolean; visibleTo?: number[] | null}>): PolicyCategories =>
+        categories.reduce<PolicyCategories>((acc, category) => {
+            acc[category.name] = {name: category.name, enabled: category.enabled, visibleTo: category.visibleTo};
+            return acc;
+        }, {});
+
+    it('returns nobody when no category restricts visibility', () => {
+        // Given a workspace without visibility restrictions (every visibleTo is null or undefined)
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: null},
+            {name: 'Meals', enabled: true},
+        ]);
+
+        // When one of several enabled categories is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2]);
+
+        // Then nobody is flagged, since every member still sees the remaining enabled categories
+        expect(result).toEqual([]);
+    });
+
+    it('returns the member whose only visible category is being disabled', () => {
+        // Given a member (accountID 2) restricted to a single category while another enabled category exists
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [2]},
+            {name: 'Meals', enabled: true, visibleTo: [1]},
+        ]);
+
+        // When that single category is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2]);
+
+        // Then only that member is flagged, since the disable would leave them without categories
+        expect(result).toEqual([2]);
+    });
+
+    it('returns nobody when the member keeps another visible category', () => {
+        // Given a member restricted to two categories
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [2]},
+            {name: 'Meals', enabled: true, visibleTo: [2]},
+            {name: 'Office', enabled: true},
+        ]);
+
+        // When only one of the member's two categories is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2]);
+
+        // Then the member is not flagged, since the other category stays visible to them
+        expect(result).toEqual([]);
+    });
+
+    it('returns every member restricted to the categories being bulk-disabled', () => {
+        // Given four members restricted to the same single category and one unrestricted member
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [2, 3, 4, 5]},
+            {name: 'Meals', enabled: true, visibleTo: [1]},
+        ]);
+
+        // When that category is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2, 3, 4, 5]);
+
+        // Then all four restricted members are flagged
+        expect(result).toEqual([2, 3, 4, 5]);
+    });
+
+    it('returns nobody when every enabled category is being disabled', () => {
+        // Given a disable that covers every enabled category, which the workspace-wide
+        // last-enabled-category check owns rather than the per-member visibility check
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [2]},
+            {name: 'Meals', enabled: true},
+        ]);
+
+        // When all enabled categories are disabled at once
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel', 'Meals'], [1, 2]);
+
+        // Then nobody is flagged, since no member could be given access to another category anyway
+        expect(result).toEqual([]);
+    });
+
+    it('ignores members who already have no visible categories', () => {
+        // Given a member (accountID 3) who cannot see any enabled category even before the disable
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [1]},
+            {name: 'Meals', enabled: true, visibleTo: [1, 2]},
+        ]);
+
+        // When a category they cannot see is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2, 3]);
+
+        // Then they are not flagged, since the disable does not change their situation
+        expect(result).toEqual([]);
+    });
+
+    it('does not count disabled categories as visible', () => {
+        // Given a member whose only other category is already disabled
+        const policyCategories = buildCategories([
+            {name: 'Travel', enabled: true, visibleTo: [2]},
+            {name: 'Meals', enabled: false, visibleTo: [2]},
+            {name: 'Office', enabled: true, visibleTo: [1]},
+        ]);
+
+        // When their only enabled category is disabled
+        const result = getMembersWithoutVisibleCategories(policyCategories, ['Travel'], [1, 2]);
+
+        // Then the member is flagged, since a disabled category cannot be picked
+        expect(result).toEqual([2]);
     });
 });

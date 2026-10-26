@@ -332,7 +332,9 @@ function setWorkspaceCategoryEnabled({
         completedTaskReportActionID: reviewWorkspaceSettingsTaskData.completedTaskReportActionID,
     };
 
-    API.write(WRITE_COMMANDS.SET_WORKSPACE_CATEGORIES_ENABLED, parameters, withReviewWorkspaceSettingsTaskData(onyxData, reviewWorkspaceSettingsTaskData));
+    // The response is returned so callers can show the affected members when the server rejects the
+    // disable because it would leave members without visible categories (additionalData.accountIDs).
+    return API.write(WRITE_COMMANDS.SET_WORKSPACE_CATEGORIES_ENABLED, parameters, withReviewWorkspaceSettingsTaskData(onyxData, reviewWorkspaceSettingsTaskData));
 }
 
 function setPolicyCategoryDescriptionRequired(
