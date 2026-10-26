@@ -157,6 +157,30 @@ describe('useDynamicBackPath', () => {
         expect(result.current).toBe('r/123/other/456/abc');
     });
 
+    it('should keep the last matched back path while another screen covers the route', () => {
+        // Given the dynamic route is focused, so its suffix matches the current path
+        const path = DYNAMIC_ROUTES.VERIFY_ACCOUNT.path;
+        getPathFromStateMock.mockReturnValue(`settings/wallet/${path}`);
+
+        const {result, rerender} = renderHook(() => useDynamicBackPath(path));
+
+        expect(result.current).toBe('settings/wallet');
+
+        // When another screen is stacked over it, the focused path no longer ends with the suffix
+        getPathFromStateMock.mockReturnValue('test-tools');
+        rerender({});
+
+        // Then the back path still points to the route's own parent, not to the covering screen
+        expect(result.current).toBe('settings/wallet');
+
+        // When the suffix matches again under a different parent
+        getPathFromStateMock.mockReturnValue(`settings/profile/${path}`);
+        rerender({});
+
+        // Then the back path follows the new parent
+        expect(result.current).toBe('settings/profile');
+    });
+
     describe('optional path params', () => {
         const OPT_TRAILING_PATH = 'opt-page/:id?';
         const OPT_MIDDLE_PATH = 'wrap/:p?/end';
