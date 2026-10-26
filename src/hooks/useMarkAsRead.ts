@@ -149,6 +149,9 @@ function useMarkAsRead({
     const lastMessageTime = useRef<string | null>(null);
     const didMarkReportAsReadInitially = useRef(false);
 
+    // The lastReadTime written by a manual "Mark as unread", so automatic read-marking stands down until it changes
+    const manuallyMarkedUnreadLastReadTime = useRef<string | null>(null);
+
     const lastAction = sortedVisibleReportActions.at(0);
     const isReportUnreadValue = isUnread(report, transactionThreadReport, isReportArchived, derivedIsEmptyReport) || (!!lastAction && isCurrentActionUnread(report, lastAction));
 
@@ -177,8 +180,10 @@ function useMarkAsRead({
             return;
         }
 
-        const subscription = DeviceEventEmitter.addListener(`unreadAction_${reportID}`, () => {
+        manuallyMarkedUnreadLastReadTime.current = null;
+        const subscription = DeviceEventEmitter.addListener(`unreadAction_${reportID}`, (newLastReadTime: string) => {
             userActiveSince.current = DateUtils.getDBTime();
+            manuallyMarkedUnreadLastReadTime.current = newLastReadTime;
         });
         return () => subscription.remove();
     }, [reportID, isAnonymousUser]);
@@ -271,6 +276,12 @@ function useMarkAsRead({
         if (!isUnread(report, transactionThreadReport, isReportArchived, derivedIsEmptyReport) && !isLastActionUnread) {
             return;
         }
+
+        // The user deliberately marked this report as unread, so don't undo it until something else moves lastReadTime
+        if (!!manuallyMarkedUnreadLastReadTime.current && report?.lastReadTime === manuallyMarkedUnreadLastReadTime.current) {
+            return;
+        }
+
         const isFromNotification = route?.params?.referrer === CONST.REFERRER.NOTIFICATION;
         const shouldReadOnReportChange = ((isVisible && Visibility.hasFocus()) || isFromNotification) && !hasNewerActions && isScrolledToEnd;
 

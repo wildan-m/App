@@ -216,6 +216,7 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
         sortedVisibleReportActions,
         isScrolledToEnd: !hasScrolledOverThreshold,
         hasNewerActions,
+        shouldRequireScreenFocus: true,
     });
 
     const persistedDraftReportAction = draftReportAction

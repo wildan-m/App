@@ -13,6 +13,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 
 import React from 'react';
+import {DeviceEventEmitter} from 'react-native';
 
 import createRandomReportAction from '../utils/collections/reportActions';
 
@@ -400,6 +401,43 @@ describe('useMarkAsRead', () => {
         rerender({report: reportWithNewMessage, actions: [incomingAction]});
 
         expect(readNewestAction).not.toHaveBeenCalled();
+    });
+
+    it('should not undo a manual mark as unread when the report changes while the list is mounted', () => {
+        const manualLastReadTime = '2023-01-01 10:59:59.999';
+        const markedUnreadReport = {reportID: REPORT_ID, lastReadTime: manualLastReadTime, lastVisibleActionCreated: '2023-01-01 11:00:00.000'} as OnyxTypes.Report;
+        const incomingAction: OnyxTypes.ReportAction = {...createRandomReportAction(2), created: '2023-01-01 11:00:00.000', actorAccountID: 2};
+
+        mockIsUnread = false;
+        const {rerender} = renderHook(
+            (props: {report: OnyxTypes.Report}) =>
+                useMarkAsRead({
+                    reportID: REPORT_ID,
+                    report: props.report as OnyxEntry<OnyxTypes.Report>,
+                    transactionThreadReport: undefined,
+                    sortedVisibleReportActions: [incomingAction],
+                    isScrolledToEnd: true,
+                    hasNewerActions: false,
+                    scopeKey: 'manualUnread',
+                }),
+            {initialProps: {report: {...markedUnreadReport, lastReadTime: '2023-01-01 11:00:00.000'} as OnyxTypes.Report}},
+        );
+        readNewestAction.mockClear();
+
+        // The user marks the chat as unread from the LHN while its list is still mounted.
+        act(() => {
+            DeviceEventEmitter.emit(`unreadAction_${REPORT_ID}`, manualLastReadTime);
+        });
+        mockIsUnread = true;
+        rerender({report: markedUnreadReport});
+        rerender({report: {...markedUnreadReport, lastVisibleActionCreated: '2023-01-01 11:00:00.001'} as OnyxTypes.Report});
+
+        expect(readNewestAction).not.toHaveBeenCalled();
+
+        // Once something else moves lastReadTime, automatic read-marking resumes.
+        rerender({report: {...markedUnreadReport, lastReadTime: '2023-01-01 10:00:00.000', lastVisibleActionCreated: '2023-01-01 11:00:00.002'} as OnyxTypes.Report});
+
+        expect(readNewestAction).toHaveBeenCalledTimes(1);
     });
 
     it('should mark the report as read on focus return when the unread action is only in the full action chain', () => {
