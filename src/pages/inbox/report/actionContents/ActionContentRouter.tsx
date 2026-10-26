@@ -139,6 +139,9 @@ type ActionContentRouterProps = {
     /** Whether this is the newest comment of Concierge or of a custom agent that is eligible for the inline feedback prompt */
     isLatestConciergeFeedbackAction: boolean;
 
+    /** Whether the action renders as its thread's parent action */
+    isThreadReportParentAction?: boolean;
+
     setIsPaymentMethodPopoverActive: (value: boolean) => void;
     isTrackIntentUser?: boolean;
     paymentExpectedDate?: string;
@@ -165,6 +168,7 @@ function ActionContentRouter({
     isTrackIntentUser,
     isLatestConciergeFeedbackAction,
     paymentExpectedDate,
+    isThreadReportParentAction = false,
 }: ActionContentRouterProps): React.JSX.Element | null {
     const {translate, formatTravelDate} = useLocalize();
     const styles = useThemeStyles();
@@ -378,6 +382,7 @@ function ActionContentRouter({
             <PolicyChangeLogContent
                 action={action}
                 policyID={policyID}
+                shouldShowFullList={isThreadReportParentAction}
             />
         );
     }

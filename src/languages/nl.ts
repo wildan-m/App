@@ -9542,6 +9542,18 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             return `heeft de categorie „${categoryName}” Itemized receipts gewijzigd naar ${newValue} (voorheen ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `heeft de categorie "${oldName}" hernoemd naar "${newName}"`,
+        setCategoryVisibility: (members: string, categories: string) => `heeft ingesteld dat ${members} alleen ${categories} ziet`,
+        changedCategoryVisibility: (members: string, categories: string) => `heeft gewijzigd dat ${members} alleen ${categories} ziet`,
+        clearedCategoryVisibility: (members: string) => `heeft gewijzigd dat ${members} alle categorieën ziet`,
+        oneCategory: (name: string) => `de categorie ${name}`,
+        someCategories: (list: string) => `de categorieën ${list}`,
+        everyone: 'iedereen',
+        categoryCount: (count: number) => `${count} categorieën`,
+        memberCount: (count: number) => `${count} leden`,
+        categoryVisibilityCategoriesList: (list: string) => `Categorieën: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Leden: ${list}`,
+        categoryVisibilityReasonDeleted: ', omdat hun enige categorie is verwijderd. Werk indien nodig hun categoriezichtbaarheid bij.',
+        categoryVisibilityReasonDisabled: ', omdat hun enige categorie is uitgeschakeld. Werk indien nodig hun categoriezichtbaarheid bij.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `heeft de beschrijvingshint "${oldValue}" verwijderd uit de categorie "${categoryName}"`;

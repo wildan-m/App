@@ -9541,6 +9541,18 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             return `alterou a categoria "${categoryName}" Itens detalhados de recibos para ${newValue} (antes ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `renomeou a categoria "${oldName}" para "${newName}"`,
+        setCategoryVisibility: (members: string, categories: string) => `definiu ${members} para ver apenas ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `alterou ${members} para ver apenas ${categories}`,
+        clearedCategoryVisibility: (members: string) => `alterou ${members} para ver todas as categorias`,
+        oneCategory: (name: string) => `a categoria ${name}`,
+        someCategories: (list: string) => `as categorias ${list}`,
+        everyone: 'todos',
+        categoryCount: (count: number) => `${count} categorias`,
+        memberCount: (count: number) => `${count} membros`,
+        categoryVisibilityCategoriesList: (list: string) => `Categorias: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Membros: ${list}`,
+        categoryVisibilityReasonDeleted: ', pois sua única categoria foi excluída. Atualize a visibilidade de categorias deles, se necessário.',
+        categoryVisibilityReasonDisabled: ', pois sua única categoria foi desativada. Atualize a visibilidade de categorias deles, se necessário.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `removeu a dica de descrição "${oldValue}" da categoria "${categoryName}"`;

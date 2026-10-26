@@ -4,7 +4,7 @@ import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 import usePrevious from '@hooks/usePrevious';
 
 // eslint-disable-next-line @dword-design/import-alias/prefer-alias
-import {doesReportContainRequestsFromMultipleUsers, getReportOrDraftReport} from '@libs/ReportUtils';
+import {doesReportContainRequestsFromMultipleUsers, getDisplayNameForParticipant, getReportOrDraftReport} from '@libs/ReportUtils';
 
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
@@ -66,7 +66,7 @@ import getBase62ReportID from './getBase62ReportID';
 import {isReportMessageAttachment} from './isReportMessageAttachment';
 import {toLocaleOrdinal} from './LocaleDigitUtils';
 import {formatPhoneNumber} from './LocalePhoneNumber';
-import {formatMessageElementList} from './Localize';
+import {formatList, formatMessageElementList} from './Localize';
 import Log from './Log';
 import getReportURLForCurrentContext from './Navigation/helpers/getReportURLForCurrentContext';
 import {getIsOffline, subscribe as subscribeNetworkState} from './NetworkState';
@@ -2085,7 +2085,8 @@ function isCategoryModificationAction(actionName: string): boolean {
         actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.ADD_CATEGORY ||
         actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.DELETE_CATEGORY ||
         actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_CATEGORY ||
-        actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.SET_CATEGORY_NAME
+        actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.SET_CATEGORY_NAME ||
+        actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.SET_CATEGORY_VISIBILITY
     );
 }
 
@@ -3434,8 +3435,8 @@ function getWorkspaceFrequencyUpdateMessage(translate: LocalizedTranslate, actio
     return translate('workspaceActions.updatedWorkspaceFrequencyAction', oldFrequencyTranslation, newFrequencyTranslation);
 }
 
-function getWorkspaceCategoryUpdateMessage(translate: LocalizedTranslate, action: ReportAction, policy?: OnyxEntry<Policy>): string {
-    const {categoryName, oldValue, newName, oldName, updatedField, newValue, currency} =
+function getWorkspaceCategoryUpdateMessage(translate: LocalizedTranslate, action: ReportAction, policy?: OnyxEntry<Policy>, shouldShowFullList = false): string {
+    const {categoryName, oldValue, newName, oldName, updatedField, newValue, currency, categoryNames, accountIDs, hadRestriction, reason} =
         getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.ADD_CATEGORY>) ?? {};
 
     const decodedOptionName = getDecodedCategoryName(categoryName ?? '');
@@ -3530,6 +3531,59 @@ function getWorkspaceCategoryUpdateMessage(translate: LocalizedTranslate, action
 
     if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.SET_CATEGORY_NAME && oldName && newName) {
         return translate('workspaceActions.setCategoryName', getDecodedCategoryName(oldName), getDecodedCategoryName(newName));
+    }
+
+    if (action.actionName === CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.SET_CATEGORY_VISIBILITY) {
+        const quotedCategoryNames = (categoryNames ?? []).map((name) => `"${getDecodedCategoryName(name)}"`);
+        const memberAccountIDs = accountIDs ?? [];
+        const memberNames = memberAccountIDs.map((accountID) => getDisplayNameForParticipant({accountID, formatPhoneNumber}));
+
+        if (shouldShowFullList) {
+            const fullListLines: string[] = [];
+            if (quotedCategoryNames.length >= CONST.CATEGORY_VISIBILITY_FULL_LIST_THRESHOLD) {
+                fullListLines.push(translate('workspaceActions.categoryVisibilityCategoriesList', formatList(quotedCategoryNames)));
+            }
+            if (memberNames.length >= CONST.CATEGORY_VISIBILITY_FULL_LIST_THRESHOLD) {
+                fullListLines.push(translate('workspaceActions.categoryVisibilityMembersList', formatList(memberNames)));
+            }
+            if (fullListLines.length > 0) {
+                return fullListLines.join('\n');
+            }
+        }
+
+        let membersText: string;
+        if (memberAccountIDs.length === 0) {
+            membersText = translate('workspaceActions.everyone');
+        } else if (memberAccountIDs.length >= CONST.CATEGORY_VISIBILITY_FULL_LIST_THRESHOLD) {
+            membersText = translate('workspaceActions.memberCount', memberAccountIDs.length);
+        } else {
+            membersText = formatList(memberNames);
+        }
+
+        let message: string;
+        if (quotedCategoryNames.length === 0) {
+            message = translate('workspaceActions.clearedCategoryVisibility', membersText);
+        } else {
+            let categoriesText: string;
+            if (quotedCategoryNames.length >= CONST.CATEGORY_VISIBILITY_FULL_LIST_THRESHOLD) {
+                categoriesText = translate('workspaceActions.categoryCount', quotedCategoryNames.length);
+            } else if (quotedCategoryNames.length === 1) {
+                categoriesText = translate('workspaceActions.oneCategory', quotedCategoryNames.at(0) ?? '');
+            } else {
+                categoriesText = translate('workspaceActions.someCategories', formatList(quotedCategoryNames));
+            }
+            message = hadRestriction
+                ? translate('workspaceActions.changedCategoryVisibility', membersText, categoriesText)
+                : translate('workspaceActions.setCategoryVisibility', membersText, categoriesText);
+        }
+
+        if (reason === CONST.POLICY.CATEGORY_VISIBILITY_CHANGE_REASON.CATEGORIES_DELETED) {
+            message += translate('workspaceActions.categoryVisibilityReasonDeleted');
+        } else if (reason === CONST.POLICY.CATEGORY_VISIBILITY_CHANGE_REASON.CATEGORIES_DISABLED) {
+            message += translate('workspaceActions.categoryVisibilityReasonDisabled');
+        }
+
+        return message;
     }
 
     return getReportActionText(action);

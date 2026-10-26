@@ -9806,6 +9806,18 @@ const translations = {
             return `changed the "${categoryName}" category Itemized receipts to ${newValue} (previously ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `renamed the category "${oldName}" to "${newName}"`,
+        setCategoryVisibility: (members: string, categories: string) => `set ${members} to only see ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `changed ${members} to only see ${categories}`,
+        clearedCategoryVisibility: (members: string) => `changed ${members} to see all categories`,
+        oneCategory: (name: string) => `the ${name} category`,
+        someCategories: (list: string) => `the ${list} categories`,
+        everyone: 'everyone',
+        categoryCount: (count: number) => `${count} categories`,
+        memberCount: (count: number) => `${count} members`,
+        categoryVisibilityCategoriesList: (list: string) => `Categories: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Members: ${list}`,
+        categoryVisibilityReasonDeleted: ', since their only category was deleted. Update their category visibility if needed.',
+        categoryVisibilityReasonDisabled: ', since their only category was disabled. Update their category visibility if needed.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `removed the description hint "${oldValue}" from the category "${categoryName}"`;

@@ -9782,6 +9782,18 @@ ${reportName}`,
             return `άλλαξε τις αναλυτικές αποδείξεις της κατηγορίας «${categoryName}» σε ${newValue} (προηγουμένως ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `μετονόμασε την κατηγορία «${oldName}» σε «${newName}»`,
+        setCategoryVisibility: (members: string, categories: string) => `όρισε ${members} να βλέπει μόνο ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `άλλαξε ${members} ώστε να βλέπει μόνο ${categories}`,
+        clearedCategoryVisibility: (members: string) => `άλλαξε ${members} ώστε να βλέπει όλες τις κατηγορίες`,
+        oneCategory: (name: string) => `την κατηγορία ${name}`,
+        someCategories: (list: string) => `τις κατηγορίες ${list}`,
+        everyone: 'όλους',
+        categoryCount: (count: number) => `${count} κατηγορίες`,
+        memberCount: (count: number) => `${count} μέλη`,
+        categoryVisibilityCategoriesList: (list: string) => `Κατηγορίες: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Μέλη: ${list}`,
+        categoryVisibilityReasonDeleted: ', καθώς η μοναδική τους κατηγορία διαγράφηκε. Ενημερώστε την ορατότητα κατηγοριών τους αν χρειάζεται.',
+        categoryVisibilityReasonDisabled: ', καθώς η μοναδική τους κατηγορία απενεργοποιήθηκε. Ενημερώστε την ορατότητα κατηγοριών τους αν χρειάζεται.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `αφαίρεσε την υπόδειξη περιγραφής «${oldValue}» από την κατηγορία «${categoryName}»`;

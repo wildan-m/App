@@ -9643,6 +9643,18 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             return `a modifié les reçus détaillés de la catégorie « ${categoryName} » en ${newValue} (auparavant ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `a renommé la catégorie « ${oldName} » en « ${newName} »`,
+        setCategoryVisibility: (members: string, categories: string) => `a configuré ${members} pour ne voir que ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `a modifié ${members} pour ne voir que ${categories}`,
+        clearedCategoryVisibility: (members: string) => `a modifié ${members} pour voir toutes les catégories`,
+        oneCategory: (name: string) => `la catégorie ${name}`,
+        someCategories: (list: string) => `les catégories ${list}`,
+        everyone: 'tout le monde',
+        categoryCount: (count: number) => `${count} catégories`,
+        memberCount: (count: number) => `${count} membres`,
+        categoryVisibilityCategoriesList: (list: string) => `Catégories : ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Membres : ${list}`,
+        categoryVisibilityReasonDeleted: ', car leur seule catégorie a été supprimée. Mettez à jour leur visibilité des catégories si nécessaire.',
+        categoryVisibilityReasonDisabled: ', car leur seule catégorie a été désactivée. Mettez à jour leur visibilité des catégories si nécessaire.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `a supprimé l’indication de description « ${oldValue} » de la catégorie « ${categoryName} »`;

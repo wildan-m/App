@@ -499,6 +499,19 @@ type OriginalMessagePolicyChangeLog = {
 
     connectionName?: AllConnectionName;
     categoryName?: string;
+
+    /** Categories the members were restricted to in a category visibility change log, empty when the restriction was cleared */
+    categoryNames?: string[];
+
+    /** Members whose category visibility changed, empty when the change applies to everyone */
+    accountIDs?: number[];
+
+    /** Whether the members already had a category restriction before a category visibility change */
+    hadRestriction?: boolean;
+
+    /** Why the category visibility changed */
+    reason?: ValueOf<typeof CONST.POLICY.CATEGORY_VISIBILITY_CHANGE_REASON>;
+
     taxName?: string;
     updatedField?: string;
     oldMaxExpenseAmountNoReceipt?: number;

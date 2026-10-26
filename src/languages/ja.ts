@@ -9430,6 +9430,18 @@ ${reportName}`,
             return `「${categoryName}」カテゴリの明細付きレシートを${newValue}に変更しました（以前は${oldValue}）`;
         },
         setCategoryName: (oldName: string, newName: string) => `カテゴリ名を「${oldName}」から「${newName}」に変更しました`,
+        setCategoryVisibility: (members: string, categories: string) => `${members}に${categories}のみを表示するように設定しました`,
+        changedCategoryVisibility: (members: string, categories: string) => `${members}に${categories}のみを表示するように変更しました`,
+        clearedCategoryVisibility: (members: string) => `${members}にすべてのカテゴリを表示するように変更しました`,
+        oneCategory: (name: string) => `${name}カテゴリ`,
+        someCategories: (list: string) => `${list}のカテゴリ`,
+        everyone: '全員',
+        categoryCount: (count: number) => `${count}件のカテゴリ`,
+        memberCount: (count: number) => `${count}名のメンバー`,
+        categoryVisibilityCategoriesList: (list: string) => `カテゴリ: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `メンバー: ${list}`,
+        categoryVisibilityReasonDeleted: '。唯一のカテゴリが削除されたため、必要に応じてカテゴリの表示設定を更新してください。',
+        categoryVisibilityReasonDisabled: '。唯一のカテゴリが無効化されたため、必要に応じてカテゴリの表示設定を更新してください。',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `カテゴリ「${categoryName}」から説明のヒント「${oldValue}」を削除しました`;

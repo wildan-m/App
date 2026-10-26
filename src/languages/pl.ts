@@ -9563,6 +9563,18 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             return `zmienił(a) pozycjonowanie paragonów dla kategorii „${categoryName}” na ${newValue} (wcześniej ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `zmieniono nazwę kategorii „${oldName}” na „${newName}”`,
+        setCategoryVisibility: (members: string, categories: string) => `ustawiono, że ${members} widzi tylko ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `zmieniono, że ${members} widzi tylko ${categories}`,
+        clearedCategoryVisibility: (members: string) => `zmieniono, że ${members} widzi wszystkie kategorie`,
+        oneCategory: (name: string) => `kategorię ${name}`,
+        someCategories: (list: string) => `kategorie ${list}`,
+        everyone: 'wszyscy',
+        categoryCount: (count: number) => `${count} kategorii`,
+        memberCount: (count: number) => `${count} członków`,
+        categoryVisibilityCategoriesList: (list: string) => `Kategorie: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Członkowie: ${list}`,
+        categoryVisibilityReasonDeleted: ', ponieważ ich jedyna kategoria została usunięta. W razie potrzeby zaktualizuj ich widoczność kategorii.',
+        categoryVisibilityReasonDisabled: ', ponieważ ich jedyna kategoria została wyłączona. W razie potrzeby zaktualizuj ich widoczność kategorii.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `usunięto podpowiedź opisu „${oldValue}” z kategorii „${categoryName}”`;

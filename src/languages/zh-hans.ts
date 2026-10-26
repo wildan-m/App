@@ -9187,6 +9187,18 @@ ${reportName}`,
             return `将“${categoryName}”类别的分项收据更改为 ${newValue}（之前为 ${oldValue}）`;
         },
         setCategoryName: (oldName: string, newName: string) => `已将类别“${oldName}”重命名为“${newName}”`,
+        setCategoryVisibility: (members: string, categories: string) => `已将${members}设置为仅可见${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `已将${members}更改为仅可见${categories}`,
+        clearedCategoryVisibility: (members: string) => `已将${members}更改为可见所有类别`,
+        oneCategory: (name: string) => `${name}类别`,
+        someCategories: (list: string) => `${list}类别`,
+        everyone: '所有人',
+        categoryCount: (count: number) => `${count}个类别`,
+        memberCount: (count: number) => `${count}名成员`,
+        categoryVisibilityCategoriesList: (list: string) => `类别：${list}`,
+        categoryVisibilityMembersList: (list: string) => `成员：${list}`,
+        categoryVisibilityReasonDeleted: '，因为其唯一的类别已被删除。如有需要，请更新其类别可见性。',
+        categoryVisibilityReasonDisabled: '，因为其唯一的类别已被禁用。如有需要，请更新其类别可见性。',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `已从类别“${categoryName}”中移除描述提示“${oldValue}”`;

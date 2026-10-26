@@ -2231,6 +2231,7 @@ const CONST = {
                     SET_AUTO_REIMBURSEMENT: 'POLICYCHANGELOG_SET_AUTOREIMBURSEMENT',
                     SET_AUTO_JOIN: 'POLICYCHANGELOG_SET_AUTO_JOIN',
                     SET_CATEGORY_NAME: 'POLICYCHANGELOG_SET_CATEGORY_NAME',
+                    SET_CATEGORY_VISIBILITY: 'POLICYCHANGELOG_SET_CATEGORY_VISIBILITY',
                     SHARED_BUDGET_NOTIFICATION: 'POLICYCHANGELOG_SHARED_BUDGET_NOTIFICATION',
                     UPDATE_ACH_ACCOUNT: 'POLICYCHANGELOG_UPDATE_ACH_ACCOUNT',
                     UPDATE_APPROVER_RULE: 'POLICYCHANGELOG_UPDATE_APPROVER_RULE',
@@ -5172,6 +5173,11 @@ const CONST = {
             COMPANY: 'company',
             EMPLOYEE: 'employee',
         },
+        CATEGORY_VISIBILITY_CHANGE_REASON: {
+            SET_BY_ADMIN: 'setByAdmin',
+            CATEGORIES_DELETED: 'categoriesDeleted',
+            CATEGORIES_DISABLED: 'categoriesDisabled',
+        },
         CASH_EXPENSE_REIMBURSEMENT_CHOICES: {
             REIMBURSABLE_DEFAULT: 'reimbursableDefault', // Reimbursable by default
             NON_REIMBURSABLE_DEFAULT: 'nonReimbursableDefault', // Non-reimbursable by default
@@ -6571,6 +6577,9 @@ const CONST = {
     // The inline category/tag pickers in the expense table are small popovers, so they show the search input sooner than the full-page pickers.
     INLINE_EDIT_PICKER_SEARCH_INPUT_THRESHOLD: 8,
     SEARCH_BAR_THRESHOLD: 3,
+
+    /** Category visibility change logs show lists of this size or longer as a count, with the full list at the top of the entry's thread */
+    CATEGORY_VISIBILITY_FULL_LIST_THRESHOLD: 10,
     // Number of approval workflow cards rendered before the "Load more" affordance on Workspace → Workflows.
     WORKFLOW_APPROVALS_INITIAL_BATCH: 5,
     LOGIN_CHARACTER_LIMIT: 254,

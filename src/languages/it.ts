@@ -9565,6 +9565,18 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             return `ha modificato le ricevute con voce di dettaglio della categoria "${categoryName}" in ${newValue} (in precedenza ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `ha rinominato la categoria "${oldName}" in "${newName}"`,
+        setCategoryVisibility: (members: string, categories: string) => `ha impostato ${members} per vedere solo ${categories}`,
+        changedCategoryVisibility: (members: string, categories: string) => `ha modificato ${members} per vedere solo ${categories}`,
+        clearedCategoryVisibility: (members: string) => `ha modificato ${members} per vedere tutte le categorie`,
+        oneCategory: (name: string) => `la categoria ${name}`,
+        someCategories: (list: string) => `le categorie ${list}`,
+        everyone: 'tutti',
+        categoryCount: (count: number) => `${count} categorie`,
+        memberCount: (count: number) => `${count} membri`,
+        categoryVisibilityCategoriesList: (list: string) => `Categorie: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Membri: ${list}`,
+        categoryVisibilityReasonDeleted: ', poiché la loro unica categoria è stata eliminata. Aggiorna la loro visibilità delle categorie se necessario.',
+        categoryVisibilityReasonDisabled: ', poiché la loro unica categoria è stata disattivata. Aggiorna la loro visibilità delle categorie se necessario.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `ha rimosso il suggerimento di descrizione "${oldValue}" dalla categoria "${categoryName}"`;

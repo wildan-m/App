@@ -9620,6 +9620,18 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             return `hat die Positionenbelege der Kategorie „${categoryName}“ auf ${newValue} geändert (zuvor ${oldValue})`;
         },
         setCategoryName: (oldName: string, newName: string) => `hat die Kategorie „${oldName}“ in „${newName}“ umbenannt`,
+        setCategoryVisibility: (members: string, categories: string) => `hat festgelegt, dass ${members} nur ${categories} sieht`,
+        changedCategoryVisibility: (members: string, categories: string) => `hat geändert, dass ${members} nur ${categories} sieht`,
+        clearedCategoryVisibility: (members: string) => `hat geändert, dass ${members} alle Kategorien sieht`,
+        oneCategory: (name: string) => `die Kategorie ${name}`,
+        someCategories: (list: string) => `die Kategorien ${list}`,
+        everyone: 'alle',
+        categoryCount: (count: number) => `${count} Kategorien`,
+        memberCount: (count: number) => `${count} Mitglieder`,
+        categoryVisibilityCategoriesList: (list: string) => `Kategorien: ${list}`,
+        categoryVisibilityMembersList: (list: string) => `Mitglieder: ${list}`,
+        categoryVisibilityReasonDeleted: ', da ihre einzige Kategorie gelöscht wurde. Aktualisiere ihre Kategoriesichtbarkeit bei Bedarf.',
+        categoryVisibilityReasonDisabled: ', da ihre einzige Kategorie deaktiviert wurde. Aktualisiere ihre Kategoriesichtbarkeit bei Bedarf.',
         updatedDescriptionHint: (categoryName: string, newValue?: string, oldValue?: string) => {
             if (!newValue) {
                 return `hat den Beschreibungshinweis „${oldValue}“ aus der Kategorie „${categoryName}“ entfernt`;
