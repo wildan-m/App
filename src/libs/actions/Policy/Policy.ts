@@ -3428,7 +3428,8 @@ function buildOptimisticDuplicatePolicy(
     const isInvoicesFeatureSelected = duplicatedParts?.invoices;
     const isInvoiceFieldsFeatureSelected = duplicatedParts?.invoiceFields;
     const isDistanceRatesFeatureSelected = duplicatedParts?.distance;
-    const isRulesFeatureSelected = duplicatedParts?.expenses;
+    // The backend copies the source's Rules toggle, so the duplicate only has Rules on when it is selected and enabled on the source.
+    const isRulesFeatureSelected = !!duplicatedParts?.expenses && PolicyUtils.arePolicyRulesEnabled(sourcePolicy, policyOptions.policyCategories);
     const isWorkflowsFeatureSelected = duplicatedParts?.exportLayouts;
     const isPerDiemFeatureSelected = duplicatedParts?.perDiem;
     const isOverviewFeatureSelected = duplicatedParts?.overview;

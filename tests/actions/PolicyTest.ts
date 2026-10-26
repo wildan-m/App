@@ -792,6 +792,55 @@ describe('actions/Policy', () => {
             await waitForBatchedUpdates();
         });
 
+        it.each([
+            {areRulesEnabled: false, expected: false},
+            {areRulesEnabled: true, expected: true},
+        ])('duplicate workspace with the rules option sets areRulesEnabled to $expected when the source has it $areRulesEnabled', async ({areRulesEnabled, expected}) => {
+            // Given a Control source workspace with rule values on the policy and the Rules feature toggled on or off
+            const fakePolicy = {...createRandomPolicy(17, CONST.POLICY.TYPE.CORPORATE), areRulesEnabled, eReceipts: true};
+            // The request stays paused so the assertions read the optimistic data, which is where a flashing Rules item would come from.
+            mockFetch?.pause?.();
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`, fakePolicy);
+            await waitForBatchedUpdates();
+
+            const policyID = Policy.generatePolicyID();
+
+            // When the workspace is duplicated with the Rules option selected
+            Policy.duplicateWorkspace(fakePolicy, {
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyName: 'Rules Workspace',
+                policyID: fakePolicy.id,
+                targetPolicyID: policyID,
+                welcomeNote: 'Join my policy',
+                personalDetailsByLogins: {},
+                parts: {
+                    people: false,
+                    reports: false,
+                    connections: false,
+                    categories: false,
+                    tags: false,
+                    taxes: false,
+                    perDiem: false,
+                    reimbursements: false,
+                    expenses: true,
+                    distance: false,
+                    invoices: false,
+                    exportLayouts: false,
+                    codingRules: false,
+                },
+                localCurrency: 'USD',
+            });
+            await waitForBatchedUpdates();
+
+            // Then the duplicate only has Rules on when the source does, matching what the backend copies
+            const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
+            expect(policy?.areRulesEnabled).toBe(expected);
+
+            await mockFetch?.resume?.();
+            await waitForBatchedUpdates();
+        });
+
         it('duplicate workspace with 3+ members creates optimistic announce chat using currentUserAccountID', async () => {
             await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
             const basePolicy = createRandomPolicy(16, CONST.POLICY.TYPE.TEAM);

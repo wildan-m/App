@@ -172,6 +172,7 @@ describe('CopyPolicySettingsUtils', () => {
             connectedIntegrationCount: 1,
             hasWorkflowRules: true,
             hasWorkspaceRules: true,
+            areRulesEnabled: true,
             codingRulesCount: 1,
             hasInvoiceConfiguration: true,
             isCollectPolicy: false,
@@ -202,9 +203,10 @@ describe('CopyPolicySettingsUtils', () => {
             expect(isCopyPolicySettingsPartEnabledOnSource('perDiem', baseContext)).toBe(true);
         });
 
-        it('shows merchant rules only when coding rules exist and not collect', () => {
+        it('shows merchant rules only when coding rules exist, Rules is enabled and not collect', () => {
             expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', {...baseContext, codingRulesCount: 0})).toBe(false);
             expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', {...baseContext, isCollectPolicy: true})).toBe(false);
+            expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', {...baseContext, areRulesEnabled: false})).toBe(false);
             expect(isCopyPolicySettingsPartEnabledOnSource('codingRules', baseContext)).toBe(true);
         });
 
