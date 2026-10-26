@@ -1388,6 +1388,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Προσθέστε επιπλέον απόδειξη',
         scanFailed: 'Η απόδειξη δεν ήταν δυνατό να σαρωθεί, επειδή λείπουν το κατάστημα, η ημερομηνία ή το ποσό.',
         crop: 'Περικοπή',
+        translate: 'Μετάφραση',
+        viewOriginal: 'Προβολή πρωτοτύπου',
+        translationDisclaimer: 'Η τεχνητή νοημοσύνη μπορεί να κάνει λάθη. Ελέγξτε το πρωτότυπο.',
+        translationErrorUnreadable: 'Δεν μπορέσαμε να διαβάσουμε αυτή την απόδειξη αρκετά καθαρά για να τη μεταφράσουμε.',
+        translationErrorSameLanguage: 'Αυτή η απόδειξη είναι ήδη στη γλώσσα σας.',
+        translationErrorGeneric: 'Δεν μπορέσαμε να μεταφράσουμε αυτή την απόδειξη. Προσπαθήστε ξανά.',
         addAReceipt: {
             phrase1: 'Προσθήκη απόδειξης',
             phrase2: 'ή σύρετε και αποθέστε ένα εδώ',

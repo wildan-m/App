@@ -1341,6 +1341,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Zusätzlichen Beleg hinzufügen',
         scanFailed: 'Der Beleg konnte nicht gescannt werden, da Händler, Datum oder Betrag fehlen.',
         crop: 'Zuschneiden',
+        translate: 'Übersetzen',
+        viewOriginal: 'Original anzeigen',
+        translationDisclaimer: 'KI kann Fehler machen. Bitte überprüfe das Original.',
+        translationErrorUnreadable: 'Wir konnten diesen Beleg nicht klar genug lesen, um ihn zu übersetzen.',
+        translationErrorSameLanguage: 'Dieser Beleg ist bereits in deiner Sprache.',
+        translationErrorGeneric: 'Wir konnten diesen Beleg nicht übersetzen. Bitte versuche es erneut.',
         addAReceipt: {
             phrase1: 'Beleg hinzufügen',
             phrase2: 'oder ziehe eine hierher und lege sie ab',

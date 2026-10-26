@@ -1463,6 +1463,7 @@ const CONST = {
         RESIZABLE_TABLE_COLUMNS: 'resizableTableColumns',
         DESCRIBE_RULE: 'describeRule',
         TRAVEL_APPROVAL: 'travelApproval',
+        RECEIPT_TRANSLATION: 'receiptTranslation',
     },
     BUTTON_STATES: {
         DEFAULT: 'default',
@@ -1930,6 +1931,19 @@ const CONST = {
 
         // Elements with this data attribute pause the hover zoom while the pointer is over them
         HOVER_ZOOM_EXCLUDED_ELEMENT: 'receipt-hover-zoom-excluded',
+
+        TRANSLATION_ERROR: {
+            UNREADABLE: 'unreadable',
+            SAME_LANGUAGE: 'sameLanguage',
+            GENERIC: 'generic',
+        },
+        TRANSLATED_ROW_TYPE: {
+            TEXT: 'text',
+            LABEL_VALUE: 'labelValue',
+            ITEM: 'item',
+            TOTAL: 'total',
+            DIVIDER: 'divider',
+        },
     },
     RECEIPT_PREVIEW_TOP_BOTTOM_MARGIN: 120,
     REPORT: {

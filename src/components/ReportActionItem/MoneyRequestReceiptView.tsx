@@ -148,7 +148,7 @@ function MoneyRequestReceiptView({
     hasParentPendingAction = false,
 }: MoneyRequestReceiptViewProps) {
     const styles = useThemeStyles();
-    const {translate, dateFnsLocale, formatPhoneNumber} = useLocalize();
+    const {translate, dateFnsLocale, formatPhoneNumber, preferredLocale} = useLocalize();
     const {isBetaEnabled, isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {convertToDisplayString, getCurrencyDecimals} = useCurrencyListActions();
@@ -200,6 +200,7 @@ function MoneyRequestReceiptView({
     const transactionViolations = useTransactionViolations(transaction?.transactionID, false);
     const [rawTransactionViolations] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${getNonEmptyStringOnyxID(transaction?.transactionID)}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${moneyRequestReport?.policyID}`);
+    const [receiptTranslation] = useOnyx(`${ONYXKEYS.COLLECTION.RECEIPT_TRANSLATION}${getNonEmptyStringOnyxID(transaction?.transactionID)}`);
 
     const displayedTransaction = updatedTransaction ?? transaction;
     const isDistanceRequest = isDistanceRequestTransactionUtils(displayedTransaction);
@@ -231,7 +232,7 @@ function MoneyRequestReceiptView({
     const addButtonRef = useRef<ComponentRef<typeof View> | null>(null);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const deviceHasHoverSupport = hasHoverSupport();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Expand', 'ReceiptPlus']);
+    const lazyIcons = useMemoizedLazyExpensifyIcons(['Expand', 'ReceiptPlus', 'Globe']);
 
     const [policyTagList] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     // Browsers don't fire mouseenter when an element mounts under the cursor
@@ -631,6 +632,12 @@ function MoneyRequestReceiptView({
     // Expanding only opens the receipt to look at, so it asks for none of the permission above
     const canExpandReceipt = hasReceipt && !isLoading && !mergeTransactionID && !readonly && canInteractWithReport;
 
+    // Translate also asks for no edit permission: any viewer on the beta can translate an uploaded receipt
+    const displayedReceiptID = displayedTransaction?.receipt?.receiptID;
+    const canTranslateReceipt = isBetaEnabled(CONST.BETAS.RECEIPT_TRANSLATION) && canExpandReceipt && !!displayedReceiptID && !receiptURIs?.isLocalFile;
+    const hasSavedReceiptTranslation =
+        !!displayedReceiptID && !!preferredLocale && receiptTranslation?.receiptID === displayedReceiptID && !!receiptTranslation?.translations?.[preferredLocale];
+
     // Show the count badge only after a multi-page PDF receipt loads. Map distance receipts render as an e-receipt card, so their stored PDF page count is never shown.
     const shouldShowReceiptPageCount = receiptPageCount > 1 && Str.isPDF(receiptURIs?.filename ?? '') && !isLoading && !isMapDistanceRequest;
 
@@ -874,6 +881,34 @@ function MoneyRequestReceiptView({
                                                 </Tooltip>
                                             )}
                                         </AttachmentPicker>
+                                    )}
+                                    {canTranslateReceipt && (
+                                        <Tooltip text={translate(hasSavedReceiptTranslation ? 'receipt.viewOriginal' : 'receipt.translate')}>
+                                            <PressableWithoutFocus
+                                                onPress={() =>
+                                                    Navigation.navigate(
+                                                        ROUTES.TRANSACTION_RECEIPT.getRoute(
+                                                            report?.reportID,
+                                                            (updatedTransaction ?? transaction)?.transactionID,
+                                                            readonly || !canEditReceipt,
+                                                            undefined,
+                                                            true,
+                                                        ),
+                                                    )
+                                                }
+                                                style={styles.receiptActionButton}
+                                                hoverStyle={styles.buttonDefaultHovered}
+                                                accessibilityLabel={translate('receipt.translate')}
+                                                role={CONST.ROLE.BUTTON}
+                                            >
+                                                <Icon
+                                                    src={lazyIcons.Globe}
+                                                    height={variables.iconSizeSmall}
+                                                    width={variables.iconSizeSmall}
+                                                    fill={theme.icon}
+                                                />
+                                            </PressableWithoutFocus>
+                                        </Tooltip>
                                     )}
                                     <Tooltip text={translate('reportActionCompose.expand')}>
                                         <PressableWithoutFocus

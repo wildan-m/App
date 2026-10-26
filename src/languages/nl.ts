@@ -1339,6 +1339,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Voeg extra bon toe',
         scanFailed: 'De bon is niet gescand, omdat er een handelaar, datum of bedrag ontbreekt.',
         crop: 'Bijsnijden',
+        translate: 'Vertalen',
+        viewOriginal: 'Origineel bekijken',
+        translationDisclaimer: 'AI kan fouten maken. Controleer het origineel.',
+        translationErrorUnreadable: 'We konden deze bon niet duidelijk genoeg lezen om te vertalen.',
+        translationErrorSameLanguage: 'Deze bon is al in jouw taal.',
+        translationErrorGeneric: 'We konden deze bon niet vertalen. Probeer het opnieuw.',
         addAReceipt: {
             phrase1: 'Voeg een bon toe',
             phrase2: 'of sleep ze hier naartoe',

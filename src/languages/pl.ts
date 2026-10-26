@@ -1375,6 +1375,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Dodaj dodatkowy paragon',
         scanFailed: 'Nie można było zeskanować paragonu, ponieważ brakuje na nim sprzedawcy, daty lub kwoty.',
         crop: 'Przytnij',
+        translate: 'Przetłumacz',
+        viewOriginal: 'Zobacz oryginał',
+        translationDisclaimer: 'AI może popełniać błędy. Sprawdź oryginał.',
+        translationErrorUnreadable: 'Nie udało się odczytać tego paragonu wystarczająco wyraźnie, aby go przetłumaczyć.',
+        translationErrorSameLanguage: 'Ten paragon jest już w Twoim języku.',
+        translationErrorGeneric: 'Nie udało się przetłumaczyć tego paragonu. Spróbuj ponownie.',
         addAReceipt: {
             phrase1: 'Dodaj paragon',
             phrase2: 'lub przeciągnij i upuść tutaj',

@@ -1346,6 +1346,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Ajouter un reçu supplémentaire',
         scanFailed: 'Le reçu n’a pas pu être scanné, car il lui manque un commerçant, une date ou un montant.',
         crop: 'Recadrer',
+        translate: 'Traduire',
+        viewOriginal: "Voir l'original",
+        translationDisclaimer: "L'IA peut faire des erreurs. Veuillez vérifier l'original.",
+        translationErrorUnreadable: "Nous n'avons pas pu lire ce reçu assez clairement pour le traduire.",
+        translationErrorSameLanguage: 'Ce reçu est déjà dans votre langue.',
+        translationErrorGeneric: "Nous n'avons pas pu traduire ce reçu. Veuillez réessayer.",
         addAReceipt: {
             phrase1: 'Ajouter un reçu',
             phrase2: 'ou faites-en glisser un ici',

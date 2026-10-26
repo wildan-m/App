@@ -132,6 +132,9 @@ type AttachmentModalBaseContentProps = {
     /** Custom content to render instead of the default attachment view (e.g., crop view) */
     customAttachmentContent?: React.ReactNode;
 
+    /** Custom content to render on top of the attachment view (e.g., the receipt translation scanning line) */
+    attachmentOverlayContent?: React.ReactNode;
+
     /** Extra styles to pass for the attachment view container */
     attachmentViewContainerStyles?: StyleProp<ViewStyle>;
 

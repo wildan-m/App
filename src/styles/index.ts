@@ -3408,6 +3408,11 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.border,
         },
 
+        receiptTranslationScanLine: {
+            height: 2,
+            backgroundColor: theme.success,
+        },
+
         unreadIndicatorText: {
             color: theme.unreadIndicator,
             ...FontUtils.fontFamily.platform.EXP_NEUE_BOLD,

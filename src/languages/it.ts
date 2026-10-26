@@ -1338,6 +1338,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Aggiungi ricevuta aggiuntiva',
         scanFailed: 'La ricevuta non può essere acquisita perché manca il nome dell’esercente, la data o l’importo.',
         crop: 'Ritaglia',
+        translate: 'Traduci',
+        viewOriginal: 'Vedi originale',
+        translationDisclaimer: "L'IA può commettere errori. Verifica l'originale.",
+        translationErrorUnreadable: 'Non siamo riusciti a leggere questa ricevuta abbastanza chiaramente da tradurla.',
+        translationErrorSameLanguage: 'Questa ricevuta è già nella tua lingua.',
+        translationErrorGeneric: 'Non siamo riusciti a tradurre questa ricevuta. Riprova.',
         addAReceipt: {
             phrase1: 'Aggiungi una ricevuta',
             phrase2: 'o trascinalo qui',

@@ -1443,6 +1443,7 @@ type AttachmentModalScreensParamList = {
         reportID: string;
         transactionID: string;
         readonly?: string;
+        shouldTranslate?: string;
         isFromReviewDuplicates?: string;
         action?: IOUAction;
         iouType?: IOUType;

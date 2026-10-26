@@ -1064,6 +1064,10 @@ const ONYXKEYS = {
         TRANSACTION_BACKUP: 'transactionsBackup_',
         SPLIT_TRANSACTION_DRAFT: 'splitTransactionDraft_',
         MERGE_TRANSACTION: 'mergeTransaction_',
+
+        // Translations of a transaction's receipt. Written only by this client and never synced,
+        // so each viewer keeps their own per-device translations, as the feature requires.
+        RECEIPT_TRANSLATION: 'receiptTranslation_',
         PRIVATE_NOTES_DRAFT: 'privateNotesDraft_',
         CODING_RULE_MATCHING_TRANSACTION: 'codingRuleMatchingTransactions_',
         // Manual expense tab selector
@@ -1698,6 +1702,7 @@ type OnyxCollectionValuesMapping = {
     [ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS]: OnyxTypes.TransactionViolations;
     [ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT]: OnyxTypes.Transaction;
     [ONYXKEYS.COLLECTION.MERGE_TRANSACTION]: OnyxTypes.MergeTransaction;
+    [ONYXKEYS.COLLECTION.RECEIPT_TRANSLATION]: OnyxTypes.ReceiptTranslation;
     [ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS]: OnyxTypes.RecentlyUsedTags;
     [ONYXKEYS.COLLECTION.SELECTED_TAB]: OnyxTypes.SelectedTabRequest;
     [ONYXKEYS.COLLECTION.SELECTED_DISTANCE_REQUEST_TAB]: OnyxTypes.SelectedTabRequest;

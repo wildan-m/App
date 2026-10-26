@@ -1324,6 +1324,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'レシートを追加',
         scanFailed: 'このレシートは、店舗名、日付、または金額が不足しているためスキャンできませんでした。',
         crop: 'トリミング',
+        translate: '翻訳',
+        viewOriginal: '原本を表示',
+        translationDisclaimer: 'AIは間違えることがあります。必ず原本をご確認ください。',
+        translationErrorUnreadable: 'このレシートを翻訳できるほど鮮明に読み取れませんでした。',
+        translationErrorSameLanguage: 'このレシートはすでにあなたの言語です。',
+        translationErrorGeneric: 'このレシートを翻訳できませんでした。もう一度お試しください。',
         addAReceipt: {
             phrase1: '領収書を追加',
             phrase2: 'または、ここにファイルをドラッグ＆ドロップしてください',

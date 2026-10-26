@@ -2,6 +2,9 @@ import Button from '@components/Button';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ReceiptCropView from '@components/ReceiptCropView';
 import type {CropRect} from '@components/ReceiptCropView';
+import ReceiptTranslationScanOverlay from '@components/ReceiptTranslationScanOverlay';
+import Text from '@components/Text';
+import TranslatedReceiptCard from '@components/TranslatedReceiptCard';
 
 import useAllTransactions from '@hooks/useAllTransactions';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -14,10 +17,12 @@ import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useRestartOnOdometerImagesFailure from '@hooks/useRestartOnOdometerImagesFailure';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {detachReceipt, navigateToStartStepIfScanFileCannotBeRead, replaceReceipt, setMoneyRequestReceipt} from '@libs/actions/IOU/Receipt';
 import {removeMoneyRequestOdometerImage, setMoneyRequestOdometerImage} from '@libs/actions/OdometerTransactionUtils';
+import {clearReceiptTranslationError, translateReceipt} from '@libs/actions/ReceiptTranslation';
 import {openReport} from '@libs/actions/Report';
 import cropOrRotateImage from '@libs/cropOrRotateImage';
 import fetchImage from '@libs/fetchImage';
@@ -59,18 +64,30 @@ import {guidedSetupAndTourStatusSelector} from '@selectors/Onboarding';
 import {getParentReportActionSelector, transactionThreadReportIDSelector} from '@selectors/ReportAction';
 import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {View} from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 
 import useDownloadAttachment from './hooks/useDownloadAttachment';
 
 function TransactionReceiptModalContent({navigation, route}: AttachmentModalScreenProps<typeof SCREENS.TRANSACTION_RECEIPT>) {
-    const {reportID, transactionID, action, iouType: iouTypeParam, readonly: readonlyParam, mergeTransactionID, imageType, isEditingConfirmation, backToReport} = route.params;
+    const {
+        reportID,
+        transactionID,
+        action,
+        iouType: iouTypeParam,
+        readonly: readonlyParam,
+        mergeTransactionID,
+        imageType,
+        isEditingConfirmation,
+        backToReport,
+        shouldTranslate,
+    } = route.params;
 
-    const {translate} = useLocalize();
-    const {isBetaEnabledOrUnknown} = usePermissions();
+    const {translate, preferredLocale} = useLocalize();
+    const {isBetaEnabled, isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
+    const isReceiptTranslationBetaEnabled = isBetaEnabled(CONST.BETAS.RECEIPT_TRANSLATION);
     const {isOffline} = useNetwork();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera', 'Download', 'Crop', 'Trashcan', 'Rotate', 'Close', 'Checkmark', 'AttachmentNotFound']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera', 'Download', 'Crop', 'Trashcan', 'Rotate', 'Close', 'Checkmark', 'AttachmentNotFound', 'Globe']);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [hasReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {selector: Boolean});
@@ -125,6 +142,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     });
     const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transactionThreadReportID)}`);
     const [transactionViolations] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${getNonEmptyStringOnyxID(transaction?.transactionID)}`);
+    const [receiptTranslation] = useOnyx(`${ONYXKEYS.COLLECTION.RECEIPT_TRANSLATION}${getNonEmptyStringOnyxID(transaction?.transactionID)}`);
     const receiptURIs = getThumbnailAndImageURIs(transaction);
     const isLocalFile = receiptURIs.isLocalFile;
     const isAuthTokenRequired = !isLocalFile && !isDraftTransaction;
@@ -211,6 +229,73 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const [isCropSaving, setIsCropSaving] = useState(false);
     const [cropRect, setCropRect] = useState<CropRect | null>(null);
     const styles = useThemeStyles();
+    const theme = useTheme();
+
+    const [isShowingTranslation, setIsShowingTranslation] = useState(false);
+    const [hasRequestedTranslation, setHasRequestedTranslation] = useState(false);
+
+    const receiptID = transaction?.receipt?.receiptID;
+    // A replaced receipt gets a new receiptID, so a record saved for the previous receipt no longer applies
+    const hasSavedTranslationForOldReceipt = !!receiptTranslation && receiptTranslation.receiptID !== receiptID;
+    const savedTranslationRows = !hasSavedTranslationForOldReceipt && receiptID && preferredLocale ? receiptTranslation?.translations?.[preferredLocale]?.rows : undefined;
+    const isTranslating = !!receiptTranslation?.isLoading;
+    const translationErrorType = !isTranslating && !isShowingTranslation ? receiptTranslation?.errorType : undefined;
+
+    // Translate intentionally ignores edit access: read-only viewers see it too. It only needs the beta,
+    // a real uploaded receipt (image or PDF, not an eReceipt or odometer photo), and a connection.
+    const shouldShowTranslateButton = isReceiptTranslationBetaEnabled && !isOdometerImage && !isEReceipt && !isDraftTransaction && (isImage || isPDF) && !!receiptID;
+    const isTranslateDisabled = isOffline || isLocalFile;
+
+    const onTranslatePress = useCallback(() => {
+        if (!transaction?.transactionID || !receiptID || !preferredLocale) {
+            return;
+        }
+        if (savedTranslationRows) {
+            // A saved translation for this receipt and language shows immediately, with no animation
+            setIsShowingTranslation(true);
+            return;
+        }
+        setHasRequestedTranslation(true);
+        translateReceipt({
+            transactionID: transaction.transactionID,
+            receiptID,
+            targetLanguage: preferredLocale,
+            shouldResetSavedTranslations: hasSavedTranslationForOldReceipt,
+        });
+    }, [transaction?.transactionID, receiptID, savedTranslationRows, preferredLocale, hasSavedTranslationForOldReceipt]);
+
+    useEffect(() => {
+        if (!hasRequestedTranslation || !savedTranslationRows) {
+            return;
+        }
+        setIsShowingTranslation(true);
+        setHasRequestedTranslation(false);
+    }, [hasRequestedTranslation, savedTranslationRows]);
+
+    useEffect(() => {
+        // Errors are transient: leaving the modal clears the last one so Translate always retries
+        return () => clearReceiptTranslationError(transactionID);
+    }, [transactionID]);
+
+    const [hasAutoTranslated, setHasAutoTranslated] = useState(false);
+
+    useEffect(() => {
+        // The thumbnail's translate button opens this modal with the flag set, so translation starts without another press
+        if (hasAutoTranslated || shouldTranslate !== 'true' || !shouldShowTranslateButton || isTranslating) {
+            return;
+        }
+        setHasAutoTranslated(true);
+        onTranslatePress();
+    }, [hasAutoTranslated, shouldTranslate, shouldShowTranslateButton, isTranslating, onTranslatePress]);
+
+    let translationErrorMessage: string | undefined;
+    if (translationErrorType === CONST.RECEIPT.TRANSLATION_ERROR.UNREADABLE) {
+        translationErrorMessage = translate('receipt.translationErrorUnreadable');
+    } else if (translationErrorType === CONST.RECEIPT.TRANSLATION_ERROR.SAME_LANGUAGE) {
+        translationErrorMessage = translate('receipt.translationErrorSameLanguage');
+    } else if (translationErrorType) {
+        translationErrorMessage = translate('receipt.translationErrorGeneric');
+    }
 
     useEffect(() => {
         if ((!!report && !!transaction) || isDraftTransaction) {
@@ -610,72 +695,118 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             );
         }
 
-        if (!shouldShowRotateAndCropReceiptButton && !shouldShowReplaceReceiptButton && !isOdometerImage) {
+        if (isShowingTranslation) {
+            return (
+                <View style={[styles.flexRow, styles.gap2, styles.ph5, styles.pb5, styles.justifyContentCenter]}>
+                    <Button
+                        onPress={() => setIsShowingTranslation(false)}
+                        style={styles.transactionReceiptButton}
+                    >
+                        <Button.Icon src={expensifyIcons.Globe} />
+                        <Button.Text>{translate('receipt.viewOriginal')}</Button.Text>
+                    </Button>
+                </View>
+            );
+        }
+
+        if (isTranslating) {
+            return (
+                <View style={[styles.flexRow, styles.ph5, styles.pb5, styles.justifyContentCenter]}>
+                    <ActivityIndicator color={theme.spinner} />
+                </View>
+            );
+        }
+
+        if (!shouldShowRotateAndCropReceiptButton && !shouldShowReplaceReceiptButton && !isOdometerImage && !shouldShowTranslateButton) {
             return null;
         }
 
         return (
-            <View style={[styles.flexRow, styles.gap2, styles.ph5, styles.pb5, styles.justifyContentCenter]}>
-                {!!shouldShowRotateAndCropReceiptButton && (
-                    <Button
-                        onPress={rotateReceipt}
-                        isLoading={isRotating}
-                        isDisabled={isRotating}
-                        style={styles.transactionReceiptButton}
-                    >
-                        <Button.Icon src={expensifyIcons.Rotate} />
-                        <Button.Text>{translate('common.rotate')}</Button.Text>
-                    </Button>
-                )}
-                {!!shouldShowRotateAndCropReceiptButton && (
-                    <Button
-                        onPress={enterCropMode}
-                        style={styles.transactionReceiptButton}
-                    >
-                        <Button.Icon src={expensifyIcons.Crop} />
-                        <Button.Text>{translate('receipt.crop')}</Button.Text>
-                    </Button>
-                )}
-                {isPDF && !isNative && (
-                    <Button
-                        onPress={() => setPdfRotation((prev) => ((prev + 270) % 360) as RotationDegrees)}
-                        style={styles.transactionReceiptButton}
-                    >
-                        <Button.Icon src={expensifyIcons.Rotate} />
-                        <Button.Text>{translate('common.rotate')}</Button.Text>
-                    </Button>
-                )}
-                {(shouldShowReplaceReceiptButton || isOdometerImage) && (
-                    <Button
-                        onPress={() => {
-                            const getDestinationRoute = () => {
-                                return isOdometerImage
-                                    ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType, isEditingConfirmation, backToReport)
-                                    : // `getDestinationRoute` runs after the modal is dismissed, so the base is the screen underneath it.
-                                      createDynamicRoute(
-                                          DYNAMIC_ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
-                                              action ?? CONST.IOU.ACTION.EDIT,
-                                              iouType,
-                                              draftTransactionID ?? transaction?.transactionID,
-                                              report?.reportID,
-                                          ),
-                                      );
-                            };
+            <View>
+                {!!translationErrorMessage && <Text style={[styles.formError, styles.textAlignCenter, styles.ph5, styles.pb3]}>{translationErrorMessage}</Text>}
+                <View style={[styles.flexRow, styles.gap2, styles.ph5, styles.pb5, styles.justifyContentCenter]}>
+                    {!!shouldShowRotateAndCropReceiptButton && (
+                        <Button
+                            onPress={rotateReceipt}
+                            isLoading={isRotating}
+                            isDisabled={isRotating}
+                            style={styles.transactionReceiptButton}
+                        >
+                            <Button.Icon src={expensifyIcons.Rotate} />
+                            <Button.Text>{translate('common.rotate')}</Button.Text>
+                        </Button>
+                    )}
+                    {!!shouldShowRotateAndCropReceiptButton && (
+                        <Button
+                            onPress={enterCropMode}
+                            style={styles.transactionReceiptButton}
+                        >
+                            <Button.Icon src={expensifyIcons.Crop} />
+                            <Button.Text>{translate('receipt.crop')}</Button.Text>
+                        </Button>
+                    )}
+                    {isPDF && !isNative && (
+                        <Button
+                            onPress={() => setPdfRotation((prev) => ((prev + 270) % 360) as RotationDegrees)}
+                            style={styles.transactionReceiptButton}
+                        >
+                            <Button.Icon src={expensifyIcons.Rotate} />
+                            <Button.Text>{translate('common.rotate')}</Button.Text>
+                        </Button>
+                    )}
+                    {!!shouldShowTranslateButton && (
+                        <Button
+                            onPress={onTranslatePress}
+                            isDisabled={isTranslateDisabled}
+                            style={styles.transactionReceiptButton}
+                        >
+                            <Button.Icon src={expensifyIcons.Globe} />
+                            <Button.Text>{translate('receipt.translate')}</Button.Text>
+                        </Button>
+                    )}
+                    {(shouldShowReplaceReceiptButton || isOdometerImage) && (
+                        <Button
+                            onPress={() => {
+                                const getDestinationRoute = () => {
+                                    return isOdometerImage
+                                        ? ROUTES.ODOMETER_IMAGE.getRoute(action ?? CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID, imageType, isEditingConfirmation, backToReport)
+                                        : // `getDestinationRoute` runs after the modal is dismissed, so the base is the screen underneath it.
+                                          createDynamicRoute(
+                                              DYNAMIC_ROUTES.MONEY_REQUEST_STEP_SCAN.getRoute(
+                                                  action ?? CONST.IOU.ACTION.EDIT,
+                                                  iouType,
+                                                  draftTransactionID ?? transaction?.transactionID,
+                                                  report?.reportID,
+                                              ),
+                                          );
+                                };
 
-                            Navigation.dismissModal({
-                                afterTransition: () => Navigation.navigate(getDestinationRoute()),
-                            });
-                        }}
-                        style={styles.transactionReceiptButton}
-                    >
-                        <Button.Icon src={expensifyIcons.Camera} />
-                        <Button.Text>{translate('common.replace')}</Button.Text>
-                    </Button>
-                )}
+                                Navigation.dismissModal({
+                                    afterTransition: () => Navigation.navigate(getDestinationRoute()),
+                                });
+                            }}
+                            style={styles.transactionReceiptButton}
+                        >
+                            <Button.Icon src={expensifyIcons.Camera} />
+                            <Button.Text>{translate('common.replace')}</Button.Text>
+                        </Button>
+                    )}
+                </View>
             </View>
         );
     }, [
         isCropping,
+        isShowingTranslation,
+        isTranslating,
+        translationErrorMessage,
+        shouldShowTranslateButton,
+        isTranslateDisabled,
+        onTranslatePress,
+        expensifyIcons.Globe,
+        theme.spinner,
+        styles.formError,
+        styles.textAlignCenter,
+        styles.pb3,
         shouldShowRotateAndCropReceiptButton,
         shouldShowReplaceReceiptButton,
         isOdometerImage,
@@ -713,6 +844,10 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     ]);
 
     const customAttachmentContent = useMemo(() => {
+        if (isShowingTranslation && savedTranslationRows) {
+            return <TranslatedReceiptCard rows={savedTranslationRows} />;
+        }
+
         if (!isCropping || (!sourceUri && !source)) {
             return null;
         }
@@ -724,7 +859,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                 isAuthTokenRequired={sourceUri ? false : isAuthTokenRequired}
             />
         );
-    }, [isCropping, sourceUri, handleCropChange, isAuthTokenRequired, source]);
+    }, [isShowingTranslation, savedTranslationRows, isCropping, sourceUri, handleCropChange, isAuthTokenRequired, source]);
 
     const contentProps = useMemo<AttachmentModalBaseContentProps>(
         () => ({
@@ -745,6 +880,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             shouldMinimizeMenuButton: false,
             footerActionButtons,
             customAttachmentContent,
+            attachmentOverlayContent: isTranslating ? <ReceiptTranslationScanOverlay /> : null,
             attachmentViewContainerStyles: [styles.pv5, styles.ph2],
             fallbackSource: expensifyIcons.AttachmentNotFound,
         }),
@@ -764,6 +900,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
             pdfRotation,
             footerActionButtons,
             customAttachmentContent,
+            isTranslating,
             styles.pv5,
             styles.ph2,
             expensifyIcons.AttachmentNotFound,

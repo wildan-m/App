@@ -1338,6 +1338,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: 'Adicionar recibo adicional',
         scanFailed: 'O recibo não pôde ser digitalizado porque está faltando o comerciante, a data ou o valor.',
         crop: 'Cortar',
+        translate: 'Traduzir',
+        viewOriginal: 'Ver original',
+        translationDisclaimer: 'A IA pode cometer erros. Verifique o original.',
+        translationErrorUnreadable: 'Não conseguimos ler este recibo com clareza suficiente para traduzi-lo.',
+        translationErrorSameLanguage: 'Este recibo já está no seu idioma.',
+        translationErrorGeneric: 'Não conseguimos traduzir este recibo. Tente novamente.',
         addAReceipt: {
             phrase1: 'Adicionar um recibo',
             phrase2: 'ou arraste e solte um aqui',

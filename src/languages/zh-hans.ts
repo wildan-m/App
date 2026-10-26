@@ -1286,6 +1286,12 @@ const translations: TranslationDeepObject<typeof en> = {
         addAdditionalReceipt: '添加额外收据',
         scanFailed: '无法扫描此收据，因为缺少商家、日期或金额。',
         crop: '裁剪',
+        translate: '翻译',
+        viewOriginal: '查看原件',
+        translationDisclaimer: 'AI 可能会出错。请核对原件。',
+        translationErrorUnreadable: '我们无法足够清晰地读取此收据以进行翻译。',
+        translationErrorSameLanguage: '此收据已是您的语言。',
+        translationErrorGeneric: '我们无法翻译此收据。请重试。',
         addAReceipt: {
             phrase1: '添加收据',
             phrase2: '或将文件拖放到此处',
