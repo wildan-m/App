@@ -51,13 +51,14 @@ import {getExpensifyCardStatementParamsFromFeed, getExpensifyCardStatementSelect
 import getSelectedTransactionOwnerAccountID from '@libs/getSelectedTransactionOwnerAccountID';
 import Log from '@libs/Log';
 import {getTransactionsAndReportsFromSearch} from '@libs/MergeTransactionUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import Parser from '@libs/Parser';
 import {getLoginByAccountID} from '@libs/PersonalDetailsUtils';
 import {canAccessPolicyBankAccount} from '@libs/PolicyPaymentUtils';
 import {getConnectedIntegration, isAdminOfCardEnabledPolicy, isSubmitPolicy} from '@libs/PolicyUtils';
-import {getReportAccountingExportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
+import {getReportAccountingExportActions, getSecondaryReportActions, isMergeActionForSelectedTransactions} from '@libs/ReportSecondaryActionUtils';
 import {
     canEditMultipleTransactions,
     canIOUBePaid,
@@ -77,6 +78,7 @@ import {
     isInvoiceReport,
     isIOUReport as isIOUReportUtil,
     isSelfDM,
+    navigateToDetailsPage,
     shouldShowMarkAsDone,
 } from '@libs/ReportUtils';
 import type {SearchKey} from '@libs/SearchKeyUtils';
@@ -122,11 +124,12 @@ import {getReportSubmitViolationSummary, mergeReportSubmitViolationSummaries} fr
 import variables from '@styles/variables';
 
 import {initBulkEditDraftTransaction} from '@userActions/IOU/BulkEdit';
+import {startMoneyRequest} from '@userActions/IOU/MoneyRequest';
 import {dismissRejectUseExplanation} from '@userActions/IOU/RejectMoneyRequest';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import {doesPersonalDetailExistSelector} from '@src/selectors/PersonalDetails';
 import type {BillingGraceEndPeriod, ExportTemplate, Policy, Report, ReportAction, ReportNameValuePairs, SearchResults, Transaction, TransactionViolations} from '@src/types/onyx';
@@ -623,6 +626,34 @@ function getChatReportForBulkPay(
  */
 type ExportMenuItem = DropdownOption<SearchHeaderOptionValue> & Pick<PopoverMenuItem, 'accessibilityLabel' | 'shouldCallAfterModalHide'>;
 
+/**
+ * How each More-menu action of a report (see getSecondaryReportActions) maps onto the option this hook builds.
+ * With exactly one report selected, the floating menu mirrors that report's More menu: an option listed here is
+ * only shown when the More menu offers its action, and the menu follows the More menu's ordering. Bulk-only
+ * options (Edit, Merge reports, statement/undelete flows) have no entry and keep their place at the end.
+ */
+const SECONDARY_ACTION_TO_BULK_ACTION: Partial<Record<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>, DeepValueOf<typeof CONST.SEARCH.BULK_ACTION_TYPES>>> = {
+    [CONST.REPORT.SECONDARY_ACTIONS.PAY]: CONST.SEARCH.BULK_ACTION_TYPES.PAY,
+    [CONST.REPORT.SECONDARY_ACTIONS.ADD_EXPENSE]: CONST.SEARCH.BULK_ACTION_TYPES.ADD_EXPENSE,
+    [CONST.REPORT.SECONDARY_ACTIONS.SUBMIT]: CONST.SEARCH.BULK_ACTION_TYPES.SUBMIT,
+    [CONST.REPORT.SECONDARY_ACTIONS.APPROVE]: CONST.SEARCH.BULK_ACTION_TYPES.APPROVE,
+    [CONST.REPORT.SECONDARY_ACTIONS.HOLD]: CONST.SEARCH.BULK_ACTION_TYPES.HOLD,
+    [CONST.REPORT.SECONDARY_ACTIONS.REMOVE_HOLD]: CONST.SEARCH.BULK_ACTION_TYPES.UNHOLD,
+    [CONST.REPORT.SECONDARY_ACTIONS.REJECT]: CONST.SEARCH.BULK_ACTION_TYPES.REJECT,
+    [CONST.REPORT.SECONDARY_ACTIONS.SPLIT]: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
+    [CONST.REPORT.SECONDARY_ACTIONS.MERGE]: CONST.SEARCH.BULK_ACTION_TYPES.MERGE,
+    [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_EXPENSE]: CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE,
+    [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT]: CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE_REPORT,
+    [CONST.REPORT.SECONDARY_ACTIONS.EXPORT]: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
+    [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF]: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_PDF,
+    [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS]: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_RECEIPTS,
+    [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE]: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_WORKSPACE,
+    [CONST.REPORT.SECONDARY_ACTIONS.MOVE_EXPENSE]: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_REPORT,
+    [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_APPROVER]: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_APPROVER,
+    [CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS]: CONST.SEARCH.BULK_ACTION_TYPES.VIEW_DETAILS,
+    [CONST.REPORT.SECONDARY_ACTIONS.DELETE]: CONST.SEARCH.BULK_ACTION_TYPES.DELETE,
+};
+
 function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const {translate, localeCompare, dateFnsLocale} = useLocalize();
     const styles = useThemeStyles();
@@ -772,6 +803,9 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         'Pencil',
         'Workflows',
         'Document',
+        'Plus',
+        'Buildings',
+        'Info',
     ]);
 
     const {getCurrencyDecimals, getCurrencySymbol, convertToDisplayString} = useCurrencyListActions();
@@ -3361,6 +3395,95 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 shouldCloseModalOnSelect: true,
                 onSelected: handleDeleteSelectedTransactions,
             });
+        }
+
+        // With exactly one report selected, the floating menu must mirror that report's More menu, so the
+        // report-level options are gated on the same secondary-actions list the open report computes and the
+        // menu follows the More menu's ordering. Bulk selections (2+) keep the curated bulk set above.
+        const singleSelectedReportID = isExpenseReportType && !areAllMatchingItemsSelected && selectedReports.length === 1 ? selectedReports.at(0)?.reportID : undefined;
+        const singleSelectedReport = getReportFromSearchSnapshot(singleSelectedReportID, currentSearchResults?.data, allReports);
+        if (singleSelectedReport) {
+            const searchData = currentSearchResults?.data;
+            const singleReportPolicy = getPolicyFromSearchSnapshot(singleSelectedReport.policyID, searchData, policies);
+            const singleReportActions = getReportActionsFromSearchSnapshot(singleSelectedReport.reportID, searchData, allReportActions);
+            const singleReportTransactions = getTransactionsByReportID(searchData ?? {}).get(singleSelectedReport.reportID) ?? [];
+            const singleChatReport = getChatReportForBulkPay(singleSelectedReport, undefined, searchData, allReports);
+            const singleChatReportNameValuePairs = allReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${singleChatReport?.reportID}`];
+            const singleOriginalTransactionID = singleReportTransactions.length === 1 ? singleReportTransactions.at(0)?.comment?.originalTransactionID : undefined;
+            const singleOriginalTransaction = singleOriginalTransactionID
+                ? ((searchData?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${singleOriginalTransactionID}`] as Transaction | undefined) ??
+                  allTransactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${singleOriginalTransactionID}`])
+                : undefined;
+
+            const secondaryActions = getSecondaryReportActions({
+                currentUserLogin: currentUserLogin ?? '',
+                currentUserAccountID: accountID,
+                submitterLogin: getLoginByAccountID(singleSelectedReport.ownerAccountID, personalDetails),
+                report: singleSelectedReport,
+                chatReport: singleChatReport,
+                reportTransactions: singleReportTransactions,
+                originalTransaction: singleOriginalTransaction,
+                violations: allTransactionViolations,
+                bankAccountList,
+                policy: singleReportPolicy,
+                moveExpenseReportNameValuePairs: allReportNameValuePairs,
+                reportActions: Object.values(singleReportActions ?? {}),
+                policies,
+                isChatReportArchived: isArchivedReport(singleChatReportNameValuePairs),
+                parentReport: getReportFromSearchSnapshot(singleSelectedReport.parentReportID, searchData, allReports),
+                isOffline,
+                rules,
+                cardList,
+            });
+
+            if (secondaryActions.includes(CONST.REPORT.SECONDARY_ACTIONS.ADD_EXPENSE)) {
+                options.push({
+                    text: translate('iou.addExpense'),
+                    icon: expensifyIcons.Plus,
+                    value: CONST.SEARCH.BULK_ACTION_TYPES.ADD_EXPENSE,
+                    shouldCloseModalOnSelect: true,
+                    onSelected: () => {
+                        if (singleReportPolicy && shouldRestrictUserBillableActions(singleReportPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID)) {
+                            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(singleReportPolicy.id));
+                            return;
+                        }
+                        startMoneyRequest(CONST.IOU.TYPE.SUBMIT, singleSelectedReport.reportID, undefined);
+                    },
+                });
+            }
+
+            if (secondaryActions.includes(CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE)) {
+                options.push({
+                    text: translate('iou.changeWorkspace'),
+                    icon: expensifyIcons.Buildings,
+                    value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_WORKSPACE,
+                    shouldCloseModalOnSelect: true,
+                    onSelected: () => Navigation.navigate(createDynamicRoute(`${DYNAMIC_ROUTES.REPORT_CHANGE_WORKSPACE.path}?reportID=${singleSelectedReport.reportID}`)),
+                });
+            }
+
+            if (secondaryActions.includes(CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS)) {
+                options.push({
+                    text: translate('iou.viewDetails'),
+                    icon: expensifyIcons.Info,
+                    value: CONST.SEARCH.BULK_ACTION_TYPES.VIEW_DETAILS,
+                    shouldCloseModalOnSelect: true,
+                    onSelected: () => navigateToDetailsPage(singleSelectedReport),
+                });
+            }
+
+            const moreMenuOrder = new Map<SearchHeaderOptionValue, number>();
+            for (const [index, action] of secondaryActions.entries()) {
+                const bulkValue = SECONDARY_ACTION_TO_BULK_ACTION[action];
+                if (bulkValue !== undefined && !moreMenuOrder.has(bulkValue)) {
+                    moreMenuOrder.set(bulkValue, index);
+                }
+            }
+            const mirroredValues = new Set(Object.values(SECONDARY_ACTION_TO_BULK_ACTION));
+            const mirroredOptions = options.filter((option) => option.value === undefined || !mirroredValues.has(option.value) || moreMenuOrder.has(option.value));
+            // Stable sort: options the More menu does not carry keep their relative order after the mirrored ones.
+            mirroredOptions.sort((a, b) => (moreMenuOrder.get(a.value) ?? secondaryActions.length) - (moreMenuOrder.get(b.value) ?? secondaryActions.length));
+            options.splice(0, options.length, ...mirroredOptions);
         }
 
         if (options.length === 0) {
