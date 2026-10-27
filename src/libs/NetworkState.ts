@@ -143,6 +143,8 @@ function setInternetUnreachable(unreachable: boolean) {
     }
 }
 
+let sustainedFailureRecoveryTimerID: NodeJS.Timeout | undefined;
+
 /**
  * Called by FailureTracker when sustained request failures are detected.
  */
@@ -153,7 +155,27 @@ function setSustainedFailures(active: boolean) {
     if (!wasActive && active) {
         Log.info('[NetworkState] Hard stop: SUSTAINED_FAILURES — requests have been failing consistently');
         updateState();
+
+        // This stop cannot rely on the usual recovery paths: the request queues stop while offline, so no
+        // successful request can clear it, and when the failures never hit the reachability Ping there is no
+        // isInternetReachable transition either (same hole setFailAllRequests clears explicitly for the test
+        // tool). Verify reachability once after the blip has had a moment to settle: a passing check recovers
+        // through the listener's pending-recovery branch, and a failing one flips isInternetReachable to false
+        // so the standard unreachable polling owns recovery from there. The jitter staggers probes across
+        // clients after a server-wide outage, mirroring scheduleJitteredReconnect.
+        clearTimeout(sustainedFailureRecoveryTimerID);
+        const delay = CONST.NETWORK.RECONNECT_STAMPEDE_JITTER_MS + Math.floor(Math.random() * CONST.NETWORK.RECONNECT_STAMPEDE_JITTER_MS);
+        sustainedFailureRecoveryTimerID = setTimeout(() => {
+            sustainedFailureRecoveryTimerID = undefined;
+            if (!sustainedFailuresActive) {
+                return;
+            }
+            Log.info('[NetworkState] SUSTAINED_FAILURES still active — forcing a reachability check to allow recovery');
+            armReachabilityRecovery();
+        }, delay);
     } else if (wasActive && !active) {
+        clearTimeout(sustainedFailureRecoveryTimerID);
+        sustainedFailureRecoveryTimerID = undefined;
         Log.info('[NetworkState] SUSTAINED_FAILURES cleared');
         updateState();
 
