@@ -136,6 +136,7 @@ function SearchColumnsPage() {
             defaultGroupColumns={defaultGroupCustomColumns}
             onSave={applyChanges}
             type={queryType}
+            shouldShowSearchInput
         />
     );
 }

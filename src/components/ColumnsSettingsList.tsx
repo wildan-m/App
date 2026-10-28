@@ -23,6 +23,7 @@ import HeaderWithBackButton from './HeaderWithBackButton';
 import Icon from './Icon';
 import ScreenWrapper from './ScreenWrapper';
 import ScrollView from './ScrollView';
+import CompactSearchBar from './SearchBar/CompactSearchBar';
 import MultiSelectListItem from './SelectionList/ListItem/MultiSelectListItem';
 import Text from './Text';
 import TextLink from './TextLink';
@@ -44,7 +45,7 @@ type ColumnItem = {
     isDragDisabled: boolean;
 
     /** Element rendered on the left side of the list item (e.g. drag handle) */
-    leftElement: React.JSX.Element;
+    leftElement?: React.JSX.Element;
 };
 
 type ColumnsSettingsListProps = {
@@ -73,6 +74,9 @@ type ColumnsSettingsListProps = {
 
     /** The active Search type, used to resolve type-specific column labels */
     type?: SearchDataTypes;
+
+    /** Whether to show a search input above the list to filter the columns by name */
+    shouldShowSearchInput?: boolean;
 };
 
 function ColumnsSettingsList({
@@ -85,6 +89,7 @@ function ColumnsSettingsList({
     defaultGroupColumns = [],
     onSave,
     type,
+    shouldShowSearchInput = false,
 }: ColumnsSettingsListProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -92,6 +97,9 @@ function ColumnsSettingsList({
     const {translate, localeCompare} = useLocalize();
 
     const isGrouped = !!groupBy;
+    const [searchValue, setSearchValue] = useState('');
+    const normalizedSearchValue = searchValue.trim().toLowerCase();
+    const isSearching = normalizedSearchValue.length > 0;
 
     const allCustomColumns = [...groupColumns, ...allColumns];
     const defaultCustomColumns = new Set([...defaultGroupColumns, ...defaultSelectedColumns]);
@@ -132,7 +140,8 @@ function ColumnsSettingsList({
         columns.map(({columnId, isSelected}) => {
             const isRequired = requiredColumns.has(columnId);
             const isEffectivelySelected = isRequired || isSelected;
-            const isDragDisabled = !isEffectivelySelected;
+            // Reordering a filtered subset would be ambiguous because the hidden columns can't be seen, so dragging is disabled while searching
+            const isDragDisabled = isSearching || !isEffectivelySelected;
             return {
                 text: translate(getSearchColumnTranslationKey(columnId, type)),
                 value: columnId,
@@ -140,7 +149,7 @@ function ColumnsSettingsList({
                 isSelected: isEffectivelySelected,
                 isDisabled: isRequired,
                 isDragDisabled,
-                leftElement: (
+                leftElement: isSearching ? undefined : (
                     <View style={[styles.mr3, isDragDisabled ? styles.cursorDisabled : styles.cursorGrab]}>
                         <Icon
                             src={icons.DragHandles}
@@ -155,6 +164,12 @@ function ColumnsSettingsList({
 
     const typeColumnsList = allColumnsList.filter((column) => allColumns.includes(column.keyForList));
     const groupColumnsList = allColumnsList.filter((column) => groupColumns.includes(column.keyForList));
+
+    // Only the rendered rows are filtered, the full column state is kept so selections made under any search are saved
+    const matchesSearch = (column: ColumnItem) => !isSearching || column.text.toLowerCase().includes(normalizedSearchValue);
+    const visibleTypeColumnsList = typeColumnsList.filter(matchesSearch);
+    const visibleGroupColumnsList = groupColumnsList.filter(matchesSearch);
+    const hasNoSearchResults = isSearching && visibleTypeColumnsList.length === 0 && visibleGroupColumnsList.length === 0;
 
     const isDefaultState =
         columns.length === defaultColumns.length &&
@@ -192,8 +207,8 @@ function ColumnsSettingsList({
         });
     };
 
-    const combinedItems = isGrouped ? [...groupColumnsList, ...typeColumnsList] : [];
-    const groupLength = groupColumnsList.length;
+    const combinedItems = isGrouped ? [...visibleGroupColumnsList, ...visibleTypeColumnsList] : [];
+    const groupLength = visibleGroupColumnsList.length;
     const disabledIndexes = combinedItems.flatMap((item, index) => (item.isDisabled ? [index] : []));
     const containerRef = useRef<ComponentRef<typeof View>>(null);
 
@@ -225,6 +240,7 @@ function ColumnsSettingsList({
 
     const resetColumns = () => {
         setColumns(defaultColumns);
+        setSearchValue('');
     };
 
     const handleSave = () => {
@@ -253,51 +269,74 @@ function ColumnsSettingsList({
             <HeaderWithBackButton title={translate('search.columns')}>
                 {!isDefaultState && <TextLink onPress={resetColumns}>{translate('search.resetColumns')}</TextLink>}
             </HeaderWithBackButton>
+            {shouldShowSearchInput && (
+                <CompactSearchBar
+                    label={translate('common.search')}
+                    inputValue={searchValue}
+                    onChangeText={setSearchValue}
+                    style={[styles.mb3, styles.mw100]}
+                />
+            )}
             <View style={styles.flex1}>
                 <ScrollView
                     style={styles.flex1}
                     contentContainerStyle={styles.flex1}
+                    keyboardShouldPersistTaps="handled"
                 >
-                    {isGrouped ? (
-                        <View ref={containerRef}>
-                            <View style={[styles.ph5, styles.pb3]}>
-                                <Text style={styles.textLabelSupporting}>{translate('search.groupColumns')}</Text>
-                            </View>
-
-                            <DraggableList
-                                disableScroll
-                                data={groupColumnsList}
-                                keyExtractor={(item) => item.value}
-                                onDragEnd={onGroupDragEnd}
-                                onSelectRow={onSelectItem}
-                                isItemDragDisabled={(item) => item.isDragDisabled}
-                                isItemDisabled={(item) => item.isDisabled}
-                                renderItem={renderItem}
-                                focusedIndex={groupFocusedIndex}
-                            />
-
-                            <View style={styles.dividerLine} />
-
-                            <View style={[styles.ph5, styles.pv3]}>
-                                <Text style={styles.textLabelSupporting}>{translate('search.expenseColumns')}</Text>
-                            </View>
-
-                            <DraggableList
-                                disableScroll
-                                data={typeColumnsList}
-                                keyExtractor={(item) => item.value}
-                                onDragEnd={onTypeDragEnd}
-                                onSelectRow={onSelectItem}
-                                isItemDragDisabled={(item) => item.isDragDisabled}
-                                isItemDisabled={(item) => item.isDisabled}
-                                renderItem={renderItem}
-                                focusedIndex={typeFocusedIndex}
-                            />
+                    {hasNoSearchResults && (
+                        <View style={[styles.ph5, styles.pb5]}>
+                            <Text style={[styles.textLabel, styles.colorMuted, styles.minHeight5]}>{translate('common.noResultsFound')}</Text>
                         </View>
-                    ) : (
+                    )}
+                    {!hasNoSearchResults && isGrouped && (
+                        <View ref={containerRef}>
+                            {visibleGroupColumnsList.length > 0 && (
+                                <>
+                                    <View style={[styles.ph5, styles.pb3]}>
+                                        <Text style={styles.textLabelSupporting}>{translate('search.groupColumns')}</Text>
+                                    </View>
+
+                                    <DraggableList
+                                        disableScroll
+                                        data={visibleGroupColumnsList}
+                                        keyExtractor={(item) => item.value}
+                                        onDragEnd={onGroupDragEnd}
+                                        onSelectRow={onSelectItem}
+                                        isItemDragDisabled={(item) => item.isDragDisabled}
+                                        isItemDisabled={(item) => item.isDisabled}
+                                        renderItem={renderItem}
+                                        focusedIndex={groupFocusedIndex}
+                                    />
+                                </>
+                            )}
+
+                            {visibleGroupColumnsList.length > 0 && visibleTypeColumnsList.length > 0 && <View style={styles.dividerLine} />}
+
+                            {visibleTypeColumnsList.length > 0 && (
+                                <>
+                                    <View style={[styles.ph5, visibleGroupColumnsList.length > 0 ? styles.pv3 : styles.pb3]}>
+                                        <Text style={styles.textLabelSupporting}>{translate('search.expenseColumns')}</Text>
+                                    </View>
+
+                                    <DraggableList
+                                        disableScroll
+                                        data={visibleTypeColumnsList}
+                                        keyExtractor={(item) => item.value}
+                                        onDragEnd={onTypeDragEnd}
+                                        onSelectRow={onSelectItem}
+                                        isItemDragDisabled={(item) => item.isDragDisabled}
+                                        isItemDisabled={(item) => item.isDisabled}
+                                        renderItem={renderItem}
+                                        focusedIndex={typeFocusedIndex}
+                                    />
+                                </>
+                            )}
+                        </View>
+                    )}
+                    {!hasNoSearchResults && !isGrouped && (
                         <DraggableList
                             disableScroll
-                            data={typeColumnsList}
+                            data={visibleTypeColumnsList}
                             keyExtractor={(item) => item.value}
                             onDragEnd={onTypeDragEnd}
                             onSelectRow={onSelectItem}
