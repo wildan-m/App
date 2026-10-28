@@ -2,32 +2,28 @@ import type {FormOnyxValues} from '@components/Form/types';
 import {useSearchQueryContext} from '@components/Search/SearchContext';
 
 import useAllTransactionViolations from '@hooks/useAllTransactionViolations';
+import useCreateCategoryInSitu from '@hooks/useCreateCategoryInSitu';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
-import useOnboardingTaskInformation from '@hooks/useOnboardingTaskInformation';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import {usePersonalDetail} from '@hooks/usePersonalDetails';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
-import useReviewWorkspaceSettingsTaskCompletion from '@hooks/useReviewWorkspaceSettingsTaskCompletion';
 
 import {getIOURequestPolicyID, setMoneyRequestCategory} from '@libs/actions/IOU/MoneyRequest';
 import {setDraftSplitTransaction} from '@libs/actions/IOU/Split';
 import {updateMoneyRequestCategory} from '@libs/actions/IOU/UpdateMoneyRequest';
-import {createPolicyCategory} from '@libs/actions/Policy/Category';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getSelectedWorkspacePolicyID, pickReportForPolicy} from '@libs/IOUUtils';
 import findAllMatchingDynamicSuffixes from '@libs/Navigation/helpers/dynamicRoutesUtils/findAllMatchingDynamicSuffixes';
 import getPathWithoutDynamicSuffix from '@libs/Navigation/helpers/dynamicRoutesUtils/getPathWithoutDynamicSuffix';
 import Navigation from '@libs/Navigation/Navigation';
-import {hasTags} from '@libs/PolicyUtils';
 import {isSelfDM} from '@libs/ReportUtils';
-import StringUtils from '@libs/StringUtils';
 
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import CategoryForm from '@pages/workspace/categories/CategoryForm';
@@ -108,61 +104,18 @@ function DynamicIOURequestStepCategoryCreate({
 
     useRestartOnReceiptFailure(transaction, reportID, iouType, action);
 
-    const policyHasTags = hasTags(policyTags);
-    const getReviewWorkspaceSettingsTaskCompletion = useReviewWorkspaceSettingsTaskCompletion();
-
-    const {
-        taskReport: setupCategoryTaskReport,
-        taskParentReport: setupCategoryTaskParentReport,
-        isOnboardingTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
-        hasOutstandingChildTask,
-        parentReportAction,
-    } = useOnboardingTaskInformation(CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES);
-
-    const {
-        taskReport: setupCategoriesAndTagsTaskReport,
-        taskParentReport: setupCategoriesAndTagsTaskParentReport,
-        isOnboardingTaskParentReportArchived: isSetupCategoriesAndTagsTaskParentReportArchived,
-        hasOutstandingChildTask: setupCategoriesAndTagsHasOutstandingChildTask,
-        parentReportAction: setupCategoriesAndTagsParentReportAction,
-    } = useOnboardingTaskInformation(CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES_AND_TAGS);
+    const createCategoryInSitu = useCreateCategoryInSitu(policyID);
 
     const createCategory = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
-        const categoryName = StringUtils.sanitizeName(values.categoryName);
+        // 1. Create the category in the workspace (optimistic update, queued API call).
+        const createdCategory = createCategoryInSitu(values.categoryName);
 
-        if (!policyID) {
+        if (!createdCategory) {
             return;
         }
 
-        // 1. Create the category in the workspace (optimistic update, queued API call).
-        createPolicyCategory({
-            policyID,
-            categoryName,
-            isSetupCategoriesTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
-            setupCategoryTaskReport,
-            setupCategoryTaskParentReport,
-            currentUserAccountID: currentUserPersonalDetails.accountID,
-            hasOutstandingChildTask,
-            parentReportAction,
-            setupCategoriesAndTagsTaskReport,
-            setupCategoriesAndTagsTaskParentReport,
-            isSetupCategoriesAndTagsTaskParentReportArchived,
-            setupCategoriesAndTagsHasOutstandingChildTask,
-            setupCategoriesAndTagsParentReportAction,
-            policyHasTags,
-            reviewWorkspaceSettingsTaskData: getReviewWorkspaceSettingsTaskCompletion(),
-        });
-
         // 2. Apply the newly created category to the transaction.
-        const policyCategoriesWithNewCategory = {
-            ...policyCategories,
-            [categoryName]: {
-                name: categoryName,
-                enabled: true,
-                errors: null,
-                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
-            },
-        };
+        const {categoryName, policyCategories: policyCategoriesWithNewCategory} = createdCategory;
 
         if (isEditingSplit && transaction) {
             setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category: categoryName}, getCurrencyDecimals, getCurrencySymbol, policy);

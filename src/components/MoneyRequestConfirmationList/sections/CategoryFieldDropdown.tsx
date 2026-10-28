@@ -3,6 +3,7 @@ import {useConfirmationFields} from '@components/MoneyRequestConfirmationFields/
 import usePolicyCategoriesForConfirmation from '@components/MoneyRequestConfirmationList/hooks/usePolicyCategoriesForConfirmation';
 import type {ListItem} from '@components/SelectionList/types';
 
+import useCreateCategoryInSitu from '@hooks/useCreateCategoryInSitu';
 import useOnyx from '@hooks/useOnyx';
 import useUpdateTransactionCategory from '@hooks/useUpdateTransactionCategory';
 
@@ -57,6 +58,7 @@ function CategoryFieldDropdown({transactionID, policy, selectedCategory, canAddC
         isEditing: action === CONST.IOU.ACTION.EDIT,
         isEditingSplit: isEditingSplitBill,
     });
+    const createCategoryInSitu = useCreateCategoryInSitu(policy?.id);
 
     const openAddCategory = () => {
         onClose();
@@ -71,6 +73,14 @@ function CategoryFieldDropdown({transactionID, policy, selectedCategory, canAddC
         updateCategory(item.searchText ?? '');
     };
 
+    const createAndSelectCategory = (categoryName: string) => {
+        const createdCategory = createCategoryInSitu(categoryName);
+        if (!createdCategory) {
+            return;
+        }
+        updateCategory(createdCategory.categoryName, createdCategory.policyCategories);
+    };
+
     return (
         <CategoryPickerModal
             {...popoverProps}
@@ -80,6 +90,7 @@ function CategoryFieldDropdown({transactionID, policy, selectedCategory, canAddC
             selectedCategory={selectedCategory}
             onSelected={handleSelected}
             onAddCategory={canAddCategory ? openAddCategory : undefined}
+            onCreateCategory={canAddCategory ? createAndSelectCategory : undefined}
             addCategorySentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.ADD_CATEGORY_BUTTON}
         />
     );

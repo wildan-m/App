@@ -14,10 +14,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import {getCategoryListSections} from '@libs/CategoryOptionListUtils';
 import type {Category} from '@libs/CategoryOptionListUtils';
-import {getEnabledCategoriesCount} from '@libs/CategoryUtils';
+import {getCategoryNameError, getEnabledCategoriesCount} from '@libs/CategoryUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getHeaderMessageForNonUserList, getNoneOption} from '@libs/OptionsListUtils';
 import type {OptionTree} from '@libs/OptionsListUtils/types';
+import StringUtils from '@libs/StringUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -57,7 +58,15 @@ type CategoryPickerProps = {
      * the `Recent` and `All` headings add one each. Only reported unfiltered, so searching never resizes it.
      */
     onRenderedRowCountChange?: (rowCount: number) => void;
+
+    /**
+     * Adds a `Create "<search>" category` row when the search matches no category, called with the trimmed search
+     * value when tapped. Only passed by callers that let the user add a category, so others keep the bare empty state.
+     */
+    onCreateCategory?: (categoryName: string) => void;
 };
+
+const CREATE_CATEGORY_ROW_KEY = 'createCategoryFromSearch';
 
 const getSelectedOptions = (selectedCategory?: string): Category[] => {
     if (!selectedCategory) {
@@ -83,6 +92,7 @@ function CategoryPicker({
     shouldAlwaysShowGLCode = false,
     searchInputThreshold = CONST.STANDARD_LIST_ITEM_LIMIT,
     onRenderedRowCountChange,
+    onCreateCategory,
 }: CategoryPickerProps) {
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
@@ -156,6 +166,37 @@ function CategoryPicker({
     // fallback. A draft collection is a complete local list, so it renders immediately rather than waiting on the read.
     const isLoadingNewOptions = isLoadingPolicyCategories && policyCategoriesDraft === undefined;
 
+    // Names the new-category page would reject (reserved, HTML, too long) get no row. The existing-name check is
+    // skipped on purpose: a disabled category with the same name is hidden from the list and gets re-enabled instead.
+    const categoryNameFromSearch = StringUtils.sanitizeName(debouncedSearchValue);
+    const shouldShowCreateCategoryRow = !!onCreateCategory && !isLoadingNewOptions && categoryData.length === 0 && !getCategoryNameError(undefined, categoryNameFromSearch);
+    const createCategoryText = translate('workspace.categories.createCategoryFromSearch', categoryNameFromSearch);
+    const createCategorySection = {
+        title: '',
+        data: [
+            {
+                text: createCategoryText,
+                keyForList: CREATE_CATEGORY_ROW_KEY,
+                searchText: categoryNameFromSearch,
+                tooltipText: createCategoryText,
+                isDisabled: false,
+                isSelected: false,
+                titleStyles: styles.w100,
+            },
+        ],
+        sectionIndex: sectionsWithTitleStyles.length,
+    };
+
+    const listSections = shouldShowCreateCategoryRow ? [createCategorySection] : sectionsWithTitleStyles;
+
+    const selectRow = (item: ListItem) => {
+        if (shouldShowCreateCategoryRow && item.keyForList === CREATE_CATEGORY_ROW_KEY) {
+            onCreateCategory(categoryNameFromSearch);
+            return;
+        }
+        onSubmit(item);
+    };
+
     const textInputOptions = {
         value: searchValue,
         label: translate('common.search'),
@@ -171,8 +212,8 @@ function CategoryPicker({
         <SelectionListWithSections
             // The list only renders the skeleton when it has no items, so the sections have to be emptied too.
             // Otherwise the selected-only fallback row still shows while the fetch is in flight.
-            sections={isLoadingNewOptions ? getEmptyArray<never>() : sectionsWithTitleStyles}
-            onSelectRow={onSubmit}
+            sections={isLoadingNewOptions ? getEmptyArray<never>() : listSections}
+            onSelectRow={selectRow}
             ListItem={SingleSelectListItem}
             shouldShowTextInput={categoriesCount >= searchInputThreshold}
             textInputOptions={textInputOptions}

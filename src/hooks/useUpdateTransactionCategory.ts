@@ -46,8 +46,11 @@ type UseUpdateTransactionCategoryParams = {
 };
 
 type UseUpdateTransactionCategoryResult = {
-    /** Writes `category` to whichever of the three stores backs the expense being edited */
-    updateCategory: (category: string) => void;
+    /**
+     * Writes `category` to whichever of the three stores backs the expense being edited. `categoriesOverride` replaces
+     * `policyCategories` for this write, for a category that was just added and isn't in the hook's snapshot yet.
+     */
+    updateCategory: (category: string, categoriesOverride?: OnyxTypes.PolicyCategories) => void;
 
     /** Whether the write landed on the money request draft rather than a saved expense, for callers that navigate differently for each. */
     isDraftUpdate: boolean;
@@ -89,7 +92,7 @@ function useUpdateTransactionCategory({
     const isSplitUpdate = isEditingSplit && !!transaction;
     const isExistingExpenseUpdate = !isSplitUpdate && isEditing && !!transaction && !!report;
 
-    const updateCategory = (category: string) => {
+    const updateCategory = (category: string, categoriesOverride?: OnyxTypes.PolicyCategories) => {
         if (isSplitUpdate) {
             setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category}, getCurrencyDecimals, getCurrencySymbol, policy);
             return;
@@ -106,7 +109,7 @@ function useUpdateTransactionCategory({
                 category,
                 policy,
                 policyTagList: policyTags,
-                policyCategories,
+                policyCategories: categoriesOverride ?? policyCategories,
                 policyRecentlyUsedCategories,
                 currentUserAccountIDParam: currentUserPersonalDetails.accountID,
                 currentUserEmailParam: currentUserPersonalDetails.login ?? '',

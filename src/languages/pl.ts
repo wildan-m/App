@@ -6930,6 +6930,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             updateFailureMessage: 'Wystąpił błąd podczas aktualizowania kategorii, spróbuj ponownie',
             createFailureMessage: 'Wystąpił błąd podczas tworzenia kategorii, spróbuj ponownie',
             addCategory: 'Dodaj kategorię',
+            createCategoryFromSearch: (categoryName: string) => `Utwórz kategorię „${categoryName}”`,
             editCategory: 'Edytuj kategorię',
             editCategories: 'Edytuj kategorie',
             findCategory: 'Znajdź kategorię',
