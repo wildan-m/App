@@ -254,6 +254,7 @@ import {
 import getFormattedPostedDate from './TransactionUtils/getFormattedPostedDate';
 import shouldShowTransactionPostedYear from './TransactionUtils/shouldShowTransactionPostedYear';
 import {isInvalidMerchantValue} from './ValidationUtils';
+import getViolationDisplayName, {SELECTABLE_VIOLATIONS} from './Violations/getViolationDisplayName';
 
 type ColumnSortMapping<T> = Partial<Record<SearchColumnType, keyof T | null>>;
 type ColumnVisibility = Partial<Record<SearchColumnType, boolean>>;
@@ -5462,25 +5463,6 @@ function getHasOptions(translate: LocalizedTranslate, type: SearchDataTypes, con
     }
 }
 
-type SubmittedTransactionViolationShortName = Exclude<ValueOf<typeof CONST.VIOLATIONS>, typeof CONST.VIOLATIONS.RULE_VIOLATION>;
-
-const SUBMITTED_TRANSACTION_VIOLATION_SHORT_NAME_SET = new Set<string>(Object.values(CONST.VIOLATIONS).filter((name) => name !== CONST.VIOLATIONS.RULE_VIOLATION));
-
-function isSubmittedTransactionViolationShortName(name: string): name is SubmittedTransactionViolationShortName {
-    return SUBMITTED_TRANSACTION_VIOLATION_SHORT_NAME_SET.has(name);
-}
-
-/**
- * Returns a parameter-free display label for a violation name.
- * Falls back to the raw identifier when no short-name translation exists.
- */
-function getViolationDisplayName(violationName: string, translate: LocalizedTranslate): string {
-    if (violationName === CONST.VIOLATIONS.RULE_VIOLATION) {
-        return translate('violations.shortName.customRules');
-    }
-    return isSubmittedTransactionViolationShortName(violationName) ? translate(`violations.shortName.${violationName}`) : violationName;
-}
-
 function collectViolationNamesForTransaction(violationNames: Set<string>, violations: ViolationsSnapshot['transactions'] | undefined, transactionID: string) {
     const transactionViolations = violations?.[transactionID];
     if (!transactionViolations?.length) {
@@ -5970,6 +5952,10 @@ const FILTER_VIEW_MAP = {
         labelKey: 'search.receiptType',
         icon: 'Receipt',
     },
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION]: {
+        labelKey: 'search.filters.violation',
+        icon: 'Exclamation',
+    },
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.TRANSACTION_STATUS]: {
         labelKey: 'search.filters.transactionStatus.label',
         icon: 'CreditCardHourglass',
@@ -6374,6 +6360,10 @@ function getDisplayValue(
         return form[key]?.map((receiptType) => translate(getReceiptTypeTranslationKey(receiptType))).join(', ');
     }
 
+    if (key === FILTER_KEYS.VIOLATION) {
+        return form[key]?.map((violationName) => getViolationDisplayName(violationName, translate)).join(', ');
+    }
+
     if (key === FILTER_KEYS.MERCHANT) {
         const merchant = form[key];
         if (!merchant) {
@@ -6675,6 +6665,10 @@ function getMultiSelectFilterOptions(
             const receiptTypeName = translate(getReceiptTypeTranslationKey(receiptType));
             return {text: receiptTypeName, value: receiptType};
         });
+    }
+
+    if (filterKey === FILTER_KEYS.VIOLATION) {
+        return SELECTABLE_VIOLATIONS.map((violationName) => ({text: getViolationDisplayName(violationName, translate), value: violationName}));
     }
 
     if (filterKey === FILTER_KEYS.STATUS) {
@@ -7832,6 +7826,7 @@ export {
     isReportDetailsCustomColumn,
     insertColumnBeforeTotalAmount,
     getHasOptions,
+    getHasOptionAvailability,
     getSubmittedViolationsForTransaction,
     getApprovedViolationsForTransaction,
     getViolationsForTransaction,

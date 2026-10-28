@@ -616,6 +616,28 @@ describe('SearchQueryUtils', () => {
             expect(result).toEqual('type:expense receiptType:ereceipt,hotel');
         });
 
+        test('violation filter value', () => {
+            const filterValues: Partial<SearchAdvancedFiltersForm> = {
+                type: 'expense',
+                violationName: ['missingCategory', 'overLimit'],
+            };
+
+            const result = buildQueryStringFromFilterFormValues(filterValues);
+
+            expect(result).toEqual('type:expense violationName:missingCategory,overLimit');
+        });
+
+        test('negated violation filter value', () => {
+            const filterValues: Partial<SearchAdvancedFiltersForm> = {
+                type: 'expense',
+                violationNameNot: ['missingCategory', 'overLimit'],
+            };
+
+            const result = buildQueryStringFromFilterFormValues(filterValues);
+
+            expect(result).toEqual('type:expense -violationName:missingCategory,overLimit');
+        });
+
         test('transaction status filter value', () => {
             const filterValues: Partial<SearchAdvancedFiltersForm> = {
                 type: 'expense',
@@ -2461,6 +2483,40 @@ describe('SearchQueryUtils', () => {
 
             expect(result.receiptTypeNot).toEqual(['hotel']);
             expect(result.receiptType).toBeUndefined();
+        });
+
+        test('violation filter round trips through the query and drops unknown names', () => {
+            // Given a query that matches two violations and names one that does not exist
+            const queryJSON = buildSearchQueryJSON('sortBy:date sortOrder:desc type:expense violation:missingCategory,overLimit,notAViolation');
+
+            if (!queryJSON) {
+                throw new Error('Failed to parse query string');
+            }
+
+            // When the form values are built from it and serialized again
+            const result = buildFilterFormValuesFromQuery(queryJSON, {}, {}, {}, {}, {}, {});
+
+            // Then only the known violation names survive, and they serialize back to the same filter
+            expect(result.violationName).toEqual(['missingCategory', 'overLimit']);
+            expect(result.violationNameNot).toBeUndefined();
+            expect(buildQueryStringFromFilterFormValues(result)).toContain('violationName:missingCategory,overLimit');
+        });
+
+        test('negated violation filter round trips into violationNameNot', () => {
+            // Given a query that excludes two violations
+            const queryJSON = buildSearchQueryJSON('sortBy:date sortOrder:desc type:expense -violation:missingCategory,overLimit');
+
+            if (!queryJSON) {
+                throw new Error('Failed to parse query string');
+            }
+
+            // When the form values are built from it and serialized again
+            const result = buildFilterFormValuesFromQuery(queryJSON, {}, {}, {}, {}, {}, {});
+
+            // Then the names land in the negated form value and keep their negation
+            expect(result.violationNameNot).toEqual(['missingCategory', 'overLimit']);
+            expect(result.violationName).toBeUndefined();
+            expect(buildQueryStringFromFilterFormValues(result)).toContain('-violationName:missingCategory,overLimit');
         });
 
         test('from:me resolves to current user account ID when currentUserAccountID is provided', () => {

@@ -10772,6 +10772,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             withdrawn: 'Retiré',
             billable: 'Facturable',
             rejected: 'Rejeté',
+            violation: 'Infraction',
             held: 'En attente',
             reimbursable: 'Remboursable',
             purchaseCurrency: 'Devise d’achat',

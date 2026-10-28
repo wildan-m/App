@@ -1,5 +1,6 @@
 import {isFilterableBankAccount} from '@libs/BankAccountUtils';
 import {hasVendorFeatureOnAnyPolicy, isPolicyFeatureEnabled} from '@libs/PolicyUtils';
+import {getHasOptionAvailability} from '@libs/SearchUIUtils';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -46,6 +47,7 @@ const typeFiltersKeys = {
             CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE,
             CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE,
             CONST.SEARCH.SYNTAX_FILTER_KEYS.RECEIPT_TYPE,
+            CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION,
             CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS,
             CONST.SEARCH.SYNTAX_FILTER_KEYS.PURCHASE_AMOUNT,
             CONST.SEARCH.SYNTAX_FILTER_KEYS.PURCHASE_CURRENCY,
@@ -320,6 +322,9 @@ function useAdvancedSearchFilters(type: SearchDataTypes | undefined) {
     const isVendorFilterAvailableSelector = (allPolicies: OnyxCollection<Policy>) => hasVendorFeatureOnAnyPolicy(allPolicies, isVendorMatchingBetaEnabled);
     const [isVendorFilterAvailable = false] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: isVendorFilterAvailableSelector});
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
+    // The Rules check needs areRulesEnabled, which advancedSearchPoliciesSelector drops, and falls back to category rules for migrated Control workspaces
+    const [policiesForRulesCheck] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [policyCategories] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CATEGORIES);
 
     const {workspaces} = useAdvancedSearchFiltersWorkspaces(policies);
 
@@ -329,6 +334,8 @@ function useAdvancedSearchFilters(type: SearchDataTypes | undefined) {
     const shouldDisplayBankAccountFilter = shouldDisplayFilter(hasFilterableBankAccount ? 1 : 0, true);
     const shouldDisplayTaxFilter = shouldDisplayFilter(policyDerived?.hasAnyTaxRates ? 1 : 0, policyDerived?.areTaxEnabled ?? false);
     const shouldDisplayWorkspaceFilter = workspaces.some((section) => section.data.length > 1);
+    // Violations come from workspace Rules, so reuse the Rules check behind the has:submitted-violation option
+    const shouldDisplayViolationFilter = getHasOptionAvailability(policiesForRulesCheck ?? {}, policyCategories).shouldShowSubmittedViolation;
 
     let currentType = type ?? CONST.SEARCH.DATA_TYPES.EXPENSE;
 
@@ -344,6 +351,9 @@ function useAdvancedSearchFilters(type: SearchDataTypes | undefined) {
                         return;
                     }
                     if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.VENDOR && !isVendorFilterAvailable) {
+                        return;
+                    }
+                    if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION && !shouldDisplayViolationFilter) {
                         return;
                     }
                     if (

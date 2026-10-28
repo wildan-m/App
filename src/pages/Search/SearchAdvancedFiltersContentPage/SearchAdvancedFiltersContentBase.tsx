@@ -132,6 +132,13 @@ function SearchAdvancedFiltersContentBase() {
                                         updatedValues.receiptTypeNot = remainingNegatedReceiptTypes?.length ? remainingNegatedReceiptTypes : undefined;
                                     }
 
+                                    const selectedViolations = newValues.violationName;
+                                    // Same for violations, so the query can't emit both violation and -violation for the same name
+                                    if (selectedViolations !== undefined) {
+                                        const remainingNegatedViolations = currentValues?.violationNameNot?.filter((violationName) => !selectedViolations.includes(violationName));
+                                        updatedValues.violationNameNot = remainingNegatedViolations?.length ? remainingNegatedViolations : undefined;
+                                    }
+
                                     if (shouldApplyFilterChangeDirectly) {
                                         Navigation.dismissModal({
                                             afterTransition: () => {

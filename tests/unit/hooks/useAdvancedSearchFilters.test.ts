@@ -216,6 +216,35 @@ describe('useAdvancedSearchFilters', () => {
         });
     });
 
+    describe('violation filter visibility', () => {
+        it('hides the violation filter when no workspace has Rules enabled', async () => {
+            // Given a Collect workspace without Rules
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}1`, buildPolicy(1, {type: CONST.POLICY.TYPE.TEAM, areRulesEnabled: false}));
+
+            // When the expense filters are listed
+            const {result} = renderHook(() => useAdvancedSearchFilters(CONST.SEARCH.DATA_TYPES.EXPENSE), {wrapper});
+
+            // Then the violation filter is not offered, because no workspace can raise rule violations
+            await waitFor(() => {
+                expect(result.current.flat()).toContain(CONST.SEARCH.SYNTAX_FILTER_KEYS.RECEIPT_TYPE);
+            });
+            expect(result.current.flat()).not.toContain(CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION);
+        });
+
+        it('shows the violation filter when a workspace has Rules enabled', async () => {
+            // Given a Control workspace with Rules enabled
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}1`, buildPolicy(1, {type: CONST.POLICY.TYPE.CORPORATE, areRulesEnabled: true}));
+
+            // When the expense filters are listed
+            const {result} = renderHook(() => useAdvancedSearchFilters(CONST.SEARCH.DATA_TYPES.EXPENSE), {wrapper});
+
+            // Then the violation filter is offered next to the receipt type filter
+            await waitFor(() => {
+                expect(result.current.flat()).toContain(CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION);
+            });
+        });
+    });
+
     describe('tax filter visibility', () => {
         it('hides tax filter when no policies have taxes enabled', async () => {
             const policy = buildPolicy(1, {tax: {trackingEnabled: false}});

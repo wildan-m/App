@@ -195,6 +195,28 @@ describe('useAutocompleteSuggestions', () => {
         expect(result.current.at(0)?.mapKey).toBe(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG);
     });
 
+    it('suggests translated violation names and substitutes the raw violation name', () => {
+        // Given the user is typing a violation filter value
+        parseForAutocomplete.mockReturnValue({
+            autocomplete: {key: CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION, value: 'missing cat'},
+            ranges: [],
+        });
+        const translate: Params['translate'] = (key, ...parameters) => (key === 'violations.shortName.missingCategory' ? 'Missing category' : String([key, ...parameters].at(0)));
+
+        // When the suggestions are computed
+        const {result} = renderHook(() => useAutocompleteSuggestions({...defaultParams, translate, autocompleteQueryValue: 'violation:missing cat'}));
+
+        // Then the translated name is suggested, and the raw violation name is what gets sent in the query
+        expect(result.current).toEqual([
+            {
+                filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.VIOLATION,
+                text: 'Missing category',
+                autocompleteID: CONST.VIOLATIONS.MISSING_CATEGORY,
+                mapKey: CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION,
+            },
+        ]);
+    });
+
     it('returns recent tags when autocomplete value is empty', () => {
         parseForAutocomplete.mockReturnValue({
             autocomplete: {key: CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG, value: ''},

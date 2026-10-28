@@ -8182,6 +8182,8 @@ const CONST = {
         },
         // Hotel needs historical receipts backfilled with isHotelReservation before it can return results
         SELECTABLE_RECEIPT_TYPES: ['ereceipt', 'itemized'],
+        // Violation names left out of the violation filter. Hold is shown as the Held state and has its own held filter
+        HIDDEN_VIOLATION_FILTER_VALUES: ['hold'],
         WITHDRAWAL_TYPE: {
             EXPENSIFY_CARD: 'expensify-card',
             REIMBURSEMENT: 'reimbursement',
@@ -8819,6 +8821,7 @@ const CONST = {
             AMOUNT: 'amount',
             EXPENSE_TYPE: 'expenseType',
             RECEIPT_TYPE: 'receiptType',
+            VIOLATION: 'violationName',
             TRANSACTION_STATUS: 'transactionStatus',
             CURRENCY: 'currency',
             GROUP_CURRENCY: 'groupCurrency',
@@ -8918,6 +8921,7 @@ const CONST = {
             AMOUNT_REIMBURSED: 'amount-reimbursed',
             EXPENSE_TYPE: 'expense-type',
             RECEIPT_TYPE: 'receipt-type',
+            VIOLATION: 'violation',
             TRANSACTION_STATUS: 'transaction-status',
             CURRENCY: 'currency',
             GROUP_CURRENCY: 'group-currency',

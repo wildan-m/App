@@ -21,6 +21,7 @@ import {
 } from '@libs/SearchAutocompleteUtils';
 import {getUserFriendlyKey, getUserFriendlyValue, isFilterSupported} from '@libs/SearchQueryUtils';
 import {getDatePresets, getHasOptions} from '@libs/SearchUIUtils';
+import getViolationDisplayName, {SELECTABLE_VIOLATIONS} from '@libs/Violations/getViolationDisplayName';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -447,6 +448,25 @@ function useAutocompleteSuggestions({
             return filteredReceiptTypes.map((receiptType) => ({
                 filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.RECEIPT_TYPE,
                 text: receiptType,
+            }));
+        }
+        case CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION: {
+            // Suggest the translated name and substitute the raw violation name when the query is sent
+            const filteredViolations = SELECTABLE_VIOLATIONS.map((violationName) => ({violationName, displayName: getViolationDisplayName(violationName, translate)}))
+                .filter(
+                    ({violationName, displayName}) =>
+                        displayName.toLowerCase().includes(autocompleteValue.toLowerCase()) &&
+                        !alreadyAutocompletedKeys.has(displayName.toLowerCase()) &&
+                        !alreadyAutocompletedKeys.has(violationName.toLowerCase()),
+                )
+                .sort((a, b) => localeCompare(a.displayName, b.displayName))
+                .slice(0, 10);
+
+            return filteredViolations.map(({violationName, displayName}) => ({
+                filterKey: CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.VIOLATION,
+                text: displayName,
+                autocompleteID: violationName,
+                mapKey: CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION,
             }));
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.TRANSACTION_STATUS: {

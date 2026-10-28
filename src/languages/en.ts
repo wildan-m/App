@@ -11031,6 +11031,7 @@ const translations = {
             withdrawn: 'Withdrawn',
             billable: 'Billable',
             rejected: 'Rejected',
+            violation: 'Violation',
             held: 'Held',
             searchFilters: 'Search filters',
             noFiltersSelected: 'No filters selected',

@@ -96,6 +96,7 @@ import {parse as parseSearchQuery} from './SearchParser/searchParser';
 import StringUtils from './StringUtils';
 import {hashText} from './UserUtils';
 import {isValidDate} from './ValidationUtils';
+import getViolationDisplayName, {isViolationName} from './Violations/getViolationDisplayName';
 
 type FilterKeys = keyof typeof CONST.SEARCH.SYNTAX_FILTER_KEYS;
 type SearchRootParams = SearchFullscreenNavigatorParamList[typeof SCREENS.SEARCH.ROOT];
@@ -1532,6 +1533,7 @@ function buildQueryStringFromFilterFormValues(filterValues: Partial<SearchAdvanc
                     filterKey === FILTER_KEYS.TAX_RATE ||
                     filterKey === FILTER_KEYS.EXPENSE_TYPE ||
                     filterKey === FILTER_KEYS.RECEIPT_TYPE ||
+                    filterKey === FILTER_KEYS.VIOLATION ||
                     filterKey === FILTER_KEYS.TAG ||
                     filterKey === FILTER_KEYS.VENDOR ||
                     filterKey === FILTER_KEYS.CURRENCY ||
@@ -1920,6 +1922,9 @@ function buildFilterFormValuesFromQuery(
             } else {
                 filtersForm[FILTER_KEYS.RECEIPT_TYPE] = receiptTypeValues;
             }
+        }
+        if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION) {
+            filtersForm[addNegation(filterKey, isNegated)] = filterValues.filter(isViolationName);
         }
         if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.TRANSACTION_STATUS) {
             filtersForm[addNegation(filterKey, isNegated)] = filterValues.find((transactionStatus): transactionStatus is TransactionStatusValue =>
@@ -2350,6 +2355,9 @@ function getFilterDisplayValue({
     }
     if (filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID) {
         return getPolicyNameWithFallback(filterValue, policies, reports);
+    }
+    if (filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION) {
+        return getViolationDisplayName(filterValue, translate);
     }
     if (filterName === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED_TO) {
         // A query can carry a standard template's ID, so display the label the backend records for it. Custom template names are returned as-is.

@@ -211,6 +211,7 @@ function filterOutRangesWithCorrectValue(
     const typeList = Object.values(CONST.SEARCH.DATA_TYPES) as string[];
     const expenseTypeList = userFriendlyExpenseTypeList;
     const receiptTypeList = userFriendlyReceiptTypeList;
+    const violationList = Object.values(CONST.VIOLATIONS) as string[];
     const transactionStatusList = userFriendlyTransactionStatusList;
     const withdrawalTypeList = Object.values(CONST.SEARCH.WITHDRAWAL_TYPE) as string[];
     const withdrawalStatusList = Object.values(CONST.SEARCH.SETTLEMENT_STATUS) as string[];
@@ -267,6 +268,8 @@ function filterOutRangesWithCorrectValue(
             return expenseTypeList.includes(range.value);
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.RECEIPT_TYPE:
             return receiptTypeList.includes(range.value);
+        case CONST.SEARCH.SYNTAX_FILTER_KEYS.VIOLATION:
+            return substitutionMap[`${range.key}:${range.value}`] !== undefined || violationList.includes(range.value);
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.TRANSACTION_STATUS:
             return transactionStatusList.includes(range.value);
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE:
