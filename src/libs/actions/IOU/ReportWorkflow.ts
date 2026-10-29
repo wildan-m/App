@@ -428,6 +428,30 @@ function approveMoneyRequest(params: ApproveMoneyRequestFunctionParams) {
         }
     }
 
+    // Held expenses move out to a new report on a partial approval, so the original report's totals must only cover the unheld ones.
+    // This is applied independently of the held-expense move below, which is skipped when the chat report isn't available locally
+    // (e.g. for a vacation delegate), so the report total doesn't keep including the held expenses until the report is re-fetched.
+    if (!full && hasHeldExpenses && expenseReport.unheldTotal !== undefined) {
+        optimisticData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
+            value: {
+                total: expenseReport.unheldTotal,
+                nonReimbursableTotal: expenseReport.unheldNonReimbursableTotal ?? 0,
+                reimbursableTotal: getUnheldReimbursableTotal(expenseReport),
+            },
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
+            value: {
+                total: expenseReport.total,
+                nonReimbursableTotal: expenseReport.nonReimbursableTotal,
+                reimbursableTotal: expenseReport.reimbursableTotal,
+            },
+        });
+    }
+
     let optimisticHoldReportID;
     let optimisticHoldActionID;
     let optimisticHoldReportExpenseActionIDs;
