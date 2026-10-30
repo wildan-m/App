@@ -100,6 +100,7 @@ function DynamicBetaOverridesPage() {
                     ))}
                     <View style={styles.mt4}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_BETA_OVERRIDES_PAGE.CLEAR_BETA_OVERRIDES}
                             size={CONST.BUTTON_SIZE.LARGE}
                             onPress={clearBetaOverrides}
                         >

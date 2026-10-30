@@ -124,6 +124,7 @@ function CompanyCardTransactionStartDateForm({
                     addBottomSafeAreaPadding
                     footerContent={
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.COMPANY_CARD_TRANSACTION_START_DATE_FORM.SUBMIT}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             size={CONST.BUTTON_SIZE.LARGE}
                             onPress={submit}

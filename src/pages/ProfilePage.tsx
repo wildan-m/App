@@ -276,6 +276,7 @@ function ProfilePage({route}: ProfilePageProps) {
                             {hasStatus && (
                                 <View style={[styles.detailsPageSectionContainer, styles.w100]}>
                                     <MenuItemWithTopDescription
+                                        sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.STATUS}
                                         style={[styles.ph0]}
                                         title={statusContent}
                                         description={translate('statusPage.status')}
@@ -288,6 +289,7 @@ function ProfilePage({route}: ProfilePageProps) {
                             {!(isCurrentUser && isAnonymousUserSession()) && login ? (
                                 <View style={[styles.w100, styles.detailsPageSectionContainer]}>
                                     <MenuItemWithTopDescription
+                                        sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.MENU_ITEM}
                                         style={[styles.ph0]}
                                         title={isSMSLogin ? formatPhoneNumber(phoneNumber ?? '') : login}
                                         copyValue={isSMSLogin ? formatPhoneNumber(phoneNumber ?? '') : login}
@@ -301,6 +303,7 @@ function ProfilePage({route}: ProfilePageProps) {
                                 <View style={[styles.alignSelfStretch, styles.mhn5]}>
                                     <OfflineWithFeedback pendingAction={details?.pendingFields?.displayName}>
                                         <MenuItemWithTopDescription
+                                            sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.DISPLAY_NAME_PAGE}
                                             title={displayName}
                                             description={translate('displayNamePage.headerTitle')}
                                             interactive={!hasDisplayNameSet}
@@ -313,6 +316,7 @@ function ProfilePage({route}: ProfilePageProps) {
                             {pronouns ? (
                                 <View style={[styles.w100, styles.detailsPageSectionContainer]}>
                                     <MenuItemWithTopDescription
+                                        sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.PREFERRED_PRONOUNS}
                                         style={[styles.ph0]}
                                         title={pronouns}
                                         description={translate('profilePage.preferredPronouns')}
@@ -324,6 +328,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         </View>
                         {isCurrentUser && (
                             <MenuItemNavigation
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.EDIT_YOUR_PROFILE}
                                 title={translate('common.editYourProfile')}
                                 icon={expensifyIcons.Pencil}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute(Navigation.getActiveRoute()))}
@@ -335,6 +340,7 @@ function ProfilePage({route}: ProfilePageProps) {
                                 errorRowStyles={[styles.mh5, styles.mb2]}
                             >
                                 <MenuItemWithTopDescription
+                                    sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.CUSTOM_INSTRUCTIONS}
                                     description={translate('profilePage.customInstructions')}
                                     title={Str.htmlDecode(agentPrompt?.prompt?.trim() ?? '')}
                                     shouldParseTitle
@@ -348,6 +354,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         )}
                         {isOwnedAgent && (
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.COPILOT_INTO_ACCOUNT}
                                 title={translate('profilePage.copilotIntoAccount')}
                                 icon={expensifyIcons.UserPlus}
                                 // The agent can't use its own Agents pages, so copiloting from here starts over from Home
@@ -356,6 +363,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         )}
                         {!!accountID && !isAnonymousUserSession() && (
                             <MenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.MENU_ITEM}
                                 shouldShowRightIcon
                                 title={translate(isCustomAgent || isAgentEmail(login) ? 'profilePage.viewAgentHistory' : 'profilePage.seeChatHistory')}
                                 icon={expensifyIcons.History}
@@ -378,7 +386,10 @@ function ProfilePage({route}: ProfilePageProps) {
                             />
                         )}
                         {Permissions.canUsePrivateNotes() && !isEmptyObject(report) && !!report.reportID && !isCurrentUser && (
-                            <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => navigateToPrivateNotes(report, currentUserAccountID, true), false, session)}>
+                            <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.PRIVATE_NOTES}
+                                onPress={callFunctionIfActionIsAllowed(() => navigateToPrivateNotes(report, currentUserAccountID, true), false, session)}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <MenuItem.Icon src={expensifyIcons.Pencil} />
@@ -395,6 +406,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         )}
                         {isConcierge && !!guideCalendarLink && (
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.TOOLTIP}
                                 title={translate('videoChatButtonAndMenu.tooltip')}
                                 icon={expensifyIcons.Phone}
                                 onPress={() => {
@@ -404,6 +416,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         )}
                         {!!report?.reportID && !!isDebugModeEnabled && (
                             <MenuItemNavigation
+                                sentryLabel={CONST.SENTRY_LABEL.PROFILE_PAGE.DEBUG}
                                 title={translate('debug.debug')}
                                 icon={expensifyIcons.Bug}
                                 onPress={() => Navigation.navigate(ROUTES.DEBUG_REPORT.getRoute(report.reportID))}

@@ -519,6 +519,7 @@ function TableContent<DataType extends TableData, ColumnKey extends string = str
                 >
                     <View style={bottomSafeAreaPaddingStyle}>
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.TABLE_CONTENT.SELECT}
                             icon={icons.CheckSquare}
                             title={translate('common.select')}
                             onPress={handleMobileSelectionPress}

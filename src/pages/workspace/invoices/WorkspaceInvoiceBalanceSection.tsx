@@ -6,6 +6,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 import React from 'react';
@@ -31,6 +32,7 @@ function WorkspaceInvoiceBalanceSection({policyID}: WorkspaceInvoiceBalanceSecti
             subtitleMuted
         >
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_INVOICE_BALANCE_SECTION.BALANCE}
                 description={translate('walletPage.balance')}
                 title={convertToDisplayString(policy?.invoice?.bankAccount?.stripeConnectAccountBalance ?? 0, policy?.outputCurrency)}
                 titleStyle={styles.textHeadlineH2}

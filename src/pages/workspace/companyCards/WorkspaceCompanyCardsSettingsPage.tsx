@@ -170,6 +170,7 @@ function WorkspaceCompanyCardsSettingsPage({
                         </View>
                         {isDirectFeedType && (
                             <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARDS_SETTINGS_PAGE.ASSIGN_NEW_CARDS}
                                 onPress={() => {
                                     if (!isUserValidated) {
                                         verifyAccountAndResume(undefined);
@@ -191,6 +192,7 @@ function WorkspaceCompanyCardsSettingsPage({
                         )}
                         {isCsvFeed && (
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARDS_SETTINGS_PAGE.IMPORT_SPREADSHEET}
                                 icon={icons.Table}
                                 title={translate('spreadsheet.importSpreadsheet')}
                                 onPress={() => {
@@ -207,6 +209,7 @@ function WorkspaceCompanyCardsSettingsPage({
                             />
                         )}
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARDS_SETTINGS_PAGE.REMOVE_CARD_FEED}
                             icon={icons.Trashcan}
                             title={translate('workspace.moreFeatures.companyCards.removeCardFeed')}
                             onPress={() => {

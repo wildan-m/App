@@ -61,6 +61,7 @@ function WorkspaceCompanyCardExpensifyCardPromotionBanner({policy, canWriteCompa
             style={[styles.flexRow, styles.gap2, smallScreenStyle]}
         >
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARD_EXPENSIFY_CARD_PROMOTION_BANNER.EXPENSIFY_CARD_BANNER_LEARN_MORE_BUTTON}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 onPress={canUseLearnMore ? handleLearnMore : onReadOnlyAction}
                 style={shouldUseNarrowLayout && !isInLandscapeMode && styles.flex1}

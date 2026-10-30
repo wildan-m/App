@@ -105,6 +105,7 @@ function DynamicReceiptReviewPage({route}: DynamicReceiptReviewPageProps) {
                 </ScrollView>
                 <FixedFooter>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_RECEIPT_REVIEW_PAGE.CONTINUE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={handleContinue}

@@ -31,6 +31,7 @@ function Template(props: PopoverMenuProps) {
     return (
         <>
             <MenuItem
+                sentryLabel="Template-ToggleVisibility"
                 title="Add payment Methods"
                 icon={icons.Plus}
                 onPress={toggleVisibility}

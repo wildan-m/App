@@ -286,6 +286,7 @@ function PolicyDistanceRateDetailsPage({route}: PolicyDistanceRateDetailsPagePro
                     )}
                     {canWriteDistanceRates && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.POLICY_DISTANCE_RATE_DETAILS_PAGE.DELETE}
                             icon={icons.Trashcan}
                             title={translate('common.delete')}
                             onPress={async () => {

@@ -123,6 +123,7 @@ function DocusignFullStepImpl({defaultValue, formID, inputID, isLoading, onBackB
                     </>
                 )}
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DOCUSIGN_FULL_STEP_IMPL.OPEN_LINK}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100, styles.mb15]}

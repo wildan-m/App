@@ -29,6 +29,7 @@ function MissingWorkspacesFooter({canInvite, isInviteDisabled, onInvite, onSkip}
         return (
             <FixedFooter addBottomSafeAreaPadding>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.MISSING_WORKSPACES_FOOTER.SKIP}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={onSkip}
@@ -42,6 +43,7 @@ function MissingWorkspacesFooter({canInvite, isInviteDisabled, onInvite, onSkip}
     return (
         <FixedFooter addBottomSafeAreaPadding>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.MISSING_WORKSPACES_FOOTER.INVITE}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 size={CONST.BUTTON_SIZE.LARGE}
                 isDisabled={isInviteDisabled}
@@ -50,6 +52,7 @@ function MissingWorkspacesFooter({canInvite, isInviteDisabled, onInvite, onSkip}
                 <Button.Text>{translate('common.invite')}</Button.Text>
             </Button>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.MISSING_WORKSPACES_FOOTER.SKIP}
                 size={CONST.BUTTON_SIZE.LARGE}
                 style={styles.mt3}
                 onPress={onSkip}

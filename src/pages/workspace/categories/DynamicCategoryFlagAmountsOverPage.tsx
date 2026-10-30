@@ -112,6 +112,7 @@ function DynamicCategoryFlagAmountsOverPage({
                         <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('workspace.rules.categoryRules.flagAmountsOverSubtitle')}</Text>
                     </View>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_CATEGORY_FLAG_AMOUNTS_OVER_PAGE.TYPE}
                         shouldShowRightIcon
                         title={translate(`workspace.rules.categoryRules.expenseLimitTypes.${expenseLimitType}`)}
                         description={translate('common.type')}

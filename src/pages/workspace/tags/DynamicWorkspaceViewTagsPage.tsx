@@ -275,6 +275,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
 
         return (
             <ButtonWithDropdownMenu
+                sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_VIEW_TAGS_PAGE.SELECTED}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 buttonRef={dropdownButtonRef}
                 onPress={() => null}
@@ -324,6 +325,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
                 errorRowStyles={styles.mh5}
             >
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_VIEW_TAGS_PAGE.NAVIGATE_TO_EDIT_TAG}
                     title={getCleanedTagName(currentPolicyTag.name)}
                     description={translate(`workspace.tags.customTagName`)}
                     onPress={navigateToEditTag}

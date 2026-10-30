@@ -142,6 +142,7 @@ function NetSuiteImportCustomFieldView({
                         );
                     })}
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.NET_SUITE_IMPORT_CUSTOM_FIELD_VIEW.REMOVE}
                         icon={icons.Trashcan}
                         title={translate('common.remove')}
                         isDisabled={!!config?.pendingFields?.[importCustomField]}

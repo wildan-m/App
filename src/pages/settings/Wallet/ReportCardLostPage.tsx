@@ -23,6 +23,7 @@ import {getFormattedAddress} from '@libs/PersonalDetailsUtils';
 
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
 
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
@@ -168,6 +169,7 @@ function ReportCardLostPage({
                         </View>
                         <View style={styles.mh5}>
                             <FormAlertWithSubmitButton
+                                sentryLabel={CONST.SENTRY_LABEL.REPORT_CARD_LOST_PAGE.SHIP_NEW_CARD_BUTTON}
                                 isAlertVisible={shouldShowAddressError}
                                 onSubmit={handleSubmitSecondStep}
                                 message={translate('reportCardLostOrDamaged.addressError')}
@@ -189,6 +191,7 @@ function ReportCardLostPage({
                         </View>
                         <View style={styles.mh5}>
                             <FormAlertWithSubmitButton
+                                sentryLabel={CONST.SENTRY_LABEL.REPORT_CARD_LOST_PAGE.NEXT_BUTTON_LABEL}
                                 isAlertVisible={shouldShowReasonError}
                                 onSubmit={handleSubmitFirstStep}
                                 message={translate('reportCardLostOrDamaged.reasonError')}

@@ -116,7 +116,10 @@ function DynamicQuickbooksDesktopOutOfPocketExpenseConfigurationPage({policy}: W
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
                 >
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_QUICKBOOKS_DESKTOP_OUT_OF_POCKET_EXPENSE_CONFIGURATION_PAGE.MENU_ITEM}
+                        onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}
+                    >
                         <MenuItemField.Row
                             name={section.description ?? ''}
                             value={section.title}

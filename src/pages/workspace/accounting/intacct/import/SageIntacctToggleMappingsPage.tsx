@@ -120,6 +120,7 @@ function SageIntacctToggleMappingsPage({route}: SageIntacctToggleMappingsPagePro
             >
                 <OfflineWithFeedback pendingAction={settingsPendingAction([mappingName], config?.pendingFields)}>
                     <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.SAGE_INTACCT_TOGGLE_MAPPINGS_PAGE.DISPLAYED_AS}
                         onPress={callFunctionIfActionIsAllowed(
                             () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_MAPPINGS_TYPE.getRoute(policyID, mappingName)),
                             false,

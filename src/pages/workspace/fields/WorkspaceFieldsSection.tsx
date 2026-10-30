@@ -155,6 +155,7 @@ function WorkspaceFieldsSection({
     const renderItem = ({item}: ListRenderItemInfo<FieldListItem>) => (
         <OfflineWithFeedback pendingAction={item.pendingAction}>
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_FIELDS_SECTION.NAVIGATE_TO_FIELD_SETTINGS}
                 style={cardPaddingHorizontal}
                 onPress={() => navigateToFieldSettings(item)}
                 description={item.text}

@@ -124,6 +124,7 @@ function PersonalCardDetailsHeaderMenu({
             <View style={styles.mt4}>
                 {isCSVImportedPersonalCard && (
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_DETAILS_HEADER_MENU.IMPORT_SPREADSHEET}
                         icon={icons.Table}
                         title={translate('spreadsheet.importSpreadsheet')}
                         onPress={() => Navigation.navigate(ROUTES.SETTINGS_WALLET_IMPORT_TRANSACTIONS_SPREADSHEET.getRoute(Number(cardID)))}
@@ -131,6 +132,7 @@ function PersonalCardDetailsHeaderMenu({
                 )}
                 {shouldShowBreakConnection && (
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_DETAILS_HEADER_MENU.BREAK_CONNECTION}
                         icon={icons.Trashcan}
                         isDisabled={isOffline || card?.isLoadingLastUpdated}
                         title="Break connection (Testing)"
@@ -139,6 +141,7 @@ function PersonalCardDetailsHeaderMenu({
                 )}
                 {isCSVImportedPersonalCard ? (
                     <MenuItem
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_DETAILS_HEADER_MENU.DELETE}
                         icon={icons.Trashcan}
                         title={translate('common.delete')}
                         style={styles.mb1}
@@ -146,6 +149,7 @@ function PersonalCardDetailsHeaderMenu({
                     />
                 ) : (
                     <MenuItem
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_DETAILS_HEADER_MENU.REMOVE_CARD}
                         icon={expensifyIcons.RemoveMembers}
                         title={translate('workspace.moreFeatures.companyCards.removeCard')}
                         style={styles.mb1}

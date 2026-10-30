@@ -241,7 +241,10 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
             {isDocumentNeededStatus.isPRDAndFSGNeeded && (
                 <View style={[styles.alignItemsStart]}>
                     <Text style={[styles.mutedTextLabel, styles.mb3]}>{translate('signerInfoStep.PDSandFSG')}</Text>
-                    <Button onPress={downloadPDSAndFSG}>
+                    <Button
+                        sentryLabel={CONST.SENTRY_LABEL.UPLOAD_DOCUMENTS.DOWNLOAD_PDS_AND_FSG}
+                        onPress={downloadPDSAndFSG}
+                    >
                         <Button.Text>{translate('common.download')}</Button.Text>
                     </Button>
                     {!isPDSandFSGDownloaded && isPDSandFSGDownloadedTouched && (

@@ -10,6 +10,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {shouldShowPolicy} from '@libs/PolicyUtils';
 import {isChatRoom as isChatRoomUtil, isPolicyExpenseChat as isPolicyExpenseChatUtil} from '@libs/ReportUtils';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
@@ -42,6 +43,7 @@ function ReportDetailsMenuGoToWorkspaceItem({reportID}: ReportDetailsMenuGoToWor
 
     return (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_MENU_GO_TO_WORKSPACE_ITEM.GO_TO_WORKSPACE}
             title={translate('workspace.common.goToWorkspace')}
             icon={expensifyIcons.Building}
             onPress={() => {

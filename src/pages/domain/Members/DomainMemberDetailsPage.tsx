@@ -129,6 +129,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
 
     const avatarButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBER_DETAILS_PAGE.SET_IS_MODAL_VISIBLE}
             onPress={() => setIsModalVisible(true)}
             style={styles.mb5}
         >
@@ -203,6 +204,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 <View style={styles.mt6} />
                 {!!accountRequiresTwoFactorAuth && (
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBER_DETAILS_PAGE.RESET_TWO_FACTOR_AUTH}
                         title={translate('domain.common.resetTwoFactorAuth')}
                         icon={icons.CircularArrowBackwards}
                         onPress={() => {
@@ -214,6 +216,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
 
                 {isAccountLocked ? (
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBER_DETAILS_PAGE.UNLOCK_ACCOUNT}
                         key="UnlockAccount"
                         title={translate('lockAccountPage.unlockAccount')}
                         icon={icons.Unlock}
@@ -221,6 +224,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                     />
                 ) : (
                     <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBER_DETAILS_PAGE.REPORT_SUSPICIOUS_ACTIVITY}
                         key="ReportSuspiciousActivity"
                         onPress={callFunctionIfActionIsAllowed(() => Navigation.navigate(ROUTES.DOMAIN_LOCK_ACCOUNT.getRoute(domainAccountID, accountID)), false, session)}
                     >

@@ -290,7 +290,12 @@ function WorkflowsPaymentsTab({policyID}: WorkflowsPaymentsTabProps) {
         wrapperStyle: styles.ph0,
         brickRoadIndicator: bankConnectionMessage ? undefined : bankConnectionBrickRoadIndicator,
     };
-    const bankAccountMenuItem = <MenuItem {...bankAccountMenuItemProps} />;
+    const bankAccountMenuItem = (
+        <MenuItem
+            sentryLabel={bankAccountMenuItemProps.sentryLabel}
+            {...bankAccountMenuItemProps}
+        />
+    );
 
     const reimbursementCountryNames = Object.keys(policy?.reimbursement?.countries ?? {})
         .filter((countryISO): countryISO is Country => countryISO in CONST.ALL_COUNTRIES)

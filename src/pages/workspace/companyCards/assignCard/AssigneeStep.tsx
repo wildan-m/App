@@ -346,6 +346,7 @@ function AssigneeStep({route}: AssigneeStepProps) {
                     shouldFooterBeInsideList={shouldFooterBeInsideList}
                     footerContent={
                         <FormAlertWithSubmitButton
+                            sentryLabel={CONST.SENTRY_LABEL.ASSIGNEE_STEP.NEXT}
                             buttonText={translate('common.next')}
                             onSubmit={assignSelectedCardholder}
                             isAlertVisible={shouldShowError}

@@ -213,6 +213,7 @@ function DynamicRoomInvitePage({report, policy, didScreenTransitionEnd}: Dynamic
 
     const footerContent = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_ROOM_INVITE_PAGE.INVITE}
             isDisabled={!validSelectedOptions.length}
             buttonText={translate('common.invite')}
             shouldShowLoadingImmediatelyOnPress={false}

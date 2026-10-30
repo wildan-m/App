@@ -93,6 +93,7 @@ function BaseDomainRequireTwoFactorAuthPage({domainAccountID, onSubmit, onBackBu
                     </ScrollView>
                     <FixedFooter style={[styles.mt2, styles.pt2]}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.BASE_DOMAIN_REQUIRE_TWO_FACTOR_AUTH_PAGE.DISABLE}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             size={CONST.BUTTON_SIZE.LARGE}
                             isLoading={!!pendingAction}

@@ -28,6 +28,7 @@ function ReportFieldFilterContentPageWrapper({values: initialValues, onChange, b
             />
             {!selectedField && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.REPORT_FIELD_FILTER_CONTENT_PAGE_WRAPPER.CONFIRM}
                     style={[styles.ph5, styles.pb5, styles.pt3, styles.mtAuto]}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}

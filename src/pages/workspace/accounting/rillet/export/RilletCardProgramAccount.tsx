@@ -77,6 +77,7 @@ function RilletCardProgramAccount({policy}: WithPolicyConnectionsProps) {
                             pendingAction={settingsPendingAction([`${CONST.RILLET_CONFIG.CARD_PROGRAM_ACCOUNT_PREFIX}${feedKey}`], rilletConfig?.pendingFields)}
                         >
                             <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.RILLET_CARD_PROGRAM_ACCOUNT.COUNT_INFO}
                                 onPress={callFunctionIfActionIsAllowed(
                                     () => (policyID ? Navigation.navigate(ROUTES.POLICY_ACCOUNTING_RILLET_CARD_PROGRAM_ACCOUNT_SELECTOR.getRoute(policyID, feedWithDomainID)) : undefined),
                                     false,

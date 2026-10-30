@@ -261,6 +261,7 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                                 style={[styles.flex1, styles.mb0]}
                             />
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_DETAILS_PAGE.NAVIGATE}
                                 variant={CONST.BUTTON_VARIANT.DANGER}
                                 size={CONST.BUTTON_SIZE.SMALL}
                                 onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.PERSONAL_CARD_FIX_CONNECTION.path))}

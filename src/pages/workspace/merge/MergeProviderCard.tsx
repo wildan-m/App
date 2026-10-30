@@ -70,6 +70,7 @@ function MergeProviderCard({card, policy, handleConnect, canWriteMoreFeatures, s
     } else {
         rightInset = (
             <ThreeDotsMenu
+                sentryLabel={CONST.SENTRY_LABEL.MERGE_PROVIDER_CARD.MORE}
                 shouldSelfPosition
                 menuItems={overflowMenu}
                 anchorAlignment={{
@@ -85,6 +86,7 @@ function MergeProviderCard({card, policy, handleConnect, canWriteMoreFeatures, s
     return (
         <>
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.MERGE_PROVIDER_CARD.MENU_ITEM}
                 title={card.displayName}
                 icon={cardIcon}
                 iconType={CONST.ICON_TYPE_AVATAR}

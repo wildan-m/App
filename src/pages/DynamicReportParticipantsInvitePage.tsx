@@ -169,6 +169,7 @@ function DynamicReportParticipantsInvitePage({report}: DynamicReportParticipants
 
     const footerContent = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REPORT_PARTICIPANTS_INVITE_PAGE.INVITE}
             isDisabled={!selectedOptions.length}
             buttonText={translate('common.invite')}
             onSubmit={() => {

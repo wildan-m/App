@@ -41,6 +41,7 @@ function RemoveHoldPrimaryAction({reportID, chatReportID, isDisabled}: SimpleAct
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.REMOVE_HOLD_PRIMARY_ACTION.UNHOLD}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             isDisabled={isDisabled}
             onPress={() => {

@@ -101,6 +101,7 @@ function BigNumberPad({numberPressed, longPressHandlerStateChanged = () => {}, i
 
                         return (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.BIG_NUMBER_PAD.NUMBER_PRESSED}
                                 key={column}
                                 size={numberPadButtonSize}
                                 enableHapticFeedback

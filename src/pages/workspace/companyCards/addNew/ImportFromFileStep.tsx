@@ -128,7 +128,10 @@ function ImportFromFileStep() {
                     </PressableWithoutFeedback>
                     <WrappingText text={translate('workspace.companyCards.addNewCard.createFileFeedHelpText.instructionEnd')} />
                 </View>
-                <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_LAYOUT_NAME.getRoute(policyID)), false, session)}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.IMPORT_FROM_FILE_STEP.COMPANY_CARD_LAYOUT_NAME}
+                    onPress={callFunctionIfActionIsAllowed(() => Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARDS_LAYOUT_NAME.getRoute(policyID)), false, session)}
+                >
                     <MenuItemField.Row
                         name={translate('workspace.companyCards.addNewCard.companyCardLayoutName')}
                         value={companyCardLayoutName}
@@ -145,6 +148,7 @@ function ImportFromFileStep() {
                 </MenuItem.Root>
                 <View style={[styles.mh5, styles.pb5, styles.mt3, styles.flexGrow1, styles.justifyContentEnd, styles.gap3]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.IMPORT_FROM_FILE_STEP.DOWNLOAD_TEMPLATE}
                         size={CONST.BUTTON_SIZE.LARGE}
                         style={[styles.w100]}
                         onPress={downloadTemplate}

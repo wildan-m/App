@@ -90,11 +90,13 @@ function FinishChatCard({requiresTwoFactorAuth, reimbursementAccount, policy, se
                 <Text style={styles.mb6}>{translate('connectBankAccountStep.letsChatText')}</Text>
                 <View style={styles.mhn5}>
                     <MenuItemNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.FINISH_CHAT_CARD.FINISH_IN_CHAT}
                         icon={icons.ChatBubble}
                         title={translate('workspace.bankAccount.finishInChat')}
                         onPress={handleNavigateToConciergeChat}
                     />
                     <MenuItemNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.FINISH_CHAT_CARD.UPDATE_DETAILS}
                         icon={icons.Pencil}
                         title={translate('workspace.bankAccount.updateDetails')}
                         onPress={() => {
@@ -112,6 +114,7 @@ function FinishChatCard({requiresTwoFactorAuth, reimbursementAccount, policy, se
                         }}
                     />
                     <MenuItemNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.FINISH_CHAT_CARD.START_OVER}
                         icon={icons.RotateLeft}
                         title={translate('workspace.bankAccount.startOver')}
                         onPress={requestResetBankAccount}

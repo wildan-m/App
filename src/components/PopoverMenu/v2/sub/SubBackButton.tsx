@@ -49,6 +49,7 @@ function SubBackButton({text, testID, onPress: consumerOnPress}: SubBackButtonPr
 
     return (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.SUB_BACK_BUTTON.PRESS}
             ref={ref}
             icon={icons.BackArrow}
             iconFill={(isHovered) => (isHovered ? theme.iconHovered : theme.icon)}

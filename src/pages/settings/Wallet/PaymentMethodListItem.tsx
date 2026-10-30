@@ -240,6 +240,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
     const rightComponent = showThreeDotsMenu ? (
         <View style={styles.alignSelfCenter}>
             <ThreeDotsMenu
+                sentryLabel={CONST.SENTRY_LABEL.PAYMENT_METHOD_LIST_ITEM.MORE}
                 shouldSelfPosition
                 onIconPress={item.onThreeDotsMenuPress ?? item.onPress}
                 menuItems={threeDotsMenuItems}
@@ -286,7 +287,12 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                   brickRoadIndicator: item.brickRoadIndicator,
               }),
     };
-    const menuItem = <MenuItem {...menuItemProps} />;
+    const menuItem = (
+        <MenuItem
+            sentryLabel={menuItemProps.sentryLabel}
+            {...menuItemProps}
+        />
+    );
 
     const actionAccessibilityLabel = connectionStatus?.actionText ? `${connectionStatus.actionText} ${item.title ?? ''}, ${item.description}` : undefined;
 
@@ -333,6 +339,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                         <Text style={[styles.mutedNormalTextLabel, styles.label, styles.flexShrink1]}>{translate('walletPage.addVirtualCardPersonalDetails.subtitle')}</Text>
                     </View>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.PAYMENT_METHOD_LIST_ITEM.NAVIGATE}
                         size={CONST.BUTTON_SIZE.SMALL}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MISSING_PERSONAL_DETAILS.getRoute(String(item.cardID))))}

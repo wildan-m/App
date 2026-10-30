@@ -80,6 +80,7 @@ function CurrencySelector({
 
     return (
         <MenuItemWithTopDescription
+            sentryLabel={CONST.SENTRY_LABEL.CURRENCY_SELECTOR.CURRENCY}
             shouldShowRightIcon
             title={shouldShowCurrencySymbol && currency ? `${currency} - ${getCurrencySymbol(currency)}` : currency}
             ref={ref}

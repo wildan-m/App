@@ -116,6 +116,7 @@ function SageIntacctAdvancedPage({policy}: WithPolicyProps) {
         >
             <OfflineWithFeedback pendingAction={settingsPendingAction([CONST.SAGE_INTACCT_CONFIG.AUTO_SYNC_ENABLED, CONST.SAGE_INTACCT_CONFIG.ACCOUNTING_METHOD], config?.pendingFields)}>
                 <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.SAGE_INTACCT_ADVANCED_PAGE.AUTO_SYNC}
                     onPress={callFunctionIfActionIsAllowed(() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_AUTO_SYNC.path)), false, session)}
                 >
                     <MenuItemField.Row

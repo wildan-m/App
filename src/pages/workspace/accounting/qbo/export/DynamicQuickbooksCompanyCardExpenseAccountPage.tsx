@@ -98,7 +98,10 @@ function DynamicQuickbooksCompanyCardExpenseAccountPage({policy}: WithPolicyConn
                     key={section.title}
                     pendingAction={settingsPendingAction(section.subscribedSettings, qboConfig?.pendingFields)}
                 >
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_QUICKBOOKS_COMPANY_CARD_EXPENSE_ACCOUNT_PAGE.MENU_ITEM}
+                        onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}
+                    >
                         <MenuItemField.Row
                             name={section.description}
                             value={section.title}
@@ -113,6 +116,7 @@ function DynamicQuickbooksCompanyCardExpenseAccountPage({policy}: WithPolicyConn
             {isVendorFeatureAvailable && (
                 <OfflineWithFeedback pendingAction={settingsPendingAction([CONST.QUICKBOOKS_CONFIG.NON_REIMBURSABLE_CREDIT_CARD_DEFAULT_VENDOR], qboConfig?.pendingFields)}>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_QUICKBOOKS_COMPANY_CARD_EXPENSE_ACCOUNT_PAGE.DEFAULT_VENDOR}
                         title={nonReimbursableCreditCardDefaultVendorObject?.name}
                         description={translate('workspace.accounting.defaultVendor')}
                         // Only the card/debit-card path auto-creates a fallback vendor when nothing auto-matches, so the two-state helper copy is scoped to this branch and deliberately not rendered on the Vendor Bill row below.

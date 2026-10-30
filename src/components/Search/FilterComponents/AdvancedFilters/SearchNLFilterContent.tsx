@@ -143,6 +143,7 @@ function SearchNLFilterContent({onSuccess, containerStyle, buttonContainerStyle,
                     message={errorMessage}
                 />
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH_NL_FILTER_CONTENT.SUBMIT}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={size}
                     isLoading={isLoading}

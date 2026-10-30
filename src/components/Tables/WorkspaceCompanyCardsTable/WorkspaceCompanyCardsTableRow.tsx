@@ -221,6 +221,7 @@ function WorkspaceCompanyCardTableRow({
                     >
                         {!isAssigned && canWriteCompanyCards && (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARD_TABLE_ROW.ASSIGN_CARD_OR_OPEN_DETAILS}
                                 size={CONST.BUTTON_SIZE.SMALL}
                                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                                 onPress={assignCardOrOpenDetails}

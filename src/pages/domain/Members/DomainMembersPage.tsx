@@ -234,6 +234,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const getHeaderButtons = () => {
         return (shouldUseNarrowLayout ? canSelectMultiple : selectedMembers.length > 0) ? (
             <ButtonWithDropdownMenu<DomainMemberBulkActionType>
+                sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBERS_PAGE.SELECTED}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 shouldAlwaysShowDropdownMenu
                 customText={translate('workspace.common.selected', {count: selectedMembers.length})}
@@ -249,6 +250,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         ) : (
             <View style={[styles.flexRow, styles.gap2]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBERS_PAGE.NAVIGATE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADD_MEMBER.getRoute(domainAccountID))}
                     innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
@@ -258,6 +260,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                     <Button.Text>{translate('domain.members.addMember')}</Button.Text>
                 </Button>
                 <ButtonWithDropdownMenu
+                    sentryLabel={CONST.SENTRY_LABEL.DOMAIN_MEMBERS_PAGE.MORE}
                     onPress={() => {}}
                     shouldAlwaysShowDropdownMenu
                     customText={translate('common.more')}

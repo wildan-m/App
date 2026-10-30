@@ -399,6 +399,7 @@ function WorkspaceTravelBillingSection({policyID}: WorkspaceTravelBillingSection
             <View style={[styles.dFlex, styles.mt6, shouldStackButtons ? [styles.flexColumn, styles.gap3, styles.mb2] : [styles.flexRow, styles.gap4, styles.alignItemsCenter]]}>
                 <View style={styles.flex1}>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_TRAVEL_BILLING_SECTION.CURRENT_TRAVEL_SPEND_LABEL}
                         description={translate('workspace.moreFeatures.travel.travelBilling.travelBillingSection.subsections.currentTravelSpendLabel')}
                         title={formattedSpend}
                         wrapperStyle={[styles.sectionMenuItemTopDescription, (hasPendingSettlement || hasPendingInvoice) && styles.pb1]}
@@ -421,6 +422,7 @@ function WorkspaceTravelBillingSection({policyID}: WorkspaceTravelBillingSection
                 </View>
                 <View style={[styles.dFlex, styles.flexRow, styles.gap2, styles.alignItemsCenter]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_TRAVEL_BILLING_SECTION.VIEW_ON_SPEND}
                         onPress={handleViewOnSpend}
                         style={shouldStackButtons ? styles.flex1 : undefined}
                     >

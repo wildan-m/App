@@ -152,6 +152,7 @@ function ReservationView({reservation, transactionID, tripRoomReportID, sequence
 
     return (
         <MenuItemWithTopDescription
+            sentryLabel={CONST.SENTRY_LABEL.RESERVATION_VIEW.NAVIGATE}
             description={descriptionWithStatus}
             descriptionTextStyle={[styles.textLabelSupporting, styles.lh16]}
             titleComponent={titleComponent()}

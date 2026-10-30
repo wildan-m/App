@@ -304,6 +304,7 @@ function WorkspaceCompanyCardFeedSelectorPage({route}: WorkspaceCompanyCardFeedS
                                 addBottomSafeAreaPadding
                             >
                                 <Button
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_COMPANY_CARD_FEED_SELECTOR_PAGE.SAVE_FEED}
                                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                                     size="large"
                                     style={styles.w100}

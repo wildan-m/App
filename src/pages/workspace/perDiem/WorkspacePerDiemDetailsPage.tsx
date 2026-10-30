@@ -112,6 +112,7 @@ function WorkspacePerDiemDetailsPage({route}: WorkspacePerDiemDetailsPageProps) 
                     />
                     {canWritePerDiem && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_PER_DIEM_DETAILS_PAGE.DELETE}
                             icon={icons.Trashcan}
                             title={translate('common.delete')}
                             onPress={async () => {

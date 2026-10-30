@@ -181,6 +181,7 @@ function WorkspaceEditTaxPage({
                     </OfflineWithFeedback>
                     {!!shouldShowDeleteMenuItem && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_EDIT_TAX_PAGE.DELETE}
                             icon={icons.Trashcan}
                             title={translate('common.delete')}
                             onPress={async () => {

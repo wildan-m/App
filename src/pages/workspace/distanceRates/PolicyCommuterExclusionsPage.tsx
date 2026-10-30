@@ -225,6 +225,7 @@ function PolicyCommuterExclusionsPage({route}: PolicyCommuterExclusionsPageProps
                 />
             )}
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.POLICY_COMMUTER_EXCLUSIONS_PAGE.SAVE}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 size={CONST.BUTTON_SIZE.LARGE}
                 onPress={onSave}
@@ -238,6 +239,7 @@ function PolicyCommuterExclusionsPage({route}: PolicyCommuterExclusionsPageProps
 
     const workArrangementFooter = (
         <MenuItemWithTopDescription
+            sentryLabel={CONST.SENTRY_LABEL.POLICY_COMMUTER_EXCLUSIONS_PAGE.WORK_ARRANGEMENT}
             shouldShowRightIcon
             title={translate(
                 hasOfficeWorkArrangement(existingCommuterExclusions)

@@ -31,6 +31,7 @@ function HighlightableMenuItem({wrapperStyle, highlighted, ...restOfProps}: Prop
 
     return (
         <MenuItem
+            sentryLabel={restOfProps.sentryLabel}
             {...restOfProps}
             outerWrapperStyle={animatedHighlightStyle}
             wrapperStyle={wrapperStyle}

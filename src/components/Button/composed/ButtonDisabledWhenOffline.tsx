@@ -8,6 +8,7 @@ function ButtonDisabledWhenOffline({children, ...props}: ButtonProps) {
     const {isOffline} = useNetwork();
     return (
         <Button
+            sentryLabel={props.sentryLabel}
             {...props}
             isDisabled={isOffline}
         >

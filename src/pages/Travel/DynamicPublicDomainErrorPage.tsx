@@ -50,6 +50,7 @@ function DynamicPublicDomainErrorPage({route}: DynamicPublicDomainErrorPageProps
                 </View>
                 <FixedFooter>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_PUBLIC_DOMAIN_ERROR_PAGE.CLOSE_RHP_FLOW}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         style={[styles.w100]}

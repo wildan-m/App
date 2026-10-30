@@ -260,6 +260,7 @@ function SubmitPrimaryActionContent({reportID, isDisabled}: SubmitPrimaryActionP
 
         return (
             <ButtonWithDropdownMenu<SubmissionMethod>
+                sentryLabel={CONST.SENTRY_LABEL.SUBMIT_PRIMARY_ACTION_CONTENT.DROPDOWN_BUTTON}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 shouldAlwaysShowDropdownMenu
                 pressOnEnter
@@ -276,6 +277,7 @@ function SubmitPrimaryActionContent({reportID, isDisabled}: SubmitPrimaryActionP
 
     return (
         <AnimatedSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.SUBMIT_PRIMARY_ACTION_CONTENT.MARK_AS_DONE}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             text={shouldShowMarkAsDoneCopy ? translate('common.markAsDone') : translate('common.submit')}
             shouldShowMarkAsDoneCopy={shouldShowMarkAsDoneCopy}

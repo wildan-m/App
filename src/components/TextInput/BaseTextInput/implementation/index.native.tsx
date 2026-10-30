@@ -466,6 +466,7 @@ function BaseTextInput({
                             )}
                             {((isFocused && !isReadOnly && shouldShowClearButton) || !shouldHideClearButton) && !!value && !inputProps.isLoading && (
                                 <TextInputClearButton
+                                    sentryLabel={CONST.SENTRY_LABEL.BASE_TEXT_INPUT.CLEAR}
                                     onPressButton={() => {
                                         setValue('');
                                         onClearInput?.();

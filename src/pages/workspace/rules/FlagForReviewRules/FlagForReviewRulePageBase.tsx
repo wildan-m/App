@@ -331,6 +331,7 @@ function FlagForReviewRulePageBase({
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv3]} />
                     <Text style={[styles.textLabel, styles.textStrong, styles.lh16, styles.ph5, styles.pv3]}>{translate('workspace.rules.flagForReviewRule.thenDoTheFollowing')}</Text>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.FLAG_FOR_REVIEW_RULE_PAGE_BASE.FLAG_TYPE}
                         description={translate('workspace.rules.flagForReviewRule.flagType')}
                         title={translate('workspace.rules.flagForReviewRule.flagTypeWarning')}
                         furtherDetails={translate('workspace.rules.flagForReviewRule.flagTypeWarningDescription')}

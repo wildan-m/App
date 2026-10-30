@@ -45,7 +45,6 @@ function BookCallButton({calendarLink, avatarAccountID, isNested = false, style}
 
     const commonProps = {
         onPress: callFunctionIfActionIsAllowed(() => openExternalLink(calendarLink), false, session),
-        sentryLabel: CONST.SENTRY_LABEL.ACCOUNT_MANAGER_BOOK_CALL.BUTTON,
         accessibilityLabel: label,
         isNested,
         style,
@@ -53,7 +52,10 @@ function BookCallButton({calendarLink, avatarAccountID, isNested = false, style}
 
     if (!avatarAccountID) {
         return (
-            <Button {...commonProps}>
+            <Button
+                sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_MANAGER_BOOK_CALL.BUTTON}
+                {...commonProps}
+            >
                 <Button.Icon src={icons.Phone} />
                 <Button.Text>{label}</Button.Text>
             </Button>
@@ -61,7 +63,10 @@ function BookCallButton({calendarLink, avatarAccountID, isNested = false, style}
     }
 
     return (
-        <Button {...commonProps}>
+        <Button
+            sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_MANAGER_BOOK_CALL.BUTTON}
+            {...commonProps}
+        >
             <UserAvatar
                 accountID={avatarAccountID}
                 source={avatarDetails?.avatar}

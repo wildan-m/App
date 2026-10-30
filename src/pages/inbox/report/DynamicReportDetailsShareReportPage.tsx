@@ -116,6 +116,7 @@ function DynamicReportDetailsShareReportPage({report, policy}: DynamicReportDeta
 
     const footerContent = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REPORT_DETAILS_SHARE_REPORT_PAGE.SHARE_REPORT}
             isDisabled={!selectedLogin}
             isAlertVisible={false}
             buttonText={translate('common.shareReport')}

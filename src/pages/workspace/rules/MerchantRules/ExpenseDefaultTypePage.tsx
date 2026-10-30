@@ -109,6 +109,7 @@ function ExpenseDefaultTypePage({route}: ExpenseDefaultTypePageProps) {
                     <View style={styles.mh5}>
                         {options.map((option) => (
                             <MenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.EXPENSE_DEFAULT_TYPE_PAGE.MENU_ITEM}
                                 key={option.key}
                                 icon={option.icon}
                                 title={option.title}

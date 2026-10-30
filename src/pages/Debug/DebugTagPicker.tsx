@@ -76,6 +76,7 @@ function DebugTagPicker({policyID, tagName = '', onSubmit}: DebugTagPickerProps)
             {policyTagLists.length > 1 && (
                 <View style={styles.ph5}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DEBUG_TAG_PICKER.SUBMIT_TAG}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={submitTag}

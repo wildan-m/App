@@ -100,6 +100,7 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
             }
             return (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SUBSCRIPTION_PLAN_CARD_ACTION_BUTTON.PLAN_PRESS}
                     style={style}
                     onPress={() => handlePlanPress(CONST.POLICY.TYPE.TEAM)}
                 >
@@ -116,6 +117,7 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
             }
             return (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SUBSCRIPTION_PLAN_CARD_ACTION_BUTTON.PLAN_PRESS}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     style={style}
                     onPress={() => handlePlanPress(CONST.POLICY.TYPE.CORPORATE)}
@@ -139,6 +141,7 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
     return (
         <View>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.SUBSCRIPTION_PLAN_CARD_ACTION_BUTTON.SUBSCRIPTION_SETTINGS}
                 description={translate('subscription.subscriptionSettings.title')}
                 style={style}
                 interactive={false}
@@ -147,6 +150,7 @@ function SubscriptionPlanCardActionButton({subscriptionPlan, isFromComparisonMod
             />
             <View style={[style, styles.mt2]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SUBSCRIPTION_PLAN_CARD_ACTION_BUTTON.NAVIGATE}
                     onPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_SETTINGS_DETAILS)}
                     style={styles.alignSelfStart}
                 >

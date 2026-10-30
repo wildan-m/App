@@ -183,6 +183,7 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
                             addBottomSafeAreaPadding
                             footerContent={
                                 <Button
+                                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_OVERVIEW_PLAN_TYPE_PAGE.UPDATE_PLAN}
                                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                                     size={CONST.BUTTON_SIZE.LARGE}
                                     style={styles.mt6}

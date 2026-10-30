@@ -138,6 +138,7 @@ function DynamicFlagCommentPage({parentReportAction, report, parentReport, repor
 
     const severityMenuItems = severities.map((item) => (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_FLAG_COMMENT_PAGE.MENU_ITEM}
             key={`${item.severity}`}
             shouldShowRightIcon
             title={item.name}

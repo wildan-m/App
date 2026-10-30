@@ -77,6 +77,7 @@ function DynamicContactMethodsPage() {
                                 key={option.partnerUserID}
                             >
                                 <MenuItem
+                                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_CONTACT_METHODS_PAGE.NAVIGATE}
                                     title={option.menuItemTitle}
                                     description={option.description}
                                     onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.CONTACT_METHOD_DETAILS.getRoute(option.partnerUserID)))}
@@ -90,6 +91,7 @@ function DynamicContactMethodsPage() {
                 )}
                 <FixedFooter style={[styles.mtAuto, styles.pt5]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_CONTACT_METHODS_PAGE.ADD_NEW_CONTACT_METHOD}
                         size={CONST.BUTTON_SIZE.LARGE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={addNewContactMethod}

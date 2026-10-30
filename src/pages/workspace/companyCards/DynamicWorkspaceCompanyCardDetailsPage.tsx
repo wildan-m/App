@@ -280,6 +280,7 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
                     </OfflineWithFeedback>
                     {canWriteCompanyCards && shouldShowBreakConnection && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_COMPANY_CARD_DETAILS_PAGE.BREAK_CONNECTION}
                             icon={expensifyIcons.Trashcan}
                             isDisabled={isOffline || card?.isLoadingLastUpdated}
                             title="Break connection (Testing)"

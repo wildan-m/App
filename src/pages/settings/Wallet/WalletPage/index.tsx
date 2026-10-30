@@ -840,6 +840,7 @@ function WalletPage() {
                                             style={[styles.mb2]}
                                         >
                                             <MenuItemWithTopDescription
+                                                sentryLabel={CONST.SENTRY_LABEL.WALLET_PAGE.BALANCE}
                                                 description={translate('walletPage.balance')}
                                                 title={convertToDisplayString(userWallet?.currentBalance ?? 0, CONST.CURRENCY.USD)}
                                                 titleStyle={styles.textHeadlineH2}

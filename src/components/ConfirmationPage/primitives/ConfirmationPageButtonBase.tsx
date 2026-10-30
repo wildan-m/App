@@ -20,6 +20,7 @@ function ConfirmationPageButtonBase({text, onPress = () => {}, isDisabled, isLoa
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_PAGE_BUTTON_BASE.BUTTON}
             size={CONST.BUTTON_SIZE.LARGE}
             testID={testID}
             style={styles.mt3}

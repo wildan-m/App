@@ -42,6 +42,7 @@ function ToggleDistanceUnitButton({onPress, children, ...rest}: PressableProps) 
 
     return (
         <PressableWithoutFeedback
+            sentryLabel={rest.sentryLabel}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

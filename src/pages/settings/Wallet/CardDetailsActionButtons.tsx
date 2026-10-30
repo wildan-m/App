@@ -63,6 +63,7 @@ function CardDetailsActionButtonBase({innerStyles, style, ...props}: ButtonProps
 
     return (
         <Button
+            sentryLabel={props.sentryLabel}
             {...props}
             innerStyles={[shouldUseEqualButtonWidths && styles.ph2, innerStyles]}
             style={[shouldUseEqualButtonWidths && styles.w100, style]}

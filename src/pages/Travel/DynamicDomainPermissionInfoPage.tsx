@@ -46,6 +46,7 @@ function DynamicDomainPermissionInfoPage({route}: DomainPermissionInfoPageProps)
             </View>
             <FixedFooter>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_DOMAIN_PERMISSION_INFO_PAGE.CLOSE_RHP_FLOW}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100]}

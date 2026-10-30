@@ -82,6 +82,7 @@ function RequireTwoFactorAuthenticationModal({onCancel = () => {}, description, 
                         <Text style={styles.textSupporting}>{description}</Text>
                     </View>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.REQUIRE_TWO_FACTOR_AUTHENTICATION_MODAL.SUBMIT}
                         size={CONST.BUTTON_SIZE.LARGE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={onSubmit}

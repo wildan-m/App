@@ -54,6 +54,7 @@ function ShowPreviousMessagesButton({reportID, actionType, hasPreviousMessages, 
             <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
             <View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SHOW_PREVIOUS_MESSAGES_BUTTON.SHOW_HISTORY}
                     size={CONST.BUTTON_SIZE.SMALL}
                     onPress={onPress}
                 >

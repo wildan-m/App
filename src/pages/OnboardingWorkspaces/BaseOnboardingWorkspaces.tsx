@@ -508,6 +508,7 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
                     <>
                         {joinablePoliciesErrors ? (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.BASE_ONBOARDING_WORKSPACES.RETRY_ACCESSIBLE_POLICIES_LOOKUP}
                                 size={CONST.BUTTON_SIZE.LARGE}
                                 onPress={retryAccessiblePoliciesLookup}
                                 style={[styles.mt5]}

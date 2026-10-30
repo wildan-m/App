@@ -368,6 +368,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             description={translate('cardPage.suspiciousBannerDescription')}
                         />
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.OPEN_OLD_DOT_LINK}
                             style={[styles.mh5, styles.mb5]}
                             onPress={() => openOldDotLink(CONST.OLDDOT_URLS.INBOX)}
                         >
@@ -422,6 +423,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                     type="error"
                                 />
                                 <Button
+                                    sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.NAVIGATE}
                                     variant={CONST.BUTTON_VARIANT.DANGER}
                                     size={CONST.BUTTON_SIZE.SMALL}
                                     onPress={() => {
@@ -433,20 +435,23 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             </View>
                         )}
                         {shouldShowSpendRulesSummary && (
-                            <MenuItem.Root accessibilityLabel={spendRulesSummary.join('. ')}>
+                            <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.SPEND_RULES}
+                                accessibilityLabel={spendRulesSummary.join('. ')}
+                            >
                                 <MenuItem.Row>
                                     <MenuItemField.Content name={translate('cardPage.spendRules')}>{spendRulesTitleComponent}</MenuItemField.Content>
                                 </MenuItem.Row>
                             </MenuItem.Root>
                         )}
-                        <MenuItem.Root>
+                        <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.AVAILABLE_SPEND}>
                             <MenuItemField.Row
                                 name={translate('cardPage.availableSpend')}
                                 value={formattedAvailableSpendAmount}
                             />
                             {!!remainingLimitHint && <MenuItem.HelpText message={remainingLimitHint} />}
                         </MenuItem.Root>
-                        <MenuItem.Root>
+                        <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.LIMIT_TYPE}>
                             <MenuItemField.Row
                                 name={translate('workspace.card.issueNewCard.limitType')}
                                 value={currentCardLimitTypeTranslationKey ? translate(currentCardLimitTypeTranslationKey) : ''}
@@ -522,6 +527,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                         />
                                     ) : (
                                         <MenuItemWithTopDescription
+                                            sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.VIRTUAL_CARD_NUMBER}
                                             description={translate('cardPage.virtualCardNumber')}
                                             title={maskCard('')}
                                             interactive={false}
@@ -531,6 +537,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             rightComponent={
                                                 !isSignedInAsDelegate ? (
                                                     <Button
+                                                        sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.REVEAL}
                                                         onPress={() => {
                                                             if (isAccountLocked) {
                                                                 showLockedAccountModal();
@@ -578,6 +585,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                         <CardDetails cvv={revealedCardDetails[String(card.cardID)]?.cvv} />
                                     ) : (
                                         <MenuItemWithTopDescription
+                                            sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.TRAVEL_CARD_CVV}
                                             description={translate('cardPage.travelCardCvv')}
                                             title="•••"
                                             interactive={false}
@@ -587,6 +595,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             rightComponent={
                                                 !isSignedInAsDelegate ? (
                                                     <Button
+                                                        sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.NAVIGATE}
                                                         onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WALLET_CARD_REVEAL_VALIDATE_CODE.getRoute(String(card.cardID))))}
                                                         isDisabled={isCardDetailsLoading[card.cardID] || isOffline}
                                                         isLoading={isCardDetailsLoading[card.cardID]}
@@ -609,6 +618,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             <View style={styles.mt4}>
                                 {shouldShowChangePINRow && (
                                     <MenuItemNavigation
+                                        sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.CHANGE_PIN}
                                         title={translate('cardPage.changePin')}
                                         icon={expensifyIcons.Key}
                                         onPress={() => {
@@ -626,6 +636,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                         {shouldShowReportVirtualCardFraudRows &&
                                             virtualCards.map((card) => (
                                                 <MenuItemNavigation
+                                                    sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.REPORT_FRAUD}
                                                     key={`virtual-fraud-${card.cardID}`}
                                                     title={translate('cardPage.reportFraud')}
                                                     icon={expensifyIcons.Flag}
@@ -645,6 +656,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                         {shouldShowReportTravelCardFraudRows &&
                                             travelCards.map((card) => (
                                                 <MenuItemNavigation
+                                                    sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.REPORT_TRAVEL_FRAUD}
                                                     key={`travel-fraud-${card.cardID}`}
                                                     title={translate('cardPage.reportTravelFraud')}
                                                     icon={expensifyIcons.Flag}
@@ -653,6 +665,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                             ))}
                                         {shouldShowReportLostCardButton && (
                                             <MenuItemNavigation
+                                                sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.SCREEN_TITLE}
                                                 title={translate('reportCardLostOrDamaged.screenTitle')}
                                                 icon={expensifyIcons.Flag}
                                                 onPress={() => {
@@ -667,6 +680,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
 
                                         {shouldShowEditSpendRules && (
                                             <MenuItemAction
+                                                sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.EDIT_SPEND_RULES}
                                                 icon={expensifyIcons.CreditCardLock}
                                                 title={translate('cardPage.editSpendRules')}
                                                 onPress={navigateToSpendRulesPage}
@@ -681,6 +695,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
             </ScrollView>
             {currentPhysicalCard?.state === CONST.EXPENSIFY_CARD.STATE.NOT_ACTIVATED && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.NAVIGATE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100, styles.p5]}
@@ -691,6 +706,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
             )}
             {currentPhysicalCard?.state === CONST.EXPENSIFY_CARD.STATE.STATE_NOT_ISSUED && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.EXPENSIFY_CARD_PAGE.NAVIGATE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MISSING_PERSONAL_DETAILS.getRoute(String(currentPhysicalCard.cardID))))}

@@ -125,6 +125,7 @@ function ReportAddApproverPage({report, isLoadingReportData, policy}: ReportAddA
 
     const button = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_ADD_APPROVER_PAGE.SAVE}
             isDisabled={!selectedApproverEmail}
             buttonText={translate('common.save')}
             shouldShowLoadingImmediatelyOnPress={false}

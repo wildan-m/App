@@ -57,6 +57,7 @@ function InitialListValueSelector({value = '', label = '', rightLabel, errorText
     return (
         <View>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.INITIAL_LIST_VALUE_SELECTOR.NAVIGATE}
                 ref={ref}
                 shouldShowRightIcon
                 title={value}

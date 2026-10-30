@@ -21,6 +21,7 @@ function HighlightableMenuItemWithTopDescription({highlighted, outerWrapperStyle
 
     return (
         <MenuItemWithTopDescription
+            sentryLabel={props.sentryLabel}
             {...props}
             ref={ref}
             outerWrapperStyle={[outerWrapperStyle, animatedHighlightStyle]}

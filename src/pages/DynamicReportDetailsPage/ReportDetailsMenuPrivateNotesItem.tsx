@@ -45,6 +45,7 @@ function ReportDetailsMenuPrivateNotesItem({reportID}: ReportDetailsMenuPrivateN
 
     return (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_MENU_PRIVATE_NOTES_ITEM.PRIVATE_NOTES}
             title={translate('privateNotes.title')}
             icon={expensifyIcons.Pencil}
             onPress={() => navigateToPrivateNotes(report, currentUserAccountID)}

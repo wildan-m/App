@@ -23,6 +23,7 @@ import {
 
 import {getReportPrivateNote} from '@userActions/Report';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
@@ -87,6 +88,7 @@ function ReportDetailsContent({reportID}: ReportDetailsContentProps) {
                     {isFinancialReportsForBusinesses && (
                         <>
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_CONTENT.REPORT_ID}
                                 title={base62ReportID}
                                 description={translate('common.reportID')}
                                 copyValue={base62ReportID}
@@ -95,6 +97,7 @@ function ReportDetailsContent({reportID}: ReportDetailsContentProps) {
                                 copyable
                             />
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_CONTENT.LONG_REPORT_ID}
                                 title={reportID}
                                 description={translate('common.longReportID')}
                                 copyValue={reportID}

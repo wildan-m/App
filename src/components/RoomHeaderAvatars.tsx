@@ -106,6 +106,7 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
 
         return (
             <PressableWithoutFocus
+                sentryLabel={CONST.SENTRY_LABEL.ROOM_HEADER_AVATARS.NAVIGATE_TO_AVATAR_PAGE}
                 style={styles.noOutline}
                 onPress={() => navigateToAvatarPage(icon)}
                 accessibilityRole={CONST.ROLE.BUTTON}
@@ -145,6 +146,7 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                         style={[styles.justifyContentCenter, styles.alignItemsCenter]}
                     >
                         <PressableWithoutFocus
+                            sentryLabel={CONST.SENTRY_LABEL.ROOM_HEADER_AVATARS.NAVIGATE_TO_AVATAR_PAGE}
                             style={[styles.mln4, getRoomHeaderAvatarBorderRadius(icon.type)]}
                             onPress={() => navigateToAvatarPage(icon)}
                             accessibilityRole={CONST.ROLE.BUTTON}

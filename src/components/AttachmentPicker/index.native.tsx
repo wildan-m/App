@@ -646,6 +646,7 @@ function AttachmentPicker({
                 <View style={[!shouldUseNarrowLayout && styles.createMenuContainer, bottomSafeAreaPaddingStyle]}>
                     {menuItemData.map((item, menuIndex) => (
                         <MenuItem
+                            sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_PICKER.SELECT_ITEM}
                             key={item.textTranslationKey}
                             icon={item.icon}
                             title={translate(item.textTranslationKey)}

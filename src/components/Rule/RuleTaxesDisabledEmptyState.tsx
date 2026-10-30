@@ -69,6 +69,7 @@ function RuleTaxesDisabledEmptyState({policyID}: RuleTaxesDisabledEmptyStateProp
             </ScrollView>
             <FixedFooter style={[styles.pt5]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.RULE_TAXES_DISABLED_EMPTY_STATE.ENABLE_TAXES}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100]}

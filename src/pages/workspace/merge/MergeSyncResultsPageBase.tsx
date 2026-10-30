@@ -163,6 +163,7 @@ function MergeSyncResultsPageBase({policyID, category}: MergeSyncResultsPageBase
                 </ScrollView>
                 <FixedFooter addBottomSafeAreaPadding>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.MERGE_SYNC_RESULTS_PAGE_BASE.GO_BACK}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={goBack}

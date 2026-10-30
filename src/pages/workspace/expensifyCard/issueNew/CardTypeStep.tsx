@@ -83,6 +83,7 @@ function CardTypeStep({policy, stepNames, startStepIndex}: CardTypeStepProps) {
             <Text style={[styles.textHeadlineLineHeightXXL, styles.ph5, styles.mv3]}>{translate('workspace.card.issueNewCard.chooseCardType')}</Text>
             <View style={styles.mh5}>
                 <MenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.CARD_TYPE_STEP.PHYSICAL_CARD}
                     icon={illustrations.HandCard}
                     title={translate('workspace.card.issueNewCard.physicalCard')}
                     description={translate('workspace.card.issueNewCard.physicalCardDescription')}
@@ -95,6 +96,7 @@ function CardTypeStep({policy, stepNames, startStepIndex}: CardTypeStepProps) {
                     wrapperStyle={styles.purposeMenuItem}
                 />
                 <MenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.CARD_TYPE_STEP.VIRTUAL_CARD}
                     icon={illustrations.VirtualCard}
                     title={translate('workspace.card.issueNewCard.virtualCard')}
                     description={translate('workspace.card.issueNewCard.virtualCardDescription')}

@@ -172,6 +172,7 @@ function MerchantTypeRulePageBase({policyID, groupID, testID}: MerchantTypeRuleP
                         <Text style={[styles.textLabel, styles.textStrong, styles.lh16]}>{translate('workspace.rules.merchantRules.ifAnyExpenseMatches')}</Text>
                     </View>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.MERCHANT_TYPE_RULE_PAGE_BASE.MERCHANT_TYPE}
                         description={translate('workspace.rules.merchantTypeRule.merchantType')}
                         title={merchantTypeDisplayName}
                         shouldShowRightIcon

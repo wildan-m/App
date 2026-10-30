@@ -24,6 +24,7 @@ function ImportedStateIndicator() {
     return (
         <View style={[styles.buttonDanger]}>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.IMPORTED_STATE_INDICATOR.CLEAR_ONYX_AND_RESET_APP}
                 variant={CONST.BUTTON_VARIANT.DANGER}
                 size={CONST.BUTTON_SIZE.SMALL}
                 removeBorderRadius={CONST.BUTTON_REMOVE_BORDER_RADIUS.ALL}

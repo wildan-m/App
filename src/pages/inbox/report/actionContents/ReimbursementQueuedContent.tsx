@@ -58,6 +58,7 @@ function ReimbursementQueuedContent({action, report, iouReport}: ReimbursementQu
                 {missingPaymentMethod === CONST.MISSING_PAYMENT_METHODS.BANK_ACCOUNT && (
                     <ActionableItemButtons layout="horizontal">
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.REIMBURSEMENT_QUEUED_CONTENT.OPEN_PERSONAL_BANK_ACCOUNT_SETUP_VIEW}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={() => openPersonalBankAccountSetupView({exitReportID: targetReport?.reportID, isUserValidated})}
                         >
@@ -79,6 +80,7 @@ function ReimbursementQueuedContent({action, report, iouReport}: ReimbursementQu
                         {(triggerKYCFlow, buttonRef) => (
                             <ActionableItemButtons layout="horizontal">
                                 <Button
+                                    sentryLabel={CONST.SENTRY_LABEL.REIMBURSEMENT_QUEUED_CONTENT.TRIGGER_KYC_FLOW}
                                     ref={buttonRef}
                                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                                     onPress={(event) => {

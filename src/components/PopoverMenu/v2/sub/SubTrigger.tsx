@@ -49,6 +49,7 @@ function SubTrigger({text, disabled = false, rightIcon, testID, iconWidth, iconH
 
     return (
         <MenuItem
+            sentryLabel={rest.sentryLabel}
             {...rest}
             ref={ref}
             title={text}

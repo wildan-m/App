@@ -251,6 +251,7 @@ function SearchMergeReports() {
                     footerContent={
                         !isLoading && (
                             <FormAlertWithSubmitButton
+                                sentryLabel={CONST.SENTRY_LABEL.SEARCH_MERGE_REPORTS.CONFIRM}
                                 buttonText={translate('common.confirm')}
                                 onSubmit={mergeSelectedReports}
                                 isDisabled={!isValidForMerge}

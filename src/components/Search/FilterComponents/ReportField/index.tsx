@@ -292,6 +292,7 @@ function ReportFieldBase({ref, values: initialValues = {}, selectedField, hasFee
         <ScrollView contentContainerStyle={[style]}>
             {listItems.map((item) => (
                 <MenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.REPORT_FIELD_BASE.FIELD_SELECTED}
                     key={item.key}
                     shouldShowRightIcon
                     viewMode={CONST.OPTION_MODE.COMPACT}

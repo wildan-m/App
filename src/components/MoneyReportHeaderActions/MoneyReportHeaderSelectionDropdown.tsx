@@ -372,6 +372,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
         <>
             {bulkDuplicateHandler}
             <ButtonWithDropdownMenu
+                sentryLabel={CONST.SENTRY_LABEL.MONEY_REPORT_HEADER_SELECTION_DROPDOWN.SELECTED}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 onPress={() => null}
                 options={selectedTransactionsOptions}

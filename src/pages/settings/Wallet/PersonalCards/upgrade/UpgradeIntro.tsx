@@ -78,6 +78,7 @@ function UpgradeIntro({onUpgrade, buttonDisabled}: Props) {
                     </View>
                 </View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.UPGRADE_INTRO.UPGRADE}
                     testID="upgrade-button"
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={onUpgrade}

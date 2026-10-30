@@ -35,6 +35,7 @@ function NetSuiteTokenSetupContent({onNext, currentPageName, policyID, shouldSho
             </View>
             <FixedFooter style={[styles.mtAuto]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.NET_SUITE_TOKEN_SETUP_CONTENT.NEXT}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100]}

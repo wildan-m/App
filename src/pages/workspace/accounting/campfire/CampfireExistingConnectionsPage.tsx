@@ -63,6 +63,7 @@ function CampfireExistingConnectionsPage({route}: CampfireExistingConnectionsPag
             <ScrollView style={[styles.flex1]}>
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE)}</Text>
                 <MenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.CAMPFIRE_EXISTING_CONNECTIONS_PAGE.CREATE_NEW_CONNECTION}
                     title={translate('workspace.common.createNewConnection')}
                     icon={icons.LinkCopy}
                     iconStyles={styles.br2}

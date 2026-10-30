@@ -50,6 +50,7 @@ function ReportMentionWhisperContent({action, reportID, actionOwnerReportStable}
                 {!resolution && (
                     <ActionableItemButtons layout="horizontal">
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.REPORT_MENTION_WHISPER_CONTENT.RESOLVE_ACTIONABLE_REPORT_MENTION_WHISPER}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={() =>
                                 resolveActionableReportMentionWhisper(actionOwnerReport, action, CONST.REPORT.ACTIONABLE_REPORT_MENTION_WHISPER_RESOLUTION.CREATE, isReportArchived)
@@ -58,6 +59,7 @@ function ReportMentionWhisperContent({action, reportID, actionOwnerReportStable}
                             <Button.Text>{translate('common.yes')}</Button.Text>
                         </Button>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.REPORT_MENTION_WHISPER_CONTENT.RESOLVE_ACTIONABLE_REPORT_MENTION_WHISPER}
                             onPress={() =>
                                 resolveActionableReportMentionWhisper(actionOwnerReport, action, CONST.REPORT.ACTIONABLE_REPORT_MENTION_WHISPER_RESOLUTION.NOTHING, isReportArchived)
                             }

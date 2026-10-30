@@ -322,6 +322,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
 
     const joinButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.HEADER_VIEW.JOIN}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             onPress={join}
         >
@@ -336,6 +337,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
 
     const newConciergeChatButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.HEADER_VIEW.START_NEW_CONCIERGE_CHAT}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             onPress={startNewConciergeChat}
         >

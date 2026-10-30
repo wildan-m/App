@@ -210,6 +210,7 @@ function AmountFilterContent({baseFilterKey, value, autoFocus, buttonSize, style
 
     const button = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.AMOUNT_FILTER_CONTENT.UPDATE_AMOUNT_FILTER}
             style={[styles.ph5, styles.pb5]}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             size={buttonSize}

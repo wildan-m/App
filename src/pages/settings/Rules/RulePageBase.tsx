@@ -28,6 +28,7 @@ import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOpt
 
 import {callFunctionIfActionIsAllowed} from '@userActions/Session';
 
+import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -161,7 +162,10 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                 <HeaderWithBackButton title={translate(titleKey)} />
                 <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                     <Text style={[styles.textHeadlineH2, styles.reportHorizontalRule, styles.mt4, styles.mb2]}>{translate('expenseRulesPage.addRule.expenseContains')}</Text>
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => navigateTo(EXPENSE_RULE_INPUT_IDS.MERCHANT, hash), false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.RULE_PAGE_BASE.MERCHANT}
+                        onPress={callFunctionIfActionIsAllowed(() => navigateTo(EXPENSE_RULE_INPUT_IDS.MERCHANT, hash), false, session)}
+                    >
                         <MenuItemField.Row
                             name={translate('common.merchant')}
                             value={form?.merchantToMatch}
@@ -241,6 +245,7 @@ function RulePageBase({titleKey, testID, hash}: RulePageBaseProps) {
                     </View>
                 </ScrollView>
                 <FormAlertWithSubmitButton
+                    sentryLabel={CONST.SENTRY_LABEL.RULE_PAGE_BASE.SAVE_RULE}
                     buttonText={translate('expenseRulesPage.addRule.saveRule')}
                     containerStyles={[styles.m4, styles.mb5]}
                     isAlertVisible={shouldShowError && !!errorMessage}

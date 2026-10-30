@@ -3,6 +3,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import DateUtils from '@libs/DateUtils';
 
+import CONST from '@src/CONST';
 import type {Timezone} from '@src/types/onyx/PersonalDetails';
 
 /**
@@ -42,6 +43,7 @@ function AutoUpdateTime({timezone}: AutoUpdateTimeProps) {
     return (
         <View style={[styles.w100, styles.detailsPageSectionContainer]}>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.AUTO_UPDATE_TIME.LOCAL_TIME}
                 style={[styles.ph0]}
                 title={`${DateUtils.formatToLocalTime(currentUserLocalTime, dateFnsLocale)} ${timezoneName}`}
                 description={translate('detailsPage.localTime')}

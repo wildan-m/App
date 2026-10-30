@@ -45,6 +45,7 @@ function CarTripDetails({reservation, personalDetails}: CarTripDetailsProps) {
         <>
             <Text style={[styles.textHeadlineH1, styles.mh5, styles.mv3]}>{reservation.vendor}</Text>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.CAR_TRIP_DETAILS.PICK_UP}
                 description={translate('travel.carDetails.pickUp')}
                 titleComponent={
                     <Text style={[styles.textLarge, styles.textHeadlineH2]}>
@@ -56,6 +57,7 @@ function CarTripDetails({reservation, personalDetails}: CarTripDetailsProps) {
                 helperTextStyle={[styles.pb3, styles.mtn2]}
             />
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.CAR_TRIP_DETAILS.DROP_OFF}
                 description={translate('travel.carDetails.dropOff')}
                 titleComponent={
                     <Text style={[styles.textLarge, styles.textHeadlineH2]}>
@@ -88,7 +90,10 @@ function CarTripDetails({reservation, personalDetails}: CarTripDetailsProps) {
                 </MenuItemField>
             )}
             {!!displayName && (
-                <MenuItem.Root accessibilityLabel={`${translate('travel.carDetails.driver')} ${displayName}`}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.CAR_TRIP_DETAILS.DRIVER}
+                    accessibilityLabel={`${translate('travel.carDetails.driver')} ${displayName}`}
+                >
                     <MenuItem.Row>
                         <MenuItemField.Content name={translate('travel.carDetails.driver')}>
                             <UserPills

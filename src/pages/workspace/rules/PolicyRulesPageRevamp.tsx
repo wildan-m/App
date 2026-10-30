@@ -335,6 +335,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
         return (
             <View style={[styles.flexRow, styles.gap2, shouldDisplayButtonsInSeparateLine && styles.w100]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.POLICY_RULES_PAGE_REVAMP.NEW_RULE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={handleNewRule}
                     style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
@@ -343,6 +344,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
                     <Button.Text>{translate('workspace.rules.merchantRules.addRuleTitle')}</Button.Text>
                 </Button>
                 <ButtonWithDropdownMenu
+                    sentryLabel={CONST.SENTRY_LABEL.POLICY_RULES_PAGE_REVAMP.MORE}
                     // onPress is required by ButtonWithDropdownMenu but never fires for a non-split button, where pressing only opens the dropdown menu
                     onPress={() => {}}
                     shouldAlwaysShowDropdownMenu

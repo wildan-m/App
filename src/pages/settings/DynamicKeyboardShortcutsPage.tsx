@@ -39,6 +39,7 @@ function DynamicKeyboardShortcutsPage() {
 
     const renderShortcut = (shortcut: Shortcut) => (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_KEYBOARD_SHORTCUTS_PAGE.MENU_ITEM}
             key={shortcut.displayName}
             title={shortcut.displayName}
             description={translate(`keyboardShortcutsPage.shortcuts.${shortcut.descriptionKey}`)}

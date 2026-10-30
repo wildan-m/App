@@ -18,7 +18,12 @@ const story: Meta<typeof FormAlertWithSubmitButton> = {
 };
 
 function Template(props: FormAlertWithSubmitButtonProps) {
-    return <FormAlertWithSubmitButton {...props} />;
+    return (
+        <FormAlertWithSubmitButton
+            sentryLabel={props.sentryLabel}
+            {...props}
+        />
+    );
 }
 
 // Arguments can be passed to the component by binding

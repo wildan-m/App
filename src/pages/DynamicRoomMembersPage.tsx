@@ -284,6 +284,7 @@ function DynamicRoomMembersPage({report, policy}: DynamicRoomMembersPageProps) {
         <View style={styles.w100}>
             {(isSmallScreenWidth ? canSelectMultiple : selectedMembers.length > 0) ? (
                 <ButtonWithDropdownMenu<RoomMemberBulkActionType>
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_ROOM_MEMBERS_PAGE.SELECTED}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     shouldAlwaysShowDropdownMenu
                     pressOnEnter
@@ -297,6 +298,7 @@ function DynamicRoomMembersPage({report, policy}: DynamicRoomMembersPageProps) {
                 />
             ) : (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_ROOM_MEMBERS_PAGE.INVITE_USER}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={inviteUser}
                     innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}

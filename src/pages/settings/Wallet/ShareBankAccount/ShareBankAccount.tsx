@@ -226,6 +226,7 @@ function ShareBankAccount({route}: ShareBankAccountProps) {
                         onSelectRow={toggleOption}
                         footerContent={
                             <FormAlertWithSubmitButton
+                                sentryLabel={CONST.SENTRY_LABEL.SHARE_BANK_ACCOUNT.SHARE}
                                 isLoading={isLoading}
                                 message={translate('walletPage.shareBankAccountNoAdminsSelected')}
                                 isAlertVisible={isAlertVisible}

@@ -63,6 +63,7 @@ function MultifactorAuthenticationValidateCodeResendButton({
                 </View>
             ) : (
                 <PressableWithFeedback
+                    sentryLabel={CONST.SENTRY_LABEL.MULTIFACTOR_AUTHENTICATION_VALIDATE_CODE_RESEND_BUTTON.RESEND_VALIDATION_CODE}
                     style={styles.mt5}
                     onPress={onResendValidationCode}
                     disabled={shouldDisableResendCode}

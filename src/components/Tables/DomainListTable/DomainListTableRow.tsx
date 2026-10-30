@@ -131,6 +131,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
 
                         {threeDotMenuItems.length > 0 && (
                             <ThreeDotsMenu
+                                sentryLabel={CONST.SENTRY_LABEL.DOMAIN_LIST_TABLE_ROW.MORE}
                                 isNested
                                 shouldOverlay
                                 shouldSelfPosition

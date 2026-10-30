@@ -87,6 +87,7 @@ function TermsStep(props: TermsStepProps) {
                     LabelComponent={AgreeToTheLabel}
                 />
                 <FormAlertWithSubmitButton
+                    sentryLabel={CONST.SENTRY_LABEL.TERMS_STEP.ENABLE_PAYMENTS}
                     buttonText={translate('termsStep.enablePayments')}
                     onSubmit={() => {
                         if (!hasAcceptedDisclosure || !hasAcceptedPrivacyPolicyAndWalletAgreement) {

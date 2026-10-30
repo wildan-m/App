@@ -83,6 +83,7 @@ function SpendRuleMerchantsBase({policyID, action, merchants, getEditMerchantRou
                 />
                 <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.SPEND_RULE_MERCHANTS_BASE.ADD_MERCHANT}
                         title={translate('workspace.rules.spendRules.addMerchant')}
                         icon={expensifyIcons.Plus}
                         onPress={addMerchant}

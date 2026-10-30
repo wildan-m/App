@@ -366,7 +366,10 @@ function IOURequestEditReportCommon({
     // A report per submitter would need one API call each, so "Auto report" serves them alone in a single call.
     const createReportOption =
         !createReport || hasMultipleSubmitters || (isEditing && !isOwner && !isAdmin) ? undefined : (
-            <MenuItem.Root onPress={handleCreateReport}>
+            <MenuItem.Root
+                sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_EDIT_REPORT_COMMON.CREATE_REPORT}
+                onPress={handleCreateReport}
+            >
                 <MenuItem.Row>
                     <MenuItem.Leading>
                         <MenuItem.Icon src={icons.Document} />
@@ -409,6 +412,7 @@ function IOURequestEditReportCommon({
     } else {
         autoReportOption = (
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_EDIT_REPORT_COMMON.AUTO_REPORT}
                 onPress={handleAutoReport}
                 title={translate('iou.autoReport')}
                 description={translate('iou.autoReportDescription')}
@@ -457,7 +461,10 @@ function IOURequestEditReportCommon({
             customListHeaderContent={listHeaderContent}
             listFooterContent={
                 shouldShowRemoveFromReport ? (
-                    <MenuItem.Root onPress={removeFromReport}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_EDIT_REPORT_COMMON.REMOVE_FROM_REPORT}
+                        onPress={removeFromReport}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Close} />

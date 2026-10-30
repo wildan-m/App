@@ -9,6 +9,7 @@ function MenuItemWithTopDescription({ref, ...props}: MenuItemProps) {
     return (
         // eslint-disable-next-line @typescript-eslint/no-deprecated -- The deprecated wrapper itself must render legacy MenuItem.
         <MenuItem
+            sentryLabel={props.sentryLabel}
             {...props}
             ref={ref}
             shouldShowBasicTitle

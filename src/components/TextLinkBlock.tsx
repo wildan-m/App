@@ -46,6 +46,7 @@ function TextLinkBlock({text, style, prefixIcon, ...rest}: TextLinkBlockProps) {
 
     return (
         <PressableWithoutFeedback
+            sentryLabel={CONST.SENTRY_LABEL.TEXT_LINK_BLOCK.OPEN_LINK}
             role={CONST.ROLE.BUTTON}
             style={styles.dContents}
             onPress={openLink}

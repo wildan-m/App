@@ -85,6 +85,7 @@ function ConnectionStatusMessage({
 
     const actionButton = shouldShowActionButton ? (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.CONNECTION_STATUS_MESSAGE.ACTION_PRESS}
             variant={isSuccessStatus ? CONST.BUTTON_VARIANT.SUCCESS : CONST.BUTTON_VARIANT.DANGER}
             size={CONST.BUTTON_SIZE.SMALL}
             style={styles.alignSelfStart}

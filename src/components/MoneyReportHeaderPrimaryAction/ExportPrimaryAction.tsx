@@ -37,6 +37,7 @@ function ExportPrimaryAction({reportID, onExportModalOpen, isDisabled}: ExportPr
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.EXPORT_PRIMARY_ACTION.EXPORT_INTEGRATION_SELECTED}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             isDisabled={isDisabled}
             onPress={() => {

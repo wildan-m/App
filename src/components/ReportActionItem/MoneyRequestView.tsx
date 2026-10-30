@@ -1047,6 +1047,7 @@ function MoneyRequestView({
         <>
             <OfflineWithFeedback pendingAction={getPendingFieldAction('waypoints') ?? getPendingFieldAction('merchant')}>
                 <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.MENU_ITEM}
                     shouldAllowTextSelection={!!distanceCopyValue}
                     onPress={
                         canEditDistance
@@ -1120,6 +1121,7 @@ function MoneyRequestView({
             </OfflineWithFeedback>
             <OfflineWithFeedback pendingAction={getPendingFieldAction('customUnitRateID')}>
                 <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.RATE}
                     shouldAllowTextSelection={!!distanceRateCopyValue}
                     onPress={
                         canEditDistanceRate
@@ -1335,6 +1337,7 @@ function MoneyRequestView({
                 )}
                 <OfflineWithFeedback pendingAction={getPendingFieldAction('amount') ?? (amountTitle ? getPendingFieldAction('customUnitRateID') : undefined)}>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.MENU_ITEM}
                         title={amountTitle}
                         shouldShowTitleIcon={shouldShowPaid}
                         titleIcon={icons.Checkmark}
@@ -1388,6 +1391,7 @@ function MoneyRequestView({
                 {!shouldHideEmptyDescription && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('comment')}>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.COMMON}
                             description={translate('common.description')}
                             descriptionTextStyle={[styles.breakWord, styles.userSelectNone]}
                             shouldRenderAsHTML
@@ -1418,6 +1422,7 @@ function MoneyRequestView({
                 ) : (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('merchant')}>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.MERCHANT}
                             description={translate('common.merchant')}
                             descriptionTextStyle={[styles.breakWord, styles.userSelectNone]}
                             title={updatedMerchantTitle}
@@ -1445,6 +1450,7 @@ function MoneyRequestView({
                 )}
                 <OfflineWithFeedback pendingAction={getPendingFieldAction('created')}>
                     <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.MENU_ITEM}
                         shouldAllowTextSelection={!!dateCopyValue}
                         onPress={
                             canEditDate
@@ -1488,6 +1494,7 @@ function MoneyRequestView({
                 {!!shouldShowCategory && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('category')}>
                         <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.CATEGORY}
                             shouldAllowTextSelection={!!categoryCopyValue}
                             onPress={
                                 canEdit
@@ -1573,6 +1580,7 @@ function MoneyRequestView({
                 {shouldShowVendor && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('vendor')}>
                         <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.VENDOR}
                             shouldAllowTextSelection={!!vendorCopyValue}
                             onPress={
                                 canEdit
@@ -1619,7 +1627,10 @@ function MoneyRequestView({
                 {shouldShowTag && tagList}
                 {!!shouldShowCard && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('cardID')}>
-                        <MenuItem.Root shouldAllowTextSelection={!!cardCopyValue}>
+                        <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.CARD}
+                            shouldAllowTextSelection={!!cardCopyValue}
+                        >
                             <MenuItemField.Row
                                 name={translate('iou.card')}
                                 value={cardCopyValue}
@@ -1634,6 +1645,7 @@ function MoneyRequestView({
                 {shouldShowTax && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('taxCode')}>
                         <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.TAX}
                             shouldAllowTextSelection={!!taxRateCopyValue}
                             onPress={
                                 canEditTaxFields
@@ -1683,6 +1695,7 @@ function MoneyRequestView({
                 {shouldShowTax && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('taxAmount')}>
                         <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.MENU_ITEM}
                             shouldAllowTextSelection={!!taxAmountCopyValue}
                             onPress={
                                 canEditTaxFields
@@ -1725,6 +1738,7 @@ function MoneyRequestView({
                 {shouldShowAttendees && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('attendees')}>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.NAVIGATE}
                             key="attendees"
                             accessibilityLabel={`${translate('iou.attendees')}, ${getAttendeesTitle}`}
                             description={`${translate('iou.attendees')} ${
@@ -1832,6 +1846,7 @@ function MoneyRequestView({
                 {shouldShowReport && (
                     <OfflineWithFeedback pendingAction={getPendingFieldAction('reportID')}>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.REPORT}
                             shouldShowRightIcon={canEditReport}
                             title={reportNameToDisplay}
                             description={translate('common.report')}
@@ -1886,6 +1901,7 @@ function MoneyRequestView({
                 {/* Note: "View trip details" should be always the last item */}
                 {shouldShowViewTripDetails && (
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_VIEW.VIEW_TRIP_DETAILS}
                         title={translate('travel.viewTripDetails')}
                         icon={icons.Suitcase}
                         onPress={() => {

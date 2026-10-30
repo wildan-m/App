@@ -104,7 +104,7 @@ function ConnectedVerifiedBankAccount({
                         onClose={resetReimbursementAccount}
                     >
                         <View style={[styles.mt3, styles.justifyContentCenter, styles.mhn5]}>
-                            <MenuItem.Root>
+                            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.CONNECTED_VERIFIED_BANK_ACCOUNT.MENU_ITEM}>
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <View style={[styles.popoverMenuIcon, iconStyles, StyleUtils.getAvatarWidthStyle(CONST.AVATAR_SIZE.DEFAULT)]}>
@@ -126,6 +126,7 @@ function ConnectedVerifiedBankAccount({
                         <View style={styles.mhn5}>
                             {shouldShowChangeBankAccount && (
                                 <MenuItemNavigation
+                                    sentryLabel={CONST.SENTRY_LABEL.CONNECTED_VERIFIED_BANK_ACCOUNT.CHANGE_BANK_ACCOUNT}
                                     title={translate('workspace.bankAccount.changeBankAccount')}
                                     icon={icons.Bank}
                                     onPress={handleChangeBankAccount}
@@ -133,6 +134,7 @@ function ConnectedVerifiedBankAccount({
                                 />
                             )}
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.CONNECTED_VERIFIED_BANK_ACCOUNT.DISCONNECT_BANK_ACCOUNT}
                                 title={translate('workspace.bankAccount.disconnectBankAccount')}
                                 icon={icons.Close}
                                 onPress={requestResetBankAccount}

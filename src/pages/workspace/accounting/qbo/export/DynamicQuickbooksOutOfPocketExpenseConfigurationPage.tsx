@@ -136,7 +136,10 @@ function DynamicQuickbooksOutOfPocketExpenseConfigurationPage({policy}: WithPoli
                     errors={section.errors}
                     errorRowStyles={[styles.ph5]}
                 >
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_QUICKBOOKS_OUT_OF_POCKET_EXPENSE_CONFIGURATION_PAGE.MENU_ITEM}
+                        onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}
+                    >
                         <MenuItemField.Row
                             name={section.description ?? ''}
                             value={section.title}

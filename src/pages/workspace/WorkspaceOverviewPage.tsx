@@ -931,6 +931,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                                                     {isPolicyAdmin && (
                                                         <View style={[styles.pAbsolute, rulesDocumentMenuPositionStyle]}>
                                                             <ThreeDotsMenu
+                                                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_OVERVIEW_PAGE.MORE}
                                                                 menuItems={getRulesDocumentMenuItems(openPicker)}
                                                                 shouldSelfPosition
                                                                 iconStyles={[styles.receiptActionButton]}
@@ -948,6 +949,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                                         return (
                                             <View style={[styles.flexRow]}>
                                                 <Button
+                                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_OVERVIEW_PAGE.OPEN_PICKER}
                                                     onPress={() => {
                                                         openPicker({
                                                             onPicked: handleRulesDocumentPicked,

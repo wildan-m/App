@@ -110,6 +110,7 @@ function ReportDetailsTitleSectionContent({report}: ReportDetailsTitleSectionCon
             >
                 <View style={[styles.flex1]}>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_TITLE_SECTION_CONTENT.TASK}
                         shouldShowRightIcon={shouldShowEditableTitleField && !isFieldDisabled}
                         interactive={shouldShowEditableTitleField && !isFieldDisabled}
                         title={reportName}
@@ -131,7 +132,10 @@ function ReportDetailsTitleSectionContent({report}: ReportDetailsTitleSectionCon
                 </View>
             </OfflineWithFeedback>
             {shouldShowFurtherDetailsContent && (
-                <MenuItem.Root accessibilityLabel={translate('threads.from')}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_TITLE_SECTION_CONTENT.FROM}
+                    accessibilityLabel={translate('threads.from')}
+                >
                     <MenuItem.Row>
                         <MenuItemField.Content name={translate('threads.from')}>
                             <ParentNavigationSubtitle

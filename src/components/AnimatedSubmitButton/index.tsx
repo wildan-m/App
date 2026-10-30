@@ -112,6 +112,7 @@ function SubmittingButton({variant, text, onAnimationFinish, shouldShowMarkAsDon
             }}
         >
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.SUBMITTING_BUTTON.BUTTON}
                 variant={variant}
                 isLoading={shouldShowLoading}
                 isDisabled

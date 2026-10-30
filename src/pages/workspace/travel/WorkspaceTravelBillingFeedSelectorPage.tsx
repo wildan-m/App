@@ -120,6 +120,7 @@ function WorkspaceTravelBillingFeedSelectorPage({route}: WorkspaceTravelBillingF
                     }
                     listFooterContent={
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_TRAVEL_BILLING_FEED_SELECTOR_PAGE.SET_UP_NEW_FEED}
                             title={translate('workspace.moreFeatures.travel.travelBilling.travelBillingSection.setUpNewFeed')}
                             icon={expensifyIcons.Plus}
                             onPress={startTravelBillingSetup}

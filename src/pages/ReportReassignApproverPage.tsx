@@ -144,6 +144,7 @@ function ReportReassignApproverPage({report, policy, isLoadingReportData}: Repor
 
     const footerContent = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_REASSIGN_APPROVER_PAGE.SAVE}
             isDisabled={!selectedMemberEmail}
             buttonText={translate('common.save')}
             onSubmit={save}

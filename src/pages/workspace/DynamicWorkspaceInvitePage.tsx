@@ -225,6 +225,7 @@ function DynamicWorkspaceInvitePageContent({route, policy, invitedEmailsToAccoun
 
     const footerContent = (
         <FormAlertWithSubmitButton
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_INVITE_PAGE_CONTENT.NEXT}
             isDisabled={!selectedOptions.length}
             isAlertVisible={shouldShowAlertPrompt}
             buttonText={translate('common.next')}

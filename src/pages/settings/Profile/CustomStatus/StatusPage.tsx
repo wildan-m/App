@@ -139,6 +139,7 @@ function StatusPage() {
 
     const saveButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.STATUS_PAGE.SAVE}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             size={CONST.BUTTON_SIZE.LARGE}
             style={styles.w100}
@@ -207,6 +208,7 @@ function StatusPage() {
                         />
                     </View>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.STATUS_PAGE.CLEAR_AFTER}
                         title={customClearAfter}
                         description={translate('statusPage.clearAfter')}
                         shouldShowRightIcon
@@ -215,6 +217,7 @@ function StatusPage() {
                     />
                     {(!!currentUserEmojiCode || !!currentUserStatusText) && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.STATUS_PAGE.CLEAR_STATUS}
                             title={translate('statusPage.clearStatus')}
                             icon={icons.Trashcan}
                             onPress={clearStatus}

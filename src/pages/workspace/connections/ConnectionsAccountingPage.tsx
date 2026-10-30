@@ -118,6 +118,7 @@ function ConnectionsAccountingPage({policy}: PolicyAccountingPageProps) {
                                     shouldDisableStrikeThrough
                                 >
                                     <MenuItem
+                                        sentryLabel={menuItem.sentryLabel}
                                         brickRoadIndicator={menuItem.brickRoadIndicator}
                                         key={menuItem.title}
                                         {...menuItem}

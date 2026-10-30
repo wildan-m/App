@@ -19,6 +19,7 @@ function ShareButton({onPress}: ShareButtonProps) {
     return (
         <FixedFooter style={[styles.pt4]}>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.SHARE_BUTTON.SHARE}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 size={CONST.BUTTON_SIZE.LARGE}
                 style={styles.w100}

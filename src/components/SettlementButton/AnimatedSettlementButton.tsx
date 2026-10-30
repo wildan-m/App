@@ -173,6 +173,7 @@ function AnimatedSettlementButton({
                     exiting={buttonAnimation}
                 >
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.ANIMATED_SETTLEMENT_BUTTON.APPROVED}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         isLoading={isDEWApprovalLoading}
                     >

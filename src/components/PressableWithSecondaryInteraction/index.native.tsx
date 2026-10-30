@@ -52,6 +52,7 @@ function PressableWithSecondaryInteraction({
 
     return (
         <PressableWithFeedback
+            sentryLabel={rest.sentryLabel}
             {...rest}
             accessibilityState={accessibilityState}
             accessibilityHasPopup={accessibilityHasPopup}

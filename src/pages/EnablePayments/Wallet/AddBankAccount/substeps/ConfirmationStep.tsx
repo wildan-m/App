@@ -64,7 +64,10 @@ function ConfirmationStep({onNext, onMove}: ConfirmationStepProps) {
         >
             <Text style={[styles.textHeadlineLineHeightXXL, styles.ph5]}>{translate('walletPage.confirmYourBankAccount')}</Text>
             <Text style={[styles.mt3, styles.mb3, styles.ph5, styles.textSupporting]}>{translate('bankAccount.letsDoubleCheck')}</Text>
-            <MenuItem.Root onPress={!isBankAccountAdded ? handleModifyAccountNumbers : undefined}>
+            <MenuItem.Root
+                sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.ACCOUNT_ENDING}
+                onPress={!isBankAccountAdded ? handleModifyAccountNumbers : undefined}
+            >
                 <MenuItem.Row>
                     <MenuItem.Content>
                         {!!bankName && <MenuItem.FieldName>{bankName}</MenuItem.FieldName>}
@@ -79,7 +82,10 @@ function ConfirmationStep({onNext, onMove}: ConfirmationStepProps) {
             </MenuItem.Root>
             {!isBankAccountAdded && (
                 <>
-                    <MenuItem.Root onPress={() => onMove(BANK_INFO_STEP_INDEXES.LEGAL_NAME)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.MOVE}
+                        onPress={() => onMove(BANK_INFO_STEP_INDEXES.LEGAL_NAME)}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>{translate('personalInfoStep.legalName')}</MenuItem.FieldName>
@@ -90,7 +96,10 @@ function ConfirmationStep({onNext, onMove}: ConfirmationStepProps) {
                             </MenuItem.Trailing>
                         </MenuItem.Row>
                     </MenuItem.Root>
-                    <MenuItem.Root onPress={() => onMove(BANK_INFO_STEP_INDEXES.ADDRESS)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.MOVE}
+                        onPress={() => onMove(BANK_INFO_STEP_INDEXES.ADDRESS)}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>{translate('personalInfoStep.address')}</MenuItem.FieldName>
@@ -112,6 +121,7 @@ function ConfirmationStep({onNext, onMove}: ConfirmationStepProps) {
                     />
                 )}
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.NEXT}
                     isLoading={isLoading}
                     isDisabled={isLoading || isOffline}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}

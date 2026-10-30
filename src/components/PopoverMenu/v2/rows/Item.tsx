@@ -45,6 +45,7 @@ function Item({text, onSelect, disabled = false, pendingAction, testID, rightIco
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>
             <MenuItem
+                sentryLabel={rest.sentryLabel}
                 {...rest}
                 ref={ref}
                 title={text}

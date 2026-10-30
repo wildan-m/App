@@ -32,6 +32,7 @@ function DateFilterContentPageWrapper({baseFilterKey, value: initialValue, hasFe
             />
             {!selectedDateModifier && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DATE_FILTER_CONTENT_PAGE_WRAPPER.CHANGE}
                     style={[styles.ph5, styles.pb5, styles.pt3]}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}

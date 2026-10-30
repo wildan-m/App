@@ -396,14 +396,17 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                         value={maskCard(card?.lastFourPAN)}
                     />
                     {spendRulesSummary.length > 0 && (
-                        <MenuItem.Root accessibilityLabel={spendRulesSummary.join('. ')}>
+                        <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE.SPEND_RULES}
+                            accessibilityLabel={spendRulesSummary.join('. ')}
+                        >
                             <MenuItem.Row>
                                 <MenuItemField.Content name={translate('cardPage.spendRules')}>{spendRulesTitleComponent}</MenuItemField.Content>
                             </MenuItem.Row>
                         </MenuItem.Root>
                     )}
                     <OfflineWithFeedback pendingAction={card?.pendingFields?.availableSpend}>
-                        <MenuItem.Root>
+                        <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE.AVAILABLE_SPEND}>
                             <MenuItemField.Row
                                 name={translate('cardPage.availableSpend')}
                                 value={formattedAvailableSpendAmount}
@@ -413,6 +416,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                     </OfflineWithFeedback>
                     <OfflineWithFeedback pendingAction={card?.nameValuePairs?.pendingFields?.limitType}>
                         <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE.LIMIT_TYPE}
                             onPress={
                                 canWriteExpensifyCard
                                     ? callFunctionIfActionIsAllowed(() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.EXPENSIFY_CARD_LIMIT_TYPE.path)), false, session)
@@ -440,6 +444,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                     <View style={styles.mt6}>
                         {canEditSpendRules && (
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE.EDIT_SPEND_RULES}
                                 icon={expensifyIcons.CreditCardLock}
                                 title={translate('cardPage.editSpendRules')}
                                 onPress={navigateToSpendRules}
@@ -447,6 +452,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                         )}
                         {canWriteExpensifyCard && !isDeactivated && (
                             <MenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE.DEACTIVATE}
                                 icon={expensifyIcons.Trashcan}
                                 title={translate('workspace.expensifyCard.deactivate')}
                                 style={styles.mb1}

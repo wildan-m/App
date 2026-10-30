@@ -87,6 +87,7 @@ function WorkspaceMCPPage({route}: WorkspaceMCPPageProps) {
                         >
                             {connectors.map((connector) => (
                                 <MenuItem
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MCP_PAGE.MENU_ITEM}
                                     key={connector.title}
                                     icon={connector.icon}
                                     iconType={CONST.ICON_TYPE_AVATAR}
@@ -97,6 +98,7 @@ function WorkspaceMCPPage({route}: WorkspaceMCPPageProps) {
                                     shouldShowRightComponent
                                     rightComponent={
                                         <Button
+                                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MCP_PAGE.OPEN_EXTERNAL_LINK}
                                             onPress={() => openExternalLink(connector.url)}
                                             style={styles.justifyContentCenter}
                                             size={CONST.BUTTON_SIZE.SMALL}

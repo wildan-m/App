@@ -344,6 +344,7 @@ function WithConfirmButton(props: SelectionListWithSectionsProps<ListItem>) {
             onSelectRow={onSelectRow}
             footerContent={
                 <Button
+                    sentryLabel="WithConfirmButton-Button"
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={() => {}}
                 >

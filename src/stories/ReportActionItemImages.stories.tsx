@@ -21,6 +21,7 @@ const story: Meta<typeof ReportActionItemImages> = {
 function Template(props: ReportActionItemImagesProps) {
     return (
         <PressableWithoutFeedback
+            sentryLabel="Template-Pressable"
             accessibilityLabel="ReportActionItemImages Story"
             style={{flex: 1}}
         >

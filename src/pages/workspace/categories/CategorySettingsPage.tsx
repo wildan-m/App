@@ -349,6 +349,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                     )}
                     {canWriteCategories && !isThereAnyAccountingConnection && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.CATEGORY_SETTINGS_PAGE.DELETE_CATEGORY}
                             icon={expensifyIcons.Trashcan}
                             title={translate('workspace.categories.deleteCategory')}
                             onPress={async () => {
@@ -381,6 +382,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                                     pendingAction={rule.pendingAction}
                                 >
                                     <MenuItem
+                                        sentryLabel={CONST.SENTRY_LABEL.CATEGORY_SETTINGS_PAGE.NAVIGATE_TO_CATEGORY_RULE}
                                         icon={expensifyIcons.Bolt}
                                         title={rule.summary}
                                         numberOfLinesTitle={3}
@@ -394,6 +396,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                             ))}
                             {canWriteRules && (
                                 <MenuItemAction
+                                    sentryLabel={CONST.SENTRY_LABEL.CATEGORY_SETTINGS_PAGE.CREATE_NEW_RULE}
                                     icon={expensifyIcons.Plus}
                                     title={translate('workspace.rules.categoryRules.createNewRule')}
                                     onPress={() => navigateToCategoryRule(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_RULES_NEW.path)}

@@ -227,6 +227,7 @@ function DynamicNewTaskPage() {
                             />
                             {assignee?.displayName ? (
                                 <MenuItem.Root
+                                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_NEW_TASK_PAGE.ASSIGNEE}
                                     accessibilityLabel={`${translate('task.assignee')}, ${assignee.displayName}`}
                                     onPress={callFunctionIfActionIsAllowed(navigateToAssignee, false, session)}
                                 >
@@ -295,6 +296,7 @@ function DynamicNewTaskPage() {
                     </View>
                     <View style={styles.flexShrink0}>
                         <FormAlertWithSubmitButton
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_NEW_TASK_PAGE.CONFIRM_TASK}
                             isAlertVisible={!!errorMessage}
                             message={errorMessage}
                             shouldShowLoadingImmediatelyOnPress={false}

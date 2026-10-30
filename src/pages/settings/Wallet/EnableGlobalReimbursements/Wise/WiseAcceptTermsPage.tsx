@@ -118,6 +118,7 @@ function WiseAcceptTermsPage() {
                 ))}
                 <View style={styles.flexGrow1} />
                 <FormAlertWithSubmitButton
+                    sentryLabel={CONST.SENTRY_LABEL.WISE_ACCEPT_TERMS_PAGE.CONFIRM}
                     buttonText={translate('common.confirm')}
                     onSubmit={confirm}
                     isAlertVisible={shouldShowError}

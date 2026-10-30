@@ -33,6 +33,7 @@ function BaseInteractiveStepSubHeader(props: InteractiveStepSubHeaderProps) {
                 {...props}
                 ref={ref}
             />
+            {/* eslint-disable-next-line no-restricted-syntax -- This is react-native's Button, which has no sentryLabel prop */}
             <Button
                 onPress={() => ref.current?.moveNext()}
                 title="Next"

@@ -63,6 +63,7 @@ function QAAuthTestToolRows() {
         <>
             <TestToolRow title={translate('initialSettingsPage.troubleshoot.qaAuth')}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.QA_AUTH_TEST_TOOL_ROWS.QA_AUTH_RUN_PROBE}
                     size={CONST.BUTTON_SIZE.SMALL}
                     isDisabled={isOperationRunning}
                     isLoading={isOperationRunning}
@@ -88,6 +89,7 @@ function QAAuthTestToolRows() {
             </TestToolRow>
             <TestToolRow title={translate('initialSettingsPage.troubleshoot.qaAuthSession')}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.QA_AUTH_TEST_TOOL_ROWS.QA_AUTH_CLEAR_SESSION}
                     size={CONST.BUTTON_SIZE.SMALL}
                     isDisabled={isOperationRunning}
                     onPress={() => {

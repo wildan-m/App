@@ -117,6 +117,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                     {/* Instantly invalidates a user's local authToken. Useful for testing flows related to reauthentication. */}
                     <TestToolRow title={translate('initialSettingsPage.troubleshoot.authenticationStatus')}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.TEST_TOOL_MENU.INVALIDATE_AUTH_TOKEN}
                             size={CONST.BUTTON_SIZE.SMALL}
                             onPress={() => invalidateAuthToken()}
                         >
@@ -127,6 +128,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                     {/* Clears stored auto-generated credentials, corrupts the local authToken and fires a request so reauth fails and the user is signed out. Useful for manually testing sign out logic. */}
                     <TestToolRow title={translate('initialSettingsPage.troubleshoot.deviceCredentials')}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.TEST_TOOL_MENU.INVALIDATE_CREDENTIALS}
                             size={CONST.BUTTON_SIZE.SMALL}
                             onPress={() => invalidateCredentials()}
                         >
@@ -137,6 +139,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                     {/* Sends an expired session to the FE and invalidates the session by the same time in the BE. Action is delayed for 15s */}
                     <TestToolRow title={translate('initialSettingsPage.troubleshoot.authenticationStatus')}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.TEST_TOOL_MENU.EXPIRE_SESSION_WITH_DELAY}
                             size={CONST.BUTTON_SIZE.SMALL}
                             onPress={() => expireSessionWithDelay()}
                         >
@@ -147,6 +150,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                     {/* Clears the useSidebarOrderedReports cache to re-compute from latest onyx values */}
                     <TestToolRow title={translate('initialSettingsPage.troubleshoot.leftHandNavCache')}>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.TEST_TOOL_MENU.CLEAR_LHN_CACHE}
                             size={CONST.BUTTON_SIZE.SMALL}
                             onPress={clearLHNCache}
                         >
@@ -158,6 +162,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                     {!isProduction && (
                         <TestToolRow title={translate('initialSettingsPage.troubleshoot.betaOverrides')}>
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.TEST_TOOL_MENU.VIEW}
                                 size={CONST.BUTTON_SIZE.SMALL}
                                 onPress={() => {
                                     const activeRoute = Navigation.getActiveRoute();

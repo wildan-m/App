@@ -25,7 +25,12 @@ const story: Meta<typeof MenuItem> = {
 };
 
 function Template(props: MenuItemProps) {
-    return <MenuItem {...props} />;
+    return (
+        <MenuItem
+            sentryLabel={props.sentryLabel}
+            {...props}
+        />
+    );
 }
 
 // Arguments can be passed to the component by binding

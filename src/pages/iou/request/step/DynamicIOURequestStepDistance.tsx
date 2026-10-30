@@ -743,6 +743,7 @@ function DynamicIOURequestStepDistance({
 
     const renderItem = ({item, drag, isActive, getIndex}: RenderItemParams<string>) => (
         <DistanceRequestRenderItem
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_IOU_REQUEST_STEP_DISTANCE.NAVIGATE_TO_WAYPOINT_EDIT_PAGE}
             waypoints={waypoints}
             item={getWaypointKey(item)}
             onSecondaryInteraction={drag}

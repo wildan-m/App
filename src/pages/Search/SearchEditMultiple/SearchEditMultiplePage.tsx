@@ -400,6 +400,7 @@ function SearchEditMultiplePage() {
                     )}
                 </ScrollView>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH_EDIT_MULTIPLE_PAGE.SAVE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={save}

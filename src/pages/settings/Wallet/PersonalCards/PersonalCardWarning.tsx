@@ -64,6 +64,7 @@ function PersonalCardWarning() {
             footer={
                 <>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_WARNING.NAVIGATE}
                         size={CONST.BUTTON_SIZE.LARGE}
                         testID="confirmation-secondary-button"
                         style={styles.mt3}
@@ -74,6 +75,7 @@ function PersonalCardWarning() {
                         <Button.Text>{translate('personalCard.thisIsPersonalCard')}</Button.Text>
                     </Button>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_WARNING.PRIMARY_ACTION_PRESS}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         testID="confirmation-primary-button"

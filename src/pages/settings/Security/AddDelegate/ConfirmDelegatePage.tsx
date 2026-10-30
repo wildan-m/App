@@ -69,7 +69,7 @@ function ConfirmDelegatePage({route}: ConfirmDelegatePageProps) {
         >
             <DelegateNoAccessWrapper accessDeniedVariants={[CONST.DELEGATE.DENIED_ACCESS_VARIANTS.DELEGATE]}>
                 <Text style={styles.ph5}>{translate('delegate.confirmCopilot')}</Text>
-                <MenuItem.Root>
+                <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.CONFIRM_DELEGATE_PAGE.MENU_ITEM}>
                     <MenuItem.Row>
                         <MenuItem.Leading>
                             <UserAvatar

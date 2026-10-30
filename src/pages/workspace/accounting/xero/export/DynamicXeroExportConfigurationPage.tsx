@@ -143,6 +143,7 @@ function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps
                     pendingAction={settingsPendingAction(menuItem?.subscribedSettings ?? [], pendingFields)}
                 >
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_XERO_EXPORT_CONFIGURATION_PAGE.MENU_ITEM}
                         title={menuItem.title}
                         interactive={menuItem?.interactive ?? true}
                         description={menuItem.description}

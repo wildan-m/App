@@ -222,6 +222,7 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                             {isEditFlow ? (
                                 <>
                                     <MenuItemWithTopDescription
+                                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_WORKFLOWS_APPROVALS_APPROVAL_LIMIT_PAGE.APPROVER}
                                         accessibilityLabel={approverDisplayName}
                                         titleStyle={styles.textNormalThemeText}
                                         description={translate('workflowsPage.approver')}
@@ -271,6 +272,7 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                             </View>
 
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_WORKFLOWS_APPROVALS_APPROVAL_LIMIT_PAGE.ADDITIONAL_APPROVER_LABEL}
                                 accessibilityLabel={selectedApproverDisplayName}
                                 titleStyle={styles.textNormalThemeText}
                                 description={translate('workflowsApprovalLimitPage.additionalApproverLabel')}
@@ -314,6 +316,7 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                     <FixedFooter addBottomSafeAreaPadding>
                         {!isEditFlow && (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_WORKFLOWS_APPROVALS_APPROVAL_LIMIT_PAGE.SKIP}
                                 size={CONST.BUTTON_SIZE.LARGE}
                                 onPress={handleSkip}
                                 style={styles.mb3}
@@ -322,6 +325,7 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                             </Button>
                         )}
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_WORKFLOWS_APPROVALS_APPROVAL_LIMIT_PAGE.SUBMIT}
                             size={CONST.BUTTON_SIZE.LARGE}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={handleSubmit}

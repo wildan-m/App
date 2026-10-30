@@ -206,6 +206,7 @@ function ConfirmationStep({route}: ConfirmationStepProps) {
                         <Text style={[styles.ph5, styles.textLabelSupporting]}>{translate('common.to')}</Text>
                     </View>
                     <MenuItemAvatarNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.EDIT_STEP}
                         title={cardholderName}
                         description={cardholderEmail}
                         avatarSource={cardholder?.avatar ?? getDefaultAvatarURL({accountID: cardholderAccountID ?? CONST.DEFAULT_NUMBER_ID})}

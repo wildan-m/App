@@ -31,6 +31,7 @@ function Template(props: ButtonWithDropdownMenuProps<unknown>) {
 
     return (
         <ButtonWithDropdownMenu
+            sentryLabel={props.sentryLabel}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             {...props}
             options={options}

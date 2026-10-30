@@ -30,6 +30,7 @@ function ReportFieldFilterContent({values, selectedField, size, style, onFieldSe
 
     const applyButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_FIELD_FILTER_CONTENT.APPLY}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             size={size}
             onPress={() => {

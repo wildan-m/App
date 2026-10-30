@@ -26,6 +26,7 @@ function AddToGroupButton({item, onPress}: AddToGroupButtonProps) {
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.ADD_TO_GROUP_BUTTON.ADD_USER_TO_GROUP}
             onPress={() => onPress(item)}
             style={styles.pl2}
             accessibilityLabel={item.text ? translate('newChatPage.addUserToGroup', item.text) : ''}

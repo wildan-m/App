@@ -95,6 +95,7 @@ function FreeTrialSection() {
                         {!!countdownSubtitle && <Text style={[styles.widgetItemSubtitle, {color: theme.trialTimer}]}>{countdownSubtitle}</Text>}
                     </View>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.FREE_TRIAL_SECTION.CTA_PRESS}
                         onPress={onCtaPress}
                         size={CONST.BUTTON_SIZE.SMALL}
                         style={styles.widgetItemButton}

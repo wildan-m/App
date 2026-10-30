@@ -91,6 +91,7 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children,
                             </MenuItemField>
                             {children}
                             <MenuItemNavigation
+                                sentryLabel={CONST.SENTRY_LABEL.BASE_DOMAIN_MEMBER_DETAILS_COMPONENT.PROFILE}
                                 title={translate('common.profile')}
                                 icon={icons.Info}
                                 onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.PROFILE.getRoute(accountID)))}

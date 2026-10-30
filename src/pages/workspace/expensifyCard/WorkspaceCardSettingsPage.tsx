@@ -106,6 +106,7 @@ function WorkspaceCardSettingsPage({route}: WorkspaceCardSettingsPageProps) {
                         </OfflineWithFeedback>
                         <OfflineWithFeedback errorRowStyles={styles.mh5}>
                             <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_CARD_SETTINGS_PAGE.SETTLEMENT_FREQUENCY}
                                 onPress={
                                     isSettlementFrequencyBlocked
                                         ? undefined

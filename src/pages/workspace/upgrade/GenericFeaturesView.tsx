@@ -99,6 +99,7 @@ function GenericFeaturesView({onUpgrade, buttonDisabled, loading, formattedPrice
             )}
             {policyID ? (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.GENERIC_FEATURES_VIEW.UPGRADE}
                     isLoading={loading}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={onUpgrade}
@@ -110,6 +111,7 @@ function GenericFeaturesView({onUpgrade, buttonDisabled, loading, formattedPrice
                 </Button>
             ) : (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.GENERIC_FEATURES_VIEW.NAVIGATE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACES_LIST.getRoute(backTo ?? Navigation.getActiveRoute()), {forceReplace: true})}
                     size={CONST.BUTTON_SIZE.LARGE}

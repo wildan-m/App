@@ -221,6 +221,7 @@ function ConfirmContent({
                     <>
                         {shouldShowCancelButton && shouldReverseStackedButtons && (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.CANCEL}
                                 style={[styles.mt4, styles.noSelect]}
                                 onPress={onCancel}
                                 size={CONST.BUTTON_SIZE.LARGE}
@@ -229,6 +230,7 @@ function ConfirmContent({
                             </Button>
                         )}
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.YES}
                             variant={confirmButtonVariant}
                             style={shouldReverseStackedButtons ? styles.mt3 : styles.mt4}
                             onPress={onConfirm}
@@ -242,6 +244,7 @@ function ConfirmContent({
                         </Button>
                         {shouldShowCancelButton && !shouldReverseStackedButtons && (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.CANCEL}
                                 style={[styles.mt3, styles.noSelect]}
                                 onPress={onCancel}
                                 size={CONST.BUTTON_SIZE.LARGE}
@@ -254,6 +257,7 @@ function ConfirmContent({
                     <View style={[styles.flexRow, styles.gap4]}>
                         {shouldShowCancelButton && (
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.CANCEL}
                                 style={[styles.noSelect, styles.flex1]}
                                 onPress={onCancel}
                             >
@@ -261,6 +265,7 @@ function ConfirmContent({
                             </Button>
                         )}
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.CONFIRM_CONTENT.CONFIRM}
                             variant={confirmButtonVariant}
                             style={[styles.flex1]}
                             onPress={onConfirm}

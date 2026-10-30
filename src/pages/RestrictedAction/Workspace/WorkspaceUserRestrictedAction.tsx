@@ -63,6 +63,7 @@ function WorkspaceUserRestrictedAction({policyID}: WorkspaceUserRestrictedAction
                     </Text>
                 </View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_USER_RESTRICTED_ACTION.OPEN_POLICY_EXPENSE_REPORT}
                     onPress={openPolicyExpenseReport}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}

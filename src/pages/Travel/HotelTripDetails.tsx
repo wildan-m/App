@@ -48,6 +48,7 @@ function HotelTripDetails({reservation, personalDetails}: HotelTripDetailsProps)
         <>
             <Text style={[styles.textHeadlineH1, styles.mh5, styles.mv3]}>{Str.recapitalize(reservation.start.longName ?? '')}</Text>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.HOTEL_TRIP_DETAILS.ADDRESS}
                 description={translate('common.address')}
                 title={StringUtils.removeDoubleQuotes(reservation.start.address)}
                 numberOfLinesTitle={2}
@@ -57,11 +58,13 @@ function HotelTripDetails({reservation, personalDetails}: HotelTripDetailsProps)
                 interactive={false}
             />
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.HOTEL_TRIP_DETAILS.CHECK_IN}
                 description={translate('travel.hotelDetails.checkIn')}
                 titleComponent={<Text style={[styles.textLarge, styles.textHeadlineH2]}>{checkInDate.date}</Text>}
                 interactive={false}
             />
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.HOTEL_TRIP_DETAILS.CHECK_OUT}
                 description={translate('travel.hotelDetails.checkOut')}
                 titleComponent={<Text style={[styles.textLarge, styles.textHeadlineH2]}>{checkOutDate.date}</Text>}
                 interactive={false}
@@ -89,7 +92,10 @@ function HotelTripDetails({reservation, personalDetails}: HotelTripDetailsProps)
                 </MenuItemField>
             )}
             {!!displayName && (
-                <MenuItem.Root accessibilityLabel={`${translate('travel.hotelDetails.guest')} ${displayName}`}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.HOTEL_TRIP_DETAILS.GUEST}
+                    accessibilityLabel={`${translate('travel.hotelDetails.guest')} ${displayName}`}
+                >
                     <MenuItem.Row>
                         <MenuItemField.Content name={translate('travel.hotelDetails.guest')}>
                             <UserPills

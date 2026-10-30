@@ -261,7 +261,10 @@ function DebugTabView({selectedTab}: Props) {
                     />
                     {!!message && <Text style={[StyleUtils.getColorStyle(theme.text), styles.lh20]}>{translate(message)}</Text>}
                 </View>
-                <Button onPress={navigateTo}>
+                <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DEBUG_TAB_VIEW.NAVIGATE_TO}
+                    onPress={navigateTo}
+                >
                     <Button.Text>{translate('common.view')}</Button.Text>
                 </Button>
             </View>

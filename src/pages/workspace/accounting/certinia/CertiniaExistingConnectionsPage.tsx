@@ -62,6 +62,7 @@ function CertiniaExistingConnectionsPage({route}: CertiniaExistingConnectionsPag
             <ScrollView style={[styles.flex1]}>
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.CERTINIA)}</Text>
                 <MenuItemNavigation
+                    sentryLabel={CONST.SENTRY_LABEL.CERTINIA_EXISTING_CONNECTIONS_PAGE.CREATE_NEW_CONNECTION}
                     title={translate('workspace.common.createNewConnection')}
                     icon={icons.LinkCopy}
                     onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_PREREQUISITES.getRoute(policyID))}

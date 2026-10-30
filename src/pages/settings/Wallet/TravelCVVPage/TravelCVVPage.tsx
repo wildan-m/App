@@ -118,6 +118,7 @@ function TravelCVVPage() {
     if (hasRevealedCVV) {
         actionButton = (
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.TRAVEL_CVV_PAGE.COPY_CVV}
                 onPress={() => {
                     Clipboard.setString(cvv);
                     setCopyButtonInactive();

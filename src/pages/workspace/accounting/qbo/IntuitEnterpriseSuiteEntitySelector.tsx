@@ -70,6 +70,7 @@ function IntuitEnterpriseSuiteEntitySelector({policy}: WithPolicyConnectionsProp
     );
     const listFooterContent = (
         <MenuItemAction
+            sentryLabel={CONST.SENTRY_LABEL.INTUIT_ENTERPRISE_SUITE_ENTITY_SELECTOR.CONNECT_NEW_ENTITY}
             title={translate('workspace.qbo.connectNewEntity')}
             icon={icons.Plus}
             onPress={() => startOAuth()}

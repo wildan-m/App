@@ -67,7 +67,10 @@ function ImportTransactionsPage() {
             <ScrollView contentContainerStyle={[styles.flexGrow1, styles.justifyContentBetween]}>
                 <View>
                     <Text style={[styles.textNormal, styles.mh5, styles.mb5]}>{translate('workspace.companyCards.importTransactions.description')}</Text>
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(navigateToCardNameSelection, false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.IMPORT_TRANSACTIONS_PAGE.CARD_DISPLAY_NAME}
+                        onPress={callFunctionIfActionIsAllowed(navigateToCardNameSelection, false, session)}
+                    >
                         <MenuItemField.Row
                             name={translate('workspace.companyCards.importTransactions.cardDisplayName')}
                             value={cardDisplayName || undefined}
@@ -107,6 +110,7 @@ function ImportTransactionsPage() {
                 </View>
                 <View style={[styles.mh5, styles.mb5]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.IMPORT_TRANSACTIONS_PAGE.NEXT}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={handleNext}

@@ -743,6 +743,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
 
     return (
         <ButtonWithDropdownMenu
+            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_HEADER_SECONDARY_ACTIONS.MORE}
             ref={dropdownMenuRef}
             onPress={() => {}}
             shouldAlwaysShowDropdownMenu

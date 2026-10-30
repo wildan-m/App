@@ -220,6 +220,7 @@ function DynamicConfirmationPage() {
                             />
                         )}
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_CONFIRMATION_PAGE.CONFIRM}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={() => {
                                 // With every duplicate filtered out (e.g. all on approved/closed/reimbursed reports) there

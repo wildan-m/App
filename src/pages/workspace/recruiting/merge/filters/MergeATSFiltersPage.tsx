@@ -120,6 +120,7 @@ function MergeATSFiltersPage({
                                     subMenuItems={
                                         <>
                                             <MenuItemWithTopDescription
+                                                sentryLabel={CONST.SENTRY_LABEL.MERGE_ATS_FILTERS_PAGE.NAVIGATE}
                                                 description={rowDescription}
                                                 title={getMergeATSFilterLabel(filterType, filters, mergeATS?.data, translate)}
                                                 shouldShowRightIcon
@@ -143,6 +144,7 @@ function MergeATSFiltersPage({
                         />
                     )}
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.MERGE_ATS_FILTERS_PAGE.SAVE}
                         size={CONST.BUTTON_SIZE.LARGE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={handleSave}

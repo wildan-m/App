@@ -135,6 +135,7 @@ function FileDownloadModal({
                         )}
                     </View>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.FILE_DOWNLOAD_MODAL.DOWNLOAD}
                         style={[styles.mt3, styles.noSelect]}
                         variant={shouldUseSuccessButton && isReady ? CONST.BUTTON_VARIANT.SUCCESS : undefined}
                         onPress={() => {

@@ -14,6 +14,7 @@ type NetSuiteMenuWithTopDescriptionFormProps = MenuItemProps & {
 function NetSuiteMenuWithTopDescriptionForm({value, valueRenderer, ...props}: NetSuiteMenuWithTopDescriptionFormProps) {
     return (
         <MenuItemWithTopDescription
+            sentryLabel={props.sentryLabel}
             {...props}
             title={valueRenderer ? valueRenderer(value) : value}
         />

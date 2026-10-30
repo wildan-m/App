@@ -533,6 +533,7 @@ function MoneyReportHeaderSecondaryActionsPlaceholder({primaryAction, isDisabled
     return (
         <View style={wrapperStyle}>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.MONEY_REPORT_HEADER_SECONDARY_ACTIONS_PLACEHOLDER.MORE}
                 size={CONST.BUTTON_SIZE.MEDIUM}
                 innerStyles={innerStyles}
                 style={shouldTakeRemainingWidth ? styles.w100 : undefined}

@@ -210,6 +210,7 @@ function DynamicTagSettingsPage({route, navigation}: DynamicTagSettingsPageProps
                     </OfflineWithFeedback>
                     <OfflineWithFeedback pendingAction={currentPolicyTag.pendingFields?.['GL Code']}>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_TAG_SETTINGS_PAGE.NAVIGATE_TO_EDIT_GL_CODE}
                             description={translate(`workspace.tags.glCode`)}
                             title={currentPolicyTag?.['GL Code']}
                             onPress={navigateToEditGlCode}
@@ -240,6 +241,7 @@ function DynamicTagSettingsPage({route, navigation}: DynamicTagSettingsPageProps
 
                     {canWriteTags && shouldShowDeleteMenuItem && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_TAG_SETTINGS_PAGE.DELETE}
                             icon={expensifyIcons.Trashcan}
                             title={translate('common.delete')}
                             onPress={async () => {

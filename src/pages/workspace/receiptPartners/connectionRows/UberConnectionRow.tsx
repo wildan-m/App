@@ -143,6 +143,7 @@ function UberConnectionRow({policyID}: ReceiptPartnerRowProps) {
                     {overflowMenuItems.length > 0 ? (
                         <View ref={overflowMenuAnchorRef}>
                             <ThreeDotsMenu
+                                sentryLabel={CONST.SENTRY_LABEL.UBER_CONNECTION_ROW.MORE}
                                 getAnchorPosition={getOverflowMenuAnchorPosition}
                                 menuItems={overflowMenuItems}
                                 anchorAlignment={{
@@ -153,6 +154,7 @@ function UberConnectionRow({policyID}: ReceiptPartnerRowProps) {
                         </View>
                     ) : (
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.UBER_CONNECTION_ROW.SETUP}
                             onPress={canWrite ? openUberConnect : showReadOnlyModal}
                             style={styles.justifyContentCenter}
                             innerStyles={canWrite ? undefined : styles.buttonOpacityDisabled}

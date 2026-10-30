@@ -164,24 +164,28 @@ function DynamicEditAgentPage({route}: DynamicEditAgentPageProps) {
                     />
                 </OfflineWithFeedback>
                 <MenuItemAction
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_EDIT_AGENT_PAGE.VIEW_AGENT_HISTORY}
                     title={translate('editAgentPage.viewAgentHistory')}
                     icon={icons.MagnifyingGlass}
                     onPress={handleViewHistoryPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_EDIT_AGENT_PAGE.CHAT_WITH_AGENT}
                     title={translate('editAgentPage.chatWithAgent')}
                     icon={icons.ChatBubble}
                     onPress={handleChatPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_EDIT_AGENT_PAGE.COPILOT_INTO_ACCOUNT}
                     title={translate('editAgentPage.copilotIntoAccount')}
                     icon={icons.Users}
                     onPress={handleCopilotPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_EDIT_AGENT_PAGE.DELETE_AGENT}
                     title={translate('editAgentPage.deleteAgent')}
                     icon={icons.Trashcan}
                     onPress={handleDeletePress}

@@ -100,6 +100,7 @@ function DowngradeIntro({onDowngrade, buttonDisabled, loading, policyID, backTo}
             </View>
             {policyID ? (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DOWNGRADE_INTRO.DOWNGRADE}
                     isLoading={loading}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={onDowngrade}
@@ -110,6 +111,7 @@ function DowngradeIntro({onDowngrade, buttonDisabled, loading, policyID, backTo}
                 </Button>
             ) : (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DOWNGRADE_INTRO.NAVIGATE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACES_LIST.getRoute(backTo ?? Navigation.getActiveRoute()), {forceReplace: true})}
                     size={CONST.BUTTON_SIZE.LARGE}

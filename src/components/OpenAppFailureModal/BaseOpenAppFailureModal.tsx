@@ -56,6 +56,7 @@ function BaseOpenAppFailureModal({onRefreshAndTryAgainButtonPress}: BaseOpenAppF
                     </TextLink>
                 </Text>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.BASE_OPEN_APP_FAILURE_MODAL.REFRESH_AND_TRY_AGAIN_BUTTON_PRESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     style={[styles.mb3]}
@@ -64,6 +65,7 @@ function BaseOpenAppFailureModal({onRefreshAndTryAgainButtonPress}: BaseOpenAppF
                     <Button.Text>{translate('openAppFailureModal.refreshAndTryAgain')}</Button.Text>
                 </Button>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.BASE_OPEN_APP_FAILURE_MODAL.SET_IS_OPEN_APP_FAILURE_MODAL_OPEN}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={() => setIsOpenAppFailureModalOpen(false)}
                 >

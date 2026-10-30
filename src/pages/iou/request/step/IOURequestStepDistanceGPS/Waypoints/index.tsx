@@ -8,6 +8,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {MoneyRequestNavigatorParamList} from '@libs/Navigation/types';
 
+import CONST from '@src/CONST';
 import {getEffectiveEndPoint, getFirstGpsPoint, getTotalGpsTripPoints, isTripStopped as isTripStoppedUtil} from '@src/libs/GPSDraftDetailsUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -80,6 +81,7 @@ function Waypoints({unit, isInLandscapeMode, action, iouType, transactionID, rep
             </View>
 
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.WAYPOINTS.START}
                 interactive={false}
                 description={translate('gps.start')}
                 shouldShowLoadingSpinnerIcon={shouldShowLoadingStartAddress}
@@ -90,6 +92,7 @@ function Waypoints({unit, isInLandscapeMode, action, iouType, transactionID, rep
             />
 
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.WAYPOINTS.STOP}
                 interactive={false}
                 description={translate('gps.stop')}
                 shouldShowLoadingSpinnerIcon={shouldShowLoadingEndAddress}

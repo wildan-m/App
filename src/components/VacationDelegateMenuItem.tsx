@@ -11,7 +11,7 @@ import {formatVacationDelegateClearDateTime, getActiveVacationDelegate, getVacat
 
 import {callFunctionIfActionIsAllowed} from '@userActions/Session';
 
-import type CONST from '@src/CONST';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {SelectedTimezone} from '@src/types/onyx/PersonalDetails';
@@ -133,6 +133,7 @@ function VacationDelegateMenuItemPreset({vacationDelegate, label, timezone, erro
         >
             {hasVacationDelegate ? (
                 <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.VACATION_DELEGATE_MENU_ITEM_PRESET.MENU_ITEM}
                     onPress={callFunctionIfActionIsAllowed(onPress, false, session)}
                     accessibilityLabel={[rowLabel, delegateDisplayName, untilText].filter(Boolean).join(', ')}
                 >

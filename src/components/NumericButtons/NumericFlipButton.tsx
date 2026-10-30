@@ -21,6 +21,7 @@ function NumericFlipButton({isDisabled = false, onPress, style, testID, shouldSh
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.NUMERIC_FLIP_BUTTON.BUTTON}
             accessibilityLabel={label}
             contentContainerStyle={styles.justifyContentCenter}
             isDisabled={isDisabled}

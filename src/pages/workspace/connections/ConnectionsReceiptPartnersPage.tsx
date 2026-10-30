@@ -158,6 +158,7 @@ function ConnectionsReceiptPartnersPage({route}: ConnectionsReceiptPartnersPageP
                                 )}
                                 {canWriteMoreFeatures && (
                                     <MenuItem
+                                        sentryLabel={CONST.SENTRY_LABEL.CONNECTIONS_RECEIPT_PARTNERS_PAGE.MANAGE_INVITES}
                                         icon={icons.Mail}
                                         title={translate('workspace.receiptPartners.uber.manageInvites')}
                                         shouldShowRightIcon

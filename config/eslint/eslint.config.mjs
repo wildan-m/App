@@ -387,10 +387,15 @@ const config = defineConfig([
                     selector: 'ImportNamespaceSpecifier[parent.source.value=/^\\./]',
                     message: 'Namespace imports from sibling modules are not allowed. Use named imports instead. Example: import { method } from "./libs/module"',
                 },
+                // Only the element's own attributes count, so a sentryLabel on a child or inside a prop like rightComponent doesn't satisfy the rule
+                {
+                    selector: 'JSXOpeningElement[name.name=/^Pressable(WithoutFeedback|WithFeedback|WithDelayToggle|WithoutFocus)$/]:not(:has(> JSXAttribute[name.name="sentryLabel"]))',
+                    message: 'All Pressable components must include sentryLabel prop for Sentry tracking. Example: <PressableWithoutFeedback sentryLabel="MoreMenu-ExportFile" />',
+                },
                 {
                     selector:
-                        'JSXElement[openingElement.name.name=/^Pressable(WithoutFeedback|WithFeedback|WithDelayToggle|WithoutFocus)$/]:not(:has(JSXAttribute[name.name="sentryLabel"]))',
-                    message: 'All Pressable components must include sentryLabel prop for Sentry tracking. Example: <PressableWithoutFeedback sentryLabel="MoreMenu-ExportFile" />',
+                        'JSXOpeningElement:matches([name.name=/^(Button|ButtonWithDropdownMenu|AnimatedSubmitButton|BookTravelButton|FormAlertWithSubmitButton|DropdownButton|TextInputClearButton|ThreeDotsMenu|MenuItem|MenuItemWithTopDescription|MenuItemAction|MenuItemNavigation|MenuItemAvatarNavigation|ContextMenuItem|DistanceRequestRenderItem)$/], [name.object.name="MenuItem"][name.property.name="Root"]):not(:has(> JSXAttribute[name.name="sentryLabel"]))',
+                    message: 'Components that wrap a Pressable must include sentryLabel prop for Sentry tracking. Example: <Button sentryLabel={CONST.SENTRY_LABEL.MORE_MENU.EXPORT_FILE} />',
                 },
 
                 // These are the original rules from AirBnB's style guide, modified to allow for...of loops and for...in loops

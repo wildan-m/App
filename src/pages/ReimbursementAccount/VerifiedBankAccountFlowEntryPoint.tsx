@@ -288,6 +288,7 @@ function VerifiedBankAccountFlowEntryPoint({
                                 onClose={reimbursementAccount?.maxAttemptsReached ? undefined : resetReimbursementAccount}
                             >
                                 <MenuItemNavigation
+                                    sentryLabel={CONST.SENTRY_LABEL.VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT.CONTINUE_WITH_SETUP}
                                     title={translate('workspace.bankAccount.continueWithSetup')}
                                     icon={expensifyIcons.Connect}
                                     onPress={onContinuePress}
@@ -295,6 +296,7 @@ function VerifiedBankAccountFlowEntryPoint({
                                 />
                                 {shouldShowChangeBankAccount && (
                                     <MenuItemNavigation
+                                        sentryLabel={CONST.SENTRY_LABEL.VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT.CHANGE_BANK_ACCOUNT}
                                         title={translate('workspace.bankAccount.changeBankAccount')}
                                         icon={expensifyIcons.Bank}
                                         onPress={handleChangeBankAccount}
@@ -302,6 +304,7 @@ function VerifiedBankAccountFlowEntryPoint({
                                     />
                                 )}
                                 <MenuItemNavigation
+                                    sentryLabel={CONST.SENTRY_LABEL.VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT.START_OVER}
                                     title={translate('workspace.bankAccount.startOver')}
                                     icon={expensifyIcons.RotateLeft}
                                     onPress={requestResetBankAccount}
@@ -312,6 +315,7 @@ function VerifiedBankAccountFlowEntryPoint({
                             <View style={styles.mhn5}>
                                 {!isNonUSDWorkspace && !shouldShowContinueSetupButton && (
                                     <MenuItemNavigation
+                                        sentryLabel={CONST.SENTRY_LABEL.VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT.CONNECT_ONLINE_WITH_PLAID}
                                         title={translate('bankAccount.connectOnlineWithPlaid')}
                                         icon={expensifyIcons.Bank}
                                         isDisabled={!!isPlaidDisabled}
@@ -319,6 +323,7 @@ function VerifiedBankAccountFlowEntryPoint({
                                     />
                                 )}
                                 <MenuItemNavigation
+                                    sentryLabel={CONST.SENTRY_LABEL.VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT.CONNECT_MANUALLY}
                                     title={translate('bankAccount.connectManually')}
                                     icon={expensifyIcons.Connect}
                                     onPress={handleConnectManually}

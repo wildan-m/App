@@ -11,6 +11,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getEffectiveDistance} from '@libs/GPSDraftDetailsUtils';
 import {formatDistanceToParts} from '@libs/NumberFormatUtils';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Unit} from '@src/types/onyx/Policy';
 
@@ -29,7 +30,7 @@ function DistanceCounter({unit}: DistanceCounterProps) {
     const distanceParts = formatDistanceToParts(preferredLocale, DistanceRequestUtils.convertDistanceUnit(getEffectiveDistance(gpsDraftDetails), unit), unit);
 
     return (
-        <MenuItem.Root>
+        <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.DISTANCE_COUNTER.DISTANCE}>
             <MenuItem.Row>
                 <MenuItem.Leading>
                     <MenuItem.IconNarrow src={icons.Crosshair} />

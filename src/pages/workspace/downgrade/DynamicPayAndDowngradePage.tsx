@@ -121,6 +121,7 @@ function DynamicPayAndDowngradePage() {
                             </View>
                         )}
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_PAY_AND_DOWNGRADE_PAGE.PAY_AND_DOWNGRADE}
                             size={CONST.BUTTON_SIZE.LARGE}
                             variant={CONST.BUTTON_VARIANT.DANGER}
                             onPress={payAndDowngrade}

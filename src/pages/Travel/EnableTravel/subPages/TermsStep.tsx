@@ -177,6 +177,7 @@ function TermsStep({policyID, resolvedDomain, firstIncompletePrerequisitePageNam
                     />
                 </View>
                 <FormAlertWithSubmitButton
+                    sentryLabel={CONST.SENTRY_LABEL.TERMS_STEP.CONFIRM}
                     buttonText={translate('common.confirm')}
                     isDisabled={!hasAcceptedTravelTerms}
                     onSubmit={acceptTermsAndOpenTravelDot}

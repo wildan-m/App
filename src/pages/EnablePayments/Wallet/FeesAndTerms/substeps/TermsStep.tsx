@@ -92,6 +92,7 @@ function TermsStep({onNext}: SubPageProps) {
                 />
             </View>
             <FormAlertWithSubmitButton
+                sentryLabel={CONST.SENTRY_LABEL.TERMS_STEP.ENABLE_PAYMENTS}
                 buttonText={translate('termsStep.enablePayments')}
                 onSubmit={submit}
                 message={errorMessage}

@@ -41,6 +41,7 @@ function EarlyRenewalBillingBanner() {
                 icon={illustrations.SubscriptionAnnual}
                 rightComponent={
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.EARLY_RENEWAL_BILLING_BANNER.SHOW_EARLY_RENEWAL_CONFIRMATION}
                         isDisabled={isOffline}
                         isLoading={!!eligibility?.pendingAction}
                         onPress={showEarlyRenewalConfirmation}

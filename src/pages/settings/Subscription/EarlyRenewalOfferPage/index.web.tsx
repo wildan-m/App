@@ -121,6 +121,7 @@ function EarlyRenewalOfferPage() {
                 <FixedFooter addBottomSafeAreaPadding>
                     <Text style={[styles.textLabelSupporting, styles.textAlignCenter, styles.mb3]}>{translate('earlyRenewal.offer.disclaimer')}</Text>
                     <FormAlertWithSubmitButton
+                        sentryLabel={CONST.SENTRY_LABEL.EARLY_RENEWAL_OFFER_PAGE.RENEW_AND_CLAIM}
                         isAlertVisible={!!errorMessage}
                         message={errorMessage}
                         onSubmit={renewWithSelectedOffer}

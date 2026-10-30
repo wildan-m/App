@@ -171,6 +171,7 @@ function KYBDocuments({onBackButtonPress, onSubmit}: KYBDocumentsProps) {
 
     const footer = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.KYB_DOCUMENTS.NAVIGATE_TO_CONCIERGE_CHAT}
             size={CONST.BUTTON_SIZE.LARGE}
             style={[styles.mv3]}
             onPress={handleNavigateToConciergeChat}

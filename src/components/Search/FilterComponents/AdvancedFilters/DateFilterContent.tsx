@@ -63,6 +63,7 @@ function DateFilterContent({baseFilterKey, value, selectedDateModifier, hasFeed,
             />
             {!!selectedDateModifier && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DATE_FILTER_CONTENT.APPLY}
                     style={[styles.ph5, styles.pb5, styles.pt3]}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={size}

@@ -92,6 +92,7 @@ function NetSuiteImportPage({policy}: WithPolicyConnectionsProps) {
                 )}
             >
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.NET_SUITE_IMPORT_PAGE.MENU_ITEM}
                     description={translate(`workspace.netsuite.import.customersOrJobs.title`)}
                     title={getCustomersOrJobsLabelNetSuite(policy, translate)}
                     shouldShowRightIcon

@@ -51,6 +51,7 @@ function PendingDigitalWalletApprovalRow({cardID, walletProvider, style}: Pendin
                 <Text style={[styles.mutedNormalTextLabel, styles.label, styles.textSuccess, styles.flexShrink1]}>{translate('addCardToDigitalWallet.approvalNeeded', {walletName})}</Text>
             </View>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.PENDING_DIGITAL_WALLET_APPROVAL_ROW.NAVIGATE_TO_ADD_CARD_TO_DIGITAL_WALLET}
                 size={CONST.BUTTON_SIZE.SMALL}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 onPress={() => navigateToAddCardToDigitalWallet(cardID)}

@@ -23,13 +23,14 @@ function RevokeRow({title, isLoading, onPress}: RevokeRowProps) {
     const {translate} = useLocalize();
 
     return (
-        <MenuItem.Root>
+        <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.REVOKE_ROW.REVOKE}>
             <MenuItem.Row>
                 <MenuItem.Content>
                     <MenuItem.Title>{title}</MenuItem.Title>
                 </MenuItem.Content>
                 <MenuItem.Trailing>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.REVOKE_ROW.REVOKE}
                         variant={CONST.BUTTON_VARIANT.DANGER}
                         size={CONST.BUTTON_SIZE.SMALL}
                         isLoading={isLoading}

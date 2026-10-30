@@ -107,6 +107,7 @@ function DualEntryAdvancedPage({policy}: WithPolicyConnectionsProps) {
             >
                 <OfflineWithFeedback pendingAction={settingsPendingAction([CONST.DUALENTRY_CONFIG.ACCOUNTING_METHOD], dualentryConfig?.pendingFields)}>
                     <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DUAL_ENTRY_ADVANCED_PAGE.ACCOUNTING_METHODS}
                         onPress={callFunctionIfActionIsAllowed(
                             () => (policyID ? Navigation.navigate(ROUTES.POLICY_ACCOUNTING_DUALENTRY_EXPORT_METHOD.getRoute(policyID)) : undefined),
                             false,

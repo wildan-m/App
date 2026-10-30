@@ -152,6 +152,7 @@ function DebugReportActionCreatePage({
                         </View>
                         <Text style={[styles.headerText, styles.textAlignCenter]}>{translate('debug.hint')}</Text>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DEBUG_REPORT_ACTION_CREATE_PAGE.CREATE_REPORT_ACTION}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             isDisabled={!draftReportAction || !!error}
                             onPress={createReportAction}

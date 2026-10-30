@@ -109,6 +109,7 @@ function PushRowWithModal(props: PushRowWithModalProps) {
     return (
         <>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.PUSH_ROW_WITH_MODAL.MODAL_OPEN}
                 description={description}
                 title={selection
                     .map((key) => optionsList[key])

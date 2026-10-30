@@ -75,6 +75,7 @@ function CountrySelection() {
             onConfirm={onConfirm}
             footerContent={
                 <FormAlertWithSubmitButton
+                    sentryLabel={CONST.SENTRY_LABEL.COUNTRY_SELECTION.NEXT}
                     buttonText={translate('common.next')}
                     shouldShowLoadingImmediatelyOnPress={false}
                     isLoading={isLoading}

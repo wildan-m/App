@@ -218,6 +218,7 @@ function AccountDetailsPage() {
                         />
                     </View>
                     <FormAlertWithSubmitButton
+                        sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_DETAILS_PAGE.NEXT}
                         isAlertVisible={!!genericError}
                         onSubmit={() => {
                             formRef.current?.submit();

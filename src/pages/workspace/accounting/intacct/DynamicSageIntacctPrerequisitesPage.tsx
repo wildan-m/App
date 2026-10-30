@@ -113,6 +113,7 @@ function DynamicSageIntacctPrerequisitesPage({route}: DynamicSageIntacctPrerequi
                 addBottomSafeAreaPadding
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_SAGE_INTACCT_PREREQUISITES_PAGE.NAVIGATE_TO_ENTER_CREDENTIALS}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={navigateToEnterCredentials}
                     size={CONST.BUTTON_SIZE.LARGE}

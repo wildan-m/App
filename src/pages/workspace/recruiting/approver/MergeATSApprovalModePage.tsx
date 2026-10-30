@@ -181,6 +181,7 @@ function MergeATSApprovalModePage({
                                 {option.value === selectedApprovalMode && selectedApprovalMode === CONST.MERGE.APPROVAL_MODE.ADVANCED && (
                                     <>
                                         <MenuItemWithTopDescription
+                                            sentryLabel={CONST.SENTRY_LABEL.MERGE_ATS_APPROVAL_MODE_PAGE.APPROVER_FIELD}
                                             shouldShowRightIcon
                                             description={translate('workspace.recruiting.approverField')}
                                             title={getApproverFieldName(approverField, translate)}
@@ -201,6 +202,7 @@ function MergeATSApprovalModePage({
                         addBottomSafeAreaPadding
                     >
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.MERGE_ATS_APPROVAL_MODE_PAGE.CONFIRM_SAVE_APPROVAL_MODE}
                             size={CONST.BUTTON_SIZE.LARGE}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={confirmSaveApprovalMode}

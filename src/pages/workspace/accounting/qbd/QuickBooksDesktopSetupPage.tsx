@@ -125,6 +125,7 @@ function RequireQuickBooksDesktopModal({route}: RequireQuickBooksDesktopModalPro
                         addBottomSafeAreaPadding
                     >
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.REQUIRE_QUICK_BOOKS_DESKTOP_MODAL.NAVIGATE_TO_FIRST_SYNC}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={navigateToFirstSync}
                             size={CONST.BUTTON_SIZE.LARGE}

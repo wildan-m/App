@@ -62,6 +62,7 @@ function MentionWhisperContent({action, actionOwnerReportStable, parentReport, o
             <ActionableItemButtons layout="vertical">
                 {canInviteToSubmitExpense && (
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.MENTION_WHISPER_CONTENT.RESOLVE_ACTIONABLE_MENTION_WHISPER}
                         onPress={() =>
                             resolveActionableMentionWhisper(
                                 actionOwnerReport,
@@ -76,6 +77,7 @@ function MentionWhisperContent({action, actionOwnerReportStable, parentReport, o
                     </Button>
                 )}
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.MENTION_WHISPER_CONTENT.RESOLVE_ACTIONABLE_MENTION_WHISPER}
                     onPress={() =>
                         resolveActionableMentionWhisper(actionOwnerReport, action, CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.INVITE, isOriginalReportArchived, parentReport)
                     }
@@ -83,6 +85,7 @@ function MentionWhisperContent({action, actionOwnerReportStable, parentReport, o
                     <Button.Text>{translate('actionableMentionWhisperOptions.inviteToChat')}</Button.Text>
                 </Button>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.MENTION_WHISPER_CONTENT.RESOLVE_ACTIONABLE_MENTION_WHISPER}
                     onPress={() =>
                         resolveActionableMentionWhisper(actionOwnerReport, action, CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION.NOTHING, isOriginalReportArchived, parentReport)
                     }

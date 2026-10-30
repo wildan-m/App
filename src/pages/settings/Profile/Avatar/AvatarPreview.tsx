@@ -141,6 +141,7 @@ function AvatarPreview({selected, isRemoved, onImageRemoved, imageData, setError
             )}
             {menuItems.length <= 1 ? (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.AVATAR_PREVIEW.UPLOAD_PHOTO}
                     accessibilityLabel={translate('avatarPage.uploadPhoto')}
                     onPress={() => {
                         openPicker({
@@ -153,6 +154,7 @@ function AvatarPreview({selected, isRemoved, onImageRemoved, imageData, setError
                 </Button>
             ) : (
                 <ButtonWithDropdownMenu
+                    sentryLabel={CONST.SENTRY_LABEL.AVATAR_PREVIEW.EDIT}
                     shouldUseOptionIcon
                     onPress={() => {}}
                     anchorAlignment={{

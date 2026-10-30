@@ -34,6 +34,7 @@ function NetSuiteCustomListPicker({value, policyID, errorText, isEditing}: NetSu
 
     return (
         <MenuItem.Root
+            sentryLabel={CONST.SENTRY_LABEL.NET_SUITE_CUSTOM_LIST_PICKER.LIST_NAME}
             onPress={callFunctionIfActionIsAllowed(
                 () => {
                     if (!policyID) {

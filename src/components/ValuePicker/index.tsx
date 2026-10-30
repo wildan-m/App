@@ -56,6 +56,7 @@ function ValuePicker({
             {shouldShowModal ? (
                 <>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.VALUE_PICKER.SHOW_PICKER_MODAL}
                         ref={ref}
                         shouldShowRightIcon
                         title={selectedItem?.label || placeholder || ''}

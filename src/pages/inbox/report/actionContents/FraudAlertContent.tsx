@@ -49,6 +49,7 @@ function FraudAlertContent({action, reportID}: FraudAlertContentProps) {
             {canResolve && (
                 <ActionableItemButtons layout="horizontal">
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.FRAUD_ALERT_CONTENT.RESOLVE_FRAUD_ALERT}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={() => {
                             resolveFraudAlert(cardID, false, reportID, reportActionID, possibleFraud);
@@ -57,6 +58,7 @@ function FraudAlertContent({action, reportID}: FraudAlertContentProps) {
                         <Button.Text>{translate('cardPage.cardFraudAlert.confirmButtonText')}</Button.Text>
                     </Button>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.FRAUD_ALERT_CONTENT.RESOLVE_FRAUD_ALERT}
                         onPress={() => {
                             resolveFraudAlert(cardID, true, reportID, reportActionID, possibleFraud);
                         }}

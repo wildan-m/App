@@ -21,6 +21,7 @@ function NumericCurrencyButton({currency, accessibilityLabel, isDisabled = false
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.NUMERIC_CURRENCY_BUTTON.BUTTON}
             accessibilityLabel={buttonAccessibilityLabel}
             contentContainerStyle={styles.justifyContentCenter}
             isDisabled={isDisabled}

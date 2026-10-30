@@ -62,6 +62,7 @@ function DomainSelectorStep({policy, onNext}: EnableTravelSubPageProps) {
                 shouldShowTooltips
                 footerContent={
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DOMAIN_SELECTOR_STEP.CONTINUE}
                         isDisabled={!selectedDomain}
                         variant="success"
                         size={CONST.BUTTON_SIZE.LARGE}

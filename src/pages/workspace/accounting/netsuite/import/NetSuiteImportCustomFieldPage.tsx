@@ -153,6 +153,7 @@ function NetSuiteImportCustomFieldPage({
                 addBottomSafeAreaPadding
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.NET_SUITE_IMPORT_CUSTOM_FIELD_PAGE.BUTTON}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     isDisabled={!!config?.pendingFields?.[importCustomField]}

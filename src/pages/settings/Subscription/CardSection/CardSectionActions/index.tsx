@@ -37,6 +37,7 @@ function CardSectionActions() {
 
     return (
         <ThreeDotsMenu
+            sentryLabel={CONST.SENTRY_LABEL.CARD_SECTION_ACTIONS.MORE}
             shouldSelfPosition
             menuItems={overflowMenu}
             anchorAlignment={anchorAlignment}

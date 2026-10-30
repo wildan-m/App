@@ -29,6 +29,7 @@ function Label({text, titleStyle, wrapperStyle, iconWidth, iconHeight, ...rest}:
 
     return (
         <MenuItem
+            sentryLabel={rest.sentryLabel}
             {...rest}
             title={text}
             titleStyle={titleStyle}

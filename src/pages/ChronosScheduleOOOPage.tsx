@@ -318,6 +318,7 @@ function ChronosScheduleOOOPage({route}: ChronosScheduleOOOPageProps) {
                 )}
                 <View style={styles.mb4}>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.CHRONOS_SCHEDULE_OOO_PAGE.LEAVE_TYPE}
                         shouldShowRightIcon
                         outerWrapperStyle={styles.mhn5}
                         title={selectedLeaveTypeItem?.label ?? ''}

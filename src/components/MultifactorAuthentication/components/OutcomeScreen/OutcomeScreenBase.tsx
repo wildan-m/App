@@ -118,6 +118,7 @@ function OutcomeScreenBaseContent({
                 </ScrollView>
                 <View style={[styles.flexRow, styles.m5, styles.mt0]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.OUTCOME_SCREEN_BASE_CONTENT.CLOSE}
                         size={CONST.BUTTON_SIZE.LARGE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         style={styles.flex1}

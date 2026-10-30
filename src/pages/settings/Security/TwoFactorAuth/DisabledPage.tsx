@@ -39,6 +39,7 @@ function DisabledPage() {
             />
             <FixedFooter style={[styles.flexGrow0]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DISABLED_PAGE.QUIT_AND_NAVIGATE_BACK}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={() => quitAndNavigateBack(is2FAEnabled, ROUTES.SETTINGS_SECURITY)}

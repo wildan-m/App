@@ -106,6 +106,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
 
             return (
                 <MenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_EXPENSIFY_CARD_BANK_ACCOUNTS.SELECT_BANK_ACCOUNT}
                     key={bankAccountID}
                     title={bankName}
                     description={`${translate('workspace.expensifyCard.accountEndingIn')} ${getLastFourDigits(bankAccountNumber)}`}
@@ -177,6 +178,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
                                 <Text style={[styles.mh5, styles.mb3]}>{translate('workspace.expensifyCard.chooseExistingBank')}</Text>
                                 {renderBankOptions()}
                                 <MenuItemAction
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_EXPENSIFY_CARD_BANK_ACCOUNTS.ADD_NEW_BANK_ACCOUNT}
                                     icon={icons.Plus}
                                     title={translate('workspace.expensifyCard.addNewBankAccount')}
                                     onPress={handleAddBankAccount}

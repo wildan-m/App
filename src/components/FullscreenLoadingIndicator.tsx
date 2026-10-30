@@ -68,7 +68,10 @@ function FullScreenLoadingIndicator({
                         <View style={styles.pv4}>
                             <Text>{translate('common.thisIsTakingLongerThanExpected')}</Text>
                         </View>
-                        <Button onPress={() => onGoBack()}>
+                        <Button
+                            sentryLabel={CONST.SENTRY_LABEL.FULL_SCREEN_LOADING_INDICATOR.GO_BACK}
+                            onPress={() => onGoBack()}
+                        >
                             <Button.Text>{translate('common.goBack')}</Button.Text>
                         </Button>
                     </View>

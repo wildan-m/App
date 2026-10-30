@@ -80,6 +80,7 @@ function WorkspaceOwnerChangeCheck({policy, accountID, error}: WorkspaceOwnerCha
             <Text style={styles.flex1}>{displayTexts.text}</Text>
             <View style={styles.pb5}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_OWNER_CHANGE_CHECK.CONFIRM}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={confirm}

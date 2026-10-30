@@ -116,6 +116,7 @@ function WorkspaceMembersChangeWorkArrangementPage({policy, personalDetails, rou
                 </View>
                 <FixedFooter>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBERS_CHANGE_WORK_ARRANGEMENT_PAGE.CHANGE_WORK_ARRANGEMENT}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={changeWorkArrangement}

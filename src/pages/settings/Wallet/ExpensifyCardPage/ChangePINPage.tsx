@@ -126,7 +126,10 @@ function ChangePINPageContent({cardID, wasPINBlocked}: {cardID: string; wasPINBl
                         </View>
 
                         <View style={[styles.flexRow, styles.justifyContentCenter, styles.mv4, styles.alignItemsCenter, styles.w100]}>
-                            <Button onPress={togglePINVisibility}>
+                            <Button
+                                sentryLabel={CONST.SENTRY_LABEL.CHANGE_PIN_PAGE_CONTENT.TOGGLE_PIN_VISIBILITY}
+                                onPress={togglePINVisibility}
+                            >
                                 <Button.Icon src={isPINHidden ? icons.Eye : icons.EyeDisabled} />
                                 <Button.Text>{isPINHidden ? translate('cardPage.revealPin') : translate('cardPage.hidePin')}</Button.Text>
                             </Button>
@@ -134,6 +137,7 @@ function ChangePINPageContent({cardID, wasPINBlocked}: {cardID: string; wasPINBl
                     </View>
 
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.CHANGE_PIN_PAGE_CONTENT.SUBMIT}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={handleSubmit}

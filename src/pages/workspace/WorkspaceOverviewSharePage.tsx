@@ -110,6 +110,7 @@ function WorkspaceOverviewSharePage({policy}: WithPolicyProps) {
                         </View>
                         <View style={[styles.mt3, styles.ph4]}>
                             <ContextMenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_OVERVIEW_SHARE_PAGE.COPY}
                                 isAnonymousAction
                                 text={translate('qrCodes.copy')}
                                 icon={icons.Copy}

@@ -33,6 +33,7 @@ function SetupMethod() {
                     <Text>{translate('walletPage.addBankAccountBody')}</Text>
                 </View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SETUP_METHOD.OPEN_PERSONAL_BANK_ACCOUNT_SETUP_WITH_PLAID}
                     onPress={() => {
                         openPersonalBankAccountSetupWithPlaid();
                     }}

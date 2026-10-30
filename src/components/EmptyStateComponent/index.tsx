@@ -71,6 +71,7 @@ function EmptyStateComponent({
                                 {buttons?.map(({buttonText, buttonAction, buttonVariant, icon, isDisabled, style, innerStyles, hoverStyles, dropDownOptions}) =>
                                     dropDownOptions ? (
                                         <ButtonWithDropdownMenu
+                                            sentryLabel={CONST.SENTRY_LABEL.EMPTY_STATE_COMPONENT.DROPDOWN_BUTTON}
                                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                                             key={buttonText}
                                             onPress={() => {}}
@@ -82,6 +83,7 @@ function EmptyStateComponent({
                                         />
                                     ) : (
                                         <Button
+                                            sentryLabel={CONST.SENTRY_LABEL.EMPTY_STATE_COMPONENT.BUTTON_ACTION}
                                             key={buttonText}
                                             variant={buttonVariant}
                                             onPress={buttonAction}

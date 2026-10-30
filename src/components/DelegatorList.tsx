@@ -34,7 +34,10 @@ function DelegatorList({delegators, message}: DelegatorListProps) {
                     const displayLogin = formattedLogin || delegatorEmail;
 
                     return (
-                        <MenuItem.Root key={delegatorEmail}>
+                        <MenuItem.Root
+                            sentryLabel={CONST.SENTRY_LABEL.DELEGATOR_LIST.MENU_ITEM}
+                            key={delegatorEmail}
+                        >
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <UserAvatar

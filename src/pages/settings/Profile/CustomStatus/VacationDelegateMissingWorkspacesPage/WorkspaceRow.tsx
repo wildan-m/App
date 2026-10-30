@@ -4,6 +4,8 @@ import MenuItem from '@components/MenuItem';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
+import CONST from '@src/CONST';
+
 import React from 'react';
 import {View} from 'react-native';
 
@@ -24,7 +26,7 @@ function WorkspaceRow({policyID, title, avatarURL, shouldShowSeparator}: Workspa
 
     return (
         <View style={shouldShowSeparator ? styles.borderBottom : undefined}>
-            <MenuItem.Root>
+            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_ROW.WORKSPACE}>
                 <MenuItem.Row>
                     <MenuItem.Leading>
                         <WorkspaceAvatar

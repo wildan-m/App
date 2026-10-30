@@ -143,6 +143,7 @@ function ScheduleCallConfirmationPage() {
                 </ScrollView>
                 <FixedFooter>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.SCHEDULE_CALL_CONFIRMATION_PAGE.CONFIRM}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={confirm}

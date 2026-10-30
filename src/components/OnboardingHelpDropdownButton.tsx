@@ -130,6 +130,7 @@ function OnboardingHelpDropdownButton({reportID, shouldUseNarrowLayout, shouldSh
 
     return (
         <ButtonWithDropdownMenu
+            sentryLabel={CONST.SENTRY_LABEL.ONBOARDING_HELP_DROPDOWN_BUTTON.CALL_SCHEDULED}
             onPress={(_event, value) => {
                 const option = options.find((opt) => opt.value === value);
                 option?.onSelected?.();

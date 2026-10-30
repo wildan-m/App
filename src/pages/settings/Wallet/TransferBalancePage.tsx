@@ -178,6 +178,7 @@ function TransferBalancePage() {
                     <View style={styles.ph5}>
                         {paymentTypes.map((paymentType) => (
                             <MenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.TRANSFER_BALANCE_PAGE.NAVIGATE_TO_CHOOSE_TRANSFER_ACCOUNT}
                                 key={paymentType.key}
                                 title={paymentType.title}
                                 description={paymentType.description}
@@ -198,6 +199,7 @@ function TransferBalancePage() {
                     <Text style={[styles.pt8, styles.ph5, styles.pb1, styles.textLabelSupporting, styles.justifyContentStart]}>{translate('transferAmountPage.whichAccount')}</Text>
                     {!!selectedAccount && (
                         <MenuItem
+                            sentryLabel={CONST.SENTRY_LABEL.TRANSFER_BALANCE_PAGE.NAVIGATE_TO_CHOOSE_TRANSFER_ACCOUNT}
                             title={selectedAccount?.title}
                             description={selectedAccount?.description}
                             shouldShowRightIcon
@@ -216,6 +218,7 @@ function TransferBalancePage() {
                 </ScrollView>
                 <View>
                     <FormAlertWithSubmitButton
+                        sentryLabel={CONST.SENTRY_LABEL.TRANSFER_BALANCE_PAGE.TRANSFER}
                         buttonText={translate('transferAmountPage.transfer', isTransferable ? convertToDisplayString(transferAmount, CONST.CURRENCY.USD) : '')}
                         isLoading={walletTransfer?.loading}
                         onSubmit={() => selectedAccount && transferWalletBalance(selectedAccount)}

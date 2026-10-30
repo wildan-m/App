@@ -51,6 +51,7 @@ function AnonymousReportFooter({reportID}: AnonymousReportFooterProps) {
                 </View>
                 <View style={[styles.anonymousRoomFooterSignInButton]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.ANONYMOUS_REPORT_FOOTER.SIGN_OUT_AND_REDIRECT_TO_SIGN_IN}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={() => {
                             signOutAndRedirectToSignIn();

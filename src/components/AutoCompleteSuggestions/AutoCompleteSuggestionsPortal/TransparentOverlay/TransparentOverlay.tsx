@@ -62,6 +62,7 @@ function TransparentOverlay({onPress: onPressProp, style}: TransparentOverlayPro
             ref={viewRef(dropZone)}
         >
             <PressableWithoutFeedback
+                sentryLabel={CONST.SENTRY_LABEL.TRANSPARENT_OVERLAY.CLOSE}
                 onPress={onPress}
                 style={[styles.flex1, styles.cursorDefault, overlay]}
                 accessibilityLabel={translate('common.close')}

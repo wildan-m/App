@@ -129,6 +129,7 @@ function StatusClearAfterPage() {
         draftPeriod !== CONST.CUSTOM_STATUS_TYPES.CUSTOM ? undefined : (
             <>
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.STATUS_CLEAR_AFTER_PAGE.DATE}
                     title={customStatusDate}
                     description={translate('statusPage.date')}
                     shouldShowRightIcon
@@ -138,6 +139,7 @@ function StatusClearAfterPage() {
                     brickRoadIndicator={redBrickDateIndicator}
                 />
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.STATUS_CLEAR_AFTER_PAGE.TIME}
                     title={customStatusTime}
                     description={translate('statusPage.time')}
                     shouldShowRightIcon

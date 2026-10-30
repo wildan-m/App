@@ -56,6 +56,7 @@ function AddPaymentCardButton() {
     return (
         <ActionableItemButtons layout="horizontal">
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.ADD_PAYMENT_CARD_BUTTON.NAVIGATE}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 onPress={() => {
                     Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.ADD_PAYMENT_CARD.path));
@@ -96,6 +97,7 @@ function ConciergeOptionsButtons({action, actionOwnerReport, reportID, options}:
         >
             {options.map((option, index) => (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.CONCIERGE_OPTIONS_BUTTONS.RESOLVE_OPTIONS}
                     key={`${action.reportActionID}-conciergeOptions-${option}`}
                     innerStyles={styles.actionableItemButton}
                     onPress={() => {
@@ -148,6 +150,7 @@ function SuggestedFollowupButtons({action, actionOwnerReport, reportID, followup
         >
             {followups.map((followup) => (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SUGGESTED_FOLLOWUP_BUTTONS.RESOLVE_SUGGESTED_FOLLOWUP}
                     key={`${action.reportActionID}-followup-${followup.text}`}
                     innerStyles={styles.actionableItemButton}
                     onPress={() => {
@@ -241,11 +244,17 @@ function TrackExpenseButtons({action, actionOwnerReportID}: TrackExpenseButtonsP
                 <>
                     {/* A DM is not a valid destination for per diem and time expenses, nor for a user restricted to one workspace. */}
                     {!isSplitExpense && !isRestrictedToPreferredPolicy && !isPerDiemRequest(trackExpenseTransaction) && !isTimeRequest(trackExpenseTransaction) && (
-                        <Button onPress={() => submit(CONST.IOU.SUBMIT_DESTINATION.FRIEND)}>
+                        <Button
+                            sentryLabel={CONST.SENTRY_LABEL.TRACK_EXPENSE_BUTTONS.SUBMIT}
+                            onPress={() => submit(CONST.IOU.SUBMIT_DESTINATION.FRIEND)}
+                        >
                             <Button.Text>{translate('actionableMentionTrackExpense.submitToFriend')}</Button.Text>
                         </Button>
                     )}
-                    <Button onPress={() => submit(CONST.IOU.SUBMIT_DESTINATION.EMPLOYER)}>
+                    <Button
+                        sentryLabel={CONST.SENTRY_LABEL.TRACK_EXPENSE_BUTTONS.SUBMIT}
+                        onPress={() => submit(CONST.IOU.SUBMIT_DESTINATION.EMPLOYER)}
+                    >
                         <Button.Text>{translate('actionableMentionTrackExpense.submitToEmployer')}</Button.Text>
                     </Button>
                 </>
@@ -254,6 +263,7 @@ function TrackExpenseButtons({action, actionOwnerReportID}: TrackExpenseButtonsP
             {Permissions.canUseTrackFlows() && (
                 <>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.TRACK_EXPENSE_BUTTONS.CREATE_DRAFT_TRANSACTION_AND_NAVIGATE_TO_PARTICIPANT_SELECTOR}
                         onPress={() => {
                             createDraftTransactionAndNavigateToParticipantSelector({...baseDraftTransactionParams, actionName: CONST.IOU.ACTION.CATEGORIZE});
                         }}
@@ -261,6 +271,7 @@ function TrackExpenseButtons({action, actionOwnerReportID}: TrackExpenseButtonsP
                         <Button.Text>{translate('actionableMentionTrackExpense.categorize')}</Button.Text>
                     </Button>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.TRACK_EXPENSE_BUTTONS.CREATE_DRAFT_TRANSACTION_AND_NAVIGATE_TO_PARTICIPANT_SELECTOR}
                         onPress={() => {
                             createDraftTransactionAndNavigateToParticipantSelector({...baseDraftTransactionParams, actionName: CONST.IOU.ACTION.SHARE});
                         }}
@@ -271,6 +282,7 @@ function TrackExpenseButtons({action, actionOwnerReportID}: TrackExpenseButtonsP
             )}
 
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.TRACK_EXPENSE_BUTTONS.DISMISS_TRACK_EXPENSE_ACTIONABLE_WHISPER}
                 onPress={() => {
                     dismissTrackExpenseActionableWhisper(actionOwnerReportID, action);
                 }}

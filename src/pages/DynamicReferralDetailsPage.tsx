@@ -74,6 +74,7 @@ function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
 
             {shouldShowClipboard && (
                 <ContextMenuItem
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REFERRAL_DETAILS_PAGE.COPY_REFERRAL_LINK}
                     isAnonymousAction
                     text={translate('referralProgram.copyReferralLink')}
                     icon={icons.Copy}
@@ -85,6 +86,7 @@ function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
             )}
 
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REFERRAL_DETAILS_PAGE.LEARN_MORE}
                 wrapperStyle={styles.mb4}
                 ref={popoverAnchor}
                 title={translate('requestorStep.learnMore')}

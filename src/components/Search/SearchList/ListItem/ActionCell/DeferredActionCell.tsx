@@ -30,6 +30,7 @@ function DeferredActionCell(actionCellProps: ActionCellProps) {
 
         return (
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.DEFERRED_ACTION_CELL.BUTTON}
                 size={CONST.BUTTON_SIZE.SMALL}
                 style={[styles.w100, styles.pointerEventsNone]}
                 isDisabled

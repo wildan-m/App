@@ -46,6 +46,7 @@ function BeneficialOwnersList({handleConfirmation, ownerKeys, handleOwnerEdit}: 
 
             return (
                 <MenuItemAvatarNavigation
+                    sentryLabel={CONST.SENTRY_LABEL.BENEFICIAL_OWNERS_LIST.OWNER_EDIT}
                     key={ownerKey}
                     title={`${ownerData.firstName} ${ownerData.lastName}`}
                     description={`${ownerData.street}, ${ownerData.city}, ${ownerData.state} ${ownerData.zipCode}`}

@@ -131,6 +131,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                     key="autoApproveReportsUnder"
                 >
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.EXPENSE_REPORT_RULES_SECTION.AUTO_APPROVE_REPORTS_UNDER_TITLE}
                         description={translate('workspace.rules.expenseReportRules.autoApproveReportsUnderTitle')}
                         title={convertToDisplayString(policy?.autoApproval?.limit ?? CONST.POLICY.AUTO_APPROVE_REPORTS_UNDER_DEFAULT_CENTS, policy?.outputCurrency ?? CONST.CURRENCY.USD)}
                         shouldShowRightIcon={canWriteApprovals}
@@ -146,6 +147,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                     key="randomReportAuditTitle"
                 >
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.EXPENSE_REPORT_RULES_SECTION.RANDOM_REPORT_AUDIT_TITLE}
                         description={translate('workspace.rules.expenseReportRules.randomReportAuditTitle')}
                         title={`${Math.round((policy?.autoApproval?.auditRate ?? CONST.POLICY.RANDOM_AUDIT_DEFAULT_PERCENTAGE) * 100)}%`}
                         shouldShowRightIcon={canWriteApprovals}
@@ -191,6 +193,7 @@ function ExpenseReportRulesSection({policyID, canWriteApprovals, canWritePayment
                     key="autoPayReportsUnder"
                 >
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.EXPENSE_REPORT_RULES_SECTION.AUTO_PAY_REPORTS_UNDER_TITLE}
                         description={translate('workspace.rules.expenseReportRules.autoPayReportsUnderTitle')}
                         title={convertToDisplayString(policy?.autoReimbursement?.limit ?? CONST.POLICY.AUTO_REIMBURSEMENT_LIMIT_DEFAULT_CENTS, policy?.outputCurrency ?? CONST.CURRENCY.USD)}
                         shouldShowRightIcon={canWritePayments}

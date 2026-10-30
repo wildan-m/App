@@ -116,6 +116,7 @@ function UpgradeIntroView({
                     )}
                 </View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.UPGRADE_INTRO_VIEW.UPGRADE}
                     isLoading={loading}
                     testID="upgrade-button"
                     variant={CONST.BUTTON_VARIANT.SUCCESS}

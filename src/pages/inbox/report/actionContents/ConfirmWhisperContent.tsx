@@ -48,6 +48,7 @@ function ConfirmWhisperContent({action, reportID, originalReportID, actionOwnerR
                 />
                 <ActionableItemButtons layout="horizontal">
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRM_WHISPER_CONTENT.RESOLVE_ACTIONABLE_MENTION_CONFIRM_WHISPER}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={() =>
                             resolveActionableMentionConfirmWhisper(

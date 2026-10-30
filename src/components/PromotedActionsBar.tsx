@@ -162,7 +162,10 @@ function PromotedActionsBar({promotedActions, containerStyle}: PromotedActionsBa
                     style={[styles.flex1, styles.mw50]}
                     key={key}
                 >
-                    <Button onPress={onSelected}>
+                    <Button
+                        sentryLabel={CONST.SENTRY_LABEL.PROMOTED_ACTIONS_BAR.SELECTED}
+                        onPress={onSelected}
+                    >
                         <Button.Icon
                             src={typeof icon === 'string' ? icons[icon] : icon}
                             fill={theme.icon}

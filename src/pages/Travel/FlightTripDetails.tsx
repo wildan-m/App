@@ -89,7 +89,7 @@ function FlightTripDetails({reservation, prevReservation, personalDetails}: Flig
                 <MenuItem.Copy value={startDate.date} />
             </MenuItemField>
 
-            <MenuItem.Root>
+            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.FLIGHT_TRIP_DETAILS.TAKE_OFF}>
                 <MenuItem.Row>
                     <MenuItemField.Content name={translate('travel.flightDetails.takeOff')}>
                         <Text style={[styles.textLarge, styles.textHeadlineH2]}>{startDate.hour}</Text>
@@ -105,7 +105,7 @@ function FlightTripDetails({reservation, prevReservation, personalDetails}: Flig
                 message={takeOffLocation}
                 style={[styles.mtn2, styles.mb0, styles.ph5, styles.pb3]}
             />
-            <MenuItem.Root>
+            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.FLIGHT_TRIP_DETAILS.LANDING}>
                 <MenuItem.Row>
                     <MenuItemField.Content name={translate('travel.flightDetails.landing')}>
                         <Text style={[styles.textLarge, styles.textHeadlineH2]}>{endDate.hour}</Text>
@@ -156,7 +156,10 @@ function FlightTripDetails({reservation, prevReservation, personalDetails}: Flig
                 )}
             </View>
             {!!displayName && (
-                <MenuItem.Root accessibilityLabel={`${translate('travel.flightDetails.passenger')} ${displayName}`}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.FLIGHT_TRIP_DETAILS.PASSENGER}
+                    accessibilityLabel={`${translate('travel.flightDetails.passenger')} ${displayName}`}
+                >
                     <MenuItem.Row>
                         <MenuItemField.Content name={translate('travel.flightDetails.passenger')}>
                             <UserPills

@@ -114,6 +114,7 @@ function AddAgentRuleSuggestionsTab({onSelectSuggestion}: AddAgentRuleSuggestion
 
     const button = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.ADD_AGENT_RULE_SUGGESTIONS_TAB.GO_TO_EDIT_WITH_SELECTION}
             variant="success"
             size={CONST.BUTTON_SIZE.LARGE}
             onPress={goToEditWithSelection}

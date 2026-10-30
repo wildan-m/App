@@ -52,6 +52,7 @@ function SageIntacctNonReimbursableExpensesPage({policy}: WithPolicyConnectionsP
                 onClose={item.onCloseError}
             >
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSES_PAGE.MENU_ITEM}
                     key={item.title}
                     title={item.title}
                     description={item.description}

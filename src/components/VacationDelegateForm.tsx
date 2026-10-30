@@ -17,6 +17,7 @@ import {
     isVacationDelegateClearDatePassed,
 } from '@libs/VacationDelegateUtils';
 
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import INPUT_IDS from '@src/types/form/VacationDelegateForm';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
@@ -195,6 +196,7 @@ function VacationDelegateForm({
             {!!savedDelegateOnOpen && !!savedDelegate && (
                 <View style={styles.mt4}>
                     <MenuItemAction
+                        sentryLabel={CONST.SENTRY_LABEL.VACATION_DELEGATE_FORM.REMOVE_DELEGATE}
                         title={translate('statusPage.vacationDelegate.removeDelegate')}
                         icon={icons.Trashcan}
                         onPress={onRemove}

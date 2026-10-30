@@ -169,6 +169,7 @@ function CopyPolicySettingsConfirmPage() {
                         </>
                     )}
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.COPY_POLICY_SETTINGS_CONFIRM_PAGE.COPY_POLICY_SETTINGS}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={handleCopyPolicySettings}

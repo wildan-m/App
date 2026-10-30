@@ -202,6 +202,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
                     <OfflineWithFeedback pendingAction={continuousReconciliationPendingAction}>
                         {!!paymentBankAccountID && !!continuousReconciliation && (
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.CARD_RECONCILIATION_PAGE.RECONCILIATION_ACCOUNT}
                                 style={styles.mt5}
                                 title={bankAccountTitle}
                                 description={translate('workspace.accounting.reconciliationAccount')}

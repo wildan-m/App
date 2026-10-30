@@ -78,6 +78,7 @@ function BusinessCentralCardProgramAccountPage({policy}: WithPolicyConnectionsPr
                             pendingAction={settingsPendingAction([pendingField], businessCentralConfig?.pendingFields)}
                         >
                             <MenuItem.Root
+                                sentryLabel={CONST.SENTRY_LABEL.BUSINESS_CENTRAL_CARD_PROGRAM_ACCOUNT_PAGE.COUNT_INFO}
                                 onPress={callFunctionIfActionIsAllowed(
                                     () =>
                                         policyID

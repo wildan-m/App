@@ -10147,6 +10147,11 @@ const CONST = {
     SENTRY_LABEL: {
         TEST_TOOL_MENU: {
             SERVER: 'TestToolMenu-Server',
+            INVALIDATE_AUTH_TOKEN: 'TestToolMenu-InvalidateAuthToken',
+            INVALIDATE_CREDENTIALS: 'TestToolMenu-InvalidateCredentials',
+            EXPIRE_SESSION_WITH_DELAY: 'TestToolMenu-ExpireSessionWithDelay',
+            CLEAR_LHN_CACHE: 'TestToolMenu-ClearLHNCache',
+            VIEW: 'TestToolMenu-View',
         },
         BILLING_BANNER: {
             RIGHT_ICON: 'BillingBanner-RightIcon',
@@ -10297,6 +10302,8 @@ const CONST = {
             BACK_BUTTON: 'HeaderView-BackButton',
             CHRONOS_TIMER_BUTTON: 'HeaderView-ChronosTimerButton',
             DETAILS_BUTTON: 'HeaderView-DetailsButton',
+            JOIN: 'HeaderView-Join',
+            START_NEW_CONCIERGE_CHAT: 'HeaderView-StartNewConciergeChat',
         },
         BLOCKING_VIEW: {
             RETRY_BUTTON: 'BlockingView-RetryButton',
@@ -10521,6 +10528,7 @@ const CONST = {
         },
         TRIP_ROOM_PREVIEW: {
             CARD: 'TripRoomPreview-Card',
+            NAVIGATE_TO_TRIP: 'TripRoomPreview-NavigateToTrip',
         },
         TRANSACTION_ITEM_ROW: {
             ARROW_RIGHT: 'TransactionItemRow-ArrowRight',
@@ -10533,6 +10541,8 @@ const CONST = {
         },
         PAYMENT_METHOD_LIST_ITEM: {
             CHASE_ACCOUNT_HELP: 'PaymentMethodListItem-ChaseAccountHelp',
+            MORE: 'PaymentMethodListItem-More',
+            NAVIGATE: 'PaymentMethodListItem-Navigate',
         },
         EMOJI_PICKER: {
             BUTTON: 'EmojiPicker-Button',
@@ -10618,6 +10628,7 @@ const CONST = {
         },
         MAP_VIEW: {
             COMPASS: 'compass',
+            CENTER: 'MapView-Center',
         },
         NEW_CHAT: {
             IMPORT_CONTACTS_ITEM: 'NewChat-ImportContacts',
@@ -10966,6 +10977,9 @@ const CONST = {
         },
         CONFIRM_CONTENT: {
             DISMISS_BUTTON: 'ConfirmContent-DismissButton',
+            CANCEL: 'ConfirmContent-Cancel',
+            YES: 'ConfirmContent-Yes',
+            CONFIRM: 'ConfirmContent-Confirm',
         },
         COPY_TEXT_TO_CLIPBOARD: {
             COPY_BUTTON: 'CopyTextToClipboard-CopyButton',
@@ -10991,15 +11005,19 @@ const CONST = {
         },
         UPLOAD_FILE: {
             REMOVE_BUTTON: 'UploadFile-RemoveButton',
+            OPEN_PICKER: 'UploadFile-OpenPicker',
         },
         LIST_FIELD: {
             REMOVE_BUTTON: 'ListField-RemoveButton',
+            EDIT_ITEM: 'ListField-EditItem',
+            MENU_ITEM: 'ListField-MenuItem',
         },
         BANK_ACCOUNT: {
             DATA_SECURE_LINK: 'BankAccount-DataSecureLink',
         },
         EARLY_DISCOUNT_BANNER: {
             DISMISS_BUTTON: 'EarlyDiscountBanner-DismissButton',
+            NAVIGATE: 'EarlyDiscountBanner-Navigate',
         },
         WORKSPACE_CARDS_LIST: {
             INFO_BUTTON: 'WorkspaceCardsList-InfoButton',
@@ -11122,6 +11140,16 @@ const CONST = {
         },
         PROFILE_PAGE: {
             AVATAR: 'ProfilePage-Avatar',
+            STATUS: 'ProfilePage-Status',
+            MENU_ITEM: 'ProfilePage-MenuItem',
+            DISPLAY_NAME_PAGE: 'ProfilePage-DisplayNamePage',
+            PREFERRED_PRONOUNS: 'ProfilePage-PreferredPronouns',
+            EDIT_YOUR_PROFILE: 'ProfilePage-EditYourProfile',
+            CUSTOM_INSTRUCTIONS: 'ProfilePage-CustomInstructions',
+            COPILOT_INTO_ACCOUNT: 'ProfilePage-CopilotIntoAccount',
+            TOOLTIP: 'ProfilePage-Tooltip',
+            DEBUG: 'ProfilePage-Debug',
+            PRIVATE_NOTES: 'ProfilePage-PrivateNotes',
         },
         BASE_AUTO_COMPLETE_SUGGESTIONS: {
             MENU_ITEM: 'BaseAutoCompleteSuggestions-MenuItem',
@@ -11156,6 +11184,1598 @@ const CONST = {
         FEATURE_TRAINING: {
             CLOSE_BUTTON: 'FeatureTraining-CloseButton',
             BACK_BUTTON: 'FeatureTraining-BackButton',
+        },
+        ADD_EXISTING_EXPENSE_FOOTER: {
+            CONFIRM: 'AddExistingExpenseFooter-Confirm',
+        },
+        CURRENT_LOCATION_BUTTON: {
+            USE_CURRENT: 'CurrentLocationButton-UseCurrent',
+        },
+        SUBMITTING_BUTTON: {
+            BUTTON: 'SubmittingButton-Button',
+        },
+        ANONYMOUS_REPORT_FOOTER: {
+            SIGN_OUT_AND_REDIRECT_TO_SIGN_IN: 'AnonymousReportFooter-SignOutAndRedirectToSignIn',
+        },
+        ATTACHMENT_PICKER: {
+            SELECT_ITEM: 'AttachmentPicker-SelectItem',
+        },
+        TRANSPARENT_OVERLAY: {
+            CLOSE: 'TransparentOverlay-Close',
+        },
+        AUTO_UPDATE_TIME: {
+            LOCAL_TIME: 'AutoUpdateTime-LocalTime',
+        },
+        AVATAR_CROP_VIEW: {
+            ROTATE_IMAGE: 'AvatarCropView-RotateImage',
+            CROP_AND_SAVE_IMAGE: 'AvatarCropView-CropAndSaveImage',
+        },
+        AVATAR_PAGE_FOOTER: {
+            SAVE: 'AvatarPageFooter-Save',
+        },
+        AVATAR_SELECTOR: {
+            SELECT_AVATAR: 'AvatarSelector-SelectAvatar',
+        },
+        BANK_ACCOUNT_VERIFICATION_VIEW: {
+            NAVIGATE: 'BankAccountVerificationView-Navigate',
+            VERIFIED_BUTTON_PRESS: 'BankAccountVerificationView-VerifiedButtonPress',
+        },
+        BASE_WIDGET_ITEM: {
+            CTA_PRESS: 'BaseWidgetItem-CtaPress',
+        },
+        BIG_NUMBER_PAD: {
+            NUMBER_PRESSED: 'BigNumberPad-NumberPressed',
+        },
+        BULK_ACTION_RUNNING: {
+            SEND_FROM_CONCIERGE: 'BulkActionRunning-SendFromConcierge',
+        },
+        BULK_ACTION_CONCIERGE: {
+            CLOSE: 'BulkActionConcierge-Close',
+        },
+        BULK_ACTION_DONE: {
+            VIEW_FAILED_REPORTS: 'BulkActionDone-ViewFailedReports',
+            CLOSE: 'BulkActionDone-Close',
+        },
+        BULK_ACTION_FAILED: {
+            CLOSE: 'BulkActionFailed-Close',
+        },
+        CHECKBOX_WITH_LABEL: {
+            TOGGLE_CHECKBOX: 'CheckboxWithLabel-ToggleCheckbox',
+        },
+        COLUMNS_SETTINGS_LIST: {
+            SAVE: 'ColumnsSettingsList-Save',
+        },
+        CONFIRMATION_PAGE_BUTTON_BASE: {
+            BUTTON: 'ConfirmationPageButtonBase-Button',
+        },
+        CONNECTION_STATUS_MESSAGE: {
+            ACTION_PRESS: 'ConnectionStatusMessage-ActionPress',
+        },
+        COUNTRY_SELECTOR: {
+            COUNTRY: 'CountrySelector-Country',
+        },
+        CURRENCY_SELECTOR: {
+            CURRENCY: 'CurrencySelector-Currency',
+        },
+        DECISION_MODAL: {
+            FIRST_OPTION_SUBMIT: 'DecisionModal-FirstOptionSubmit',
+            SECOND_OPTION_SUBMIT: 'DecisionModal-SecondOptionSubmit',
+        },
+        COPYABLE_TEXT_FIELD: {
+            SET_EXPANDED: 'CopyableTextField-SetExpanded',
+        },
+        DOT_INDICATOR_MESSAGE: {
+            RETRY_RECEIPT_UPLOAD: 'DotIndicatorMessage-RetryReceiptUpload',
+            FILE_DOWNLOAD: 'DotIndicatorMessage-FileDownload',
+        },
+        EMPTY_STATE_COMPONENT: {
+            DROPDOWN_BUTTON: 'EmptyStateComponent-DropdownButton',
+            BUTTON_ACTION: 'EmptyStateComponent-ButtonAction',
+        },
+        EXPORT_DOWNLOAD_STATUS_MODAL: {
+            SEND_FROM_CONCIERGE: 'ExportDownloadStatusModal-SendFromConcierge',
+            GO_TO_CONCIERGE: 'ExportDownloadStatusModal-GoToConcierge',
+            CLOSE: 'ExportDownloadStatusModal-Close',
+            DOWNLOAD_FILE: 'ExportDownloadStatusModal-DownloadFile',
+        },
+        FEATURE_LIST: {
+            MENU_ITEM: 'FeatureList-MenuItem',
+        },
+        FEEDBACK_SURVEY: {
+            SUBMIT: 'FeedbackSurvey-Submit',
+        },
+        FROZEN_CARD_HEADER: {
+            BUTTON: 'FrozenCardHeader-Button',
+        },
+        FULL_SCREEN_LOADING_INDICATOR: {
+            GO_BACK: 'FullScreenLoadingIndicator-GoBack',
+        },
+        GOVERNMENT_RATE_COUNTRY_SELECTOR: {
+            SAVE: 'GovernmentRateCountrySelector-Save',
+        },
+        IMPORT_COLUMN: {
+            DROPDOWN_BUTTON: 'ImportColumn-DropdownButton',
+        },
+        IMPORT_SPREADSHEET: {
+            CHOOSE_FILE: 'ImportSpreadsheet-ChooseFile',
+        },
+        IMPORT_SPREADSHEET_COLUMNS: {
+            IMPORT_FUNCTION: 'ImportSpreadsheetColumns-ImportFunction',
+        },
+        IMPORTED_STATE_INDICATOR: {
+            CLEAR_ONYX_AND_RESET_APP: 'ImportedStateIndicator-ClearOnyxAndResetApp',
+        },
+        GPS_MAP_VIEW_CONTENT: {
+            CENTER: 'GPSMapViewContent-Center',
+        },
+        MAP_VIEW_IMPL: {
+            CENTER: 'MapViewImpl-Center',
+        },
+        FILE_DOWNLOAD_MODAL: {
+            DOWNLOAD: 'FileDownloadModal-Download',
+        },
+        MONEY_REPORT_HEADER_SECONDARY_ACTIONS_PLACEHOLDER: {
+            MORE: 'MoneyReportHeaderSecondaryActionsPlaceholder-More',
+        },
+        MONEY_REPORT_HEADER_SELECTION_DROPDOWN: {
+            SELECTED: 'MoneyReportHeaderSelectionDropdown-Selected',
+        },
+        EXPORT_PRIMARY_ACTION: {
+            EXPORT_INTEGRATION_SELECTED: 'ExportPrimaryAction-ExportIntegrationSelected',
+        },
+        MARK_AS_CASH_PRIMARY_ACTION: {
+            MARK_AS_CASH: 'MarkAsCashPrimaryAction-MarkAsCash',
+        },
+        MARK_AS_RESOLVED_PRIMARY_ACTION: {
+            MARK_AS_RESOLVED: 'MarkAsResolvedPrimaryAction-MarkAsResolved',
+        },
+        REMOVE_HOLD_PRIMARY_ACTION: {
+            UNHOLD: 'RemoveHoldPrimaryAction-Unhold',
+        },
+        REVIEW_DUPLICATES_PRIMARY_ACTION: {
+            REVIEW_DUPLICATES: 'ReviewDuplicatesPrimaryAction-ReviewDuplicates',
+        },
+        SUBMIT_PRIMARY_ACTION_CONTENT: {
+            DROPDOWN_BUTTON: 'SubmitPrimaryActionContent-DropdownButton',
+            MARK_AS_DONE: 'SubmitPrimaryActionContent-MarkAsDone',
+        },
+        CONFIRMATION_FIELD_LIST: {
+            SET_SHOW_MORE_FIELDS: 'ConfirmationFieldList-SetShowMoreFields',
+        },
+        MONEY_REQUEST_HEADER_PRIMARY_ACTION: {
+            UNHOLD: 'MoneyRequestHeaderPrimaryAction-Unhold',
+            MARK_AS_RESOLVED: 'MoneyRequestHeaderPrimaryAction-MarkAsResolved',
+            REVIEW_DUPLICATES: 'MoneyRequestHeaderPrimaryAction-ReviewDuplicates',
+            KEEP_THIS_ONE: 'MoneyRequestHeaderPrimaryAction-KeepThisOne',
+            MARK_AS_CASH_ACTION: 'MoneyRequestHeaderPrimaryAction-MarkAsCashAction',
+        },
+        MONEY_REQUEST_HEADER_SECONDARY_ACTIONS: {
+            MORE: 'MoneyRequestHeaderSecondaryActions-More',
+        },
+        MONEY_REQUEST_REPORT_GROUP_BY_BUTTON: {
+            GROUP_BY: 'MoneyRequestReportGroupByButton-GroupBy',
+        },
+        MONEY_REQUEST_REPORT_LIST_FOOTER: {
+            ADD_EXPENSE: 'MoneyRequestReportListFooter-AddExpense',
+        },
+        MONEY_REQUEST_REPORT_TRANSACTION_LONG_PRESS_MODAL: {
+            SELECT: 'MoneyRequestReportTransactionLongPressModal-Select',
+        },
+        SELECTION_DROPDOWN: {
+            SELECTED: 'SelectionDropdown-Selected',
+        },
+        MULTIFACTOR_AUTHENTICATION_VALIDATE_CODE_RESEND_BUTTON: {
+            RESEND_VALIDATION_CODE: 'MultifactorAuthenticationValidateCodeResendButton-ResendValidationCode',
+        },
+        OUTCOME_SCREEN_BASE_CONTENT: {
+            CLOSE: 'OutcomeScreenBaseContent-Close',
+        },
+        DEBUG_TAB_VIEW: {
+            NAVIGATE_TO: 'DebugTabView-NavigateTo',
+        },
+        QUICK_CREATION_ACTIONS_BAR: {
+            EXPENSE: 'QuickCreationActionsBar-Expense',
+            REPORT: 'QuickCreationActionsBar-Report',
+            DISTANCE: 'QuickCreationActionsBar-Distance',
+            TRAVEL: 'QuickCreationActionsBar-Travel',
+        },
+        NUMBER_WITH_SYMBOL_FORM: {
+            FLIP: 'NumberWithSymbolForm-Flip',
+            TRAILING_DROPDOWN_PRESS: 'NumberWithSymbolForm-TrailingDropdownPress',
+            SYMBOL_BUTTON_PRESS: 'NumberWithSymbolForm-SymbolButtonPress',
+        },
+        NUMERIC_CURRENCY_BUTTON: {
+            BUTTON: 'NumericCurrencyButton-Button',
+        },
+        NUMERIC_FLIP_BUTTON: {
+            BUTTON: 'NumericFlipButton-Button',
+        },
+        ONBOARDING_HELP_DROPDOWN_BUTTON: {
+            CALL_SCHEDULED: 'OnboardingHelpDropdownButton-CallScheduled',
+        },
+        ONBOARDING_MERGING_ACCOUNT_BLOCKED_VIEW: {
+            BUTTON_CONFIRM: 'OnboardingMergingAccountBlockedView-ButtonConfirm',
+        },
+        BASE_OPEN_APP_FAILURE_MODAL: {
+            REFRESH_AND_TRY_AGAIN_BUTTON_PRESS: 'BaseOpenAppFailureModal-RefreshAndTryAgainButtonPress',
+            SET_IS_OPEN_APP_FAILURE_MODAL_OPEN: 'BaseOpenAppFailureModal-SetIsOpenAppFailureModalOpen',
+        },
+        PDF_PASSWORD_FORM: {
+            SUBMIT_PASSWORD: 'PDFPasswordForm-SubmitPassword',
+        },
+        BASE_POPOVER_MENU: {
+            MENU_ITEM: 'BasePopoverMenu-MenuItem',
+        },
+        SUB_BACK_BUTTON: {
+            PRESS: 'SubBackButton-Press',
+        },
+        PROACTIVE_APP_REVIEW_MODAL: {
+            POSITIVE: 'ProactiveAppReviewModal-Positive',
+            NEGATIVE: 'ProactiveAppReviewModal-Negative',
+        },
+        PROMOTED_ACTIONS_BAR: {
+            SELECTED: 'PromotedActionsBar-Selected',
+        },
+        PUSH_ROW_WITH_MODAL: {
+            MODAL_OPEN: 'PushRowWithModal-ModalOpen',
+        },
+        QA_AUTH_TEST_TOOL_ROWS: {
+            QA_AUTH_RUN_PROBE: 'QAAuthTestToolRows-QaAuthRunProbe',
+            QA_AUTH_CLEAR_SESSION: 'QAAuthTestToolRows-QaAuthClearSession',
+        },
+        CHRONOS_OOO_LIST_ACTIONS: {
+            REMOVE_EVENT: 'ChronosOOOListActions-RemoveEvent',
+        },
+        ISSUE_CARD_MESSAGE: {
+            NAVIGATE: 'IssueCardMessage-Navigate',
+            ACTIVATE_CARD: 'IssueCardMessage-ActivateCard',
+        },
+        MONEY_REQUEST_VIEW: {
+            MENU_ITEM: 'MoneyRequestView-MenuItem',
+            COMMON: 'MoneyRequestView-Common',
+            MERCHANT: 'MoneyRequestView-Merchant',
+            NAVIGATE: 'MoneyRequestView-Navigate',
+            REPORT: 'MoneyRequestView-Report',
+            VIEW_TRIP_DETAILS: 'MoneyRequestView-ViewTripDetails',
+            RATE: 'MoneyRequestView-Rate',
+            CATEGORY: 'MoneyRequestView-Category',
+            VENDOR: 'MoneyRequestView-Vendor',
+            CARD: 'MoneyRequestView-Card',
+            TAX: 'MoneyRequestView-Tax',
+        },
+        SUPPORT_TICKET_VIEW: {
+            ASSIGNEE: 'SupportTicketView-Assignee',
+        },
+        TRANSACTION_PREVIEW_CONTENT: {
+            NAVIGATE_TO_REVIEW_FIELDS: 'TransactionPreviewContent-NavigateToReviewFields',
+        },
+        RESERVATION_VIEW: {
+            NAVIGATE: 'ReservationView-Navigate',
+            MENU_ITEM: 'ReservationView-MenuItem',
+        },
+        REQUIRE_TWO_FACTOR_AUTHENTICATION_MODAL: {
+            SUBMIT: 'RequireTwoFactorAuthenticationModal-Submit',
+        },
+        ROOM_HEADER_AVATARS: {
+            NAVIGATE_TO_AVATAR_PAGE: 'RoomHeaderAvatars-NavigateToAvatarPage',
+        },
+        RULE_CATEGORIES_DISABLED_EMPTY_STATE: {
+            ENABLE_CATEGORIES: 'RuleCategoriesDisabledEmptyState-EnableCategories',
+        },
+        RULE_TAXES_DISABLED_EMPTY_STATE: {
+            ENABLE_TAXES: 'RuleTaxesDisabledEmptyState-EnableTaxes',
+        },
+        AMOUNT_FILTER_CONTENT: {
+            UPDATE_AMOUNT_FILTER: 'AmountFilterContent-UpdateAmountFilter',
+        },
+        DATE_FILTER_CONTENT: {
+            APPLY: 'DateFilterContent-Apply',
+        },
+        REPORT_FIELD_FILTER_CONTENT: {
+            APPLY: 'ReportFieldFilterContent-Apply',
+        },
+        SEARCH_NL_FILTER_CONTENT: {
+            SUBMIT: 'SearchNLFilterContent-Submit',
+        },
+        DATE_FILTER_BASE: {
+            RESET: 'DateFilterBase-Reset',
+            SAVE: 'DateFilterBase-Save',
+        },
+        DATE_PRESET_FILTER_BASE: {
+            SELECT_CUSTOM_DATE_MODE: 'DatePresetFilterBase-SelectCustomDateMode',
+            SELECT_DATE_MODIFIER: 'DatePresetFilterBase-SelectDateModifier',
+        },
+        NEGATABLE_FILTER: {
+            NEGATION_CHANGE: 'NegatableFilter-NegationChange',
+        },
+        REPORT_FIELD_BASE: {
+            FIELD_SELECTED: 'ReportFieldBase-FieldSelected',
+        },
+        AMOUNT_POPUP: {
+            SET_SELECTED_MODIFIER: 'AmountPopup-SetSelectedModifier',
+        },
+        DROPDOWN_BUTTON: {
+            CLOSE_PRESS: 'DropdownButton-ClosePress',
+        },
+        DEFERRED_ACTION_CELL: {
+            BUTTON: 'DeferredActionCell-Button',
+        },
+        ACTION_CELL: {
+            ACTION: 'ActionCell-Action',
+        },
+        SEARCH_PAGE_FOOTER: {
+            BUTTON: 'SearchPageFooter-Button',
+        },
+        SEARCH_ACTIONS_BAR_CREATE_BUTTON: {
+            SHOW_CREATE_MENU: 'SearchActionsBarCreateButton-ShowCreateMenu',
+        },
+        FOOTER: {
+            CONFIRM: 'Footer-Confirm',
+        },
+        SETTLEMENT_ACCOUNT_SELECTOR: {
+            ADD_NEW_BANK_ACCOUNT: 'SettlementAccountSelector-AddNewBankAccount',
+        },
+        ANIMATED_SETTLEMENT_BUTTON: {
+            APPROVED: 'AnimatedSettlementButton-Approved',
+        },
+        SIDE_PANEL_OVERLAY: {
+            BACKDROP_LABEL: 'SidePanelOverlay-BackdropLabel',
+        },
+        ICON_BUTTON: {
+            PRESSABLE: 'IconButton-Pressable',
+        },
+        SOFT_KILL_TEST_TOOL_ROW: {
+            SOFT_KILL_APP: 'SoftKillTestToolRow-SoftKillApp',
+        },
+        SPEND_RULE_CATEGORY_BASE: {
+            SAVE: 'SpendRuleCategoryBase-Save',
+        },
+        SPEND_RULE_MERCHANTS_BASE: {
+            ADD_MERCHANT: 'SpendRuleMerchantsBase-AddMerchant',
+        },
+        SPEND_RULES_CURRENCY_BASE: {
+            SAVE: 'SpendRulesCurrencyBase-Save',
+        },
+        STATE_SELECTOR: {
+            STATE: 'StateSelector-State',
+        },
+        CONFIRMATION_STEP: {
+            MENU_ITEM: 'ConfirmationStep-MenuItem',
+            NEXT: 'ConfirmationStep-Next',
+            EDIT_STEP: 'ConfirmationStep-EditStep',
+            ISSUE_CARD: 'ConfirmationStep-IssueCard',
+            ACCOUNT_ENDING: 'ConfirmationStep-AccountEnding',
+            MOVE: 'ConfirmationStep-Move',
+        },
+        DOCUSIGN_FULL_STEP_IMPL: {
+            OPEN_LINK: 'DocusignFullStepImpl-OpenLink',
+        },
+        SUBSCRIPTION_PLAN_DOWNGRADE_BLOCKED: {
+            CLOSE_PRESS: 'SubscriptionPlanDowngradeBlocked-ClosePress',
+        },
+        SUPPORT_TICKET_RESOLVED_FOOTER: {
+            REOPEN_TICKET: 'SupportTicketResolvedFooter-ReopenTicket',
+        },
+        SYMBOL_BUTTON: {
+            SELECT_SYMBOL_OR_CURRENCY: 'SymbolButton-SelectSymbolOrCurrency',
+        },
+        TABLE_CONTENT: {
+            SELECT: 'TableContent-Select',
+        },
+        TABLE_FILTER_TRIGGER: {
+            FILTERS_HEADER: 'TableFilterTrigger-FiltersHeader',
+        },
+        TABLE_FILTER_BAR: {
+            DROPDOWN_BUTTON: 'TableFilterBar-DropdownButton',
+        },
+        DOMAIN_LIST_TABLE_ROW: {
+            MORE: 'DomainListTableRow-More',
+        },
+        WORKSPACE_COMPANY_CARD_TABLE_ROW: {
+            ASSIGN_CARD_OR_OPEN_DETAILS: 'WorkspaceCompanyCardTableRow-AssignCardOrOpenDetails',
+        },
+        TEST_CRASH: {
+            TEST_CRASH: 'TestCrash-TestCrash',
+        },
+        TEST_DRIVE_BANNER: {
+            GET_STARTED: 'TestDriveBanner-GetStarted',
+        },
+        BASE_TEXT_INPUT: {
+            CLEAR: 'BaseTextInput-Clear',
+        },
+        TEXT_LINK_BLOCK: {
+            OPEN_LINK: 'TextLinkBlock-OpenLink',
+        },
+        TEXT_PICKER: {
+            SHOW_PICKER_MODAL: 'TextPicker-ShowPickerModal',
+        },
+        TIME_MODAL_PICKER: {
+            SET_IS_PICKER_VISIBLE: 'TimeModalPicker-SetIsPickerVisible',
+        },
+        TIME_PICKER: {
+            SET_AM_PM_VALUE: 'TimePicker-SetAmPmValue',
+            SUBMIT: 'TimePicker-Submit',
+        },
+        TRIAL_PAYMENT_REMINDER_MODAL: {
+            ADD_PAYMENT_CARD: 'TrialPaymentReminderModal-AddPaymentCard',
+            CLOSE: 'TrialPaymentReminderModal-Close',
+        },
+        VACATION_DELEGATE_FORM: {
+            REMOVE_DELEGATE: 'VacationDelegateForm-RemoveDelegate',
+        },
+        VALUE_PICKER: {
+            SHOW_PICKER_MODAL: 'ValuePicker-ShowPickerModal',
+        },
+        BASE_VIDEO_PLAYER: {
+            PRESSABLE: 'BaseVideoPlayer-Pressable',
+        },
+        BASE_OVERLAY: {
+            CLOSE: 'BaseOverlay-Close',
+        },
+        CHRONOS_SCHEDULE_OOO_PAGE: {
+            LEAVE_TYPE: 'ChronosScheduleOOOPage-LeaveType',
+        },
+        DEBUG_DETAILS: {
+            DELETE: 'DebugDetails-Delete',
+        },
+        DEBUG_JSON: {
+            COPY_ONYX_DATA: 'DebugJSON-CopyOnyxData',
+        },
+        DEBUG_TAG_PICKER: {
+            SUBMIT_TAG: 'DebugTagPicker-SubmitTag',
+        },
+        DEBUG_REPORT_ACTIONS: {
+            NAVIGATE: 'DebugReportActions-Navigate',
+        },
+        DEBUG_REPORT_PAGE: {
+            BUTTON: 'DebugReportPage-Button',
+            NAVIGATE: 'DebugReportPage-Navigate',
+        },
+        DEBUG_REPORT_ACTION_CREATE_PAGE: {
+            CREATE_REPORT_ACTION: 'DebugReportActionCreatePage-CreateReportAction',
+        },
+        DEBUG_REPORT_ACTION_PAGE: {
+            NAVIGATE: 'DebugReportActionPage-Navigate',
+        },
+        DEBUG_TRANSACTION_PAGE: {
+            NAVIGATE: 'DebugTransactionPage-Navigate',
+        },
+        DEBUG_TRANSACTION_VIOLATIONS: {
+            DETAILS: 'DebugTransactionViolations-Details',
+            NAVIGATE: 'DebugTransactionViolations-Navigate',
+        },
+        DEBUG_TRANSACTION_VIOLATION_CREATE_PAGE: {
+            CREATE_TRANSACTION_VIOLATION: 'DebugTransactionViolationCreatePage-CreateTransactionViolation',
+        },
+        DYNAMIC_FLAG_COMMENT_PAGE: {
+            MENU_ITEM: 'DynamicFlagCommentPage-MenuItem',
+        },
+        DYNAMIC_REFERRAL_DETAILS_PAGE: {
+            COPY_REFERRAL_LINK: 'DynamicReferralDetailsPage-CopyReferralLink',
+            LEARN_MORE: 'DynamicReferralDetailsPage-LearnMore',
+        },
+        REPORT_DETAILS_CONTENT: {
+            REPORT_ID: 'ReportDetailsContent-ReportID',
+            LONG_REPORT_ID: 'ReportDetailsContent-LongReportID',
+        },
+        REPORT_DETAILS_DELETE_ACTION: {
+            MENU_ITEM: 'ReportDetailsDeleteAction-MenuItem',
+        },
+        REPORT_DETAILS_MENU_DEBUG_ITEM: {
+            DEBUG: 'ReportDetailsMenuDebugItem-Debug',
+        },
+        REPORT_DETAILS_MENU_GO_TO_ROOM_ITEM: {
+            GO_TO_ROOM: 'ReportDetailsMenuGoToRoomItem-GoToRoom',
+        },
+        REPORT_DETAILS_MENU_GO_TO_WORKSPACE_ITEM: {
+            GO_TO_WORKSPACE: 'ReportDetailsMenuGoToWorkspaceItem-GoToWorkspace',
+        },
+        REPORT_DETAILS_MENU_LEAVE_ITEM: {
+            LEAVE: 'ReportDetailsMenuLeaveItem-Leave',
+        },
+        REPORT_DETAILS_MENU_MARK_AS_INCOMPLETE_ITEM: {
+            MARK_AS_INCOMPLETE: 'ReportDetailsMenuMarkAsIncompleteItem-MarkAsIncomplete',
+        },
+        REPORT_DETAILS_MENU_MEMBERS_OR_INVITE_ITEM: {
+            MEMBERS: 'ReportDetailsMenuMembersOrInviteItem-Members',
+            INVITE: 'ReportDetailsMenuMembersOrInviteItem-Invite',
+        },
+        REPORT_DETAILS_MENU_PRIVATE_NOTES_ITEM: {
+            PRIVATE_NOTES: 'ReportDetailsMenuPrivateNotesItem-PrivateNotes',
+        },
+        REPORT_DETAILS_MENU_SETTINGS_ITEM: {
+            SETTINGS: 'ReportDetailsMenuSettingsItem-Settings',
+        },
+        REPORT_DETAILS_MENU_TRACK_EXPENSE_ITEMS: {
+            SUBMIT_TO_FRIEND: 'ReportDetailsMenuTrackExpenseItems-SubmitToFriend',
+            SUBMIT_TO_EMPLOYER: 'ReportDetailsMenuTrackExpenseItems-SubmitToEmployer',
+            CATEGORIZE: 'ReportDetailsMenuTrackExpenseItems-Categorize',
+            SHARE: 'ReportDetailsMenuTrackExpenseItems-Share',
+        },
+        REPORT_DETAILS_TASK_DELETE_ACTION_CONTENT: {
+            DELETE: 'ReportDetailsTaskDeleteActionContent-Delete',
+        },
+        REPORT_DETAILS_TITLE_SECTION_CONTENT: {
+            TASK: 'ReportDetailsTitleSectionContent-Task',
+            FROM: 'ReportDetailsTitleSectionContent-From',
+        },
+        DYNAMIC_REPORT_PARTICIPANT_DETAILS: {
+            ASK_FOR_CONFIRMATION_TO_REMOVE: 'DynamicReportParticipantDetails-AskForConfirmationToRemove',
+            PROFILE: 'DynamicReportParticipantDetails-Profile',
+        },
+        DYNAMIC_REPORT_PARTICIPANTS_INVITE_PAGE: {
+            INVITE: 'DynamicReportParticipantsInvitePage-Invite',
+        },
+        DYNAMIC_REPORT_PARTICIPANTS_PAGE: {
+            SELECTED: 'DynamicReportParticipantsPage-Selected',
+            NAVIGATE: 'DynamicReportParticipantsPage-Navigate',
+        },
+        DYNAMIC_ROOM_INVITE_PAGE: {
+            INVITE: 'DynamicRoomInvitePage-Invite',
+        },
+        DYNAMIC_ROOM_MEMBER_DETAILS_PAGE: {
+            ASK_FOR_CONFIRMATION_TO_REMOVE: 'DynamicRoomMemberDetailsPage-AskForConfirmationToRemove',
+            PROFILE: 'DynamicRoomMemberDetailsPage-Profile',
+        },
+        DYNAMIC_ROOM_MEMBERS_PAGE: {
+            SELECTED: 'DynamicRoomMembersPage-Selected',
+            INVITE_USER: 'DynamicRoomMembersPage-InviteUser',
+        },
+        ONFIDO_PRIVACY: {
+            SUBMIT: 'OnfidoPrivacy-Submit',
+        },
+        TERMS_STEP: {
+            ENABLE_PAYMENTS: 'TermsStep-EnablePayments',
+            CONFIRM: 'TermsStep-Confirm',
+        },
+        SETUP_METHOD: {
+            OPEN_PERSONAL_BANK_ACCOUNT_SETUP_WITH_PLAID: 'SetupMethod-OpenPersonalBankAccountSetupWithPlaid',
+        },
+        FEES_STEP: {
+            NEXT: 'FeesStep-Next',
+        },
+        VERIFY_IDENTITY: {
+            SUBMIT: 'VerifyIdentity-Submit',
+        },
+        GENERIC_ERROR_PAGE: {
+            REFRESH_PAGE: 'GenericErrorPage-RefreshPage',
+            SIGN_OUT: 'GenericErrorPage-SignOut',
+        },
+        UPDATE_REQUIRED_VIEW: {
+            UPDATE_APP: 'UpdateRequiredView-UpdateApp',
+        },
+        PIN: {
+            TOGGLE_PIN_VISIBILITY: 'PIN-TogglePINVisibility',
+        },
+        MULTIFACTOR_AUTHENTICATION_AUTHORIZE_TRANSACTION_ACTIONS: {
+            DENY: 'MultifactorAuthenticationAuthorizeTransactionActions-Deny',
+            AUTHORIZE: 'MultifactorAuthenticationAuthorizeTransactionActions-Authorize',
+        },
+        MULTIFACTOR_AUTHENTICATION_PROMPT_PAGE: {
+            APPROVE_SOFT_PROMPT: 'MultifactorAuthenticationPromptPage-ApproveSoftPrompt',
+        },
+        MULTIFACTOR_AUTHENTICATION_REVOKE_PAGE: {
+            PROMPT_REVOKE: 'MultifactorAuthenticationRevokePage-PromptRevoke',
+            GO_BACK_PRESS: 'MultifactorAuthenticationRevokePage-GoBackPress',
+        },
+        REVOKE_ROW: {
+            REVOKE: 'RevokeRow-Revoke',
+        },
+        AVATAR_AND_GROUP_NAME_SECTION: {
+            GROUP_NAME: 'AvatarAndGroupNameSection-GroupName',
+        },
+        ADD_TO_GROUP_BUTTON: {
+            ADD_USER_TO_GROUP: 'AddToGroupButton-AddUserToGroup',
+        },
+        NEW_CHAT_PAGE: {
+            CREATE_GROUP: 'NewChatPage-CreateGroup',
+        },
+        BASE_ONBOARDING_PERSONAL_TRACK_GOAL: {
+            SUBMIT_SOMETHING_ELSE_GOAL: 'BaseOnboardingPersonalTrackGoal-SubmitSomethingElseGoal',
+            MENU_ITEM: 'BaseOnboardingPersonalTrackGoal-MenuItem',
+        },
+        BASE_ONBOARDING_WORKSPACES: {
+            RETRY_ACCESSIBLE_POLICIES_LOOKUP: 'BaseOnboardingWorkspaces-RetryAccessiblePoliciesLookup',
+        },
+        CONNECTED_VERIFIED_BANK_ACCOUNT: {
+            CHANGE_BANK_ACCOUNT: 'ConnectedVerifiedBankAccount-ChangeBankAccount',
+            DISCONNECT_BANK_ACCOUNT: 'ConnectedVerifiedBankAccount-DisconnectBankAccount',
+            MENU_ITEM: 'ConnectedVerifiedBankAccount-MenuItem',
+        },
+        UPLOAD_DOCUMENTS: {
+            DOWNLOAD_PDS_AND_FSG: 'UploadDocuments-DownloadPDSAndFSG',
+        },
+        BENEFICIAL_OWNERS_LIST: {
+            OWNER_EDIT: 'BeneficialOwnersList-OwnerEdit',
+        },
+        FINISH: {
+            I_HAVE_A: 'Finish-IHaveA',
+        },
+        HANG_TIGHT: {
+            SEND_REMINDER: 'HangTight-SendReminder',
+        },
+        COMPANY_OWNERS_LIST_UBO: {
+            UBO_EDIT: 'CompanyOwnersListUBO-UBOEdit',
+            MENU_ITEM: 'CompanyOwnersListUBO-MenuItem',
+        },
+        FINISH_CHAT_CARD: {
+            FINISH_IN_CHAT: 'FinishChatCard-FinishInChat',
+            UPDATE_DETAILS: 'FinishChatCard-UpdateDetails',
+            START_OVER: 'FinishChatCard-StartOver',
+        },
+        KYB_DOCUMENTS: {
+            NAVIGATE_TO_CONCIERGE_CHAT: 'KYBDocuments-NavigateToConciergeChat',
+        },
+        VERIFIED_BANK_ACCOUNT_FLOW_ENTRY_POINT: {
+            CONTINUE_WITH_SETUP: 'VerifiedBankAccountFlowEntryPoint-ContinueWithSetup',
+            CHANGE_BANK_ACCOUNT: 'VerifiedBankAccountFlowEntryPoint-ChangeBankAccount',
+            START_OVER: 'VerifiedBankAccountFlowEntryPoint-StartOver',
+            CONNECT_ONLINE_WITH_PLAID: 'VerifiedBankAccountFlowEntryPoint-ConnectOnlineWithPlaid',
+            CONNECT_MANUALLY: 'VerifiedBankAccountFlowEntryPoint-ConnectManually',
+        },
+        REPORT_ADD_APPROVER_PAGE: {
+            SAVE: 'ReportAddApproverPage-Save',
+        },
+        REPORT_REASSIGN_APPROVER_PAGE: {
+            SAVE: 'ReportReassignApproverPage-Save',
+        },
+        REQUIRE_TWO_FACTOR_AUTHENTICATION_OVERLAY: {
+            ESCAPE_PRESS: 'RequireTwoFactorAuthenticationOverlay-EscapePress',
+            ENABLE_TWO_FACTOR_AUTH: 'RequireTwoFactorAuthenticationOverlay-EnableTwoFactorAuth',
+        },
+        WORKSPACE_ADMIN_RESTRICTED_ACTION: {
+            OPEN_ADMINS_REPORT: 'WorkspaceAdminRestrictedAction-OpenAdminsReport',
+        },
+        WORKSPACE_OWNER_RESTRICTED_ACTION: {
+            GO_TO_SUBSCRIPTION: 'WorkspaceOwnerRestrictedAction-GoToSubscription',
+            ADD_PAYMENT_CARD: 'WorkspaceOwnerRestrictedAction-AddPaymentCard',
+        },
+        WORKSPACE_USER_RESTRICTED_ACTION: {
+            OPEN_POLICY_EXPENSE_REPORT: 'WorkspaceUserRestrictedAction-OpenPolicyExpenseReport',
+        },
+        SCHEDULE_CALL_CONFIRMATION_PAGE: {
+            CONFIRM: 'ScheduleCallConfirmationPage-Confirm',
+        },
+        SCHEDULE_CALL_PAGE: {
+            TIMEZONE: 'ScheduleCallPage-Timezone',
+            BUTTON: 'ScheduleCallPage-Button',
+        },
+        EMPTY_SEARCH_VIEW_CONTENT: {
+            EMPTY_TRIP_RESULTS: 'EmptySearchViewContent-EmptyTripResults',
+        },
+        DATE_FILTER_CONTENT_PAGE_WRAPPER: {
+            CHANGE: 'DateFilterContentPageWrapper-Change',
+        },
+        LIST_FILTER_CONTENT_PAGE_WRAPPER: {
+            CHANGE: 'ListFilterContentPageWrapper-Change',
+        },
+        REPORT_FIELD_FILTER_CONTENT_PAGE_WRAPPER: {
+            CONFIRM: 'ReportFieldFilterContentPageWrapper-Confirm',
+        },
+        SEARCH_ADVANCED_FILTERS_BASE: {
+            RESET_FILTERS: 'SearchAdvancedFiltersBase-ResetFilters',
+            APPLY_FILTERS: 'SearchAdvancedFiltersBase-ApplyFilters',
+        },
+        SEARCH_APPROVER_PAGE: {
+            SAVE: 'SearchApproverPage-Save',
+        },
+        SEARCH_EDIT_MULTIPLE_PAGE: {
+            SAVE: 'SearchEditMultiplePage-Save',
+        },
+        SEARCH_MERGE_REPORTS: {
+            CONFIRM: 'SearchMergeReports-Confirm',
+        },
+        SHARE_BUTTON: {
+            SHARE: 'ShareButton-Share',
+        },
+        SHARE_CODE_PAGE: {
+            COPY: 'ShareCodePage-Copy',
+            NAVIGATE: 'ShareCodePage-Navigate',
+            DOWNLOAD: 'ShareCodePage-Download',
+        },
+        IM_TEACHER_UPDATE_EMAIL_PAGE: {
+            UPDATE_EMAIL: 'ImTeacherUpdateEmailPage-UpdateEmail',
+        },
+        DYNAMIC_CONFIRMATION_PAGE: {
+            CONFIRM: 'DynamicConfirmationPage-Confirm',
+            MERGE_EXPENSES: 'DynamicConfirmationPage-MergeExpenses',
+        },
+        DYNAMIC_REVIEW_PAGE: {
+            KEEP_ALL: 'DynamicReviewPage-KeepAll',
+            KEEP_SELECTED: 'DynamicReviewPage-KeepSelected',
+        },
+        DYNAMIC_DETAILS_REVIEW_PAGE: {
+            VALIDATE_AND_CONTINUE: 'DynamicDetailsReviewPage-ValidateAndContinue',
+        },
+        DYNAMIC_RECEIPT_REVIEW_PAGE: {
+            CONTINUE: 'DynamicReceiptReviewPage-Continue',
+        },
+        TRANSACTION_MERGE_RECEIPTS: {
+            NAVIGATE: 'TransactionMergeReceipts-Navigate',
+        },
+        CAR_TRIP_DETAILS: {
+            PICK_UP: 'CarTripDetails-PickUp',
+            DROP_OFF: 'CarTripDetails-DropOff',
+            DRIVER: 'CarTripDetails-Driver',
+        },
+        DYNAMIC_DOMAIN_PERMISSION_INFO_PAGE: {
+            CLOSE_RHP_FLOW: 'DynamicDomainPermissionInfoPage-CloseRHPFlow',
+        },
+        DYNAMIC_PUBLIC_DOMAIN_ERROR_PAGE: {
+            CLOSE_RHP_FLOW: 'DynamicPublicDomainErrorPage-CloseRHPFlow',
+        },
+        DYNAMIC_TRIP_DETAILS_PAGE: {
+            MODIFY_TRIP: 'DynamicTripDetailsPage-ModifyTrip',
+            TRIP_SUPPORT: 'DynamicTripDetailsPage-TripSupport',
+        },
+        DOMAIN_SELECTOR_STEP: {
+            CONTINUE: 'DomainSelectorStep-Continue',
+        },
+        HOTEL_TRIP_DETAILS: {
+            ADDRESS: 'HotelTripDetails-Address',
+            CHECK_IN: 'HotelTripDetails-CheckIn',
+            CHECK_OUT: 'HotelTripDetails-CheckOut',
+            GUEST: 'HotelTripDetails-Guest',
+        },
+        MANAGE_TRIPS: {
+            BOOK_DEMO: 'ManageTrips-BookDemo',
+            BOOK_TRAVEL: 'ManageTrips-BookTravel',
+        },
+        DOMAIN_ADD_ADMIN_PAGE: {
+            INVITE: 'DomainAddAdminPage-Invite',
+        },
+        DOMAIN_ADMIN_DETAILS_PAGE: {
+            RESET_DOMAIN: 'DomainAdminDetailsPage-ResetDomain',
+            REVOKE_ADMIN_ACCESS: 'DomainAdminDetailsPage-RevokeAdminAccess',
+        },
+        DOMAIN_ADMINS_PAGE: {
+            NAVIGATE: 'DomainAdminsPage-Navigate',
+        },
+        BASE_DOMAIN_MEMBER_DETAILS_COMPONENT: {
+            PROFILE: 'BaseDomainMemberDetailsComponent-Profile',
+        },
+        BASE_DOMAIN_REQUIRE_TWO_FACTOR_AUTH_PAGE: {
+            DISABLE: 'BaseDomainRequireTwoFactorAuthPage-Disable',
+        },
+        BASE_VERIFY_DOMAIN_PAGE: {
+            VERIFY_DOMAIN: 'BaseVerifyDomainPage-VerifyDomain',
+        },
+        DELETE_GROUP_ROW: {
+            DELETE_GROUP: 'DeleteGroupRow-DeleteGroup',
+        },
+        DOMAIN_MEMBER_DETAILS_PAGE: {
+            SET_IS_MODAL_VISIBLE: 'DomainMemberDetailsPage-SetIsModalVisible',
+            RESET_TWO_FACTOR_AUTH: 'DomainMemberDetailsPage-ResetTwoFactorAuth',
+            UNLOCK_ACCOUNT: 'DomainMemberDetailsPage-UnlockAccount',
+            REPORT_SUSPICIOUS_ACTIVITY: 'DomainMemberDetailsPage-ReportSuspiciousActivity',
+        },
+        DOMAIN_MEMBERS_PAGE: {
+            SELECTED: 'DomainMembersPage-Selected',
+            NAVIGATE: 'DomainMembersPage-Navigate',
+            MORE: 'DomainMembersPage-More',
+        },
+        MOVE_USER_BETWEEN_GROUPS_PAGE: {
+            MOVE_TO_SELECTED_GROUP: 'MoveUserBetweenGroupsPage-MoveToSelectedGroup',
+        },
+        MOVE_USERS_BETWEEN_GROUPS_PAGE: {
+            MOVE_SELECTED_MEMBERS_TO_GROUP: 'MoveUsersBetweenGroupsPage-MoveSelectedMembersToGroup',
+        },
+        EARLY_RENEWAL_OFFER_SECTION: {
+            ADMIN_CTA: 'EarlyRenewalOfferSection-AdminCTA',
+        },
+        FREE_TRIAL_SECTION: {
+            CTA_PRESS: 'FreeTrialSection-CtaPress',
+        },
+        GETTING_STARTED_ROW: {
+            NAVIGATE_TO_ITEM: 'GettingStartedRow-NavigateToItem',
+        },
+        UPCOMING_TRAVEL_ITEM: {
+            PRESS: 'UpcomingTravelItem-Press',
+        },
+        CARD_ROW: {
+            NAVIGATE: 'CardRow-Navigate',
+        },
+        SPEND_SUMMARY_ROW: {
+            MENU_ITEM: 'SpendSummaryRow-MenuItem',
+        },
+        CONCIERGE_CHAT_HISTORY_TOGGLE: {
+            BUTTON: 'ConciergeChatHistoryToggle-Button',
+        },
+        DYNAMIC_REPORT_DETAILS_SHARE_REPORT_PAGE: {
+            SHARE_REPORT: 'DynamicReportDetailsShareReportPage-ShareReport',
+        },
+        ENABLE_NOTIFICATIONS_BANNER: {
+            REQUEST_AND_DISMISS: 'EnableNotificationsBanner-RequestAndDismiss',
+            DISMISS_FOR_SESSION: 'EnableNotificationsBanner-DismissForSession',
+        },
+        SHOW_PREVIOUS_MESSAGES_BUTTON: {
+            SHOW_HISTORY: 'ShowPreviousMessagesButton-ShowHistory',
+        },
+        ADD_PAYMENT_CARD_BUTTON: {
+            NAVIGATE: 'AddPaymentCardButton-Navigate',
+        },
+        CONCIERGE_OPTIONS_BUTTONS: {
+            RESOLVE_OPTIONS: 'ConciergeOptionsButtons-ResolveOptions',
+        },
+        SUGGESTED_FOLLOWUP_BUTTONS: {
+            RESOLVE_SUGGESTED_FOLLOWUP: 'SuggestedFollowupButtons-ResolveSuggestedFollowup',
+        },
+        TRACK_EXPENSE_BUTTONS: {
+            SUBMIT: 'TrackExpenseButtons-Submit',
+            CREATE_DRAFT_TRANSACTION_AND_NAVIGATE_TO_PARTICIPANT_SELECTOR: 'TrackExpenseButtons-CreateDraftTransactionAndNavigateToParticipantSelector',
+            DISMISS_TRACK_EXPENSE_ACTIONABLE_WHISPER: 'TrackExpenseButtons-DismissTrackExpenseActionableWhisper',
+        },
+        CONFIRM_WHISPER_CONTENT: {
+            RESOLVE_ACTIONABLE_MENTION_CONFIRM_WHISPER: 'ConfirmWhisperContent-ResolveActionableMentionConfirmWhisper',
+        },
+        FRAUD_ALERT_CONTENT: {
+            RESOLVE_FRAUD_ALERT: 'FraudAlertContent-ResolveFraudAlert',
+        },
+        HOME_ADDRESS_REQUIRED_CONTENT: {
+            OPEN_PRIVATE_PERSONAL_DETAILS_PAGE: 'HomeAddressRequiredContent-OpenPrivatePersonalDetailsPage',
+        },
+        JOIN_REQUEST_CONTENT: {
+            ACCEPT_JOIN_REQUEST: 'JoinRequestContent-AcceptJoinRequest',
+            DECLINE_JOIN_REQUEST: 'JoinRequestContent-DeclineJoinRequest',
+        },
+        MENTION_WHISPER_CONTENT: {
+            RESOLVE_ACTIONABLE_MENTION_WHISPER: 'MentionWhisperContent-ResolveActionableMentionWhisper',
+        },
+        REIMBURSEMENT_QUEUED_CONTENT: {
+            OPEN_PERSONAL_BANK_ACCOUNT_SETUP_VIEW: 'ReimbursementQueuedContent-OpenPersonalBankAccountSetupView',
+            TRIGGER_KYC_FLOW: 'ReimbursementQueuedContent-TriggerKYCFlow',
+        },
+        REPORT_MENTION_WHISPER_CONTENT: {
+            RESOLVE_ACTIONABLE_REPORT_MENTION_WHISPER: 'ReportMentionWhisperContent-ResolveActionableReportMentionWhisper',
+        },
+        SIGN_IN_BUTTON: {
+            SIGN_OUT_AND_REDIRECT_TO_SIGN_IN: 'SignInButton-SignOutAndRedirectToSignIn',
+        },
+        DYNAMIC_SPLIT_EXPENSE_EDIT_PAGE: {
+            COMMON: 'DynamicSplitExpenseEditPage-Common',
+            RATE: 'DynamicSplitExpenseEditPage-Rate',
+        },
+        DYNAMIC_IOU_REQUEST_STEP_DISTANCE: {
+            NAVIGATE_TO_WAYPOINT_EDIT_PAGE: 'DynamicIOURequestStepDistance-NavigateToWaypointEditPage',
+        },
+        IOU_REQUEST_EDIT_REPORT_COMMON: {
+            AUTO_REPORT: 'IOURequestEditReportCommon-AutoReport',
+            CREATE_REPORT: 'IOURequestEditReportCommon-CreateReport',
+            REMOVE_FROM_REPORT: 'IOURequestEditReportCommon-RemoveFromReport',
+        },
+        WAYPOINTS: {
+            START: 'Waypoints-Start',
+            STOP: 'Waypoints-Stop',
+        },
+        TRANSACTION_RECEIPT_MODAL_CONTENT: {
+            EXIT_CROP_MODE: 'TransactionReceiptModalContent-ExitCropMode',
+            SAVE_CROP: 'TransactionReceiptModalContent-SaveCrop',
+            ROTATE_RECEIPT: 'TransactionReceiptModalContent-RotateReceipt',
+            ENTER_CROP_MODE: 'TransactionReceiptModalContent-EnterCropMode',
+            SET_PDF_ROTATION: 'TransactionReceiptModalContent-SetPdfRotation',
+            REPLACE: 'TransactionReceiptModalContent-Replace',
+        },
+        AGENTS_PAGE: {
+            NAVIGATE: 'AgentsPage-Navigate',
+            SELECTED: 'AgentsPage-Selected',
+        },
+        DYNAMIC_EDIT_AGENT_PAGE: {
+            VIEW_AGENT_HISTORY: 'DynamicEditAgentPage-ViewAgentHistory',
+            CHAT_WITH_AGENT: 'DynamicEditAgentPage-ChatWithAgent',
+            COPILOT_INTO_ACCOUNT: 'DynamicEditAgentPage-CopilotIntoAccount',
+            DELETE_AGENT: 'DynamicEditAgentPage-DeleteAgent',
+        },
+        AGENT_TEMPLATE_CARD: {
+            ADD: 'AgentTemplateCard-Add',
+        },
+        DYNAMIC_NEW_AGENT_PAGE: {
+            BUILD_CUSTOM_AGENT: 'DynamicNewAgentPage-BuildCustomAgent',
+        },
+        EDIT_AGENT_AVATAR_CONTENT: {
+            UPLOAD_PHOTO: 'EditAgentAvatarContent-UploadPhoto',
+        },
+        DYNAMIC_KEYBOARD_SHORTCUTS_PAGE: {
+            MENU_ITEM: 'DynamicKeyboardShortcutsPage-MenuItem',
+        },
+        EMAIL_ISSUE_PAGE: {
+            NAVIGATE_TO_CONCIERGE_CHAT: 'EmailIssuePage-NavigateToConciergeChat',
+            REQUEST_EMAIL_UNBLOCK: 'EmailIssuePage-RequestEmailUnblock',
+        },
+        AGENT_AI_PROMPT_SECTION: {
+            SAVE: 'AgentAIPromptSection-Save',
+        },
+        AVATAR_PREVIEW: {
+            UPLOAD_PHOTO: 'AvatarPreview-UploadPhoto',
+            EDIT: 'AvatarPreview-Edit',
+        },
+        DYNAMIC_CONTACT_METHOD_DETAILS_PAGE: {
+            SET_AS_DEFAULT: 'DynamicContactMethodDetailsPage-SetAsDefault',
+            REMOVE: 'DynamicContactMethodDetailsPage-Remove',
+        },
+        DYNAMIC_CONTACT_METHODS_PAGE: {
+            NAVIGATE: 'DynamicContactMethodsPage-Navigate',
+            ADD_NEW_CONTACT_METHOD: 'DynamicContactMethodsPage-AddNewContactMethod',
+        },
+        STATUS_CLEAR_AFTER_PAGE: {
+            DATE: 'StatusClearAfterPage-Date',
+            TIME: 'StatusClearAfterPage-Time',
+        },
+        STATUS_PAGE: {
+            SAVE: 'StatusPage-Save',
+            CLEAR_AFTER: 'StatusPage-ClearAfter',
+            CLEAR_STATUS: 'StatusPage-ClearStatus',
+        },
+        MISSING_WORKSPACES_FOOTER: {
+            SKIP: 'MissingWorkspacesFooter-Skip',
+            INVITE: 'MissingWorkspacesFooter-Invite',
+        },
+        EXPENSE_RULES_PAGE: {
+            SELECTED: 'ExpenseRulesPage-Selected',
+        },
+        RULE_PAGE_BASE: {
+            SAVE_RULE: 'RulePageBase-SaveRule',
+            MERCHANT: 'RulePageBase-Merchant',
+        },
+        DEVICE_MANAGEMENT_PAGE: {
+            REVOKE_DEVICE: 'DeviceManagementPage-RevokeDevice',
+        },
+        ACCOUNT_DETAILS_PAGE: {
+            NEXT: 'AccountDetailsPage-Next',
+        },
+        DISABLE_PAGE: {
+            DISABLE: 'DisablePage-Disable',
+        },
+        DISABLED_PAGE: {
+            QUIT_AND_NAVIGATE_BACK: 'DisabledPage-QuitAndNavigateBack',
+        },
+        DYNAMIC_TWO_FACTOR_AUTH_PAGE: {
+            DOWNLOAD_CODES: 'DynamicTwoFactorAuthPage-DownloadCodes',
+        },
+        DYNAMIC_VERIFY_PAGE: {
+            NEXT: 'DynamicVerifyPage-Next',
+        },
+        ENABLED_PAGE: {
+            REPLACE_DEVICE: 'EnabledPage-ReplaceDevice',
+            DISABLE_TWO_FACTOR_AUTH: 'EnabledPage-DisableTwoFactorAuth',
+        },
+        REPLACE_DEVICE_VERIFY_NEW_PAGE: {
+            CONTINUE: 'ReplaceDeviceVerifyNewPage-Continue',
+        },
+        REPLACE_DEVICE_VERIFY_OLD_PAGE: {
+            CONTINUE: 'ReplaceDeviceVerifyOldPage-Continue',
+        },
+        CANCEL_SUBSCRIPTION_PAGE: {
+            GO_BACK: 'CancelSubscriptionPage-GoBack',
+        },
+        EARLY_RENEWAL_BILLING_BANNER: {
+            SHOW_EARLY_RENEWAL_CONFIRMATION: 'EarlyRenewalBillingBanner-ShowEarlyRenewalConfirmation',
+        },
+        SUBSCRIPTION_EXPIRING_SOON_BANNER: {
+            NAVIGATE: 'SubscriptionExpiringSoonBanner-Navigate',
+        },
+        CARD_SECTION_ACTIONS: {
+            MORE: 'CardSectionActions-More',
+        },
+        CARD_SECTION_DATA_EMPTY: {
+            ADD_PAYMENT_CARD_PRESS: 'CardSectionDataEmpty-AddPaymentCardPress',
+        },
+        EARLY_RENEWAL_OFFER_PAGE: {
+            RENEW_AND_CLAIM: 'EarlyRenewalOfferPage-RenewAndClaim',
+        },
+        FREE_TRIAL: {
+            NAVIGATE: 'FreeTrial-Navigate',
+        },
+        SUBSCRIPTION_PLAN_CARD_ACTION_BUTTON: {
+            PLAN_PRESS: 'SubscriptionPlanCardActionButton-PlanPress',
+            SUBSCRIPTION_SETTINGS: 'SubscriptionPlanCardActionButton-SubscriptionSettings',
+            NAVIGATE: 'SubscriptionPlanCardActionButton-Navigate',
+        },
+        CONFIRMATION: {
+            NEXT: 'Confirmation-Next',
+        },
+        DYNAMIC_BETA_OVERRIDES_PAGE: {
+            CLEAR_BETA_OVERRIDES: 'DynamicBetaOverridesPage-ClearBetaOverrides',
+        },
+        BANK_ACCOUNT_PURPOSE: {
+            GET_REIMBURSED: 'BankAccountPurpose-GetReimbursed',
+            MAKE_PAYMENTS: 'BankAccountPurpose-MakePayments',
+        },
+        COUNTRY_SELECTION: {
+            NEXT: 'CountrySelection-Next',
+        },
+        CHOOSE_TRANSFER_ACCOUNT_PAGE: {
+            ADD_NEW_BANK_ACCOUNT: 'ChooseTransferAccountPage-AddNewBankAccount',
+        },
+        WISE_ACCEPT_TERMS_PAGE: {
+            CONFIRM: 'WiseAcceptTermsPage-Confirm',
+        },
+        CHANGE_PIN_PAGE_CONTENT: {
+            TOGGLE_PIN_VISIBILITY: 'ChangePINPageContent-TogglePINVisibility',
+            SUBMIT: 'ChangePINPageContent-Submit',
+        },
+        EXPENSIFY_CARD_PAGE: {
+            OPEN_OLD_DOT_LINK: 'ExpensifyCardPage-OpenOldDotLink',
+            NAVIGATE: 'ExpensifyCardPage-Navigate',
+            VIRTUAL_CARD_NUMBER: 'ExpensifyCardPage-VirtualCardNumber',
+            REVEAL: 'ExpensifyCardPage-Reveal',
+            TRAVEL_CARD_CVV: 'ExpensifyCardPage-TravelCardCvv',
+            CHANGE_PIN: 'ExpensifyCardPage-ChangePin',
+            REPORT_FRAUD: 'ExpensifyCardPage-ReportFraud',
+            REPORT_TRAVEL_FRAUD: 'ExpensifyCardPage-ReportTravelFraud',
+            SCREEN_TITLE: 'ExpensifyCardPage-ScreenTitle',
+            EDIT_SPEND_RULES: 'ExpensifyCardPage-EditSpendRules',
+            SPEND_RULES: 'ExpensifyCardPage-SpendRules',
+            AVAILABLE_SPEND: 'ExpensifyCardPage-AvailableSpend',
+            LIMIT_TYPE: 'ExpensifyCardPage-LimitType',
+        },
+        IMPORT_TRANSACTIONS_PAGE: {
+            NEXT: 'ImportTransactionsPage-Next',
+            CARD_DISPLAY_NAME: 'ImportTransactionsPage-CardDisplayName',
+        },
+        ACCOUNT_FLOW_ENTRY_POINT: {
+            CONNECT_ONLINE_WITH_PLAID: 'AccountFlowEntryPoint-ConnectOnlineWithPlaid',
+            CONNECT_MANUALLY: 'AccountFlowEntryPoint-ConnectManually',
+        },
+        PENDING_DIGITAL_WALLET_APPROVAL_ROW: {
+            NAVIGATE_TO_ADD_CARD_TO_DIGITAL_WALLET: 'PendingDigitalWalletApprovalRow-NavigateToAddCardToDigitalWallet',
+        },
+        PERSONAL_CARD_DETAILS_HEADER_MENU: {
+            IMPORT_SPREADSHEET: 'PersonalCardDetailsHeaderMenu-ImportSpreadsheet',
+            BREAK_CONNECTION: 'PersonalCardDetailsHeaderMenu-BreakConnection',
+            DELETE: 'PersonalCardDetailsHeaderMenu-Delete',
+            REMOVE_CARD: 'PersonalCardDetailsHeaderMenu-RemoveCard',
+        },
+        PERSONAL_CARD_DETAILS_PAGE: {
+            NAVIGATE: 'PersonalCardDetailsPage-Navigate',
+        },
+        PERSONAL_CARD_EDIT_TRANSACTION_START_DATE_PAGE: {
+            SUBMIT: 'PersonalCardEditTransactionStartDatePage-Submit',
+        },
+        PERSONAL_CARD_WARNING: {
+            NAVIGATE: 'PersonalCardWarning-Navigate',
+            PRIMARY_ACTION_PRESS: 'PersonalCardWarning-PrimaryActionPress',
+        },
+        UPGRADE_INTRO: {
+            UPGRADE: 'UpgradeIntro-Upgrade',
+        },
+        REPORT_CARD_LOST_PAGE: {
+            SHIP_NEW_CARD_BUTTON: 'ReportCardLostPage-ShipNewCardButton',
+            NEXT_BUTTON_LABEL: 'ReportCardLostPage-NextButtonLabel',
+        },
+        REPORT_VIRTUAL_CARD_FRAUD_CONFIRMATION_PAGE: {
+            CLOSE: 'ReportVirtualCardFraudConfirmationPage-Close',
+        },
+        REPORT_VIRTUAL_CARD_FRAUD_PAGE: {
+            DEACTIVATE_CARD: 'ReportVirtualCardFraudPage-DeactivateCard',
+        },
+        SHARE_BANK_ACCOUNT: {
+            SHARE: 'ShareBankAccount-Share',
+        },
+        TRANSFER_BALANCE_PAGE: {
+            NAVIGATE_TO_CHOOSE_TRANSFER_ACCOUNT: 'TransferBalancePage-NavigateToChooseTransferAccount',
+            TRANSFER: 'TransferBalancePage-Transfer',
+        },
+        TRAVEL_CVV_PAGE: {
+            COPY_CVV: 'TravelCVVPage-CopyCvv',
+        },
+        UNSHARE_BANK_ACCOUNT: {
+            PROMPT_UNSHARE: 'UnshareBankAccount-PromptUnshare',
+        },
+        CARD_DETAILS: {
+            CARD_NUMBER: 'CardDetails-CardNumber',
+            EXPIRATION: 'CardDetails-Expiration',
+            CVV: 'CardDetails-Cvv',
+            ADDRESS: 'CardDetails-Address',
+            LIMIT_TYPE: 'CardDetails-LimitType',
+        },
+        WALLET_PAGE: {
+            BALANCE: 'WalletPage-Balance',
+        },
+        DYNAMIC_NEW_TASK_PAGE: {
+            CONFIRM_TASK: 'DynamicNewTaskPage-ConfirmTask',
+            ASSIGNEE: 'DynamicNewTaskPage-Assignee',
+        },
+        DYNAMIC_WORKSPACE_INVITE_PAGE_CONTENT: {
+            NEXT: 'DynamicWorkspaceInvitePageContent-Next',
+        },
+        DYNAMIC_WORKSPACE_OVERVIEW_PLAN_TYPE_PAGE: {
+            UPDATE_PLAN: 'DynamicWorkspaceOverviewPlanTypePage-UpdatePlan',
+        },
+        WORKSPACE_AGENTS_PAGE: {
+            NAVIGATE: 'WorkspaceAgentsPage-Navigate',
+            SELECTED: 'WorkspaceAgentsPage-Selected',
+        },
+        EMPTY_WORKSPACE_VIEW: {
+            NAVIGATE: 'EmptyWorkspaceView-Navigate',
+        },
+        WORKSPACE_OVERVIEW_PAGE: {
+            MORE: 'WorkspaceOverviewPage-More',
+            OPEN_PICKER: 'WorkspaceOverviewPage-OpenPicker',
+        },
+        WORKSPACE_OVERVIEW_SHARE_PAGE: {
+            COPY: 'WorkspaceOverviewSharePage-Copy',
+        },
+        BUSINESS_CENTRAL_PREREQUISITES_PAGE: {
+            NAVIGATE: 'BusinessCentralPrerequisitesPage-Navigate',
+        },
+        CAMPFIRE_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'CampfireExistingConnectionsPage-CreateNewConnection',
+        },
+        CAMPFIRE_ADVANCED_PAGE: {
+            ACCOUNTING_METHODS: 'CampfireAdvancedPage-AccountingMethods',
+            BILL_PAYMENT_ACCOUNT: 'CampfireAdvancedPage-BillPaymentAccount',
+            SETTLEMENT_ACCOUNT: 'CampfireAdvancedPage-SettlementAccount',
+            TRAVEL_BILLING_SETTLEMENT_ACCOUNT: 'CampfireAdvancedPage-TravelBillingSettlementAccount',
+            TRAVEL_BILLING_PAYABLE_ACCOUNT: 'CampfireAdvancedPage-TravelBillingPayableAccount',
+        },
+        CAMPFIRE_EXPORT_PAGE: {
+            PREFERRED_EXPORTER: 'CampfireExportPage-PreferredExporter',
+            EXPORT_REIMBURSABLE: 'CampfireExportPage-ExportReimbursable',
+            EXPORT_DATE: 'CampfireExportPage-ExportDate',
+            EXPORT_NON_REIMBURSABLE: 'CampfireExportPage-ExportNonReimbursable',
+            DEFAULT_COMPANY_CARD_VENDOR: 'CampfireExportPage-DefaultCompanyCardVendor',
+            COMPANY_CARD_ACCOUNT: 'CampfireExportPage-CompanyCardAccount',
+        },
+        CERTINIA_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'CertiniaExistingConnectionsPage-CreateNewConnection',
+        },
+        CERTINIA_ADVANCED_PAGE: {
+            FX_EXPENSE_ACCOUNT: 'CertiniaAdvancedPage-FxExpenseAccount',
+        },
+        CERTINIA_EXPORT_PAGE: {
+            MENU_ITEM: 'CertiniaExportPage-MenuItem',
+        },
+        CERTINIA_PREREQUISITES_STEP: {
+            BUTTON: 'CertiniaPrerequisitesStep-Button',
+        },
+        DUAL_ENTRY_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'DualEntryExistingConnectionsPage-CreateNewConnection',
+        },
+        DYNAMIC_SAGE_INTACCT_PREREQUISITES_PAGE: {
+            NAVIGATE_TO_ENTER_CREDENTIALS: 'DynamicSageIntacctPrerequisitesPage-NavigateToEnterCredentials',
+        },
+        EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'ExistingConnectionsPage-CreateNewConnection',
+        },
+        SAGE_INTACCT_NON_REIMBURSABLE_EXPENSES_PAGE: {
+            MENU_ITEM: 'SageIntacctNonReimbursableExpensesPage-MenuItem',
+        },
+        SAGE_INTACCT_EDIT_USER_DIMENSIONS_PAGE: {
+            REMOVE: 'SageIntacctEditUserDimensionsPage-Remove',
+        },
+        SAGE_INTACCT_USER_DIMENSIONS_PAGE: {
+            ADD_USER_DEFINED_DIMENSION: 'SageIntacctUserDimensionsPage-AddUserDefinedDimension',
+        },
+        NET_SUITE_TOKEN_SETUP_CONTENT: {
+            NEXT: 'NetSuiteTokenSetupContent-Next',
+        },
+        DYNAMIC_NET_SUITE_INVOICE_ITEM_PREFERENCE_SELECT_PAGE: {
+            SAVE_PREFERENCE: 'DynamicNetSuiteInvoiceItemPreferenceSelectPage-SavePreference',
+        },
+        NET_SUITE_IMPORT_CUSTOM_FIELD_PAGE: {
+            BUTTON: 'NetSuiteImportCustomFieldPage-Button',
+        },
+        NET_SUITE_IMPORT_CUSTOM_FIELD_VIEW: {
+            REMOVE: 'NetSuiteImportCustomFieldView-Remove',
+        },
+        NET_SUITE_IMPORT_PAGE: {
+            MENU_ITEM: 'NetSuiteImportPage-MenuItem',
+        },
+        REQUIRE_QUICK_BOOKS_DESKTOP_MODAL: {
+            NAVIGATE_TO_FIRST_SYNC: 'RequireQuickBooksDesktopModal-NavigateToFirstSync',
+            CONFIRM: 'RequireQuickBooksDesktopModal-Confirm',
+        },
+        QUICKBOOKS_DESKTOP_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'QuickbooksDesktopExistingConnectionsPage-CreateNewConnection',
+        },
+        INTUIT_ENTERPRISE_SUITE_ENTITY_SELECTOR: {
+            CONNECT_NEW_ENTITY: 'IntuitEnterpriseSuiteEntitySelector-ConnectNewEntity',
+        },
+        DYNAMIC_QUICKBOOKS_COMPANY_CARD_EXPENSE_ACCOUNT_PAGE: {
+            DEFAULT_VENDOR: 'DynamicQuickbooksCompanyCardExpenseAccountPage-DefaultVendor',
+            MENU_ITEM: 'DynamicQuickbooksCompanyCardExpenseAccountPage-MenuItem',
+        },
+        CARD_RECONCILIATION_PAGE: {
+            RECONCILIATION_ACCOUNT: 'CardReconciliationPage-ReconciliationAccount',
+        },
+        RILLET_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'RilletExistingConnectionsPage-CreateNewConnection',
+        },
+        DYNAMIC_XERO_EXPORT_CONFIGURATION_PAGE: {
+            MENU_ITEM: 'DynamicXeroExportConfigurationPage-MenuItem',
+        },
+        ZOHO_BOOKS_EXISTING_CONNECTIONS_PAGE: {
+            CREATE_NEW_CONNECTION: 'ZohoBooksExistingConnectionsPage-CreateNewConnection',
+        },
+        CATEGORY_SETTINGS_PAGE: {
+            DELETE_CATEGORY: 'CategorySettingsPage-DeleteCategory',
+            NAVIGATE_TO_CATEGORY_RULE: 'CategorySettingsPage-NavigateToCategoryRule',
+            CREATE_NEW_RULE: 'CategorySettingsPage-CreateNewRule',
+        },
+        DYNAMIC_CATEGORY_FLAG_AMOUNTS_OVER_PAGE: {
+            TYPE: 'DynamicCategoryFlagAmountsOverPage-Type',
+        },
+        COMPANY_CARD_TRANSACTION_START_DATE_FORM: {
+            SUBMIT: 'CompanyCardTransactionStartDateForm-Submit',
+        },
+        DYNAMIC_WORKSPACE_COMPANY_CARD_DETAILS_PAGE: {
+            BREAK_CONNECTION: 'DynamicWorkspaceCompanyCardDetailsPage-BreakConnection',
+        },
+        WORKSPACE_COMPANY_CARD_ADD_WORK_EMAIL_PAGE: {
+            NAVIGATE: 'WorkspaceCompanyCardAddWorkEmailPage-Navigate',
+        },
+        WORKSPACE_COMPANY_CARD_EXPENSIFY_CARD_PROMOTION_BANNER: {
+            EXPENSIFY_CARD_BANNER_LEARN_MORE_BUTTON: 'WorkspaceCompanyCardExpensifyCardPromotionBanner-ExpensifyCardBannerLearnMoreButton',
+        },
+        WORKSPACE_COMPANY_CARD_FEED_SELECTOR_PAGE: {
+            SAVE_FEED: 'WorkspaceCompanyCardFeedSelectorPage-SaveFeed',
+        },
+        WORKSPACE_COMPANY_CARD_STATEMENT_CLOSE_DATE_SELECTION_LIST: {
+            CUSTOM_CLOSE_DATE: 'WorkspaceCompanyCardStatementCloseDateSelectionList-CustomCloseDate',
+            SUBMIT: 'WorkspaceCompanyCardStatementCloseDateSelectionList-Submit',
+        },
+        WORKSPACE_COMPANY_CARDS_SETTINGS_PAGE: {
+            IMPORT_SPREADSHEET: 'WorkspaceCompanyCardsSettingsPage-ImportSpreadsheet',
+            REMOVE_CARD_FEED: 'WorkspaceCompanyCardsSettingsPage-RemoveCardFeed',
+            ASSIGN_NEW_CARDS: 'WorkspaceCompanyCardsSettingsPage-AssignNewCards',
+        },
+        IMPORT_FROM_FILE_STEP: {
+            DOWNLOAD_TEMPLATE: 'ImportFromFileStep-DownloadTemplate',
+            COMPANY_CARD_LAYOUT_NAME: 'ImportFromFileStep-CompanyCardLayoutName',
+        },
+        ASSIGNEE_STEP: {
+            NEXT: 'AssigneeStep-Next',
+        },
+        CARD_SELECTION_STEP: {
+            SUBMIT: 'CardSelectionStep-Submit',
+        },
+        TRANSACTION_START_DATE_STEP: {
+            SUBMIT: 'TransactionStartDateStep-Submit',
+        },
+        CONNECTIONS_RECEIPT_PARTNERS_PAGE: {
+            MANAGE_INVITES: 'ConnectionsReceiptPartnersPage-ManageInvites',
+        },
+        COPY_POLICY_SETTINGS_CONFIRM_PAGE: {
+            COPY_POLICY_SETTINGS: 'CopyPolicySettingsConfirmPage-CopyPolicySettings',
+        },
+        POLICY_COMMUTER_EXCLUSIONS_PAGE: {
+            SAVE: 'PolicyCommuterExclusionsPage-Save',
+            WORK_ARRANGEMENT: 'PolicyCommuterExclusionsPage-WorkArrangement',
+        },
+        POLICY_DISTANCE_RATE_DETAILS_PAGE: {
+            DELETE: 'PolicyDistanceRateDetailsPage-Delete',
+        },
+        POLICY_DISTANCE_RATES_SETTINGS_PAGE: {
+            COMMUTER_EXCLUSIONS: 'PolicyDistanceRatesSettingsPage-CommuterExclusions',
+        },
+        DOWNGRADE_INTRO: {
+            DOWNGRADE: 'DowngradeIntro-Downgrade',
+            NAVIGATE: 'DowngradeIntro-Navigate',
+        },
+        DYNAMIC_PAY_AND_DOWNGRADE_PAGE: {
+            PAY_AND_DOWNGRADE: 'DynamicPayAndDowngradePage-PayAndDowngrade',
+        },
+        DYNAMIC_WORKSPACE_EXPENSIFY_CARD_DETAILS_PAGE: {
+            EDIT_SPEND_RULES: 'DynamicWorkspaceExpensifyCardDetailsPage-EditSpendRules',
+            DEACTIVATE: 'DynamicWorkspaceExpensifyCardDetailsPage-Deactivate',
+            SPEND_RULES: 'DynamicWorkspaceExpensifyCardDetailsPage-SpendRules',
+            AVAILABLE_SPEND: 'DynamicWorkspaceExpensifyCardDetailsPage-AvailableSpend',
+            LIMIT_TYPE: 'DynamicWorkspaceExpensifyCardDetailsPage-LimitType',
+        },
+        REQUEST_LIMIT_INCREASE_BUTTON: {
+            REQUEST: 'RequestLimitIncreaseButton-Request',
+        },
+        WORKSPACE_CARDS_LIST_LABEL: {
+            SETTLE_BALANCE_BUTTON_CLICK: 'WorkspaceCardsListLabel-SettleBalanceButtonClick',
+        },
+        WORKSPACE_EXPENSIFY_CARD_ADD_WORK_EMAIL_PAGE: {
+            NAVIGATE: 'WorkspaceExpensifyCardAddWorkEmailPage-Navigate',
+        },
+        WORKSPACE_EXPENSIFY_CARD_BANK_ACCOUNTS: {
+            SELECT_BANK_ACCOUNT: 'WorkspaceExpensifyCardBankAccounts-SelectBankAccount',
+            ADD_NEW_BANK_ACCOUNT: 'WorkspaceExpensifyCardBankAccounts-AddNewBankAccount',
+        },
+        WORKSPACE_EXPENSIFY_CARD_FEED_SELECTOR_PAGE: {
+            SAVE_FEED: 'WorkspaceExpensifyCardFeedSelectorPage-SaveFeed',
+        },
+        CARD_TYPE_STEP: {
+            PHYSICAL_CARD: 'CardTypeStep-PhysicalCard',
+            VIRTUAL_CARD: 'CardTypeStep-VirtualCard',
+        },
+        SPEND_RULE_SELECTION_PAGE: {
+            SAVE: 'SpendRuleSelectionPage-Save',
+        },
+        FIELDS_LIST_VALUES_PAGE: {
+            SELECTED: 'FieldsListValuesPage-Selected',
+            NAVIGATE: 'FieldsListValuesPage-Navigate',
+        },
+        FIELDS_SETTINGS_PAGE: {
+            DELETE: 'FieldsSettingsPage-Delete',
+        },
+        FIELDS_VALUE_SETTINGS_PAGE: {
+            DELETE: 'FieldsValueSettingsPage-Delete',
+        },
+        WORKSPACE_FIELDS_SECTION: {
+            NAVIGATE_TO_FIELD_SETTINGS: 'WorkspaceFieldsSection-NavigateToFieldSettings',
+        },
+        HR_APPROVAL_MODE_PAGE_BASE: {
+            CONFIRM_SAVE_APPROVAL_MODE: 'HRApprovalModePageBase-ConfirmSaveApprovalMode',
+        },
+        MERGE_HR_GROUPS_PAGE: {
+            SAVE: 'MergeHRGroupsPage-Save',
+        },
+        WORKSPACE_INVOICE_BALANCE_SECTION: {
+            BALANCE: 'WorkspaceInvoiceBalanceSection-Balance',
+        },
+        WORKSPACE_MCP_PAGE: {
+            MENU_ITEM: 'WorkspaceMCPPage-MenuItem',
+            OPEN_EXTERNAL_LINK: 'WorkspaceMCPPage-OpenExternalLink',
+        },
+        DYNAMIC_WORKSPACE_OWNER_CHANGE_ERROR_PAGE: {
+            CLOSE_PAGE: 'DynamicWorkspaceOwnerChangeErrorPage-ClosePage',
+        },
+        WORKSPACE_MEMBER_DETAILS_PAGE: {
+            REMOVE_WORKSPACE_MEMBER_BUTTON_TITLE: 'WorkspaceMemberDetailsPage-RemoveWorkspaceMemberButtonTitle',
+            ROLE: 'WorkspaceMemberDetailsPage-Role',
+            WORK_ARRANGEMENT: 'WorkspaceMemberDetailsPage-WorkArrangement',
+            PROFILE: 'WorkspaceMemberDetailsPage-Profile',
+            NAVIGATE_TO_DETAILS: 'WorkspaceMemberDetailsPage-NavigateToDetails',
+            MENU_ITEM: 'WorkspaceMemberDetailsPage-MenuItem',
+        },
+        WORKSPACE_MEMBER_OFFICE_LOCATION_PAGE: {
+            CHANGE_OFFICE_LOCATION: 'WorkspaceMemberOfficeLocationPage-ChangeOfficeLocation',
+        },
+        WORKSPACE_MEMBERS_CHANGE_OFFICE_LOCATION_PAGE: {
+            CHANGE_OFFICE_LOCATION: 'WorkspaceMembersChangeOfficeLocationPage-ChangeOfficeLocation',
+        },
+        WORKSPACE_MEMBERS_CHANGE_WORK_ARRANGEMENT_PAGE: {
+            CHANGE_WORK_ARRANGEMENT: 'WorkspaceMembersChangeWorkArrangementPage-ChangeWorkArrangement',
+        },
+        WORKSPACE_OWNER_CHANGE_CHECK: {
+            CONFIRM: 'WorkspaceOwnerChangeCheck-Confirm',
+        },
+        MERGE_PROVIDER_CARD: {
+            MORE: 'MergeProviderCard-More',
+            MENU_ITEM: 'MergeProviderCard-MenuItem',
+        },
+        MERGE_SYNC_RESULTS_PAGE_BASE: {
+            GO_BACK: 'MergeSyncResultsPageBase-GoBack',
+        },
+        WORKSPACE_PER_DIEM_DETAILS_PAGE: {
+            DELETE: 'WorkspacePerDiemDetailsPage-Delete',
+        },
+        UBER_CONNECTION_ROW: {
+            MORE: 'UberConnectionRow-More',
+            SETUP: 'UberConnectionRow-Setup',
+        },
+        MERGE_ATS_APPROVAL_MODE_PAGE: {
+            APPROVER_FIELD: 'MergeATSApprovalModePage-ApproverField',
+            CONFIRM_SAVE_APPROVAL_MODE: 'MergeATSApprovalModePage-ConfirmSaveApprovalMode',
+        },
+        MERGE_ATS_FILTER_SELECTION_PAGE: {
+            SAVE: 'MergeATSFilterSelectionPage-Save',
+        },
+        MERGE_ATS_FILTERS_PAGE: {
+            NAVIGATE: 'MergeATSFiltersPage-Navigate',
+            SAVE: 'MergeATSFiltersPage-Save',
+        },
+        INITIAL_LIST_VALUE_SELECTOR: {
+            NAVIGATE: 'InitialListValueSelector-Navigate',
+        },
+        TYPE_SELECTOR: {
+            NAVIGATE: 'TypeSelector-Navigate',
+        },
+        WORKSPACE_ROOMS_PAGE: {
+            NAVIGATE: 'WorkspaceRoomsPage-Navigate',
+        },
+        ADD_AGENT_RULE_SUGGESTIONS_TAB: {
+            GO_TO_EDIT_WITH_SELECTION: 'AddAgentRuleSuggestionsTab-GoToEditWithSelection',
+        },
+        EXPENSE_REPORT_RULES_SECTION: {
+            AUTO_APPROVE_REPORTS_UNDER_TITLE: 'ExpenseReportRulesSection-AutoApproveReportsUnderTitle',
+            RANDOM_REPORT_AUDIT_TITLE: 'ExpenseReportRulesSection-RandomReportAuditTitle',
+            AUTO_PAY_REPORTS_UNDER_TITLE: 'ExpenseReportRulesSection-AutoPayReportsUnderTitle',
+        },
+        FLAG_FOR_REVIEW_RULE_PAGE_BASE: {
+            FLAG_TYPE: 'FlagForReviewRulePageBase-FlagType',
+        },
+        ADD_CATEGORY_TO_MATCH_PAGE: {
+            SAVE: 'AddCategoryToMatchPage-Save',
+        },
+        EXPENSE_DEFAULT_TYPE_PAGE: {
+            MENU_ITEM: 'ExpenseDefaultTypePage-MenuItem',
+        },
+        MERCHANT_TYPE_RULE_PAGE_BASE: {
+            MERCHANT_TYPE: 'MerchantTypeRulePageBase-MerchantType',
+        },
+        POLICY_RULES_PAGE_REVAMP: {
+            NEW_RULE: 'PolicyRulesPageRevamp-NewRule',
+            MORE: 'PolicyRulesPageRevamp-More',
+        },
+        SPEND_RULE_CARD_PAGE: {
+            SAVE: 'SpendRuleCardPage-Save',
+        },
+        DYNAMIC_TAG_SETTINGS_PAGE: {
+            NAVIGATE_TO_EDIT_GL_CODE: 'DynamicTagSettingsPage-NavigateToEditGlCode',
+            DELETE: 'DynamicTagSettingsPage-Delete',
+        },
+        DYNAMIC_WORKSPACE_VIEW_TAGS_PAGE: {
+            SELECTED: 'DynamicWorkspaceViewTagsPage-Selected',
+            NAVIGATE_TO_EDIT_TAG: 'DynamicWorkspaceViewTagsPage-NavigateToEditTag',
+        },
+        IMPORT_MULTI_LEVEL_TAGS_SETTINGS_PAGE: {
+            NEXT: 'ImportMultiLevelTagsSettingsPage-Next',
+        },
+        IMPORT_TAGS_OPTIONS_PAGE: {
+            SINGLE_LEVEL: 'ImportTagsOptionsPage-SingleLevel',
+            MULTI_LEVEL: 'ImportTagsOptionsPage-MultiLevel',
+        },
+        WORKSPACE_CREATE_TAX_VALUE_PAGE: {
+            SAVE: 'WorkspaceCreateTaxValuePage-Save',
+        },
+        WORKSPACE_EDIT_TAX_PAGE: {
+            DELETE: 'WorkspaceEditTaxPage-Delete',
+        },
+        WORKSPACE_TRAVEL_PAGE: {
+            MORE: 'WorkspaceTravelPage-More',
+        },
+        REVIEWING_REQUEST: {
+            CTA_TEXT: 'ReviewingRequest-CtaText',
+        },
+        WORKSPACE_TRAVEL_BILLING_EXPORT_PAGE: {
+            PROCESS_DOWNLOAD: 'WorkspaceTravelBillingExportPage-ProcessDownload',
+            DOWNLOAD_CSV: 'WorkspaceTravelBillingExportPage-DownloadCSV',
+        },
+        WORKSPACE_TRAVEL_BILLING_FEED_SELECTOR_PAGE: {
+            SET_UP_NEW_FEED: 'WorkspaceTravelBillingFeedSelectorPage-SetUpNewFeed',
+        },
+        WORKSPACE_TRAVEL_BILLING_SECTION: {
+            CURRENT_TRAVEL_SPEND_LABEL: 'WorkspaceTravelBillingSection-CurrentTravelSpendLabel',
+            VIEW_ON_SPEND: 'WorkspaceTravelBillingSection-ViewOnSpend',
+        },
+        GENERIC_FEATURES_VIEW: {
+            UPGRADE: 'GenericFeaturesView-Upgrade',
+            NAVIGATE: 'GenericFeaturesView-Navigate',
+        },
+        UPGRADE_INTRO_VIEW: {
+            UPGRADE: 'UpgradeIntroView-Upgrade',
+        },
+        WORKSPACE_AUTO_REPORTING_FREQUENCY_PAGE: {
+            SAVE: 'WorkspaceAutoReportingFrequencyPage-Save',
+        },
+        WORKSPACE_WORKFLOWS_PAYER_PAGE: {
+            SAVE: 'WorkspaceWorkflowsPayerPage-Save',
+        },
+        DYNAMIC_WORKSPACE_WORKFLOWS_APPROVALS_EXPENSES_FROM_PAGE: {
+            SUBMIT: 'DynamicWorkspaceWorkflowsApprovalsExpensesFromPage-Submit',
+        },
+        WORKSPACE_WORKFLOWS_APPROVALS_APPROVAL_LIMIT_PAGE: {
+            APPROVER: 'WorkspaceWorkflowsApprovalsApprovalLimitPage-Approver',
+            ADDITIONAL_APPROVER_LABEL: 'WorkspaceWorkflowsApprovalsApprovalLimitPage-AdditionalApproverLabel',
+            SKIP: 'WorkspaceWorkflowsApprovalsApprovalLimitPage-Skip',
+            SUBMIT: 'WorkspaceWorkflowsApprovalsApprovalLimitPage-Submit',
+        },
+        WORKSPACE_WORKFLOWS_APPROVALS_CREATE_PAGE: {
+            SUBMIT_BUTTON: 'WorkspaceWorkflowsApprovalsCreatePage-SubmitButton',
+        },
+        COUNTRY_PICKER: {
+            COUNTRY: 'CountryPicker-Country',
+        },
+        CURRENCY_PICKER: {
+            MENU_ITEM: 'CurrencyPicker-MenuItem',
+        },
+        DELEGATOR_LIST: {
+            MENU_ITEM: 'DelegatorList-MenuItem',
+        },
+        STATE_PICKER: {
+            STATE: 'StatePicker-State',
+        },
+        VACATION_DELEGATE_MENU_ITEM_PRESET: {
+            MENU_ITEM: 'VacationDelegateMenuItemPreset-MenuItem',
+        },
+        CONSTANT_SELECTOR: {
+            MENU_ITEM: 'ConstantSelector-MenuItem',
+        },
+        DATE_TIME_SELECTOR: {
+            MENU_ITEM: 'DateTimeSelector-MenuItem',
+        },
+        REPORT_DETAILS_DESCRIPTION: {
+            NAVIGATE: 'ReportDetailsDescription-Navigate',
+        },
+        REPORT_DETAILS_NAME_SECTION_CONTENT: {
+            MENU_ITEM: 'ReportDetailsNameSectionContent-MenuItem',
+        },
+        BUSINESS_TYPE_PICKER: {
+            MENU_ITEM: 'BusinessTypePicker-MenuItem',
+        },
+        FLIGHT_TRIP_DETAILS: {
+            TAKE_OFF: 'FlightTripDetails-TakeOff',
+            LANDING: 'FlightTripDetails-Landing',
+            PASSENGER: 'FlightTripDetails-Passenger',
+        },
+        TRAIN_TRIP_DETAILS: {
+            DEPARTS: 'TrainTripDetails-Departs',
+            ARRIVES: 'TrainTripDetails-Arrives',
+            PASSENGER: 'TrainTripDetails-Passenger',
+        },
+        DISTANCE_COUNTER: {
+            DISTANCE: 'DistanceCounter-Distance',
+        },
+        DYNAMIC_APP_DOWNLOAD_LINKS_PAGE: {
+            ANDROID: 'DynamicAppDownloadLinksPage-Android',
+            IOS: 'DynamicAppDownloadLinksPage-Ios',
+        },
+        WORKSPACE_ROW: {
+            WORKSPACE: 'WorkspaceRow-Workspace',
+        },
+        CONFIRM_DELEGATE_PAGE: {
+            MENU_ITEM: 'ConfirmDelegatePage-MenuItem',
+        },
+        EXACT_ONLINE_WAITLIST_ROW: {
+            MENU_ITEM: 'ExactOnlineWaitlistRow-MenuItem',
+        },
+        BUSINESS_CENTRAL_ADVANCED_PAGE: {
+            ACCOUNTING_METHODS: 'BusinessCentralAdvancedPage-AccountingMethods',
+        },
+        BUSINESS_CENTRAL_CARD_ACCOUNT_PAGE: {
+            COUNT_INFO: 'BusinessCentralCardAccountPage-CountInfo',
+        },
+        BUSINESS_CENTRAL_CARD_PROGRAM_ACCOUNT_PAGE: {
+            COUNT_INFO: 'BusinessCentralCardProgramAccountPage-CountInfo',
+        },
+        CAMPFIRE_CARD_ACCOUNT_PAGE: {
+            COUNT_INFO: 'CampfireCardAccountPage-CountInfo',
+        },
+        CAMPFIRE_CARD_PROGRAM_ACCOUNT_PAGE: {
+            COUNT_INFO: 'CampfireCardProgramAccountPage-CountInfo',
+        },
+        DUAL_ENTRY_ADVANCED_PAGE: {
+            ACCOUNTING_METHODS: 'DualEntryAdvancedPage-AccountingMethods',
+        },
+        DUAL_ENTRY_CARD_ACCOUNT_PAGE: {
+            COUNT_INFO: 'DualEntryCardAccountPage-CountInfo',
+        },
+        DUAL_ENTRY_CARD_PROGRAM_ACCOUNT_PAGE: {
+            COUNT_INFO: 'DualEntryCardProgramAccountPage-CountInfo',
+        },
+        SAGE_INTACCT_ADVANCED_PAGE: {
+            AUTO_SYNC: 'SageIntacctAdvancedPage-AutoSync',
+        },
+        SAGE_INTACCT_TOGGLE_MAPPINGS_PAGE: {
+            DISPLAYED_AS: 'SageIntacctToggleMappingsPage-DisplayedAs',
+        },
+        NET_SUITE_ADVANCED_PAGE: {
+            MENU_ITEM: 'NetSuiteAdvancedPage-MenuItem',
+        },
+        NET_SUITE_CUSTOM_LIST_PICKER: {
+            LIST_NAME: 'NetSuiteCustomListPicker-ListName',
+        },
+        DYNAMIC_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT_PAGE: {
+            MENU_ITEM: 'DynamicQuickbooksDesktopCompanyCardExpenseAccountPage-MenuItem',
+        },
+        DYNAMIC_QUICKBOOKS_DESKTOP_OUT_OF_POCKET_EXPENSE_CONFIGURATION_PAGE: {
+            MENU_ITEM: 'DynamicQuickbooksDesktopOutOfPocketExpenseConfigurationPage-MenuItem',
+        },
+        DYNAMIC_QUICKBOOKS_OUT_OF_POCKET_EXPENSE_CONFIGURATION_PAGE: {
+            MENU_ITEM: 'DynamicQuickbooksOutOfPocketExpenseConfigurationPage-MenuItem',
+        },
+        RILLET_ADVANCED_PAGE: {
+            ACCOUNTING_METHODS: 'RilletAdvancedPage-AccountingMethods',
+        },
+        RILLET_CARD_ACCOUNT: {
+            COUNT_INFO: 'RilletCardAccount-CountInfo',
+        },
+        RILLET_CARD_PROGRAM_ACCOUNT: {
+            COUNT_INFO: 'RilletCardProgramAccount-CountInfo',
+        },
+        WORKSPACE_CARD_SETTINGS_PAGE: {
+            SETTLEMENT_FREQUENCY: 'WorkspaceCardSettingsPage-SettlementFrequency',
+        },
+        MERGE_ATS_FINAL_APPROVER_MENU_ITEM: {
+            MENU_ITEM: 'MergeATSFinalApproverMenuItem-MenuItem',
+        },
+        TAX_VALUE_PICKER: {
+            VALUE: 'TaxValuePicker-Value',
         },
     },
 

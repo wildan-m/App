@@ -91,6 +91,7 @@ function MenuItemList({menuItems = [], shouldUseSingleExecution = false, wrapper
                 shouldForceOpacity={menuItemProps.shouldForceOpacity}
             >
                 <MenuItem
+                    sentryLabel={menuItemProps.sentryLabel}
                     key={key ?? menuItemProps.title}
                     wrapperStyle={wrapperStyle}
                     onSecondaryInteraction={menuItemProps.link !== undefined ? (e) => secondaryInteraction(menuItemProps.link, e) : undefined}

@@ -138,6 +138,7 @@ function CertiniaExportPage({policy}: WithPolicyConnectionsProps) {
                         pendingAction={pendingAction}
                     >
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.CERTINIA_EXPORT_PAGE.MENU_ITEM}
                             title={row.title}
                             description={row.description}
                             helperText={row.helperText}

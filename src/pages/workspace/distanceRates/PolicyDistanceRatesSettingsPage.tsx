@@ -334,6 +334,7 @@ function PolicyDistanceRatesSettingsPage({route}: PolicyDistanceRatesSettingsPag
                             onClose={() => clearPolicyCommuterExclusionsErrors(policyID)}
                         >
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.POLICY_DISTANCE_RATES_SETTINGS_PAGE.COMMUTER_EXCLUSIONS}
                                 shouldShowRightIcon
                                 title={getCommuterExclusionsSummary(policy?.commuterExclusions, defaultUnit, translate)}
                                 description={translate('workspace.distanceRates.commuterExclusions.title')}

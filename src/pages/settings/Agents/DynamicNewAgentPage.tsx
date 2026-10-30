@@ -68,6 +68,7 @@ function AgentTemplateCard({template, avatarID, onAdd}: AgentTemplateCardProps) 
                     <Text style={[styles.textLabelSupporting, styles.lh16]}>{translate('newAgentPage.role')}</Text>
                 </View>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.AGENT_TEMPLATE_CARD.ADD}
                     size={CONST.BUTTON_SIZE.SMALL}
                     onPress={onAdd}
                 >
@@ -122,6 +123,7 @@ function DynamicNewAgentPage({route}: DynamicNewAgentPageProps) {
 
     const buildCustomAgentButton = (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_NEW_AGENT_PAGE.BUILD_CUSTOM_AGENT}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             size={CONST.BUTTON_SIZE.LARGE}
             onPress={handleBuildCustomAgent}

@@ -62,6 +62,7 @@ function ChronosOOOListActions({reportID, action}: ChronosOOOListActionsProps) {
                                       )}
                             </Text>
                             <Button
+                                sentryLabel={CONST.SENTRY_LABEL.CHRONOS_OOO_LIST_ACTIONS.REMOVE_EVENT}
                                 size={CONST.BUTTON_SIZE.SMALL}
                                 style={styles.pl2}
                                 // Restores the 12px horizontal padding from the legacy implementation.

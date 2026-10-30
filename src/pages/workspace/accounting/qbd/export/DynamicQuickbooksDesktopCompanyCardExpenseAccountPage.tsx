@@ -85,7 +85,10 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountPage({policy}: WithPol
                     key={section.keyForList}
                     pendingAction={settingsPendingAction(section.subscribedSettings, qbdConfig?.pendingFields)}
                 >
-                    <MenuItem.Root onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}>
+                    <MenuItem.Root
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT_PAGE.MENU_ITEM}
+                        onPress={callFunctionIfActionIsAllowed(section.onPress, false, session)}
+                    >
                         <MenuItemField.Row
                             name={section.description}
                             value={section.title}

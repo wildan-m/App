@@ -147,6 +147,7 @@ function DynamicNetSuiteInvoiceItemPreferenceSelectPage({policy}: WithPolicyConn
                 addBottomSafeAreaPadding
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_NET_SUITE_INVOICE_ITEM_PREFERENCE_SELECT_PAGE.SAVE_PREFERENCE}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={savePreference}

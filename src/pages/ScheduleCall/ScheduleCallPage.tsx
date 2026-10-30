@@ -193,6 +193,7 @@ function ScheduleCallPage() {
                             </View>
                         </View>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.SCHEDULE_CALL_PAGE.TIMEZONE}
                             interactive={false}
                             title={userTimezone}
                             description={translate('timezonePage.timezone')}
@@ -217,6 +218,7 @@ function ScheduleCallPage() {
                                 <View style={[styles.flexRow, styles.flexWrap, styles.justifyContentStart, styles.gap2]}>
                                     {timeSlotsForSelectedData.map((timeSlot: TimeSlot) => (
                                         <Button
+                                            sentryLabel={CONST.SENTRY_LABEL.SCHEDULE_CALL_PAGE.BUTTON}
                                             key={`time-slot-${timeSlot.startTime}`}
                                             size={CONST.BUTTON_SIZE.LARGE}
                                             variant={scheduleCallDraft?.timeSlot === timeSlot.startTime ? CONST.BUTTON_VARIANT.SUCCESS : undefined}

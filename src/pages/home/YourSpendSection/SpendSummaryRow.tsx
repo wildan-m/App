@@ -12,6 +12,7 @@ import {ICON_SLOT_SIZE, useWidgetSkeletonRowGeometry, WidgetSkeletonRowIcon} fro
 
 import variables from '@styles/variables';
 
+import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 import type {StyleProp, ViewStyle} from 'react-native';
@@ -96,6 +97,7 @@ function SpendSummaryRow({state, testIDPrefix, description, totals, iconSrc, onP
     return (
         <View testID={`${testIDPrefix}-row`}>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.SPEND_SUMMARY_ROW.MENU_ITEM}
                 description={description}
                 title={totals.total !== undefined ? convertToDisplayString(totals.total, totals.currency) : undefined}
                 titleStyle={[styles.textBold, isStale && styles.offlineFeedbackPending]}

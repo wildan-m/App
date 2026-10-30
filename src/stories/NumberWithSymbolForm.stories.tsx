@@ -42,6 +42,7 @@ Default.args = {
     containerStyle: defaultStyles.iouAmountTextInputContainer,
     footer: (
         <Button
+            sentryLabel="NumberWithSymbolForm.stories-Alert"
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             size={CONST.BUTTON_SIZE.LARGE}
             onPress={() => {

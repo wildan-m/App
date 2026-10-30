@@ -42,6 +42,7 @@ function Confirmation({onNext}: ConfirmationProps) {
             />
             <FixedFooter style={[styles.mtAuto]}>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION.NEXT}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     onPress={onNext}

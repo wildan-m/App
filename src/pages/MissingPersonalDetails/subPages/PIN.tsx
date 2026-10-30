@@ -111,7 +111,10 @@ function PIN({onNext}: CustomSubPageProps) {
                 </View>
 
                 <View style={[styles.flexRow, styles.justifyContentCenter, styles.mv4, styles.alignItemsCenter, styles.w100]}>
-                    <Button onPress={togglePINVisibility}>
+                    <Button
+                        sentryLabel={CONST.SENTRY_LABEL.PIN.TOGGLE_PIN_VISIBILITY}
+                        onPress={togglePINVisibility}
+                    >
                         <Button.Icon src={isPINHidden ? icons.Eye : icons.EyeDisabled} />
                         <Button.Text>{isPINHidden ? translate('cardPage.revealPin') : translate('cardPage.hidePin')}</Button.Text>
                     </Button>

@@ -56,6 +56,7 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
         <View>
             {pan?.length > 0 && (
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.CARD_DETAILS.CARD_NUMBER}
                     description={translate('cardPage.cardDetails.cardNumber')}
                     title={pan}
                     interactive={false}
@@ -65,7 +66,7 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
                 />
             )}
             {!!limitType && (
-                <MenuItem.Root>
+                <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.CARD_DETAILS.LIMIT_TYPE}>
                     <MenuItemField.Row
                         name={translate('workspace.card.issueNewCard.limitType')}
                         value={translate(getTranslationKeyForLimitType(limitType))}
@@ -75,6 +76,7 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
             )}
             {expiration?.length > 0 && (
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.CARD_DETAILS.EXPIRATION}
                     description={translate('cardPage.cardDetails.expiration')}
                     title={expiration}
                     interactive={false}
@@ -84,6 +86,7 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
             )}
             {cvv?.length > 0 && (
                 <MenuItemWithTopDescription
+                    sentryLabel={CONST.SENTRY_LABEL.CARD_DETAILS.CVV}
                     description={translate('cardPage.cardDetails.cvv')}
                     title={cvv}
                     interactive={false}
@@ -94,6 +97,7 @@ function CardDetails({pan = '', expiration = '', cvv = '', onUpdateAddressPress,
             {pan?.length > 0 && (
                 <>
                     <MenuItemWithTopDescription
+                        sentryLabel={CONST.SENTRY_LABEL.CARD_DETAILS.ADDRESS}
                         description={translate('cardPage.cardDetails.address')}
                         title={getFormattedAddress(privatePersonalDetails ?? defaultPrivatePersonalDetails)}
                         interactive={false}

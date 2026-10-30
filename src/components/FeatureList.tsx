@@ -109,6 +109,7 @@ function FeatureList({
                             style={styles.w100}
                         >
                             <MenuItem
+                                sentryLabel={CONST.SENTRY_LABEL.FEATURE_LIST.MENU_ITEM}
                                 title={translate(translationKey)}
                                 icon={icon}
                                 iconWidth={variables.menuIconSize}

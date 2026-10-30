@@ -52,7 +52,7 @@ function TrainTripDetails({reservation, personalDetails}: TrainTripDetailsProps)
                 value={startDate.date}
             />
 
-            <MenuItem.Root>
+            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.TRAIN_TRIP_DETAILS.DEPARTS}>
                 <MenuItem.Row>
                     <MenuItemField.Content name={translate('travel.trainDetails.departs')}>
                         <Text style={[styles.textLarge, styles.textHeadlineH2]}>{startDate.hour}</Text>
@@ -65,7 +65,7 @@ function TrainTripDetails({reservation, personalDetails}: TrainTripDetailsProps)
                 message={formatTransitLocationLabel(reservation.start)}
                 style={[styles.mtn2, styles.mb0, styles.ph5, styles.pb3]}
             />
-            <MenuItem.Root>
+            <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.TRAIN_TRIP_DETAILS.ARRIVES}>
                 <MenuItem.Row>
                     <MenuItemField.Content name={translate('travel.trainDetails.arrives')}>
                         <Text style={[styles.textLarge, styles.textHeadlineH2]}>{endDate.hour}</Text>
@@ -107,7 +107,10 @@ function TrainTripDetails({reservation, personalDetails}: TrainTripDetailsProps)
             )}
 
             {!!displayName && (
-                <MenuItem.Root accessibilityLabel={`${translate('travel.trainDetails.passenger')} ${displayName}`}>
+                <MenuItem.Root
+                    sentryLabel={CONST.SENTRY_LABEL.TRAIN_TRIP_DETAILS.PASSENGER}
+                    accessibilityLabel={`${translate('travel.trainDetails.passenger')} ${displayName}`}
+                >
                     <MenuItem.Row>
                         <MenuItemField.Content name={translate('travel.trainDetails.passenger')}>
                             <UserPills

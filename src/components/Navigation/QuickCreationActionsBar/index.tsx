@@ -122,6 +122,7 @@ function QuickCreationActionsBar() {
     return (
         <View style={[styles.flexRow, styles.gap2, styles.pt1, styles.pb5]}>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.QUICK_CREATION_ACTIONS_BAR.EXPENSE}
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={handleExpense}
                 style={styles.quickCreationActionsBarButton}
@@ -132,6 +133,7 @@ function QuickCreationActionsBar() {
                 <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('common.expense')}</Button.Text>
             </Button>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.QUICK_CREATION_ACTIONS_BAR.REPORT}
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={createReport}
                 isDisabled={!isCreateReportReady}
@@ -143,6 +145,7 @@ function QuickCreationActionsBar() {
                 <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('common.report')}</Button.Text>
             </Button>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.QUICK_CREATION_ACTIONS_BAR.DISTANCE}
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={handleDistance}
                 style={styles.quickCreationActionsBarButton}
@@ -154,6 +157,7 @@ function QuickCreationActionsBar() {
             </Button>
             {shouldShowBookTravel && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.QUICK_CREATION_ACTIONS_BAR.TRAVEL}
                     size={CONST.BUTTON_SIZE.SMALL}
                     onPress={handleBookTravel}
                     style={styles.quickCreationActionsBarButton}

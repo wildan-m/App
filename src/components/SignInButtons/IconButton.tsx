@@ -42,6 +42,7 @@ function IconButton({onPress = () => {}, provider}: IconButtonProps) {
 
     return (
         <PressableWithoutFeedback
+            sentryLabel={CONST.SENTRY_LABEL.ICON_BUTTON.PRESSABLE}
             onPress={onPress}
             style={styles.signInIconButton}
             role={CONST.ROLE.BUTTON}

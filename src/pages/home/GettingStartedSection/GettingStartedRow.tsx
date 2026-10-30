@@ -67,6 +67,7 @@ function GettingStartedRow({item}: GettingStartedRowProps) {
                         />
                     ) : (
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.GETTING_STARTED_ROW.NAVIGATE_TO_ITEM}
                             size={CONST.BUTTON_SIZE.SMALL}
                             variant="success"
                             onPress={navigateToItem}

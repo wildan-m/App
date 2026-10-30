@@ -120,6 +120,7 @@ function SageIntacctUserDimensionsPage({policy}: WithPolicyProps) {
                 addBottomSafeAreaPadding
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SAGE_INTACCT_USER_DIMENSIONS_PAGE.ADD_USER_DEFINED_DIMENSION}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={addUserDefinedDimension}
                     size={CONST.BUTTON_SIZE.LARGE}

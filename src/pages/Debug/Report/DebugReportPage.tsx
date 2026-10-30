@@ -219,13 +219,17 @@ function DebugReportPage({
                         </View>
                         {!!message && <Text style={styles.textSupporting}>{message}</Text>}
                         {!!action && (
-                            <Button onPress={action.callback}>
+                            <Button
+                                sentryLabel={CONST.SENTRY_LABEL.DEBUG_REPORT_PAGE.BUTTON}
+                                onPress={action.callback}
+                            >
                                 <Button.Text>{action.name}</Button.Text>
                             </Button>
                         )}
                     </View>
                 ))}
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.DEBUG_REPORT_PAGE.NAVIGATE}
                     onPress={() => {
                         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
                     }}
@@ -235,6 +239,7 @@ function DebugReportPage({
                 </Button>
                 {!!transactionID && (
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.DEBUG_REPORT_PAGE.NAVIGATE}
                         onPress={() => {
                             Navigation.navigate(ROUTES.DEBUG_TRANSACTION.getRoute(transactionID));
                         }}

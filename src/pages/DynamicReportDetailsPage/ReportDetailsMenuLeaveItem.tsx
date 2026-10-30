@@ -100,6 +100,7 @@ function ReportDetailsMenuLeaveItem({reportID}: ReportDetailsMenuLeaveItemProps)
 
     return (
         <MenuItem
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_MENU_LEAVE_ITEM.LEAVE}
             title={translate('common.leave')}
             icon={expensifyIcons.Exit}
             onPress={() => {

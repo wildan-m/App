@@ -22,6 +22,7 @@ function FocusableMenuItem({shouldSyncFocus = true, ...props}: FocusableMenuItem
 
     return (
         <MenuItem
+            sentryLabel={props.sentryLabel}
             {...props}
             ref={ref}
         />

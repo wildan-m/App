@@ -98,6 +98,7 @@ function ReportDetailsDeleteAction({reportID, caseID, requestData}: ReportDetail
 
     return (
         <MenuItemAction
+            sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_DELETE_ACTION.MENU_ITEM}
             key={CONST.REPORT_DETAILS_MENU_ITEM.DELETE}
             icon={shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan}
             title={deleteMenuItemTitle}

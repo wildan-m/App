@@ -110,6 +110,7 @@ function CertiniaPrerequisitesStep({onNext, currentPageName, onConnect, isSandbo
                 addBottomSafeAreaPadding
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.CERTINIA_PREREQUISITES_STEP.BUTTON}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}
                     style={[styles.w100]}

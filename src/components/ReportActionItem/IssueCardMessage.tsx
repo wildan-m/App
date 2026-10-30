@@ -68,6 +68,7 @@ function IssueCardMessage({action, policyID}: IssueCardMessageProps) {
             />
             {shouldShowAddMissingDetailsButton && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.ISSUE_CARD_MESSAGE.NAVIGATE}
                     onPress={() => {
                         Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.MISSING_PERSONAL_DETAILS.getRoute(String(expensifyCard.cardID))));
                     }}
@@ -79,6 +80,7 @@ function IssueCardMessage({action, policyID}: IssueCardMessageProps) {
             )}
             {shouldShowActivateButton && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.ISSUE_CARD_MESSAGE.ACTIVATE_CARD}
                     onPress={() => {
                         if (!expensifyCard?.cardID) {
                             return;

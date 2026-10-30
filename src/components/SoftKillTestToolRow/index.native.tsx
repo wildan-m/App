@@ -13,6 +13,7 @@ export default function SoftKillTestToolRow() {
     return (
         <TestToolRow title={translate('initialSettingsPage.troubleshoot.softKillTheApp')}>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.SOFT_KILL_TEST_TOOL_ROW.SOFT_KILL_APP}
                 size={CONST.BUTTON_SIZE.SMALL}
                 onPress={() => NativeModules.TestToolsBridge.softKillApp()}
             >

@@ -58,6 +58,7 @@ function CompanyOwnersListUBO({isAnyoneElseUBO, isUserUBO, handleUBOsConfirmatio
 
             return (
                 <MenuItemAvatarNavigation
+                    sentryLabel={CONST.SENTRY_LABEL.COMPANY_OWNERS_LIST_UBO.UBO_EDIT}
                     key={ownerKey}
                     title={`${beneficialOwnerData.firstName} ${beneficialOwnerData.lastName}`}
                     description={`${beneficialOwnerData.street}, ${beneficialOwnerData.city}, ${beneficialOwnerData.state} ${beneficialOwnerData.zipCode}`}
@@ -79,7 +80,7 @@ function CompanyOwnersListUBO({isAnyoneElseUBO, isUserUBO, handleUBOsConfirmatio
             <View>
                 <Text style={[styles.textSupporting, styles.pv1, styles.ph5]}>{`${translate('beneficialOwnerInfoStep.owners')}:`}</Text>
                 {isUserUBO && (
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.COMPANY_OWNERS_LIST_UBO.MENU_ITEM}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <UserAvatar accountID={CONST.DEFAULT_NUMBER_ID} />

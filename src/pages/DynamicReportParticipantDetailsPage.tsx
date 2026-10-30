@@ -116,6 +116,7 @@ function DynamicReportParticipantDetails({report, route}: DynamicReportParticipa
                     )}
                     {isCurrentUserAdmin && (
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REPORT_PARTICIPANT_DETAILS.ASK_FOR_CONFIRMATION_TO_REMOVE}
                             onPress={askForConfirmationToRemove}
                             isDisabled={isSelectedMemberCurrentUser}
                             style={styles.mv5}
@@ -140,6 +141,7 @@ function DynamicReportParticipantDetails({report, route}: DynamicReportParticipa
                         </OfflineWithFeedback>
                     )}
                     <MenuItemNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_REPORT_PARTICIPANT_DETAILS.PROFILE}
                         title={translate('common.profile')}
                         icon={icons.Info}
                         onPress={navigateToProfile}

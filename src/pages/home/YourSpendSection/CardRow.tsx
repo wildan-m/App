@@ -83,6 +83,7 @@ function CardRow({cardRow, wrapperStyle}: CardRowProps) {
             onMouseLeave={onMouseLeave}
         >
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.CARD_ROW.NAVIGATE}
                 description={cardRow.lastFour}
                 title={cardTotal}
                 titleStyle={styles.textBold}

@@ -93,6 +93,7 @@ function VerifyIdentity() {
                             </View>
                             <FixedFooter>
                                 <FormAlertWithSubmitButton
+                                    sentryLabel={CONST.SENTRY_LABEL.VERIFY_IDENTITY.SUBMIT}
                                     isAlertVisible={!!onfidoError}
                                     onSubmit={openOnfidoFlow}
                                     message={onfidoError}

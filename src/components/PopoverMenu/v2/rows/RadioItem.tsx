@@ -48,6 +48,7 @@ function RadioItem({text, isSelected = false, onSelect, disabled = false, pendin
     return (
         <OfflineWithFeedback pendingAction={pendingAction}>
             <MenuItem
+                sentryLabel={rest.sentryLabel}
                 {...rest}
                 ref={ref}
                 title={text}

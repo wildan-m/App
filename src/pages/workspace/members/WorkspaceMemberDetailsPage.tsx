@@ -432,6 +432,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                 )
                             ) : (
                                 <Button
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.REMOVE_WORKSPACE_MEMBER_BUTTON_TITLE}
                                     onPress={isAccountLocked ? showLockedAccountModal : askForConfirmationToRemove}
                                     isDisabled={!canRemoveSelectedMember}
                                     style={styles.mb5}
@@ -449,6 +450,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                 <MenuItem.Copy value={memberLoginToCopy} />
                             </MenuItemField>
                             <MenuItemWithTopDescription
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.ROLE}
                                 disabled={!canEditSelectedMemberRole}
                                 title={translate(`workspace.common.roleName`, member?.role)}
                                 interactive={canEditSelectedMemberRole}
@@ -474,6 +476,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             {isApprovalsEnabled && !shouldHideApprovalWorkflows && (
                                 <OfflineWithFeedback pendingAction={approverPendingActionByMemberEmail[memberLogin]}>
                                     <MenuItem.Root
+                                        sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.MENU_ITEM}
                                         onPress={shouldAllowApproverEdit ? openMemberApprovalWorkflow : undefined}
                                         testID="member-approver-menu-item"
                                     >
@@ -513,6 +516,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             )}
                             {policy?.commuterExclusions?.method === CONST.POLICY.COMMUTER_EXCLUSION_METHOD.HOME_AND_OFFICE && isWorkArrangementBetaEnabled && (
                                 <MenuItemWithTopDescription
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.WORK_ARRANGEMENT}
                                     disabled={!canWriteMembers}
                                     title={getWorkArrangementLabel(translate, memberWorkArrangement)}
                                     interactive={canWriteMembers}
@@ -546,6 +550,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             )}
                             <View style={styles.mb5}>
                                 <MenuItemNavigation
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.PROFILE}
                                     title={translate('common.profile')}
                                     icon={icons.Info}
                                     onPress={navigateToProfile}
@@ -574,6 +579,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                                 pendingAction={memberCard.pendingAction}
                                             >
                                                 <MenuItem
+                                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.NAVIGATE_TO_DETAILS}
                                                     key={memberCard.cardID}
                                                     pressableTestID={`card-${memberCard.cardID}`}
                                                     title={cardTitle ?? customCardNames?.[memberCard.cardID] ?? maskCardNumber(memberCard?.cardName ?? '', memberCard.bank)}
@@ -608,7 +614,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                             {translate('common.bankAccount')}
                                         </Text>
                                     </View>
-                                    <MenuItem.Root>
+                                    <MenuItem.Root sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_MEMBER_DETAILS_PAGE.MENU_ITEM}>
                                         <MenuItem.Row>
                                             <MenuItem.Leading>
                                                 <Icon

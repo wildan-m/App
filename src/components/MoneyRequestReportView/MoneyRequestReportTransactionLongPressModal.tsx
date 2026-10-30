@@ -53,6 +53,7 @@ function MoneyRequestReportTransactionLongPressModal({isMobileSelectionModeEnabl
         >
             <View style={bottomSafeAreaPaddingStyle}>
                 <MenuItemAction
+                    sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_REPORT_TRANSACTION_LONG_PRESS_MODAL.SELECT}
                     title={translate('common.select')}
                     icon={expensifyIcons.CheckSquare}
                     onPress={() => {

@@ -48,6 +48,7 @@ function CardSectionDataEmpty() {
                 <Text style={styles.forYouEmptyStateDescription}>{translate('subscription.cardSection.subtitle')}</Text>
             </View>
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.CARD_SECTION_DATA_EMPTY.ADD_PAYMENT_CARD_PRESS}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 onPress={handleAddPaymentCardPress}
             >

@@ -165,6 +165,7 @@ function FieldsValueSettingsPage({policy, policyID, valueIndex, reportFieldID, i
                     />
                     {canWrite && !isImportedReportField && (
                         <MenuItemAction
+                            sentryLabel={CONST.SENTRY_LABEL.FIELDS_VALUE_SETTINGS_PAGE.DELETE}
                             icon={icons.Trashcan}
                             title={translate('common.delete')}
                             onPress={showDeleteModal}

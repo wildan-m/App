@@ -107,6 +107,7 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
                 />
                 <FixedFooter>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.MOVE_USER_BETWEEN_GROUPS_PAGE.MOVE_TO_SELECTED_GROUP}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={moveToSelectedGroup}

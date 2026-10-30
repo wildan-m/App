@@ -98,6 +98,7 @@ function SupportTicketView({report, action}: SupportTicketViewProps) {
                 </View>
                 {!!report?.managerID && (
                     <MenuItem
+                        sentryLabel={CONST.SENTRY_LABEL.SUPPORT_TICKET_VIEW.ASSIGNEE}
                         label={translate('task.assignee')}
                         accessibilityLabel={`${translate('task.assignee')}, ${assigneeDisplayName}`}
                         titleComponent={

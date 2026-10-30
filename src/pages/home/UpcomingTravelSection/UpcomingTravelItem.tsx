@@ -111,6 +111,7 @@ function UpcomingTravelItem({reservation: upcomingReservation}: UpcomingTravelIt
 
     return (
         <MenuItemWithTopDescription
+            sentryLabel={CONST.SENTRY_LABEL.UPCOMING_TRAVEL_ITEM.PRESS}
             description={formatCancelledDescription(translate('iou.canceled'), subtitle, isCancelled)}
             title={title}
             titleStyle={isCancelled ? [styles.textBold, styles.textSupporting] : styles.textBold}

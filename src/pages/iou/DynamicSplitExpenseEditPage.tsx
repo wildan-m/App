@@ -372,6 +372,7 @@ function DynamicSplitExpenseEditPage({route}: DynamicSplitExpenseEditPageProps) 
                 }}
             />
             <MenuItem.Root
+                sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_SPLIT_EXPENSE_EDIT_PAGE.RATE}
                 onPress={
                     isRateInteractive
                         ? callFunctionIfActionIsAllowed(
@@ -448,6 +449,7 @@ function DynamicSplitExpenseEditPage({route}: DynamicSplitExpenseEditPageProps) 
                     />
                     <ScrollView>
                         <MenuItemWithTopDescription
+                            sentryLabel={CONST.SENTRY_LABEL.DYNAMIC_SPLIT_EXPENSE_EDIT_PAGE.COMMON}
                             shouldShowRightIcon
                             shouldRenderAsHTML
                             key={translate('common.description')}

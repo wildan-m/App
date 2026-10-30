@@ -41,6 +41,7 @@ function AvatarPageFooter({validationError, phraseParam = {}, isDirty, onSave}: 
                 />
             )}
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.AVATAR_PAGE_FOOTER.SAVE}
                 size={CONST.BUTTON_SIZE.LARGE}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 isDisabled={!isDirty}

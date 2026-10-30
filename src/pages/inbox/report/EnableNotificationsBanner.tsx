@@ -46,6 +46,7 @@ function EnableNotificationsBanner() {
                 containerStyles={[styles.pt3, styles.pr3, styles.pl4, containerOverrideStyle]}
             >
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.ENABLE_NOTIFICATIONS_BANNER.REQUEST_AND_DISMISS}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.SMALL}
                     onPress={requestAndDismiss}
@@ -53,6 +54,7 @@ function EnableNotificationsBanner() {
                     <Button.Text>{translate('concierge.enableNotifications.cta')}</Button.Text>
                 </Button>
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.ENABLE_NOTIFICATIONS_BANNER.DISMISS_FOR_SESSION}
                     size={CONST.BUTTON_SIZE.SMALL}
                     style={[styles.ml2]}
                     onPress={dismissForSession}

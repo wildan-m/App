@@ -142,6 +142,7 @@ function FieldsSettingsPage({
                     {canWrite && !isImportedReportField && (
                         <View style={styles.flexGrow1}>
                             <MenuItemAction
+                                sentryLabel={CONST.SENTRY_LABEL.FIELDS_SETTINGS_PAGE.DELETE}
                                 icon={icons.Trashcan}
                                 title={translate('common.delete')}
                                 onPress={showDeleteModal}

@@ -23,6 +23,7 @@ function ReviewingRequest() {
             subtitle={translate('workspace.moreFeatures.travel.reviewingRequest.subtitle')}
             footer={
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.REVIEWING_REQUEST.CTA_TEXT}
                     style={[styles.w100]}
                     isDisabled
                     size={CONST.BUTTON_SIZE.LARGE}

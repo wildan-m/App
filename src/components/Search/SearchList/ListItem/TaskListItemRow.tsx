@@ -116,6 +116,7 @@ function ActionCell({taskItem, isLargeScreenWidth}: TaskCellProps) {
 
     return (
         <Button
+            sentryLabel={CONST.SENTRY_LABEL.ACTION_CELL.ACTION}
             size={CONST.BUTTON_SIZE.SMALL}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             style={[styles.w100]}

@@ -142,6 +142,7 @@ function SearchActionsBarCreateButton() {
                 enableEdgeToEdgeBottomSafeAreaPadding
             />
             <Button
+                sentryLabel={CONST.SENTRY_LABEL.SEARCH_ACTIONS_BAR_CREATE_BUTTON.SHOW_CREATE_MENU}
                 ref={createButtonRef}
                 variant={CONST.BUTTON_VARIANT.SUCCESS}
                 size={CONST.BUTTON_SIZE.SMALL}

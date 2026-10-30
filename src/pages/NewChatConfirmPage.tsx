@@ -115,6 +115,7 @@ function AvatarAndGroupNameSection({setAvatarFile, optimisticReportID}: AvatarAn
                 />
             </View>
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.AVATAR_AND_GROUP_NAME_SECTION.GROUP_NAME}
                 title={groupName}
                 onPress={navigateToEditChatName}
                 shouldShowRightIcon

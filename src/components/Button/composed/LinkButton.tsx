@@ -74,6 +74,7 @@ function LinkButtonComponent({innerStyles = [], children, ...rest}: LinkButtonPr
     const styles = useThemeStyles();
     return (
         <Button
+            sentryLabel={rest.sentryLabel}
             {...rest}
             innerStyles={[innerStyles, styles.bgTransparent]}
             hoverStyles={styles.bgTransparent}

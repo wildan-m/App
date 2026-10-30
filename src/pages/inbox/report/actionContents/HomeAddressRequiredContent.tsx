@@ -47,6 +47,7 @@ function HomeAddressRequiredContent({action}: HomeAddressRequiredContentProps) {
             {!isResolved && (
                 <ActionableItemButtons layout="horizontal">
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.HOME_ADDRESS_REQUIRED_CONTENT.OPEN_PRIVATE_PERSONAL_DETAILS_PAGE}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                         onPress={() => openPrivatePersonalDetailsPage(INPUT_IDS.ADDRESS_LINE_1)}
                     >

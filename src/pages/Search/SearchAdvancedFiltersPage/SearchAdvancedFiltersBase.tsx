@@ -103,6 +103,7 @@ function SearchAdvancedFiltersBase() {
             <View style={[isInLandscapeMode ? [styles.flexRow, styles.gap2] : [styles.gap3], styles.ph5, styles.pb5]}>
                 {shouldShowResetFilters && (
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.SEARCH_ADVANCED_FILTERS_BASE.RESET_FILTERS}
                         style={[isInLandscapeMode ? styles.flex1 : undefined]}
                         size={CONST.BUTTON_SIZE.LARGE}
                         onPress={resetFilters}
@@ -111,6 +112,7 @@ function SearchAdvancedFiltersBase() {
                     </Button>
                 )}
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SEARCH_ADVANCED_FILTERS_BASE.APPLY_FILTERS}
                     style={[isInLandscapeMode ? styles.flex1 : undefined]}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     size={CONST.BUTTON_SIZE.LARGE}

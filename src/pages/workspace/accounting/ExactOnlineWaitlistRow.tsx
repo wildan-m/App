@@ -52,6 +52,7 @@ function ExactOnlineWaitlistRow({policy, style, titleWrapperStyle, isBadgeConden
             errorRowStyles={[style, styles.pb3]}
         >
             <MenuItem.Root
+                sentryLabel={CONST.SENTRY_LABEL.EXACT_ONLINE_WAITLIST_ROW.MENU_ITEM}
                 accessibilityLabel={accessibilityLabel}
                 // On iOS, disable row grouping so VoiceOver can focus the nested waitlist button.
                 shouldBeAccessible={getPlatform() !== CONST.PLATFORM.IOS}

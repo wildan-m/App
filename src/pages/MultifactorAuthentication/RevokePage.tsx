@@ -238,6 +238,7 @@ function MultifactorAuthenticationRevokePage() {
                 <View style={[styles.flexRow, styles.m5, styles.mt0]}>
                     {hasDevices ? (
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.MULTIFACTOR_AUTHENTICATION_REVOKE_PAGE.PROMPT_REVOKE}
                             size={CONST.BUTTON_SIZE.LARGE}
                             variant={CONST.BUTTON_VARIANT.DANGER}
                             style={styles.flex1}
@@ -248,6 +249,7 @@ function MultifactorAuthenticationRevokePage() {
                         </Button>
                     ) : (
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.MULTIFACTOR_AUTHENTICATION_REVOKE_PAGE.GO_BACK_PRESS}
                             size={CONST.BUTTON_SIZE.LARGE}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             style={styles.flex1}

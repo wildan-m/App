@@ -68,6 +68,7 @@ function SupportTicketResolvedFooter({reportID, isOffline, shouldShowReopenButto
         >
             {shouldShowReopenButton && (
                 <Button
+                    sentryLabel={CONST.SENTRY_LABEL.SUPPORT_TICKET_RESOLVED_FOOTER.REOPEN_TICKET}
                     size={CONST.BUTTON_SIZE.MEDIUM}
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     isDisabled={isOffline}

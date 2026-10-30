@@ -77,6 +77,7 @@ function SelectionDropdown({
 
     return (
         <ButtonWithDropdownMenu
+            sentryLabel={CONST.SENTRY_LABEL.SELECTION_DROPDOWN.SELECTED}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             onPress={() => null}
             options={selectedTransactionsOptions}

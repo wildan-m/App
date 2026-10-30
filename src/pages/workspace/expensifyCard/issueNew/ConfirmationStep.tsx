@@ -227,6 +227,7 @@ function ConfirmationStep({policyID, stepNames, startStepIndex}: ConfirmationSte
                 />
                 <View style={[styles.mh5, styles.pb5, styles.mt3, styles.flexGrow1, styles.justifyContentEnd]}>
                     <FormAlertWithSubmitButton
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.ISSUE_CARD}
                         buttonRef={submitButton}
                         message={errorMessage}
                         isAlertVisible={!!errorMessage}

@@ -445,6 +445,7 @@ function MapViewImpl({
             {interactive && (
                 <View style={[styles.pAbsolute, styles.p5, styles.t0, styles.r0, styles.zIndex1]}>
                     <Button
+                        sentryLabel={CONST.SENTRY_LABEL.MAP_VIEW_IMPL.CENTER}
                         onPress={centerMap}
                         accessibilityLabel={translate('common.center')}
                     >

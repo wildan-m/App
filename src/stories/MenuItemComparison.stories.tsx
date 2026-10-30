@@ -161,6 +161,7 @@ function Comparison() {
                 title="description, numberOfLinesTitle, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-MenuItem"
                         description="Cancellation"
                         title="Free until 24 hours before pickup, then the daily rate is charged"
                         numberOfLinesTitle={2}
@@ -168,7 +169,7 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Cancellation</MenuItem.FieldName>
@@ -190,6 +191,7 @@ function Comparison() {
                 title="description, numberOfLinesTitle, onPress, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="List values"
                         title="Engineering, Design, Product, Marketing, Sales, Support, Finance"
                         numberOfLinesTitle={5}
@@ -198,7 +200,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>List values</MenuItem.FieldName>
@@ -224,6 +229,7 @@ function Comparison() {
                 title="description, numberOfLinesTitle={0}, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-MenuItem"
                         description="Invite message"
                         title="Hello! You have been invited to join the workspace. Take a look around and add your first expense."
                         numberOfLinesTitle={0}
@@ -231,7 +237,7 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Invite message</MenuItem.FieldName>
@@ -255,6 +261,7 @@ function Comparison() {
                 title="description, style, titleStyle, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Tax amount"
                         title="$4.20"
                         style={[styles.moneyRequestMenuItem]}
@@ -264,7 +271,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Tax amount</MenuItem.FieldName>
@@ -290,6 +300,7 @@ function Comparison() {
                 legacy={
                     <Section title="Share">
                         <MenuItem
+                            sentryLabel="Comparison-Noop"
                             title="Download"
                             icon={icons.Download}
                             onPress={noop}
@@ -322,6 +333,7 @@ function Comparison() {
                 title="copyable, copyValue, description, interactive, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-MenuItem"
                         description="Email"
                         title="john@example.com"
                         copyValue="john@example.com"
@@ -330,7 +342,7 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Email</MenuItem.FieldName>
@@ -356,6 +368,7 @@ function Comparison() {
                 title="copyable, description, icon, interactive, title"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-MenuItem"
                         title="CONF-12345"
                         description="Confirmation"
                         icon={icons.Gear}
@@ -364,7 +377,7 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -385,6 +398,7 @@ function Comparison() {
                 title="icon, iconRight, onPress, onSecondaryInteraction, role, shouldBlockSelection, shouldShowContextMenuHint, shouldShowRightIcon, title"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         ref={popoverAnchor}
                         title="Android"
                         icon={icons.Gear}
@@ -405,7 +419,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -427,13 +444,17 @@ function Comparison() {
                 title="description, onPress, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Sort by"
                         title="Date"
                         onPress={noop}
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Sort by</MenuItem.FieldName>
@@ -448,6 +469,7 @@ function Comparison() {
                 title="description, interactive, onPress, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Name"
                         title="Standard rate"
                         interactive
@@ -456,7 +478,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Name</MenuItem.FieldName>
@@ -481,6 +506,7 @@ function Comparison() {
                 title="brickRoadIndicator, description, onPress, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Export as"
                         title="Vendor bill"
                         shouldShowRightIcon
@@ -489,7 +515,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Export as</MenuItem.FieldName>
@@ -517,6 +546,7 @@ function Comparison() {
                 title="brickRoadIndicator, description, errorText, onPress, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Country"
                         title="United States"
                         shouldShowRightIcon
@@ -526,7 +556,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItemField.Row
                             name="Country"
                             value="United States"
@@ -546,6 +579,7 @@ function Comparison() {
                 title="description, hintText, non-interactive, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-MenuItem"
                         description="Limit type"
                         title="Smart limit"
                         interactive={false}
@@ -553,7 +587,7 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItemField.Row
                             name="Limit type"
                             value="Smart limit"
@@ -567,6 +601,7 @@ function Comparison() {
                 title="description, errorText, hintText, onPress, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Limit type"
                         title="Smart limit"
                         shouldShowRightIcon
@@ -576,7 +611,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItemField.Row
                             name="Limit type"
                             value="Smart limit"
@@ -596,13 +634,14 @@ function Comparison() {
                 title="description, non-interactive, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-MenuItem"
                         description="Country"
                         title="United States"
                         interactive={false}
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>Country</MenuItem.FieldName>
@@ -648,6 +687,7 @@ function Comparison() {
                 title="description, disabled, onPress, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Role"
                         title="Admin"
                         disabled
@@ -656,6 +696,7 @@ function Comparison() {
                 }
                 composable={
                     <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
                         onPress={noop}
                         isDisabled
                     >
@@ -673,6 +714,7 @@ function Comparison() {
                 title="description, interactive, onPress, pressableTestID, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Member"
                         title="John Doe"
                         interactive
@@ -683,6 +725,7 @@ function Comparison() {
                 }
                 composable={
                     <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
                         onPress={noop}
                         testID="menuItemComparisonStoryPressable"
                     >
@@ -711,6 +754,7 @@ function Comparison() {
                 title="description, disabled, interactive, key, onPress, pressableTestID, shouldShowRightIcon, title"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="Bank account"
                         title="Chase ••••1234"
                         interactive
@@ -722,6 +766,7 @@ function Comparison() {
                 }
                 composable={
                     <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
                         onPress={noop}
                         isDisabled
                         testID="menuItemComparisonStoryPressableWide"
@@ -754,6 +799,7 @@ function Comparison() {
                     <>
                         <Variant label="no title">
                             <MenuItemWithTopDescription
+                                sentryLabel="Comparison-Noop"
                                 description="Share somewhere"
                                 rightLabel="Required"
                                 shouldShowRightIcon
@@ -762,6 +808,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="title present">
                             <MenuItemWithTopDescription
+                                sentryLabel="Comparison-Noop"
                                 description="Share somewhere"
                                 title="#announce"
                                 rightLabel="Required"
@@ -774,7 +821,10 @@ function Comparison() {
                 composable={
                     <>
                         <Variant label="no value">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Content>
                                         <MenuItem.FieldNamePlaceholder>Share somewhere</MenuItem.FieldNamePlaceholder>
@@ -787,7 +837,10 @@ function Comparison() {
                             </MenuItem.Root>
                         </Variant>
                         <Variant label="value present">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Content>
                                         <MenuItem.FieldName>Share somewhere</MenuItem.FieldName>
@@ -826,13 +879,17 @@ function Comparison() {
                 title="title, onPress — value with no field name"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         title="Account ending in 1234"
                         shouldShowRightIcon
                         onPress={noop}
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldValue>Account ending in 1234</MenuItem.FieldValue>
@@ -849,6 +906,7 @@ function Comparison() {
                 title="description, title — long text truncation"
                 legacy={
                     <MenuItemWithTopDescription
+                        sentryLabel="Comparison-Noop"
                         description="A field name long enough to need a second line before it truncates"
                         title="A value long enough that it has to truncate on a single line"
                         shouldShowRightIcon
@@ -856,7 +914,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.FieldName>A field name long enough to need a second line before it truncates</MenuItem.FieldName>
@@ -884,6 +945,7 @@ function Comparison() {
                         <>
                             <Variant label="title present">
                                 <MenuItemWithTopDescription
+                                    sentryLabel="Comparison-Noop"
                                     description="Sort by"
                                     title="Date"
                                     shouldShowRightIcon
@@ -892,6 +954,7 @@ function Comparison() {
                             </Variant>
                             <Variant label="title={undefined}">
                                 <MenuItemWithTopDescription
+                                    sentryLabel="Comparison-Noop"
                                     description="Group by"
                                     shouldShowRightIcon
                                     onPress={noop}
@@ -902,7 +965,10 @@ function Comparison() {
                     composable={
                         <>
                             <Variant label="value present">
-                                <MenuItem.Root onPress={noop}>
+                                <MenuItem.Root
+                                    sentryLabel="Comparison-Noop"
+                                    onPress={noop}
+                                >
                                     <MenuItem.Row>
                                         <MenuItem.Content>
                                             <MenuItem.FieldName>Sort by</MenuItem.FieldName>
@@ -915,7 +981,10 @@ function Comparison() {
                                 </MenuItem.Root>
                             </Variant>
                             <Variant label="no value">
-                                <MenuItem.Root onPress={noop}>
+                                <MenuItem.Root
+                                    sentryLabel="Comparison-Noop"
+                                    onPress={noop}
+                                >
                                     <MenuItem.Row>
                                         <MenuItem.Content>
                                             <MenuItem.FieldNamePlaceholder>Group by</MenuItem.FieldNamePlaceholder>
@@ -954,6 +1023,7 @@ function Comparison() {
                 title="Avatar + label + tooltip title + description + chevron"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         label="Assignee"
                         avatarID={STORY_ACCOUNT_ID}
                         iconType={CONST.ICON_TYPE_AVATAR}
@@ -1001,6 +1071,7 @@ function Comparison() {
                 legacy={
                     <View style={styles.mt1}>
                         <MenuItem
+                            sentryLabel="Comparison-MenuItem"
                             title="John Doe"
                             description="john.doe.with.a.very.long.email.address.for.truncation@example.com"
                             avatarID={STORY_ACCOUNT_ID}
@@ -1013,7 +1084,7 @@ function Comparison() {
                 }
                 composable={
                     <View style={styles.mt1}>
-                        <MenuItem.Root>
+                        <MenuItem.Root sentryLabel="Comparison-MenuItem">
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <UserAvatar
@@ -1035,6 +1106,7 @@ function Comparison() {
                 title="Avatar + title + description + chevron"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="John Doe"
                         description="john@example.com"
                         avatarID={STORY_ACCOUNT_ID}
@@ -1046,7 +1118,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <UserAvatar
@@ -1066,6 +1141,7 @@ function Comparison() {
                 }
                 preset={
                     <MenuItemAvatarNavigation
+                        sentryLabel="Comparison-Noop"
                         title="John Doe"
                         description="john@example.com"
                         avatarSource={icons.FallbackAvatar}
@@ -1081,6 +1157,7 @@ function Comparison() {
                     <>
                         <Variant label="icon={FallbackAvatar} + displayInDefaultIconColor">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
                                 icon={icons.FallbackAvatar}
@@ -1094,6 +1171,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="disabled">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
                                 icon={icons.FallbackAvatar}
@@ -1109,6 +1187,7 @@ function Comparison() {
                     <>
                         <Variant label="no avatarSource (default avatar for accountID)">
                             <MenuItemAvatarNavigation
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
                                 accountID={CONST.DEFAULT_NUMBER_ID}
@@ -1117,6 +1196,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="isDisabled">
                             <MenuItemAvatarNavigation
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
                                 accountID={CONST.DEFAULT_NUMBER_ID}
@@ -1134,6 +1214,7 @@ function Comparison() {
                     <>
                         <Variant label="No title (legacy bumps the font size)">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 description="Vacation delegate"
                                 shouldShowRightIcon
                                 onPress={noop}
@@ -1141,6 +1222,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="With title (supporting-size description)">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="Vacation delegate"
                                 shouldShowRightIcon
@@ -1152,7 +1234,10 @@ function Comparison() {
                 composable={
                     <>
                         <Variant label="variant='placeholder'">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Content>
                                         <MenuItem.FieldNamePlaceholder>Vacation delegate</MenuItem.FieldNamePlaceholder>
@@ -1164,7 +1249,10 @@ function Comparison() {
                             </MenuItem.Root>
                         </Variant>
                         <Variant label="default variant, with a title">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Content>
                                         <MenuItem.Title>John Doe</MenuItem.Title>
@@ -1186,6 +1274,7 @@ function Comparison() {
                     <>
                         <Variant label="DEFAULT (40)">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
@@ -1196,6 +1285,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="SMALL (28)">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
@@ -1207,6 +1297,7 @@ function Comparison() {
                         </Variant>
                         <Variant label="X_SMALL (24)">
                             <MenuItem
+                                sentryLabel="Comparison-Noop"
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
@@ -1221,7 +1312,10 @@ function Comparison() {
                 composable={
                     <>
                         <Variant label="DEFAULT (40)">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
@@ -1237,7 +1331,10 @@ function Comparison() {
                             </MenuItem.Root>
                         </Variant>
                         <Variant label="SMALL (28)">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
@@ -1254,7 +1351,10 @@ function Comparison() {
                             </MenuItem.Root>
                         </Variant>
                         <Variant label="X_SMALL (24)">
-                            <MenuItem.Root onPress={noop}>
+                            <MenuItem.Root
+                                sentryLabel="Comparison-Noop"
+                                onPress={noop}
+                            >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
@@ -1278,6 +1378,7 @@ function Comparison() {
                 title="Workspace avatar + label + title + description"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         avatarID={STORY_POLICY_ID}
                         iconType={CONST.ICON_TYPE_WORKSPACE}
                         title="Expensify Inc"
@@ -1316,6 +1417,7 @@ function Comparison() {
                 title="accountID avatar + tooltip title + description"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         label="Assignee"
                         title="John Doe"
                         description="john@example.com"
@@ -1360,6 +1462,7 @@ function Comparison() {
                 title="reportID avatar + right label"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         label="Share"
                         description="Expensify Inc"
                         iconReportID={STORY_REPORT_ID}
@@ -1396,6 +1499,7 @@ function Comparison() {
                 title="Disabled — greyed out"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         label="Assignee"
                         title="John Doe"
                         description="john@example.com"
@@ -1433,12 +1537,16 @@ function Comparison() {
                 title="Title only"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         onPress={noop}
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1452,13 +1560,17 @@ function Comparison() {
                 title="Icon + title"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         onPress={noop}
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -1471,6 +1583,7 @@ function Comparison() {
                 }
                 preset={
                     <MenuItemAction
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         onPress={noop}
@@ -1482,6 +1595,7 @@ function Comparison() {
                 title="Icon + title + chevron"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         shouldShowRightIcon
@@ -1489,7 +1603,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -1505,6 +1622,7 @@ function Comparison() {
                 }
                 preset={
                     <MenuItemNavigation
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         onPress={noop}
@@ -1516,6 +1634,7 @@ function Comparison() {
                 title="Icon + title + description + chevron"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         description="Manage your preferences"
                         icon={icons.Gear}
@@ -1524,7 +1643,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -1546,6 +1668,7 @@ function Comparison() {
                 note="IOURequestEditReportCommon:312 and WorkspaceCompanyCardsSettingsPage:183. Interactive but with no trailing cell — pressing it acts in place, so composition simply omits Trailing."
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Create report"
                         description="Expensify Inc"
                         icon={icons.Gear}
@@ -1553,7 +1676,10 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -1572,12 +1698,14 @@ function Comparison() {
                 note="RevokePage:191. Legacy needs shouldShowRightComponent + rightComponent + a wrapping View; in composition the button is just a child of MenuItem.Trailing, which already centers it."
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-MenuItem"
                         title="This device"
                         interactive={false}
                         shouldShowRightComponent
                         rightComponent={
                             <View style={styles.justifyContentCenter}>
                                 <Button
+                                    sentryLabel="Comparison-Noop"
                                     variant={CONST.BUTTON_VARIANT.DANGER}
                                     size={CONST.BUTTON_SIZE.SMALL}
                                     onPress={noop}
@@ -1589,13 +1717,14 @@ function Comparison() {
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.Title>This device</MenuItem.Title>
                             </MenuItem.Content>
                             <MenuItem.Trailing>
                                 <Button
+                                    sentryLabel="Comparison-Noop"
                                     variant={CONST.BUTTON_VARIANT.DANGER}
                                     size={CONST.BUTTON_SIZE.SMALL}
                                     onPress={noop}
@@ -1612,13 +1741,17 @@ function Comparison() {
                 title="Title + description (no icon)"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         description="Manage your preferences"
                         onPress={noop}
                     />
                 }
                 composable={
-                    <MenuItem.Root onPress={noop}>
+                    <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
+                        onPress={noop}
+                    >
                         <MenuItem.Row>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1633,13 +1766,14 @@ function Comparison() {
                 title="Non-interactive (no onPress)"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-MenuItem"
                         title="Settings"
                         icon={icons.Gear}
                         interactive={false}
                     />
                 }
                 composable={
-                    <MenuItem.Root>
+                    <MenuItem.Root sentryLabel="Comparison-MenuItem">
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <MenuItem.Icon src={icons.Gear} />
@@ -1656,6 +1790,7 @@ function Comparison() {
                 title="Disabled"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         shouldShowRightIcon
@@ -1665,6 +1800,7 @@ function Comparison() {
                 }
                 composable={
                     <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
                         onPress={noop}
                         isDisabled
                     >
@@ -1683,6 +1819,7 @@ function Comparison() {
                 }
                 preset={
                     <MenuItemNavigation
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         isDisabled
@@ -1695,6 +1832,7 @@ function Comparison() {
                 title="Custom accessibility label"
                 legacy={
                     <MenuItem
+                        sentryLabel="Comparison-Noop"
                         title="Settings"
                         icon={icons.Gear}
                         onPress={noop}
@@ -1702,6 +1840,7 @@ function Comparison() {
                 }
                 composable={
                     <MenuItem.Root
+                        sentryLabel="Comparison-Noop"
                         onPress={noop}
                         accessibilityLabel="Settings"
                     >
@@ -1717,6 +1856,7 @@ function Comparison() {
                 }
                 preset={
                     <MenuItemAction
+                        sentryLabel="Comparison-Noop"
                         title={'Settings'}
                         icon={icons.Gear}
                         onPress={noop}
@@ -1729,6 +1869,7 @@ function Comparison() {
                     title="Compact popover — no description"
                     legacy={
                         <MenuItem
+                            sentryLabel="Comparison-Noop"
                             title="Edit columns"
                             icon={icons.Gear}
                             shouldShowRightIcon
@@ -1736,7 +1877,10 @@ function Comparison() {
                         />
                     }
                     composable={
-                        <MenuItem.Root onPress={noop}>
+                        <MenuItem.Root
+                            sentryLabel="Comparison-Noop"
+                            onPress={noop}
+                        >
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <MenuItem.Icon src={icons.Gear} />
@@ -1752,6 +1896,7 @@ function Comparison() {
                     }
                     preset={
                         <MenuItemNavigation
+                            sentryLabel="Comparison-Noop"
                             title="Edit columns"
                             icon={icons.Gear}
                             onPress={noop}
@@ -1765,6 +1910,7 @@ function Comparison() {
                     title="Compact popover — with description"
                     legacy={
                         <MenuItem
+                            sentryLabel="Comparison-Noop"
                             title="Edit columns"
                             description="Choose what to display"
                             icon={icons.Gear}
@@ -1773,7 +1919,10 @@ function Comparison() {
                         />
                     }
                     composable={
-                        <MenuItem.Root onPress={noop}>
+                        <MenuItem.Root
+                            sentryLabel="Comparison-Noop"
+                            onPress={noop}
+                        >
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <MenuItem.Icon src={icons.Gear} />

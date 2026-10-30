@@ -126,6 +126,7 @@ function DebugTransactionViolationCreatePage({
                         </View>
                         <Text style={[styles.headerText, styles.textAlignCenter]}>{translate('debug.hint')}</Text>
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.DEBUG_TRANSACTION_VIOLATION_CREATE_PAGE.CREATE_TRANSACTION_VIOLATION}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             isDisabled={!draftTransactionViolation || !!error}
                             onPress={createTransactionViolation}

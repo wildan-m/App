@@ -125,6 +125,7 @@ function PersonalCardEditTransactionStartDatePage({route}: PersonalCardEditTrans
                     addBottomSafeAreaPadding
                     footerContent={
                         <Button
+                            sentryLabel={CONST.SENTRY_LABEL.PERSONAL_CARD_EDIT_TRANSACTION_START_DATE_PAGE.SUBMIT}
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             size={CONST.BUTTON_SIZE.LARGE}
                             onPress={submit}

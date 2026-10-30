@@ -189,6 +189,7 @@ function ConfirmationStep({
                     fsClass={forwardedFSClass}
                 >
                     <MenuItemAvatarNavigation
+                        sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.MENU_ITEM}
                         testID={row.id}
                         title={row.title}
                         description={row.description}
@@ -202,6 +203,7 @@ function ConfirmationStep({
         const {id, description, title, shouldShowRightIcon, onPress, interactive, brickRoadIndicator, errorText, testID, accessibilityLabel} = row;
         return (
             <MenuItemWithTopDescription
+                sentryLabel={CONST.SENTRY_LABEL.CONFIRMATION_STEP.MENU_ITEM}
                 key={id}
                 pressableTestID={testID ?? id}
                 description={description}

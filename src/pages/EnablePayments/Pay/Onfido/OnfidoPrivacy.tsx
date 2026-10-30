@@ -79,6 +79,7 @@ function OnfidoPrivacy({walletOnfidoData = DEFAULT_WALLET_ONFIDO_DATA, onProceed
                     </FormScrollView>
                     <FixedFooter>
                         <FormAlertWithSubmitButton
+                            sentryLabel={CONST.SENTRY_LABEL.ONFIDO_PRIVACY.SUBMIT}
                             isAlertVisible={!!onfidoError}
                             onSubmit={() => {
                                 onProceedToVerification?.();

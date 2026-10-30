@@ -116,6 +116,7 @@ function WorkspaceWorkflowsApprovalsCreatePage({policy, isLoadingReportData = tr
                             />
                             <FixedFooter addBottomSafeAreaPadding>
                                 <FormAlertWithSubmitButton
+                                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_WORKFLOWS_APPROVALS_CREATE_PAGE.SUBMIT_BUTTON}
                                     isAlertVisible={!isEmptyObject(approvalWorkflow?.errors)}
                                     onSubmit={createApprovalWorkflow}
                                     onFixTheErrorsLinkPressed={() => {

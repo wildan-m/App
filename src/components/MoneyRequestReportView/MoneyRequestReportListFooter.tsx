@@ -138,6 +138,7 @@ function MoneyRequestReportListFooter({report, policy, transactions, hasPendingA
                 {shouldShowAddExpenseButton && (
                     <OfflineWithFeedback pendingAction={reportPendingAction}>
                         <ButtonWithDropdownMenu
+                            sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST_REPORT_LIST_FOOTER.ADD_EXPENSE}
                             onPress={() => {}}
                             shouldAlwaysShowDropdownMenu
                             customText={translate('iou.addExpense')}

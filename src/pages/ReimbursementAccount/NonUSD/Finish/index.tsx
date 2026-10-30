@@ -69,6 +69,7 @@ function Finish() {
                     <Text style={[styles.mb6, styles.mt3, styles.textLabelSupportingEmptyValue]}>{translate('finishStep.thanksFor')}</Text>
                     <View style={styles.mhn5}>
                         <MenuItemNavigation
+                            sentryLabel={CONST.SENTRY_LABEL.FINISH.I_HAVE_A}
                             icon={icons.ChatBubble}
                             title={translate('finishStep.iHaveA')}
                             onPress={handleNavigateToConciergeChat}

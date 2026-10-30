@@ -85,6 +85,7 @@ function ReportDetailsMenuMembersOrInviteItem({reportID}: ReportDetailsMenuMembe
     ) {
         return (
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_MENU_MEMBERS_OR_INVITE_ITEM.MEMBERS}
                 title={translate('common.members')}
                 subtitle={activeChatMembers.length}
                 icon={expensifyIcons.Users}
@@ -105,6 +106,7 @@ function ReportDetailsMenuMembersOrInviteItem({reportID}: ReportDetailsMenuMembe
     if (!isGuestAnnounceRoom && ((isUserCreatedPolicyRoom && (!participants.length || !isPolicyEmployee)) || ((isDefaultRoom || isPolicyExpenseChat) && isChatThread && !isPolicyEmployee))) {
         return (
             <MenuItem
+                sentryLabel={CONST.SENTRY_LABEL.REPORT_DETAILS_MENU_MEMBERS_OR_INVITE_ITEM.INVITE}
                 title={translate('common.invite')}
                 icon={expensifyIcons.Users}
                 onPress={() => {

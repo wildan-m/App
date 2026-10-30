@@ -5,7 +5,12 @@ import ButtonKeyboardShortcut from '@components/Button/primitives/ButtonKeyboard
 import ButtonText from '@components/Button/primitives/ButtonText';
 
 function CardSectionButtonBase(props: ButtonProps) {
-    return <Button {...props} />;
+    return (
+        <Button
+            sentryLabel={props.sentryLabel}
+            {...props}
+        />
+    );
 }
 
 const CardSectionButton = Object.assign(CardSectionButtonBase, {
