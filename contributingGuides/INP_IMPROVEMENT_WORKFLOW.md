@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Introduction to the INP metric](#introduction-to-the-inp-metric)
+- [Naming `data-sentry-label` values](#naming-data-sentry-label-values)
 - [Workflow for improving the INP metric](#workflow-for-improving-the-inp-metric)
     1. [Find the interactions in the app](#1-find-the-interactions-in-the-app)
     2. [Evaluate whether the `data-sentry-label` grouping is correct](#2-evaluate-whether-the-data-sentry-label-grouping-is-correct)
@@ -33,6 +34,20 @@ Project-specific notes:
 - INP entries should always be analyzed case-by-case, based on where the interaction occurred.
 
 *Example of the importance of context for the INP interaction: an interaction that edits transaction details will produce very different work depending on where it's invoked: from the Search Page, it additionally triggers re-renders of the Search List; from a report view, it may re-render the report header and transaction list instead. Even though both interactions share the same `data-sentry-label`, their performance characteristics and the components contributing to the INP differ significantly.*
+
+## Naming `data-sentry-label` values
+
+On web, the `sentryLabel` prop of a pressable is rendered as the `data-sentry-label` attribute, and Sentry uses it to name the INP span of the interaction. Components that wrap a pressable, such as `Button` and `MenuItem`, accept `sentryLabel` and pass it down. Define every label as a constant in `CONST.SENTRY_LABEL` and follow these rules:
+
+- Use the `<Area>-<Action>-<Detail>` schema in PascalCase, for example `Search-ActionCellAction-Submit`. `<Area>` is the page or feature, `<Action>` is the interacted component, and `<Detail>` is the concrete interaction when the same component triggers different work.
+- Labels never contain IDs, amounts, names, emails or any other user data. They are static strings, not values built from props or Onyx data.
+- Renaming a label starts a new series in Sentry and loses the history of the old one, so list renamed labels in the PR description.
+
+### How `inp.category` is derived
+
+The `inpCategory` middleware in `src/libs/telemetry/middlewares/` runs as `beforeSendSpan`. For every span whose `op` starts with `ui.interaction.`, it reads the label closest to the interacted element from the span description and, when the label has at least three parts, sets the `inp.category` span attribute to its first two parts (`<Area>-<Action>`). For example, `Search-ActionCellAction-Submit` and `Search-ActionCellAction-Approve` both get the `Search-ActionCellAction` category. Labels with only two parts get no category.
+
+In Sentry, filter by `has:inp.category` and group by `inp.category` to see the aggregated INP of each interaction group, then group by `span.description` to compare the interactions inside a group.
 
 ## Workflow for improving the INP metric
 

@@ -74,6 +74,7 @@ Do not use `useMemo`, `useCallback`, or `React.memo` in components or hooks that
 ### Code Quality
 
 - **ESLint**: Linter. Pre-existing violations are grandfathered via the seatbelt ratchet in `scripts/lint/`.
+- **Sentry labels**: pressables, and components that wrap them such as `Button` and `MenuItem`, need a `sentryLabel` from `CONST.SENTRY_LABEL` that follows the `<Area>-<Action>-<Detail>` schema and never contains IDs or user data. See [Naming `data-sentry-label` values](contributingGuides/INP_IMPROVEMENT_WORKFLOW.md#naming-data-sentry-label-values).
 - **Design tokens**: font sizes come from `<Text variant="...">`, and paddings or margins that differ between narrow and wide layouts come from `useLayoutSpacing()` (`cardPaddingHorizontal`, `pageGutter`, ...). Never write `shouldUseNarrowLayout ? styles.ph5 : styles.ph8` or a raw `fontSize`. See `contributingGuides/STYLING.md`.
 
 ### Post-Edit Checklist (IMPORTANT)

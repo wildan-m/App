@@ -15,6 +15,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 
 import React from 'react';
 
+import actionSentryLabelMap from './actionSentryLabelMap';
 import actionTranslationsMap from './actionTranslationsMap';
 import ApproveActionCell from './ApproveActionCell';
 import PayActionCell from './PayActionCell';
@@ -123,7 +124,7 @@ function ActionCell({
             stayNormalOnDisable={shouldDisablePointerEvents}
             innerStyles={buttonInnerStyles}
             isNested
-            sentryLabel={CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_ACTION}
+            sentryLabel={actionSentryLabelMap[action] ?? CONST.SENTRY_LABEL.SEARCH.ACTION_CELL_ACTION}
         >
             <Button.Text>{text}</Button.Text>
         </Button>
