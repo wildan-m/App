@@ -1,8 +1,6 @@
 /** Exercises optional clear values at the actual submission hook. */
 import {renderHook} from '@testing-library/react-native';
 
-import type * as UseSidePanelActionsModule from '@hooks/useSidePanelActions';
-
 import type * as ReportModule from '@libs/actions/Report';
 import {addAttachmentWithComment, addComment} from '@libs/actions/Report';
 import {createTaskFromMarkdown} from '@libs/actions/Task';
@@ -32,12 +30,7 @@ jest.mock('@hooks/useIsInSidePanel', () => () => false);
 jest.mock('@hooks/useOnyx', () => () => [undefined]);
 jest.mock('@hooks/usePermissions', () => () => ({isBetaEnabled: () => false}));
 jest.mock('@hooks/useReportIsArchived', () => () => false);
-jest.mock('@hooks/useSidePanelActions', () => () => ({
-    openSidePanel: jest.fn<
-        ReturnType<ReturnType<typeof UseSidePanelActionsModule.default>['openSidePanel']>,
-        Parameters<ReturnType<typeof UseSidePanelActionsModule.default>['openSidePanel']>
-    >(),
-}));
+jest.mock('@hooks/useOpenConciergeThread', () => () => jest.fn<void, [string]>());
 jest.mock('@react-navigation/native', () => ({useRoute: () => ({name: 'Report'})}));
 jest.mock('@pages/inbox/ActionListContext', () => ({useActionListContext: () => ({scrollOffsetRef: {current: 100000}})}));
 jest.mock('@pages/inbox/report/ReportActionCompose/ComposerContext', () => ({

@@ -3,8 +3,8 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useOnyx from '@hooks/useOnyx';
+import useOpenConciergeThread from '@hooks/useOpenConciergeThread';
 import useReportIsArchived from '@hooks/useReportIsArchived';
-import useSidePanelActions from '@hooks/useSidePanelActions';
 
 import {addAttachmentWithComment, addComment, clearAgentZeroProcessingIndicator} from '@libs/actions/Report';
 import {createTaskFromMarkdown} from '@libs/actions/Task';
@@ -33,7 +33,7 @@ function useComposerSubmit(reportID: string) {
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isInSidePanel = useIsInSidePanel();
     const sidePanelContext = useSidePanelContext(reportID);
-    const {openSidePanel} = useSidePanelActions();
+    const openConciergeThread = useOpenConciergeThread(isInSidePanel);
     const route = useRoute();
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -98,17 +98,14 @@ function useComposerSubmit(reportID: string) {
                 sidePanelContext,
                 conciergeReportID,
                 conciergeThreadReportID,
-                shouldNavigateToConciergeThread: !isInSidePanel,
+                openConciergeThread,
             });
-            if (conciergeThreadReportID && isInSidePanel) {
-                openSidePanel({reportID: conciergeThreadReportID});
-            }
             attachmentFileRef.current = null;
             return;
         }
 
         if (createTaskFromMarkdown({text: draftMessageTrimmed, parentReport: report, currentUserPersonalDetails, quickAction, delegateAccountID, ancestors: reportAncestors})) {
-            if (shouldRespondInThread && !isInSidePanel) {
+            if (shouldRespondInThread) {
                 setShowFullHistory(true);
             }
             return;
@@ -146,11 +143,8 @@ function useComposerSubmit(reportID: string) {
             delegateAccountID,
             conciergeReportID,
             conciergeThreadReportID,
-            shouldNavigateToConciergeThread: !isInSidePanel,
+            openConciergeThread,
         });
-        if (conciergeThreadReportID && isInSidePanel) {
-            openSidePanel({reportID: conciergeThreadReportID});
-        }
     };
 
     const submitDraftAndClearComposer = () => {

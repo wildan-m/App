@@ -439,7 +439,8 @@ type AddCommentParams = {
     delegateAccountID: number | undefined;
     conciergeReportID: string | undefined;
     conciergeThreadReportID?: string;
-    shouldNavigateToConciergeThread?: boolean;
+    /** Opens the thread Concierge answers in once it is created. Defaults to navigating to it in the main pane. */
+    openConciergeThread?: (conciergeThreadReportID: string) => void;
 };
 
 type AddActionsParams = {
@@ -458,7 +459,8 @@ type AddActionsParams = {
     delegateAccountID: number | undefined;
     conciergeReportID: string | undefined;
     conciergeThreadReportID?: string;
-    shouldNavigateToConciergeThread?: boolean;
+    /** Opens the thread Concierge answers in once it is created. Defaults to navigating to it in the main pane. */
+    openConciergeThread?: (conciergeThreadReportID: string) => void;
 };
 
 type AddAttachmentWithCommentParams = {
@@ -475,7 +477,8 @@ type AddAttachmentWithCommentParams = {
     sidePanelContext?: SidePanelContext;
     conciergeReportID: string | undefined;
     conciergeThreadReportID?: string;
-    shouldNavigateToConciergeThread?: boolean;
+    /** Opens the thread Concierge answers in once it is created. Defaults to navigating to it in the main pane. */
+    openConciergeThread?: (conciergeThreadReportID: string) => void;
 };
 
 type MergeReportsProps = {
@@ -911,7 +914,7 @@ function addActions({
     delegateAccountID,
     conciergeReportID,
     conciergeThreadReportID,
-    shouldNavigateToConciergeThread = true,
+    openConciergeThread = (threadReportID: string) => Navigation.navigate(getReportRouteForCurrentContext({reportID: threadReportID})),
 }: AddActionsParams) {
     if (!report?.reportID) {
         return;
@@ -1321,12 +1324,7 @@ function addActions({
     startSendMessagePhase(reportActionID, CONST.TELEMETRY.SPAN_SEND_MESSAGE_PHASE.PROPAGATE);
 
     if (conciergeThreadReportID && resolvedReportActionID) {
-        Onyx.update(conciergeThreadOnyxData).then(() => {
-            if (!shouldNavigateToConciergeThread) {
-                return;
-            }
-            Navigation.navigate(getReportRouteForCurrentContext({reportID: conciergeThreadReportID}));
-        });
+        Onyx.update(conciergeThreadOnyxData).then(() => openConciergeThread(conciergeThreadReportID));
     }
     notifyNewAction(resolvedNotifyReportID, lastAction, lastAction?.actorAccountID === currentUserAccountID);
 }
@@ -1346,7 +1344,7 @@ function addAttachmentWithComment({
     sidePanelContext,
     conciergeReportID,
     conciergeThreadReportID,
-    shouldNavigateToConciergeThread,
+    openConciergeThread,
 }: AddAttachmentWithCommentParams) {
     if (!report?.reportID) {
         return;
@@ -1375,7 +1373,7 @@ function addAttachmentWithComment({
             sidePanelContext,
             conciergeReportID,
             conciergeThreadReportID,
-            shouldNavigateToConciergeThread,
+            openConciergeThread,
         });
         handlePlaySound();
         return;
@@ -1432,7 +1430,7 @@ function addComment({
     delegateAccountID,
     conciergeReportID,
     conciergeThreadReportID,
-    shouldNavigateToConciergeThread,
+    openConciergeThread,
 }: AddCommentParams) {
     if (shouldPlaySound) {
         playSound(SOUNDS.DONE);
@@ -1451,7 +1449,7 @@ function addComment({
         sidePanelContext,
         conciergeReportID,
         conciergeThreadReportID,
-        shouldNavigateToConciergeThread,
+        openConciergeThread,
     });
 }
 

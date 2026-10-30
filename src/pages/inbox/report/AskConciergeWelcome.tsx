@@ -1,5 +1,6 @@
 import ScrollView from '@components/ScrollView';
 
+import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -24,11 +25,12 @@ type AskConciergeWelcomeProps = {
 function AskConciergeWelcome({reportID, onShowPreviousMessages}: AskConciergeWelcomeProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const isInSidePanel = useIsInSidePanel();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
 
     return (
         <ScrollView
-            style={[!shouldUseNarrowLayout && styles.flexGrow0, styles.conciergeAskColumn]}
+            style={[!shouldUseNarrowLayout && !isInSidePanel && styles.flexGrow0, styles.conciergeAskColumn]}
             contentContainerStyle={[styles.flexGrow1, styles.justifyContentCenter]}
             keyboardShouldPersistTaps="handled"
             onLayout={() => markOpenReportEnd(reportID, report, {warm: true})}

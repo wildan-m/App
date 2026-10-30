@@ -5,9 +5,10 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 
 import SidePanelActions from '@libs/actions/SidePanel';
 import focusComposerWithDelay from '@libs/focusComposerWithDelay';
-import {getServerAnchoredDBTime} from '@libs/NetworkState';
 import {canEditWorkspaceSettings, shouldShowPolicy} from '@libs/PolicyUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
+
+import {useConciergeChatHistoryActions} from '@pages/inbox/ConciergeChatHistoryContext';
 
 import variables from '@styles/variables';
 
@@ -33,7 +34,6 @@ type SidePanelStateContextProps = {
     sidePanelOffset: RefObject<Animated.Value>;
     sidePanelTranslateX: RefObject<Animated.Value>;
     sidePanelNVP?: SidePanel;
-    sessionStartTime: string | null;
 };
 
 type SidePanelActionsContextProps = {
@@ -50,7 +50,6 @@ const SidePanelStateContext = createContext<SidePanelStateContextProps>({
     shouldHideToolTip: false,
     sidePanelOffset: {current: new Animated.Value(0)},
     sidePanelTranslateX: {current: new Animated.Value(0)},
-    sessionStartTime: null,
 });
 
 const SidePanelReportIDContext = createContext<string | undefined>(undefined);
@@ -96,15 +95,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     const reportID = sidePanelNVP?.reportID ?? defaultReportID;
 
     const onCloseCompleteRef = useRef<(() => void) | undefined>(undefined);
-    const [sessionStartTime, setSessionStartTime] = useState<string | null>(null);
-    const [prevShouldHideSidePanel, setPrevShouldHideSidePanel] = useState(shouldHideSidePanel);
-
-    if (prevShouldHideSidePanel !== shouldHideSidePanel) {
-        setPrevShouldHideSidePanel(shouldHideSidePanel);
-        if (!shouldHideSidePanel && !sessionStartTime) {
-            setSessionStartTime(getServerAnchoredDBTime());
-        }
-    }
+    const {resetHistory: resetSidePanelConciergeHistory} = useConciergeChatHistoryActions(true);
 
     useEffect(() => {
         sidePanelWidthRef.current = sidePanelWidth;
@@ -129,14 +120,16 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
             }),
         ]).start(({finished}) => {
             setIsSidePanelTransitionEnded(true);
-            // Clear the session after the slide-out, not when it starts: the panel stays mounted for the animation and
-            // a null session empties its message list. `finished` is false on an interrupted close, sparing the new session.
+            // Every time the side panel opens, the Concierge chat in it starts on the welcome screen. Collapse its history
+            // after the slide-out, not when it starts: the panel stays mounted for the animation and would flash the
+            // welcome screen. `finished` is false on an interrupted close, sparing the reopened panel.
             if (finished && shouldHideSidePanel) {
-                setSessionStartTime(null);
+                resetSidePanelConciergeHistory();
             }
             onCloseCompleteRef.current?.();
             onCloseCompleteRef.current = undefined;
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- the animation only reruns when the panel visibility or offset changes
     }, [shouldHideSidePanel, shouldApplySidePanelOffset]);
 
     const closeSidePanel = (options?: {afterTransition?: () => void}) => {
@@ -154,7 +147,6 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     };
 
     const openSidePanel = (options?: {forceConcierge?: boolean; reportID?: string}) => {
-        setSessionStartTime(getServerAnchoredDBTime());
         SidePanelActions.openSidePanel(!isExtraLargeScreenWidth, options?.forceConcierge, options?.reportID);
     };
 
@@ -170,7 +162,6 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         sidePanelOffset,
         sidePanelTranslateX,
         sidePanelNVP,
-        sessionStartTime,
     };
 
     // Because of the React Compiler we don't need to memoize it manually

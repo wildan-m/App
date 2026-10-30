@@ -2,6 +2,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useOnyx from '@hooks/useOnyx';
 import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
+import useOpenConciergeThread from '@hooks/useOpenConciergeThread';
 import useSidePanelReportID from '@hooks/useSidePanelReportID';
 
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -37,7 +38,8 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
     const {timezone, accountID: currentUserAccountID} = currentUserPersonalDetails;
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const delegateAccountID = useDelegateAccountID();
-    const {setShowFullHistory} = useConciergeChatHistoryActions();
+    const {setShowFullHistory} = useConciergeChatHistoryActions(isInSidePanel);
+    const openConciergeThread = useOpenConciergeThread(isInSidePanel);
     const shouldShowAskConcierge = !!targetReportID && !!targetReport;
 
     const shouldRespondInThread = targetReportID === conciergeReportID;
@@ -49,7 +51,7 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
         }
         const isTask = createTaskFromMarkdown({text: trimmedQuery, parentReport: targetReport, currentUserPersonalDetails, quickAction, delegateAccountID});
         if (isTask) {
-            if (shouldRespondInThread && !isInSidePanel) {
+            if (shouldRespondInThread) {
                 setShowFullHistory(true);
             }
             openConciergeAnywhere({forceConcierge});
@@ -68,10 +70,10 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
             delegateAccountID,
             conciergeReportID,
             conciergeThreadReportID,
-            shouldNavigateToConciergeThread: !isInSidePanel,
+            openConciergeThread,
         });
-        if (!conciergeThreadReportID || isInSidePanel) {
-            openConciergeAnywhere({forceConcierge, reportID: conciergeThreadReportID});
+        if (!conciergeThreadReportID) {
+            openConciergeAnywhere({forceConcierge});
         }
     };
 
@@ -94,10 +96,10 @@ function useAskConcierge({forceConcierge = false}: {forceConcierge?: boolean} = 
             delegateAccountID,
             conciergeReportID,
             conciergeThreadReportID,
-            shouldNavigateToConciergeThread: !isInSidePanel,
+            openConciergeThread,
         });
-        if (!conciergeThreadReportID || isInSidePanel) {
-            openConciergeAnywhere({forceConcierge, reportID: conciergeThreadReportID});
+        if (!conciergeThreadReportID) {
+            openConciergeAnywhere({forceConcierge});
         }
     };
 

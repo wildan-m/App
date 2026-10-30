@@ -164,91 +164,36 @@ describe('useUnreadMarker', () => {
         expect(result.current.unreadMarkerReportActionIndex).toBe(-1);
     });
 
-    it('does not push the read watermark on a bulk history reveal without a session boundary (marker appears on the next render)', () => {
-        const greeting = makeAction(CONST.CONCIERGE_GREETING_ACTION_ID, {created: LAST_READ_TIME});
-        const createdAction = makeAction('created', {created: '2023-01-01 08:00:00.000', actionName: CONST.REPORT.ACTIONS.TYPE.CREATED});
-        const welcomeActions = [greeting, createdAction];
-
-        const {result, rerender} = renderHook(
-            (sortedVisibleReportActions: OnyxTypes.ReportAction[]) =>
-                useUnreadMarker({
-                    reportID: REPORT_ID,
-                    sortedVisibleReportActions,
-                    sortedReportActions: sortedVisibleReportActions,
-                    oldestUnreadReportActionID: undefined,
-                    isScrolledOverThreshold: false,
-                    hasOnceLoadedReportActions: true,
-                }),
-            {initialProps: welcomeActions},
-        );
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
-
-        const bumpedGreeting = makeAction(CONST.CONCIERGE_GREETING_ACTION_ID, {created: '2023-01-01 12:00:00.000'});
-        rerender([bumpedGreeting, createdAction]);
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
-
+    it('keeps the unread marker when `View chat history` loads older messages below it', () => {
+        // Given a Concierge chat whose newest page, with an unread Concierge reply, is already loaded behind the welcome screen
         const unreadMessage = makeAction('unread', {created: '2023-01-01 11:00:00.000'});
         const readMessage = makeAction('read', {created: '2023-01-01 09:00:00.000'});
-        const fullHistory = [unreadMessage, readMessage, createdAction];
-        rerender(fullHistory);
+        const newestPage = [unreadMessage, readMessage];
 
-        rerender(fullHistory);
+        const {result, rerender} = renderHook(
+            (sortedVisibleReportActions: OnyxTypes.ReportAction[]) =>
+                useUnreadMarker({
+                    reportID: REPORT_ID,
+                    sortedVisibleReportActions,
+                    sortedReportActions: sortedVisibleReportActions,
+                    oldestUnreadReportActionID: undefined,
+                    isScrolledOverThreshold: false,
+                    hasOnceLoadedReportActions: true,
+                }),
+            {initialProps: newestPage},
+        );
         expect(result.current.unreadMarkerReportActionID).toBe('unread');
-        expect(result.current.unreadMarkerReportActionIndex).toBe(0);
-    });
 
-    it('shows the marker immediately on the reveal render when a session boundary is provided ("Show history")', () => {
-        const sessionStartTime = '2023-01-01 11:30:00.000';
-        const greeting = makeAction(CONST.CONCIERGE_GREETING_ACTION_ID, {created: LAST_READ_TIME});
+        // When the user reveals the earlier conversation and an older page loads below it
+        const olderMessage = makeAction('older', {created: '2023-01-01 08:30:00.000'});
         const createdAction = makeAction('created', {created: '2023-01-01 08:00:00.000', actionName: CONST.REPORT.ACTIONS.TYPE.CREATED});
+        const fullHistory = [...newestPage, olderMessage, createdAction];
+        rerender(fullHistory);
+        rerender(fullHistory);
 
-        const {result, rerender} = renderHook(
-            (sortedVisibleReportActions: OnyxTypes.ReportAction[]) =>
-                useUnreadMarker({
-                    reportID: REPORT_ID,
-                    sortedVisibleReportActions,
-                    sortedReportActions: sortedVisibleReportActions,
-                    oldestUnreadReportActionID: undefined,
-                    isScrolledOverThreshold: false,
-                    hasOnceLoadedReportActions: true,
-                    newMessageBoundaryTime: sessionStartTime,
-                }),
-            {initialProps: [greeting, createdAction]},
-        );
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
-
-        const unreadMessage = makeAction('unread', {created: '2023-01-01 11:00:00.000'});
-        const readMessage = makeAction('read', {created: '2023-01-01 09:00:00.000'});
-        rerender([unreadMessage, readMessage, createdAction]);
-
+        // Then the marker stays on the unread reply, because loading older history does not move the newest message and so does not count as reading it
         expect(result.current.unreadMarkerReportActionID).toBe('unread');
         expect(result.current.unreadMarkerReportActionIndex).toBe(0);
-    });
-
-    it('still auto-reads a live message received while caught up when a session boundary is provided', () => {
-        const sessionStartTime = '2023-01-01 10:30:00.000';
-        const oldMessage = makeAction('old', {created: '2023-01-01 09:00:00.000'});
-
-        const {result, rerender} = renderHook(
-            (sortedVisibleReportActions: OnyxTypes.ReportAction[]) =>
-                useUnreadMarker({
-                    reportID: REPORT_ID,
-                    sortedVisibleReportActions,
-                    sortedReportActions: sortedVisibleReportActions,
-                    oldestUnreadReportActionID: undefined,
-                    isScrolledOverThreshold: false,
-                    hasOnceLoadedReportActions: true,
-                    newMessageBoundaryTime: sessionStartTime,
-                }),
-            {initialProps: [oldMessage]},
-        );
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
-
-        const incoming = makeAction('incoming', {created: '2023-01-01 11:00:00.000'});
-        rerender([incoming, oldMessage]);
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
-        rerender([incoming, oldMessage]);
-        expect(result.current.unreadMarkerReportActionID).toBeNull();
     });
 
     it('still pushes the watermark past a new message received while caught up', () => {

@@ -21,6 +21,7 @@ let mockSidePanelReportID: string | undefined;
 let mockIsInSidePanel = false;
 const mockOpenConciergeAnywhere = jest.fn();
 const mockSetShowFullHistory = jest.fn();
+const mockOpenConciergeThread = jest.fn();
 
 jest.mock('@hooks/useSidePanelReportID', () => ({
     __esModule: true,
@@ -32,8 +33,13 @@ jest.mock('@hooks/useOpenConciergeAnywhere', () => ({
     default: () => ({openConciergeAnywhere: mockOpenConciergeAnywhere, isInSidePanel: mockIsInSidePanel}),
 }));
 
+jest.mock('@hooks/useOpenConciergeThread', () => ({
+    __esModule: true,
+    default: (isInSidePanel: boolean) => (conciergeThreadReportID: string) => mockOpenConciergeThread(conciergeThreadReportID, isInSidePanel),
+}));
+
 jest.mock('@pages/inbox/ConciergeChatHistoryContext', () => ({
-    useConciergeChatHistoryActions: () => ({setShowFullHistory: mockSetShowFullHistory}),
+    useConciergeChatHistoryActions: (isInSidePanel?: boolean) => ({setShowFullHistory: (show: boolean) => mockSetShowFullHistory(show, isInSidePanel)}),
 }));
 
 jest.mock('@hooks/useCurrentUserPersonalDetails', () => ({
@@ -57,6 +63,16 @@ jest.mock('@userActions/Task', () => ({
 
 const mockAddComment = jest.mocked(addComment);
 const mockAddAttachmentWithComment = jest.mocked(addAttachmentWithComment);
+
+/** The report actions are mocked, so run the thread opener the hook handed them, as they do once the thread is created. */
+function openCreatedThread(sendAction: typeof mockAddComment | typeof mockAddAttachmentWithComment): string | undefined {
+    const params = sendAction.mock.calls.at(0)?.at(0);
+    const conciergeThreadReportID = params?.conciergeThreadReportID;
+    if (conciergeThreadReportID) {
+        params?.openConciergeThread?.(conciergeThreadReportID);
+    }
+    return conciergeThreadReportID;
+}
 const mockCreateTaskFromMarkdown = jest.mocked(createTaskFromMarkdown);
 
 const CONCIERGE_REPORT = {reportID: CONCIERGE_REPORT_ID, reportName: 'Concierge'} as Report;
@@ -142,10 +158,11 @@ describe('useAskConcierge', () => {
             // When a padded message is sent
             result.current.askConcierge('  Where is my expense?  ');
 
-            // Then Concierge is opened on the new thread and the trimmed text is added as a comment
-            const conciergeThreadReportID = mockAddComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID;
+            // Then the new thread is opened in the side panel and the trimmed text is added as a comment
+            const conciergeThreadReportID = openCreatedThread(mockAddComment);
             expect(conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true, reportID: conciergeThreadReportID});
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, true);
+            expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
             expect(mockAddComment).toHaveBeenCalledWith(
                 expect.objectContaining({
                     report: CONCIERGE_REPORT,
@@ -174,9 +191,24 @@ describe('useAskConcierge', () => {
             // Then Concierge is still opened with its history expanded so the task shows, the detection gets the
             // trimmed text and the target report, and the text is not also posted as a plain comment
             expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true});
-            expect(mockSetShowFullHistory).toHaveBeenCalledWith(true);
+            expect(mockSetShowFullHistory).toHaveBeenCalledWith(true, false);
             expect(mockCreateTaskFromMarkdown).toHaveBeenCalledWith(expect.objectContaining({text: '[] Buy milk', parentReport: CONCIERGE_REPORT}));
             expect(mockAddComment).not.toHaveBeenCalled();
+        });
+
+        it('expands the side panel history for a task on web, so the task shows in place of the welcome screen', async () => {
+            // Given web, where Concierge opens in the side panel, and text that the markdown task detection claims
+            mockIsInSidePanel = true;
+            await seedReports();
+            mockCreateTaskFromMarkdown.mockReturnValueOnce(true);
+            const {result} = renderAskConcierge({forceConcierge: true});
+
+            // When the shorthand is sent
+            result.current.askConcierge('[] Buy milk');
+
+            // Then the side panel's Concierge history is expanded before it opens
+            expect(mockSetShowFullHistory).toHaveBeenCalledWith(true, true);
+            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true});
         });
 
         it('falls back to a comment when the text is not the task shorthand', async () => {
@@ -221,10 +253,11 @@ describe('useAskConcierge', () => {
             // When attachments are sent with a padded caption
             result.current.askConciergeWithAttachment(FILES, '  Here it is  ');
 
-            // Then Concierge is opened on the new thread and the attachments are added with the trimmed text
-            const conciergeThreadReportID = mockAddAttachmentWithComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID;
+            // Then the new thread is opened in the side panel and the attachments are added with the trimmed text
+            const conciergeThreadReportID = openCreatedThread(mockAddAttachmentWithComment);
             expect(conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true, reportID: conciergeThreadReportID});
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, true);
+            expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
             expect(mockAddAttachmentWithComment).toHaveBeenCalledWith(
                 expect.objectContaining({
                     report: CONCIERGE_REPORT,
@@ -287,12 +320,12 @@ describe('useAskConcierge', () => {
             result.current.askConcierge('Where is my expense?');
 
             // Then a thread is created without navigating to it
-            const conciergeThreadReportID = mockAddComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID;
+            const conciergeThreadReportID = openCreatedThread(mockAddComment);
             expect(conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockAddComment).toHaveBeenCalledWith(expect.objectContaining({shouldNavigateToConciergeThread: false}));
 
             // And the side panel shows that thread
-            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true, reportID: conciergeThreadReportID});
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, true);
+            expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
         });
 
         it('sends the user to the thread on native, where there is no side panel', async () => {
@@ -305,8 +338,9 @@ describe('useAskConcierge', () => {
             result.current.askConcierge('Where is my expense?');
 
             // Then the thread is created and navigated to, and no side panel is opened
-            expect(mockAddComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockAddComment).toHaveBeenCalledWith(expect.objectContaining({shouldNavigateToConciergeThread: true}));
+            const conciergeThreadReportID = openCreatedThread(mockAddComment);
+            expect(conciergeThreadReportID).toEqual(expect.any(String));
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, false);
             expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
         });
 
@@ -321,9 +355,10 @@ describe('useAskConcierge', () => {
             result.current.askConciergeWithAttachment(FILES, 'Here it is');
 
             // Then the side panel shows the thread it was posted to
-            const conciergeThreadReportID = mockAddAttachmentWithComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID;
+            const conciergeThreadReportID = openCreatedThread(mockAddAttachmentWithComment);
             expect(conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true, reportID: conciergeThreadReportID});
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, true);
+            expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
         });
 
         it('shows the thread in the side panel for several attachments', async () => {
@@ -337,9 +372,10 @@ describe('useAskConcierge', () => {
             result.current.askConciergeWithAttachment([...FILES, {name: 'second.jpg', type: 'image/jpeg', uri: 'file://second.jpg'}], 'Here they are');
 
             // Then the side panel shows the thread they were posted to
-            const conciergeThreadReportID = mockAddAttachmentWithComment.mock.calls.at(0)?.at(0)?.conciergeThreadReportID;
+            const conciergeThreadReportID = openCreatedThread(mockAddAttachmentWithComment);
             expect(conciergeThreadReportID).toEqual(expect.any(String));
-            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true, reportID: conciergeThreadReportID});
+            expect(mockOpenConciergeThread).toHaveBeenCalledWith(conciergeThreadReportID, true);
+            expect(mockOpenConciergeAnywhere).not.toHaveBeenCalled();
         });
     });
 });

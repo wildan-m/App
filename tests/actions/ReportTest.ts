@@ -2329,7 +2329,7 @@ describe('actions/Report', () => {
             delegateAccountID: undefined,
             conciergeReportID: undefined,
             conciergeThreadReportID,
-            shouldNavigateToConciergeThread: false,
+            openConciergeThread: () => {},
         });
         await waitForBatchedUpdates();
 

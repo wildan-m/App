@@ -16,7 +16,6 @@ import useReportScrollManager from '@hooks/useReportScrollManager';
 import useReportsParentHierarchy from '@hooks/useReportsParentHierarchy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useRetireMerchantRuleSuggestionOnLeave from '@hooks/useRetireMerchantRuleSuggestionOnLeave';
-import useSidePanelState from '@hooks/useSidePanelState';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useUnreadMarker from '@hooks/useUnreadMarker';
 import useWindowDimensions from '@hooks/useWindowDimensions';
@@ -87,7 +86,6 @@ import ReportActionsListHeader from './ReportActionsListHeader';
 import ReportActionsListItemRenderer from './ReportActionsListItemRenderer';
 import ReportActionsListPaddingView from './ReportActionsListPaddingView';
 import ReportActionsSkeletonGuard from './ReportActionsSkeletonGuard';
-import ShowPreviousMessagesButton from './ShowPreviousMessagesButton';
 import useFollowActionBadgeTarget from './useFollowActionBadgeTarget';
 import useReportActionsPresentation from './useReportActionsPresentation';
 import useScrollToEditingReportAction from './useScrollToEditingReportAction';
@@ -140,9 +138,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
         parentReportAction,
         sortedReportActions: unfilteredReportActions,
         sortedVisibleReportActions: unfilteredVisibleReportActions,
-        isConciergeHiddenHistory,
-        showFullHistory,
-        hasPreviousMessages,
         persistedReportActionIDs,
         shouldShowConciergeWelcome,
         isConciergeHistoryExpanded,
@@ -159,7 +154,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
     const {isOffline} = useNetwork();
     const route = useRoute<PlatformStackRouteProp<ReportsSplitNavigatorParamList, typeof SCREENS.REPORT>>();
     const reportActionIDFromRoute = route?.params?.reportActionID;
-    const {sessionStartTime} = useSidePanelState();
     const {collapseHistory: collapseConciergeHistory} = useConciergeChatHistoryActions();
 
     const didLayout = useRef(false);
@@ -210,9 +204,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
     const {draftReportAction, isDraftPendingCompletion} = useConciergeDraft();
     const {clearDraft, revealDraftFromReportAction} = useConciergeDraftActions();
 
-    const showHiddenHistory = isConciergeHiddenHistory && !showFullHistory;
-    const onShowPreviousMessages = handleShowPreviousMessages;
-
     const [hasScrolledOverThreshold, setHasScrolledOverThreshold] = useState(() => getScrollOffset() >= CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD);
 
     const {unreadMarkerReportActionID} = useUnreadMarker({
@@ -222,7 +213,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
         oldestUnreadReportActionID: oldestUnreadReportAction?.reportActionID,
         isScrolledOverThreshold: hasScrolledOverThreshold,
         hasOnceLoadedReportActions: !!hasOnceLoadedReportActions,
-        newMessageBoundaryTime: isConciergeHiddenHistory ? sessionStartTime : undefined,
     });
 
     const {markNewestActionAsRead, completeSkippedMarkAsRead} = useMarkAsRead({
@@ -248,10 +238,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
 
     const visibleReportActions = (() => {
         if (!draftReportAction) {
-            return sortedVisibleReportActions;
-        }
-
-        if (showHiddenHistory && sessionStartTime && draftReportAction.created < sessionStartTime) {
             return sortedVisibleReportActions;
         }
 
@@ -427,13 +413,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
         onViewableItemsChanged(info);
     };
 
-    const loadOlderChatsOnEndReached = () => {
-        if (showHiddenHistory) {
-            return;
-        }
-        loadOlderChats(false);
-    };
-
     const loadNewerChatsAfterTransitions = () => {
         if (!isSearchTopmostFullScreenRoute()) {
             loadNewerChats(false);
@@ -553,15 +532,6 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
                         shouldDisableContextMenuForConciergeDraft={shouldDisableContextMenuForConciergeDraft}
                     />
                 )}
-                {!!reportStable?.reportID && (
-                    <ShowPreviousMessagesButton
-                        reportID={reportStable.reportID}
-                        actionType={reportAction.actionName}
-                        hasPreviousMessages={!!hasPreviousMessages}
-                        showFullHistory={!showHiddenHistory}
-                        onPress={onShowPreviousMessages}
-                    />
-                )}
             </ReportActionPositionContextProvider>
         );
     };
@@ -635,7 +605,7 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
         return (
             <AskConciergeWelcome
                 reportID={reportID}
-                onShowPreviousMessages={onShowPreviousMessages}
+                onShowPreviousMessages={handleShowPreviousMessages}
             />
         );
     }
@@ -674,7 +644,7 @@ function ReportActionsListContent({reportID, conciergeChat, onLayout}: ReportAct
                     drawDistance={1500}
                     renderScrollComponent={renderActionSheetAwareScrollView}
                     contentContainerStyle={styles.chatContentScrollView}
-                    onEndReached={loadOlderChatsOnEndReached}
+                    onEndReached={() => loadOlderChats(false)}
                     onEndReachedThreshold={0.75}
                     onStartReached={loadNewerChatsAfterTransitions}
                     onStartReachedThreshold={0.75}

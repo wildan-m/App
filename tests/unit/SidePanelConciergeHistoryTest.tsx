@@ -5,6 +5,8 @@ import SidePanelContextProvider from '@components/SidePanel/SidePanelContextProv
 import useSidePanelDisplayStatus from '@hooks/useSidePanelDisplayStatus';
 import useSidePanelState from '@hooks/useSidePanelState';
 
+import {ConciergeChatHistoryProvider, useConciergeChatHistoryActions, useConciergeChatHistoryState} from '@pages/inbox/ConciergeChatHistoryContext';
+
 import ONYXKEYS from '@src/ONYXKEYS';
 
 import type {PropsWithChildren} from 'react';
@@ -21,7 +23,7 @@ jest.mock('@hooks/useSidePanelDisplayStatus');
 
 const mockUseSidePanelDisplayStatus = jest.mocked(useSidePanelDisplayStatus);
 
-/** Drives the only input the provider's session logic reacts to, so the test needs no navigator and no viewport. */
+/** Drives the only input the provider's history reset reacts to, so the test needs no navigator and no viewport. */
 function setSidePanelHidden(shouldHideSidePanel: boolean) {
     mockUseSidePanelDisplayStatus.mockReturnValue({
         sidePanelNVP: {open: !shouldHideSidePanel, openNarrowScreen: false, forceConcierge: false},
@@ -65,10 +67,24 @@ function mockSlideAnimation() {
 }
 
 function wrapper({children}: PropsWithChildren) {
-    return <SidePanelContextProvider>{children}</SidePanelContextProvider>;
+    return (
+        <ConciergeChatHistoryProvider>
+            <SidePanelContextProvider>{children}</SidePanelContextProvider>
+        </ConciergeChatHistoryProvider>
+    );
 }
 
-describe('SidePanelContextProvider (Concierge session lifetime)', () => {
+function useSidePanelConciergeHistory() {
+    return {
+        sidePanelState: useSidePanelState(),
+        sidePanelHistory: useConciergeChatHistoryState(true),
+        inboxHistory: useConciergeChatHistoryState(false),
+        sidePanelHistoryActions: useConciergeChatHistoryActions(true),
+        inboxHistoryActions: useConciergeChatHistoryActions(false),
+    };
+}
+
+describe('SidePanelContextProvider (Concierge history in the side panel)', () => {
     beforeAll(() => {
         Onyx.init({keys: ONYXKEYS});
     });
@@ -80,41 +96,39 @@ describe('SidePanelContextProvider (Concierge session lifetime)', () => {
         setSidePanelHidden(true);
     });
 
-    it('keeps the session alive for the whole close animation, then clears it once the panel unmounts', () => {
-        // Given an open Side Panel with an established Concierge session
+    it('keeps the history shown for the whole close animation, then collapses it once the panel unmounts', () => {
+        // Given an open Side Panel where the user expanded the Concierge chat history
         const takeLatestSlide = mockSlideAnimation();
-        const {result, rerender} = renderHook(() => useSidePanelState(), {wrapper});
+        const {result, rerender} = renderHook(() => useSidePanelConciergeHistory(), {wrapper});
         setSidePanelHidden(false);
         rerender({});
         takeLatestSlide()(true);
-        const openSessionStartTime = result.current.sessionStartTime;
-        expect(openSessionStartTime).not.toBeNull();
+        act(() => result.current.sidePanelHistoryActions.setShowFullHistory(true));
+        expect(result.current.sidePanelHistory.showFullHistory).toBe(true);
 
         // When the panel starts closing
         setSidePanelHidden(true);
         rerender({});
         const finishClose = takeLatestSlide();
 
-        // Then the session survives while the panel is still mounted and sliding out. Clearing it here is what made
-        // the Concierge message list filter every action out mid-animation, collapsing the panel content.
-        expect(result.current.isSidePanelTransitionEnded).toBe(false);
-        expect(result.current.sessionStartTime).toBe(openSessionStartTime);
+        // Then the history stays shown while the panel is still mounted and sliding out, so the welcome screen doesn't flash in
+        expect(result.current.sidePanelState.isSidePanelTransitionEnded).toBe(false);
+        expect(result.current.sidePanelHistory.showFullHistory).toBe(true);
 
-        // And it is cleared once the animation completes, in the same commit that unmounts the panel
+        // And it collapses once the animation completes, so the next open starts on the welcome screen
         finishClose(true);
-        expect(result.current.isSidePanelTransitionEnded).toBe(true);
-        expect(result.current.sessionStartTime).toBeNull();
+        expect(result.current.sidePanelState.isSidePanelTransitionEnded).toBe(true);
+        expect(result.current.sidePanelHistory).toEqual({showFullHistory: false, isHistoryCollapsedByUser: false});
     });
 
-    it('does not let an interrupted close wipe the session when the panel is reopened mid-animation', () => {
-        // Given an open Side Panel with an established Concierge session
+    it('does not let an interrupted close collapse the history when the panel is reopened mid-animation', () => {
+        // Given an open Side Panel where the user expanded the Concierge chat history
         const takeLatestSlide = mockSlideAnimation();
-        const {result, rerender} = renderHook(() => useSidePanelState(), {wrapper});
+        const {result, rerender} = renderHook(() => useSidePanelConciergeHistory(), {wrapper});
         setSidePanelHidden(false);
         rerender({});
         takeLatestSlide()(true);
-        const openSessionStartTime = result.current.sessionStartTime;
-        expect(openSessionStartTime).not.toBeNull();
+        act(() => result.current.sidePanelHistoryActions.setShowFullHistory(true));
 
         // When the panel is closed, its close callback is captured, and the panel is reopened before that close
         // animation gets to finish. Capturing it first is what keeps the reopen from taking its place.
@@ -124,9 +138,30 @@ describe('SidePanelContextProvider (Concierge session lifetime)', () => {
         setSidePanelHidden(false);
         rerender({});
 
-        // Then the superseded close reports back unfinished and leaves the reopened session intact. Without the
-        // `finished` guard this stale callback would wipe the session the reopen just established.
+        // Then the superseded close reports back unfinished and leaves the reopened panel's history alone
         finishInterruptedClose(false);
-        expect(result.current.sessionStartTime).toBe(openSessionStartTime);
+        expect(result.current.sidePanelHistory.showFullHistory).toBe(true);
+    });
+
+    it('keeps the Inbox and the side panel history apart', () => {
+        // Given the Concierge chat open both in the Inbox and in the Side Panel, as it can be on wide screens
+        const takeLatestSlide = mockSlideAnimation();
+        const {result, rerender} = renderHook(() => useSidePanelConciergeHistory(), {wrapper});
+        setSidePanelHidden(false);
+        rerender({});
+        takeLatestSlide()(true);
+
+        // When the user expands the history in the Inbox
+        act(() => result.current.inboxHistoryActions.setShowFullHistory(true));
+
+        // Then the Side Panel keeps showing the welcome screen
+        expect(result.current.inboxHistory.showFullHistory).toBe(true);
+        expect(result.current.sidePanelHistory.showFullHistory).toBe(false);
+
+        // And closing the Side Panel leaves the Inbox history expanded
+        setSidePanelHidden(true);
+        rerender({});
+        takeLatestSlide()(true);
+        expect(result.current.inboxHistory.showFullHistory).toBe(true);
     });
 });
