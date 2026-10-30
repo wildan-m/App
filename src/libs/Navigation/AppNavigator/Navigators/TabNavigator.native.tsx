@@ -8,12 +8,15 @@ import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
 import SCREENS from '@src/SCREENS';
 
+import type {NativeBottomTabNavigationOptions} from '@react-navigation/bottom-tabs/unstable';
+
 import {createNativeBottomTabNavigator} from '@react-navigation/bottom-tabs/unstable';
 import React from 'react';
 
 import type {NativeTabName} from './NativeTabNavigator/NATIVE_TAB_GLYPHS';
 import type {NativeTabLayoutProps} from './NativeTabNavigator/NativeTabLayout';
 
+import getStableTabOptions from './NativeTabNavigator/getStableTabOptions';
 import NativeTabLayout from './NativeTabNavigator/NativeTabLayout';
 import tabScreenListeners from './NativeTabNavigator/tabScreenListeners';
 import useNativeTabBarOptions from './NativeTabNavigator/useNativeTabBarOptions';
@@ -35,17 +38,25 @@ const HIDDEN_TAB_OPTIONS = {tabBarItemHidden: true};
 const renderNativeTabLayout = (props: NativeTabLayoutProps) => <NativeTabLayout {...props} />;
 
 function TabNavigator() {
-    const {shouldShowNativeTabBar, dotColors, tabLabels, tabWithoutBarItem, tabRouterOverride, isTabSelectionEnabled} = useNativeTabNavigator();
-    const {screenOptions, getTabOptions} = useNativeTabBarOptions({shouldShowNativeTabBar, dotColors, tabLabels});
-    // A tab with no bar item draws no icon.
-    const getScreenOptions = ({route}: {route: {name: NativeTabName}}) =>
-        route.name === tabWithoutBarItem
-            ? {...screenOptions, ...HIDDEN_TAB_OPTIONS}
-            : {
-                  ...screenOptions,
-                  ...getTabOptions(route.name),
-                  tabBarSelectionEnabled: isTabSelectionEnabled(route.name),
-              };
+    const {shouldShowNativeTabBar, activeTabName, dotColors, tabLabels, tabWithoutBarItem, tabRouterOverride, isTabSelectionEnabled} = useNativeTabNavigator();
+    const {screenOptions, getTabOptions} = useNativeTabBarOptions({dotColors, tabLabels});
+    const getScreenOptions = ({route}: {route: {name: NativeTabName}}) => {
+        // A tab with no bar item draws no icon.
+        const options: NativeBottomTabNavigationOptions =
+            route.name === tabWithoutBarItem
+                ? {...screenOptions, ...HIDDEN_TAB_OPTIONS}
+                : {
+                      ...screenOptions,
+                      ...getTabOptions(route.name),
+                      tabBarSelectionEnabled: isTabSelectionEnabled(route.name),
+                  };
+        // The bar reads its visibility from the focused tab only, so hiding or showing it changes that tab's options and
+        // leaves every other tab, its icon and its screen as they are. Before the tab state exists every tab hides it.
+        if (!shouldShowNativeTabBar && (!activeTabName || route.name === activeTabName)) {
+            options.tabBarStyle = {...options.tabBarStyle, display: 'none'};
+        }
+        return getStableTabOptions(route.name, options);
+    };
 
     return (
         <Tab.Navigator

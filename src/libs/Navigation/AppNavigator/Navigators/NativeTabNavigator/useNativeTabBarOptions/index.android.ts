@@ -24,7 +24,7 @@ const TAB_ICON_LAYOUT: TabIconLayout = {
     direction: 'stacked',
 };
 
-function useNativeTabBarOptions({shouldShowNativeTabBar, dotColors, tabLabels}: NativeTabBarOptionsParams) {
+function useNativeTabBarOptions({dotColors, tabLabels}: NativeTabBarOptionsParams) {
     const theme = useTheme();
     const styles = useThemeStyles();
 
@@ -35,8 +35,8 @@ function useNativeTabBarOptions({shouldShowNativeTabBar, dotColors, tabLabels}: 
         tabBarLabelStyle: {fontFamily: styles.textSmall.fontFamily, fontSize: styles.textSmall.fontSize},
         tabBarActiveIndicatorColor: theme.androidTabBarActiveIndicatorBG,
         tabBarLabelVisibilityMode: 'labeled',
-        // Every tab shares one style, so the bar reads the current visibility in the same render that changed it.
-        tabBarStyle: {display: shouldShowNativeTabBar ? 'flex' : 'none', backgroundColor: theme.appBG},
+        // The bar's visibility is set on the focused tab alone (see TabNavigator), so hiding the bar leaves the other tabs as they are.
+        tabBarStyle: {backgroundColor: theme.appBG},
     };
 
     const getTabOptions = (name: NativeTabName): NativeBottomTabNavigationOptions => ({

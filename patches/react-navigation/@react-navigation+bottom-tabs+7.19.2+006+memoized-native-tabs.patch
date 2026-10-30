@@ -1,0 +1,455 @@
+diff --git a/node_modules/@react-navigation/bottom-tabs/lib/module/unstable/NativeBottomTabView.native.js b/node_modules/@react-navigation/bottom-tabs/lib/module/unstable/NativeBottomTabView.native.js
+index 5144b70..76c698a 100644
+--- a/node_modules/@react-navigation/bottom-tabs/lib/module/unstable/NativeBottomTabView.native.js
++++ b/node_modules/@react-navigation/bottom-tabs/lib/module/unstable/NativeBottomTabView.native.js
+@@ -181,30 +181,6 @@ export function NativeBottomTabView({
+     default: colors.text
+   });
+   const activeIndicatorColor = currentOptions?.tabBarActiveIndicatorColor ?? (typeof activeTintColor === 'string' ? Color(activeTintColor)?.alpha(0.1).string() : undefined);
+-  const onTransitionStart = ({
+-    closing,
+-    route
+-  }) => {
+-    navigation.emit({
+-      type: 'transitionStart',
+-      data: {
+-        closing
+-      },
+-      target: route.key
+-    });
+-  };
+-  const onTransitionEnd = ({
+-    closing,
+-    route
+-  }) => {
+-    navigation.emit({
+-      type: 'transitionEnd',
+-      data: {
+-        closing
+-      },
+-      target: route.key
+-    });
+-  };
+   const tabBarControllerMode = currentOptions.tabBarControllerMode === 'auto' ? 'automatic' : currentOptions.tabBarControllerMode;
+   const tabBarMinimizeBehavior = currentOptions.tabBarMinimizeBehavior === 'auto' ? 'automatic' : currentOptions.tabBarMinimizeBehavior === 'none' ? 'never' : currentOptions.tabBarMinimizeBehavior;
+   const shouldHideTabBar = currentOptions.tabBarStyle?.display === 'none';
+@@ -240,163 +216,34 @@ export function NativeBottomTabView({
+         const {
+           options,
+           render,
+-          navigation
++          navigation: routeNavigation
+         } = descriptors[route.key];
+-        const isFocused = state.index === index;
+-        const isPreloaded = state.preloadedRouteKeys.includes(route.key);
+         // Only the tab the hidden routes are drawn in is drawn unselected, so a tab the user taps natively shows as
+         // selected right away.
+         const isSelectionHidden = isFocusedRouteHidden && route.key === hiddenRoutesHostKey;
+-        const {
+-          title,
+-          lazy = false,
+-          tabBarLabel,
+-          tabBarAccessibilityLabel,
+-          tabBarSelectionEnabled,
+-          tabBarBadgeStyle,
+-          tabBarIcon,
+-          tabBarBadge,
+-          tabBarSystemItem,
+-          tabBarBlurEffect = dark ? 'systemMaterialDark' : 'systemMaterial',
+-          tabBarStyle,
+-          overrideScrollViewContentInsetAdjustmentBehavior
+-        } = options;
+-        const {
+-          backgroundColor: tabBarBackgroundColor,
+-          shadowColor: tabBarShadowColor
+-        } = tabBarStyle || {};
+-        const tabTitle =
+-        // On iOS, `systemItem` already provides a localized label
+-        // So we should only use `tabBarLabel` if explicitly provided
+-        Platform.OS === 'ios' && tabBarSystemItem != null ? tabBarLabel : getLabel({
+-          label: tabBarLabel,
+-          title
+-        }, route.name);
+-        const badgeBackgroundColor = tabBarBadgeStyle?.backgroundColor ?? colors.notification;
+-        const badgeTextColor = tabBarBadgeStyle?.color ?? (typeof badgeBackgroundColor === 'string' ? Color(badgeBackgroundColor).isLight() ? 'black' : 'white' : undefined);
+-        const tabItemAppearance = {
+-          tabBarItemTitleFontFamily: fontFamily,
+-          tabBarItemTitleFontSize: fontSize,
+-          tabBarItemTitleFontWeight: fontWeight,
+-          tabBarItemTitleFontStyle: fontStyle,
+-          tabBarItemTitleFontColor: inactiveTintColor ?? fontColor,
+-          tabBarItemIconColor: inactiveTintColor,
+-          tabBarItemBadgeBackgroundColor: badgeBackgroundColor
+-        };
+-        const normalTabItemAppearance = {
+-          tabBarItemTitleFontColor: inactiveTintColor ?? fontColor,
+-          tabBarItemIconColor: inactiveTintColor
+-        };
+-        const selectedTabItemAppearance = {
+-          tabBarItemTitleFontColor: activeTintColor,
+-          tabBarItemIconColor: activeTintColor
+-        };
+-        const icon = typeof tabBarIcon === 'function' ? getPlatformIcon(tabBarIcon({
+-          focused: false
+-        })) : tabBarIcon != null ? getPlatformIcon(tabBarIcon) : undefined;
+-        const selectedIcon = typeof tabBarIcon === 'function' ? getPlatformIcon(tabBarIcon({
+-          focused: !isSelectionHidden
+-        })) : undefined;
+-        return /*#__PURE__*/_jsx(Tabs.Screen, {
+-          onWillDisappear: () => onTransitionStart({
+-            closing: true,
+-            route
+-          }),
+-          onWillAppear: () => onTransitionStart({
+-            closing: false,
+-            route
+-          }),
+-          onDidAppear: () => onTransitionEnd({
+-            closing: false,
+-            route
+-          }),
+-          onDidDisappear: () => onTransitionEnd({
+-            closing: true,
+-            route
+-          }),
+-          screenKey: route.name,
+-          preventNativeSelection: tabBarSelectionEnabled === false,
+-          badgeValue: tabBarBadge?.toString(),
+-          title: tabTitle,
+-          tabBarItemAccessibilityLabel: tabBarAccessibilityLabel,
+-          nativeContainerStyle: {
+-            backgroundColor: colors.background
+-          },
+-          specialEffects: {
+-            repeatedTabSelection: {
+-              popToRoot: !isSelectionHidden,
+-              scrollToTop: !isSelectionHidden
+-            }
+-          },
+-          android: {
+-            icon: icon?.android ?? icon?.shared,
+-            selectedIcon: selectedIcon?.android ?? selectedIcon?.shared,
+-            standardAppearance: {
+-              tabBarBackgroundColor: tabBarBackgroundColor ?? colors.card,
+-              tabBarItemRippleColor: currentOptions?.tabBarRippleColor,
+-              tabBarItemLabelVisibilityMode: currentOptions?.tabBarLabelVisibilityMode,
+-              normal: normalTabItemAppearance,
+-              selected: isSelectionHidden ? normalTabItemAppearance : selectedTabItemAppearance,
+-              tabBarItemActiveIndicatorColor: isSelectionHidden ? 'transparent' : activeIndicatorColor,
+-              tabBarItemActiveIndicatorEnabled: currentOptions?.tabBarActiveIndicatorEnabled,
+-              tabBarItemTitleFontFamily: fontFamily,
+-              tabBarItemTitleFontWeight: fontWeight,
+-              tabBarItemTitleSmallLabelFontSize: fontSize,
+-              tabBarItemTitleLargeLabelFontSize: fontSize,
+-              tabBarItemTitleFontStyle: fontStyle,
+-              tabBarItemBadgeBackgroundColor: badgeBackgroundColor,
+-              tabBarItemBadgeTextColor: badgeTextColor
+-            }
+-          },
+-          ios: {
+-            icon: icon?.ios ?? icon?.shared,
+-            selectedIcon: selectedIcon?.ios ?? selectedIcon?.shared,
+-            systemItem: tabBarSystemItem,
+-            scrollEdgeAppearance: {
+-              tabBarBackgroundColor,
+-              tabBarShadowColor,
+-              tabBarBlurEffect,
+-              stacked: {
+-                normal: tabItemAppearance
+-              },
+-              inline: {
+-                normal: tabItemAppearance
+-              },
+-              compactInline: {
+-                normal: tabItemAppearance
+-              }
+-            },
+-            standardAppearance: {
+-              tabBarBackgroundColor,
+-              tabBarShadowColor,
+-              tabBarBlurEffect,
+-              stacked: {
+-                normal: tabItemAppearance
+-              },
+-              inline: {
+-                normal: tabItemAppearance
+-              },
+-              compactInline: {
+-                normal: tabItemAppearance
+-              }
+-            },
+-            overrideScrollViewContentInsetAdjustmentBehavior
+-          },
+-          // Keyed by route key, so a re-keyed route still remounts its content inside the same native tab.
+-          children: [/*#__PURE__*/_jsx(Deferred, {
+-            lazy: lazy,
+-            visible: isFocused || isPreloaded,
+-            children: /*#__PURE__*/_jsx(ScreenWithHeader, {
+-              isFocused: isFocused,
+-              route: route,
+-              navigation: navigation,
+-              options: options,
+-              children: /*#__PURE__*/_jsx(NavigationMetaContext.Provider, {
+-                value: meta,
+-                children: render()
+-              })
+-            })
+-          }, route.key), route.key === hiddenRoutesHostKey ? renderHiddenRoutes() : null]
++        return /*#__PURE__*/_jsx(NativeTab, {
++          route: route,
++          options: options,
++          render: render,
++          navigation: routeNavigation,
++          navigatorNavigation: navigation,
++          isFocused: state.index === index,
++          isPreloaded: state.preloadedRouteKeys.includes(route.key),
++          isSelectionHidden: isSelectionHidden,
++          hiddenRoutes: route.key === hiddenRoutesHostKey ? renderHiddenRoutes() : null,
++          dark: dark,
++          colors: colors,
++          fontFamily: fontFamily,
++          fontWeight: fontWeight,
++          fontSize: fontSize,
++          fontStyle: fontStyle,
++          fontColor: fontColor,
++          activeTintColor: activeTintColor,
++          inactiveTintColor: inactiveTintColor,
++          activeIndicatorColor: activeIndicatorColor,
++          tabBarRippleColor: currentOptions?.tabBarRippleColor,
++          tabBarLabelVisibilityMode: currentOptions?.tabBarLabelVisibilityMode,
++          tabBarActiveIndicatorEnabled: currentOptions?.tabBarActiveIndicatorEnabled
+         }, route.name);
+       })
+     }, "native-tabs-host")]
+@@ -431,6 +278,231 @@ export function NativeBottomTabView({
+     });
+   }
+ }
++// Each tab renders on its own and is skipped while nothing it draws changed. The bar's visibility, a navigation inside
++// another tab or an options update for one tab then re-renders only the tabs it reaches, instead of every tab, its
++// icons and its screen in the same commit.
++const NativeTab = /*#__PURE__*/React.memo(function NativeTab({
++  route,
++  options,
++  render,
++  navigation,
++  navigatorNavigation,
++  isFocused,
++  isPreloaded,
++  isSelectionHidden,
++  hiddenRoutes,
++  dark,
++  colors,
++  fontFamily,
++  fontWeight,
++  fontSize,
++  fontStyle,
++  fontColor,
++  activeTintColor,
++  inactiveTintColor,
++  activeIndicatorColor,
++  tabBarRippleColor,
++  tabBarLabelVisibilityMode,
++  tabBarActiveIndicatorEnabled
++}) {
++  const emitTransition = (type, {
++    closing,
++    route
++  }) => {
++    navigatorNavigation.emit({
++      type,
++      data: {
++        closing
++      },
++      target: route.key
++    });
++  };
++  const {
++    title,
++    lazy = false,
++    tabBarLabel,
++    tabBarAccessibilityLabel,
++    tabBarSelectionEnabled,
++    tabBarBadgeStyle,
++    tabBarIcon,
++    tabBarBadge,
++    tabBarSystemItem,
++    tabBarBlurEffect = dark ? 'systemMaterialDark' : 'systemMaterial',
++    tabBarStyle,
++    overrideScrollViewContentInsetAdjustmentBehavior
++  } = options;
++  const {
++    backgroundColor: tabBarBackgroundColor,
++    shadowColor: tabBarShadowColor
++  } = tabBarStyle || {};
++  const tabTitle =
++  // On iOS, `systemItem` already provides a localized label
++  // So we should only use `tabBarLabel` if explicitly provided
++  Platform.OS === 'ios' && tabBarSystemItem != null ? tabBarLabel : getLabel({
++    label: tabBarLabel,
++    title
++  }, route.name);
++  const badgeBackgroundColor = tabBarBadgeStyle?.backgroundColor ?? colors.notification;
++  const badgeTextColor = tabBarBadgeStyle?.color ?? (typeof badgeBackgroundColor === 'string' ? Color(badgeBackgroundColor).isLight() ? 'black' : 'white' : undefined);
++  const tabItemAppearance = {
++    tabBarItemTitleFontFamily: fontFamily,
++    tabBarItemTitleFontSize: fontSize,
++    tabBarItemTitleFontWeight: fontWeight,
++    tabBarItemTitleFontStyle: fontStyle,
++    tabBarItemTitleFontColor: inactiveTintColor ?? fontColor,
++    tabBarItemIconColor: inactiveTintColor,
++    tabBarItemBadgeBackgroundColor: badgeBackgroundColor
++  };
++  const normalTabItemAppearance = {
++    tabBarItemTitleFontColor: inactiveTintColor ?? fontColor,
++    tabBarItemIconColor: inactiveTintColor
++  };
++  const selectedTabItemAppearance = {
++    tabBarItemTitleFontColor: activeTintColor,
++    tabBarItemIconColor: activeTintColor
++  };
++  const icon = typeof tabBarIcon === 'function' ? getPlatformIcon(tabBarIcon({
++    focused: false
++  })) : tabBarIcon != null ? getPlatformIcon(tabBarIcon) : undefined;
++  const selectedIcon = typeof tabBarIcon === 'function' ? getPlatformIcon(tabBarIcon({
++    focused: !isSelectionHidden
++  })) : undefined;
++  return /*#__PURE__*/_jsx(Tabs.Screen, {
++    onWillDisappear: () => emitTransition('transitionStart', {
++      closing: true,
++      route
++    }),
++    onWillAppear: () => emitTransition('transitionStart', {
++      closing: false,
++      route
++    }),
++    onDidAppear: () => emitTransition('transitionEnd', {
++      closing: false,
++      route
++    }),
++    onDidDisappear: () => emitTransition('transitionEnd', {
++      closing: true,
++      route
++    }),
++    screenKey: route.name,
++    preventNativeSelection: tabBarSelectionEnabled === false,
++    badgeValue: tabBarBadge?.toString(),
++    title: tabTitle,
++    tabBarItemAccessibilityLabel: tabBarAccessibilityLabel,
++    nativeContainerStyle: {
++      backgroundColor: colors.background
++    },
++    specialEffects: {
++      repeatedTabSelection: {
++        popToRoot: !isSelectionHidden,
++        scrollToTop: !isSelectionHidden
++      }
++    },
++    android: {
++      icon: icon?.android ?? icon?.shared,
++      selectedIcon: selectedIcon?.android ?? selectedIcon?.shared,
++      standardAppearance: {
++        tabBarBackgroundColor: tabBarBackgroundColor ?? colors.card,
++        tabBarItemRippleColor: tabBarRippleColor,
++        tabBarItemLabelVisibilityMode: tabBarLabelVisibilityMode,
++        normal: normalTabItemAppearance,
++        selected: isSelectionHidden ? normalTabItemAppearance : selectedTabItemAppearance,
++        tabBarItemActiveIndicatorColor: isSelectionHidden ? 'transparent' : activeIndicatorColor,
++        tabBarItemActiveIndicatorEnabled: tabBarActiveIndicatorEnabled,
++        tabBarItemTitleFontFamily: fontFamily,
++        tabBarItemTitleFontWeight: fontWeight,
++        tabBarItemTitleSmallLabelFontSize: fontSize,
++        tabBarItemTitleLargeLabelFontSize: fontSize,
++        tabBarItemTitleFontStyle: fontStyle,
++        tabBarItemBadgeBackgroundColor: badgeBackgroundColor,
++        tabBarItemBadgeTextColor: badgeTextColor
++      }
++    },
++    ios: {
++      icon: icon?.ios ?? icon?.shared,
++      selectedIcon: selectedIcon?.ios ?? selectedIcon?.shared,
++      systemItem: tabBarSystemItem,
++      scrollEdgeAppearance: {
++        tabBarBackgroundColor,
++        tabBarShadowColor,
++        tabBarBlurEffect,
++        stacked: {
++          normal: tabItemAppearance
++        },
++        inline: {
++          normal: tabItemAppearance
++        },
++        compactInline: {
++          normal: tabItemAppearance
++        }
++      },
++      standardAppearance: {
++        tabBarBackgroundColor,
++        tabBarShadowColor,
++        tabBarBlurEffect,
++        stacked: {
++          normal: tabItemAppearance
++        },
++        inline: {
++          normal: tabItemAppearance
++        },
++        compactInline: {
++          normal: tabItemAppearance
++        }
++      },
++      overrideScrollViewContentInsetAdjustmentBehavior
++    },
++    // Keyed by route key, so a re-keyed route still remounts its content inside the same native tab.
++    children: [/*#__PURE__*/_jsx(Deferred, {
++      lazy: lazy,
++      visible: isFocused || isPreloaded,
++      children: /*#__PURE__*/_jsx(ScreenWithHeader, {
++        isFocused: isFocused,
++        route: route,
++        navigation: navigation,
++        options: options,
++        children: /*#__PURE__*/_jsx(NavigationMetaContext.Provider, {
++          value: meta,
++          children: render()
++        })
++      })
++    }, route.key), hiddenRoutes]
++  });
++}, areNativeTabPropsEqual);
++
++// A descriptor's `render` and `options` are created anew on every render of the navigator. The rendered screen only
++// depends on the route (which holds the screen's state), its navigation object and its options, so `render` is left
++// out and the options are compared one by one.
++function areNativeTabPropsEqual(prevProps, nextProps) {
++  for (const key of Object.keys(nextProps)) {
++    if (key === 'render') {
++      continue;
++    }
++    if (key === 'options' || key === 'hiddenRoutes') {
++      if (!areShallowEqual(prevProps[key], nextProps[key])) {
++        return false;
++      }
++      continue;
++    }
++    if (prevProps[key] !== nextProps[key]) {
++      return false;
++    }
++  }
++  return true;
++}
++function areShallowEqual(prev, next) {
++  if (prev === next) {
++    return true;
++  }
++  if (prev == null || next == null) {
++    return false;
++  }
++  const prevKeys = Object.keys(prev);
++  if (prevKeys.length !== Object.keys(next).length) {
++    return false;
++  }
++  return prevKeys.every(key => prev[key] === next[key]);
++}
+ const styles = StyleSheet.create({
+   hiddenRoute: {
+     display: 'none'

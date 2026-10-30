@@ -95,6 +95,14 @@
 - PR Introducing Patch: [#104491](https://github.com/Expensify/App/pull/104491)
 - PR Updating Patch: N/A
 
+### [@react-navigation+bottom-tabs+7.19.2+006+memoized-native-tabs.patch](@react-navigation+bottom-tabs+7.19.2+006+memoized-native-tabs.patch)
+
+- Reason: `NativeBottomTabView` renders every `Tabs.Screen` inline, so each render of the navigator rebuilds every tab: its icons, its appearance objects, its badge colors and the descriptor element of its screen. React Navigation builds new descriptors on every render, so hiding the native tab bar or navigating inside one tab re-rendered all of them in the same commit as the navigation, which slowed down opening the Create expense flow, Search, Send message and Open report on iOS and Android. The patch moves the body of each tab into a memoized `NativeTab` component that re-renders only when that tab's route, navigation object, focus, selection state, hidden routes or one of its options changes. A descriptor's `render` is left out of the comparison, because the screen it renders depends only on the route, its navigation object and its options, and the options are compared one by one, because React Navigation merges them into a new object on every render. The App keeps each tab's options equal while nothing the tab draws changes (`getStableTabOptions`) and sets the bar's visibility on the focused tab alone.
+- Upstream PR/issue: not reported yet. The same per-tab memoization would help any app that uses the native bottom tabs, but this patch builds on patches 003 to 005, which have no upstream counterpart.
+- E/App issue: [#105517](https://github.com/Expensify/App/issues/105517)
+- PR Introducing Patch: TBD
+- PR Updating Patch: N/A
+
 ### Removed patches
 
 - `@react-navigation+native+7.1.33+003+increase-history-go-popstate-fallback-timeout.patch` was dropped: upstream raised the `createMemoryHistory.go()` fallback timeout from 100ms to 1000ms in 7.3.18 (https://github.com/react-navigation/react-navigation/pull/13217), with the same Firefox rationale as our patch. Original context: [#94571](https://github.com/Expensify/App/issues/94571) / [#95980](https://github.com/Expensify/App/pull/95980), upstream issue https://github.com/react-navigation/react-navigation/issues/11145.

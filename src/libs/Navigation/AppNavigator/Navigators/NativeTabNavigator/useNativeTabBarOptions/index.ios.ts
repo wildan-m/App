@@ -34,7 +34,7 @@ const LANDSCAPE_TAB_ICON_LAYOUT: TabIconLayout = {
  * in the color of the selected tab, so each icon is drawn with its own colors, its status dot and its label. Both
  * selection states are images, because RNScreens rejects a tab whose icon and selectedIcon differ in type.
  */
-function useNativeTabBarOptions({shouldShowNativeTabBar, dotColors, tabLabels}: NativeTabBarOptionsParams) {
+function useNativeTabBarOptions({dotColors, tabLabels}: NativeTabBarOptionsParams) {
     const theme = useTheme();
     const {windowWidth} = useWindowDimensions();
     const {isInLandscapeMode} = useResponsiveLayout();
@@ -49,9 +49,9 @@ function useNativeTabBarOptions({shouldShowNativeTabBar, dotColors, tabLabels}: 
         tabBarLabel: '',
         tabBarActiveTintColor: theme.iconMenu,
         tabBarInactiveTintColor: theme.icon,
-        // Every tab shares one style, so the bar reads the current visibility in the same render that changed it.
+        // The bar's visibility is set on the focused tab alone (see TabNavigator), so hiding the bar leaves the other tabs as they are.
         // The background only lands on iOS 18 and below; iOS 26 keeps its own glass material.
-        tabBarStyle: {display: shouldShowNativeTabBar ? 'flex' : 'none', backgroundColor: theme.appBG},
+        tabBarStyle: {backgroundColor: theme.appBG},
         tabBarControllerMode: 'tabBar',
         // The bar stays put while the content scrolls, instead of collapsing the way iOS 26 does by default.
         tabBarMinimizeBehavior: 'none',

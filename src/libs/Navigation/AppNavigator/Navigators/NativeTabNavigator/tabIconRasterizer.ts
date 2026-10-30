@@ -42,6 +42,11 @@ type TabIconParams = {
 const MAX_CACHED_ICONS = 64;
 
 const iconCache = new Map<string, NativeBottomTabIcon | undefined>();
+
+type TabBarIcon = (props: {focused: boolean}) => NativeBottomTabIcon;
+
+/** The tabBarIcon function of each pair of icons, keyed by the inactive icon and then the active one. */
+const tabBarIconCache = new WeakMap<NativeBottomTabIcon, WeakMap<NativeBottomTabIcon, TabBarIcon>>();
 const glyphPathCache = new Map<NativeTabName, SkPath[]>();
 
 function getGlyphPaths(name: NativeTabName): SkPath[] {
@@ -214,11 +219,29 @@ function getTabIcon(layout: TabIconLayout, params: TabIconParams): NativeBottomT
     return icon;
 }
 
-/** Both selection states as images, given as a function, because React Navigation derives the selected icon only from a function. */
+/**
+ * Both selection states as images, given as a function, because React Navigation derives the selected icon only from a function.
+ * The same pair of icons always gets the same function, so the options of a tab whose icons did not change stay equal and the tab
+ * is not re-rendered.
+ */
 function getTabBarIcon(layout: TabIconLayout, getParams: (isSelected: boolean) => TabIconParams): NativeBottomTabNavigationOptions['tabBarIcon'] {
     const inactiveIcon = getTabIcon(layout, getParams(false));
     const activeIcon = getTabIcon(layout, getParams(true));
-    return inactiveIcon && activeIcon ? ({focused}) => (focused ? activeIcon : inactiveIcon) : undefined;
+    if (!inactiveIcon || !activeIcon) {
+        return undefined;
+    }
+    let tabBarIconsByActiveIcon = tabBarIconCache.get(inactiveIcon);
+    if (!tabBarIconsByActiveIcon) {
+        tabBarIconsByActiveIcon = new WeakMap();
+        tabBarIconCache.set(inactiveIcon, tabBarIconsByActiveIcon);
+    }
+    const cachedTabBarIcon = tabBarIconsByActiveIcon.get(activeIcon);
+    if (cachedTabBarIcon) {
+        return cachedTabBarIcon;
+    }
+    const tabBarIcon: TabBarIcon = ({focused}) => (focused ? activeIcon : inactiveIcon);
+    tabBarIconsByActiveIcon.set(activeIcon, tabBarIcon);
+    return tabBarIcon;
 }
 
 export default getTabBarIcon;

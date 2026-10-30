@@ -13,7 +13,6 @@ import SCREENS from '@src/SCREENS';
 const mockGetTabBarIcon = jest.mocked(getTabBarIcon);
 
 const PARAMS: NativeTabBarOptionsParams = {
-    shouldShowNativeTabBar: true,
     dotColors: {[NAVIGATORS.REPORTS_SPLIT_NAVIGATOR]: '#ff0000'},
     tabLabels: {
         [SCREENS.HOME]: 'Home',
