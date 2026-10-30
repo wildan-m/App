@@ -84,6 +84,29 @@ describe('MenuItem accessibility', () => {
         expect(await screen.findByLabelText(`${NAME}, ${VALUE}`)).toBeOnTheScreen();
     });
 
+    it('reads a title slot after the text lines, since its element has no text the row can read', async () => {
+        // Given a row whose value is an element below a description, as the legacy titleComponent rows show a pill
+        const description = 'Approvers';
+        render(
+            <LocaleContextProvider>
+                <MenuItem.Root>
+                    <MenuItem.Row>
+                        <MenuItem.Content>
+                            <MenuItem.Label>{NAME}</MenuItem.Label>
+                            <MenuItem.Description>{description}</MenuItem.Description>
+                            <MenuItem.TitleSlot accessibilityLabel={VALUE}>
+                                <MenuItem.RightLabel>{VALUE}</MenuItem.RightLabel>
+                            </MenuItem.TitleSlot>
+                        </MenuItem.Content>
+                    </MenuItem.Row>
+                </MenuItem.Root>
+            </LocaleContextProvider>,
+        );
+
+        // Then the slot's label is read last, after both text lines, in the order they show
+        expect(await screen.findByLabelText(`${NAME}, ${description}, ${VALUE}`)).toBeOnTheScreen();
+    });
+
     it('still announces facts about a row that names itself', async () => {
         // Given a row that passes its own label, e.g. because its value is an element the text leaves can't read
         render(

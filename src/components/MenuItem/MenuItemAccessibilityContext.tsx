@@ -8,7 +8,7 @@ import {createContext, useContext, useEffect, useState} from 'react';
  * Label slots a `MenuItem` row can contribute, in the order they are announced. Keyed by line rather
  * than by role, so the announced order matches the visual one on both field and navigation rows.
  */
-const MENU_ITEM_LABEL_SLOTS = ['top', 'bottom'] as const;
+const MENU_ITEM_LABEL_SLOTS = ['top', 'bottom', 'details'] as const;
 
 type MenuItemLabelSlot = TupleToUnion<typeof MENU_ITEM_LABEL_SLOTS>;
 
@@ -59,7 +59,7 @@ function useRegistration<TKey>(registry: MenuItemAccessibilityRegistry<TKey> | u
     }, [key, text, register, unregister]);
 }
 
-/** Contributes text to the label `MenuItem.Root` derives, announced in slot order (`top`, then `bottom`) */
+/** Contributes text to the label `MenuItem.Root` derives, announced in slot order (`top`, `bottom`, then `details`) */
 function useMenuItemAccessibilityLabel(slot: MenuItemLabelSlot, text: string | undefined) {
     useRegistration(useContext(MenuItemAccessibilityContext)?.label, slot, text);
 }

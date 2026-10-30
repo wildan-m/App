@@ -63,6 +63,15 @@ type MenuItemRootProps = PropsWithChildren &
          */
         shouldBeAccessible?: boolean;
 
+        /**
+         * Whether the row is the active one, e.g. the selected entry of a list or the current settings page.
+         * Holds the hover background and brightens the trailing icons as if the row were hovered.
+         */
+        isActive?: boolean;
+
+        /** Whether the screen holding the row is focused, so the hover state resets when the screen loses focus */
+        isScreenFocused?: boolean;
+
         /** The pressable row, for a caller that moves focus to it */
         ref?: Ref<ComponentRef<typeof View>>;
     };
@@ -78,6 +87,8 @@ function MenuItemRoot({
     shouldAllowTextSelection = false,
     accessibilityState,
     shouldBeAccessible = true,
+    isActive = false,
+    isScreenFocused,
     ref,
 }: MenuItemRootProps) {
     const styles = useThemeStyles();
@@ -134,7 +145,7 @@ function MenuItemRoot({
 
     return (
         <MenuItemConfigContext.Provider value={{isDisabled, isInteractive, shouldAllowTextSelection: shouldEnableTextSelection}}>
-            <Hoverable>
+            <Hoverable isFocused={isScreenFocused}>
                 {(isHovered) => (
                     <PressableWithSecondaryInteraction
                         onPress={onPressAction}
@@ -164,9 +175,9 @@ function MenuItemRoot({
                                 !isInteractive && styles.cursorDefault,
                                 isCompactPopover && styles.compactPopoverMenuItemBase,
                                 style,
-                                StyleUtils.getButtonBackgroundColorStyle(getButtonState({isActive: isHovered, isPressed: pressed, isDisabled, isInteractive}), true),
+                                StyleUtils.getButtonBackgroundColorStyle(getButtonState({isActive: isActive || isHovered, isPressed: pressed, isDisabled, isInteractive}), true),
                                 isDisabled && styles.buttonOpacityDisabled,
-                                isHovered && isInteractive && !pressed && styles.hoveredComponentBG,
+                                isHovered && isInteractive && !isActive && !pressed && styles.hoveredComponentBG,
                             ] as StyleProp<ViewStyle>
                         }
                         disabled={isDisabled}
@@ -187,6 +198,7 @@ function MenuItemRoot({
                                         value={{
                                             isHovered,
                                             isPressed: pressed,
+                                            isActive,
                                         }}
                                     >
                                         <View style={styles.flex1}>{children}</View>

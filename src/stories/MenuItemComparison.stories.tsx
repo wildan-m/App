@@ -16,6 +16,7 @@ import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import ReportActionAvatars from '@components/ReportActionAvatars';
 import Section from '@components/Section';
 import Text from '@components/Text';
+import UserPill from '@components/UserPill';
 
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -144,17 +145,114 @@ function SectionHeading({title, children}: {title: string; children?: string}) {
 
 function Comparison() {
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'FallbackAvatar', 'NewWindow', 'Download']);
+    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'FallbackAvatar', 'NewWindow', 'Download', 'Lock']);
 
     // The legacy external-link row anchors its context menu to the row itself, which the composable API does for the call site
     const popoverAnchor = useRef<ComponentRef<typeof View>>(null);
 
-    if (!icons.Gear || !icons.FallbackAvatar || !icons.NewWindow || !icons.Download) {
+    if (!icons.Gear || !icons.FallbackAvatar || !icons.NewWindow || !icons.Download || !icons.Lock) {
         return null;
     }
 
     return (
         <View style={[styles.p4, styles.flexRow, styles.flexWrap, styles.gap4]}>
+            <SectionHeading title="Phase 6 — long-tail leaves">Escape hatches the presets leave out, composed from leaves instead of props.</SectionHeading>
+
+            <Card
+                title="description, iconRight, onPress, shouldShowRightIcon, title"
+                note="Any trailing icon but the arrow stays at full opacity and brightens with the row"
+                legacy={
+                    <MenuItemWithTopDescription
+                        description="Tag"
+                        title="Department"
+                        iconRight={icons.Lock}
+                        onPress={noop}
+                        shouldShowRightIcon
+                    />
+                }
+                composable={
+                    <MenuItem.Root onPress={noop}>
+                        <MenuItem.Row>
+                            <MenuItem.Content>
+                                <MenuItem.FieldName>Tag</MenuItem.FieldName>
+                                <MenuItem.FieldValue>Department</MenuItem.FieldValue>
+                            </MenuItem.Content>
+                            <MenuItem.Trailing>
+                                <MenuItem.TrailingIcon src={icons.Lock} />
+                            </MenuItem.Trailing>
+                        </MenuItem.Row>
+                    </MenuItem.Root>
+                }
+            />
+
+            <Card
+                title="accessibilityLabel, label, onPress, shouldShowRightIcon, titleComponent"
+                legacy={
+                    <MenuItem
+                        label="Assignee"
+                        accessibilityLabel="Assignee, John Doe"
+                        titleComponent={
+                            <UserPill
+                                displayName="John Doe"
+                                accountID={STORY_ACCOUNT_ID}
+                                email="john@example.com"
+                                style={styles.userPillStandalone}
+                            />
+                        }
+                        onPress={noop}
+                        shouldShowRightIcon
+                    />
+                }
+                composable={
+                    <MenuItem.Root onPress={noop}>
+                        <MenuItem.Row>
+                            <MenuItem.Content>
+                                <MenuItem.Label>Assignee</MenuItem.Label>
+                                <MenuItem.TitleSlot accessibilityLabel="John Doe">
+                                    <UserPill
+                                        displayName="John Doe"
+                                        accountID={STORY_ACCOUNT_ID}
+                                        email="john@example.com"
+                                        style={styles.userPillStandalone}
+                                    />
+                                </MenuItem.TitleSlot>
+                            </MenuItem.Content>
+                            <MenuItem.Trailing>
+                                <MenuItem.Chevron />
+                            </MenuItem.Trailing>
+                        </MenuItem.Row>
+                    </MenuItem.Root>
+                }
+            />
+
+            <Card
+                title="focused, icon, onPress, title"
+                note="The active row holds the hover background, the way the selected settings page does"
+                legacy={
+                    <MenuItem
+                        title="Preferences"
+                        icon={icons.Gear}
+                        onPress={noop}
+                        focused
+                    />
+                }
+                composable={
+                    <MenuItem.Root
+                        onPress={noop}
+                        isActive
+                    >
+                        <MenuItem.Row>
+                            <MenuItem.Leading>
+                                <MenuItem.Icon src={icons.Gear} />
+                            </MenuItem.Leading>
+                            <MenuItem.Content>
+                                <MenuItem.Title>Preferences</MenuItem.Title>
+                            </MenuItem.Content>
+                        </MenuItem.Row>
+                    </MenuItem.Root>
+                }
+            />
+
             <SectionHeading title="Phase 4 - styles" />
 
             <Card

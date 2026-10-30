@@ -39,6 +39,7 @@ import MenuItemFieldValue from './leaves/content/MenuItemFieldValue';
 import MenuItemFieldValueHTML from './leaves/content/MenuItemFieldValueHTML';
 import MenuItemLabel from './leaves/content/MenuItemLabel';
 import MenuItemTitle from './leaves/content/MenuItemTitle';
+import MenuItemTitleSlot from './leaves/content/MenuItemTitleSlot';
 import MenuItemHelpText from './leaves/helpText/MenuItemHelpText';
 import MenuItemHelpTextHTML from './leaves/helpText/MenuItemHelpTextHTML';
 import MenuItemIcon from './leaves/leading/MenuItemIcon';
@@ -47,6 +48,7 @@ import MenuItemBrickRoadIndicator from './leaves/trailing/icons/MenuItemBrickRoa
 import MenuItemChevron from './leaves/trailing/icons/MenuItemChevron';
 import MenuItemDownCaret from './leaves/trailing/icons/MenuItemDownCaret';
 import MenuItemNewWindowIcon from './leaves/trailing/icons/MenuItemNewWindowIcon';
+import MenuItemTrailingIcon from './leaves/trailing/icons/MenuItemTrailingIcon';
 import MenuItemCopy from './leaves/trailing/MenuItemCopy';
 import MenuItemExternalLink from './leaves/trailing/MenuItemExternalLink';
 import MenuItemRightLabel from './leaves/trailing/MenuItemRightLabel';
@@ -63,6 +65,7 @@ const MenuItem = Object.assign(LegacyMenuItem, {
     IconNarrow: MenuItemIconNarrow,
     Label: MenuItemLabel,
     Title: MenuItemTitle,
+    TitleSlot: MenuItemTitleSlot,
     Description: MenuItemDescription,
     FieldName: MenuItemFieldName,
     FieldNamePlaceholder: MenuItemFieldNamePlaceholder,
@@ -72,6 +75,7 @@ const MenuItem = Object.assign(LegacyMenuItem, {
     Chevron: MenuItemChevron,
     DownCaret: MenuItemDownCaret,
     NewWindowIcon: MenuItemNewWindowIcon,
+    TrailingIcon: MenuItemTrailingIcon,
     RightLabel: MenuItemRightLabel,
     Copy: MenuItemCopy,
     ExternalLink: MenuItemExternalLink,

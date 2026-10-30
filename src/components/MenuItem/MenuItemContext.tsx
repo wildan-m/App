@@ -19,6 +19,9 @@ type MenuItemInteraction = {
 
     /** Whether the row is currently pressed */
     isPressed: boolean;
+
+    /** Whether the row is marked active by its caller, e.g. the selected entry of a list */
+    isActive: boolean;
 };
 
 const DEFAULT_CONFIG: MenuItemConfig = {
@@ -30,6 +33,7 @@ const DEFAULT_CONFIG: MenuItemConfig = {
 const DEFAULT_INTERACTION: MenuItemInteraction = {
     isHovered: false,
     isPressed: false,
+    isActive: false,
 };
 
 const MenuItemConfigContext = createContext<MenuItemConfig | undefined>(undefined);
