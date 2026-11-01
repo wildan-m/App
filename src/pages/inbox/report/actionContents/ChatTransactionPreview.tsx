@@ -10,6 +10,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import getReportRouteForCurrentContext from '@libs/Navigation/helpers/getReportRouteForCurrentContext';
+import getValidDynamicRouteBasePath from '@libs/Navigation/helpers/getValidDynamicRouteBasePath';
 import Navigation from '@libs/Navigation/Navigation';
 import {getIOUReportIDFromReportActionPreview, isSplitBillAction, isTrackExpenseAction} from '@libs/ReportActionsUtils';
 
@@ -74,7 +75,12 @@ function ChatTransactionPreview({action, reportID, chatReport, iouReport, should
                 transactionPreviewWidth={reportPreviewStyles.transactionPreviewStandaloneStyle.width}
                 onPreviewPressed={() => {
                     if (shouldShowSplitPreview) {
-                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.getRoute(action.reportActionID)));
+                        // Outside a report (e.g. a Chat-type Search row) the active route can't host split details, so fall back to the report route.
+                        const basePath = getValidDynamicRouteBasePath({
+                            entryScreens: DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.entryScreens,
+                            fallbackPath: getReportRouteForCurrentContext({reportID}),
+                        });
+                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.getRoute(action.reportActionID), basePath));
                         return;
                     }
 
