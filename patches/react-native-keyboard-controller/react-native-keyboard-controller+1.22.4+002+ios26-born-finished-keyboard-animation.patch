@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-keyboard-controller/ios/observers/movement/observer/KeyboardMovementObserver+Animation.swift b/node_modules/react-native-keyboard-controller/ios/observers/movement/observer/KeyboardMovementObserver+Animation.swift
+index c56d308..bf73e87 100644
+--- a/node_modules/react-native-keyboard-controller/ios/observers/movement/observer/KeyboardMovementObserver+Animation.swift
++++ b/node_modules/react-native-keyboard-controller/ios/observers/movement/observer/KeyboardMovementObserver+Animation.swift
+@@ -7,6 +7,15 @@
+ 
+ extension KeyboardMovementObserver {
+   func initializeAnimation(fromValue: Double, toValue: Double) {
++    // The extracted animation is per-flight - a previous flight's finished animation must not leak into a new flight.
++    animation = nil
++
++    // A stale `fromValue` equal to the destination creates a born-finished animation that swallows every frame of
++    // the flight (`isFinished` is true from the first tick) - rely on direct keyboard position reads instead.
++    if fromValue == toValue {
++      return
++    }
++
+     for key in ["position", "opacity"] {
+       if let keyboardAnimation = keyboardTrackingView.view?.layer.presentation()?.animation(forKey: key) {
+         if let springAnimation = keyboardAnimation as? CASpringAnimation {
