@@ -590,7 +590,7 @@ describe('Lazily loaded group selection', () => {
         expect(result.current.selectedTransactions['2']).toBeUndefined();
     });
 
-    it('narrows a Select All onto one child of a group whose rows arrived afterwards, even once they are stored individually', async () => {
+    it('narrows a Select All onto one child of a group whose rows arrived afterwards, while the group entry still covers them', async () => {
         const {result, rerender} = renderSelection(PagingWrapper);
         const [firstChild, secondChild] = loadedChildren;
 
@@ -600,14 +600,15 @@ describe('Lazily loaded group selection', () => {
             await waitForBatchedUpdatesWithAct();
         });
 
-        // When its first page arrives, which writes the selection out into an entry per row
+        // When its first page arrives, the selection stays under the group's own key, which still covers the unloaded rows
         pagingGroup = cachedPartialGroup;
         rerender({});
         await act(async () => {
             expandGroup(result, GROUP_KEY, loadedChildren);
             await waitForBatchedUpdatesWithAct();
         });
-        expect(result.current.selectedTransactions[secondChild.keyForList]?.isSelected).toBe(true);
+        expect(result.current.selectedTransactions[GROUP_KEY]?.isSelected).toBe(true);
+        expect(result.current.selectedTransactions[secondChild.keyForList]).toBeUndefined();
 
         // And a shift+click lands on the first child
         await act(async () => {
@@ -615,7 +616,8 @@ describe('Lazily loaded group selection', () => {
             await waitForBatchedUpdatesWithAct();
         });
 
-        // Then the Select All narrows onto it, rather than those entries reading as hand-picked and resisting the collapse
+        // Then the Select All narrows onto it, rather than the group entry resisting the collapse
+        expect(result.current.selectedTransactions[GROUP_KEY]).toBeUndefined();
         expect(result.current.selectedTransactions[firstChild.keyForList]?.isSelected).toBe(true);
         expect(result.current.selectedTransactions[secondChild.keyForList]).toBeUndefined();
     });
@@ -871,7 +873,7 @@ describe('Lazily loaded group selection', () => {
     it('unchecks a child of a group selected while collapsed, once that group’s first page reaches the list', async () => {
         pagingGroup = partiallyLoadedGroup;
         const {result, rerender} = renderSelection(PagingWrapper);
-        const [firstChild] = loadedChildren;
+        const [firstChild, secondChild] = loadedChildren;
 
         // Given a group of five selected while collapsed, so the selection is held under its own key
         await act(async () => {
@@ -880,24 +882,24 @@ describe('Lazily loaded group selection', () => {
         });
         expect(result.current.selectedTransactions[GROUP_KEY]?.isSelected).toBe(true);
 
-        // When its first page arrives, which is the same commit that makes those rows clickable
+        // When its first page arrives, the selection stays under the group's own key, which still covers the three unloaded rows
         pagingGroup = cachedPartialGroup;
         rerender({});
         await act(async () => {
             expandGroup(result, GROUP_KEY, loadedChildren);
             await waitForBatchedUpdatesWithAct();
         });
+        expect(result.current.selectedTransactions[GROUP_KEY]?.isSelected).toBe(true);
+        expect(result.current.selectedTransactions[firstChild.keyForList]).toBeUndefined();
 
-        // Then the group has been written out into the rows that arrived, rather than staying an unnameable block
-        expect(result.current.selectedTransactions[GROUP_KEY]).toBeUndefined();
-        expect(result.current.selectedTransactions[firstChild.keyForList]?.isSelected).toBe(true);
-
-        // And clicking one of them unchecks it, rather than the paging refusal making the checkbox dead
+        // Then clicking one of the loaded rows unchecks it: the group is written out into the rows that arrived, rather than the click being refused
         await act(async () => {
             result.current.toggle(firstChild);
             await waitForBatchedUpdatesWithAct();
         });
+        expect(result.current.selectedTransactions[GROUP_KEY]).toBeUndefined();
         expect(result.current.selectedTransactions[firstChild.keyForList]).toBeUndefined();
+        expect(result.current.selectedTransactions[secondChild.keyForList]?.isSelected).toBe(true);
     });
 
     it('narrows a group that is still paging in down to the rows a range keeps', async () => {

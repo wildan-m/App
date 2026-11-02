@@ -226,6 +226,19 @@ function useReconcileSelectionWithData({
                     nonEmptyReportKeys.add(reportKey);
                 }
 
+                // A group ticked before its rows loaded is selected as a whole under its own key, which is what carries
+                // the group's full count and totals. Keep that entry once rows load instead of converting it to per-row
+                // entries for the loaded page only, so the selection keeps covering rows a later page loads. The loaded
+                // rows read as checked through the group entry (see isRowChecked), and narrowing the selection still
+                // goes through spellOutGroupSelection, which writes the loaded rows out and drops this entry.
+                const isWholeGroupSelected =
+                    !isExpenseReportType && !areAllMatchingItemsSelected && !!reportKey && !!selectedTransactions[reportKey]?.isSelected && !Object.hasOwn(excludedTransactions, reportKey);
+                if (isWholeGroupSelected && reportKey) {
+                    const [, groupSelection] = mapEmptyReportToSelectedEntry(transactionGroup);
+                    newTransactionList[reportKey] = groupSelection;
+                    continue;
+                }
+
                 // For expense reports: when ANY transaction is selected, we want ALL transactions in the report selected.
                 // This ensures report-level selection persists when new transactions are added.
                 // Also check if the report itself was selected (when it was empty) by checking the reportID key

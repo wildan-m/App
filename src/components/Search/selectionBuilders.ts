@@ -418,6 +418,9 @@ type GroupSelectionParams = {
 
     /** Whether every matching item is selected, which checks rows that have no entry of their own */
     areAllMatchingItemsSelected: boolean;
+
+    /** The group's total on the server, which can be more than the rows it has loaded */
+    groupCount?: number;
 };
 
 /** Whether clicking a group's checkbox means "deselect": true once any row under it reads as checked. */
@@ -427,7 +430,7 @@ function isGroupSelected(params: GroupSelectionParams): boolean {
 }
 
 /** What a group's checkbox shows: fully checked, and whether only some of its rows are. Rows being deleted count for neither. */
-function getGroupCheckboxState({groupKey, children, selectedTransactions, excludedTransactions, areAllMatchingItemsSelected}: GroupSelectionParams): {
+function getGroupCheckboxState({groupKey, children, selectedTransactions, excludedTransactions, areAllMatchingItemsSelected, groupCount}: GroupSelectionParams): {
     isSelectAllChecked: boolean;
     isIndeterminate: boolean;
 } {
@@ -449,7 +452,14 @@ function getGroupCheckboxState({groupKey, children, selectedTransactions, exclud
             isIndeterminate: false,
         };
     }
-    return {isSelectAllChecked: selectableCount > 0 && checkedCount === selectableCount, isIndeterminate: checkedCount > 0 && checkedCount !== selectableCount};
+    // Every loaded row being checked is a full tick only when that covers the whole group: rows a `limit:` left
+    // unloaded are not selected by hand-picking the loaded ones, so the box shows indeterminate until the group's
+    // remaining count is covered. A group selected under its own key covers all of its rows, loaded or not.
+    const isSelectedUnderOwnKey = !!groupKey && isRowChecked({rowKey: groupKey, parentGroupKey: undefined, selectedTransactions, excludedTransactions, areAllMatchingItemsSelected});
+    const remainingGroupCount = getRemainingSearchGroupCount(groupCount, children.length, selectableCount);
+    const coversWholeGroup = isSelectedUnderOwnKey || remainingGroupCount === undefined || checkedCount >= remainingGroupCount;
+    const isSelectAllChecked = selectableCount > 0 && checkedCount === selectableCount && coversWholeGroup;
+    return {isSelectAllChecked, isIndeterminate: checkedCount > 0 && !isSelectAllChecked};
 }
 
 type RowCheckedParams = {
