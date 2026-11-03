@@ -4,6 +4,9 @@ type PayViaABAParams = {
 
     /** Whether held expenses are paid too, otherwise they're moved to a new report */
     shouldReimburseHeldTransactions: boolean;
+
+    /** ID of the exportDownload_ record the backend pushes the file's ready/failed state to */
+    exportID: string;
 };
 
 export default PayViaABAParams;

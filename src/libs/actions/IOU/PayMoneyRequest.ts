@@ -1,21 +1,17 @@
 import type {PaymentMethod} from '@components/KYCWall/types';
-import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 
 import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 
 import * as API from '@libs/API';
 import type {MarkReportPaymentReceivedParams, PayInvoiceParams, PayMoneyRequestParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
-import {getCommandURL} from '@libs/ApiUtils';
 import {shouldSetUpGlobalReimbursementsBeforePaying} from '@libs/BankAccountUtils';
 import DateUtils from '@libs/DateUtils';
-import type HttpsError from '@libs/Errors/HttpsError';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
-import fileDownload from '@libs/fileDownload';
 import {translateLocal} from '@libs/Localize';
 import Navigation from '@libs/Navigation/Navigation';
-import enhanceParameters from '@libs/Network/enhanceParameters';
 import {buildOptimisticNextStep} from '@libs/NextStepUtils';
+import {rand64} from '@libs/NumberUtils';
 import {getPersonalDetailsForAccountIDs} from '@libs/PersonalDetailsUtils';
 import {isPaidGroupPolicy, isPolicyAdmin} from '@libs/PolicyUtils';
 import {getAllReportActions, getElsewherePaymentReportActionMessage, getReportActionHtml, getReportActionText, isCreatedAction} from '@libs/ReportActionsUtils';
@@ -36,6 +32,7 @@ import playSound, {SOUNDS} from '@libs/Sound';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {shouldSplitScanFailedTransactions} from '@libs/TransactionUtils';
 
+import {markExportInitiatedLocally} from '@userActions/Export';
 import {buildPolicyData, generatePolicyID} from '@userActions/Policy/Policy';
 import type {BuildPolicyDataKeys} from '@userActions/Policy/Policy';
 import {completeOnboarding} from '@userActions/Report';
@@ -49,13 +46,12 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
-import type {OnyxData} from '@src/types/onyx/Request';
+import type {AnyOnyxUpdate, OnyxData} from '@src/types/onyx/Request';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
-import {format} from 'date-fns';
 import Onyx from 'react-native-onyx';
 
 import type AdditionalPayOnyxData from './types/AdditionalPayOnyxData';
@@ -1010,15 +1006,13 @@ type PayViaABAFunctionParams = {
     userBillingGracePeriodEnds: OnyxCollection<OnyxTypes.BillingGraceEndPeriod>;
     amountOwed: OnyxEntry<number>;
     ownerBillingGracePeriodEnd?: OnyxEntry<number>;
-    translate: LocalizedTranslate;
-    onDownloadFailed: (error?: HttpsError) => void;
 };
 
 /**
- * Downloads the ABA file for paying the given reports. The backend marks them as "paid elsewhere" when it creates the file.
- * Resolves once the download has finished or failed.
+ * Queues the ABA file generation for paying the given reports. The backend pushes the exportDownload record to
+ * ready/failed and marks the reports as paid, and ExportDownloadStatusManager surfaces the download modal for it.
  */
-function payViaABA(params: PayViaABAFunctionParams): Promise<void> {
+function payViaABA(params: PayViaABAFunctionParams): void {
     const {
         reportIDs,
         policy,
@@ -1031,55 +1025,36 @@ function payViaABA(params: PayViaABAFunctionParams): Promise<void> {
         userBillingGracePeriodEnds,
         amountOwed,
         ownerBillingGracePeriodEnd,
-        translate,
-        onDownloadFailed,
     } = params;
     if (policy && shouldRestrictUserBillableActions(policy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, currentUserAccountID)) {
         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
-        return Promise.resolve();
+        return;
     }
 
     completePaymentOnboarding(CONST.IOU.PAYMENT_SELECTED.BBA, introSelected, isSelfTourViewed, currentUserAccountID, conciergeChat, delegateAccountID);
 
-    const finalParameters = enhanceParameters(WRITE_COMMANDS.PAY_VIA_ABA, {reportIDList: reportIDs.join(','), shouldReimburseHeldTransactions});
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(finalParameters)) {
-        formData.append(key, String(value));
-    }
+    const exportID = rand64();
+    const onyxKey = `${ONYXKEYS.COLLECTION.EXPORT_DOWNLOAD}${exportID}` as const;
 
-    // Matches the file names Classic gives ABA files
-    const fileName = reportIDs.length === 1 ? `ABA_Report_${reportIDs.at(0)}.aba` : `ABA_Report_Bulk_${format(new Date(), CONST.DATE.FNS_FORMAT_STRING)}.aba`;
-    let hasDownloadFailed = false;
-    const handleDownloadFailed = (error?: HttpsError) => {
-        hasDownloadFailed = true;
-        onDownloadFailed(error);
-    };
-    return fileDownload(
-        translate,
-        getCommandURL({command: WRITE_COMMANDS.PAY_VIA_ABA}),
-        fileName,
-        '',
-        false,
-        formData,
-        CONST.NETWORK.METHOD.POST,
-        handleDownloadFailed,
-        undefined,
-        false,
-    ).then(() => {
-        if (hasDownloadFailed) {
-            return;
-        }
+    const optimisticData: AnyOnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: onyxKey,
+            value: {state: CONST.EXPORT_DOWNLOAD.STATE.PREPARING, exportType: CONST.EXPORT_DOWNLOAD.TYPE.ABA},
+        },
+    ];
 
-        // A successful download means the reports are paid, so we mark them as paid now to stop the Pay button
-        // reappearing before the BE's pusher updates arrive.
-        Onyx.update(
-            reportIDs.map((reportID) => ({
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.REPORT}${reportID}`,
-                value: {statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED, stateNum: CONST.REPORT.STATE_NUM.APPROVED},
-            })),
-        );
-    });
+    const failureData: AnyOnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: onyxKey,
+            value: {state: CONST.EXPORT_DOWNLOAD.STATE.FAILED, exportType: CONST.EXPORT_DOWNLOAD.TYPE.ABA},
+        },
+    ];
+
+    markExportInitiatedLocally(exportID);
+
+    API.write(WRITE_COMMANDS.PAY_VIA_ABA, {reportIDList: reportIDs.join(','), shouldReimburseHeldTransactions, exportID}, {optimisticData, failureData});
 }
 
 function markReportPaymentReceived(

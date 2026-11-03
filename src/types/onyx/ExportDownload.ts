@@ -33,6 +33,9 @@ type ExportDownload = {
     /** Number of receipts that failed to export (receipts exports only) */
     failedReceiptCount?: number;
 
+    /** Why the export failed, when the backend can tell (used to pick the failure message for ABA files) */
+    failureReason?: ValueOf<typeof CONST.EXPORT_DOWNLOAD.FAILURE_REASON>;
+
     /** Whether the export file should be sent from Concierge */
     shouldSendFromConcierge?: boolean;
 

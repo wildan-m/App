@@ -680,6 +680,10 @@ const CONST = {
             CSV: 'csv',
             PDF: 'pdf',
             RECEIPTS: 'receipts',
+            ABA: 'aba',
+        },
+        FAILURE_REASON: {
+            MISSING_ABA_DEPOSIT_ACCOUNT: 'missingABADepositAccount',
         },
     },
     BULK_ACTION: {
@@ -694,6 +698,7 @@ const CONST = {
     SECURE_DOWNLOAD_TYPE: {
         CSV_EXPORT: 'csvexport',
         PDF_REPORT: 'pdfreport',
+        ABA_FILE: 'abafile',
     },
 
     EXPORT_LABELS: {

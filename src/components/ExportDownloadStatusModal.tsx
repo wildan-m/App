@@ -95,9 +95,13 @@ function ExportDownloadStatusModal({exportID, isVisible, onClose, failedBody}: E
             return;
         }
         const baseURL = getOldDotURLFromEnvironment(environment);
-        const isCSV = fileName.endsWith('.csv');
-        const secureType = isCSV ? CONST.SECURE_DOWNLOAD_TYPE.CSV_EXPORT : CONST.SECURE_DOWNLOAD_TYPE.PDF_REPORT;
-        const url = buildSecureDownloadURL({baseURL, secureType, fileName, downloadName: fileName, email: currentUserLogin});
+        const getSecureType = () => {
+            if (fileName.endsWith('.aba')) {
+                return CONST.SECURE_DOWNLOAD_TYPE.ABA_FILE;
+            }
+            return fileName.endsWith('.csv') ? CONST.SECURE_DOWNLOAD_TYPE.CSV_EXPORT : CONST.SECURE_DOWNLOAD_TYPE.PDF_REPORT;
+        };
+        const url = buildSecureDownloadURL({baseURL, secureType: getSecureType(), fileName, downloadName: fileName, email: currentUserLogin});
         fileDownload(translate, addEncryptedAuthTokenToURL(url, encryptedAuthToken ?? '', true), fileName, '', isMobileSafari(), undefined, undefined, undefined, undefined, false);
     };
 
@@ -234,6 +238,11 @@ function ExportDownloadStatusModal({exportID, isVisible, onClose, failedBody}: E
 
         if (isFailed) {
             const getDefaultFailedBody = () => {
+                if (exportType === CONST.EXPORT_DOWNLOAD.TYPE.ABA) {
+                    return displayedExport?.failureReason === CONST.EXPORT_DOWNLOAD.FAILURE_REASON.MISSING_ABA_DEPOSIT_ACCOUNT
+                        ? translate('iou.submittersMissingABADepositAccount')
+                        : translate('common.downloadFailedDescription');
+                }
                 if (exportType === CONST.EXPORT_DOWNLOAD.TYPE.CSV) {
                     return translate('exportDownload.csvFailedBody');
                 }
