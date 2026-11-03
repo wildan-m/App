@@ -250,6 +250,19 @@ function getSelectableRoles(policy: OnyxInputOrEntry<Policy>, login: string, all
     return SELECTABLE_ROLES.filter((role) => canMemberAssignRole(policy, login, role) && (!allowedRoles || allowedRoles.includes(role)));
 }
 
+/**
+ * Whether the New roles promotion (the `New roles` badge on the Members menu item, the Members page banner, and the
+ * `New` badges in the role selector) applies to this member on this policy. It only shows to members who can assign
+ * the new scoped roles here, and it ends for everyone on the promo end date.
+ */
+function shouldShowNewRolesPromo(policy: OnyxInputOrEntry<Policy>, login: string): boolean {
+    if (Date.now() >= new Date(CONST.NEW_WORKSPACE_ROLES_PROMO_END_DATE).getTime()) {
+        return false;
+    }
+    const selectableRoles = getSelectableRoles(policy, login);
+    return selectableRoles.includes(CONST.POLICY.ROLE.GUEST) || selectableRoles.includes(CONST.POLICY.ROLE.APPROVE_ONLY);
+}
+
 // Whether the member can assign any elevated role: admins (via assignElevatedRoles) on any policy, or People Admins (up to auditor) on Control.
 function canMemberAssignElevatedRole(policy: OnyxInputOrEntry<Policy>, login: string): boolean {
     return canMemberWrite(policy, login, CONST.POLICY.POLICY_FEATURE.ASSIGN_ELEVATED_ROLES) || canMemberAssignRole(policy, login, CONST.POLICY.ROLE.AUDITOR);
@@ -410,6 +423,7 @@ export {
     hasReadOnlyAllReportsAccess,
     canMemberAssignRole,
     getSelectableRoles,
+    shouldShowNewRolesPromo,
     canMemberAssignElevatedRole,
     canMemberManageMemberWithRole,
     getPolicyRole,

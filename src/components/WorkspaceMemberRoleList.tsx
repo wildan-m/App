@@ -3,7 +3,7 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import Navigation from '@libs/Navigation/Navigation';
-import {getSelectableRoles} from '@libs/PolicyUtils';
+import {getSelectableRoles, shouldShowNewRolesPromo} from '@libs/PolicyUtils';
 
 import CONST from '@src/CONST';
 import type {Route} from '@src/ROUTES';
@@ -18,10 +18,12 @@ import {View} from 'react-native';
 import type {LocalizedTranslate} from './LocaleContextProvider';
 import type {ConfirmButtonOptions, ListItem} from './SelectionList/types';
 
+import Badge from './Badge';
 import FormHelpMessage from './FormHelpMessage';
 import HeaderWithBackButton from './HeaderWithBackButton';
-import SelectionList from './SelectionList';
+import RenderHTML from './RenderHTML';
 import SingleSelectListItem from './SelectionList/ListItem/SingleSelectListItem';
+import SelectionListWithSections from './SelectionList/SelectionListWithSections';
 
 type ListItemType = ListItem<ValueOf<typeof CONST.POLICY.ROLE>> & {
     value: ValueOf<typeof CONST.POLICY.ROLE>;
@@ -49,6 +51,15 @@ type WorkspaceMemberRoleListProps = {
     /** Bump to have the error read out again, since a repeated confirmation leaves the message itself unchanged */
     errorAnnouncementKey?: number;
 };
+
+/** The roles of the `Admin roles` group in the role selector, in the alphabetical order of their display names. */
+const ADMIN_GROUP_ROLES: Array<ValueOf<typeof CONST.POLICY.ROLE>> = [CONST.POLICY.ROLE.CARD_ADMIN, CONST.POLICY.ROLE.PAYMENTS_ADMIN, CONST.POLICY.ROLE.PEOPLE_ADMIN, CONST.POLICY.ROLE.ADMIN];
+
+/** The roles of the `Other roles` group in the role selector, in the alphabetical order of their display names. */
+const OTHER_GROUP_ROLES: Array<ValueOf<typeof CONST.POLICY.ROLE>> = [CONST.POLICY.ROLE.APPROVE_ONLY, CONST.POLICY.ROLE.AUDITOR, CONST.POLICY.ROLE.GUEST, CONST.POLICY.ROLE.USER];
+
+/** The recently launched roles that carry a `New` badge while the New roles promotion runs. */
+const NEW_ROLES: Array<ValueOf<typeof CONST.POLICY.ROLE>> = [CONST.POLICY.ROLE.APPROVE_ONLY, CONST.POLICY.ROLE.GUEST];
 
 /**
  * Roles a member can be assigned, in the same order as the role-selection page.
@@ -141,6 +152,51 @@ function WorkspaceMemberRoleList({
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
 
     const availableRoleItems = getAssignableWorkspaceMemberRoleItems(translate, role, policy, currentUserLogin, allowedRoles);
+    const isNewRolesPromoActive = shouldShowNewRolesPromo(policy, currentUserLogin);
+
+    // The `New` badges stay for the whole promo window, independent of the Members page banner dismissal.
+    const toGroupedItem = (item: ListItemType): ListItemType =>
+        isNewRolesPromoActive && NEW_ROLES.includes(item.value)
+            ? {
+                  ...item,
+                  rightElement: (
+                      <Badge
+                          success
+                          text={translate('common.new')}
+                      />
+                  ),
+              }
+            : item;
+
+    const buildGroupItems = (groupRoles: Array<ValueOf<typeof CONST.POLICY.ROLE>>): ListItemType[] =>
+        groupRoles.flatMap((groupRole) => {
+            const item = availableRoleItems.find((roleItem) => roleItem.value === groupRole);
+            return item ? [toGroupedItem(item)] : [];
+        });
+
+    const sections = [
+        {title: translate('workspace.common.adminRoles'), data: buildGroupItems(ADMIN_GROUP_ROLES), sectionIndex: 0},
+        {title: translate('workspace.common.otherRoles'), data: buildGroupItems(OTHER_GROUP_ROLES), sectionIndex: 1},
+    ].filter((section) => section.data.length > 0);
+
+    const listFooterContent = (
+        <View style={[styles.ph5, styles.pt3]}>
+            {!!errorMessage && (
+                <View style={[styles.mb3]}>
+                    {/* Remounting is what makes the alert speak again. The list is not inside a `Form`,
+                        so `FormHelpMessage` has no submit count of its own to re-announce from. */}
+                    <FormHelpMessage
+                        key={errorAnnouncementKey}
+                        isError
+                        message={errorMessage}
+                    />
+                </View>
+            )}
+            <View style={styles.renderHTML}>
+                <RenderHTML html={translate('workspace.common.roleSelectorFooter')} />
+            </View>
+        </View>
+    );
 
     return (
         <>
@@ -150,27 +206,19 @@ function WorkspaceMemberRoleList({
             />
             {!isLoading && (
                 <View style={[styles.containerWithSpaceBetween, styles.pointerEventsBoxNone]}>
-                    <SelectionList
-                        data={availableRoleItems}
+                    <View style={[styles.ph5, styles.pb3, styles.renderHTML]}>
+                        <RenderHTML html={translate('workspace.common.roleSelectorSubtitle')} />
+                    </View>
+                    <SelectionListWithSections
+                        sections={sections}
                         ListItem={SingleSelectListItem}
                         onSelectRow={onSelectRole}
                         confirmButtonOptions={confirmButtonOptions}
                         shouldSingleExecuteRowSelect={!confirmButtonOptions?.showButton}
                         initiallyFocusedItemKey={availableRoleItems.find((item) => item.isSelected)?.keyForList}
+                        listFooterContent={listFooterContent}
                         addBottomSafeAreaPadding
-                    >
-                        {!!errorMessage && (
-                            <View style={[styles.ph3, styles.mb3]}>
-                                {/* Remounting is what makes the alert speak again. The list is not inside a `Form`,
-                                    so `FormHelpMessage` has no submit count of its own to re-announce from. */}
-                                <FormHelpMessage
-                                    key={errorAnnouncementKey}
-                                    isError
-                                    message={errorMessage}
-                                />
-                            </View>
-                        )}
-                    </SelectionList>
+                    />
                 </View>
             )}
         </>

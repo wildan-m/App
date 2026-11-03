@@ -62,6 +62,7 @@ const CLAUDE_CONNECT_URL = 'https://claude.ai/directory/connectors/expensify';
 const CLAUDE_MCP_HELP_URL = 'https://help.expensify.com/articles/new-expensify/connections/connect-ai-assistants/Connect-Claude-to-Expensify-Using-MCP';
 const CURSOR_MCP_HELP_URL = 'https://help.expensify.com/articles/new-expensify/connections/connect-ai-assistants/Connect-Cursor-to-Expensify-Using-MCP';
 const DISTANCE_EXPENSES_FREQUENT_TRIPS_HELP_URL = 'https://help.expensify.com/articles/new-expensify/reports-and-expenses/Distance-Expenses#how-to-reuse-a-route-from-a-frequent-trip';
+const MANAGING_WORKSPACE_MEMBERS_HELP_URL = 'https://help.expensify.com/articles/new-expensify/workspaces/Managing-Workspace-Members';
 const DISTANCE_RATES_AUTO_UPDATE_HELP_URL =
     'https://help.expensify.com/articles/new-expensify/workspaces/Set-distance-rates#how-to-automatically-update-distance-rates-when-government-rates-change';
 const XERO_PARTNER_LINK = 'https://referrals.xero.com/uzfjy4uegog2-v0pj1v';
@@ -799,6 +800,7 @@ const CONST = {
     CLAUDE_MCP_HELP_URL,
     CURSOR_MCP_HELP_URL,
     DISTANCE_EXPENSES_FREQUENT_TRIPS_HELP_URL,
+    MANAGING_WORKSPACE_MEMBERS_HELP_URL,
     DISTANCE_RATES_AUTO_UPDATE_HELP_URL,
     XERO_PARTNER_LINK,
     UBER_TERMS_LINK,
@@ -9947,6 +9949,9 @@ const CONST = {
     INBOX_TAB_STALE_UNREAD_MONTHS: 3,
     CHANGE_POLICY_TRAINING_MODAL: 'changePolicyModal',
     AGENTS_RULES_BANNER: 'agentsRulesBanner',
+    NEW_WORKSPACE_ROLES_BANNER: 'newWorkspaceRolesBanner',
+    // The New roles promotion (Members menu badge, Members page banner, and the New role badges) ends for everyone on this date, 90 days after the Approve-only and Guest roles launch.
+    NEW_WORKSPACE_ROLES_PROMO_END_DATE: '2027-02-01',
     WISE_GLOBAL_REIMBURSEMENTS_WALLET_BANNER: 'wiseGlobalReimbursementsWalletBanner',
     WISE_GLOBAL_REIMBURSEMENTS_WORKSPACE_BANNER: 'wiseGlobalReimbursementsWorkspaceBanner',
     SMART_BANNER_HEIGHT: 152,
@@ -10237,6 +10242,9 @@ const CONST = {
         AGENTS_RULES_BANNER: {
             CTA: 'AgentsRulesBanner-CTA',
             DISMISS: 'AgentsRulesBanner-Dismiss',
+        },
+        NEW_ROLES_BANNER: {
+            DISMISS: 'NewRolesBanner-Dismiss',
         },
         WISE_GLOBAL_REIMBURSEMENTS_WALLET_BANNER: {
             CTA: 'WiseGlobalReimbursementsWalletBanner-CTA',

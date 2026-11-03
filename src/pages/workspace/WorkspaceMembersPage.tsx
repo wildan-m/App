@@ -5,6 +5,7 @@ import type {DropdownOption, WorkspaceMemberBulkActionType} from '@components/Bu
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
 import MessagesRow from '@components/MessagesRow';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import RenderHTML from '@components/RenderHTML';
 import type {TableHandle} from '@components/Table';
 import type {WorkspaceMemberRowData, WorkspaceMembersTableColumnKey} from '@components/Tables/WorkspaceMembersTable';
 import WorkspaceMembersTable from '@components/Tables/WorkspaceMembersTable';
@@ -16,7 +17,7 @@ import useApprovalWorkflows from '@hooks/useApprovalWorkflows';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLayoutSpacing from '@hooks/useLayoutSpacing';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useMergeSyncResultsPage from '@hooks/useMergeSyncResultsPage';
 import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
@@ -84,6 +85,7 @@ import {
     isSubmitPolicy,
     PAYER_ROLES,
     shouldHideDynamicExternalWorkflowPeople,
+    shouldShowNewRolesPromo,
 } from '@libs/PolicyUtils';
 import type {MemberEmailsToAccountIDs} from '@libs/PolicyUtils';
 import {getDisplayNameForParticipant, isApproverOfOutstandingPolicyReports} from '@libs/ReportUtils';
@@ -91,17 +93,22 @@ import getShouldPopoverUseScrollView from '@libs/shouldPopoverUseScrollView';
 import {generateAccountID} from '@libs/UserUtils';
 import {getFirstApproverByMemberEmail, hasMultiLevelApprovalWorkflow, updateWorkflowDataOnApproverRemoval} from '@libs/WorkflowUtils';
 
+import BillingBanner from '@pages/settings/Subscription/CardSection/BillingBanner/BillingBanner';
+
 import {close} from '@userActions/Modal';
 import {dismissAddedWithPrimaryLoginMessages} from '@userActions/Policy/Policy';
+import {dismissProductTraining} from '@userActions/Welcome';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type DismissedProductTraining from '@src/types/onyx/DismissedProductTraining';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
+import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
 import {useIsFocused} from '@react-navigation/native';
@@ -116,6 +123,8 @@ import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 import WorkspacePageWithSections from './WorkspacePageWithSections';
 
 type WorkspaceMembersPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.MEMBERS>;
+
+const newRolesBannerDismissedSelector = (value: OnyxEntry<DismissedProductTraining>): boolean => !!value?.[CONST.NEW_WORKSPACE_ROLES_BANNER];
 
 /**
  * Inverts an object, equivalent of _.invert
@@ -136,7 +145,8 @@ function resolveMemberAccountID(email: string, policyMemberEmailsToAccountIDs: M
 function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembersPageProps) {
     useWorkspaceDocumentTitle(policy?.name, 'common.members');
     const tableRef = useRef<TableHandle<WorkspaceMemberRowData, WorkspaceMembersTableColumnKey, string>>(null);
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'Download', 'FallbackAvatar', 'Location', 'Plus', 'RemoveMembers', 'Sync', 'Table', 'UserPencil']);
+    const icons = useMemoizedLazyExpensifyIcons(['Building', 'Download', 'FallbackAvatar', 'Location', 'Plus', 'RemoveMembers', 'Sync', 'Table', 'UserPencil', 'Close']);
+    const illustrations = useMemoizedLazyIllustrations(['Profile']);
     const employeePersonalDetails = usePersonalDetailsByLogins(Object.keys(policy?.employeeList ?? {}));
     const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList, employeePersonalDetails, true);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -176,6 +186,8 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     const currentUserLogin = currentUserPersonalDetails.login;
     const canEditWorkspaceSettings = canEditWorkspaceSettingsUtil(policy, currentUserLogin);
     const canWriteMembers = canMemberWrite(policy, currentUserLogin ?? '', CONST.POLICY.POLICY_FEATURE.MEMBERS);
+    const [isNewRolesBannerDismissed = false] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {selector: newRolesBannerDismissedSelector});
+    const shouldShowNewRolesBanner = shouldShowNewRolesPromo(policy, currentUserLogin ?? '') && !isNewRolesBannerDismissed;
     const shouldShowMemberBankAccounts = isPolicyAdmin(policy) && arePaymentsEnabled(policy);
 
     // Group policies (Collect/Control + Submit) allow member management.
@@ -538,6 +550,25 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
 
     const getHeaderContent = () => (
         <View style={shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection}>
+            {shouldShowNewRolesBanner && (
+                <View style={[styles.ph5, styles.mt3]}>
+                    <BillingBanner
+                        icon={illustrations.Profile}
+                        title={translate('workspace.people.newRolesBannerTitle')}
+                        subtitle={
+                            <View style={styles.renderHTML}>
+                                <RenderHTML html={translate('workspace.people.newRolesBannerSubtitle')} />
+                            </View>
+                        }
+                        subtitleStyle={styles.mt1}
+                        style={[styles.borderRadiusComponentLarge]}
+                        rightIcon={icons.Close}
+                        onRightIconPress={() => dismissProductTraining(CONST.NEW_WORKSPACE_ROLES_BANNER, true)}
+                        rightIconAccessibilityLabel={translate('common.dismiss')}
+                        rightIconSentryLabel={CONST.SENTRY_LABEL.NEW_ROLES_BANNER.DISMISS}
+                    />
+                </View>
+            )}
             <View style={[styles.pl5, styles.mb5, styles.mt3, styles.flexRow, styles.alignItemsCenter]}>
                 <Text style={[styles.textSupporting, styles.flexShrink1, isPendingAddOrDelete && styles.offlineFeedbackPending]}>
                     {translate('workspace.people.workspaceMembersCount', memberCount)}

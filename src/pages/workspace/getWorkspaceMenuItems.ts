@@ -120,6 +120,8 @@ type GetWorkspaceMenuItemsParams = {
     hasApprovalWorkflowWithNonMemberApprover?: boolean;
     /** Whether the vendor matching beta is enabled. */
     isVendorMatchingBetaEnabled?: boolean;
+    /** Whether the Members item shows the `New roles` promo badge. */
+    shouldShowNewRolesBadge?: boolean;
     /** Formats the invoice account balance for its menu badge. */
     convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'];
 };
@@ -139,6 +141,7 @@ function getWorkspaceMenuItems({
     shouldShowRBR = false,
     hasApprovalWorkflowWithNonMemberApprover = false,
     isVendorMatchingBetaEnabled = false,
+    shouldShowNewRolesBadge = false,
     convertToDisplayString,
 }: GetWorkspaceMenuItemsParams): WorkspaceMenuItem[] {
     const isAgentAccount = currentUserPersonalDetails?.isCustomAgent;
@@ -212,6 +215,7 @@ function getWorkspaceMenuItems({
             icon: icons.Users,
             getRoute: () => ROUTES.WORKSPACE_MEMBERS.getRoute(policyID),
             brickRoadIndicator: hasMembersError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+            badgeTranslationKey: shouldShowNewRolesBadge ? 'workspace.common.newRoles' : undefined,
             screenName: SCREENS.WORKSPACE.MEMBERS,
             sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.MEMBERS,
         },

@@ -37,7 +37,7 @@ import goBackFromWorkspaceSettingPages from '@libs/Navigation/helpers/goBackFrom
 import WorkspaceCreationReveal from '@libs/Navigation/helpers/WorkspaceCreationReveal';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
-import {canMemberRead, shouldShowPolicy as checkIfShouldShowPolicy, goBackFromInvalidPolicy, isPendingDeletePolicy} from '@libs/PolicyUtils';
+import {canMemberRead, shouldShowPolicy as checkIfShouldShowPolicy, goBackFromInvalidPolicy, isPendingDeletePolicy, shouldShowNewRolesPromo} from '@libs/PolicyUtils';
 
 import type {WorkspaceSplitNavigatorParamList} from '@navigation/types';
 
@@ -45,10 +45,12 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import type DismissedProductTraining from '@src/types/onyx/DismissedProductTraining';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 import type {LayoutChangeEvent} from 'react-native';
+import type {OnyxEntry} from 'react-native-onyx';
 import type {TupleToUnion} from 'type-fest';
 
 import {findFocusedRoute, useFocusEffect, useIsFocused, useNavigationState} from '@react-navigation/native';
@@ -64,6 +66,8 @@ import getWorkspaceMenuItems from './getWorkspaceMenuItems';
 import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 
 type WorkspaceInitialPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.INITIAL>;
+
+const newRolesBannerDismissedSelector = (value: OnyxEntry<DismissedProductTraining>): boolean => !!value?.[CONST.NEW_WORKSPACE_ROLES_BANNER];
 
 function dismissError(policyID: string | undefined, pendingAction: PendingAction | undefined) {
     if (!policyID || pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
@@ -94,6 +98,7 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
     const wasRendered = useRef(false);
 
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const [isNewRolesBannerDismissed = false] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING, {selector: newRolesBannerDismissedSelector});
     const policy = policyDraft?.id ? policyDraft : policyProp;
     const policyID = policy?.id;
     const routePolicyID = route.params?.policyID;
@@ -211,6 +216,7 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
         shouldShowRBR,
         hasApprovalWorkflowWithNonMemberApprover,
         isVendorMatchingBetaEnabled: isBetaEnabled(CONST.BETAS.VENDOR_MATCHING),
+        shouldShowNewRolesBadge: shouldShowNewRolesPromo(policy, currentUserLogin ?? '') && !isNewRolesBannerDismissed,
         convertToDisplayString,
     }).map((item) => ({
         ...item,
