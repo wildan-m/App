@@ -1,0 +1,74 @@
+diff --git a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
+index 12cf9d9..2c0e9e0 100644
+--- a/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
++++ b/node_modules/@shopify/flash-list/dist/recyclerview/RecyclerView.js
+@@ -45,6 +45,9 @@ const RecyclerViewComponent = (props, ref) => {
+     const internalViewRef = useRef(null);
+     const firstChildViewRef = useRef(null);
+     const containerViewSizeRef = useRef(undefined);
++    // Set while the container measures 0x0 (hidden), so the first visible measurement can re-validate item sizes.
++    const wasHiddenRef = useRef(false);
++    const revalidateFrameRef = useRef(null);
+     const pendingChildIds = useRef(new Set()).current;
+     // Track scroll position
+     const scrollY = useRef(new Animated.Value(0)).current;
+@@ -137,10 +140,45 @@ const RecyclerViewComponent = (props, ref) => {
+             const outerViewSize = measureParentSize(internalViewRef.current);
+             if (outerViewSize.width === 0 && outerViewSize.height === 0) {
+                 containerViewSizeRef.current = outerViewSize;
++                wasHiddenRef.current = true;
+                 return;
+             }
+             const firstChildViewLayout = measureFirstChildLayout(firstChildViewRef.current, internalViewRef.current);
+             containerViewSizeRef.current = outerViewSize;
++            if (wasHiddenRef.current) {
++                wasHiddenRef.current = false;
++                // Item boxes read in the same commit the container is un-hidden can be stale on WebKit, and nothing
++                // re-measures them afterwards because their real DOM size never changes. Re-measure every mounted
++                // item one frame later, once the un-hidden subtree has been laid out, and overwrite stale layouts.
++                if (Platform.OS === "web" && typeof requestAnimationFrame === "function") {
++                    if (revalidateFrameRef.current !== null) {
++                        cancelAnimationFrame(revalidateFrameRef.current);
++                    }
++                    revalidateFrameRef.current = requestAnimationFrame(() => {
++                        var _a, _b;
++                        revalidateFrameRef.current = null;
++                        if (recyclerViewManager.isDisposed ||
++                            !recyclerViewManager.hasLayout() ||
++                            (((_a = containerViewSizeRef.current) === null || _a === void 0 ? void 0 : _a.width) === 0 &&
++                                ((_b = containerViewSizeRef.current) === null || _b === void 0 ? void 0 : _b.height) === 0)) {
++                            return;
++                        }
++                        const layoutInfo = [];
++                        refHolder.forEach((viewHolderRef, index) => {
++                            if (!viewHolderRef.current) {
++                                return;
++                            }
++                            layoutInfo.push({
++                                index,
++                                dimensions: measureItemLayout(viewHolderRef.current, recyclerViewManager.tryGetLayout(index)),
++                            });
++                        });
++                        if (recyclerViewManager.modifyChildrenLayout(layoutInfo, recyclerViewManager.getDataLength())) {
++                            setRenderId((prev) => prev + 1);
++                        }
++                    });
++                }
++            }
+             // firstChildViewLayout is already relative to the outer container,
+             // so its x/y directly gives the first item offset.
+             const firstItemOffset = inverted
+@@ -163,6 +201,13 @@ const RecyclerViewComponent = (props, ref) => {
+                 : firstItemOffset);
+         }
+     });
++    // Drop a pending re-validation frame when the list unmounts.
++    useEffect(() => () => {
++        if (revalidateFrameRef.current !== null) {
++            cancelAnimationFrame(revalidateFrameRef.current);
++            revalidateFrameRef.current = null;
++        }
++    }, []);
+     /**
+      * Effect to handle layout updates for list items
+      * This ensures proper positioning and recycling of items

@@ -214,3 +214,12 @@
 - Upstream PR/issue: https://github.com/Shopify/flash-list/issues/2334 (tracks the underlying web scrollbar oscillation addressed by patch 012; this patch releases the stale width lock after content changes).
 - E/App issue: https://github.com/Expensify/App/issues/103719
 - PR introducing patch: https://github.com/Expensify/App/pull/104066
+
+### [@shopify+flash-list+2.3.2+018+revalidate-layout-after-unhide.patch](@shopify+flash-list+2.3.2+018+revalidate-layout-after-unhide.patch)
+
+- Reason: Follow-up to patch 002. While a navigation stack hides the list with `display: none`, patch 002 skips layout work, and data changes made in that window (for example an optimistically added workspace) are only measured once the container becomes visible again. On WebKit the item boxes read in that same un-hide commit can be stale, and the wrong heights stick in the layout table because the items' real DOM size never changes afterwards, so neither the item `onLayout` nor the container `onLayout` fires again. Later rows are then positioned from the wrong stored heights and overlap the rows above them.
+- Changes: The container measurement effect records when it measured 0x0. On the first non-zero measurement after that, it schedules one `requestAnimationFrame` pass that re-measures every mounted `ViewHolder` with `measureItemLayout` and feeds the results through `modifyChildrenLayout`, re-rendering only when a stored layout actually changed. The pass is skipped if the list was disposed, has no layout, or is hidden again, and a pending frame is cancelled on unmount. Web only; steady-state measurement is untouched.
+- Files changed: `dist/recyclerview/RecyclerView.js` only.
+- Upstream PR/issue: TBD
+- E/App issue: https://github.com/Expensify/App/issues/104951
+- PR introducing patch: TBD
