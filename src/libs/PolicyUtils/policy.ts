@@ -21,8 +21,17 @@ import type {ValueOf} from 'type-fest';
 import {hasAccountingConnections} from './connections';
 import {getPerDiemCustomUnit, isPerDiemEligiblePolicy} from './customUnits';
 import {isTimeTrackingEnabled} from './features';
-import {canCreateExpensesOnPolicy, canEditWorkspaceSettings, canMemberWrite, getPolicyRole, isPolicyAdmin, isPolicyOwner, isPolicyUser} from './permissions';
-import {isArchivedPolicy, isControlPolicy, isGroupPolicy, isPaidGroupPolicy, isSubmitPolicy} from './policyType';
+import {
+    canCreateExpensesOnPolicy,
+    canEditWorkspaceSettings,
+    canMemberWrite,
+    getPolicyRole,
+    isPolicyAdmin,
+    isPolicyMemberWithoutPendingDelete,
+    isPolicyOwner,
+    isPolicyUser,
+} from './permissions';
+import {isArchivedOrPendingDeletePolicy, isArchivedPolicy, isControlPolicy, isGroupPolicy, isPaidGroupPolicy, isSubmitPolicy} from './policyType';
 
 type WorkspaceDetails = {
     policyID: string | undefined;
@@ -282,22 +291,33 @@ function hasAnyPaidPolicy(policies: OnyxCollection<Policy> | null) {
 }
 
 /**
-/**
- * Whether the user can create a report on this workspace: a paid (Team/Corporate) or Submit workspace the user
- * has a role on. Submit workspaces are free but still support report creation, so they belong here even though
- * they're excluded from `getGroupPaidPolicies`. A policy stub (e.g. the `{id, name}` the backend sends for a
- * preferred workspace the user is not a member of) has no type or role and is rejected. Workspaces whose role for the user
- * cannot create expenses (e.g. approve-only) are excluded.
+ * The one shared rule for whether a workspace can be the default destination for a new report or expense,
+ * used by `canCreateReportOnPolicy`, `useDefaultExpensePolicy` and `usePolicyForMovingExpenses`. A workspace
+ * qualifies when it is a group workspace (paid Team/Corporate or Submit) that is not join-pending, not
+ * archived, not pending delete, the user is not pending removal from it, and the user's role can create
+ * expenses (which also rejects role-less stubs like the `{id, name}` the backend sends for a preferred
+ * workspace the user is not a member of). Flow-specific filters (e.g. per diem or time tracking for moving
+ * expenses) stay as extra checks at the call sites.
  */
-function canCreateReportOnPolicy(policy: OnyxEntry<Policy>, currentUserLogin?: string): policy is Policy {
+function canBeDefaultWorkspaceForExpenses(policy: OnyxEntry<Policy>, currentUserLogin: string | undefined): policy is Policy {
     return (
         !!policy &&
+        isGroupPolicy(policy) &&
         !policy.isJoinRequestPending &&
-        (isPaidGroupPolicy(policy) || isSubmitPolicy(policy)) &&
-        shouldShowPolicy(policy, false, currentUserLogin) &&
+        !isArchivedOrPendingDeletePolicy(policy) &&
+        // Without a login or a hydrated employeeList there is no member entry to inspect, so only enforce the pending-removal check when both exist
+        (!currentUserLogin || isEmptyObject(policy.employeeList) || isPolicyMemberWithoutPendingDelete(currentUserLogin, policy)) &&
         canCreateExpensesOnPolicy(policy, currentUserLogin) &&
         !isTeachersUnitePolicyID(policy.id)
     );
+}
+
+/**
+ * Whether the user can create a report on this workspace: the shared default-workspace rule with no extra
+ * flow-specific filters.
+ */
+function canCreateReportOnPolicy(policy: OnyxEntry<Policy>, currentUserLogin?: string): policy is Policy {
+    return canBeDefaultWorkspaceForExpenses(policy, currentUserLogin);
 }
 
 /** Returns the group workspaces where the user can create a report; the collection form of `canCreateReportOnPolicy`. */
@@ -442,6 +462,7 @@ export {
     isPolicyAccessible,
     getGroupPaidPolicies,
     hasAnyPaidPolicy,
+    canBeDefaultWorkspaceForExpenses,
     canCreateReportOnPolicy,
     getGroupPoliciesWhereReportCanBeCreated,
     getDefaultChatEnabledPolicy,

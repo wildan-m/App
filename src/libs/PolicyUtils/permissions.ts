@@ -331,6 +331,15 @@ function canCreateExpensesOnPolicy(policy: OnyxInputOrEntry<Policy>, login?: str
     return canRoleCreateExpenses(getPolicyRole(policy, login, false) ?? policy?.role);
 }
 
+function isPolicyMemberWithoutPendingDelete(currentUserLogin: string | undefined, policy: OnyxEntry<Policy>): boolean {
+    if (!currentUserLogin || !policy?.id) {
+        return false;
+    }
+
+    const policyEmployee = policy?.employeeList?.[currentUserLogin];
+    return !!policyEmployee && policyEmployee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+}
+
 /** Check if the passed employee is an approver in the policy's employeeList */
 function isPolicyApprover(policy: OnyxInputOrEntry<Policy>, employeeLogin: string) {
     if (policy?.approver === employeeLogin) {
@@ -417,6 +426,7 @@ export {
     canRolePay,
     canRoleCreateExpenses,
     canCreateExpensesOnPolicy,
+    isPolicyMemberWithoutPendingDelete,
     PAYER_ROLES,
     isPolicyApprover,
     getPolicyApproverLogins,

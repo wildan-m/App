@@ -74,15 +74,6 @@ function isMemberInHomeAndOfficeWorkspace(policy: OnyxEntry<Policy>, memberLogin
     return !!memberLogin && policy?.commuterExclusions?.method === CONST.POLICY.COMMUTER_EXCLUSION_METHOD.HOME_AND_OFFICE && !!policy.employeeList?.[memberLogin];
 }
 
-function isPolicyMemberWithoutPendingDelete(currentUserLogin: string | undefined, policy: OnyxEntry<Policy>): boolean {
-    if (!currentUserLogin || !policy?.id) {
-        return false;
-    }
-
-    const policyEmployee = policy?.employeeList?.[currentUserLogin];
-    return !!policyEmployee && policyEmployee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
-}
-
 /** Check if the passed employee holds an active Expensify Card on the policy, as reported by the backend in the policy's employeeList */
 function hasActiveExpensifyCard(policy: OnyxEntry<Policy>, employeeLogin: string) {
     const primaryLogin = policy?.primaryLoginsInvited?.[employeeLogin];
@@ -418,7 +409,6 @@ export {
     isPolicyMember,
     isMemberInHomeAndOfficeWorkspace,
     getEligibleBankAccountShareRecipientEmails,
-    isPolicyMemberWithoutPendingDelete,
     hasActiveExpensifyCard,
 };
 

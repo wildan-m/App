@@ -18,7 +18,9 @@ import {
     canMemberManageMemberWithRole,
     canMemberRead,
     canMemberWrite,
+    canBeDefaultWorkspaceForExpenses,
     canCreateExpensesOnPolicy,
+    canCreateReportOnPolicy,
     canRoleCreateExpenses,
     canSendInvoice,
     canSendInvoiceFromWorkspace,
@@ -5111,6 +5113,135 @@ describe('PolicyUtils', () => {
                 const policy: Policy = {...createRandomPolicy(0), approvalMode: CONST.POLICY.APPROVAL_MODE.ADVANCED, dynamicExternalWorkflowHidePeople: true};
                 expect(shouldHideDynamicExternalWorkflowPeople(policy)).toBe(false);
             });
+        });
+    });
+
+    describe('canBeDefaultWorkspaceForExpenses', () => {
+        const eligiblePolicy = createMock<Policy>({
+            id: '1',
+            type: CONST.POLICY.TYPE.TEAM,
+            employeeList: {
+                [employeeEmail]: {email: employeeEmail, role: CONST.POLICY.ROLE.USER},
+            },
+        });
+
+        it('should return true for an active group workspace where the user can create expenses', () => {
+            // Given an active paid group workspace where the user is a member whose role can create expenses
+            // When checking whether it can be the default destination for a new report or expense
+            const result = canBeDefaultWorkspaceForExpenses(eligiblePolicy, employeeEmail);
+
+            // Then the workspace qualifies
+            expect(result).toBe(true);
+        });
+
+        it('should return false for an archived workspace', () => {
+            // Given an otherwise eligible workspace that has been archived
+            const policy = createMock<Policy>({...eligiblePolicy, archivedDate: '2024-01-01'});
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected, so an archived workspace can never silently become the default
+            expect(result).toBe(false);
+        });
+
+        it('should return false for a workspace the user has only asked to join', () => {
+            // Given an otherwise eligible workspace with a pending join request
+            const policy = createMock<Policy>({...eligiblePolicy, isJoinRequestPending: true});
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected because the user is not a member yet
+            expect(result).toBe(false);
+        });
+
+        it('should return false for a workspace pending delete even when it has errors', () => {
+            // Given a workspace whose deletion is pending and failed with an error (the state shouldShowPolicy keeps visible in lists)
+            const policy = createMock<Policy>({...eligiblePolicy, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE, errors: {error: 'Deletion failed'}});
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected: staying visible in lists must not make a half-deleted workspace a default destination
+            expect(result).toBe(false);
+        });
+
+        it('should return false when the user is pending removal from the workspace', () => {
+            // Given a workspace where the user's own member entry is pending delete
+            const policy = createMock<Policy>({
+                ...eligiblePolicy,
+                employeeList: {
+                    [employeeEmail]: {email: employeeEmail, role: CONST.POLICY.ROLE.USER, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE},
+                },
+            });
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected because the user is being removed
+            expect(result).toBe(false);
+        });
+
+        it('should skip the pending-removal check when the employee list is not hydrated', () => {
+            // Given a workspace whose employeeList is not loaded but whose global role allows creating expenses
+            const policy = createMock<Policy>({id: '1', type: CONST.POLICY.TYPE.TEAM, role: CONST.POLICY.ROLE.USER, employeeList: {}});
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then there is no member entry to inspect, so the workspace still qualifies
+            expect(result).toBe(true);
+        });
+
+        it('should return false for a personal policy', () => {
+            // Given a personal (non-group) policy
+            const policy = createMock<Policy>({id: '1', type: CONST.POLICY.TYPE.PERSONAL, role: CONST.POLICY.ROLE.ADMIN});
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected because only group workspaces can take reports and expenses
+            expect(result).toBe(false);
+        });
+
+        it('should return false when the user role cannot create expenses', () => {
+            // Given a workspace where the user's role is approve-only, which has no create-expenses permission
+            const policy = createMock<Policy>({
+                id: '1',
+                type: CONST.POLICY.TYPE.TEAM,
+                employeeList: {
+                    [employeeEmail]: {email: employeeEmail, role: CONST.POLICY.ROLE.APPROVE_ONLY},
+                },
+            });
+
+            // When checking whether it can be the default destination
+            const result = canBeDefaultWorkspaceForExpenses(policy, employeeEmail);
+
+            // Then it is rejected because the user cannot create expenses there
+            expect(result).toBe(false);
+        });
+
+        it('should keep working for callers that pass no login', () => {
+            // Given an eligible workspace with a global role and a caller that does not know the current user login
+            const policy = createMock<Policy>({...eligiblePolicy, role: CONST.POLICY.ROLE.USER});
+
+            // When checking whether it can be the default destination without a login
+            const result = canBeDefaultWorkspaceForExpenses(policy, undefined);
+
+            // Then the global policy role decides and the pending-removal check is skipped
+            expect(result).toBe(true);
+        });
+
+        it('should back canCreateReportOnPolicy with the same shared rule', () => {
+            // Given an archived workspace, which the shared rule rejects
+            const policy = createMock<Policy>({...eligiblePolicy, archivedDate: '2024-01-01'});
+
+            // When checking report creation, which delegates to the shared rule
+            const result = canCreateReportOnPolicy(policy, employeeEmail);
+
+            // Then it is rejected the same way as every other default-workspace flow
+            expect(result).toBe(false);
         });
     });
 
