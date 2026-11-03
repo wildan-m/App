@@ -1,5 +1,6 @@
 import {createGuardContext, evaluateGuards} from '@libs/Navigation/guards';
 import getAdaptedStateFromPath from '@libs/Navigation/helpers/getAdaptedStateFromPath';
+import getStateForRouteNamesChangeWithFallback from '@libs/Navigation/helpers/getStateForRouteNamesChangeWithFallback';
 import {isFullScreenName} from '@libs/Navigation/helpers/isNavigatorName';
 import isSideModalNavigator from '@libs/Navigation/helpers/isSideModalNavigator';
 import {getTabScreenParam} from '@libs/Navigation/helpers/tabNavigatorUtils';
@@ -247,6 +248,7 @@ function RootStackRouter(options: RootStackNavigatorRouterOptions) {
 
             return stackRouter.getStateForAction(state, action, configOptions);
         },
+        getStateForRouteNamesChange: getStateForRouteNamesChangeWithFallback(stackRouter, 'RootStackNavigator'),
     };
 }
 

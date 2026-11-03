@@ -1,3 +1,4 @@
+import getStateForRouteNamesChangeWithFallback from '@libs/Navigation/helpers/getStateForRouteNamesChangeWithFallback';
 import navigationRef from '@libs/Navigation/navigationRef';
 import {getSearchRootParamsFromRootState} from '@libs/SearchQueryUtils';
 
@@ -40,10 +41,15 @@ function SearchFullscreenRouter(options: SearchFullscreenNavigatorRouterOptions)
 
     return {
         ...stackRouter,
-        getInitialState({routeNames, routeParamList, routeGetIdList}: RouterConfigOptions) {
+        getInitialState(configOptions: RouterConfigOptions) {
             const preservedState = getPreservedNavigatorState(options.parentRoute.key);
-            return preservedState ?? getInitialStateWithLastSearchQuery(stackRouter.getInitialState({routeNames, routeParamList, routeGetIdList}));
+            if (preservedState) {
+                // A preserved state can be a partial state seeded from a restored path, so it has to be normalized before use.
+                return stackRouter.getRehydratedState(preservedState, configOptions);
+            }
+            return getInitialStateWithLastSearchQuery(stackRouter.getInitialState(configOptions));
         },
+        getStateForRouteNamesChange: getStateForRouteNamesChangeWithFallback(stackRouter, options.parentRoute.name),
     };
 }
 

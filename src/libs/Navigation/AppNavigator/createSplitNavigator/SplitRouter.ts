@@ -1,6 +1,7 @@
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
 import Log from '@libs/Log';
 import getParamsFromRoute from '@libs/Navigation/helpers/getParamsFromRoute';
+import getStateForRouteNamesChangeWithFallback from '@libs/Navigation/helpers/getStateForRouteNamesChangeWithFallback';
 import isSideModalNavigator from '@libs/Navigation/helpers/isSideModalNavigator';
 import navigationRef from '@libs/Navigation/navigationRef';
 
@@ -190,8 +191,9 @@ function SplitRouter(options: SplitNavigatorRouterOptions) {
             const initialState = getPreservedNavigatorState(options.parentRoute.key) ?? stackRouter.getInitialState({routeNames, routeParamList, routeGetIdList});
             const maybeAdaptedState = adaptStateIfNecessary({state: initialState, options});
 
-            // If we needed to modify the state we need to rehydrate it to get keys for new routes.
-            if (maybeAdaptedState.stale) {
+            // Rehydrate anything that is not a realized state: an adapted state needs keys for its new routes, and a preserved
+            // partial state (stale is undefined) still needs the fields the stack router expects, such as preloadedRoutes.
+            if (maybeAdaptedState.stale !== false) {
                 return stackRouter.getRehydratedState(maybeAdaptedState, {routeNames, routeParamList, routeGetIdList});
             }
 
@@ -199,6 +201,8 @@ function SplitRouter(options: SplitNavigatorRouterOptions) {
         },
 
         getRehydratedState,
+
+        getStateForRouteNamesChange: getStateForRouteNamesChangeWithFallback(stackRouter, options.parentRoute.name),
     };
 }
 

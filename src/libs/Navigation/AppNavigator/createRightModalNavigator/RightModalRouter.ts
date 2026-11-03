@@ -1,3 +1,5 @@
+import getStateForRouteNamesChangeWithFallback from '@libs/Navigation/helpers/getStateForRouteNamesChangeWithFallback';
+
 import {getPreservedNavigatorState} from '@navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
 
 import type {RouterConfigOptions} from '@react-navigation/native';
@@ -15,6 +17,7 @@ function RightModalRouter(options: RightModalNavigatorRouterOptions) {
             const preservedState = getPreservedNavigatorState(options.parentRoute.key);
             return preservedState ?? stackRouter.getInitialState({routeNames, routeParamList, routeGetIdList});
         },
+        getStateForRouteNamesChange: getStateForRouteNamesChangeWithFallback(stackRouter, options.parentRoute.name),
     };
 }
 

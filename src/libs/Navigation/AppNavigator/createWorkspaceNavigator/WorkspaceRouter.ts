@@ -1,3 +1,4 @@
+import getStateForRouteNamesChangeWithFallback from '@libs/Navigation/helpers/getStateForRouteNamesChangeWithFallback';
 import {getWorkspacesTabStateFromSessionStorage} from '@libs/Navigation/helpers/lastVisitedTabPathUtils';
 
 import {getPreservedNavigatorState} from '@navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
@@ -41,7 +42,8 @@ function WorkspaceRouter(options: WorkspaceNavigatorRouterOptions) {
         getInitialState(configOptions: RouterConfigOptions) {
             const preservedState = getPreservedNavigatorState(options.parentRoute.key);
             if (preservedState) {
-                return preservedState;
+                // A preserved state can be a partial state seeded from a restored path, so it has to be normalized before use.
+                return stackRouter.getRehydratedState(preservedState, configOptions);
             }
             const sessionState = buildWorkspaceInitialStateFromSessionStorage();
             if (sessionState) {
@@ -49,6 +51,7 @@ function WorkspaceRouter(options: WorkspaceNavigatorRouterOptions) {
             }
             return stackRouter.getInitialState(configOptions);
         },
+        getStateForRouteNamesChange: getStateForRouteNamesChangeWithFallback(stackRouter, options.parentRoute.name),
     };
 }
 
