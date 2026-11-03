@@ -79,7 +79,7 @@ const updateUnread: UpdateUnread = (totalCount, reportIDs = []) => {
     updateDocumentTitle();
 };
 
-function setUnreadUpdateCallback(callback: () => void) {
+function setUnreadUpdateCallback(callback: (() => void) | undefined) {
     requestUnreadUpdate = callback;
 }
 

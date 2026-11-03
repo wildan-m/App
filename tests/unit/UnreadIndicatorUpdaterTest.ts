@@ -1,10 +1,28 @@
+import type {UnreadIndicatorData} from '../../src/libs/UnreadIndicatorUpdater/getUnreadReportsForUnreadIndicator';
+
 /* eslint-disable @typescript-eslint/naming-convention */
 import CONST from '../../src/CONST';
-import UnreadIndicatorUpdater from '../../src/libs/UnreadIndicatorUpdater';
+import getUnreadReportsForUnreadIndicator from '../../src/libs/UnreadIndicatorUpdater/getUnreadReportsForUnreadIndicator';
 import * as TestHelper from '../utils/TestHelper';
 
 const TEST_USER_ACCOUNT_ID = 1;
 const TEST_USER_LOGIN = 'test@test.com';
+
+/** The pure counting function takes all of its data as parameters; tests only vary the reports. */
+function buildUnreadIndicatorData(reports: UnreadIndicatorData['reports']): UnreadIndicatorData {
+    return {
+        reports,
+        currentReportID: '3',
+        draftComment: undefined,
+        reportNameValuePairs: {},
+        reportActions: {},
+        reportAttributes: undefined,
+        currentUserAccountID: TEST_USER_ACCOUNT_ID,
+        currentUserLogin: TEST_USER_LOGIN,
+        conciergeReportID: undefined,
+        isOffline: false,
+    };
+}
 
 describe('UnreadIndicatorUpdaterTest', () => {
     describe('should return correct number of unread reports', () => {
@@ -29,7 +47,7 @@ describe('UnreadIndicatorUpdaterTest', () => {
                 3: {reportID: '3', reportName: 'test', type: CONST.REPORT.TYPE.TASK, lastMessageText: 'test'},
             };
             TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID).then(() => {
-                expect(UnreadIndicatorUpdater.getUnreadReportsForUnreadIndicator(reportsToBeUsed, '3', undefined).length).toBe(2);
+                expect(getUnreadReportsForUnreadIndicator(buildUnreadIndicatorData(reportsToBeUsed)).length).toBe(2);
             });
         });
 
@@ -39,7 +57,7 @@ describe('UnreadIndicatorUpdaterTest', () => {
                 2: {reportID: '2', type: CONST.REPORT.TYPE.TASK, lastReadTime: '2023-02-05 09:12:05.000', lastVisibleActionCreated: '2023-02-06 07:15:44.030'},
                 3: {reportID: '3', type: CONST.REPORT.TYPE.TASK},
             };
-            expect(UnreadIndicatorUpdater.getUnreadReportsForUnreadIndicator(reportsToBeUsed, '3', undefined).length).toBe(0);
+            expect(getUnreadReportsForUnreadIndicator(buildUnreadIndicatorData(reportsToBeUsed)).length).toBe(0);
         });
 
         it('given notification preference of some reports is hidden', () => {
@@ -68,7 +86,7 @@ describe('UnreadIndicatorUpdaterTest', () => {
                 3: {reportID: '3', reportName: 'test', type: CONST.REPORT.TYPE.TASK, lastMessageText: 'test'},
             };
             TestHelper.setPersonalDetails(TEST_USER_LOGIN, TEST_USER_ACCOUNT_ID).then(() => {
-                expect(UnreadIndicatorUpdater.getUnreadReportsForUnreadIndicator(reportsToBeUsed, '3', undefined).length).toBe(1);
+                expect(getUnreadReportsForUnreadIndicator(buildUnreadIndicatorData(reportsToBeUsed)).length).toBe(1);
             });
         });
     });

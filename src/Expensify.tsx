@@ -12,6 +12,7 @@ import type {Route} from './ROUTES';
 import {useInitialURLActions} from './components/InitialURLContextProvider';
 import AppleAuthWrapper from './components/SignInButtons/AppleAuthWrapper';
 import SplashScreenHider from './components/SplashScreenHider';
+import UnreadIndicatorUpdater from './components/UnreadIndicatorUpdater';
 import CONFIG from './CONFIG';
 import CONST from './CONST';
 import DeepLinkHandler from './DeepLinkHandler';
@@ -307,6 +308,8 @@ function Expensify() {
             <FullstoryUserContextHandler />
             <DeepLinkHandler onInitialUrl={setInitialUrl} />
             <AppleAuthWrapper />
+            {/* Mounted only once the splash screen is hidden, preserving the former post-splash deferred loading of the unread indicator updater */}
+            {splashScreenState === CONST.BOOT_SPLASH_STATE.HIDDEN && <UnreadIndicatorUpdater />}
             {/* Wait for the initial URL to resolve before mounting NavigationRoot, because its initialState
                 is computed once on mount. In HybridApp, getInitialURL() may never resolve (OldDot native
                 bridge), so we skip this guard to avoid blocking the app. */}
