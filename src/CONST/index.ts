@@ -10383,6 +10383,7 @@ const CONST = {
             BACK_BUTTON: 'HeaderView-BackButton',
             CHRONOS_TIMER_BUTTON: 'HeaderView-ChronosTimerButton',
             DETAILS_BUTTON: 'HeaderView-DetailsButton',
+            EXPAND_SIDE_PANEL_BUTTON: 'HeaderView-ExpandSidePanelButton',
         },
         BLOCKING_VIEW: {
             RETRY_BUTTON: 'BlockingView-RetryButton',

@@ -1,4 +1,5 @@
 import useOnyx from '@hooks/useOnyx';
+import useResizableSidePanelWidth from '@hooks/useResizableSidePanelWidth';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSidePanelDisplayStatus from '@hooks/useSidePanelDisplayStatus';
 import useWindowDimensions from '@hooks/useWindowDimensions';
@@ -34,11 +35,24 @@ type SidePanelStateContextProps = {
     sidePanelTranslateX: RefObject<Animated.Value>;
     sidePanelNVP?: SidePanel;
     sessionStartTime: string | null;
+
+    /** The panel's width on a wide layout: the dragged width clamped to the window, or the default. */
+    sidePanelWidth: number;
+
+    /** How narrow and how wide the panel can be dragged. */
+    sidePanelMinWidth: number;
+    sidePanelMaxWidth: number;
+
+    /** Whether the panel shows a resize handle and an Expand button. */
+    isSidePanelResizable: boolean;
 };
 
 type SidePanelActionsContextProps = {
     openSidePanel: (options?: {forceConcierge?: boolean; reportID?: string}) => void;
     closeSidePanel: (options?: {afterTransition?: () => void}) => void;
+
+    /** Set from below the WideRHPContextProvider, which mounts under this provider, so the panel can stay narrow enough to keep a wide RHP on screen. */
+    setIsWideRHPOpen: (isWideRHPOpen: boolean) => void;
 };
 
 const SidePanelStateContext = createContext<SidePanelStateContextProps>({
@@ -51,6 +65,10 @@ const SidePanelStateContext = createContext<SidePanelStateContextProps>({
     sidePanelOffset: {current: new Animated.Value(0)},
     sidePanelTranslateX: {current: new Animated.Value(0)},
     sessionStartTime: null,
+    sidePanelWidth: variables.sidePanelWidth,
+    sidePanelMinWidth: variables.sidePanelWidth,
+    sidePanelMaxWidth: variables.sidePanelWidth,
+    isSidePanelResizable: false,
 });
 
 const SidePanelReportIDContext = createContext<string | undefined>(undefined);
@@ -58,6 +76,7 @@ const SidePanelReportIDContext = createContext<string | undefined>(undefined);
 const SidePanelActionsContext = createContext<SidePanelActionsContextProps>({
     openSidePanel: () => {},
     closeSidePanel: () => {},
+    setIsWideRHPOpen: () => {},
 });
 
 /**
@@ -66,16 +85,19 @@ const SidePanelActionsContext = createContext<SidePanelActionsContextProps>({
 function SidePanelContextProvider({children}: PropsWithChildren) {
     const {isExtraLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const {windowWidth} = useWindowDimensions();
-    const sidePanelWidth = shouldUseNarrowLayout ? windowWidth : variables.sidePanelWidth;
+    const [isWideRHPOpen, setIsWideRHPOpen] = useState(false);
+    const {width: resizableSidePanelWidth, min: sidePanelMinWidth, max: sidePanelMaxWidth, isResizable: isSidePanelResizable} = useResizableSidePanelWidth(isWideRHPOpen);
+    const sidePanelWidth = shouldUseNarrowLayout ? windowWidth : resizableSidePanelWidth;
 
     const [isSidePanelTransitionEnded, setIsSidePanelTransitionEnded] = useState(true);
     const {shouldHideSidePanel, shouldHideSidePanelBackdrop, shouldHideHelpButton, isSidePanelHiddenOrLargeScreen, sidePanelNVP} = useSidePanelDisplayStatus();
     const shouldHideToolTip = isExtraLargeScreenWidth ? !isSidePanelTransitionEnded : !shouldHideSidePanel;
 
     const shouldApplySidePanelOffset = isExtraLargeScreenWidth && !shouldHideSidePanel;
-    const sidePanelOffset = useRef(new Animated.Value(shouldApplySidePanelOffset ? variables.sidePanelWidth : 0));
+    const sidePanelOffset = useRef(new Animated.Value(shouldApplySidePanelOffset ? resizableSidePanelWidth : 0));
     const sidePanelTranslateX = useRef(new Animated.Value(shouldHideSidePanel ? sidePanelWidth : 0));
     const sidePanelWidthRef = useRef(sidePanelWidth);
+    const dockedSidePanelWidthRef = useRef(resizableSidePanelWidth);
 
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [onboardingRHPVariant] = useOnyx(ONYXKEYS.NVP_ONBOARDING_RHP_VARIANT);
@@ -110,6 +132,16 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         sidePanelWidthRef.current = sidePanelWidth;
     }, [sidePanelWidth]);
 
+    // A docked panel that changes width (a drag, a window resize, a wide RHP opening) moves the page beside it along. Mid-transition, the animation picks up the new width.
+    useEffect(() => {
+        dockedSidePanelWidthRef.current = resizableSidePanelWidth;
+        if (!shouldApplySidePanelOffset || !isSidePanelTransitionEnded) {
+            return;
+        }
+        sidePanelOffset.current.setValue(resizableSidePanelWidth);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- only a width change should move the offset; open/close is animated below
+    }, [resizableSidePanelWidth]);
+
     // sidePanelWidth dependency in useEffect below caused the help panel content to slide in on window resize
     useEffect(() => {
         // We need to set transition state to false when animation starts, then back to true when it completes.
@@ -118,7 +150,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         setIsSidePanelTransitionEnded(false);
         Animated.parallel([
             Animated.timing(sidePanelOffset.current, {
-                toValue: shouldApplySidePanelOffset ? variables.sidePanelWidth : 0,
+                toValue: shouldApplySidePanelOffset ? dockedSidePanelWidthRef.current : 0,
                 duration: CONST.SIDE_PANEL_ANIMATED_TRANSITION,
                 useNativeDriver: true,
             }),
@@ -171,6 +203,10 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
         sidePanelTranslateX,
         sidePanelNVP,
         sessionStartTime,
+        sidePanelWidth: resizableSidePanelWidth,
+        sidePanelMinWidth,
+        sidePanelMaxWidth,
+        isSidePanelResizable,
     };
 
     // Because of the React Compiler we don't need to memoize it manually
@@ -178,6 +214,7 @@ function SidePanelContextProvider({children}: PropsWithChildren) {
     const actionsValue = {
         openSidePanel,
         closeSidePanel,
+        setIsWideRHPOpen,
     };
 
     return (

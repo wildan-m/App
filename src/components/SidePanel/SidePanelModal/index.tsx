@@ -1,12 +1,14 @@
 import ColorSchemeWrapper from '@components/ColorSchemeWrapper';
 import FocusTrapForModal from '@components/FocusTrap/FocusTrapForModal';
 import SidePanelOverlay from '@components/SidePanel/SidePanelOverlay';
+import SidePanelResizeHandle from '@components/SidePanel/SidePanelResizeHandle';
 import {useWideRHPState} from '@components/WideRHPContextProvider';
 
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSafeAreaPaddings from '@hooks/useSafeAreaPaddings';
+import useSidePanelState from '@hooks/useSidePanelState';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import ComposerFocusManager from '@libs/ComposerFocusManager';
@@ -26,10 +28,14 @@ import ModalPortal from 'react-native-web/dist/exports/Modal/ModalPortal';
 
 import type SidePanelModalProps from './types';
 
-function SidePanelModal({children, sidePanelTranslateX, closeSidePanel, shouldHideSidePanelBackdrop}: SidePanelModalProps) {
+function SidePanelModal({children, sidePanelTranslateX, closeSidePanel, shouldHideSidePanel, shouldHideSidePanelBackdrop}: SidePanelModalProps) {
     const styles = useThemeStyles();
     const {isExtraLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const {paddingTop, paddingBottom, paddingLeft, paddingRight} = useSafeAreaPaddings();
+    const {sidePanelWidth, isSidePanelResizable, isSidePanelTransitionEnded} = useSidePanelState();
+
+    // Only once the panel has slid in, so the handle doesn't sit at the edge of a panel that is still moving.
+    const shouldShowResizeHandle = isSidePanelResizable && !shouldHideSidePanel && isSidePanelTransitionEnded;
 
     const [isRHPVisible = false] = useOnyx(ONYXKEYS.MODAL, {selector: isRHPVisibleSelector});
     const uniqueModalId = ComposerFocusManager.getId();
@@ -96,7 +102,7 @@ function SidePanelModal({children, sidePanelTranslateX, closeSidePanel, shouldHi
                         <Animated.View
                             style={[
                                 styles.sidePanelContent,
-                                styles.sidePanelContentWidth(shouldUseNarrowLayout),
+                                styles.sidePanelContentWidth(shouldUseNarrowLayout, sidePanelWidth),
                                 styles.sidePanelContentBorderWidth(isExtraLargeScreenWidth),
                                 {transform: [{translateX: sidePanelTranslateX.current}], paddingTop, paddingBottom, paddingLeft, paddingRight},
                             ]}
@@ -104,6 +110,7 @@ function SidePanelModal({children, sidePanelTranslateX, closeSidePanel, shouldHi
                             {children}
                         </Animated.View>
                     </ColorSchemeWrapper>
+                    {shouldShowResizeHandle && <SidePanelResizeHandle />}
                 </View>
             </FocusTrapForModal>
         </ModalPortal>

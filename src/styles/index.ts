@@ -6,6 +6,7 @@ import {animatedReceiptPaneRHPWidth, animatedWideRHPWidth} from '@components/Wid
 import {getBrowser, isMobile, isMobileSafari, isSafari} from '@libs/Browser';
 import getPlatform from '@libs/getPlatform';
 import RHP_FLOATING_CARD_INSET from '@libs/Navigation/helpers/rhpFloatingCardInset';
+import {getSidePanelWidthStyleValue} from '@libs/Navigation/helpers/sidePanelWidth';
 import {getSingleRHPWidthStyleValue} from '@libs/Navigation/helpers/singleRHPWidth';
 
 import CONST from '@src/CONST';
@@ -7571,9 +7572,19 @@ const dynamicStyles = (theme: ThemeColors) =>
         sidePanelOverlayOpacity: (isOverlayVisible: boolean) => ({
             opacity: isOverlayVisible ? variables.overlayOpacity : 0,
         }),
-        sidePanelContentWidth: (shouldUseNarrowLayout: boolean): ViewStyle => ({
-            width: shouldUseNarrowLayout ? '100%' : variables.sidePanelWidth,
+        sidePanelContentWidth: (shouldUseNarrowLayout: boolean, sidePanelWidth: number = variables.sidePanelWidth): ViewStyle => ({
+            width: shouldUseNarrowLayout ? '100%' : getSidePanelWidthStyleValue(sidePanelWidth),
         }),
+
+        // Straddles the side panel's left edge. Fixed like the panel, so it stays put while the page scrolls.
+        sidePanelResizeHandle: (sidePanelWidth: number) =>
+            ({
+                position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+                top: 0,
+                bottom: 0,
+                width: CONST.RHP_RESIZE.HANDLE_HIT_WIDTH,
+                right: getSidePanelWidthStyleValue(sidePanelWidth, -CONST.RHP_RESIZE.HANDLE_HIT_WIDTH / 2),
+            }) satisfies ViewStyle,
         sidePanelContentBorderWidth: (isExtraLargeScreenWidth: boolean): ViewStyle => ({
             borderLeftWidth: isExtraLargeScreenWidth ? 1 : 0,
         }),

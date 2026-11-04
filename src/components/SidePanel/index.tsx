@@ -1,10 +1,12 @@
+import {useWideRHPState} from '@components/WideRHPContextProvider';
+
 import useSidePanelActions from '@hooks/useSidePanelActions';
 import useSidePanelReportID from '@hooks/useSidePanelReportID';
 import useSidePanelState from '@hooks/useSidePanelState';
 
 import type {ExtraContentProps} from '@libs/Navigation/PlatformStackNavigation/types';
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import SidePanelModal from './SidePanelModal';
 import SidePanelReport from './SidePanelReport';
@@ -13,7 +15,14 @@ import useSyncSidePanelWithHistory from './useSyncSidePanelWithHistory';
 function SidePanel({navigation}: Pick<ExtraContentProps, 'navigation'>) {
     const {sidePanelNVP, isSidePanelTransitionEnded, shouldHideSidePanel, sidePanelTranslateX, shouldHideSidePanelBackdrop} = useSidePanelState();
     const reportID = useSidePanelReportID();
-    const {closeSidePanel} = useSidePanelActions();
+    const {closeSidePanel, setIsWideRHPOpen} = useSidePanelActions();
+    const {wideRHPRouteKeys, superWideRHPRouteKeys} = useWideRHPState();
+    const isWideRHPOpen = wideRHPRouteKeys.length > 0 || superWideRHPRouteKeys.length > 0;
+
+    // SidePanelContextProvider mounts above the WideRHPContextProvider, so it learns from here when the panel has to make room for a wide RHP.
+    useEffect(() => {
+        setIsWideRHPOpen(isWideRHPOpen);
+    }, [isWideRHPOpen, setIsWideRHPOpen]);
 
     // Hide side panel once animation ends
     // This hook synchronizes the side panel visibility with the browser history when it is displayed as RHP.

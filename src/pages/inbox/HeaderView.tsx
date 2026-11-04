@@ -34,12 +34,17 @@ import usePolicy from '@hooks/usePolicy';
 import {useDerivedReportNamesByReportIDs} from '@hooks/useReportAttributes';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useRootNavigationState from '@hooks/useRootNavigationState';
+import useSidePanelActions from '@hooks/useSidePanelActions';
+import useSidePanelState from '@hooks/useSidePanelState';
 import useSubscriptionPlan from '@hooks/useSubscriptionPlan';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import getActiveTabName from '@libs/Navigation/helpers/getActiveTabName';
 import getReportRouteForCurrentContext from '@libs/Navigation/helpers/getReportRouteForCurrentContext';
+import getTopmostReportParams from '@libs/Navigation/helpers/getTopmostReportParams';
 import Navigation from '@libs/Navigation/Navigation';
 import Parser from '@libs/Parser';
 import {getPersonalDetailsForAccountIDs} from '@libs/PersonalDetailsUtils';
@@ -93,7 +98,9 @@ import {joinRoom} from '@userActions/Report';
 import {callFunctionIfActionIsAllowed} from '@userActions/Session';
 
 import CONST from '@src/CONST';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
@@ -121,11 +128,27 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {selector: getStableReportSelector});
     const parentReportAction = useParentReportAction(report, {shouldIgnoreThreadReplies: true});
 
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow', 'Close', 'DotIndicator', 'Plus']);
+    const icons = useMemoizedLazyExpensifyIcons(['BackArrow', 'Close', 'DotIndicator', 'Expand', 'Plus']);
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth, shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const isInSidePanel = useIsInSidePanel();
+    const {isSidePanelResizable} = useSidePanelState();
+    const {closeSidePanel} = useSidePanelActions();
     const route = useRoute();
+
+    // Expanding would open the chat the user is already looking at when it's the topmost report of the Inbox on screen.
+    const isSidePanelReportOpenInInbox = useRootNavigationState((state) => {
+        if (!isInSidePanel || !state) {
+            return false;
+        }
+
+        const topmostFullScreenRoute = state.routes.findLast(
+            (fullScreenRoute) => fullScreenRoute.name === NAVIGATORS.TAB_NAVIGATOR || fullScreenRoute.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR,
+        );
+        const isInboxOnScreen = getActiveTabName(topmostFullScreenRoute) === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR;
+
+        return isInboxOnScreen && getTopmostReportParams(state)?.reportID === reportID;
+    });
     const openParentReportInCurrentTab = route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT;
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID) ?? getNonEmptyStringOnyxID(report?.reportID)}`, {
         selector: getStableReportSelector,
@@ -387,6 +410,12 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
     // shouldUseNarrowLayout true for any RHP regardless of actual screen width.
     const shouldShowCloseButton = (!!isInSidePanel && !shouldUseNarrowLayout) || isAgentReportInRHP;
     const shouldShowBackButton = (shouldUseNarrowLayout || !!isInSidePanel) && !shouldShowCloseButton;
+    // Same conditions as the side panel's resize handle. Narrow layouts already show the panel full screen.
+    const shouldShowExpandButton = !!isInSidePanel && !shouldUseNarrowLayout && isSidePanelResizable && !isSidePanelReportOpenInInbox;
+
+    const openSidePanelReportInInbox = () => {
+        closeSidePanel({afterTransition: () => Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID))});
+    };
 
     const onboardingHelpDropdownButton = (
         <OnboardingHelpDropdownButton
@@ -537,6 +566,22 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
                                     {!shouldUseNarrowLayout && isOpenTaskReport(report, parentReportAction) && <TaskHeaderActionButton reportID={report.reportID} />}
                                     {!isParentReportLoading && canJoin && !shouldUseNarrowLayout && joinButton}
                                 </View>
+                                {shouldShowExpandButton && (
+                                    <Tooltip text={translate('common.expand')}>
+                                        <PressableWithoutFeedback
+                                            onPress={openSidePanelReportInInbox}
+                                            style={[styles.touchableButtonImage]}
+                                            role={CONST.ROLE.BUTTON}
+                                            accessibilityLabel={translate('common.expand')}
+                                            sentryLabel={CONST.SENTRY_LABEL.HEADER_VIEW.EXPAND_SIDE_PANEL_BUTTON}
+                                        >
+                                            <Icon
+                                                src={icons.Expand}
+                                                fill={theme.icon}
+                                            />
+                                        </PressableWithoutFeedback>
+                                    </Tooltip>
+                                )}
                                 {shouldShowCloseButton && (
                                     <Tooltip text={translate('common.close')}>
                                         <PressableWithoutFeedback
