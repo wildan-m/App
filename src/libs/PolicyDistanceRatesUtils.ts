@@ -11,6 +11,7 @@ import type {OnyxData} from '@src/types/onyx/Request';
 
 import type {NullishDeep, OnyxUpdate} from 'react-native-onyx';
 
+import {format} from 'date-fns';
 import Onyx from 'react-native-onyx';
 
 import type {Option} from './searchOptions';
@@ -303,6 +304,30 @@ function getGovernmentRateSeries(sourceRateID: string): string {
 /** Whether a government rate is a UK fuel band, whose sourceRateID carries the band between the country code and the date. */
 function isFuelBandGovernmentRate(sourceRateID: string): boolean {
     return sourceRateID.split('_').length > 2;
+}
+
+/**
+ * A country's currently effective government reference rate: the standard (non-fuel-band) entry with the newest start
+ * date that isn't in the future. The Add rate calculation summary reads its start date and amount for the country
+ * notes that show them.
+ */
+function getActiveGovernmentRateForCountry(governmentMileageRates: GovernmentMileageRate[] | undefined, country: string | undefined): GovernmentMileageRate | undefined {
+    if (!country || !governmentMileageRates) {
+        return undefined;
+    }
+    const today = format(new Date(), CONST.DATE.FNS_FORMAT_STRING);
+    let activeRate: GovernmentMileageRate | undefined;
+    for (const governmentMileageRate of governmentMileageRates) {
+        const rateCountry = governmentMileageRate.sourceRateID.split('_').at(0);
+        // ISO 8601 dates sort chronologically as plain strings
+        if (rateCountry !== country || isFuelBandGovernmentRate(governmentMileageRate.sourceRateID) || governmentMileageRate.startDate > today) {
+            continue;
+        }
+        if (!activeRate || governmentMileageRate.startDate > activeRate.startDate) {
+            activeRate = governmentMileageRate;
+        }
+    }
+    return activeRate;
 }
 
 /** The tax reclaimable amount, in currency units, as the distance rate tax reclaimable page shows it. */
@@ -676,6 +701,7 @@ export {
     getDistanceExpenseTypeForPolicy,
     isGovernmentRateUnmodified,
     getGovernmentRateSeries,
+    getActiveGovernmentRateForCountry,
     getTaxClaimableDisplayAmount,
     getDistanceRateNameError,
     getDistanceRateNameErrorMessage,

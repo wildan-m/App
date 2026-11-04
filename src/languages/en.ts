@@ -9016,6 +9016,20 @@ const translations = {
             governmentRateCountrySelectionPrompt: 'To continue using the auto-update government distance rates feature, please confirm which country you want to use going forward.',
             currencyChangeGovernmentRateWarning: (currency: string, countryPhrase: string) =>
                 `Heads up! Changing the workspace currency to ${currency} will start using the government mileage rates ${countryPhrase} publishes instead. Are you sure you want to proceed?`,
+            calculationSummary: {
+                // @context {unit} is the capitalized plural distance unit ("Miles" or "Kilometers") and {currencyCode} an ISO currency code, e.g. "Miles, paid in GBP"
+                unitLine: (unit: string, currencyCode: string) => `${unit}, paid in ${currencyCode}`,
+                countryNotes: {
+                    AU: 'Tax-free up to 5,000 km a year. Above that, PAYG is withheld on the excess',
+                    AT: 'Tax-free up to 30,000 km a year. Above that, the allowance is taxable',
+                    // @context {effectiveDate} is a long date, e.g. "July 1, 2026"
+                    BE: (effectiveDate: string) => `Indexed every quarter. This is the rate from ${effectiveDate}`,
+                    NL: 'One rate covers every transport type, including bicycle and walking',
+                    NO: 'Tax-free up to NOK 3.50 per km. The rest is taxable salary',
+                    // @context {amount} is the per-mil amount in kronor, e.g. "25"
+                    SE: (amount: string) => `Skatteverket publishes per Swedish mil (10 km): SEK ${amount} per mil for a car`,
+                },
+            },
             errors: {
                 rateNameRequired: 'Rate name is required',
                 existingRateName: 'A distance rate with this name already exists',

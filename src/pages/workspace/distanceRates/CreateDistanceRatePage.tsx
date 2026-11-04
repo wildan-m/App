@@ -25,6 +25,7 @@ import Navigation from '@navigation/Navigation';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
+import DistanceRateCalculationSummary from '@pages/workspace/distanceRates/DistanceRateCalculationSummary';
 
 import {createPolicyDistanceRate} from '@userActions/Policy/DistanceRate';
 import {generateCustomUnitID} from '@userActions/Policy/Policy';
@@ -157,6 +158,11 @@ function CreateDistanceRatePage({
                             label={translate('workspace.distanceRates.endDate')}
                             shouldDeferShowUntilPositioned
                             shouldDismissKeyboardBeforeShow
+                        />
+                        <DistanceRateCalculationSummary
+                            style={styles.mt4}
+                            unit={distanceUnit}
+                            currency={currency}
                         />
                     </FormProvider>
                 </FullPageBlockingView>
