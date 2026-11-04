@@ -7,6 +7,7 @@ import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import usePolicy from '@hooks/usePolicy';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
@@ -78,7 +79,11 @@ function DynamicSageIntacctDefaultVendorPage() {
         isSelected: !defaultVendor,
     };
     const shouldShowClearOption = canClear && (!!defaultVendor || vendorOptions.length > 0);
-    const vendorSelectorOptions: SelectorType[] = shouldShowClearOption ? [clearOption, ...vendorOptions] : vendorOptions;
+    const {filteredData: vendorSelectorOptions, textInputOptions} = useSelectionListSearch(
+        shouldShowClearOption ? [clearOption, ...vendorOptions] : vendorOptions,
+        translate('common.noResultsFound'),
+        true,
+    );
 
     const listHeaderComponent = (
         <View style={[styles.pb2, styles.ph5]}>
@@ -113,13 +118,15 @@ function DynamicSageIntacctDefaultVendorPage() {
             policyID={policyID}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="SageIntacctDefaultVendorPage"
-            data={vendorSelectorOptions ?? []}
+            data={vendorSelectorOptions}
+            textInputOptions={textInputOptions}
             onSelectRow={updateDefaultVendor}
             initiallyFocusedOptionKey={vendorSelectorOptions.find((mode) => mode.isSelected)?.keyForList}
             headerContent={listHeaderComponent}
             onBackButtonPress={goBack}
             title="workspace.sageIntacct.defaultVendor"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.PAID]}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT}
             pendingAction={settingsPendingAction([settingName], config?.pendingFields)}

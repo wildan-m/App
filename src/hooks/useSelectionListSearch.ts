@@ -13,8 +13,9 @@ import useSearchResults from './useSearchResults';
 /**
  * @param noResultsMessage Shown above the list when a search matches nothing. Omit it to leave the list blank
  * instead, which is only appropriate when the caller renders its own message for that case.
+ * @param shouldAlwaysShowTextInput Show the search input regardless of how many items the list has.
  */
-function useSelectionListSearch<T extends ListItem & {value: string}>(data: T[], noResultsMessage?: string) {
+function useSelectionListSearch<T extends ListItem & {value: string}>(data: T[], noResultsMessage?: string, shouldAlwaysShowTextInput = false) {
     const {translate} = useLocalize();
     // Snapshot the selected items on the first render that has data (handles async-loaded lists), then keep it frozen
     // so staged selections don't move the pin.
@@ -30,7 +31,7 @@ function useSelectionListSearch<T extends ListItem & {value: string}>(data: T[],
         (item, searchInput) => tokenizedSearch([item], searchInput, () => [item.text ?? '', item.value]).length > 0,
     );
     const textInputOptions = {
-        label: data.length >= CONST.STANDARD_LIST_ITEM_LIMIT ? translate('common.search') : undefined,
+        label: shouldAlwaysShowTextInput || data.length >= CONST.STANDARD_LIST_ITEM_LIMIT ? translate('common.search') : undefined,
         value: searchValue,
         onChangeText: setSearchValue,
         headerMessage: noResultsMessage && searchValue && filteredData.length === 0 ? noResultsMessage : undefined,
