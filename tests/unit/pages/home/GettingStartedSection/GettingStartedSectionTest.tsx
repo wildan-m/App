@@ -48,6 +48,9 @@ jest.mock('@hooks/useLocalize', () =>
 
 jest.mock('@hooks/useResponsiveLayout', () => jest.fn(() => ({shouldUseNarrowLayout: false})));
 
+const mockOpenConciergeAnywhere = jest.fn();
+jest.mock('@hooks/useOpenConciergeAnywhere', () => jest.fn(() => ({openConciergeAnywhere: mockOpenConciergeAnywhere, isInSidePanel: true})));
+
 const renderGettingStartedSection = () =>
     render(
         <OnyxListItemProvider>
@@ -484,6 +487,26 @@ describe('GettingStartedSection', () => {
 
             expect(screen.getByText('homePage.gettingStartedSection.talkToAccountExecutive')).toBeTruthy();
             expect(screen.queryByText('homePage.gettingStartedSection.talkToConcierge')).toBeNull();
+        });
+
+        it('opens Concierge instead of the #admins room or account executive for an invited employee', async () => {
+            // Given an invited employee whose account has a guide, and an #admins room in Onyx that they do not belong to
+            const employeeEmail = 'employee@example.com';
+            await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.SUBMIT, inviteType: CONST.ONBOARDING_INVITE_TYPES.WORKSPACE});
+            await Onyx.merge(ONYXKEYS.SESSION, {email: employeeEmail, accountID: 5});
+            await Onyx.merge(ONYXKEYS.LOGINS, {[employeeEmail]: {partnerUserID: employeeEmail, validatedDate: `${RECENT_TRIAL_START} 00:00:00.000`}});
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {guideDetails: {email: 'guide@expensify.com'}});
+            await setAdminsRoom();
+
+            // When the footer link is pressed
+            renderGettingStartedSection();
+            await waitForBatchedUpdates();
+            expect(screen.queryByText('homePage.gettingStartedSection.talkToAccountExecutive')).toBeNull();
+            fireEvent.press(screen.getByText('homePage.gettingStartedSection.talkToConcierge'), {preventDefault: () => {}});
+
+            // Then Concierge opens, because the admins room is not something an employee can reach
+            expect(mockOpenConciergeAnywhere).toHaveBeenCalledWith({forceConcierge: true});
+            expect(Navigation.navigate).not.toHaveBeenCalled();
         });
 
         it('opens the #admins room in the RHP when the footer link is pressed on wide layout', async () => {

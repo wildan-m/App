@@ -5,6 +5,7 @@ import WidgetContainer from '@components/WidgetContainer';
 import useLayoutSpacing from '@hooks/useLayoutSpacing';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useOpenConciergeAnywhere from '@hooks/useOpenConciergeAnywhere';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -32,9 +33,15 @@ function GettingStartedSection() {
     const activePolicy = usePolicy(activePolicyID);
     const [guideDetails] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountGuideDetailsSelector});
     const hasGuide = !!guideDetails?.email;
-    const {shouldShowSection, items} = useGettingStartedItems();
+    const {shouldShowSection, items, shouldOfferConciergeHelp} = useGettingStartedItems();
+    const {openConciergeAnywhere} = useOpenConciergeAnywhere();
 
-    const openAdminsRoom = () => {
+    const openHelpChat = () => {
+        if (shouldOfferConciergeHelp) {
+            openConciergeAnywhere({forceConcierge: true});
+            return;
+        }
+
         const policyAdminsReportID = activePolicy?.chatReportIDAdmins?.toString();
         const adminsRoomReportIDFromPolicy = policyAdminsReportID && policyAdminsReportID !== CONST.DEFAULT_NUMBER_ID.toString() ? policyAdminsReportID : undefined;
         const adminsRoomReportID = (activePolicyID ? getRoom(CONST.REPORT.CHAT_TYPE.POLICY_ADMINS, activePolicyID)?.reportID : undefined) ?? adminsRoomReportIDFromPolicy;
@@ -50,7 +57,7 @@ function GettingStartedSection() {
         Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: adminsRoomReportID, backTo: ROUTES.HOME}));
     };
 
-    const helpLinkText = translate(hasGuide ? 'homePage.gettingStartedSection.talkToAccountExecutive' : 'homePage.gettingStartedSection.talkToConcierge');
+    const helpLinkText = translate(hasGuide && !shouldOfferConciergeHelp ? 'homePage.gettingStartedSection.talkToAccountExecutive' : 'homePage.gettingStartedSection.talkToConcierge');
     const footerHelpText = `${translate('homePage.gettingStartedSection.needHelp')} ${helpLinkText} ${translate('homePage.gettingStartedSection.forGuidedSetup')}`;
 
     if (!shouldShowSection) {
@@ -69,7 +76,7 @@ function GettingStartedSection() {
             </View>
             <View style={[cardPaddingHorizontal, cardPaddingBottom]}>
                 <PressableWithoutFeedback
-                    onPress={openAdminsRoom}
+                    onPress={openHelpChat}
                     accessibilityLabel={footerHelpText}
                     role={CONST.ROLE.LINK}
                     sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.GETTING_STARTED_FOOTER_HELP}

@@ -1189,6 +1189,12 @@ const translations: TranslationDeepObject<typeof en> = {
             configureApprovalsSubText: 'Definieer rapportgoedkeuringen',
             setupTravel: 'Reizen instellen',
             setupTravelSubText: 'Reisspecifieke regels instellen',
+            addYourName: 'Voeg je naam toe',
+            addYourNameSubText: 'Help je teamgenoten je in Expensify te herkennen.',
+            addYourFirstReceipt: 'Voeg je eerste bonnetje toe',
+            addYourFirstReceiptSubText: 'Scan, sleep neer en zet neer, of voer handmatig een bon in',
+            downloadTheApp: 'Download de app',
+            downloadTheAppSubText: 'Scan bonnetjes, dien uitgaven in en keur rapporten goed, waar je ook bent.',
         },
         yourSpend: {
             title: 'Je uitgaven',

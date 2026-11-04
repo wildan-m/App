@@ -1,5 +1,7 @@
 import useBankLinkedPersonalCards from '@hooks/useBankLinkedPersonalCards';
 import useCardFeeds from '@hooks/useCardFeeds';
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useHasLoggedIntoMobileApp from '@hooks/useHasLoggedIntoMobileApp';
 import useLocalize from '@hooks/useLocalize';
 import useOnboardingIntent from '@hooks/useOnboardingIntent';
 import useOnyx from '@hooks/useOnyx';
@@ -37,7 +39,7 @@ import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 
 import {hasIssuedExpensifyCardSelector} from '@selectors/Card';
 import {createHasExpenseDefaultRulesSelector} from '@selectors/Rule';
-import {accountIDSelector} from '@selectors/Session';
+import {accountIDSelector, emailSelector} from '@selectors/Session';
 import {validTransactionDraftIDsSelector} from '@selectors/TransactionDraft';
 
 const MIN_MEMBERS_FOR_ACCOUNTANT_INVITED = 2;
@@ -55,6 +57,9 @@ type GettingStartedItem = {
 type UseGettingStartedItemsResult = {
     shouldShowSection: boolean;
     items: GettingStartedItem[];
+
+    /** Whether the footer should offer Concierge, because an invited employee has no #admins room or account executive to talk to */
+    shouldOfferConciergeHelp?: boolean;
 };
 
 // Onboarding accounting options that link to the Connections page. Keep in sync with `CONST.ONBOARDING_ACCOUNTING_MAPPING`.
@@ -73,6 +78,11 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const intent = useOnboardingIntent();
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [loginList] = useOnyx(ONYXKEYS.LOGINS);
+    const [currentUserEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const {hasLoggedIntoMobileApp} = useHasLoggedIntoMobileApp();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [hasMerchantRules] = useOnyx(ONYXKEYS.COLLECTION.RULE, {selector: createHasExpenseDefaultRulesSelector(activePolicyID)});
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: accountIDSelector});
@@ -110,8 +120,44 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         return {shouldShowSection: true, items: builtItems};
     };
 
+    // Same check TourUtils uses to show the employee tour. An invited employee has no trial, and the workspace they joined can be
+    // far older than their account, so neither date used for the other intents says when they joined. The primary login is
+    // validated on first sign-in, so it anchors the window on the account and also keeps out long-standing users who are invited
+    // to another workspace later.
+    if (intent === CONST.ONBOARDING_CHOICES.SUBMIT && introSelected?.inviteType === CONST.ONBOARDING_INVITE_TYPES.WORKSPACE) {
+        if (!isWithinGettingStartedPeriod(currentUserEmail ? loginList?.[currentUserEmail]?.validatedDate : undefined)) {
+            return emptyResult;
+        }
+
+        const employeeResult = buildResult([
+            {
+                key: 'addYourName',
+                label: translate('homePage.gettingStartedSection.addYourName'),
+                subText: translate('homePage.gettingStartedSection.addYourNameSubText'),
+                // displayName falls back to the login, so only a first or last name means the user actually set one.
+                isComplete: !!currentUserPersonalDetails.firstName || !!currentUserPersonalDetails.lastName,
+                route: ROUTES.SETTINGS_DISPLAY_NAME,
+            },
+            {
+                key: 'addYourFirstReceipt',
+                label: translate('homePage.gettingStartedSection.addYourFirstReceipt'),
+                subText: translate('homePage.gettingStartedSection.addYourFirstReceiptSubText'),
+                isComplete: hasCreatedExpense,
+                onPress: () => startMoneyRequest(CONST.IOU.TYPE.CREATE, generateReportID(), draftTransactionIDs),
+            },
+            {
+                key: 'downloadTheApp',
+                label: translate('homePage.gettingStartedSection.downloadTheApp'),
+                subText: translate('homePage.gettingStartedSection.downloadTheAppSubText'),
+                isComplete: hasLoggedIntoMobileApp,
+                onPress: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.APP_DOWNLOAD_LINKS.path)),
+            },
+        ]);
+        return {...employeeResult, shouldOfferConciergeHelp: true};
+    }
+
     // "Submit expenses to my employer" writes EMPLOYER when the user picks it themselves and SUBMIT when they were
-    // invited to someone else's workspace. Only the former should see this section, which the ownership gate below enforces.
+    // invited to someone else's workspace. The workspace steps below are only for the former, which the ownership gate enforces.
     const isSubmitIntent = intent === CONST.ONBOARDING_CHOICES.EMPLOYER || intent === CONST.ONBOARDING_CHOICES.SUBMIT;
 
     if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE && intent !== CONST.ONBOARDING_CHOICES.TRACK_PERSONAL && !isSubmitIntent) {

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention -- test fixtures use backend-shaped object keys that don't follow camelCase: email addresses for PolicyEmployeeList entries and human-readable names / 'GL Code' for PolicyCategories */
 import {renderHook, waitFor} from '@testing-library/react-native';
 
+import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+
 import Navigation from '@libs/Navigation/Navigation';
 
 import useGettingStartedItems from '@pages/home/GettingStartedSection/hooks/useGettingStartedItems';
@@ -8,7 +10,7 @@ import useGettingStartedItems from '@pages/home/GettingStartedSection/hooks/useG
 import CONST from '@src/CONST';
 import type {OnboardingAccounting} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Policy, PolicyCategories} from '@src/types/onyx';
 import type {PolicyEmployeeList} from '@src/types/onyx/PolicyEmployee';
 
@@ -37,6 +39,7 @@ const useResponsiveLayoutMock = jest.requireMock<jest.Mock>('@hooks/useResponsiv
 jest.mock('@userActions/Policy/Category', () => ({enablePolicyCategories: jest.fn()}));
 jest.mock('@userActions/Policy/Policy', () => ({enableCompanyCards: jest.fn(), enableExpensifyCard: jest.fn(), enablePolicyConnections: jest.fn(), enablePolicyRules: jest.fn()}));
 jest.mock('@libs/actions/IOU/MoneyRequest', () => ({startMoneyRequest: jest.fn()}));
+jest.mock('@hooks/useCurrentUserPersonalDetails', () => jest.fn(() => ({accountID: 5})));
 jest.mock('@libs/actions/Policy/Rules', () => ({getRules: jest.fn(), resetRulesFetchState: jest.fn()}));
 
 const {startMoneyRequest} = jest.requireMock<{startMoneyRequest: jest.Mock}>('@libs/actions/IOU/MoneyRequest');
@@ -2201,6 +2204,160 @@ describe('useGettingStartedItems', () => {
 
             expect(result.current.shouldShowSection).toBe(true);
             expect(result.current.items.some((item) => !item.isComplete)).toBe(true);
+        });
+    });
+
+    describe('invited employee', () => {
+        const EMPLOYEE_EMAIL = 'employee@example.com';
+        const SIXTY_ONE_DAYS_MS = 61 * 24 * 60 * 60 * 1000;
+        const toDBTime = (date: Date) => date.toISOString().replace('T', ' ').replace('Z', '');
+        const RECENT_VALIDATED_DATE = toDBTime(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+
+        async function setupInvitedEmployeeScenario({
+            validatedDate = RECENT_VALIDATED_DATE,
+            inviteType = CONST.ONBOARDING_INVITE_TYPES.WORKSPACE,
+        }: {validatedDate?: string; inviteType?: string} = {}) {
+            await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.SUBMIT, inviteType: inviteType as typeof CONST.ONBOARDING_INVITE_TYPES.WORKSPACE});
+            await Onyx.merge(ONYXKEYS.SESSION, {email: EMPLOYEE_EMAIL, accountID: CURRENT_USER_ACCOUNT_ID});
+            await Onyx.merge(ONYXKEYS.LOGINS, {[EMPLOYEE_EMAIL]: {partnerUserID: EMPLOYEE_EMAIL, validatedDate}});
+            await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
+            await waitForBatchedUpdates();
+        }
+
+        const findItem = (items: ReadonlyArray<{key: string; isComplete: boolean; route?: string; onPress?: () => void}>, key: string) => items.find((item) => item.key === key);
+
+        beforeEach(() => {
+            jest.mocked(useCurrentUserPersonalDetails).mockReturnValue({accountID: CURRENT_USER_ACCOUNT_ID});
+        });
+
+        it('should list the three employee steps when the joined workspace is far older than the account and no trial exists', async () => {
+            // Given a new employee on someone else's old paid workspace, the case the trial and policy.created windows would hide
+            await setupInvitedEmployeeScenario();
+            const oldPolicy = buildPolicy({role: CONST.POLICY.ROLE.USER, created: '2020-01-01 00:00:00.000', ownerAccountID: CURRENT_USER_ACCOUNT_ID + 1});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, oldPolicy);
+            await waitForBatchedUpdates();
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the employee checklist shows in the order the issue lists it, and the footer offers Concierge
+            expect(result.current.shouldShowSection).toBe(true);
+            expect(result.current.shouldOfferConciergeHelp).toBe(true);
+            expect(result.current.items.map((item) => item.key)).toEqual(['addYourName', 'addYourFirstReceipt', 'downloadTheApp']);
+            expect(result.current.items.every((item) => !item.isComplete)).toBe(true);
+        });
+
+        it('should be hidden for a long-standing account that is invited to another workspace later', async () => {
+            // Given a login validated outside the window, which is what a user who already belonged to a workspace has
+            await setupInvitedEmployeeScenario({validatedDate: toDBTime(new Date(Date.now() - SIXTY_ONE_DAYS_MS))});
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the section stays hidden, because this user is not joining Expensify
+            expect(result.current.shouldShowSection).toBe(false);
+            expect(result.current.items).toEqual([]);
+        });
+
+        it('should not show the employee steps when the invite was not a workspace invite', async () => {
+            // Given a user who arrived through an expense invite, who is not joining a workspace
+            await setupInvitedEmployeeScenario({inviteType: CONST.ONBOARDING_INVITE_TYPES.IOU});
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the employee checklist is not offered
+            expect(findItem(result.current.items, 'addYourName')).toBeUndefined();
+        });
+
+        it('should complete the name step from a saved name but not from the login fallback', async () => {
+            // Given a user whose displayName is only the fallback that the backend derives from the login
+            await setupInvitedEmployeeScenario();
+            jest.mocked(useCurrentUserPersonalDetails).mockReturnValue({accountID: CURRENT_USER_ACCOUNT_ID, displayName: EMPLOYEE_EMAIL});
+            const {result, rerender} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the step is still open
+            expect(findItem(result.current.items, 'addYourName')?.isComplete).toBe(false);
+
+            // When the user saves a name
+            jest.mocked(useCurrentUserPersonalDetails).mockReturnValue({accountID: CURRENT_USER_ACCOUNT_ID, firstName: 'Sam', displayName: 'Sam'});
+            rerender({});
+            await waitForBatchedUpdates();
+
+            // Then the step completes
+            expect(findItem(result.current.items, 'addYourName')?.isComplete).toBe(true);
+        });
+
+        it('should complete the receipt step from an expense created anywhere', async () => {
+            // Given an employee with no expenses
+            await setupInvitedEmployeeScenario();
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+            expect(findItem(result.current.items, 'addYourFirstReceipt')?.isComplete).toBe(false);
+
+            // When an expense lands in Onyx, regardless of which flow created it
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}1`, {transactionID: '1', reportID: '2'});
+            await waitForBatchedUpdates();
+
+            // Then the step completes
+            expect(findItem(result.current.items, 'addYourFirstReceipt')?.isComplete).toBe(true);
+        });
+
+        it.each([ONYXKEYS.NVP_LAST_IPHONE_LOGIN, ONYXKEYS.NVP_LAST_ANDROID_LOGIN, ONYXKEYS.NVP_LAST_ECASH_IOS_LOGIN, ONYXKEYS.NVP_LAST_ECASH_ANDROID_LOGIN] as const)(
+            'should complete the download step from %s',
+            async (mobileLoginKey) => {
+                // Given an employee who has not signed in to an app
+                await setupInvitedEmployeeScenario();
+                const {result} = renderHook(() => useGettingStartedItems());
+                await waitForBatchedUpdates();
+                expect(findItem(result.current.items, 'downloadTheApp')?.isComplete).toBe(false);
+
+                // When the backend records an app sign-in, which a mobile browser sign-in does not write
+                await Onyx.set(mobileLoginKey, '2026-11-01 10:00:00.000');
+                await waitForBatchedUpdates();
+
+                // Then the step completes
+                expect(findItem(result.current.items, 'downloadTheApp')?.isComplete).toBe(true);
+            },
+        );
+
+        it('should hide the section once every step is complete', async () => {
+            // Given an employee who finished all three steps
+            await setupInvitedEmployeeScenario();
+            jest.mocked(useCurrentUserPersonalDetails).mockReturnValue({accountID: CURRENT_USER_ACCOUNT_ID, firstName: 'Sam'});
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}1`, {transactionID: '1', reportID: '2'});
+            await Onyx.set(ONYXKEYS.NVP_LAST_IPHONE_LOGIN, '2026-11-01 10:00:00.000');
+            await waitForBatchedUpdates();
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then nothing is left to show, matching the other intents
+            expect(result.current.shouldShowSection).toBe(false);
+        });
+
+        it('should send each step to the destination the issue names', async () => {
+            // Given an employee with all steps open
+            await setupInvitedEmployeeScenario();
+            startMoneyRequest.mockClear();
+            const navigateSpy = jest.spyOn(Navigation, 'navigate').mockImplementation(() => undefined);
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // When the receipt and download steps are pressed
+            findItem(result.current.items, 'addYourFirstReceipt')?.onPress?.();
+            findItem(result.current.items, 'downloadTheApp')?.onPress?.();
+
+            // Then name goes to Display name, receipt opens the expense form, and download opens the App download links RHP
+            expect(findItem(result.current.items, 'addYourName')?.route).toBe(ROUTES.SETTINGS_DISPLAY_NAME);
+            expect(startMoneyRequest).toHaveBeenCalledWith(CONST.IOU.TYPE.CREATE, expect.any(String), []);
+            expect(navigateSpy).toHaveBeenCalledWith(expect.stringContaining(DYNAMIC_ROUTES.APP_DOWNLOAD_LINKS.path));
+            navigateSpy.mockRestore();
         });
     });
 });

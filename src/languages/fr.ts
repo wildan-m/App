@@ -1191,6 +1191,12 @@ const translations: TranslationDeepObject<typeof en> = {
             configureApprovalsSubText: 'Définir les approbations de notes de frais',
             setupTravel: 'Configurer les déplacements',
             setupTravelSubText: 'Configurer des règles spécifiques aux déplacements',
+            addYourName: 'Ajoutez votre nom',
+            addYourNameSubText: 'Aidez vos coéquipiers à vous reconnaître dans Expensify.',
+            addYourFirstReceipt: 'Ajoutez votre premier reçu',
+            addYourFirstReceiptSubText: 'Scannez, faites glisser et déposez ou saisissez manuellement un reçu',
+            downloadTheApp: 'Télécharger l’application',
+            downloadTheAppSubText: 'Scannez des reçus, soumettez des dépenses et approuvez des notes de frais où que vous soyez.',
         },
         yourSpend: {
             title: 'Vos dépenses',

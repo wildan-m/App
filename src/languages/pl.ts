@@ -1213,6 +1213,12 @@ const translations: TranslationDeepObject<typeof en> = {
             configureApprovalsSubText: 'Zdefiniuj zatwierdzanie raportów',
             setupTravel: 'Skonfiguruj podróże',
             setupTravelSubText: 'Skonfiguruj zasady dotyczące podróży',
+            addYourName: 'Dodaj swoje imię',
+            addYourNameSubText: 'Pomóż współpracownikom rozpoznać cię w Expensify.',
+            addYourFirstReceipt: 'Dodaj swój pierwszy paragon',
+            addYourFirstReceiptSubText: 'Zeskanuj, przeciągnij i upuść lub wprowadź paragon ręcznie',
+            downloadTheApp: 'Pobierz aplikację',
+            downloadTheAppSubText: 'Skanuj paragony, wysyłaj wydatki i zatwierdzaj raporty w podróży.',
         },
         yourSpend: {
             title: 'Twoje wydatki',

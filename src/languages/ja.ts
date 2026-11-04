@@ -1178,6 +1178,12 @@ const translations: TranslationDeepObject<typeof en> = {
             configureApprovalsSubText: 'レポート承認を定義する',
             setupTravel: '出張を設定',
             setupTravelSubText: '出張用のルールを設定する',
+            addYourName: 'お名前を追加してください',
+            addYourNameSubText: 'Expensify でチームメイトにあなたを認識してもらいましょう。',
+            addYourFirstReceipt: '最初の領収書を追加',
+            addYourFirstReceiptSubText: 'レシートをスキャン、ドラッグ＆ドロップ、または手動で入力する',
+            downloadTheApp: 'アプリをダウンロード',
+            downloadTheAppSubText: 'レシートをスキャンし、経費を提出して、外出先でもレポートを承認できます。',
         },
         yourSpend: {
             title: 'あなたの支出',

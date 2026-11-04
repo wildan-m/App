@@ -1174,6 +1174,12 @@ const translations: TranslationDeepObject<typeof en> = {
             configureApprovalsSubText: 'Berichtsfreigaben festlegen',
             setupTravel: 'Reisen einrichten',
             setupTravelSubText: 'Reisespezifische Regeln konfigurieren',
+            addYourName: 'Fügen Sie Ihren Namen hinzu',
+            addYourNameSubText: 'Helfen Sie Ihren Teammitgliedern, Sie in Expensify zu erkennen.',
+            addYourFirstReceipt: 'Fügen Sie Ihren ersten Beleg hinzu',
+            addYourFirstReceiptSubText: 'Beleg scannen, per Drag & Drop hinzufügen oder manuell eingeben',
+            downloadTheApp: 'Laden Sie die App herunter',
+            downloadTheAppSubText: 'Belege scannen, Ausgaben einreichen und Berichte unterwegs genehmigen.',
         },
         freeTrialSection: {
             title: ({count}: {count: number}) => ({
