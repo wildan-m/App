@@ -29,6 +29,7 @@ import {
 } from '@libs/PolicyUtils';
 import {generateReportID} from '@libs/ReportUtils';
 import {isDeletedTransaction, isTransactionPendingDelete} from '@libs/TransactionUtils';
+import {firstValidatedLoginDateSelector} from '@libs/UserUtils';
 
 import isWithinGettingStartedPeriod from '@pages/home/GettingStartedSection/utils/isWithinGettingStartedPeriod';
 
@@ -39,7 +40,7 @@ import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 
 import {hasIssuedExpensifyCardSelector} from '@selectors/Card';
 import {createHasExpenseDefaultRulesSelector} from '@selectors/Rule';
-import {accountIDSelector, emailSelector} from '@selectors/Session';
+import {accountIDSelector} from '@selectors/Session';
 import {validTransactionDraftIDsSelector} from '@selectors/TransactionDraft';
 
 const MIN_MEMBERS_FOR_ACCOUNTANT_INVITED = 2;
@@ -79,8 +80,7 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const intent = useOnboardingIntent();
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
-    const [loginList] = useOnyx(ONYXKEYS.LOGINS);
-    const [currentUserEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const [firstValidatedLoginDate] = useOnyx(ONYXKEYS.LOGINS, {selector: firstValidatedLoginDateSelector});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {hasLoggedIntoMobileApp} = useHasLoggedIntoMobileApp();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
@@ -121,11 +121,11 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     };
 
     // Same check TourUtils uses to show the employee tour. An invited employee has no trial, and the workspace they joined can be
-    // far older than their account, so neither date used for the other intents says when they joined. The primary login is
-    // validated on first sign-in, so it anchors the window on the account and also keeps out long-standing users who are invited
-    // to another workspace later.
+    // far older than their account, so neither date used for the other intents says when they joined. A contact method is
+    // validated on first sign-in, so the earliest one anchors the window on the account and also keeps out long-standing users
+    // who are invited to another workspace later.
     if (intent === CONST.ONBOARDING_CHOICES.SUBMIT && introSelected?.inviteType === CONST.ONBOARDING_INVITE_TYPES.WORKSPACE) {
-        if (!isWithinGettingStartedPeriod(currentUserEmail ? loginList?.[currentUserEmail]?.validatedDate : undefined)) {
+        if (!isWithinGettingStartedPeriod(firstValidatedLoginDate)) {
             return emptyResult;
         }
 

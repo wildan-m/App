@@ -494,7 +494,16 @@ describe('GettingStartedSection', () => {
             const employeeEmail = 'employee@example.com';
             await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.SUBMIT, inviteType: CONST.ONBOARDING_INVITE_TYPES.WORKSPACE});
             await Onyx.merge(ONYXKEYS.SESSION, {email: employeeEmail, accountID: 5});
-            await Onyx.merge(ONYXKEYS.LOGINS, {[employeeEmail]: {partnerUserID: employeeEmail, validatedDate: `${RECENT_TRIAL_START} 00:00:00.000`}});
+            await Onyx.merge(ONYXKEYS.LOGINS, {
+                [`${CONST.PARTNER_ID.EXPENSIFY}_${employeeEmail}`]: {
+                    accountID: 5,
+                    created: `${RECENT_TRIAL_START} 00:00:00`,
+                    lastLogin: `${RECENT_TRIAL_START} 00:00:00`,
+                    partnerID: CONST.PARTNER_ID.EXPENSIFY,
+                    partnerUserID: employeeEmail,
+                    validatedDate: `${RECENT_TRIAL_START} 00:00:00`,
+                },
+            });
             await Onyx.merge(ONYXKEYS.ACCOUNT, {guideDetails: {email: 'guide@expensify.com'}});
             await setAdminsRoom();
 

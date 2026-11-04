@@ -91,6 +91,17 @@ function expensifyLoginsSelector(logins: OnyxEntry<Logins>): LoginList | undefin
     return result;
 }
 
+/**
+ * Selector that returns when the user first validated one of their Expensify contact methods, which is the closest thing
+ * the client has to the date they joined. Device logins are skipped because each new sign-in validates a fresh one.
+ */
+function firstValidatedLoginDateSelector(logins: OnyxEntry<Logins>): string | undefined {
+    const validatedDates = Object.values(expensifyLoginsSelector(logins) ?? {}).flatMap((login) => login.validatedDate ?? []);
+
+    // These are DB timestamps, so sorting them as strings also sorts them by time.
+    return validatedDates.sort().at(0);
+}
+
 const DEVICE_PARTNER_IDS = new Set<number>([CONST.PARTNER_ID.IPHONE, CONST.PARTNER_ID.ANDROID, CONST.PARTNER_ID.NEWDOT, CONST.PARTNER_ID.OAUTH]);
 
 function isDeviceLogin(login: NewLogin) {
@@ -290,5 +301,6 @@ export {
     getDeviceDisplayName,
     hasDeviceManagementError,
     expensifyLoginsSelector,
+    firstValidatedLoginDateSelector,
 };
 export type {AvatarSource};

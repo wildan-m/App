@@ -2213,13 +2213,26 @@ describe('useGettingStartedItems', () => {
         const toDBTime = (date: Date) => date.toISOString().replace('T', ' ').replace('Z', '');
         const RECENT_VALIDATED_DATE = toDBTime(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
 
+        const buildLogin = (partnerID: number, partnerUserID: string, validatedDate: string | null) => ({
+            accountID: CURRENT_USER_ACCOUNT_ID,
+            created: validatedDate ?? '2026-01-01 00:00:00',
+            lastLogin: validatedDate ?? '2026-01-01 00:00:00',
+            partnerID,
+            partnerUserID,
+            validatedDate,
+        });
+
         async function setupInvitedEmployeeScenario({
             validatedDate = RECENT_VALIDATED_DATE,
             inviteType = CONST.ONBOARDING_INVITE_TYPES.WORKSPACE,
         }: {validatedDate?: string; inviteType?: string} = {}) {
             await Onyx.merge(ONYXKEYS.NVP_INTRO_SELECTED, {choice: CONST.ONBOARDING_CHOICES.SUBMIT, inviteType: inviteType as typeof CONST.ONBOARDING_INVITE_TYPES.WORKSPACE});
             await Onyx.merge(ONYXKEYS.SESSION, {email: EMPLOYEE_EMAIL, accountID: CURRENT_USER_ACCOUNT_ID});
-            await Onyx.merge(ONYXKEYS.LOGINS, {[EMPLOYEE_EMAIL]: {partnerUserID: EMPLOYEE_EMAIL, validatedDate}});
+            // Mirrors what the server sends: rows keyed by partnerID_partnerUserID, with a device login validated at every new sign-in.
+            await Onyx.set(ONYXKEYS.LOGINS, {
+                [`${CONST.PARTNER_ID.EXPENSIFY}_${EMPLOYEE_EMAIL}`]: buildLogin(CONST.PARTNER_ID.EXPENSIFY, EMPLOYEE_EMAIL, validatedDate),
+                [`${CONST.PARTNER_ID.NEWDOT}_expensify.cash-device`]: buildLogin(CONST.PARTNER_ID.NEWDOT, 'expensify.cash-device', toDBTime(new Date())),
+            });
             await Onyx.merge(ONYXKEYS.NVP_ACTIVE_POLICY_ID, POLICY_ID);
             await waitForBatchedUpdates();
         }
@@ -2259,6 +2272,36 @@ describe('useGettingStartedItems', () => {
             // Then the section stays hidden, because this user is not joining Expensify
             expect(result.current.shouldShowSection).toBe(false);
             expect(result.current.items).toEqual([]);
+        });
+
+        it('should anchor the window on the earliest contact method so promoting a new one does not reopen it', async () => {
+            // Given an old account that validated a new contact method this week
+            await setupInvitedEmployeeScenario();
+            await Onyx.merge(ONYXKEYS.LOGINS, {
+                [`${CONST.PARTNER_ID.EXPENSIFY}_old@example.com`]: buildLogin(CONST.PARTNER_ID.EXPENSIFY, 'old@example.com', toDBTime(new Date(Date.now() - SIXTY_ONE_DAYS_MS))),
+            });
+            await waitForBatchedUpdates();
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the older contact method wins, because this user did not just join
+            expect(result.current.shouldShowSection).toBe(false);
+        });
+
+        it('should be hidden when no contact method has been validated', async () => {
+            // Given only unvalidated contact methods, so there is no date to measure from
+            await setupInvitedEmployeeScenario();
+            await Onyx.set(ONYXKEYS.LOGINS, {[`${CONST.PARTNER_ID.EXPENSIFY}_${EMPLOYEE_EMAIL}`]: buildLogin(CONST.PARTNER_ID.EXPENSIFY, EMPLOYEE_EMAIL, null)});
+            await waitForBatchedUpdates();
+
+            // When the hook resolves the section
+            const {result} = renderHook(() => useGettingStartedItems());
+            await waitForBatchedUpdates();
+
+            // Then the section stays hidden, matching how the window treats a missing date for the other intents
+            expect(result.current.shouldShowSection).toBe(false);
         });
 
         it('should not show the employee steps when the invite was not a workspace invite', async () => {
