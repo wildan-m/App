@@ -21,10 +21,10 @@ import React from 'react';
 import {View} from 'react-native';
 
 function WorkspaceOwnerRestrictedAction() {
-    const illustrations = useMemoizedLazyIllustrations(['LockClosedOrange']);
+    const {LockClosedOrange: lockClosedOrangeIllustration} = useMemoizedLazyIllustrations(['LockClosedOrange']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Unlock']);
+    const {Unlock: unlockIcon} = useMemoizedLazyExpensifyIcons(['Unlock']);
 
     const goToSubscription = () => {
         // Read the active route at press time rather than snapshotting it at mount. This screen stays
@@ -52,12 +52,12 @@ function WorkspaceOwnerRestrictedAction() {
                 <View style={[styles.cardSectionContainer, styles.p5, styles.mb0, styles.mh0]}>
                     <View style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsStart, styles.mb3]}>
                         <Icon
-                            src={illustrations.LockClosedOrange}
+                            src={lockClosedOrangeIllustration}
                             height={variables.iconHeader}
                             width={variables.iconHeader}
                         />
                         <Badge
-                            icon={expensifyIcons.Unlock}
+                            icon={unlockIcon}
                             success
                             text={translate('workspace.restrictedAction.addPaymentCardToUnlock')}
                             badgeStyles={styles.alignSelfStart}

@@ -52,7 +52,7 @@ function IOURequestStepVendor({
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const {isBetaEnabled} = usePermissions();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const [searchValue, setSearchValue] = useState('');
 
     const [draftVendor, setDraftVendor] = useState<VendorListItem>();
@@ -185,7 +185,7 @@ function IOURequestStepVendor({
     const listEmptyContent =
         enabledVendors.length === 0 && !disabledCurrentVendorRow ? (
             <BlockingView
-                icon={illustrations.Telescope}
+                icon={telescopeIllustration}
                 iconWidth={variables.emptyListIconWidth}
                 iconHeight={variables.emptyListIconHeight}
                 title={emptyState.title}

@@ -49,7 +49,7 @@ export default function WorkspaceReportFieldListValuesTable({
 }: WorkspaceReportFieldListValuesTableProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['FolderWithPapers']);
+    const {FolderWithPapers: folderWithPapersIllustration} = useMemoizedLazyIllustrations(['FolderWithPapers']);
     const findFieldKey = isInvoicePage ? 'workspace.invoiceFields.findInvoiceField' : 'workspace.reportFields.findReportField';
     const emptyValuesSubtitleKey = isInvoicePage ? 'workspace.invoiceFields.emptyInvoiceFieldsValues.subtitle' : 'workspace.reportFields.emptyReportFieldsValues.subtitle';
 
@@ -121,7 +121,7 @@ export default function WorkspaceReportFieldListValuesTable({
             <Table.EmptyState
                 title={translate('workspace.reportFields.emptyReportFieldsValues.title')}
                 subtitle={translate(emptyValuesSubtitleKey)}
-                headerMedia={illustrations.FolderWithPapers}
+                headerMedia={folderWithPapersIllustration}
                 headerStyles={styles.emptyStateCardIllustrationContainer}
                 headerContentStyles={styles.emptyStateFolderWithPaperIconSize}
             />

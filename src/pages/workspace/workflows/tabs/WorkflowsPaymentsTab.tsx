@@ -76,7 +76,7 @@ function WorkflowsPaymentsTab({policyID}: WorkflowsPaymentsTabProps) {
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
     const policy = usePolicy(policyID);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {showConfirmModal} = useConfirmModal();
     const {isOffline} = useNetwork();
     const canConfigureCurrencyConversionFees = useCanConfigureCurrencyConversionFees(policy);
@@ -373,7 +373,7 @@ function WorkflowsPaymentsTab({policyID}: WorkflowsPaymentsTabProps) {
                                 >
                                     <MenuItem.Row>
                                         <MenuItem.Leading>
-                                            <MenuItem.Icon src={expensifyIcons.Plus} />
+                                            <MenuItem.Icon src={plusIcon} />
                                         </MenuItem.Leading>
                                         <MenuItem.Content>
                                             <MenuItem.Title>{translate('bankAccount.addBankAccount')}</MenuItem.Title>

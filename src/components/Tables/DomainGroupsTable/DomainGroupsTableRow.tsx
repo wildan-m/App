@@ -43,7 +43,7 @@ export default function DomainGroupsTableRow({item, rowIndex, shouldUseNarrowTab
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'DotIndicator']);
+    const {ArrowRight: arrowRightIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'DotIndicator']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -52,7 +52,7 @@ export default function DomainGroupsTableRow({item, rowIndex, shouldUseNarrowTab
 
     const brickRoadIndicator = !!item.brickRoadIndicator && (
         <Icon
-            src={icons.DotIndicator}
+            src={dotIndicatorIcon}
             fill={item.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR ? theme.danger : theme.iconSuccessFill}
         />
     );
@@ -101,7 +101,7 @@ export default function DomainGroupsTableRow({item, rowIndex, shouldUseNarrowTab
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                 {brickRoadIndicator}
                                 <Icon
-                                    src={icons.ArrowRight}
+                                    src={arrowRightIcon}
                                     fill={theme.icon}
                                     additionalStyles={[styles.alignSelfCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                                     width={variables.iconSizeNormal}
@@ -144,7 +144,7 @@ export default function DomainGroupsTableRow({item, rowIndex, shouldUseNarrowTab
                             >
                                 {brickRoadIndicator}
                                 <Icon
-                                    src={icons.ArrowRight}
+                                    src={arrowRightIcon}
                                     fill={theme.icon}
                                     additionalStyles={[styles.alignSelfCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                                     width={variables.iconSizeNormal}

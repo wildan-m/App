@@ -37,7 +37,7 @@ function DynamicQuickbooksCompanyCardExpenseAccountSelectPage({policy}: WithPoli
     const {translate} = useLocalize();
     const integrationName = getQuickbooksOnlineIntegrationName(policy, translate);
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const {creditCards, accountPayable, bankAccounts} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
@@ -81,7 +81,7 @@ function DynamicQuickbooksCompanyCardExpenseAccountSelectPage({policy}: WithPoli
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbo.noAccountsFound')}

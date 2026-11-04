@@ -44,7 +44,7 @@ export default function SpendRulesCurrencyBase({currencies, settlementCurrency, 
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
 
     const {currencyList} = useCurrencyListState();
     const {getCurrencySymbol} = useCurrencyListActions();
@@ -162,7 +162,7 @@ export default function SpendRulesCurrencyBase({currencies, settlementCurrency, 
                 </View>
                 <Icon
                     size={CONST.ICON_SIZE.MEDIUM}
-                    src={icons.Lock}
+                    src={lockIcon}
                     fill={theme.icon}
                 />
             </View>

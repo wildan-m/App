@@ -58,7 +58,7 @@ function DynamicSplitBillDetailsPage({report, reportAction}: SplitBillDetailsPag
     const theme = useTheme();
     const {isBetaEnabled, isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptScan']);
+    const {ReceiptScan: receiptScanIcon} = useMemoizedLazyExpensifyIcons(['ReceiptScan']);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.SPLIT_BILL_DETAILS.path);
     const reportID = report?.reportID;
     const originalMessage = reportAction && isMoneyRequestAction(reportAction) ? getOriginalMessage(reportAction) : undefined;
@@ -173,7 +173,7 @@ function DynamicSplitBillDetailsPage({report, reportAction}: SplitBillDetailsPag
                             <MoneyRequestHeaderStatusBar
                                 icon={
                                     <Icon
-                                        src={icons.ReceiptScan}
+                                        src={receiptScanIcon}
                                         height={variables.iconSizeSmall}
                                         width={variables.iconSizeSmall}
                                         fill={theme.icon}

@@ -66,7 +66,8 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MoneySearch', 'RemoveMembers', 'Sync']);
+    const {MoneySearch: moneySearchIcon, RemoveMembers, Sync: syncIcon} = useMemoizedLazyExpensifyIcons(['MoneySearch', 'RemoveMembers', 'Sync']);
+    const expensifyIcons = {MoneySearch: moneySearchIcon, RemoveMembers, Sync: syncIcon};
 
     const {isOffline} = useNetwork();
 
@@ -228,7 +229,7 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                                 isLoading={card?.isLoadingLastUpdated}
                                 style={styles.flexShrink0}
                             >
-                                <CardDetailsActionButton.Icon src={expensifyIcons.Sync} />
+                                <CardDetailsActionButton.Icon src={syncIcon} />
                                 <CardDetailsActionButton.Text>{translate('workspace.moreFeatures.companyCards.updateCard')}</CardDetailsActionButton.Text>
                             </CardDetailsActionButton>
                         )}
@@ -236,7 +237,7 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                             onPress={navigateToTransactions}
                             style={styles.flexShrink0}
                         >
-                            <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                            <CardDetailsActionButton.Icon src={moneySearchIcon} />
                             <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                         </CardDetailsActionButton>
                     </CardDetailsActionButtons>

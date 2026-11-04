@@ -48,7 +48,7 @@ type ApprovalWorkflowEditorProps = {
 };
 
 function ApprovalWorkflowEditor({approvalWorkflow, removeApprovalWorkflow, policy, policyID, ref}: ApprovalWorkflowEditorProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const styles = useThemeStyles();
     const {translate, toLocaleOrdinalWithWords, localeCompare, formatPhoneNumber} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
@@ -263,7 +263,7 @@ function ApprovalWorkflowEditor({approvalWorkflow, removeApprovalWorkflow, polic
                         <MenuItemSectionRoot onPress={removeApprovalWorkflow}>
                             <MenuItem.Row>
                                 <MenuItem.Leading>
-                                    <MenuItem.Icon src={icons.Trashcan} />
+                                    <MenuItem.Icon src={trashcanIcon} />
                                 </MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>{translate('common.delete')}</MenuItem.Title>

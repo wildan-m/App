@@ -13,11 +13,11 @@ import React from 'react';
 
 function AddDepositAccount() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Bank']);
+    const {Bank: bankIcon} = useMemoizedLazyExpensifyIcons(['Bank']);
 
     return (
         <BaseWidgetItem
-            icon={icons.Bank}
+            icon={bankIcon}
             title={translate('homePage.timeSensitiveSection.addDepositAccount.title')}
             subtitle={translate('common.wallet')}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

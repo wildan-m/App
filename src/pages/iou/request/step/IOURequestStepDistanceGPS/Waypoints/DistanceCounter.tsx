@@ -22,7 +22,7 @@ type DistanceCounterProps = {
 function DistanceCounter({unit}: DistanceCounterProps) {
     const styles = useThemeStyles();
     const {translate, preferredLocale} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Crosshair']);
+    const {Crosshair: crosshairIcon} = useMemoizedLazyExpensifyIcons(['Crosshair']);
 
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
 
@@ -32,7 +32,7 @@ function DistanceCounter({unit}: DistanceCounterProps) {
         <MenuItem.Root>
             <MenuItem.Row>
                 <MenuItem.Leading>
-                    <MenuItem.IconNarrow src={icons.Crosshair} />
+                    <MenuItem.IconNarrow src={crosshairIcon} />
                 </MenuItem.Leading>
                 <MenuItemField.Content name={translate('common.distance')}>
                     <Text style={[styles.iouAmountTextInput, styles.textXLarge]}>

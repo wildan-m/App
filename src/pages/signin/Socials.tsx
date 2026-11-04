@@ -55,7 +55,8 @@ function Socials() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Podcast', 'Twitter', 'Instagram', 'Facebook', 'Linkedin']);
+    const {Podcast, Twitter, Instagram, Facebook, Linkedin} = useMemoizedLazyExpensifyIcons(['Podcast', 'Twitter', 'Instagram', 'Facebook', 'Linkedin']);
+    const icons = {Podcast, Twitter, Instagram, Facebook, Linkedin};
 
     return (
         <View style={[styles.flexRow, styles.flexWrap]}>

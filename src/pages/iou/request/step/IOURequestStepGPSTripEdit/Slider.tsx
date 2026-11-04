@@ -23,7 +23,7 @@ function Slider({onSliderRatioChange}: SliderProps) {
 
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MapStopWaypoint']);
+    const {MapStopWaypoint: mapStopWaypointIcon} = useMemoizedLazyExpensifyIcons(['MapStopWaypoint']);
 
     const totalDistanceMeters = gpsDraftDetails?.distanceInMeters ?? 0;
 
@@ -70,7 +70,7 @@ function Slider({onSliderRatioChange}: SliderProps) {
                 <GestureDetector gesture={panGesture}>
                     <Animated.View style={[styles.editedStopSliderKnob, thumbStyle]}>
                         <ImageSVG
-                            src={expensifyIcons.MapStopWaypoint}
+                            src={mapStopWaypointIcon}
                             width={CONST.MAP_MARKER_SIZES.STOP_WAYPOINT.width}
                             height={CONST.MAP_MARKER_SIZES.STOP_WAYPOINT.height}
                         />

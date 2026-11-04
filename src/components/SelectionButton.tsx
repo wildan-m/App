@@ -127,7 +127,7 @@ function SelectionButton({
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Minus']);
+    const {Checkmark: checkmarkIcon, Minus: minusIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'Minus']);
 
     const borderRadius = containerBorderRadius ?? (role === CONST.ROLE.RADIO ? variables.componentBorderRadiusCircle : variables.componentBorderRadiusSmall);
 
@@ -208,7 +208,7 @@ function SelectionButton({
                 >
                     {(isChecked || isIndeterminate) && (
                         <Icon
-                            src={isChecked ? icons.Checkmark : icons.Minus}
+                            src={isChecked ? checkmarkIcon : minusIcon}
                             fill={theme.textLight}
                             height={caretSize}
                             width={caretSize}

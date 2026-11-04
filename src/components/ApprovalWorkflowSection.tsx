@@ -64,7 +64,12 @@ function ApprovalWorkflowSection({
     isRecruitingAdvancedMode = false,
     hrFinalApproverEmail,
 }: ApprovalWorkflowSectionProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lightbulb', 'Pencil', 'Users', 'UserCheck']);
+    const {
+        Lightbulb: lightbulbIcon,
+        Pencil: pencilIcon,
+        Users: usersIcon,
+        UserCheck: userCheckIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lightbulb', 'Pencil', 'Users', 'UserCheck']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, toLocaleOrdinalWithWords, localeCompare, formatPhoneNumber} = useLocalize();
@@ -139,7 +144,7 @@ function ApprovalWorkflowSection({
                 {approvalWorkflow.isDefault && (
                     <View style={[styles.flexRow, styles.mb4, styles.alignItemsCenter, styles.pb1, styles.pt1]}>
                         <Icon
-                            src={icons.Lightbulb}
+                            src={lightbulbIcon}
                             fill={theme.icon}
                             additionalStyles={styles.mr2}
                             size={CONST.ICON_SIZE.SMALL}
@@ -162,7 +167,7 @@ function ApprovalWorkflowSection({
                         numberOfLinesDescription={4}
                         shouldBeAccessible={false}
                         tabIndex={-1}
-                        icon={icons.Users}
+                        icon={usersIcon}
                         iconHeight={20}
                         iconWidth={20}
                         iconFill={theme.icon}
@@ -201,7 +206,7 @@ function ApprovalWorkflowSection({
                                 style={styles.p0}
                                 titleStyle={styles.textLabelSupportingNormal}
                                 descriptionTextStyle={[styles.textNormalThemeText, styles.lineHeightXLarge]}
-                                icon={icons.UserCheck}
+                                icon={userCheckIcon}
                                 shouldBeAccessible={false}
                                 tabIndex={-1}
                                 iconHeight={20}
@@ -238,7 +243,7 @@ function ApprovalWorkflowSection({
                         accessibilityLabel={editButtonAccessibilityLabel}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.APPROVAL_WORKFLOW_SECTION}
                     >
-                        <Button.Icon src={icons.Pencil} />
+                        <Button.Icon src={pencilIcon} />
                         <Button.Text>{editWorkflowText}</Button.Text>
                     </Button>
                 </View>

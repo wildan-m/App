@@ -33,7 +33,7 @@ function SageIntacctFxExpenseAccountPage({policy}: WithPolicyConnectionsProps) {
     const canConfigureCurrencyConversionFees = useCanConfigureCurrencyConversionFees(policy);
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const {config} = policy?.connections?.intacct ?? {};
     const {syncReimbursedReports} = config?.sync ?? {};
@@ -58,7 +58,7 @@ function SageIntacctFxExpenseAccountPage({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.sageIntacct.noAccountsFound')}

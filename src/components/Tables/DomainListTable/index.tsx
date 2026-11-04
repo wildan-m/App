@@ -48,7 +48,7 @@ export default function DomainListTable({domains, headerComponent}: DomainListTa
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['EarthWithControls']);
+    const {EarthWithControls: earthWithControlsIllustration} = useMemoizedLazyIllustrations(['EarthWithControls']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
 
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
@@ -111,7 +111,7 @@ export default function DomainListTable({domains, headerComponent}: DomainListTa
         >
             <Table.ListHeader>{tableHeaderComponent}</Table.ListHeader>
             <Table.EmptyState
-                headerMedia={illustrations.EarthWithControls}
+                headerMedia={earthWithControlsIllustration}
                 headerContentStyles={styles.emptyDomainListStaticIllustrationStyle}
                 title={translate('workspace.emptyDomain.title')}
                 subtitle={translate('workspace.emptyDomain.subtitle')}

@@ -19,7 +19,7 @@ function CurrentLocationButton({onPress, isDisabled = false}: CurrentLocationBut
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Location']);
+    const {Location: locationIcon} = useMemoizedLazyExpensifyIcons(['Location']);
 
     return (
         <PressableWithFeedback
@@ -31,7 +31,7 @@ function CurrentLocationButton({onPress, isDisabled = false}: CurrentLocationBut
             onMouseDown={(e) => e.preventDefault()}
         >
             <Icon
-                src={expensifyIcons.Location}
+                src={locationIcon}
                 fill={colors.green}
             />
             <Text style={[styles.textLabel, styles.mh2, isDisabled && styles.userSelectNone]}>{translate('location.useCurrent')}</Text>

@@ -16,7 +16,7 @@ import React, {useEffect} from 'react';
 
 function AvatarCropPage() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ImageCropSquareMask']);
+    const {ImageCropSquareMask: imageCropSquareMaskIcon} = useMemoizedLazyExpensifyIcons(['ImageCropSquareMask']);
     const [draft, draftMetadata] = useOnyx(ONYXKEYS.AVATAR_CROP_DRAFT);
     const isLoadingDraft = isLoadingOnyxValue(draftMetadata);
     // The image is base64-persisted, so it survives a refresh and the cropper can re-render. The opener
@@ -56,7 +56,7 @@ function AvatarCropPage() {
             imageUri={draft.uri}
             imageName={draft.name}
             imageType={draft.type}
-            maskImage={draft.maskType === 'square' ? icons.ImageCropSquareMask : undefined}
+            maskImage={draft.maskType === 'square' ? imageCropSquareMaskIcon : undefined}
             buttonLabel={draft.buttonLabelKey ? translate(draft.buttonLabelKey) : undefined}
             onSave={onSave}
             onClose={() => Navigation.goBack()}

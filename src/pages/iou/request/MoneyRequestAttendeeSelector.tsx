@@ -71,7 +71,7 @@ function MoneyRequestAttendeeSelector({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const {didScreenTransitionEnd} = useScreenWrapperTransitionStatus();
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [recentAttendees] = useOnyx(ONYXKEYS.NVP_RECENT_ATTENDEES);
@@ -107,7 +107,7 @@ function MoneyRequestAttendeeSelector({
             isSelected: true,
             icons: [
                 {
-                    source: option.attendee.avatarUrl || icons.FallbackAvatar,
+                    source: option.attendee.avatarUrl || fallbackAvatarIcon,
                     name: option.login,
                     type: CONST.ICON_TYPE_AVATAR,
                     id: option.accountID,

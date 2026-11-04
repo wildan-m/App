@@ -53,7 +53,7 @@ function Switch({isOn, onToggle, accessibilityLabel, disabled, pending = false, 
     const {translate} = useLocalize();
     const offsetX = useSharedValue(isOn ? OFFSET_X.ON : OFFSET_X.OFF);
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
 
     const targetOffsetX = isOn ? OFFSET_X.ON : OFFSET_X.OFF;
     const prevIsOn = useRef(isOn);
@@ -146,7 +146,7 @@ function Switch({isOn, onToggle, accessibilityLabel, disabled, pending = false, 
                         (!!disabled || !!showLockIcon) && (
                             <Icon
                                 testID={CONST.SWITCH_LOCK_ICON_TEST_ID}
-                                src={expensifyIcons.Lock}
+                                src={lockIcon}
                                 fill={isOn ? theme.text : theme.icon}
                                 width={styles.toggleSwitchLockIcon.width}
                                 height={styles.toggleSwitchLockIcon.height}

@@ -126,22 +126,22 @@ function WalletPage() {
     const activeAdminPolicies = getActiveAdminWorkspaces(allPolicies, currentUserLogin).sort((a, b) => localeCompare(a.name || '', b.name || ''));
     const hasSinglePolicy = activeAdminPolicies.length === 1;
 
-    const icons = useMemoizedLazyExpensifyIcons([
-        'MoneySearch',
-        'Wallet',
-        'Transfer',
-        'Hourglass',
-        'Exclamation',
-        'Star',
-        'Trashcan',
-        'Globe',
-        'UserPlus',
-        'UserMinus',
-        'Table',
-        'Plus',
-        'Pencil',
-    ]);
-    const illustrations = useMemoizedLazyIllustrations(['VerticalCreditCards']);
+    const {
+        MoneySearch: moneySearchIcon,
+        Wallet: walletIcon,
+        Transfer: transferIcon,
+        Hourglass: hourglassIcon,
+        Exclamation: exclamationIcon,
+        Star: starIcon,
+        Trashcan: trashcanIcon,
+        Globe: globeIcon,
+        UserPlus: userPlusIcon,
+        UserMinus: userMinusIcon,
+        Table: tableIcon,
+        Plus: plusIcon,
+        Pencil: pencilIcon,
+    } = useMemoizedLazyExpensifyIcons(['MoneySearch', 'Wallet', 'Transfer', 'Hourglass', 'Exclamation', 'Star', 'Trashcan', 'Globe', 'UserPlus', 'UserMinus', 'Table', 'Plus', 'Pencil']);
+    const {VerticalCreditCards: verticalCreditCardsIllustration} = useMemoizedLazyIllustrations(['VerticalCreditCards']);
     const walletIllustration = useWalletSectionIllustration();
 
     const theme = useTheme();
@@ -509,7 +509,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('walletPage.setDefaultConfirmation'),
-                      icon: icons.Star,
+                      icon: starIcon,
                       onSelected: () => {
                           if (isAccountLocked) {
                               closeModal(() => showLockedAccountModal());
@@ -525,7 +525,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('common.enableGlobalReimbursements'),
-                      icon: icons.Globe,
+                      icon: globeIcon,
                       onSelected: () => {
                           if (isAccountLocked) {
                               closeModal(() => showLockedAccountModal());
@@ -553,7 +553,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('walletPage.editNickname'),
-                      icon: icons.Pencil,
+                      icon: pencilIcon,
                       onSelected: () => {
                           if (isAccountLocked) {
                               closeModal(() => showLockedAccountModal());
@@ -568,7 +568,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('common.share'),
-                      icon: icons.UserPlus,
+                      icon: userPlusIcon,
                       onSelected: () => {
                           if (isAccountLocked) {
                               closeModal(() => showLockedAccountModal());
@@ -583,7 +583,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('common.unshare'),
-                      icon: icons.UserMinus,
+                      icon: userMinusIcon,
                       onSelected: () => {
                           if (isAccountLocked) {
                               closeModal(() => showLockedAccountModal());
@@ -596,7 +596,7 @@ function WalletPage() {
             : []),
         {
             text: translate('common.delete'),
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             onSelected: () => {
                 if (isAccountLocked) {
                     closeModal(() => showLockedAccountModal());
@@ -657,7 +657,7 @@ function WalletPage() {
         ...(shouldUseNarrowLayout ? [bottomMountItem] : []),
         {
             text: translate('workspace.common.viewTransactions'),
-            icon: icons.MoneySearch,
+            icon: moneySearchIcon,
             onSelected: () => {
                 closeModal(() => {
                     Navigation.navigate(
@@ -676,7 +676,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('spreadsheet.importSpreadsheet'),
-                      icon: icons.Table,
+                      icon: tableIcon,
                       onSelected: () => {
                           closeModal(() => {
                               Navigation.navigate(ROUTES.SETTINGS_WALLET_IMPORT_TRANSACTIONS_SPREADSHEET.getRoute(Number(paymentMethod.methodID)));
@@ -689,7 +689,7 @@ function WalletPage() {
             ? [
                   {
                       text: translate('common.delete'),
-                      icon: icons.Trashcan,
+                      icon: trashcanIcon,
                       onSelected: () => {
                           closeModal(() => {
                               confirmDeleteCard();
@@ -774,7 +774,7 @@ function WalletPage() {
                                     sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.ADD_PERSONAL_CARD}
                                 >
                                     <MenuItem.Row>
-                                        <MenuItem.Icon src={icons.Plus} />
+                                        <MenuItem.Icon src={plusIcon} />
                                         <MenuItem.Content>
                                             <MenuItem.Title>{translate('personalCard.addPersonalCard')}</MenuItem.Title>
                                         </MenuItem.Content>
@@ -786,7 +786,7 @@ function WalletPage() {
                                 sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.IMPORT_TRANSACTIONS}
                             >
                                 <MenuItem.Row>
-                                    <MenuItem.Icon src={icons.Table} />
+                                    <MenuItem.Icon src={tableIcon} />
                                     <MenuItem.Content>
                                         <MenuItem.Title>{translate('workspace.companyCards.importTransactions.importButton')}</MenuItem.Title>
                                     </MenuItem.Content>
@@ -800,7 +800,7 @@ function WalletPage() {
                                     <MenuItem.Row>
                                         <View style={[styles.popoverMenuIcon, StyleUtils.getAvatarWidthStyle(CONST.AVATAR_SIZE.DEFAULT)]}>
                                             <Icon
-                                                src={illustrations.VerticalCreditCards}
+                                                src={verticalCreditCardsIllustration}
                                                 width={40}
                                                 height={40}
                                             />
@@ -881,7 +881,7 @@ function WalletPage() {
                                                         sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.TRANSFER_BALANCE}
                                                     >
                                                         <MenuItem.Row>
-                                                            <MenuItem.Icon src={icons.Transfer} />
+                                                            <MenuItem.Icon src={transferIcon} />
                                                             <MenuItem.Content>
                                                                 <MenuItem.Title>{translate('common.transferBalance')}</MenuItem.Title>
                                                             </MenuItem.Content>
@@ -897,7 +897,7 @@ function WalletPage() {
                                                 return (
                                                     <View style={alertViewStyle}>
                                                         <Icon
-                                                            src={icons.Hourglass}
+                                                            src={hourglassIcon}
                                                             fill={theme.icon}
                                                         />
 
@@ -910,7 +910,7 @@ function WalletPage() {
                                                 return (
                                                     <View style={alertViewStyle}>
                                                         <Icon
-                                                            src={icons.Exclamation}
+                                                            src={exclamationIcon}
                                                             fill={theme.icon}
                                                         />
 
@@ -926,7 +926,7 @@ function WalletPage() {
                                                     sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.ENABLE_WALLET}
                                                 >
                                                     <MenuItem.Row>
-                                                        <MenuItem.Icon src={icons.Wallet} />
+                                                        <MenuItem.Icon src={walletIcon} />
                                                         <MenuItem.Content>
                                                             <MenuItem.Title>{translate('walletPage.enableWallet')}</MenuItem.Title>
                                                         </MenuItem.Content>

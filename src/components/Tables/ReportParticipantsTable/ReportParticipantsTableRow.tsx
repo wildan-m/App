@@ -29,7 +29,7 @@ export default function ReportParticipantsTableRow({item, rowIndex, shouldUseNar
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
     const avatarSize = shouldUseNarrowTableLayout ? CONST.AVATAR_SIZE.DEFAULT : CONST.AVATAR_SIZE.SMALL;
@@ -86,7 +86,7 @@ export default function ReportParticipantsTableRow({item, rowIndex, shouldUseNar
 
                     <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, !hovered && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

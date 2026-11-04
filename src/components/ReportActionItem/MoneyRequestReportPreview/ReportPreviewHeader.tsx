@@ -38,7 +38,7 @@ function ReportPreviewHeader() {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
+    const {ArrowRight: arrowRightIcon, BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
     const {iouReportID, iouReport, action, transactions} = useReportPreviewData();
     const {previewMessageStyle, shouldShowSkeleton, showStatusAndSkeleton, shouldShowEmptyPlaceholder, shouldShowAccessPlaceHolder, shouldShowCarouselArrows} = useReportPreviewUIState();
     const {isPreviousDisabled, isNextDisabled} = useReportPreviewCarouselState();
@@ -128,7 +128,7 @@ function ReportPreviewHeader() {
                             sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.CAROUSEL_PREVIOUS}
                         >
                             <Icon
-                                src={expensifyIcons.BackArrow}
+                                src={backArrowIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeExtraSmall}
                                 height={variables.iconSizeExtraSmall}
@@ -145,7 +145,7 @@ function ReportPreviewHeader() {
                             sentryLabel={CONST.SENTRY_LABEL.REPORT_PREVIEW.CAROUSEL_NEXT}
                         >
                             <Icon
-                                src={expensifyIcons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeExtraSmall}
                                 height={variables.iconSizeExtraSmall}

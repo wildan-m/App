@@ -48,7 +48,7 @@ function SelectionListPopoverHeader({title, onBackButtonPress, backButtonSentryL
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth -- must match PopoverWithMeasuredContent's dock decision (bottom-docked only when isSmallScreenWidth)
     const {isSmallScreenWidth} = useResponsiveLayout();
 
@@ -65,7 +65,7 @@ function SelectionListPopoverHeader({title, onBackButtonPress, backButtonSentryL
                             sentryLabel={backButtonSentryLabel}
                         >
                             <Icon
-                                src={icons.BackArrow}
+                                src={backArrowIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeNormal}
                                 height={variables.iconSizeNormal}

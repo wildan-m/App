@@ -50,7 +50,7 @@ export default function PriorityModeController() {
     const currentRouteName = useCurrentRouteName();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['ThreeLeggedLaptopWoman']);
+    const {ThreeLeggedLaptopWoman: threeLeggedLaptopWomanIllustration} = useMemoizedLazyIllustrations(['ThreeLeggedLaptopWoman']);
     const {environmentURL} = useEnvironment();
     const {translate} = useLocalize();
     const {showConfirmModal, closeModal} = useConfirmModal();
@@ -75,7 +75,7 @@ export default function PriorityModeController() {
                     <RenderHTML html={translate('focusModeUpdateModal.prompt', priorityModePageUrl)} />
                 </View>
             ),
-            image: illustrations.ThreeLeggedLaptopWoman,
+            image: threeLeggedLaptopWomanIllustration,
             imageStyles: StyleUtils.getBackgroundColorStyle(colors.pink800),
             titleStyles: [styles.textHeadline, styles.mbn3],
         }).then(() => {

@@ -23,13 +23,13 @@ type CaretWrapperProps = ChildrenProps & {
 function CaretWrapper({children, style, caretWidth, caretHeight, isActive = false}: CaretWrapperProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
 
     return (
         <View style={[styles.flexRow, styles.gap1, styles.alignItemsCenter, style]}>
             {children}
             <Icon
-                src={expensifyIcons.DownArrow}
+                src={downArrowIcon}
                 fill={theme.icon}
                 width={caretWidth ?? variables.iconSizeExtraSmall}
                 height={caretHeight ?? variables.iconSizeExtraSmall}

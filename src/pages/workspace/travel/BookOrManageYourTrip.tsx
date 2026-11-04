@@ -37,8 +37,8 @@ function BookOrManageYourTrip({policyID}: BookOrManageYourTripProps) {
     const StyleUtils = useStyleUtils();
     const policy = usePolicy(policyID);
     const {canWrite: canWriteMoreFeatures, withReadOnlyFallback} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.MORE_FEATURES);
-    const icons = useMemoizedLazyExpensifyIcons(['LuggageWithLines']);
-    const illustrations = useMemoizedLazyIllustrations(['RocketDude']);
+    const {LuggageWithLines: luggageWithLinesIcon} = useMemoizedLazyExpensifyIcons(['LuggageWithLines']);
+    const {RocketDude: rocketDudeIllustration} = useMemoizedLazyIllustrations(['RocketDude']);
     const {isBetaEnabled} = usePermissions();
     const {showConfirmModal} = useConfirmModal();
     const blockIfDefaultWorkspaceLacksTravel = useDefaultWorkspaceTravelGuard();
@@ -65,7 +65,7 @@ function BookOrManageYourTrip({policyID}: BookOrManageYourTripProps) {
                 title: translate('travel.blockedFeatureModal.title'),
                 titleStyles: styles.textHeadlineH1,
                 titleContainerStyles: styles.mb2,
-                image: illustrations.RocketDude,
+                image: rocketDudeIllustration,
                 imageStyles: StyleUtils.getBackgroundColorStyle(colors.ice600),
                 prompt: translate('travel.blockedFeatureModal.message'),
                 promptStyles: styles.mb2,
@@ -97,7 +97,7 @@ function BookOrManageYourTrip({policyID}: BookOrManageYourTripProps) {
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TRAVEL.BOOK_TRAVEL_BUTTON}
                     >
                         <MenuItem.Row>
-                            <MenuItem.Icon src={icons.LuggageWithLines} />
+                            <MenuItem.Icon src={luggageWithLinesIcon} />
                             <MenuItem.Content>
                                 <MenuItem.Title>{bookTravelText}</MenuItem.Title>
                             </MenuItem.Content>

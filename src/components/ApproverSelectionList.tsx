@@ -86,7 +86,7 @@ function ApproverSelectionList({
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const shouldShowTextInput = shouldShowTextInputProp ?? allApprovers?.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
-    const lazyIllustrations = useMemoizedLazyIllustrations(['TurtleInShell']);
+    const {TurtleInShell: turtleInShellIllustration} = useMemoizedLazyIllustrations(['TurtleInShell']);
     const shouldFooterBeInsideList = useShouldFooterBeInsideList();
 
     const handleSearchChange = (term: string) => {
@@ -128,7 +128,7 @@ function ApproverSelectionList({
 
     const listEmptyContent = (
         <BlockingView
-            icon={lazyIllustrations.TurtleInShell}
+            icon={turtleInShellIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workflowsPage.emptyContent.title')}

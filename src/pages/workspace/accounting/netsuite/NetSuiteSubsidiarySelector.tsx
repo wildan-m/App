@@ -34,7 +34,7 @@ function NetSuiteSubsidiarySelector({policy}: WithPolicyConnectionsProps) {
     const currentSubsidiaryID = netsuiteConfig?.subsidiaryID ?? CONST.DEFAULT_NUMBER_ID.toString();
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
 
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const subsidiaryListSections =
         subsidiaryList.map((subsidiary: NetSuiteSubsidiary) => ({
@@ -65,7 +65,7 @@ function NetSuiteSubsidiarySelector({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noSubsidiariesFound')}

@@ -43,7 +43,7 @@ function ReceiptCell({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const isLargeScreenWidth = !shouldUseNarrowLayout;
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
+    const {Receipt: receiptIcon} = useMemoizedLazyExpensifyIcons(['Receipt']);
     const backgroundStyles = isSelected ? StyleUtils.getBackgroundColorStyle(theme.buttonHoveredBG) : StyleUtils.getBackgroundColorStyle(theme.border);
     const {hovered, bind} = useHover();
     // Lazily mount ReceiptPreview on first hover and keep it mounted afterward.
@@ -102,7 +102,7 @@ function ReceiptCell({
                 shouldUseThumbnailImage
                 thumbnailContainerStyles={styles.bgTransparent}
                 isAuthTokenRequired
-                fallbackIcon={icons.Receipt}
+                fallbackIcon={receiptIcon}
                 fallbackIconSize={20}
                 fallbackIconColor={theme.icon}
                 fallbackIconBackground={isSelected ? theme.buttonHoveredBG : undefined}

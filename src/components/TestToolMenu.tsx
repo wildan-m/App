@@ -50,7 +50,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
     const [shouldShowBranchNameInTitle = false] = useOnyx(ONYXKEYS.SHOULD_SHOW_BRANCH_NAME_IN_TITLE);
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {translate} = useLocalize();
     const {clearLHNCache} = useSidebarOrderedReportsActions();
     const {isProduction} = useEnvironment();
@@ -71,7 +71,7 @@ function TestToolMenu({serverPageRoute}: TestToolMenuProps) {
                 <Text style={styles.textSupporting}>{translate(`initialSettingsPage.troubleshoot.servers.${activeServer}.label`)}</Text>
                 {!isPinnedByEnvironment && (
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={theme.icon}
                         width={variables.iconSizeSmall}
                         height={variables.iconSizeSmall}

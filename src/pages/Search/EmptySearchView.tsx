@@ -141,7 +141,7 @@ function EmptySearchViewContent({
     const scrollLockStyle = useSearchListScrollLockStyle();
     const scrollViewRef = useRegisterSearchScrollView();
 
-    const illustrations = useMemoizedLazyIllustrations(['EmptyStateTravel']);
+    const {EmptyStateTravel: emptyStateTravelIllustration} = useMemoizedLazyIllustrations(['EmptyStateTravel']);
     const {isBetaEnabled} = usePermissions();
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     // With the travelApproval beta, Book a trip shows once the workspace is set up in Spotnana, like the other Book travel entry points.
@@ -251,7 +251,7 @@ function EmptySearchViewContent({
         switch (type) {
             case CONST.SEARCH.DATA_TYPES.TRIP:
                 content = {
-                    headerMedia: illustrations.EmptyStateTravel,
+                    headerMedia: emptyStateTravelIllustration,
                     headerContentStyles: [styles.tripEmptyStateIllustration],
                     title: translate('travel.title'),
                     subtitleText: (

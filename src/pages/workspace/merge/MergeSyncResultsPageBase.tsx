@@ -72,8 +72,8 @@ function MergeSyncResultsPageBase({policyID, category}: MergeSyncResultsPageBase
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isBetaEnabled} = usePermissions();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
-    const illustrations = useMemoizedLazyIllustrations(['SyncUsers']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {SyncUsers: syncUsersIllustration} = useMemoizedLazyIllustrations(['SyncUsers']);
     const [isSkippedSectionExpanded, setIsSkippedSectionExpanded] = useState(false);
 
     const {featureName, dynamicRoutePath, testID, shouldBeBlocked, getProviderDisplayName} = PAGE_CONFIG[category];
@@ -125,7 +125,7 @@ function MergeSyncResultsPageBase({policyID, category}: MergeSyncResultsPageBase
                 >
                     <View style={[styles.alignItemsCenter, styles.mt4, styles.mb4, styles.pRelative]}>
                         <Icon
-                            src={illustrations.SyncUsers}
+                            src={syncUsersIllustration}
                             width={68}
                             height={68}
                         />
@@ -145,7 +145,7 @@ function MergeSyncResultsPageBase({policyID, category}: MergeSyncResultsPageBase
                             <Text style={[styles.textNormalThemeText, styles.textStrong]}>{translate(`workspace.${category}.syncResults.importedCount`, {count: skippedCount})}</Text>
                         </View>
                         <Icon
-                            src={icons.DownArrow}
+                            src={downArrowIcon}
                             fill={theme.icon}
                             additionalStyles={isSkippedSectionExpanded ? styles.flipUpsideDown : undefined}
                         />

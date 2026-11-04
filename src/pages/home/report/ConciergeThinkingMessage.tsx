@@ -87,7 +87,7 @@ function ConciergeThinkingMessageContent({accountID, reasoningHistory, statusLab
     const styles = useThemeStyles();
     const theme = useTheme();
     const {datetimeToCalendarTime, translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
+    const {UpArrow: upArrowIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
     const hasReasoningHistory = !!reasoningHistory && reasoningHistory.length > 0;
     const [manuallyCollapsed, setManuallyCollapsed] = useState(true);
     const isExpanded = hasReasoningHistory && !manuallyCollapsed;
@@ -215,7 +215,7 @@ function ConciergeThinkingMessageContent({accountID, reasoningHistory, statusLab
                         {!!historyLength && (
                             <View style={styles.ml2}>
                                 <Icon
-                                    src={isExpanded ? icons.UpArrow : icons.DownArrow}
+                                    src={isExpanded ? upArrowIcon : downArrowIcon}
                                     fill={theme.icon}
                                     width={variables.iconSizeXXSmall}
                                     height={variables.iconSizeXXSmall}

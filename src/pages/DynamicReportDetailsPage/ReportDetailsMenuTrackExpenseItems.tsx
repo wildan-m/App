@@ -39,7 +39,7 @@ function ReportDetailsMenuTrackExpenseItems({reportID, requestData}: ReportDetai
     const {isRestrictedToPreferredPolicy, preferredPolicyID} = usePreferredPolicy();
     const activePolicy = useActivePolicy();
     const lastWorkspaceNumber = useLastWorkspaceNumber();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Send', 'Folder', 'UserPlus']);
+    const {Send: sendIcon, Folder: folderIcon, UserPlus: userPlusIcon} = useMemoizedLazyExpensifyIcons(['Send', 'Folder', 'UserPlus']);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
@@ -107,7 +107,7 @@ function ReportDetailsMenuTrackExpenseItems({reportID, requestData}: ReportDetai
                 {!isSelfDMExpenseSplit && !isRestrictedToPreferredPolicy && !isPerDiemRequest(iouTransaction) && !isTimeRequest(iouTransaction) && (
                     <MenuItemNavigation
                         title={translate('actionableMentionTrackExpense.submitToFriend')}
-                        icon={expensifyIcons.Send}
+                        icon={sendIcon}
                         onPress={() => {
                             createDraftTransactionAndNavigateToParticipantSelector({
                                 ...baseSubmitParams,
@@ -120,7 +120,7 @@ function ReportDetailsMenuTrackExpenseItems({reportID, requestData}: ReportDetai
                 )}
                 <MenuItemNavigation
                     title={translate('actionableMentionTrackExpense.submitToEmployer')}
-                    icon={expensifyIcons.Send}
+                    icon={sendIcon}
                     onPress={() => {
                         createDraftTransactionAndNavigateToParticipantSelector({
                             ...baseSubmitParams,
@@ -141,7 +141,7 @@ function ReportDetailsMenuTrackExpenseItems({reportID, requestData}: ReportDetai
                 <>
                     <MenuItemNavigation
                         title={translate('actionableMentionTrackExpense.categorize')}
-                        icon={expensifyIcons.Folder}
+                        icon={folderIcon}
                         onPress={() => {
                             createDraftTransactionAndNavigateToParticipantSelector({
                                 reportID: actionReportID,
@@ -165,7 +165,7 @@ function ReportDetailsMenuTrackExpenseItems({reportID, requestData}: ReportDetai
                     />
                     <MenuItemNavigation
                         title={translate('actionableMentionTrackExpense.share')}
-                        icon={expensifyIcons.UserPlus}
+                        icon={userPlusIcon}
                         onPress={() => {
                             createDraftTransactionAndNavigateToParticipantSelector({
                                 reportID: actionReportID,

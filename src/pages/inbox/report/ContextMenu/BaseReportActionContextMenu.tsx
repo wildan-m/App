@@ -140,26 +140,28 @@ function BaseReportActionContextMenu({
     const {transitionActionSheetState} = ActionSheetAwareScrollView.useActionSheetAwareScrollViewActions();
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
-    const icons = useMemoizedLazyExpensifyIcons([
-        'Bell',
-        'Bug',
-        'ChatBubbleReply',
-        'ChatBubbleUnread',
-        'Checkmark',
-        'Concierge',
-        'Copy',
-        'Download',
-        'Exit',
-        'Eye',
-        'Flag',
-        'LinkCopy',
-        'Mail',
-        'Pencil',
-        'Pin',
-        'Stopwatch',
-        'ThreeDots',
-        'Trashcan',
-    ]);
+    const {Bell, Bug, ChatBubbleReply, ChatBubbleUnread, Checkmark, Concierge, Copy, Download, Exit, Eye, Flag, LinkCopy, Mail, Pencil, Pin, Stopwatch, ThreeDots, Trashcan} =
+        useMemoizedLazyExpensifyIcons([
+            'Bell',
+            'Bug',
+            'ChatBubbleReply',
+            'ChatBubbleUnread',
+            'Checkmark',
+            'Concierge',
+            'Copy',
+            'Download',
+            'Exit',
+            'Eye',
+            'Flag',
+            'LinkCopy',
+            'Mail',
+            'Pencil',
+            'Pin',
+            'Stopwatch',
+            'ThreeDots',
+            'Trashcan',
+        ]);
+    const icons = {Bell, Bug, ChatBubbleReply, ChatBubbleUnread, Checkmark, Concierge, Copy, Download, Exit, Eye, Flag, LinkCopy, Mail, Pencil, Pin, Stopwatch, ThreeDots, Trashcan};
     const StyleUtils = useStyleUtils();
     const {translate, getLocalDateFromDatetime, formatPhoneNumber, dateFnsLocale} = useLocalize();
     const {convertToDisplayString, convertToDisplayStringWithoutCurrency} = useCurrencyListActions();

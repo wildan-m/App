@@ -89,7 +89,7 @@ function ColumnsSettingsList({
 }: ColumnsSettingsListProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['DragHandles']);
+    const {DragHandles: dragHandlesIcon} = useMemoizedLazyExpensifyIcons(['DragHandles']);
     const {translate, localeCompare} = useLocalize();
 
     const isGrouped = !!groupBy;
@@ -147,7 +147,7 @@ function ColumnsSettingsList({
                 leftElement: isSearching ? undefined : (
                     <View style={[styles.mr3, isDragDisabled ? styles.cursorDisabled : styles.cursorGrab]}>
                         <Icon
-                            src={icons.DragHandles}
+                            src={dragHandlesIcon}
                             fill={theme.icon}
                             additionalStyles={isDragDisabled && styles.opacitySemiTransparent}
                         />

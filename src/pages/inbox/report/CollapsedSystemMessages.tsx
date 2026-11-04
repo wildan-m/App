@@ -43,7 +43,7 @@ function CollapsedSystemMessages({count, earliestReportAction, report, onPress, 
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const label = translate('report.collapsedSystemMessages', {count});
 
     return (
@@ -68,7 +68,7 @@ function CollapsedSystemMessages({count, earliestReportAction, report, onPress, 
                             >
                                 <Text style={[styles.chatItemMessage, styles.colorMuted]}>{label}</Text>
                                 <Icon
-                                    src={icons.DownArrow}
+                                    src={downArrowIcon}
                                     fill={theme.icon}
                                     width={variables.iconSizeExtraSmall}
                                     height={variables.iconSizeExtraSmall}

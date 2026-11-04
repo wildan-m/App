@@ -44,7 +44,7 @@ type InteractiveStepButtonProps = {
 
 function InteractiveStepButton({stepNumber, stepLabel, currentStepDescription, isCurrentStep, isLockedStep, isCompletedStep, onPress}: InteractiveStepButtonProps) {
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
     const accessibilityLabel = isCurrentStep && currentStepDescription ? `${stepLabel}, ${currentStepDescription}` : stepLabel;
     // Display-only steps are never actionable. Set disabled so TalkBack says
     // "Disabled" instead of "Double tap to activate". Mark the current step selected so
@@ -74,7 +74,7 @@ function InteractiveStepButton({stepNumber, stepLabel, currentStepDescription, i
             >
                 {isCompletedStep ? (
                     <Icon
-                        src={icons.Checkmark}
+                        src={checkmarkIcon}
                         width={variables.iconSizeNormal}
                         height={variables.iconSizeNormal}
                         fill={colors.white}

@@ -35,7 +35,7 @@ type ExactOnlineWaitlistRowProps = {
 function ExactOnlineWaitlistRow({policy, style, titleWrapperStyle, isBadgeCondensed}: ExactOnlineWaitlistRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ExactOnlineSquare']);
+    const {ExactOnlineSquare: exactOnlineSquareIcon} = useMemoizedLazyExpensifyIcons(['ExactOnlineSquare']);
     const [signupTimestamp] = useOnyx(ONYXKEYS.NVP_EXACT_ONLINE_WAITLIST);
     const [errors] = useOnyx(ONYXKEYS.ACCOUNT, {selector: (account) => account?.errorFields?.exactOnlineWaitlist});
     const [pendingAction] = useOnyx(ONYXKEYS.ACCOUNT, {selector: (account) => account?.pendingFields?.exactOnlineWaitlist});
@@ -60,7 +60,7 @@ function ExactOnlineWaitlistRow({policy, style, titleWrapperStyle, isBadgeConden
                 <MenuItem.Row>
                     <MenuItem.Leading>
                         <UserAvatar
-                            source={icons.ExactOnlineSquare}
+                            source={exactOnlineSquareIcon}
                             accountID={CONST.DEFAULT_NUMBER_ID}
                         />
                     </MenuItem.Leading>

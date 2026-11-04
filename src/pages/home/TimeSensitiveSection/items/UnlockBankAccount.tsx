@@ -28,7 +28,7 @@ type UnlockBankAccountProps = {
 
 function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['BankLock']);
+    const {BankLock: bankLockIcon} = useMemoizedLazyExpensifyIcons(['BankLock']);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [conciergePersonalDetails] = usePersonalDetailsByIDs([CONST.ACCOUNT_ID.CONCIERGE]);
@@ -58,7 +58,7 @@ function UnlockBankAccount({bankAccountID, policyName}: UnlockBankAccountProps) 
 
     return (
         <BaseWidgetItem
-            icon={icons.BankLock}
+            icon={bankLockIcon}
             title={title}
             subtitle={subtitle}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

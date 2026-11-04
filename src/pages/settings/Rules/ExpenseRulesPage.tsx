@@ -49,7 +49,7 @@ function ExpenseRulesPage() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {pageGutter} = useLayoutSpacing();
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
-    const icons = useMemoizedLazyExpensifyIcons(['Pencil', 'Plus', 'Trashcan']);
+    const {Pencil: pencilIcon, Plus: plusIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Pencil', 'Plus', 'Trashcan']);
     const [expenseRules = getEmptyArray<ExpenseRule>(), expenseRulesResult] = useOnyx(ONYXKEYS.NVP_EXPENSE_RULES);
 
     const [selectedRules, setSelectedRules] = useState<string[]>([]);
@@ -155,7 +155,7 @@ function ExpenseRulesPage() {
         ...(selectedRules.length === 1
             ? [
                   {
-                      icon: icons.Pencil,
+                      icon: pencilIcon,
                       text: translate('expenseRulesPage.editRule.title'),
                       value: CONST.EXPENSE_RULES.BULK_ACTION_TYPES.EDIT,
                       onSelected: () => navigateToEditRulePage(selectedRules.at(0)),
@@ -163,7 +163,7 @@ function ExpenseRulesPage() {
               ]
             : []),
         {
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             text: translate(selectedRules.length === 1 ? 'expenseRulesPage.deleteRule.deleteSingle' : 'expenseRulesPage.deleteRule.deleteMultiple'),
             value: CONST.EXPENSE_RULES.BULK_ACTION_TYPES.DELETE,
             shouldSkipFocusRestore: true,
@@ -194,7 +194,7 @@ function ExpenseRulesPage() {
                 style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                 sentryLabel={CONST.SENTRY_LABEL.SETTINGS_RULES.NEW_RULE}
             >
-                <Button.Icon src={icons.Plus} />
+                <Button.Icon src={plusIcon} />
                 <Button.Text>{translate('expenseRulesPage.newRule')}</Button.Text>
             </Button>
         </View>

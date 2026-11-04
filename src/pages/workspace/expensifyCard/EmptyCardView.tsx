@@ -26,7 +26,10 @@ function EmptyCardView({isBankAccountVerified, policyID, buttons}: EmptyCardView
     const {windowHeight} = useWindowDimensions();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const isUkEuCurrencySupported = useExpensifyCardUkEuSupported(policyID);
-    const lazyIllustrations = useMemoizedLazyIllustrations(['ExpensifyCardCoins', 'CompanyCardsPendingState']);
+    const {ExpensifyCardCoins: expensifyCardCoinsIllustration, CompanyCardsPendingState: companyCardsPendingStateIllustration} = useMemoizedLazyIllustrations([
+        'ExpensifyCardCoins',
+        'CompanyCardsPendingState',
+    ]);
 
     const headerHeight = useEmptyViewHeaderHeight(shouldUseNarrowLayout, isBankAccountVerified);
 
@@ -37,7 +40,7 @@ function EmptyCardView({isBankAccountVerified, policyID, buttons}: EmptyCardView
         >
             <View style={[{minHeight: windowHeight - headerHeight}, styles.pt5]}>
                 <EmptyStateComponent
-                    headerMedia={isBankAccountVerified ? lazyIllustrations.ExpensifyCardCoins : lazyIllustrations.CompanyCardsPendingState}
+                    headerMedia={isBankAccountVerified ? expensifyCardCoinsIllustration : companyCardsPendingStateIllustration}
                     headerStyles={styles.emptyStateCardIllustrationContainer}
                     title={translate(`workspace.expensifyCard.${isBankAccountVerified ? 'issueAndManageCards' : 'verificationInProgress'}`)}
                     subtitle={translate(`workspace.expensifyCard.${isBankAccountVerified ? 'getStartedIssuing' : 'verifyingTheDetails'}`)}

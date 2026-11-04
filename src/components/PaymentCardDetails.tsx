@@ -33,7 +33,7 @@ function PaymentCardDetails({card, rightComponent, wrapperStyle}: PaymentCardDet
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, dateFnsLocale} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCard']);
+    const {CreditCard: creditCardIcon} = useMemoizedLazyExpensifyIcons(['CreditCard']);
 
     const cardMonth = DateUtils.getMonthNames(dateFnsLocale)[(card?.accountData?.cardMonth ?? 1) - 1];
 
@@ -44,7 +44,7 @@ function PaymentCardDetails({card, rightComponent, wrapperStyle}: PaymentCardDet
     return (
         <View style={[styles.flexRow, styles.flex1, styles.gap3, wrapperStyle]}>
             <Icon
-                src={icons.CreditCard}
+                src={creditCardIcon}
                 additionalStyles={styles.subscriptionAddedCardIcon}
                 fill={theme.icon}
                 size={CONST.ICON_SIZE.MEDIUM}

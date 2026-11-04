@@ -28,7 +28,7 @@ function isContentType(contentType: unknown): contentType is ContentType {
 
 function EmptySelectionListContent({contentType}: EmptySelectionListContentProps) {
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ToddWithPhones']);
+    const {ToddWithPhones: toddWithPhonesIllustration} = useMemoizedLazyIllustrations(['ToddWithPhones']);
     const {translate} = useLocalize();
 
     if (!isContentType(contentType)) {
@@ -41,7 +41,7 @@ function EmptySelectionListContent({contentType}: EmptySelectionListContentProps
         <ScrollView contentContainerStyle={[styles.flexGrow1]}>
             <View style={[styles.flex1, styles.overflowHidden, styles.minHeight65]}>
                 <BlockingView
-                    icon={illustrations.ToddWithPhones}
+                    icon={toddWithPhonesIllustration}
                     iconWidth={variables.emptySelectionListIconWidth}
                     iconHeight={variables.emptySelectionListIconHeight}
                     title={translate(`emptyList.${translationKeyContentType}.title`)}

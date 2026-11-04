@@ -30,7 +30,7 @@ function AgentRulesSection({policyID, canWriteRules, showReadOnlyModal}: AgentRu
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
     const policy = usePolicy(policyID);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const visibleRules = getVisibleAgentRules(policy?.rules?.agentRules, isOffline);
     const hasRules = visibleRules.length > 0;
@@ -71,7 +71,7 @@ function AgentRulesSection({policyID, canWriteRules, showReadOnlyModal}: AgentRu
                 >
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={expensifyIcons.Plus} />
+                            <MenuItem.Icon src={plusIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('workspace.rules.agentRules.addRule')}</MenuItem.Title>

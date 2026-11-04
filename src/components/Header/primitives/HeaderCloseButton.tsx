@@ -20,13 +20,13 @@ type HeaderCloseButtonProps = {
  */
 function HeaderCloseButton({onPress = () => Navigation.dismissModal(), iconFill}: HeaderCloseButtonProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     return (
         <HeaderIconButton
             tooltipText={translate('common.close')}
             onPress={onPress}
-            iconSrc={icons.Close}
+            iconSrc={closeIcon}
             iconFill={iconFill}
             sentryLabel={CONST.SENTRY_LABEL.HEADER.CLOSE_BUTTON}
         />

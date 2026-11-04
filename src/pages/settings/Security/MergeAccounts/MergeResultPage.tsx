@@ -23,7 +23,7 @@ import {useEffect} from 'react';
 function MergeResultPage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['LockClosedOrange']);
+    const {LockClosedOrange: lockClosedOrangeIllustration} = useMemoizedLazyIllustrations(['LockClosedOrange']);
     const {params} = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.MERGE_ACCOUNTS.MERGE_RESULT>>();
     const {result, login, backTo} = params;
 
@@ -63,7 +63,7 @@ function MergeResultPage() {
             <ConfirmationPage style={styles.mt3}>
                 <ConfirmationPage.Content>
                     <ConfirmationPage.Illustration
-                        illustration={illustration ?? lazyIllustrations.LockClosedOrange}
+                        illustration={illustration ?? lockClosedOrangeIllustration}
                         illustrationStyle={illustrationStyle}
                     />
                     <ConfirmationPage.Heading>{heading ?? translate('mergeAccountsPage.mergeFailureGenericHeading')}</ConfirmationPage.Heading>

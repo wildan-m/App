@@ -122,21 +122,36 @@ function AttachmentPickerWithMenuItems({
     shouldDisableAttachmentItem,
     testID,
 }: AttachmentPickerWithMenuItemsProps) {
-    const icons = useMemoizedLazyExpensifyIcons([
-        'Cash',
-        'Coins',
-        'Collapse',
-        'Document',
-        'Expand',
-        'InvoiceGeneric',
-        'Location',
-        'MoneyCircle',
-        'Paperclip',
-        'Plus',
-        'Receipt',
-        'Task',
-        'Transfer',
-    ]);
+    const {
+        Cash,
+        Coins,
+        Collapse,
+        Document: documentIcon,
+        Expand,
+        InvoiceGeneric: invoiceGenericIcon,
+        Location: locationIcon,
+        MoneyCircle,
+        Paperclip: paperclipIcon,
+        Plus: plusIcon,
+        Receipt,
+        Task: taskIcon,
+        Transfer: transferIcon,
+    } = useMemoizedLazyExpensifyIcons(['Cash', 'Coins', 'Collapse', 'Document', 'Expand', 'InvoiceGeneric', 'Location', 'MoneyCircle', 'Paperclip', 'Plus', 'Receipt', 'Task', 'Transfer']);
+    const icons = {
+        Cash,
+        Coins,
+        Collapse,
+        Document: documentIcon,
+        Expand,
+        InvoiceGeneric: invoiceGenericIcon,
+        Location: locationIcon,
+        MoneyCircle,
+        Paperclip: paperclipIcon,
+        Plus: plusIcon,
+        Receipt,
+        Task: taskIcon,
+        Transfer: transferIcon,
+    };
     const isFocused = useIsFocused();
     const StyleUtils = useStyleUtils();
     const styles = useThemeStyles();
@@ -221,7 +236,7 @@ function AttachmentPickerWithMenuItems({
     const options: MoneyRequestOptions = {
         [CONST.IOU.TYPE.SPLIT]: [
             {
-                icon: icons.Transfer,
+                icon: transferIcon,
                 text: translate('iou.splitExpense'),
                 shouldCallAfterModalHide: shouldUseNarrowLayout,
                 sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_SPLIT_EXPENSE,
@@ -237,7 +252,7 @@ function AttachmentPickerWithMenuItems({
                 onSelected: () => selectOption(() => startMoneyRequest(CONST.IOU.TYPE.SUBMIT, report?.reportID ?? String(CONST.DEFAULT_NUMBER_ID), draftTransactionIDs), true),
             },
             {
-                icon: icons.Location,
+                icon: locationIcon,
                 text: translate('quickAction.recordDistance'),
                 shouldCallAfterModalHide: shouldUseNarrowLayout,
                 sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_TRACK_DISTANCE,
@@ -276,7 +291,7 @@ function AttachmentPickerWithMenuItems({
                 onSelected: () => selectOption(() => startMoneyRequest(CONST.IOU.TYPE.TRACK, report?.reportID ?? String(CONST.DEFAULT_NUMBER_ID), draftTransactionIDs), true),
             },
             {
-                icon: icons.Location,
+                icon: locationIcon,
                 text: translate('iou.trackDistance'),
                 shouldCallAfterModalHide: shouldUseNarrowLayout,
                 sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_TRACK_DISTANCE,
@@ -291,7 +306,7 @@ function AttachmentPickerWithMenuItems({
         ],
         [CONST.IOU.TYPE.INVOICE]: [
             {
-                icon: icons.InvoiceGeneric,
+                icon: invoiceGenericIcon,
                 text: translate('workspace.invoices.sendInvoice'),
                 shouldCallAfterModalHide: shouldUseNarrowLayout,
                 sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_SEND_INVOICE,
@@ -309,7 +324,7 @@ function AttachmentPickerWithMenuItems({
             ? []
             : [
                   {
-                      icon: icons.Document,
+                      icon: documentIcon,
                       text: translate('report.newReport.createReport'),
                       shouldCallAfterModalHide: shouldUseNarrowLayout,
                       sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_CREATE_REPORT,
@@ -324,7 +339,7 @@ function AttachmentPickerWithMenuItems({
         ? []
         : [
               {
-                  icon: icons.Task,
+                  icon: taskIcon,
                   text: translate('newTaskPage.assignTask'),
                   shouldCallAfterModalHide: shouldUseNarrowLayout,
                   sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_ASSIGN_TASK,
@@ -405,7 +420,7 @@ function AttachmentPickerWithMenuItems({
                     ...(!isReportTeachersUnite ? createReportOption : []),
                     ...taskOption,
                     {
-                        icon: icons.Paperclip,
+                        icon: paperclipIcon,
                         text: translate('reportActionCompose.addAttachment'),
                         disabled: shouldDisableAttachmentItem,
                         sentryLabel: CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_MENU_ADD_ATTACHMENT,
@@ -445,7 +460,7 @@ function AttachmentPickerWithMenuItems({
                                             {({hovered, pressed}) => (
                                                 <Icon
                                                     fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered && !disabled, isPressed: pressed && !disabled})})}
-                                                    src={icons.Plus}
+                                                    src={plusIcon}
                                                 />
                                             )}
                                         </PressableWithoutFeedback>

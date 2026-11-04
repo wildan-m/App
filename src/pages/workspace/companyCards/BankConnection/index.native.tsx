@@ -73,7 +73,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
     const {errorMessage, hasError: isNewFeedHasError} = useCompanyCardConnectionError({cardFeeds, addNewCard, newFeed, isAddingNewCard: !feed});
     // importPlaidAccounts only writes these errors while repairing an existing feed, so the add-card flow ignores them
     const hasImportError = !!feed && !isEmptyObject(assignCard?.errors);
-    const illustrations = useMemoizedLazyIllustrations(['BrokenCompanyCardBankConnection']);
+    const {BrokenCompanyCardBankConnection: brokenCompanyCardBankConnectionIllustration} = useMemoizedLazyIllustrations(['BrokenCompanyCardBankConnection']);
     const {isBlockedToAddNewFeeds, isAllFeedsResultLoading} = useIsBlockedToAddFeed(policyID);
     const {checkForDuplicateFeed} = useDuplicateFeedDetection({policyID, isPlaid});
 
@@ -217,7 +217,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
                     <ConfirmationPageDefault
                         heading={translate('workspace.companyCards.error.feedCouldNotBeLoadedTitle')}
                         description={translate('common.genericErrorMessage')}
-                        illustration={illustrations.BrokenCompanyCardBankConnection}
+                        illustration={brokenCompanyCardBankConnectionIllustration}
                         illustrationStyle={styles.errorStateCardIllustration}
                         buttonText={translate('common.buttonConfirm')}
                         onButtonPress={() => Navigation.goBack(ROUTES.WORKSPACE_COMPANY_CARDS.getRoute(policyID))}

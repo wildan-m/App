@@ -24,7 +24,7 @@ function LHNEmptyState() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'Plus']);
+    const {MagnifyingGlass: magnifyingGlassIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'Plus']);
     const emptyLHNIllustration = useEmptyLHNIllustration() as BlockingViewProps;
     const {activeTab} = useSidebarOrderedReportsState();
     const {setActiveTab} = useSidebarOrderedReportsActions();
@@ -62,7 +62,7 @@ function LHNEmptyState() {
                 text={translate('common.emptyLHN.subtitleText1')}
             />
             <Icon
-                src={expensifyIcons.MagnifyingGlass}
+                src={magnifyingGlassIcon}
                 width={variables.emptyLHNIconWidth}
                 height={variables.emptyLHNIconHeight}
                 fill={theme.icon}
@@ -75,7 +75,7 @@ function LHNEmptyState() {
                 text={translate('common.emptyLHN.subtitleText2')}
             />
             <Icon
-                src={expensifyIcons.Plus}
+                src={plusIcon}
                 width={variables.emptyLHNIconWidth}
                 height={variables.emptyLHNIconHeight}
                 fill={theme.icon}

@@ -86,7 +86,7 @@ function AttachmentModalBaseContent({
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
 
     // This logic is used to ensure that the source is updated when the source changes and
     // that the initially provided source is always used as a fallback.
@@ -302,7 +302,7 @@ function AttachmentModalBaseContent({
                 )}
                 {shouldShowNotFoundPage && !isLoading && (
                     <BlockingView
-                        icon={illustrations.ToddBehindCloud}
+                        icon={toddBehindCloudIllustration}
                         iconWidth={variables.modalTopIconWidth}
                         iconHeight={variables.modalTopIconHeight}
                         title={translate('notFound.notHere')}

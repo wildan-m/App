@@ -92,7 +92,27 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
     const {triggerExportOrConfirm} = useExportAgainModal(moneyRequestReport?.reportID, moneyRequestReport?.policyID);
     const {clearSelectedTransactions} = useSearchSelectionActions();
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Table: tableIcon,
+        TablePencil: tablePencilIcon,
+        Export: exportIcon,
+        Download: downloadIcon,
+        Printer: printerIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        ArrowRight: arrowRightIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'Table',
         'TablePencil',
         'Export',
@@ -113,6 +133,27 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         'GustoSquare',
         'ArrowRight',
     ]);
+    const expensifyIcons = {
+        Table: tableIcon,
+        TablePencil: tablePencilIcon,
+        Export: exportIcon,
+        Download: downloadIcon,
+        Printer: printerIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        ArrowRight: arrowRightIcon,
+    };
 
     const showEmptyReportDownloadErrorModal = () => {
         showDecisionModal({
@@ -160,7 +201,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
     const exportSubmenuOptions: Record<string, DropdownOption<string>> = {
         [CONST.REPORT.EXPORT_OPTIONS.DOWNLOAD_CSV]: {
             text: translate('export.basicExport'),
-            icon: expensifyIcons.Table,
+            icon: tableIcon,
             value: CONST.REPORT.EXPORT_OPTIONS.DOWNLOAD_CSV,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.EXPORT_FILE,
             onSelected: () => {
@@ -240,7 +281,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         const isDefaultTemplate = defaultTemplates.includes(template);
         exportSubmenuOptions[template.name] = {
             text: template.name,
-            icon: isDefaultTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil,
+            icon: isDefaultTemplate ? tableIcon : tablePencilIcon,
             value: template.templateName,
             description: template.description,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.EXPORT_FILE,
@@ -277,15 +318,15 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
             value: CONST.REPORT.SECONDARY_ACTIONS.EXPORT,
             text: translate('common.export'),
             backButtonText: translate('common.export'),
-            icon: expensifyIcons.Export,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: exportIcon,
+            rightIcon: arrowRightIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.EXPORT,
             subMenuItems: exportSubMenuItems,
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_PDF,
             text: translate('common.downloadReport', {count: 1}),
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DOWNLOAD_PDF,
             onSelected: () => {
                 if (isOffline) {
@@ -302,7 +343,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         [CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.DOWNLOAD_RECEIPTS,
             text: translate('common.downloadReceipt', {count: receiptCount}),
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DOWNLOAD_RECEIPTS,
             onSelected: () => {
                 if (isOffline) {
@@ -319,7 +360,7 @@ function useExportActions({reportID, policy, onPDFModalOpen}: UseExportActionsPa
         [CONST.REPORT.SECONDARY_ACTIONS.PRINT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.PRINT,
             text: translate('common.print'),
-            icon: expensifyIcons.Printer,
+            icon: printerIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.PRINT,
             onSelected: () => {
                 if (!moneyRequestReport) {

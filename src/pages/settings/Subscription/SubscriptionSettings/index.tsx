@@ -64,7 +64,7 @@ import {View} from 'react-native';
 function SubscriptionSettings() {
     const {translate, dateFnsLocale} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['Coins']);
+    const {Coins: coinsIcon} = useMemoizedLazyExpensifyIcons(['Coins']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {environmentURL} = useEnvironment();
@@ -143,19 +143,19 @@ function SubscriptionSettings() {
 
         Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_EXPENSIFY_CODE);
     };
-    const illustrations = useMemoizedLazyIllustrations(['SubscriptionAnnual', 'SubscriptionPPU']);
+    const {SubscriptionAnnual: subscriptionAnnualIllustration, SubscriptionPPU: subscriptionPPUIllustration} = useMemoizedLazyIllustrations(['SubscriptionAnnual', 'SubscriptionPPU']);
     const delegateAccountID = useDelegateAccountID();
 
     const options: Array<OptionsPickerItem<SubscriptionType>> = [
         {
             key: CONST.SUBSCRIPTION.TYPE.ANNUAL,
             title: 'subscription.details.annual',
-            icon: illustrations.SubscriptionAnnual,
+            icon: subscriptionAnnualIllustration,
         },
         {
             key: CONST.SUBSCRIPTION.TYPE.PAY_PER_USE,
             title: 'subscription.details.payPerUse',
-            icon: illustrations.SubscriptionPPU,
+            icon: subscriptionPPUIllustration,
         },
     ];
 
@@ -267,7 +267,7 @@ function SubscriptionSettings() {
                         <View style={[styles.mt5, styles.mb5]}>
                             <OptionItem
                                 title="subscription.details.payPerUse"
-                                icon={illustrations.SubscriptionPPU}
+                                icon={subscriptionPPUIllustration}
                                 style={styles.flex0}
                                 isSelected
                                 isDisabled
@@ -377,7 +377,7 @@ function SubscriptionSettings() {
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Coins} />
+                                <MenuItem.Icon src={coinsIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 {privateTaxExempt ? (

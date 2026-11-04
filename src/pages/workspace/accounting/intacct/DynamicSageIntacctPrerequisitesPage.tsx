@@ -36,8 +36,8 @@ type DynamicSageIntacctPrerequisitesPageProps = PlatformStackScreenProps<Setting
 function DynamicSageIntacctPrerequisitesPage({route}: DynamicSageIntacctPrerequisitesPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'NewWindow', 'Task']);
-    const illustrations = useMemoizedLazyIllustrations(['Computer']);
+    const {Download: downloadIcon, NewWindow: newWindowIcon, Task: taskIcon} = useMemoizedLazyExpensifyIcons(['Download', 'NewWindow', 'Task']);
+    const {Computer: computerIllustration} = useMemoizedLazyIllustrations(['Computer']);
     const popoverAnchor = useRef<ComponentRef<typeof View> | ComponentRef<typeof RNText> | null>(null);
     const policyID: string = route.params.policyID;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.SAGE_INTACCT_PREREQUISITES.path);
@@ -48,8 +48,8 @@ function DynamicSageIntacctPrerequisitesPage({route}: DynamicSageIntacctPrerequi
         {
             title: translate('workspace.intacct.downloadExpensifyPackage'),
             key: 'workspace.intacct.downloadExpensifyPackage',
-            icon: icons.Download,
-            iconRight: icons.NewWindow,
+            icon: downloadIcon,
+            iconRight: newWindowIcon,
             shouldShowRightIcon: true,
             onPress: () => {
                 fileDownload(translate, CONST.EXPENSIFY_PACKAGE_FOR_SAGE_INTACCT, CONST.EXPENSIFY_PACKAGE_FOR_SAGE_INTACCT_FILE_NAME, '', true);
@@ -67,8 +67,8 @@ function DynamicSageIntacctPrerequisitesPage({route}: DynamicSageIntacctPrerequi
         {
             title: translate('workspace.intacct.followSteps'),
             key: 'workspace.intacct.followSteps',
-            icon: icons.Task,
-            iconRight: icons.NewWindow,
+            icon: taskIcon,
+            iconRight: newWindowIcon,
             shouldShowRightIcon: true,
             onPress: () => {
                 openExternalLink(CONST.HOW_TO_CONNECT_TO_SAGE_INTACCT);
@@ -99,7 +99,7 @@ function DynamicSageIntacctPrerequisitesPage({route}: DynamicSageIntacctPrerequi
             />
             <ScrollView>
                 <View style={[styles.alignSelfCenter, styles.computerIllustrationContainer]}>
-                    <ImageSVG src={illustrations.Computer} />
+                    <ImageSVG src={computerIllustration} />
                 </View>
 
                 <Text style={[styles.textHeadlineH1, styles.p5, styles.p6]}>{translate('workspace.intacct.prerequisitesTitle')}</Text>

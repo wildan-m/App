@@ -54,7 +54,26 @@ function UpgradeIntro({feature, onUpgrade, buttonDisabled, loading, isCategorizi
     const allIconNames = Object.values(CONST.UPGRADE_FEATURE_INTRO_MAPPING)
         .map((feat) => feat?.icon)
         .filter((icon) => icon !== undefined);
-    const illustrations = useMemoizedLazyIllustrations([
+    const {
+        FolderOpen,
+        Tag,
+        Coins,
+        Rules,
+        CompanyCard,
+        PerDiem,
+        ReportReceipt,
+        CarIce,
+        BlueShield,
+        Pencil,
+        Luggage,
+        Workflows,
+        Accounting,
+        HandCard,
+        InvoiceBlue,
+        Members,
+        Approval,
+        NewUser,
+    } = useMemoizedLazyIllustrations([
         'FolderOpen',
         'Tag',
         'Coins',
@@ -74,7 +93,40 @@ function UpgradeIntro({feature, onUpgrade, buttonDisabled, loading, isCategorizi
         'Approval',
         'NewUser',
     ]);
-    const illustrationIcons = useMemoizedLazyExpensifyIcons([
+    const illustrations = {
+        FolderOpen,
+        Tag,
+        Coins,
+        Rules,
+        CompanyCard,
+        PerDiem,
+        ReportReceipt,
+        CarIce,
+        BlueShield,
+        Pencil,
+        Luggage,
+        Workflows,
+        Accounting,
+        HandCard,
+        InvoiceBlue,
+        Members,
+        Approval,
+        NewUser,
+    };
+    const {
+        IntacctSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        QBDSquare,
+        QBOSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        BusinessCentralSquare,
+        AdvancedApprovalsSquare,
+        Unlock,
+    } = useMemoizedLazyExpensifyIcons([
         'IntacctSquare',
         'IntuitSquare',
         'NetSuiteSquare',
@@ -88,6 +140,20 @@ function UpgradeIntro({feature, onUpgrade, buttonDisabled, loading, isCategorizi
         'AdvancedApprovalsSquare',
         'Unlock',
     ]);
+    const illustrationIcons = {
+        IntacctSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        QBDSquare,
+        QBOSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        BusinessCentralSquare,
+        AdvancedApprovalsSquare,
+        Unlock,
+    };
     const imported = new Set([...Object.keys(illustrations), ...Object.keys(illustrationIcons)]);
     const missing = allIconNames.filter((n): n is string => !!n && !imported.has(n));
     if (missing.length) {

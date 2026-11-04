@@ -30,7 +30,7 @@ function SageIntacctPaymentAccountPage({policy}: WithPolicyConnectionsProps) {
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
 
     const {config} = policy?.connections?.intacct ?? {};
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const vendorSelectorOptions: SelectorType[] = getSageIntacctBankAccounts(policy, config?.sync?.reimbursementAccountID);
 
@@ -43,7 +43,7 @@ function SageIntacctPaymentAccountPage({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.sageIntacct.noAccountsFound')}

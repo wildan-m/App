@@ -149,7 +149,8 @@ function PromotedActionsBar({promotedActions, containerStyle}: PromotedActionsBa
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ChatBubbles', 'CommentBubbles', 'Pin', 'QrCode']);
+    const {ChatBubbles, CommentBubbles, Pin, QrCode} = useMemoizedLazyExpensifyIcons(['ChatBubbles', 'CommentBubbles', 'Pin', 'QrCode']);
+    const icons = {ChatBubbles, CommentBubbles, Pin, QrCode};
 
     if (promotedActions.length === 0) {
         return null;

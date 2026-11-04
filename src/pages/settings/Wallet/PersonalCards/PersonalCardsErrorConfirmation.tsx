@@ -22,7 +22,7 @@ type PersonalCardsErrorConfirmationProps = {
 function PersonalCardsErrorConfirmation({errorMessage}: PersonalCardsErrorConfirmationProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['QuestionMark']);
+    const {QuestionMark: questionMarkIllustration} = useMemoizedLazyIllustrations(['QuestionMark']);
 
     const onButtonPress = () => {
         clearAddNewPersonalCardErrors();
@@ -46,7 +46,7 @@ function PersonalCardsErrorConfirmation({errorMessage}: PersonalCardsErrorConfir
         <ConfirmationPage>
             <ConfirmationPage.Content>
                 <ConfirmationPage.Illustration
-                    illustration={illustrations.QuestionMark}
+                    illustration={questionMarkIllustration}
                     illustrationStyle={styles.errorStateCardIllustration}
                 />
                 <ConfirmationPage.Heading>{translate('personalCard.bankConnectionError')}</ConfirmationPage.Heading>

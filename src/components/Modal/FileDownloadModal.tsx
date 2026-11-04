@@ -79,7 +79,7 @@ function FileDownloadModal({
     const {isSmallScreenWidth} = useResponsiveLayout();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const isReady = status === CONST.FILE_DOWNLOAD_STATUS.READY;
     const hasFailed = status === CONST.FILE_DOWNLOAD_STATUS.FAILED;
@@ -160,7 +160,7 @@ function FileDownloadModal({
                     sentryLabel={CONST.SENTRY_LABEL.MORE_MENU.CLOSE_PDF_MODAL}
                 >
                     <Icon
-                        src={expensifyIcons.Close}
+                        src={closeIcon}
                         fill={theme.icon}
                     />
                 </PressableWithFeedback>

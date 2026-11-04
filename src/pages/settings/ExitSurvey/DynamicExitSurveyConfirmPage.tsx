@@ -41,7 +41,7 @@ function DynamicExitSurveyConfirmPage() {
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['MushroomTopHat']);
+    const {MushroomTopHat: mushroomTopHatIllustration} = useMemoizedLazyIllustrations(['MushroomTopHat']);
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT);
     const [exitSurveyResponse] = useOnyx(ONYXKEYS.FORMS.EXIT_SURVEY_RESPONSE_FORM, {
         selector: exitResponseSelector,
@@ -82,7 +82,7 @@ function DynamicExitSurveyConfirmPage() {
                 {!isOffline && (
                     <>
                         <Icon
-                            src={illustrations.MushroomTopHat}
+                            src={mushroomTopHatIllustration}
                             width={variables.mushroomTopHatWidth}
                             height={variables.mushroomTopHatHeight}
                         />

@@ -27,7 +27,7 @@ function YourSpendSection() {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {cardPaddingHorizontal} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['ThumbsUpHourglass', 'MoneyBag']);
+    const {ThumbsUpHourglass: thumbsUpHourglassIcon, MoneyBag: moneyBagIcon} = useMemoizedLazyExpensifyIcons(['ThumbsUpHourglass', 'MoneyBag']);
     const [isExpanded, setIsExpanded] = useState(false);
 
     useFocusEffect(
@@ -61,7 +61,7 @@ function YourSpendSection() {
                     testIDPrefix="your-spend-approval"
                     description={translate('homePage.yourSpend.awaitingApproval')}
                     totals={approvalTotals}
-                    iconSrc={icons.ThumbsUpHourglass}
+                    iconSrc={thumbsUpHourglassIcon}
                     onPress={() => Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: awaitingApprovalQuery, searchKey: CONST.SEARCH.SEARCH_KEYS.EXPENSES}))}
                     wrapperStyle={wrapperStyle}
                     skeletonRowIndex={0}
@@ -73,7 +73,7 @@ function YourSpendSection() {
                     testIDPrefix="your-spend-payment"
                     description={translate('homePage.yourSpend.repaidLast30Days')}
                     totals={paymentTotals}
-                    iconSrc={icons.MoneyBag}
+                    iconSrc={moneyBagIcon}
                     onPress={() => Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: repaidLast30DaysQuery, searchKey: CONST.SEARCH.SEARCH_KEYS.EXPENSES}))}
                     wrapperStyle={wrapperStyle}
                     skeletonRowIndex={1}

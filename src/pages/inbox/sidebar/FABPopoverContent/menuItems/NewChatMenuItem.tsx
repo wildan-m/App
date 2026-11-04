@@ -22,14 +22,14 @@ function NewChatMenuItem() {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['ChatBubble']);
+    const {ChatBubble: chatBubbleIcon} = useMemoizedLazyExpensifyIcons(['ChatBubble']);
     const isSupportalSession = useIsSupportalSession();
 
     return (
         <FABFocusableMenuItem
             itemId={ITEM_ID}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.START_CHAT}
-            icon={icons.ChatBubble}
+            icon={chatBubbleIcon}
             title={translate('sidebarScreen.fabNewChat')}
             onPress={() => {
                 // Support agents cannot create chats on a user's behalf, so block before the selector opens.

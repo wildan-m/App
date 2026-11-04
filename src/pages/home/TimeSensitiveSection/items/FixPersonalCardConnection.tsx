@@ -19,11 +19,11 @@ type FixPersonalCardConnectionProps = {
 
 function FixPersonalCardConnection({card}: FixPersonalCardConnectionProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Connect']);
+    const {Connect: connectIcon} = useMemoizedLazyExpensifyIcons(['Connect']);
 
     return (
         <BaseWidgetItem
-            icon={icons.Connect}
+            icon={connectIcon}
             title={translate('homePage.timeSensitiveSection.fixPersonalCardConnection.title', {cardName: card?.cardName})}
             subtitle={translate('homePage.timeSensitiveSection.fixPersonalCardConnection.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

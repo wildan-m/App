@@ -36,7 +36,7 @@ type AccountListItem = ListItem & {
 function CampfireTravelBillingSettlementAccountPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const campfireConfig = policy?.connections?.campfire?.config;
     const campfireData = policy?.connections?.campfire?.data;
@@ -69,7 +69,7 @@ function CampfireTravelBillingSettlementAccountPage({policy}: WithPolicyConnecti
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.campfire.noAccountsFound')}

@@ -19,7 +19,7 @@ type AttachmentOfflineIndicatorProps = {
 
 function AttachmentOfflineIndicator({isPreview = false}: AttachmentOfflineIndicatorProps) {
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
+    const {OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
@@ -42,7 +42,7 @@ function AttachmentOfflineIndicator({isPreview = false}: AttachmentOfflineIndica
         <View style={[styles.flexColumn, styles.alignItemsCenter, styles.justifyContentCenter, styles.pAbsolute, styles.h100, styles.w100, isPreview && styles.hoveredComponentBG]}>
             <Icon
                 fill={theme.icon}
-                src={icons.OfflineCloud}
+                src={offlineCloudIcon}
                 width={variables.iconSizeSuperLarge}
                 height={variables.iconSizeSuperLarge}
             />

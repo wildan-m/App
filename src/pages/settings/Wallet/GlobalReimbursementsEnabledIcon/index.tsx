@@ -24,7 +24,7 @@ function GlobalReimbursementsEnabledIcon({onPress}: GlobalReimbursementsEnabledI
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Globe']);
+    const {Globe: globeIcon} = useMemoizedLazyExpensifyIcons(['Globe']);
     const label = translate('walletPage.globalReimbursementsEnabled');
 
     // The shared Tooltip renders nothing on touch-only web, so fall back to the long-press tooltip native uses
@@ -41,7 +41,7 @@ function GlobalReimbursementsEnabledIcon({onPress}: GlobalReimbursementsEnabledI
                 accessibilityLabel={label}
             >
                 <Icon
-                    src={icons.Globe}
+                    src={globeIcon}
                     width={variables.iconSizeSemiSmall}
                     height={variables.iconSizeSemiSmall}
                     fill={theme.icon}

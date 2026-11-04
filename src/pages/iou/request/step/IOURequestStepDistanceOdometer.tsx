@@ -110,7 +110,7 @@ function IOURequestStepDistanceOdometer({
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const {isExtraSmallScreenHeight} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['GalleryPlus']);
+    const {GalleryPlus: galleryPlusIcon} = useMemoizedLazyExpensifyIcons(['GalleryPlus']);
 
     const startReadingInputRef = useRef<BaseTextInputRef | null>(null);
     const endReadingInputRef = useRef<BaseTextInputRef | null>(null);
@@ -709,7 +709,7 @@ function IOURequestStepDistanceOdometer({
                                         shouldUseThumbnailImage
                                         thumbnailContainerStyles={styles.bgTransparent}
                                         isAuthTokenRequired
-                                        fallbackIcon={icons.GalleryPlus}
+                                        fallbackIcon={galleryPlusIcon}
                                         fallbackIconSize={variables.iconSizeNormal}
                                         fallbackIconColor={theme.icon}
                                         iconSize="x-small"
@@ -755,7 +755,7 @@ function IOURequestStepDistanceOdometer({
                                         shouldUseThumbnailImage
                                         thumbnailContainerStyles={styles.bgTransparent}
                                         isAuthTokenRequired
-                                        fallbackIcon={icons.GalleryPlus}
+                                        fallbackIcon={galleryPlusIcon}
                                         fallbackIconSize={variables.iconSizeNormal}
                                         fallbackIconColor={theme.icon}
                                         iconSize="x-small"

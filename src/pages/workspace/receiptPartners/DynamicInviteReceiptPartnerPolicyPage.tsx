@@ -39,7 +39,7 @@ type DynamicInviteReceiptPartnerPolicyPageProps = PlatformStackScreenProps<Works
 
 function DynamicInviteReceiptPartnerPolicyPage({route}: DynamicInviteReceiptPartnerPolicyPageProps) {
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ToddInCar']);
+    const {ToddInCar: toddInCarIllustration} = useMemoizedLazyIllustrations(['ToddInCar']);
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const {isOffline} = useNetwork();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_RECEIPT_PARTNERS_INVITE.path);
@@ -47,7 +47,7 @@ function DynamicInviteReceiptPartnerPolicyPage({route}: DynamicInviteReceiptPart
     const [selectedOptions, setSelectedOptions] = useState<MemberForList[]>([]);
     const [isInvitationSent, setIsInvitationSent] = useState(false);
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const policyID = route.params?.policyID;
     const policy = usePolicy(policyID);
@@ -83,7 +83,7 @@ function DynamicInviteReceiptPartnerPolicyPage({route}: DynamicInviteReceiptPart
                         accountID: personalDetail?.accountID,
                         icons: [
                             {
-                                source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                                source: personalDetail?.avatar ?? fallbackAvatarIcon,
                                 name: formatPhoneNumber(email),
                                 type: CONST.ICON_TYPE_AVATAR,
                                 id: personalDetail?.accountID,
@@ -193,7 +193,7 @@ function DynamicInviteReceiptPartnerPolicyPage({route}: DynamicInviteReceiptPart
                     onBackButtonPress={() => Navigation.goBack(backPath)}
                 />
                 <ConfirmationPageDefault
-                    illustration={illustrations.ToddInCar}
+                    illustration={toddInCarIllustration}
                     illustrationStyle={styles.toddInCarIllustrationContainer}
                     heading={translate('workspace.receiptPartners.uber.readyToRoll')}
                     description={translate('workspace.receiptPartners.uber.takeBusinessRideMessage')}

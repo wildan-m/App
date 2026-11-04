@@ -57,8 +57,19 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const {domainAccountID} = route.params;
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['LaptopWithMembers', 'LockClosed', 'BuildingCross', 'Encryption']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator', 'RemoveMembers', 'Download', 'Transfer']);
+    const {
+        LaptopWithMembers: laptopWithMembersIllustration,
+        LockClosed: lockClosedIllustration,
+        BuildingCross: buildingCrossIllustration,
+        Encryption: encryptionIllustration,
+    } = useMemoizedLazyIllustrations(['LaptopWithMembers', 'LockClosed', 'BuildingCross', 'Encryption']);
+    const {
+        Plus: plusIcon,
+        Gear: gearIcon,
+        RemoveMembers: removeMembersIcon,
+        Download: downloadIcon,
+        Transfer: transferIcon,
+    } = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator', 'RemoveMembers', 'Download', 'Transfer']);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const clearSelectedMembers = () => {
@@ -88,15 +99,15 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
 
     const membersFeatureListItems: FeatureListItem[] = [
         {
-            icon: illustrations.BuildingCross,
+            icon: buildingCrossIllustration,
             translationKey: 'domain.members.membersFeatureList.controlPolicyCreation',
         },
         {
-            icon: illustrations.LockClosed,
+            icon: lockClosedIllustration,
             translationKey: 'domain.members.membersFeatureList.enableSamlSso',
         },
         {
-            icon: illustrations.Encryption,
+            icon: encryptionIllustration,
             translationKey: 'domain.members.membersFeatureList.enforce2FA',
         },
     ];
@@ -183,7 +194,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         {
             text: translate('domain.members.closeAccount', {count: selectedMembers.length}),
             value: CONST.DOMAIN.MEMBERS.BULK_ACTION_TYPES.CLOSE_ACCOUNT,
-            icon: icons.RemoveMembers,
+            icon: removeMembersIcon,
             shouldSkipFocusRestore: true,
             onSelected: () => {
                 showCloseAccountModal();
@@ -192,7 +203,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
         {
             text: translate('domain.members.moveToGroup'),
             value: CONST.DOMAIN.MEMBERS.BULK_ACTION_TYPES.MOVE_TO_GROUP,
-            icon: icons.Transfer,
+            icon: transferIcon,
             onSelected: () => {
                 setDomainMembersSelectedForMove(selectedMembers);
                 Navigation.navigate(ROUTES.DOMAIN_MEMBERS_MOVE_TO_GROUP.getRoute(domainAccountID));
@@ -250,7 +261,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                     innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
                     style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow1, styles.mb3] : undefined}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('domain.members.addMember')}</Button.Text>
                 </Button>
                 <ButtonWithDropdownMenu
@@ -262,13 +273,13 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                         {
                             value: CONST.DOMAIN.MEMBERS.SECONDARY_ACTIONS.SETTINGS,
                             text: translate('domain.common.settings'),
-                            icon: icons.Gear,
+                            icon: gearIcon,
                             onSelected: () => Navigation.navigate(ROUTES.DOMAIN_MEMBERS_SETTINGS.getRoute(domainAccountID)),
                             brickRoadIndicator: hasSettingsErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
                         },
                         {
                             text: translate('spreadsheet.downloadCSV'),
-                            icon: icons.Download,
+                            icon: downloadIcon,
                             onSelected: onDownloadCSV,
                             value: CONST.DOMAIN.MEMBERS.SECONDARY_ACTIONS.SAVE_TO_CSV,
                         },
@@ -317,7 +328,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                                     Navigation.navigate(ROUTES.DOMAIN_MEMBERS_VERIFY.getRoute(domainAccountID));
                                 }}
                                 illustrationBackgroundColor={colors.ice800}
-                                illustration={illustrations.LaptopWithMembers}
+                                illustration={laptopWithMembersIllustration}
                                 illustrationStyle={styles.emptyStateSamlIllustration}
                                 illustrationContainerStyle={[styles.cardSectionIllustrationContainer, styles.justifyContentCenter, styles.pv5]}
                                 titleStyles={styles.textHeadlineH1}

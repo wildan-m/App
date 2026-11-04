@@ -128,7 +128,7 @@ function IOURequestEditReportCommon({
     shouldAutoFocusSearchInput = false,
     renderInContainer,
 }: IOURequestEditReportCommonProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Close', 'Document', 'DocumentMagicWand']);
+    const {Close: closeIcon, Document: documentIcon, DocumentMagicWand: documentMagicWandIcon} = useMemoizedLazyExpensifyIcons(['Close', 'Document', 'DocumentMagicWand']);
     const {inputCallbackRef} = useAutoFocusInput();
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const personalDetails = usePersonalDetails();
@@ -373,7 +373,7 @@ function IOURequestEditReportCommon({
             <MenuItem.Root onPress={handleCreateReport}>
                 <MenuItem.Row>
                     <MenuItem.Leading>
-                        <MenuItem.Icon src={icons.Document} />
+                        <MenuItem.Icon src={documentIcon} />
                     </MenuItem.Leading>
                     <MenuItem.Content>
                         <MenuItem.Title>{translate('report.newReport.createReport')}</MenuItem.Title>
@@ -415,7 +415,7 @@ function IOURequestEditReportCommon({
             <MenuItem.Root onPress={callFunctionIfActionIsAllowed(handleAutoReport, false, session)}>
                 <MenuItem.Row>
                     <MenuItem.Leading>
-                        <MenuItem.Icon src={icons.DocumentMagicWand} />
+                        <MenuItem.Icon src={documentMagicWandIcon} />
                     </MenuItem.Leading>
                     <MenuItem.Content>
                         <MenuItem.Title>{translate('iou.autoReport')}</MenuItem.Title>
@@ -469,7 +469,7 @@ function IOURequestEditReportCommon({
                     <MenuItem.Root onPress={removeFromReport}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Close} />
+                                <MenuItem.Icon src={closeIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>{translate('iou.removeFromReport')}</MenuItem.Title>

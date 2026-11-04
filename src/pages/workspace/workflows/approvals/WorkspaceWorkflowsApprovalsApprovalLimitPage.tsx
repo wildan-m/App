@@ -50,7 +50,7 @@ type WorkspaceWorkflowsApprovalsApprovalLimitPageProps = WithPolicyAndFullscreen
 function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportData = true, route}: WorkspaceWorkflowsApprovalsApprovalLimitPageProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const [approvalWorkflow] = useOnyx(ONYXKEYS.APPROVAL_WORKFLOW);
     const personalDetailsByEmail = usePersonalDetailsByEmail();
     const {getCurrencyDecimals} = useCurrencyListActions();
@@ -300,7 +300,7 @@ function WorkspaceWorkflowsApprovalsApprovalLimitPage({policy, isLoadingReportDa
                                 <MenuItemSectionRoot onPress={handleSkip}>
                                     <MenuItem.Row>
                                         <MenuItem.Leading>
-                                            <MenuItem.Icon src={icons.Trashcan} />
+                                            <MenuItem.Icon src={trashcanIcon} />
                                         </MenuItem.Leading>
                                         <MenuItem.Content>
                                             <MenuItem.Title>{translate('workflowsApprovalLimitPage.removeLimit')}</MenuItem.Title>

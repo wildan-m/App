@@ -42,7 +42,7 @@ function ReportDetailsMenuMembersOrInviteItem({reportID}: ReportDetailsMenuMembe
     const {translate} = useLocalize();
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Users']);
+    const {Users: usersIcon} = useMemoizedLazyExpensifyIcons(['Users']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {selector: pendingChatMembersSelector});
@@ -106,7 +106,7 @@ function ReportDetailsMenuMembersOrInviteItem({reportID}: ReportDetailsMenuMembe
             >
                 <MenuItem.Row>
                     <MenuItem.Leading>
-                        <MenuItem.Icon src={expensifyIcons.Users} />
+                        <MenuItem.Icon src={usersIcon} />
                     </MenuItem.Leading>
                     <MenuItem.Content>
                         <MenuItem.Title>{translate('common.members')}</MenuItem.Title>
@@ -124,7 +124,7 @@ function ReportDetailsMenuMembersOrInviteItem({reportID}: ReportDetailsMenuMembe
         return (
             <MenuItemNavigation
                 title={translate('common.invite')}
-                icon={expensifyIcons.Users}
+                icon={usersIcon}
                 onPress={() => {
                     Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.ROOM_INVITE.path));
                 }}

@@ -38,7 +38,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
     const {translate, dateFnsLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCard', 'ReceiptBody', 'CreditCardExclamation']);
+    const {CreditCard: creditCardIcon, CreditCardExclamation: creditCardExclamationIcon} = useMemoizedLazyExpensifyIcons(['CreditCard', 'ReceiptBody', 'CreditCardExclamation']);
     const {convertToDisplayString, convertToDisplayStringWithoutCurrency} = useCurrencyListActions();
 
     const reportPreviewStyles = StyleUtils.getMoneyRequestReportPreviewStyle(shouldUseNarrowLayout, 1);
@@ -75,7 +75,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
         primaryColor: colorStyles?.backgroundColor,
         secondaryColor: colorStyles?.color,
         titleColor: colorStyles?.titleColor,
-        MCCIcon: icons.CreditCardExclamation,
+        MCCIcon: creditCardExclamationIcon,
         backgroundImage: eReceiptBGs.EReceiptBGGreen,
         titleText: translate('multifactorAuthentication.reviewTransaction.attemptedTransaction'),
     };
@@ -113,7 +113,7 @@ function AuthorizeCardTransactionPreview({transactionID, amount, currency, merch
                             {shouldShowCardEnding && (
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}>
                                     <Icon
-                                        src={icons.CreditCard}
+                                        src={creditCardIcon}
                                         height={variables.iconSizeExtraSmall}
                                         width={variables.iconSizeExtraSmall}
                                         fill={theme.icon}

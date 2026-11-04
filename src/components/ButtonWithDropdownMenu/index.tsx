@@ -99,7 +99,7 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
         shouldPutHeaderTextAfterBackButton = false,
     } = props;
 
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'DotIndicator']);
+    const {DownArrow: downArrowIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'DotIndicator']);
     const hasError = brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -127,7 +127,7 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
         dropdownArrowIconSize = CONST.ICON_SIZE.MEDIUM;
     }
     const shouldShowButtonRightIcon = !!options.at(0)?.shouldShowButtonRightIcon;
-    const splitButtonIcon = hasError ? icons.DotIndicator : icon;
+    const splitButtonIcon = hasError ? dotIndicatorIcon : icon;
     const singleOptionButtonIcon = shouldUseOptionIcon && !shouldShowButtonRightIcon ? options.at(0)?.icon : icon;
     const rightOptionIcon = options.at(0)?.icon;
 
@@ -251,7 +251,7 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
                         )}
                         {!isSplitButton && !isLoading && options?.length > 0 && (
                             <Button.Icon
-                                src={icons.DownArrow}
+                                src={downArrowIcon}
                                 style={isMenuVisible ? styles.flipUpsideDown : undefined}
                                 fill={hasError ? theme.buttonIcon : undefined}
                                 hoverFill={hasError ? theme.buttonIcon : undefined}
@@ -283,7 +283,7 @@ function ButtonWithDropdownMenu<IValueType>({ref, ...props}: ButtonWithDropdownM
                                 >
                                     <IconComponent
                                         size={dropdownArrowIconSize}
-                                        src={icons.DownArrow}
+                                        src={downArrowIcon}
                                         additionalStyles={[...(shouldUseShortForm ? [styles.pRelative, styles.t0] : []), isMenuVisible ? styles.flipUpsideDown : undefined]}
                                         fill={variant === CONST.BUTTON_VARIANT.SUCCESS ? theme.buttonSuccessText : theme.buttonIcon}
                                         testID="dropdown-arrow-icon"

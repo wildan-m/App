@@ -39,8 +39,8 @@ function RulesAgentsTab({policyID, canWriteRules, showReadOnlyModal, headerCompo
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isOffline} = useNetwork();
     const policy = usePolicy(policyID);
-    const illustrations = useMemoizedLazyIllustrations(['AgentsIceCream']);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {AgentsIceCream: agentsIceCreamIllustration} = useMemoizedLazyIllustrations(['AgentsIceCream']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const visibleRules = getVisibleAgentRules(policy?.rules?.agentRules, isOffline);
     const hasRules = visibleRules.length > 0;
@@ -68,7 +68,7 @@ function RulesAgentsTab({policyID, canWriteRules, showReadOnlyModal, headerCompo
                 {headerComponent}
                 <View style={[styles.flexGrow1, styles.justifyContentCenter, styles.w100]}>
                     <GenericEmptyStateComponent
-                        headerMedia={illustrations.AgentsIceCream}
+                        headerMedia={agentsIceCreamIllustration}
                         headerStyles={styles.emptyStateCardIllustrationContainer}
                         headerContentStyles={styles.agentsRulesEmptyStateIllustration}
                         title={translate('workspace.rules.agentRulesEmptyState.title')}
@@ -82,7 +82,7 @@ function RulesAgentsTab({policyID, canWriteRules, showReadOnlyModal, headerCompo
                                 buttonText: translate('workspace.rules.agentRulesEmptyState.cta'),
                                 buttonAction: handleAddAgentRule,
                                 buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,
-                                icon: icons.Plus,
+                                icon: plusIcon,
                                 isDisabled: !canWriteRules,
                             },
                         ]}
@@ -121,7 +121,7 @@ function RulesAgentsTab({policyID, canWriteRules, showReadOnlyModal, headerCompo
                         >
                             <MenuItem.Row>
                                 <MenuItem.Leading>
-                                    <MenuItem.Icon src={icons.Plus} />
+                                    <MenuItem.Icon src={plusIcon} />
                                 </MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>{translate('workspace.rules.agentRules.addRule')}</MenuItem.Title>

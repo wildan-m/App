@@ -108,7 +108,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
     const workspaceAccountID = policy?.policyAccountID ?? CONST.DEFAULT_NUMBER_ID;
 
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info', 'Transfer']);
+    const {RemoveMembers: removeMembersIcon, Info: infoIcon, Transfer: transferIcon} = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info', 'Transfer']);
     const styles = useThemeStyles();
     const {isBetaEnabled} = usePermissions();
     const isWorkArrangementBetaEnabled = isBetaEnabled(CONST.BETAS.COMMUTER_EXCLUSIONS_ARRANGEMENTS);
@@ -426,7 +426,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                         onPress={startChangeOwnershipFlow}
                                         style={styles.mb5}
                                     >
-                                        <Button.Icon src={icons.Transfer} />
+                                        <Button.Icon src={transferIcon} />
                                         <Button.Text>{translate('workspace.people.transferOwner')}</Button.Text>
                                     </ButtonDisabledWhenOffline>
                                 )
@@ -436,7 +436,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                                     isDisabled={!canRemoveSelectedMember}
                                     style={styles.mb5}
                                 >
-                                    <Button.Icon src={icons.RemoveMembers} />
+                                    <Button.Icon src={removeMembersIcon} />
                                     <Button.Text>{translate('workspace.people.removeWorkspaceMemberButtonTitle')}</Button.Text>
                                 </Button>
                             )}
@@ -547,7 +547,7 @@ function WorkspaceMemberDetailsPage({personalDetails, policy, route}: WorkspaceM
                             <View style={styles.mb5}>
                                 <MenuItemNavigation
                                     title={translate('common.profile')}
-                                    icon={icons.Info}
+                                    icon={infoIcon}
                                     onPress={navigateToProfile}
                                     testID="member-profile-menu-item"
                                 />

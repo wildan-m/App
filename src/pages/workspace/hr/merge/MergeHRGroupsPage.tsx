@@ -45,7 +45,7 @@ function MergeHRGroupsPage({
 }: MergeHRGroupsPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policy = usePolicy(policyID);
     const availableGroups = policy?.connections?.merge_hris?.data?.groups ?? [];
@@ -114,7 +114,7 @@ function MergeHRGroupsPage({
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.hr.mergeHR.groups.noGroupsFound')}

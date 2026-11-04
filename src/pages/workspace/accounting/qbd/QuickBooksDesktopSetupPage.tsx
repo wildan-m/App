@@ -40,7 +40,10 @@ function RequireQuickBooksDesktopModal({route}: RequireQuickBooksDesktopModalPro
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {environmentURL} = useEnvironment();
-    const illustrations = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass', 'LaptopWithSecondScreenSync']);
+    const {BrokenMagnifyingGlass: brokenMagnifyingGlassIllustration, LaptopWithSecondScreenSync: laptopWithSecondScreenSyncIllustration} = useMemoizedLazyIllustrations([
+        'BrokenMagnifyingGlass',
+        'LaptopWithSecondScreenSync',
+    ]);
     const policyID: string = route.params.policyID;
     const [hasError, setHasError] = useState(false);
     const [codatSetupLink, setCodatSetupLink] = useState<string>('');
@@ -92,7 +95,7 @@ function RequireQuickBooksDesktopModal({route}: RequireQuickBooksDesktopModalPro
             {shouldShowError && (
                 <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter, styles.ph5, styles.mb9]}>
                     <Icon
-                        src={illustrations.BrokenMagnifyingGlass}
+                        src={brokenMagnifyingGlassIllustration}
                         width={116}
                         height={168}
                     />
@@ -105,7 +108,7 @@ function RequireQuickBooksDesktopModal({route}: RequireQuickBooksDesktopModalPro
             {!shouldShowError && (
                 <View style={[styles.flex1, styles.ph5]}>
                     <View style={[styles.alignSelfCenter, styles.computerIllustrationContainer, styles.pv6]}>
-                        <ImageSVG src={illustrations.LaptopWithSecondScreenSync} />
+                        <ImageSVG src={laptopWithSecondScreenSyncIllustration} />
                     </View>
 
                     <Text style={[styles.textHeadlineH1, styles.pt5]}>{translate('workspace.qbd.setupPage.title')}</Text>

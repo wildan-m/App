@@ -14,7 +14,7 @@ type AmountSignFlipButtonProps = Pick<ButtonProps, 'isDisabled' | 'onPress' | 's
 
 /** Presentational sign toggle button shared by KeypadAmountEditor and AmountFormField. */
 function AmountSignFlipButton({isDisabled = false, onPress, style, testID, shouldShowLabel = true}: AmountSignFlipButtonProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['PlusMinus']);
+    const {PlusMinus: plusMinusIcon} = useMemoizedLazyExpensifyIcons(['PlusMinus']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const label = translate('iou.flip');
@@ -31,7 +31,7 @@ function AmountSignFlipButton({isDisabled = false, onPress, style, testID, shoul
             style={style}
             testID={testID}
         >
-            <Button.Icon src={icons.PlusMinus} />
+            <Button.Icon src={plusMinusIcon} />
             {shouldShowLabel && <Button.Text>{label}</Button.Text>}
         </Button>
     );

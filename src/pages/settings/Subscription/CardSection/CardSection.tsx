@@ -61,8 +61,8 @@ function CardSection() {
     const route = useRoute();
     const {translate, dateFnsLocale} = useLocalize();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['History', 'Bill', 'Close']);
-    const illustrations = useMemoizedLazyIllustrations(['CreditCardEyes']);
+    const {History: historyIcon, Bill: billIcon, Close: closeIcon2} = useMemoizedLazyExpensifyIcons(['History', 'Bill', 'Close']);
+    const {CreditCardEyes: creditCardEyesIllustration} = useMemoizedLazyIllustrations(['CreditCardEyes']);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [earlyRenewalEligibility, earlyRenewalEligibilityMetadata] = useOnyx(ONYXKEYS.EARLY_RENEWAL_OFFER_ELIGIBILITY);
     const {isNonIncentivizedPeriod, isIncentivizedPeriod} = useEarlyRenewalPeriod();
@@ -125,8 +125,8 @@ function CardSection() {
             billingDisputePending,
             retryBillingFailed: subscriptionRetryBillingStatusFailed,
             billingStatus: billingStatusOnyx,
-            creditCardEyesIcon: illustrations.CreditCardEyes,
-            closeIcon: expensifyIcons.Close,
+            creditCardEyesIcon: creditCardEyesIllustration,
+            closeIcon: closeIcon2,
             fundList,
             amountOwed,
             ownerBillingGracePeriodEnd,
@@ -157,8 +157,8 @@ function CardSection() {
                 billingDisputePending,
                 retryBillingFailed: subscriptionRetryBillingStatusFailed,
                 billingStatus: billingStatusOnyx,
-                creditCardEyesIcon: illustrations.CreditCardEyes,
-                closeIcon: expensifyIcons.Close,
+                creditCardEyesIcon: creditCardEyesIllustration,
+                closeIcon: closeIcon2,
                 fundList,
                 amountOwed,
                 ownerBillingGracePeriodEnd,
@@ -176,8 +176,8 @@ function CardSection() {
         purchaseList,
         billingDisputePending,
         billingStatusOnyx,
-        illustrations.CreditCardEyes,
-        expensifyIcons.Close,
+        creditCardEyesIllustration,
+        closeIcon2,
         fundList,
         amountOwed,
         ownerBillingGracePeriodEnd,
@@ -281,7 +281,7 @@ function CardSection() {
                     sentryLabel={CONST.SENTRY_LABEL.SETTINGS_SUBSCRIPTION.VIEW_PAYMENT_HISTORY}
                 >
                     <MenuItem.Row>
-                        <MenuItem.Icon src={expensifyIcons.History} />
+                        <MenuItem.Icon src={historyIcon} />
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('subscription.cardSection.viewPaymentHistory')}</MenuItem.Title>
                         </MenuItem.Content>
@@ -305,7 +305,7 @@ function CardSection() {
                     sentryLabel={CONST.SENTRY_LABEL.SETTINGS_SUBSCRIPTION.REQUEST_REFUND}
                 >
                     <MenuItem.Row>
-                        <MenuItem.Icon src={expensifyIcons.Bill} />
+                        <MenuItem.Icon src={billIcon} />
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('subscription.cardSection.requestRefund')}</MenuItem.Title>
                         </MenuItem.Content>

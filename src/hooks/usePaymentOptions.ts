@@ -61,7 +61,16 @@ function usePaymentOptions({
     shouldDisableApproveButton = false,
     onlyShowPayElsewhere,
 }: UsePaymentOptionsProps): PaymentOrApproveOption[] {
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'User', 'ThumbsUp', 'Bank', 'Wallet', 'Cash', 'CheckCircle']);
+    const {
+        Building: buildingIcon,
+        User: userIcon,
+        ThumbsUp: thumbsUpIcon,
+        Bank: bankIcon,
+        Wallet: walletIcon,
+        Cash: cashIcon,
+        CheckCircle: checkCircleIcon,
+    } = useMemoizedLazyExpensifyIcons(['Building', 'User', 'ThumbsUp', 'Bank', 'Wallet', 'Cash', 'CheckCircle']);
+    const icons = {Building: buildingIcon, User: userIcon, ThumbsUp: thumbsUpIcon, Bank: bankIcon, Wallet: walletIcon, Cash: cashIcon, CheckCircle: checkCircleIcon};
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     // The app would crash due to subscribing to the entire report collection if chatReportID is an empty string. So we should have a fallback ID here.
@@ -116,23 +125,23 @@ function usePaymentOptions({
         const paymentMethods = {
             [CONST.IOU.PAYMENT_TYPE.EXPENSIFY]: {
                 text: hasActivatedWallet || hasPersonalBankAccount ? translate('iou.settleWallet', '') : translate('iou.settlePersonal', ''),
-                icon: hasActivatedWallet || hasPersonalBankAccount ? icons.Wallet : icons.User,
+                icon: hasActivatedWallet || hasPersonalBankAccount ? walletIcon : userIcon,
                 value: CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
             },
             [CONST.IOU.PAYMENT_TYPE.VBBA]: {
                 text: translate('iou.settleBusiness', formattedAmount),
-                icon: icons.Building,
+                icon: buildingIcon,
                 value: CONST.IOU.PAYMENT_TYPE.VBBA,
             },
             [CONST.IOU.PAYMENT_TYPE.ELSEWHERE]: {
                 text: translate('iou.payElsewhere', formattedAmount),
-                icon: icons.CheckCircle,
+                icon: checkCircleIcon,
                 value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
             },
         };
         const approveButtonOption = {
             text: translate('iou.approve', {formattedAmount}),
-            icon: icons.ThumbsUp,
+            icon: thumbsUpIcon,
             value: CONST.IOU.REPORT_ACTION_TYPE.APPROVE,
             disabled: !!shouldDisableApproveButton,
         };
@@ -188,7 +197,7 @@ function usePaymentOptions({
 
             const addBankAccountItem = {
                 text: translate('bankAccount.addBankAccount'),
-                icon: icons.Bank,
+                icon: bankIcon,
                 onSelected: () => {
                     const bankAccountRoute = getBankAccountRoute(chatReport, areInvoicesEnabled);
                     Navigation.navigate(bankAccountRoute);
@@ -198,14 +207,14 @@ function usePaymentOptions({
             if (isIndividualInvoiceRoomUtil(chatReport)) {
                 buttonOptions.push({
                     text: translate('iou.settlePersonal', formattedAmount),
-                    icon: icons.User,
+                    icon: userIcon,
                     value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                     backButtonText: translate('iou.individual'),
                     subMenuItems: [
                         ...(showPayViaExpensifyOptions ? getPaymentSubItems(false) : []),
                         {
                             text: translate('iou.payElsewhere', ''),
-                            icon: icons.Cash,
+                            icon: cashIcon,
                             value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                             onSelected: () => onPress({paymentType: CONST.IOU.PAYMENT_TYPE.ELSEWHERE}),
                         },
@@ -216,7 +225,7 @@ function usePaymentOptions({
 
             buttonOptions.push({
                 text: translate('iou.settleBusiness', formattedAmount),
-                icon: icons.Building,
+                icon: buildingIcon,
                 value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                 backButtonText: translate('iou.business'),
                 subMenuItems: [
@@ -224,7 +233,7 @@ function usePaymentOptions({
                     ...(showPayViaExpensifyOptions ? [addBankAccountItem] : []),
                     {
                         text: translate('iou.payElsewhere', ''),
-                        icon: icons.Cash,
+                        icon: cashIcon,
                         value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                         onSelected: () => onPress({paymentType: CONST.IOU.PAYMENT_TYPE.ELSEWHERE, payAsBusiness: true}),
                     },

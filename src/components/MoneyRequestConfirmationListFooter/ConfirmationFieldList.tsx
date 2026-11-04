@@ -75,7 +75,7 @@ function ConfirmationFieldList({
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles', 'DownArrow']);
+    const {Sparkles: sparklesIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['Sparkles', 'DownArrow']);
     const {action, iouType, transactionID, isReadOnly, isPolicyExpenseChat, isDistanceRequest, isPerDiemRequest, isTimeRequest, isTypeInvoice} = useConfirmationFields();
     const {shouldUseDropdownRows} = useExpenseFormLayout();
     const policyTagLists = getTagLists(policyTags);
@@ -141,7 +141,7 @@ function ConfirmationFieldList({
                 {compactState.isCompactMode && (
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.pl5, styles.gap2, styles.mb2, styles.pr10]}>
                         <Icon
-                            src={icons.Sparkles}
+                            src={sparklesIcon}
                             fill={theme.icon}
                             width={variables.iconSizeNormal}
                             height={variables.iconSizeNormal}
@@ -187,7 +187,7 @@ function ConfirmationFieldList({
                             innerStyles={[styles.hoveredComponentBG, styles.pv2, styles.pl3]}
                         >
                             <Button.Text>{translate('common.showMore')}</Button.Text>
-                            <Button.Icon src={icons.DownArrow} />
+                            <Button.Icon src={downArrowIcon} />
                         </Button>
                     </View>
                 )}

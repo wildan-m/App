@@ -40,7 +40,7 @@ function DynamicReconciliationFeedSelectorPage({route}: DynamicReconciliationFee
     const {policyID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
+    const {ExpensifyCardImage: expensifyCardImageIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_ACCOUNTING_RECONCILIATION_SELECT_FEED.path);
 
     const {candidates, fundID: selectedFundID} = useReconciliationFundID(policyID);
@@ -57,7 +57,7 @@ function DynamicReconciliationFeedSelectorPage({route}: DynamicReconciliationFee
         isSelected: entry.fundID === selectedFundID,
         leftElement: (
             <Icon
-                src={illustrations.ExpensifyCardImage}
+                src={expensifyCardImageIllustration}
                 height={variables.cardIconHeight}
                 width={variables.cardIconWidth}
                 additionalStyles={[styles.mr3, styles.cardIcon]}

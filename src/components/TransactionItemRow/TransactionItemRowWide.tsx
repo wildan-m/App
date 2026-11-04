@@ -159,7 +159,7 @@ function TransactionItemRowWide({
     const getSearchColumnStyles = useSearchColumnStyles();
     const theme = useTheme();
     const [hasFilterValues] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: searchHasFilterSelector});
-    const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isDeletedTransaction = isDeletedTransactionUtil(transactionItem);
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const reportPolicyID = [report?.policyID, transactionItem.report?.policyID, transactionItem.policyID, transactionItem.policy?.id].find((policyID): policyID is string => !!policyID);
@@ -798,7 +798,7 @@ function TransactionItemRowWide({
                             sentryLabel={CONST.SENTRY_LABEL.TRANSACTION_ITEM_ROW.ARROW_RIGHT}
                         >
                             <Icon
-                                src={expensicons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={!isHover && styles.opacitySemiTransparent}
                                 width={variables.iconSizeNormal}

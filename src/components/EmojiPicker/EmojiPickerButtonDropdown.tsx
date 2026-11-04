@@ -42,7 +42,7 @@ function EmojiPickerButtonDropdown({isDisabled = false, withoutOverlay = false, 
     const StyleUtils = useStyleUtils();
     const emojiPopoverAnchor = useRef(null);
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Emoji']);
+    const {ArrowRight: arrowRightIcon, Emoji: emojiIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Emoji']);
 
     useEffect(() => resetEmojiPopoverAnchor, []);
     const onPress = () => {
@@ -90,14 +90,14 @@ function EmojiPickerButtonDropdown({isDisabled = false, withoutOverlay = false, 
                         ) : (
                             <View style={styles.emojiPickerButtonDropdownIcon}>
                                 <Icon
-                                    src={icons.Emoji}
+                                    src={emojiIcon}
                                     fill={StyleUtils.getIconFillColor({buttonState: CONST.BUTTON_STATES.DISABLED})}
                                 />
                             </View>
                         )}
                         <View style={[styles.popoverMenuIcon, styles.pointerEventsAuto, disabled && styles.cursorDisabled, styles.rotate90]}>
                             <Icon
-                                src={icons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered, isPressed: pressed})})}
                             />
                         </View>

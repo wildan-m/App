@@ -31,7 +31,7 @@ function NetSuiteCollectionAccountSelectPage({policy}: WithPolicyConnectionsProp
     const {translate} = useLocalize();
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const config = policy?.connections?.netsuite?.options.config;
     const netsuiteCollectionAccountOptions: SelectorType[] = getNetSuiteCollectionAccountOptions(policy ?? undefined, config?.collectionAccount);
@@ -47,7 +47,7 @@ function NetSuiteCollectionAccountSelectPage({policy}: WithPolicyConnectionsProp
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noAccountsFound')}

@@ -37,7 +37,7 @@ function AgentsPage() {
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const selectionModeHeader = isMobileSelectionModeEnabled && shouldUseNarrowLayout;
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Trashcan']);
+    const {Plus: plusIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Trashcan']);
     const {agents, selectedAgentKeys, setSelectedAgents, clearSelectedAgents, askForConfirmationToDelete, tableRef} = useAgentsTable();
     const hasAgents = agents.length > 0;
     const canSelectMultiple = shouldUseNarrowLayout ? isMobileSelectionModeEnabled : true;
@@ -51,13 +51,13 @@ function AgentsPage() {
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.AGENT_NEW.getRoute()))}
         >
-            <Button.Icon src={icons.Plus} />
+            <Button.Icon src={plusIcon} />
             <Button.Text>{translate('agentsPage.newAgent')}</Button.Text>
         </Button>
     ) : null;
     const emptyStateButtons = [
         {
-            icon: icons.Plus,
+            icon: plusIcon,
             buttonText: translate('agentsPage.newAgent'),
             buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,
             buttonAction: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.AGENT_NEW.getRoute())),
@@ -68,7 +68,7 @@ function AgentsPage() {
         {
             text: translate('agentsPage.deleteAgentsTitle', {count: selectedAgentKeys.length}),
             value: CONST.AGENTS.BULK_ACTION_TYPES.DELETE,
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             shouldSkipFocusRestore: true,
             onSelected: askForConfirmationToDelete,
         },

@@ -47,7 +47,7 @@ import DeleteWorkspaceFlow from './deleteWorkspace/DeleteWorkspaceFlow';
 
 function WorkspacesListPage() {
     const tableRef = useRef<TableHandle<WorkspaceRowData, WorkspaceTableColumnKey, string>>(null);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     useDocumentTitle(translate('common.workspaces'));
@@ -227,7 +227,7 @@ function WorkspacesListPage() {
             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.LIST.NEW_WORKSPACE_BUTTON}
             onPress={() => interceptAnonymousUser(() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CONFIRMATION.path, ROUTES.WORKSPACES_LIST.route)), session)}
         >
-            <Button.Icon src={icons.Plus} />
+            <Button.Icon src={plusIcon} />
             <Button.Text>{translate('common.new')}</Button.Text>
         </Button>
     );

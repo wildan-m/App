@@ -29,7 +29,7 @@ type TwoFactorAuthSecretDisplayProps = {
 function TwoFactorAuthSecretDisplay({contactMethod, secretKey, description}: TwoFactorAuthSecretDisplayProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const {Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Copy']);
 
     return (
         <>
@@ -61,7 +61,7 @@ function TwoFactorAuthSecretDisplay({contactMethod, secretKey, description}: Two
                     tooltipText=""
                     tooltipTextChecked=""
                     accessibilityLabel={translate('twoFactorAuth.copy')}
-                    icon={icons.Copy}
+                    icon={copyIcon}
                     inline={false}
                     onPress={() => Clipboard.setString(secretKey)}
                     styles={[styles.button, styles.buttonMedium, styles.twoFactorAuthCopyCodeButton]}

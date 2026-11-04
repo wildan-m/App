@@ -41,7 +41,7 @@ type PersonalExpenseRulesTableProps = {
 
 export default function PersonalExpenseRulesTable({headerComponent, personalExpenseRules, selectedKeys, onRowSelectionChange}: PersonalExpenseRulesTableProps) {
     const {translate, localeCompare} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
 
     const personalExpenseRulesTableColumns: Array<TableColumn<PersonalExpenseRulesTableColumnKey>> = [
@@ -121,7 +121,7 @@ export default function PersonalExpenseRulesTable({headerComponent, personalExpe
                     {
                         buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,
                         buttonAction: navigateToNewRulePage,
-                        icon: icons.Plus,
+                        icon: plusIcon,
                         buttonText: translate('expenseRulesPage.newRule'),
                     },
                 ]}

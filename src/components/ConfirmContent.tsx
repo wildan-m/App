@@ -139,7 +139,7 @@ function ConfirmContent({
     const {translate} = useLocalize();
     const theme = useTheme();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true});
     const {isContentWrappedInScrollView} = useContext(ModalContext);
 
@@ -189,7 +189,7 @@ function ConfirmContent({
                             >
                                 <Icon
                                     fill={theme.icon}
-                                    src={icons.Close}
+                                    src={closeIcon}
                                 />
                             </PressableWithoutFeedback>
                         </Tooltip>

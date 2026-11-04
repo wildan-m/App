@@ -48,7 +48,7 @@ import {View} from 'react-native';
 import type {BaseOnboardingWorkspacesProps} from './types';
 
 function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboardingWorkspacesProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -496,7 +496,7 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
                             >
                                 <LinkButton.Text style={styles.fontSizeNormal}>{translate('common.showMore')}</LinkButton.Text>
                                 <LinkButton.Icon
-                                    src={icons.DownArrow}
+                                    src={downArrowIcon}
                                     fill={theme.link}
                                     hoverFill={theme.linkHover}
                                 />

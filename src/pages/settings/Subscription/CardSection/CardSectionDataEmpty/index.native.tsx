@@ -15,12 +15,12 @@ function CardSectionDataEmpty() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCardExclamation']);
+    const {CreditCardExclamation: creditCardExclamationIcon} = useMemoizedLazyExpensifyIcons(['CreditCardExclamation']);
 
     return (
         <View style={[styles.mt8, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
             <Icon
-                src={icons.CreditCardExclamation}
+                src={creditCardExclamationIcon}
                 additionalStyles={styles.subscriptionCardIcon}
                 fill={theme.icon}
                 size={CONST.ICON_SIZE.MEDIUM}

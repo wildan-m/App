@@ -136,7 +136,16 @@ function resolveMemberAccountID(email: string, policyMemberEmailsToAccountIDs: M
 function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembersPageProps) {
     useWorkspaceDocumentTitle(policy?.name, 'common.members');
     const tableRef = useRef<TableHandle<WorkspaceMemberRowData, WorkspaceMembersTableColumnKey, string>>(null);
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'Download', 'FallbackAvatar', 'Location', 'Plus', 'RemoveMembers', 'Sync', 'Table', 'UserPencil']);
+    const {
+        Building: buildingIcon,
+        Download: downloadIcon,
+        Location: locationIcon,
+        Plus: plusIcon,
+        RemoveMembers: removeMembersIcon,
+        Sync: syncIcon,
+        Table: tableIcon,
+        UserPencil: userPencilIcon,
+    } = useMemoizedLazyExpensifyIcons(['Building', 'Download', 'FallbackAvatar', 'Location', 'Plus', 'RemoveMembers', 'Sync', 'Table', 'UserPencil']);
     const employeePersonalDetails = usePersonalDetailsByLogins(Object.keys(policy?.employeeList ?? {}));
     const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList, employeePersonalDetails, true);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -611,7 +620,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push({
                 text: translate('workspace.people.changeRole'),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.CHANGE_ROLE,
-                icon: icons.UserPencil,
+                icon: userPencilIcon,
                 shouldSkipFocusRestore: true,
                 onSelected: () => {
                     setMembersSelectedForRoleChange(policyID, selectedEmployees);
@@ -624,7 +633,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push({
                 text: translate('workspace.people.changeOfficeLocation'),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.CHANGE_OFFICE_LOCATION,
-                icon: icons.Location,
+                icon: locationIcon,
                 onSelected: () => editSelectedEmployees(ROUTES.WORKSPACE_MEMBERS_CHANGE_OFFICE_LOCATION.getRoute(policyID)),
             });
         }
@@ -637,7 +646,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push({
                 text: translate('workspace.people.changeWorkArrangement'),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.CHANGE_WORK_ARRANGEMENT,
-                icon: icons.Building,
+                icon: buildingIcon,
                 onSelected: () => editSelectedEmployees(ROUTES.WORKSPACE_MEMBERS_CHANGE_WORK_ARRANGEMENT.getRoute(policyID)),
             });
         }
@@ -646,7 +655,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             options.push({
                 text: translate('workspace.people.removeMembersTitle', {count: selectedEmployees.length}),
                 value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.REMOVE,
-                icon: icons.RemoveMembers,
+                icon: removeMembersIcon,
                 shouldSkipFocusRestore: true,
                 onSelected: askForConfirmationToRemove,
             });
@@ -671,7 +680,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
     } else {
         const menuItems: Array<DropdownOption<ValueOf<typeof CONST.POLICY.SECONDARY_ACTIONS>>> = [
             {
-                icon: icons.Table,
+                icon: tableIcon,
                 text: translate('spreadsheet.importSpreadsheet'),
                 onSelected: () => {
                     if (isAccountLocked) {
@@ -687,7 +696,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 value: CONST.POLICY.SECONDARY_ACTIONS.IMPORT_SPREADSHEET,
             },
             {
-                icon: icons.Download,
+                icon: downloadIcon,
                 text: translate('spreadsheet.downloadCSV'),
                 onSelected: () => {
                     if (isOffline) {
@@ -704,7 +713,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         const hrProvider = getConnectedHRProvider(policy);
         if (hrProvider) {
             menuItems.push({
-                icon: icons.Sync,
+                icon: syncIcon,
                 text: translate('workspace.people.syncWithHR', hrProvider.displayName),
                 onSelected: () => {
                     if (isOffline) {
@@ -757,7 +766,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
                     style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('workspace.invite.member')}</Button.Text>
                 </Button>
                 <ButtonWithDropdownMenu

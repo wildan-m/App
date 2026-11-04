@@ -110,7 +110,7 @@ function SuggestionMention({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isMentionSuggestionsMenuVisible = !!suggestionValues.suggestedMentions.length && suggestionValues.shouldShowSuggestionMenu;
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Megaphone', 'FallbackAvatar']);
+    const {Megaphone: megaphoneIcon, FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['Megaphone', 'FallbackAvatar']);
 
     const {currentReportID} = useCurrentReportIDState();
     const [currentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${currentReportID}`);
@@ -395,7 +395,7 @@ function SuggestionMention({
                     alternateText: translate('mentionSuggestions.hereAlternateText'),
                     icons: [
                         {
-                            source: expensifyIcons.Megaphone,
+                            source: megaphoneIcon,
                             type: CONST.ICON_TYPE_AVATAR,
                         },
                     ],
@@ -448,7 +448,7 @@ function SuggestionMention({
                     icons: [
                         {
                             name: detail?.login,
-                            source: detail?.avatar ?? expensifyIcons.FallbackAvatar,
+                            source: detail?.avatar ?? fallbackAvatarIcon,
                             type: CONST.ICON_TYPE_AVATAR,
                             fallbackIcon: detail?.fallbackIcon,
                             id: detail?.accountID,
@@ -462,8 +462,8 @@ function SuggestionMention({
         [
             localeCompare,
             translate,
-            expensifyIcons.Megaphone,
-            expensifyIcons.FallbackAvatar,
+            megaphoneIcon,
+            fallbackAvatarIcon,
             formatPhoneNumber,
             formatLoginPrivateDomain,
             personalDetails,

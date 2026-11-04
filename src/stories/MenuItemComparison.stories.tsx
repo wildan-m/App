@@ -144,12 +144,17 @@ function SectionHeading({title, children}: {title: string; children?: string}) {
 
 function Comparison() {
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'FallbackAvatar', 'NewWindow', 'Download']);
+    const {
+        Gear: gearIcon,
+        FallbackAvatar: fallbackAvatarIcon,
+        NewWindow: newWindowIcon,
+        Download: downloadIcon,
+    } = useMemoizedLazyExpensifyIcons(['Gear', 'FallbackAvatar', 'NewWindow', 'Download']);
 
     // The legacy external-link row anchors its context menu to the row itself, which the composable API does for the call site
     const popoverAnchor = useRef<ComponentRef<typeof View>>(null);
 
-    if (!icons.Gear || !icons.FallbackAvatar || !icons.NewWindow || !icons.Download) {
+    if (!gearIcon || !fallbackAvatarIcon || !newWindowIcon || !downloadIcon) {
         return null;
     }
 
@@ -291,7 +296,7 @@ function Comparison() {
                     <Section title="Share">
                         <MenuItem
                             title="Download"
-                            icon={icons.Download}
+                            icon={downloadIcon}
                             onPress={noop}
                             wrapperStyle={styles.sectionMenuItemTopDescription}
                         />
@@ -302,7 +307,7 @@ function Comparison() {
                         <MenuItemSectionRoot onPress={noop}>
                             <MenuItem.Row>
                                 <MenuItem.Leading>
-                                    <MenuItem.Icon src={icons.Download} />
+                                    <MenuItem.Icon src={downloadIcon} />
                                 </MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>Download</MenuItem.Title>
@@ -358,7 +363,7 @@ function Comparison() {
                     <MenuItem
                         title="CONF-12345"
                         description="Confirmation"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         interactive={false}
                         copyable
                     />
@@ -367,7 +372,7 @@ function Comparison() {
                     <MenuItem.Root>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>CONF-12345</MenuItem.Title>
@@ -387,8 +392,8 @@ function Comparison() {
                     <MenuItem
                         ref={popoverAnchor}
                         title="Android"
-                        icon={icons.Gear}
-                        iconRight={icons.NewWindow}
+                        icon={gearIcon}
+                        iconRight={newWindowIcon}
                         onPress={noop}
                         onSecondaryInteraction={(event) =>
                             showContextMenu({
@@ -408,7 +413,7 @@ function Comparison() {
                     <MenuItem.Root onPress={noop}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Android</MenuItem.Title>
@@ -957,7 +962,7 @@ function Comparison() {
                         label="Assignee"
                         avatarID={STORY_ACCOUNT_ID}
                         iconType={CONST.ICON_TYPE_AVATAR}
-                        icon={icons.FallbackAvatar}
+                        icon={fallbackAvatarIcon}
                         title="John Doe"
                         description="john@example.com"
                         titleWithTooltips={STORY_TOOLTIP_DETAILS}
@@ -973,7 +978,7 @@ function Comparison() {
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <UserAvatar
-                                    source={icons.FallbackAvatar}
+                                    source={fallbackAvatarIcon}
                                     accountID={STORY_ACCOUNT_ID}
                                 />
                             </MenuItem.Leading>
@@ -1004,7 +1009,7 @@ function Comparison() {
                             title="John Doe"
                             description="john.doe.with.a.very.long.email.address.for.truncation@example.com"
                             avatarID={STORY_ACCOUNT_ID}
-                            icon={icons.FallbackAvatar}
+                            icon={fallbackAvatarIcon}
                             iconType={CONST.ICON_TYPE_AVATAR}
                             numberOfLinesDescription={1}
                             interactive={false}
@@ -1017,7 +1022,7 @@ function Comparison() {
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <UserAvatar
-                                        source={icons.FallbackAvatar}
+                                        source={fallbackAvatarIcon}
                                         accountID={STORY_ACCOUNT_ID}
                                     />
                                 </MenuItem.Leading>
@@ -1038,7 +1043,7 @@ function Comparison() {
                         title="John Doe"
                         description="john@example.com"
                         avatarID={STORY_ACCOUNT_ID}
-                        icon={icons.FallbackAvatar}
+                        icon={fallbackAvatarIcon}
                         iconType={CONST.ICON_TYPE_AVATAR}
                         numberOfLinesDescription={1}
                         shouldShowRightIcon
@@ -1050,7 +1055,7 @@ function Comparison() {
                         <MenuItem.Row>
                             <MenuItem.Leading>
                                 <UserAvatar
-                                    source={icons.FallbackAvatar}
+                                    source={fallbackAvatarIcon}
                                     accountID={STORY_ACCOUNT_ID}
                                 />
                             </MenuItem.Leading>
@@ -1068,7 +1073,7 @@ function Comparison() {
                     <MenuItemAvatarNavigation
                         title="John Doe"
                         description="john@example.com"
-                        avatarSource={icons.FallbackAvatar}
+                        avatarSource={fallbackAvatarIcon}
                         accountID={STORY_ACCOUNT_ID}
                         onPress={noop}
                     />
@@ -1083,7 +1088,7 @@ function Comparison() {
                             <MenuItem
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
-                                icon={icons.FallbackAvatar}
+                                icon={fallbackAvatarIcon}
                                 iconType={CONST.ICON_TYPE_AVATAR}
                                 iconWidth={40}
                                 iconHeight={40}
@@ -1096,7 +1101,7 @@ function Comparison() {
                             <MenuItem
                                 title="John Doe"
                                 description="123 Main St, Springfield, IL 62704"
-                                icon={icons.FallbackAvatar}
+                                icon={fallbackAvatarIcon}
                                 iconType={CONST.ICON_TYPE_AVATAR}
                                 shouldShowRightIcon
                                 disabled
@@ -1189,7 +1194,7 @@ function Comparison() {
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
-                                icon={icons.FallbackAvatar}
+                                icon={fallbackAvatarIcon}
                                 iconType={CONST.ICON_TYPE_AVATAR}
                                 onPress={noop}
                             />
@@ -1199,7 +1204,7 @@ function Comparison() {
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
-                                icon={icons.FallbackAvatar}
+                                icon={fallbackAvatarIcon}
                                 iconType={CONST.ICON_TYPE_AVATAR}
                                 avatarSize={CONST.AVATAR_SIZE.SMALL}
                                 onPress={noop}
@@ -1210,7 +1215,7 @@ function Comparison() {
                                 title="John Doe"
                                 description="john@example.com"
                                 avatarID={STORY_ACCOUNT_ID}
-                                icon={icons.FallbackAvatar}
+                                icon={fallbackAvatarIcon}
                                 iconType={CONST.ICON_TYPE_AVATAR}
                                 avatarSize={CONST.AVATAR_SIZE.X_SMALL}
                                 onPress={noop}
@@ -1225,7 +1230,7 @@ function Comparison() {
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
-                                            source={icons.FallbackAvatar}
+                                            source={fallbackAvatarIcon}
                                             accountID={STORY_ACCOUNT_ID}
                                         />
                                     </MenuItem.Leading>
@@ -1241,7 +1246,7 @@ function Comparison() {
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
-                                            source={icons.FallbackAvatar}
+                                            source={fallbackAvatarIcon}
                                             accountID={STORY_ACCOUNT_ID}
                                             size={CONST.AVATAR_SIZE.SMALL}
                                         />
@@ -1258,7 +1263,7 @@ function Comparison() {
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
                                         <UserAvatar
-                                            source={icons.FallbackAvatar}
+                                            source={fallbackAvatarIcon}
                                             accountID={STORY_ACCOUNT_ID}
                                             size={CONST.AVATAR_SIZE.X_SMALL}
                                         />
@@ -1453,7 +1458,7 @@ function Comparison() {
                 legacy={
                     <MenuItem
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1461,7 +1466,7 @@ function Comparison() {
                     <MenuItem.Root onPress={noop}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1472,7 +1477,7 @@ function Comparison() {
                 preset={
                     <MenuItemAction
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1483,7 +1488,7 @@ function Comparison() {
                 legacy={
                     <MenuItem
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         shouldShowRightIcon
                         onPress={noop}
                     />
@@ -1492,7 +1497,7 @@ function Comparison() {
                     <MenuItem.Root onPress={noop}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1506,7 +1511,7 @@ function Comparison() {
                 preset={
                     <MenuItemNavigation
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1518,7 +1523,7 @@ function Comparison() {
                     <MenuItem
                         title="Settings"
                         description="Manage your preferences"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         shouldShowRightIcon
                         onPress={noop}
                     />
@@ -1527,7 +1532,7 @@ function Comparison() {
                     <MenuItem.Root onPress={noop}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1548,7 +1553,7 @@ function Comparison() {
                     <MenuItem
                         title="Create report"
                         description="Expensify Inc"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1556,7 +1561,7 @@ function Comparison() {
                     <MenuItem.Root onPress={noop}>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Create report</MenuItem.Title>
@@ -1634,7 +1639,7 @@ function Comparison() {
                 legacy={
                     <MenuItem
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         interactive={false}
                     />
                 }
@@ -1642,7 +1647,7 @@ function Comparison() {
                     <MenuItem.Root>
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1657,7 +1662,7 @@ function Comparison() {
                 legacy={
                     <MenuItem
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         shouldShowRightIcon
                         disabled
                         onPress={noop}
@@ -1670,7 +1675,7 @@ function Comparison() {
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1684,7 +1689,7 @@ function Comparison() {
                 preset={
                     <MenuItemNavigation
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         isDisabled
                         onPress={noop}
                     />
@@ -1696,7 +1701,7 @@ function Comparison() {
                 legacy={
                     <MenuItem
                         title="Settings"
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1707,7 +1712,7 @@ function Comparison() {
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Gear} />
+                                <MenuItem.Icon src={gearIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>Settings</MenuItem.Title>
@@ -1718,7 +1723,7 @@ function Comparison() {
                 preset={
                     <MenuItemAction
                         title={'Settings'}
-                        icon={icons.Gear}
+                        icon={gearIcon}
                         onPress={noop}
                     />
                 }
@@ -1730,7 +1735,7 @@ function Comparison() {
                     legacy={
                         <MenuItem
                             title="Edit columns"
-                            icon={icons.Gear}
+                            icon={gearIcon}
                             shouldShowRightIcon
                             onPress={noop}
                         />
@@ -1739,7 +1744,7 @@ function Comparison() {
                         <MenuItem.Root onPress={noop}>
                             <MenuItem.Row>
                                 <MenuItem.Leading>
-                                    <MenuItem.Icon src={icons.Gear} />
+                                    <MenuItem.Icon src={gearIcon} />
                                 </MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>Edit columns</MenuItem.Title>
@@ -1753,7 +1758,7 @@ function Comparison() {
                     preset={
                         <MenuItemNavigation
                             title="Edit columns"
-                            icon={icons.Gear}
+                            icon={gearIcon}
                             onPress={noop}
                         />
                     }
@@ -1767,7 +1772,7 @@ function Comparison() {
                         <MenuItem
                             title="Edit columns"
                             description="Choose what to display"
-                            icon={icons.Gear}
+                            icon={gearIcon}
                             shouldShowRightIcon
                             onPress={noop}
                         />
@@ -1776,7 +1781,7 @@ function Comparison() {
                         <MenuItem.Root onPress={noop}>
                             <MenuItem.Row>
                                 <MenuItem.Leading>
-                                    <MenuItem.Icon src={icons.Gear} />
+                                    <MenuItem.Icon src={gearIcon} />
                                 </MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>Edit columns</MenuItem.Title>

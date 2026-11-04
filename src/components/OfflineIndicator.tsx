@@ -31,7 +31,7 @@ function OfflineIndicator({style, containerStyles: containerStylesProp, addBotto
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
+    const {OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
 
     const fallbackStyle = [styles.offlineIndicatorContainer, containerStylesProp];
     const containerStyles = useBottomSafeSafeAreaPaddingStyle({
@@ -48,7 +48,7 @@ function OfflineIndicator({style, containerStyles: containerStylesProp, addBotto
         <View style={[containerStyles, styles.flexRow, styles.alignItemsCenter, style]}>
             <Icon
                 fill={theme.icon}
-                src={icons.OfflineCloud}
+                src={offlineCloudIcon}
                 width={variables.iconSizeSmall}
                 height={variables.iconSizeSmall}
             />

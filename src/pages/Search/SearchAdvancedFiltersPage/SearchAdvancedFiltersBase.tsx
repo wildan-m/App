@@ -43,7 +43,7 @@ function SearchAdvancedFiltersBase() {
     const StyleUtils = useStyleUtils();
     const {isBetaEnabled} = usePermissions();
     const canUseNLFilters = isBetaEnabled(CONST.BETAS.NL_FILTERS);
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles', 'ArrowRight']);
+    const {Sparkles: sparklesIcon, ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['Sparkles', 'ArrowRight']);
     const [filterSearchValue, debouncedFilterSearchValue, setFilterSearchValue] = useDebouncedState('', CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
     const allFilters = useAdvancedSearchFilters(currentDraftFilters.type);
     // A cleared input lists every filter at once rather than after the debounce, as in useSearchResults.
@@ -100,14 +100,14 @@ function SearchAdvancedFiltersBase() {
                                 {({pressed}) => (
                                     <>
                                         <Icon
-                                            src={icons.Sparkles}
+                                            src={sparklesIcon}
                                             fill={theme.icon}
                                             width={variables.iconSizeSmall}
                                             height={variables.iconSizeSmall}
                                         />
                                         <Text style={[styles.flex1]}>{translate('search.filters.describeSearch.title')}</Text>
                                         <Icon
-                                            src={icons.ArrowRight}
+                                            src={arrowRightIcon}
                                             fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isPressed: pressed})})}
                                             width={variables.iconSizeNormal}
                                             height={variables.iconSizeNormal}

@@ -32,8 +32,8 @@ function FileUpload({onPicked, shouldAcceptMultipleFiles = false, onLayout, isRe
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['ReceiptStack']);
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
+    const {ReceiptStack: receiptStackIllustration} = useMemoizedLazyIllustrations(['ReceiptStack']);
+    const {ReplaceReceipt: replaceReceiptIcon, SmartScan: smartScanIcon} = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
 
     const {isDraggingOver} = useDragAndDropState();
 
@@ -73,7 +73,7 @@ function FileUpload({onPicked, shouldAcceptMultipleFiles = false, onLayout, isRe
                         onLayout={(e) => setUploadViewHeight(e.nativeEvent.layout.height)}
                     >
                         <Icon
-                            src={lazyIllustrations.ReceiptStack}
+                            src={receiptStackIllustration}
                             width={CONST.RECEIPT.ICON_SIZE}
                             height={CONST.RECEIPT.ICON_SIZE}
                         />
@@ -106,7 +106,7 @@ function FileUpload({onPicked, shouldAcceptMultipleFiles = false, onLayout, isRe
             </View>
             <DragAndDropConsumer onDrop={handleDrop}>
                 <DropZoneUI
-                    icon={isReplacingReceipt ? lazyIcons.ReplaceReceipt : lazyIcons.SmartScan}
+                    icon={isReplacingReceipt ? replaceReceiptIcon : smartScanIcon}
                     dropStyles={styles.receiptDropOverlay(true)}
                     dropTitle={isReplacingReceipt ? translate('dropzone.replaceReceipt') : translate(shouldAcceptMultipleFiles ? 'dropzone.scanReceipts' : 'quickAction.scanReceipt')}
                     dropTextStyles={styles.receiptDropText}

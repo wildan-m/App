@@ -44,7 +44,12 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lock', 'CircleSlash', 'Checkmark']);
+    const {
+        ArrowRight: arrowRightIcon,
+        Lock: lockIcon2,
+        CircleSlash: circleSlashIcon,
+        Checkmark: checkmarkIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Lock', 'CircleSlash', 'Checkmark']);
     const {processedData} = useTableContext<SpendRuleTableItem>();
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
@@ -60,7 +65,7 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
         <Tooltip text={translate('workspace.rules.spendRules.defaultRulesCannotBeDeleted')}>
             <View>
                 <Icon
-                    src={Expensicons.Lock}
+                    src={lockIcon2}
                     width={variables.iconSizeNormal}
                     height={variables.iconSizeNormal}
                     fill={theme.icon}
@@ -99,7 +104,7 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                     <Badge
                                         text={item.actionLabel}
-                                        icon={item.isBlock ? Expensicons.CircleSlash : Expensicons.Checkmark}
+                                        icon={item.isBlock ? circleSlashIcon : checkmarkIcon}
                                         badgeStyles={[styles.ml0, styles.justifyContentCenter, StyleUtils.getMinimumWidth(variables.componentSizeNormal)]}
                                         error={item.isBlock}
                                         success={!item.isBlock}
@@ -129,7 +134,7 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
                                 >
                                     <Badge
                                         text={item.actionLabel}
-                                        icon={item.isBlock ? Expensicons.CircleSlash : Expensicons.Checkmark}
+                                        icon={item.isBlock ? circleSlashIcon : checkmarkIcon}
                                         badgeStyles={[styles.ml0, styles.justifyContentCenter, StyleUtils.getMinimumWidth(variables.componentSizeNormal)]}
                                         error={item.isBlock}
                                         success={!item.isBlock}
@@ -163,7 +168,7 @@ function WorkspaceSpendRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout
 
                         <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                             <Icon
-                                src={Expensicons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                                 width={variables.iconSizeNormal}

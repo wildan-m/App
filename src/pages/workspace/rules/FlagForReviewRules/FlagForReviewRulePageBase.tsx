@@ -83,7 +83,7 @@ function FlagForReviewRulePageBase({
     const {policy} = policyData;
     const {convertToDisplayString, getCurrencyDecimals} = useCurrencyListActions();
     const {canWrite: canWriteRules} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
-    const icons = useMemoizedLazyExpensifyIcons(['Folder', 'CoinsButton']);
+    const {Folder: folderIcon, CoinsButton: coinsButtonIcon} = useMemoizedLazyExpensifyIcons(['Folder', 'CoinsButton']);
     const isEditing = !!categoryName;
     const isCategoryLocked = isCategoryLockedProp ?? !!initialCategoryName;
     const canEditCategory = canWriteRules && !isCategoryLocked;
@@ -273,7 +273,7 @@ function FlagForReviewRulePageBase({
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.IconNarrow src={icons.Folder} />
+                                <MenuItem.IconNarrow src={folderIcon} />
                             </MenuItem.Leading>
                             <MenuItemField.Content name={translate('common.category')}>
                                 {!!categoryDisplayName && <MenuItem.FieldValue>{categoryDisplayName}</MenuItem.FieldValue>}
@@ -310,7 +310,7 @@ function FlagForReviewRulePageBase({
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.IconNarrow src={icons.CoinsButton} />
+                                <MenuItem.IconNarrow src={coinsButtonIcon} />
                             </MenuItem.Leading>
                             <MenuItemField.Content name={translate('iou.amount')}>
                                 {!!maxAmountMenuTitle && <MenuItem.FieldValue>{translate('workspace.rules.spendRules.maxAmountAbove', {amount: maxAmountMenuTitle})}</MenuItem.FieldValue>}

@@ -123,7 +123,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
 
     const verificationState = getVerificationState();
 
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const handleVerifiedButtonPress = () => {
         if (!policyID) {
@@ -177,7 +177,7 @@ function WorkspaceExpensifyCardBankAccounts({route}: WorkspaceExpensifyCardBankA
                                 <Text style={[styles.mh5, styles.mb3]}>{translate('workspace.expensifyCard.chooseExistingBank')}</Text>
                                 {renderBankOptions()}
                                 <MenuItemAction
-                                    icon={icons.Plus}
+                                    icon={plusIcon}
                                     title={translate('workspace.expensifyCard.addNewBankAccount')}
                                     onPress={handleAddBankAccount}
                                 />

@@ -22,7 +22,7 @@ function MenuItemNewWindowIcon() {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['NewWindow']);
+    const {NewWindow: newWindowIcon} = useMemoizedLazyExpensifyIcons(['NewWindow']);
     const {isDisabled, isInteractive} = useMenuItemConfig();
     const {isHovered, isPressed} = useMenuItemInteraction();
 
@@ -31,7 +31,7 @@ function MenuItemNewWindowIcon() {
     return (
         <View style={[styles.menuItemTrailingIcon, isDisabled && styles.cursorDisabled]}>
             <Icon
-                src={icons.NewWindow}
+                src={newWindowIcon}
                 fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: isHovered, isPressed, isDisabled, isInteractive})})}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}

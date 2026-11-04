@@ -37,15 +37,19 @@ function ManageTrips({policyID}: ManageTripsProps) {
     const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
 
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['PiggyBank', 'TravelAlerts', 'EmptyStateTravel']);
+    const {
+        PiggyBank: piggyBankIllustration,
+        TravelAlerts: travelAlertsIllustration,
+        EmptyStateTravel: emptyStateTravelIllustration,
+    } = useMemoizedLazyIllustrations(['PiggyBank', 'TravelAlerts', 'EmptyStateTravel']);
 
     const tripsFeatures: FeatureListItem[] = [
         {
-            icon: illustrations.PiggyBank,
+            icon: piggyBankIllustration,
             translationKey: 'travel.features.saveMoney',
         },
         {
-            icon: illustrations.TravelAlerts,
+            icon: travelAlertsIllustration,
             translationKey: 'travel.features.alerts',
         },
     ];
@@ -77,7 +81,7 @@ function ManageTrips({policyID}: ManageTripsProps) {
                         menuItems={tripsFeatures}
                         title={translate('travel.title')}
                         subtitle={translate('travel.subtitle')}
-                        illustration={isReduceMotionEnabled ? illustrations.EmptyStateTravel : LottieAnimations.TripsEmptyState}
+                        illustration={isReduceMotionEnabled ? emptyStateTravelIllustration : LottieAnimations.TripsEmptyState}
                         illustrationStyle={isReduceMotionEnabled ? [styles.mv4, {width: variables.tripsIllustrationW, height: variables.tripsIllustrationH}] : [styles.mv4]}
                         illustrationBackgroundColor={colors.blue600}
                         titleStyles={styles.textHeadlineH1}

@@ -89,7 +89,7 @@ function SearchPageFooter({
     const {translate} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
 
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
@@ -201,7 +201,7 @@ function SearchPageFooter({
                 )}
             </View>
             <Button.Icon
-                src={icons.DownArrow}
+                src={downArrowIcon}
                 fill={theme.icon}
                 hoverFill={theme.iconHovered}
             />

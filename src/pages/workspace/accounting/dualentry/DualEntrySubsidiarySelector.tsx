@@ -37,7 +37,7 @@ function DualEntrySubsidiarySelector({policy}: WithPolicyConnectionsProps) {
     const currentSubsidiaryID = dualEntryConfig?.subsidiaryID ?? CONST.DEFAULT_NUMBER_ID.toString();
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
 
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const data: CompanyListItem[] = companyList
         ? companyList.map((companyItem) => ({
@@ -60,7 +60,7 @@ function DualEntrySubsidiarySelector({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.dualEntry.noCompaniesFound')}

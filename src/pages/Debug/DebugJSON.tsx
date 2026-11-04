@@ -25,7 +25,7 @@ function DebugJSON({data}: DebugJSONProps) {
     const [isThrottledButtonActive, setThrottledButtonInactive] = useThrottledButtonState();
 
     const json = DebugUtils.stringifyJSON(data);
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const {Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Copy']);
 
     return (
         <ScrollView
@@ -39,7 +39,7 @@ function DebugJSON({data}: DebugJSONProps) {
                     setThrottledButtonInactive();
                 }}
             >
-                <Button.Icon src={icons.Copy} />
+                <Button.Icon src={copyIcon} />
                 <Button.Text>{isThrottledButtonActive ? translate('reportActionContextMenu.copyOnyxData') : translate('reportActionContextMenu.copied')}</Button.Text>
             </Button>
             <View {...SwipeInterceptPanResponder.panHandlers}>

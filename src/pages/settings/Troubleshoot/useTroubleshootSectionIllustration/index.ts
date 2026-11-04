@@ -4,11 +4,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type UseTroubleshootSectionIllustration from './types';
 
 const useTroubleshootSectionIllustration: UseTroubleshootSectionIllustration = () => {
-    const illustrations = useMemoizedLazyIllustrations(['WorkspaceScene']);
+    const {WorkspaceScene: workspaceSceneIllustration} = useMemoizedLazyIllustrations(['WorkspaceScene']);
     const styles = useThemeStyles();
 
     return {
-        illustration: illustrations.WorkspaceScene,
+        illustration: workspaceSceneIllustration,
         illustrationStyle: styles.troubleshootStaticIllustration,
     };
 };

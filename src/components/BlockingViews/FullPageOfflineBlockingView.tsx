@@ -17,14 +17,14 @@ type FullPageOfflineBlockingViewProps = ChildrenProps & {
 function FullPageOfflineBlockingView({children, addBottomSafeAreaPadding = true, addOfflineIndicatorBottomSafeAreaPadding = addBottomSafeAreaPadding}: FullPageOfflineBlockingViewProps) {
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
+    const {OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
 
     const theme = useTheme();
 
     if (isOffline) {
         return (
             <BlockingView
-                icon={icons.OfflineCloud}
+                icon={offlineCloudIcon}
                 iconColor={theme.offline}
                 title={translate('common.youAppearToBeOffline')}
                 subtitle={translate('common.thisFeatureRequiresInternet')}

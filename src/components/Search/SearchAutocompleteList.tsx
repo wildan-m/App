@@ -243,7 +243,7 @@ function SearchAutocompleteList({
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
     const currentUserAccountID = currentUserPersonalDetails.accountID;
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['History', 'MagnifyingGlass']);
+    const {History: historyIcon, MagnifyingGlass: magnifyingGlassIcon} = useMemoizedLazyExpensifyIcons(['History', 'MagnifyingGlass']);
     const taxRates = getAllTaxRates(policies);
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
 
@@ -476,7 +476,7 @@ function SearchAutocompleteList({
                       bankAccountList,
                   })
                 : query,
-            singleIcon: expensifyIcons.History,
+            singleIcon: historyIcon,
             searchQuery: query,
             keyForList: recentSearchHash,
             searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
@@ -712,7 +712,7 @@ function SearchAutocompleteList({
             return {
                 text: getAutocompleteDisplayText(filterKey, text),
                 mapKey: mapKey ? getSubstitutionMapKey(mapKey, text) : undefined,
-                singleIcon: expensifyIcons.MagnifyingGlass,
+                singleIcon: magnifyingGlassIcon,
                 searchQuery: text,
                 autocompleteID,
                 keyForList: autocompleteID ?? text,

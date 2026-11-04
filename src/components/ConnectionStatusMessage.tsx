@@ -39,7 +39,7 @@ function ConnectionStatusMessage({
     shouldIncludeHorizontalPadding = true,
     actionAccessibilityLabel,
 }: ConnectionStatusMessageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {cardPaddingHorizontal} = useLayoutSpacing();
@@ -69,7 +69,7 @@ function ConnectionStatusMessage({
             {(isDangerStatus || isSuccessStatus) && (
                 <View style={[styles.offlineFeedbackErrorDot, styles.mr2]}>
                     <Icon
-                        src={icons.DotIndicator}
+                        src={dotIndicatorIcon}
                         fill={isDangerStatus ? theme.danger : theme.iconSuccessFill}
                     />
                 </View>

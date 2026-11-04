@@ -32,7 +32,7 @@ function DynamicSageIntacctNonReimbursableCreditCardAccountPage({policy}: WithPo
     const {config} = policy?.connections?.intacct ?? {};
     const {export: exportConfig} = policy?.connections?.intacct?.config ?? {};
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_NON_REIMBURSABLE_CREDIT_CARD_ACCOUNT.path);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const goBack = () => {
         Navigation.goBack(backPath);
@@ -49,7 +49,7 @@ function DynamicSageIntacctNonReimbursableCreditCardAccountPage({policy}: WithPo
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.sageIntacct.noAccountsFound')}

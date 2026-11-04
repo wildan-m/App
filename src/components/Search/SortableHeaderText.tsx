@@ -47,7 +47,7 @@ export default function SortableHeaderText({
     sentryLabel,
     children,
 }: SearchTableHeaderColumnProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowDownLong', 'ArrowUpLong']);
+    const {ArrowDownLong: arrowDownLongIcon, ArrowUpLong: arrowUpLongIcon} = useMemoizedLazyExpensifyIcons(['ArrowDownLong', 'ArrowUpLong']);
     const styles = useThemeStyles();
     const theme = useTheme();
 
@@ -77,7 +77,7 @@ export default function SortableHeaderText({
         );
     }
 
-    const sortArrowIcon = sortOrder === CONST.SEARCH.SORT_ORDER.ASC ? icons.ArrowUpLong : icons.ArrowDownLong;
+    const sortArrowIcon = sortOrder === CONST.SEARCH.SORT_ORDER.ASC ? arrowUpLongIcon : arrowDownLongIcon;
     const displayIcon = isActive;
     const activeColumnStyle = isSortable && isActive && styles.searchTableHeaderActive;
 

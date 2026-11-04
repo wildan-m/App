@@ -99,7 +99,20 @@ type MenuSection = {
 };
 
 function useSettingsNavigationMenuData(): {accountMenuItemsData: MenuSection; generalMenuItemsData: MenuSection} {
-    const icons = useMemoizedLazyExpensifyIcons(['Bot', 'Gear', 'Profile', 'Heart', 'Info', 'QuestionMark', 'Lightbulb', 'Lock', 'Users', 'CreditCard', 'Wallet', 'Bolt']);
+    const {
+        Bot: botIcon,
+        Gear: gearIcon,
+        Profile: profileIcon,
+        Heart: heartIcon,
+        Info: infoIcon,
+        QuestionMark: questionMarkIcon,
+        Lightbulb: lightbulbIcon,
+        Lock: lockIcon,
+        Users: usersIcon,
+        CreditCard: creditCardIcon,
+        Wallet: walletIcon,
+        Bolt: boltIcon,
+    } = useMemoizedLazyExpensifyIcons(['Bot', 'Gear', 'Profile', 'Heart', 'Info', 'QuestionMark', 'Lightbulb', 'Lock', 'Users', 'CreditCard', 'Wallet', 'Bolt']);
     const [amountOwed = 0] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const subscriptionPlan = useSubscriptionPlan();
     const isAgentAccount = useIsAgentAccount();
@@ -107,42 +120,42 @@ function useSettingsNavigationMenuData(): {accountMenuItemsData: MenuSection; ge
     const accountItems: MenuData[] = [
         {
             translationKey: 'common.profile',
-            icon: icons.Profile,
+            icon: profileIcon,
             screenName: SCREENS.SETTINGS.PROFILE.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PROFILE,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute()),
         },
         {
             translationKey: 'common.wallet',
-            icon: icons.Wallet,
+            icon: walletIcon,
             screenName: SCREENS.SETTINGS.WALLET.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.WALLET,
             action: () => Navigation.navigate(ROUTES.SETTINGS_WALLET),
         },
         {
             translationKey: 'expenseRulesPage.title',
-            icon: icons.Bolt,
+            icon: boltIcon,
             screenName: SCREENS.SETTINGS.RULES.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.RULES,
             action: () => Navigation.navigate(ROUTES.SETTINGS_RULES),
         },
         {
             translationKey: 'common.preferences',
-            icon: icons.Gear,
+            icon: gearIcon,
             screenName: SCREENS.SETTINGS.PREFERENCES.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.PREFERENCES,
             action: () => Navigation.navigate(ROUTES.SETTINGS_PREFERENCES),
         },
         {
             translationKey: 'delegate.copilot',
-            icon: icons.Users,
+            icon: usersIcon,
             screenName: SCREENS.SETTINGS.COPILOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.COPILOT,
             action: () => Navigation.navigate(ROUTES.SETTINGS_COPILOT),
         },
         {
             translationKey: 'initialSettingsPage.security',
-            icon: icons.Lock,
+            icon: lockIcon,
             screenName: SCREENS.SETTINGS.SECURITY,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SECURITY,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SECURITY.getRoute()),
@@ -153,7 +166,7 @@ function useSettingsNavigationMenuData(): {accountMenuItemsData: MenuSection; ge
         const rulesIndex = accountItems.findIndex((item) => item.screenName === SCREENS.SETTINGS.RULES.ROOT);
         accountItems.splice(rulesIndex + 1, 0, {
             translationKey: 'agentsPage.title',
-            icon: icons.Bot,
+            icon: botIcon,
             screenName: SCREENS.SETTINGS.AGENTS.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.AGENTS,
             action: () => Navigation.navigate(ROUTES.SETTINGS_AGENTS),
@@ -163,7 +176,7 @@ function useSettingsNavigationMenuData(): {accountMenuItemsData: MenuSection; ge
     if (subscriptionPlan || amountOwed > 0) {
         accountItems.splice(1, 0, {
             translationKey: 'allSettingsScreen.subscription',
-            icon: icons.CreditCard,
+            icon: creditCardIcon,
             screenName: SCREENS.SETTINGS.SUBSCRIPTION.ROOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.SUBSCRIPTION,
             action: () => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.route),
@@ -180,28 +193,28 @@ function useSettingsNavigationMenuData(): {accountMenuItemsData: MenuSection; ge
             items: [
                 {
                     translationKey: 'initialSettingsPage.help',
-                    icon: icons.QuestionMark,
+                    icon: questionMarkIcon,
                     screenName: SCREENS.SETTINGS.HELP,
                     sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.HELP,
                     action: () => Navigation.navigate(ROUTES.SETTINGS_HELP),
                 },
                 {
                     translationKey: 'initialSettingsPage.about',
-                    icon: icons.Info,
+                    icon: infoIcon,
                     screenName: SCREENS.SETTINGS.ABOUT,
                     sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.ABOUT,
                     action: () => Navigation.navigate(ROUTES.SETTINGS_ABOUT),
                 },
                 {
                     translationKey: 'initialSettingsPage.aboutPage.troubleshoot',
-                    icon: icons.Lightbulb,
+                    icon: lightbulbIcon,
                     screenName: SCREENS.SETTINGS.TROUBLESHOOT,
                     sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.TROUBLESHOOT,
                     action: () => Navigation.navigate(ROUTES.SETTINGS_TROUBLESHOOT),
                 },
                 {
                     translationKey: 'sidebarScreen.saveTheWorld',
-                    icon: icons.Heart,
+                    icon: heartIcon,
                     screenName: SCREENS.SETTINGS.SAVE_THE_WORLD,
                     sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.SAVE_THE_WORLD,
                     action: () => Navigation.navigate(ROUTES.SETTINGS_SAVE_THE_WORLD),

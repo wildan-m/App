@@ -78,9 +78,9 @@ function Banner({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Exclamation', 'Close']);
+    const {Exclamation: exclamationIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Exclamation', 'Close']);
 
-    const displayIcon = icon ?? expensifyIcons.Exclamation;
+    const displayIcon = icon ?? exclamationIcon;
 
     return (
         <Hoverable>
@@ -134,7 +134,7 @@ function Banner({
                                     sentryLabel="Banner-Close"
                                 >
                                     <Icon
-                                        src={expensifyIcons.Close}
+                                        src={closeIcon}
                                         fill={theme.icon}
                                     />
                                 </PressableWithFeedback>

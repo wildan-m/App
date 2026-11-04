@@ -70,7 +70,7 @@ function MapViewImpl({
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Crosshair', 'Expand', 'MapCurrentLocation']);
+    const {Crosshair: crosshairIcon, Expand: expandIcon, MapCurrentLocation: mapCurrentLocationIcon} = useMemoizedLazyExpensifyIcons(['Crosshair', 'Expand', 'MapCurrentLocation']);
 
     const [mapRef, setMapRef] = useState<MapRef | null>(null);
     const initialLocation = {longitude: initialState.location[0], latitude: initialState.location[1]};
@@ -407,7 +407,7 @@ function MapViewImpl({
                                 latitude={currentPosition?.latitude ?? 0}
                             >
                                 <ImageSVG
-                                    src={expensifyIcons.MapCurrentLocation}
+                                    src={mapCurrentLocationIcon}
                                     width={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.width}
                                     height={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.height}
                                 />
@@ -449,7 +449,7 @@ function MapViewImpl({
                         accessibilityLabel={translate('common.center')}
                     >
                         <Button.Icon
-                            src={shouldShowWaypointsCenterIcon ? expensifyIcons.Expand : expensifyIcons.Crosshair}
+                            src={shouldShowWaypointsCenterIcon ? expandIcon : crosshairIcon}
                             fill={theme.icon}
                             hoverFill={theme.icon}
                         />

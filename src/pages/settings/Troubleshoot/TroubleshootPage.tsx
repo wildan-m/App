@@ -61,7 +61,7 @@ type BaseMenuItem = WithSentryLabel & {
 };
 
 function TroubleshootPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'ExpensifyLogoNew', 'RotateLeft']);
+    const {Download: downloadIcon, ExpensifyLogoNew: expensifyLogoNewIcon, RotateLeft: rotateLeftIcon} = useMemoizedLazyExpensifyIcons(['Download', 'ExpensifyLogoNew', 'RotateLeft']);
     const troubleshootIllustration = useTroubleshootSectionIllustration();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -139,7 +139,7 @@ function TroubleshootPage() {
 
         return {
             translationKey: 'exitSurvey.goToExpensifyClassic',
-            icon: icons.ExpensifyLogoNew,
+            icon: expensifyLogoNewIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.GO_TO_CLASSIC,
             ...(CONFIG.IS_HYBRID_APP
                 ? {
@@ -170,13 +170,13 @@ function TroubleshootPage() {
         const baseMenuItems: BaseMenuItem[] = [
             {
                 translationKey: 'initialSettingsPage.troubleshoot.clearCacheAndRestart',
-                icon: icons.RotateLeft,
+                icon: rotateLeftIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.CLEAR_CACHE,
                 action: showResetAndRefreshModal,
             },
             {
                 translationKey: 'initialSettingsPage.troubleshoot.exportOnyxState',
-                icon: icons.Download,
+                icon: downloadIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_TROUBLESHOOT.EXPORT_ONYX,
                 action: exportOnyxState,
             },

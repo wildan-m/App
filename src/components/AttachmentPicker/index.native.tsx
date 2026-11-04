@@ -205,7 +205,7 @@ function AttachmentPicker({
     onOpenPicker,
     shouldSkipAttachmentTypeModal = false,
 }: AttachmentPickerProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Camera', 'Gallery', 'Paperclip']);
+    const {Camera: cameraIcon, Gallery: galleryIcon, Paperclip: paperclipIcon} = useMemoizedLazyExpensifyIcons(['Camera', 'Gallery', 'Paperclip']);
     const styles = useThemeStyles();
     const [isVisible, setIsVisible] = useState(false);
     // Mount and visibility are tracked separately so the camera stays mounted through its hide
@@ -343,28 +343,28 @@ function AttachmentPicker({
     const menuItemData: Item[] = useMemo(() => {
         const data: Item[] = [
             {
-                icon: icons.Paperclip,
+                icon: paperclipIcon,
                 textTranslationKey: 'attachmentPicker.chooseDocument',
                 pickAttachment: showDocumentPicker,
             },
         ];
         if (!shouldHideGalleryOption) {
             data.unshift({
-                icon: icons.Gallery,
+                icon: galleryIcon,
                 textTranslationKey: 'attachmentPicker.chooseFromGallery',
                 pickAttachment: () => showImagePicker(launchImageLibrary),
             });
         }
         if (!shouldHideCameraOption) {
             data.unshift({
-                icon: icons.Camera,
+                icon: cameraIcon,
                 textTranslationKey: 'attachmentPicker.takePhoto',
                 onPress: launchInAppCamera,
             });
         }
 
         return data;
-    }, [icons.Camera, icons.Paperclip, icons.Gallery, showDocumentPicker, shouldHideGalleryOption, shouldHideCameraOption, launchInAppCamera, showImagePicker]);
+    }, [cameraIcon, paperclipIcon, galleryIcon, showDocumentPicker, shouldHideGalleryOption, shouldHideCameraOption, launchInAppCamera, showImagePicker]);
 
     const [focusedIndex, setFocusedIndex] = useArrowKeyFocusManager({initialFocusedIndex: -1, maxIndex: menuItemData.length - 1, isActive: isVisible});
 

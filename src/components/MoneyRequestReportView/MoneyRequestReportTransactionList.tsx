@@ -210,7 +210,7 @@ function MoneyRequestReportTransactionList({
 }: MoneyRequestReportTransactionListProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Columns']);
+    const {Columns: columnsIcon} = useMemoizedLazyExpensifyIcons(['Columns']);
     const {translate} = useLocalize();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
@@ -426,7 +426,7 @@ function MoneyRequestReportTransactionList({
                         onPress={openColumnsPage}
                     >
                         <LinkButton.Icon
-                            src={expensifyIcons.Columns}
+                            src={columnsIcon}
                             fill={theme.link}
                             hoverFill={theme.linkHover}
                         />

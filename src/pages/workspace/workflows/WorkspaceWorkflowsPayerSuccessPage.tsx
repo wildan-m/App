@@ -19,7 +19,7 @@ function WorkspaceWorkflowsPayerSuccessPage() {
     const [sharedBankAccountData] = useOnyx(ONYXKEYS.SHARE_BANK_ACCOUNT);
     const shouldShowSuccess = sharedBankAccountData?.shouldShowSuccess ?? false;
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ShareBank', 'Telescope']);
+    const {ShareBank: shareBankIllustration} = useMemoizedLazyIllustrations(['ShareBank', 'Telescope']);
 
     useEffect(() => {
         return () => {
@@ -40,7 +40,7 @@ function WorkspaceWorkflowsPayerSuccessPage() {
             <ConfirmationPageDefault
                 heading={translate('walletPage.shareBankAccountSuccess')}
                 description={translate('walletPage.shareBankAccountSuccessDescription')}
-                illustration={illustrations.ShareBank}
+                illustration={shareBankIllustration}
                 descriptionStyle={[styles.ph4, styles.textSupporting]}
                 illustrationStyle={styles.successBankSharedCardIllustration}
                 onButtonPress={onButtonPress}

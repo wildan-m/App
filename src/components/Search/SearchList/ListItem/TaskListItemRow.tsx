@@ -134,7 +134,7 @@ function ActionCell({taskItem, isLargeScreenWidth}: TaskCellProps) {
 }
 
 function TaskListItemRow({item, containerStyle, showTooltip}: TaskListItemRowProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRightLong']);
+    const {ArrowRightLong: arrowRightLongIcon} = useMemoizedLazyExpensifyIcons(['ArrowRightLong']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
@@ -158,7 +158,7 @@ function TaskListItemRow({item, containerStyle, showTooltip}: TaskListItemRowPro
 
                         {shouldDisplayCompactArrowIcon && (
                             <Icon
-                                src={icons.ArrowRightLong}
+                                src={arrowRightLongIcon}
                                 width={variables.iconSizeXXSmall}
                                 height={variables.iconSizeXXSmall}
                                 fill={theme.icon}

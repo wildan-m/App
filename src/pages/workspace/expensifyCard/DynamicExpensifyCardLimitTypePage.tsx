@@ -66,7 +66,7 @@ function DynamicExpensifyCardLimitTypePage({route}: WorkspaceEditCardLimitTypePa
     const styles = useThemeStyles();
     const theme = useTheme();
     const {environmentURL} = useEnvironment();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
     const {showConfirmModal} = useConfirmModal();
     const policy = usePolicy(policyID);
     const defaultFundID = useDefaultFundID(policyID);
@@ -159,7 +159,7 @@ function DynamicExpensifyCardLimitTypePage({route}: WorkspaceEditCardLimitTypePa
         alternateTextComponent: areApprovalsConfigured ? undefined : <RenderHTML html={translate('workspace.card.issueNewCard.smartLimitDisabledDescription', workspaceWorkflowsPageURL)} />,
         rightElement: areApprovalsConfigured ? undefined : (
             <Icon
-                src={expensifyIcons.Lock}
+                src={lockIcon}
                 fill={theme.icon}
             />
         ),

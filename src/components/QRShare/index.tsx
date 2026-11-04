@@ -44,7 +44,7 @@ function QRShare({
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const {windowWidth, windowHeight} = useWindowDimensions();
     const qrCodeContainerWidth = shouldUseNarrowLayout ? windowWidth : variables.rhpWidth;
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
 
     const landscapeQrCodeSize = isInLandscapeMode ? Math.min(QR_CODE_LANDSCAPE_SIZE_RATIO * windowHeight, MAX_QR_CODE_LANDSCAPE_SIZE) : undefined;
 
@@ -75,7 +75,7 @@ function QRShare({
                 <View style={styles.expensifyQrLogo}>
                     <ImageSVG
                         contentFit="contain"
-                        src={icons.ExpensifyWordmark}
+                        src={expensifyWordmarkIcon}
                         fill={theme.QRLogo}
                     />
                 </View>

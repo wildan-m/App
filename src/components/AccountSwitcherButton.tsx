@@ -53,7 +53,7 @@ const filterMenuItem = (item: PopoverMenuItem, searchInput: string) => tokenized
 /** The "Switch" button and its delegator menu. Renders nothing for accounts that have no other account to switch to. */
 function AccountSwitcherButton({isScreenFocused}: AccountSwitcherButtonProps) {
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
-    const icons = useMemoizedLazyExpensifyIcons(['CaretUpDown']);
+    const {CaretUpDown: caretUpDownIcon} = useMemoizedLazyExpensifyIcons(['CaretUpDown']);
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {isOffline} = useNetwork();
@@ -304,7 +304,7 @@ function AccountSwitcherButton({isScreenFocused}: AccountSwitcherButtonProps) {
                         sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_SWITCHER.SHOW_ACCOUNTS}
                     >
                         <Button.Text>{translate('delegate.switch')}</Button.Text>
-                        <Button.Icon src={icons.CaretUpDown} />
+                        <Button.Icon src={caretUpDownIcon} />
                     </Button>
                 </View>
             </TooltipToRender>

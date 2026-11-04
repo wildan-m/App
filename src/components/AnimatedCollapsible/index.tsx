@@ -73,7 +73,7 @@ function AnimatedCollapsible({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
+    const {UpArrow: upArrowIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
     const contentHeight = useSharedValue(0);
     const descriptionHeight = useSharedValue(0);
     const hasExpanded = useSharedValue(isExpanded);
@@ -147,7 +147,7 @@ function AnimatedCollapsible({
                     >
                         {({hovered}) => (
                             <Icon
-                                src={isExpanded ? expensifyIcons.UpArrow : expensifyIcons.DownArrow}
+                                src={isExpanded ? upArrowIcon : downArrowIcon}
                                 fill={theme.icon}
                                 additionalStyles={!hovered && styles.opacitySemiTransparent}
                                 size={CONST.ICON_SIZE.SMALL}

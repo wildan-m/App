@@ -101,7 +101,7 @@ function FloatingMessageCounter({
     onActionBadgePress,
     shouldShowMarkAsDoneCopy,
 }: FloatingMessageCounterProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -161,7 +161,7 @@ function FloatingMessageCounter({
                         <FloatingPillButton
                             variant={isError ? CONST.BUTTON_VARIANT.DANGER : CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={onActionBadgePress}
-                            icon={icons.UpArrow}
+                            icon={upArrowIcon}
                             iconFill={theme.textLight}
                             label={actionBadgeText}
                             textStyle={styles.textWhite}
@@ -170,7 +170,7 @@ function FloatingMessageCounter({
                         <FloatingPillButton
                             variant={hasNewMessages ? CONST.BUTTON_VARIANT.SUCCESS : undefined}
                             onPress={onClick}
-                            icon={icons.DownArrow}
+                            icon={downArrowIcon}
                             iconFill={hasNewMessages ? theme.textLight : theme.icon}
                             label={hasNewMessages ? translate('newMessages') : translate('latestMessages')}
                             textStyle={hasNewMessages && styles.textWhite}

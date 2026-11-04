@@ -75,7 +75,7 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
     const styles = useThemeStyles();
     const theme = useTheme();
     const {environmentURL} = useEnvironment();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Clock']);
+    const {Clock: clockIcon} = useMemoizedLazyExpensifyIcons(['Clock']);
     const getReviewWorkspaceSettingsTaskCompletion = useReviewWorkspaceSettingsTaskCompletion();
     const policyID = policy?.id;
 
@@ -176,7 +176,7 @@ function WorkspaceAutoReportingFrequencyPage({policy, route}: WorkspaceAutoRepor
                         {!!selectedFrequency && (
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mb5]}>
                                 <Icon
-                                    src={expensifyIcons.Clock}
+                                    src={clockIcon}
                                     fill={theme.icon}
                                 />
                                 <View style={[styles.flex1, styles.ml3, styles.flexRow, styles.renderHTML]}>

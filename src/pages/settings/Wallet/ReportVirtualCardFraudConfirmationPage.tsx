@@ -35,7 +35,7 @@ function ReportVirtualCardFraudConfirmationPage({
 }: ReportVirtualCardFraudConfirmationPageProps) {
     const themeStyles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlassSpyMouthClosed']);
+    const {MagnifyingGlassSpyMouthClosed: magnifyingGlassSpyMouthClosedIcon} = useMemoizedLazyExpensifyIcons(['MagnifyingGlassSpyMouthClosed']);
     const [physicalCardForm] = useOnyx(ONYXKEYS.FORMS.REPORT_PHYSICAL_CARD_FORM);
     const isCardTerminatedWithoutReplacement = !!physicalCardForm?.cardTerminatedWithoutReplacement;
     const description = isCardTerminatedWithoutReplacement ? 'reportFraudConfirmationPage.descriptionCardNotReplaced' : 'reportFraudConfirmationPage.description';
@@ -74,7 +74,7 @@ function ReportVirtualCardFraudConfirmationPage({
                 <ScrollView contentContainerStyle={[themeStyles.flexGrow1, themeStyles.justifyContentCenter]}>
                     <ImageSVG
                         contentFit="contain"
-                        src={expensifyIcons.MagnifyingGlassSpyMouthClosed}
+                        src={magnifyingGlassSpyMouthClosedIcon}
                         style={themeStyles.alignSelfCenter}
                         width={184}
                         height={290}

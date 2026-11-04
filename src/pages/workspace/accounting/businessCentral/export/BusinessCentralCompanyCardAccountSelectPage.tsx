@@ -31,7 +31,7 @@ type AccountListItem = ListItem & {
 function BusinessCentralCompanyCardAccountSelectPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const businessCentralConfig = policy?.connections?.businessCentral?.config;
     const nonReimbursableAccount = businessCentralConfig?.export?.nonReimbursableAccount;
@@ -54,7 +54,7 @@ function BusinessCentralCompanyCardAccountSelectPage({policy}: WithPolicyConnect
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.businessCentral.noBankAccountsFound')}

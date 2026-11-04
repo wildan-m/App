@@ -47,7 +47,7 @@ function FreeTrialSection() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {cardPaddingHorizontal} = useLayoutSpacing();
-    const illustrations = useMemoizedLazyIllustrations(['TreasureChest']);
+    const {TreasureChest: treasureChestIllustration} = useMemoizedLazyIllustrations(['TreasureChest']);
     const {shouldShowFreeTrialSection, discountType, daysLeft, discountInfo} = useFreeTrial();
 
     if (!shouldShowFreeTrialSection) {
@@ -86,7 +86,7 @@ function FreeTrialSection() {
             >
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3, styles.pt3, styles.pb8, cardPaddingHorizontal]}>
                     <Icon
-                        src={illustrations.TreasureChest}
+                        src={treasureChestIllustration}
                         width={ILLUSTRATION_SIZE}
                         height={ILLUSTRATION_SIZE}
                     />

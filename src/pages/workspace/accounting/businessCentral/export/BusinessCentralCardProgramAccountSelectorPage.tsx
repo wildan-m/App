@@ -48,7 +48,7 @@ function BusinessCentralCardProgramAccountSelectorPage({
 }: BusinessCentralCardProgramAccountSelectorPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const [cardFeeds] = useCardFeeds(policyID);
     const cardFeed = cardFeeds?.[feedWithDomainID];
@@ -82,7 +82,7 @@ function BusinessCentralCardProgramAccountSelectorPage({
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.businessCentral.noBankAccountsFound')}

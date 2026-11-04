@@ -70,7 +70,7 @@ function ReportFieldInlineInput({reportField, fieldKey, value, isDisabled, error
     const {windowHeight} = useWindowDimensions();
     const isInLandscapeMode = useIsInLandscapeMode();
     const {isInNarrowPaneModal} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'Trashcan']);
+    const {DownArrow: downArrowIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'Trashcan']);
 
     const [draftValue, setDraftValue] = useState(value);
     const [previousValue, setPreviousValue] = useState(value);
@@ -158,7 +158,7 @@ function ReportFieldInlineInput({reportField, fieldKey, value, isDisabled, error
                     sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_FIELD_DELETE_BUTTON}
                 >
                     <Icon
-                        src={icons.Trashcan}
+                        src={trashcanIcon}
                         fill={theme.icon}
                     />
                 </PressableWithFeedback>
@@ -262,7 +262,7 @@ function ReportFieldInlineInput({reportField, fieldKey, value, isDisabled, error
                                 value={value}
                                 errorText={errorText}
                                 inputStyle={styles.pointerEventsNone}
-                                icon={icons.DownArrow}
+                                icon={downArrowIcon}
                                 // `pr0` makes the icon container's padding asymmetric, so it has to flip in place.
                                 // `flipUpsideDown` would rotate that padding too and shift the caret left when open.
                                 iconContainerStyle={[styles.pr0, isExpanded && styles.flipUpsideDownInPlace]}

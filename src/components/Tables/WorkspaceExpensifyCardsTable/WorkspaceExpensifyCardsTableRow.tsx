@@ -45,7 +45,7 @@ type WorkspaceExpensifyCardsTableRowProps = {
 };
 
 export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldUseNarrowTableLayout, policy, shouldShowExportAccountColumn}: WorkspaceExpensifyCardsTableRowProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FreezeCard']);
+    const {ArrowRight: arrowRightIcon, FreezeCard: freezeCardIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FreezeCard']);
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
     const theme = useTheme();
@@ -92,7 +92,7 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
     const frozenByRowFooter = !!frozenByText && (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt1]}>
             <Icon
-                src={icons.FreezeCard}
+                src={freezeCardIcon}
                 fill={theme.icon}
                 size={CONST.ICON_SIZE.SMALL}
             />
@@ -280,7 +280,7 @@ export default function WorkspaceExpensifyCardsTableRow({item, rowIndex, shouldU
                         {...getCellAccessibilityProps(isTableSemanticsEnabled)}
                     >
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

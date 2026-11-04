@@ -21,7 +21,7 @@ type VictoryChartExpandButtonProps = {
 function VictoryChartExpandButton({onPress, shouldShow}: VictoryChartExpandButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Expand']);
+    const {Expand: expandIcon} = useMemoizedLazyExpensifyIcons(['Expand']);
 
     return (
         <Tooltip text={translate('common.expand')}>
@@ -41,7 +41,7 @@ function VictoryChartExpandButton({onPress, shouldShow}: VictoryChartExpandButto
                     accessibilityLabel={translate('common.expand')}
                     sentryLabel={CONST.SENTRY_LABEL.HTML_RENDERER.VICTORY_CHART_EXPAND_BUTTON}
                 >
-                    <Button.Icon src={icons.Expand} />
+                    <Button.Icon src={expandIcon} />
                 </Button>
             </View>
         </Tooltip>

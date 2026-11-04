@@ -73,7 +73,7 @@ type DynamicRoomMembersPageProps = WithReportOrNotFoundProps & PlatformStackScre
 
 function DynamicRoomMembersPage({report, policy}: DynamicRoomMembersPageProps) {
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.ROOM_MEMBERS.path);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'RemoveMembers']);
+    const {Plus: plusIcon, RemoveMembers: removeMembersIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'RemoveMembers']);
     const reportAction = useParentReportAction(report);
     const shouldParserToHTML = !!reportAction && reportAction.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT;
     const styles = useThemeStyles();
@@ -273,7 +273,7 @@ function DynamicRoomMembersPage({report, policy}: DynamicRoomMembersPageProps) {
                 count: selectedMembers.length,
             }),
             value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.REMOVE,
-            icon: icons.RemoveMembers,
+            icon: removeMembersIcon,
             shouldSkipFocusRestore: true,
             onSelected: showRemoveMembersModal,
         },
@@ -302,7 +302,7 @@ function DynamicRoomMembersPage({report, policy}: DynamicRoomMembersPageProps) {
                     innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
                     style={[shouldUseNarrowLayout && styles.flexGrow1, styles.mb5]}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('workspace.invite.member')}</Button.Text>
                 </Button>
             )}

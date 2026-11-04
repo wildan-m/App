@@ -14,7 +14,7 @@ import type {CompassProps} from './MapViewTypes';
 
 function Compass({interactive, shouldDisplayCompass, cameraRef, mapHeading}: CompassProps) {
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Compass']);
+    const {Compass: compassIcon} = useMemoizedLazyExpensifyIcons(['Compass']);
     const {translate} = useLocalize();
 
     // Rotate the compass needle opposite to the map's bearing so it keeps pointing to true north.
@@ -43,7 +43,7 @@ function Compass({interactive, shouldDisplayCompass, cameraRef, mapHeading}: Com
             >
                 <Animated.View style={compassAnimatedStyle}>
                     <ImageSVG
-                        src={expensifyIcons.Compass}
+                        src={compassIcon}
                         width={CONST.MAP_VIEW_COMPASS_SIZE.width}
                         height={CONST.MAP_VIEW_COMPASS_SIZE.height}
                     />

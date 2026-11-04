@@ -20,7 +20,7 @@ import React from 'react';
 import TwoFactorAuthWrapper from './TwoFactorAuthWrapper';
 
 function DisabledPage() {
-    const illustrations = useMemoizedLazyIllustrations(['LockOpen']);
+    const {LockOpen: lockOpenIllustration} = useMemoizedLazyIllustrations(['LockOpen']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [is2FAEnabled = false] = useOnyx(ONYXKEYS.ACCOUNT, {selector: (account) => !!account?.requiresTwoFactorAuth});
@@ -31,7 +31,7 @@ function DisabledPage() {
             title={translate('twoFactorAuth.disableTwoFactorAuth')}
         >
             <BlockingView
-                icon={illustrations.LockOpen}
+                icon={lockOpenIllustration}
                 iconWidth={variables.modalTopIconWidth}
                 iconHeight={variables.modalTopIconHeight}
                 title={translate('twoFactorAuth.disabled')}

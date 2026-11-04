@@ -25,7 +25,7 @@ type DeleteGroupRowProps = {
 };
 
 function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan'] as const);
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
 
@@ -63,7 +63,7 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
 
     return groupID !== defaultSecurityGroupID ? (
         <MenuItemAction
-            icon={icons.Trashcan}
+            icon={trashcanIcon}
             title={translate('domain.groups.deleteGroup')}
             onPress={() => {
                 onDeleteGroupSelect();

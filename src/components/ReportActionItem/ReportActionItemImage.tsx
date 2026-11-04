@@ -147,7 +147,7 @@ function ReportActionItemImage({
 }: ReportActionItemImageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
+    const {Receipt: receiptIcon} = useMemoizedLazyExpensifyIcons(['Receipt']);
     const {report: contextReport, transactionThreadReport} = useShowContextMenuState();
     const isMapDistanceRequest = !!transaction && isDistanceRequest(transaction) && !isManualDistanceRequest(transaction);
     const hasErrors = !isEmptyObject(transaction?.errors) || !isEmptyObject(transaction?.errorFields?.route) || !isEmptyObject(transaction?.errorFields?.waypoints);
@@ -204,7 +204,7 @@ function ReportActionItemImage({
             shouldUseThumbnailImage: shouldUseThumbnailImage ?? true,
 
             source: isPDF || shouldUseThumbnailImage !== false ? thumbnailSource : originalImageSource,
-            fallbackIcon: icons.Receipt,
+            fallbackIcon: receiptIcon,
             fallbackIconSize: isSingleImage ? variables.iconSizeSuperLarge : variables.iconSizeExtraLarge,
             isAuthTokenRequired: true,
 
@@ -220,7 +220,7 @@ function ReportActionItemImage({
             shouldUseThumbnailImage: shouldUseThumbnailImage ?? true,
             isAuthTokenRequired: false,
             source: shouldUseThumbnailImage ? (effectiveThumbnail ?? effectiveImage ?? '') : originalImageSource,
-            fallbackIcon: icons.Receipt,
+            fallbackIcon: receiptIcon,
             fallbackIconSize: isSingleImage ? variables.iconSizeSuperLarge : variables.iconSizeExtraLarge,
 
             // If the image is full height, use initial position to make sure it will grow properly to fill the container

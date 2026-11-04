@@ -34,7 +34,7 @@ function DomainsListPage() {
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const isFocused = useIsFocused();
 
     useDocumentTitle(translate('common.domains'));
@@ -108,7 +108,7 @@ function DomainsListPage() {
             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.LIST.NEW_DOMAIN_BUTTON}
             onPress={() => interceptAnonymousUser(() => Navigation.navigate(ROUTES.WORKSPACES_ADD_DOMAIN), session)}
         >
-            <Button.Icon src={icons.Plus} />
+            <Button.Icon src={plusIcon} />
             <Button.Text>{translate('common.new')}</Button.Text>
         </Button>
     );

@@ -20,7 +20,7 @@ function ExpandCollapseArrowButton({isExpanded, onPress}: ExpandCollapseArrowBut
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
+    const {UpArrow: upArrowIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
 
     return (
         <PressableWithFeedback
@@ -32,7 +32,7 @@ function ExpandCollapseArrowButton({isExpanded, onPress}: ExpandCollapseArrowBut
         >
             {({hovered}) => (
                 <Icon
-                    src={isExpanded ? icons.UpArrow : icons.DownArrow}
+                    src={isExpanded ? upArrowIcon : downArrowIcon}
                     fill={theme.icon}
                     additionalStyles={!hovered && styles.opacitySemiTransparent}
                     size={isLargeScreenWidth ? CONST.ICON_SIZE.SMALL : undefined}

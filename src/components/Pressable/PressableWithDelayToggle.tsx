@@ -96,8 +96,8 @@ function PressableWithDelayToggle({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const [isActive, temporarilyDisableInteractions] = useThrottledButtonState();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Checkmark']);
-    const resolvedIconChecked = iconChecked ?? lazyIcons.Checkmark;
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const resolvedIconChecked = iconChecked ?? checkmarkIcon;
 
     const updatePressState = () => {
         if (!isActive) {

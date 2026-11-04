@@ -86,7 +86,7 @@ function InsightsChartWidget({
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {cardPaddingHorizontal, cardPaddingBottom} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['Expand', 'Table']);
+    const {Expand: expandIcon, Table: tableIcon} = useMemoizedLazyExpensifyIcons(['Expand', 'Table']);
     const {getCurrencyDecimals} = useCurrencyListActions();
 
     const {data, state, comparison} = useInsightsChartData({chart, queryJSON, snapshot, previousPeriodQueryJSON, previousPeriodSnapshot, averageTotal, isDashboardLoaded}, filters);
@@ -136,7 +136,7 @@ function InsightsChartWidget({
                 menuItems={[
                     {
                         text: translate('insightsPage.viewOnSpend'),
-                        icon: icons.Expand,
+                        icon: expandIcon,
                         onSelected: () => Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: buildViewOnSpendQuery(queryJSON)})),
                         shouldCallAfterModalHide: true,
                     },
@@ -144,7 +144,7 @@ function InsightsChartWidget({
                         ? [
                               {
                                   text: translate('spreadsheet.downloadCSV'),
-                                  icon: icons.Table,
+                                  icon: tableIcon,
                                   onSelected: downloadCSV,
                                   shouldCallAfterModalHide: true,
                               },

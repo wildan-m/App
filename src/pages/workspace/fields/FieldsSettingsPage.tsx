@@ -60,7 +60,7 @@ function FieldsSettingsPage({
 }: FieldsSettingsPageProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const {showConfirmModal} = useConfirmModal();
     const {canWrite} = usePolicyFeatureWriteAccess(policy, policyFeature);
 
@@ -142,7 +142,7 @@ function FieldsSettingsPage({
                     {canWrite && !isImportedReportField && (
                         <View style={styles.flexGrow1}>
                             <MenuItemAction
-                                icon={icons.Trashcan}
+                                icon={trashcanIcon}
                                 title={translate('common.delete')}
                                 onPress={showDeleteModal}
                             />

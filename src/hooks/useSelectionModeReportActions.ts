@@ -81,7 +81,7 @@ function useSelectionModeReportActions({
 
     const isChatReportArchived = useReportIsArchived(chatReport?.reportID);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Send', 'ThumbsUp', 'Cash', 'ArrowRight'] as const);
+    const {Send: sendIcon, ThumbsUp: thumbsUpIcon, Cash: cashIcon, ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['Send', 'ThumbsUp', 'Cash', 'ArrowRight'] as const);
 
     const {showHoldMenu} = useHoldMenuModal();
 
@@ -259,7 +259,7 @@ function useSelectionModeReportActions({
         if (hasSubmitAction && !effectiveShouldBlockSubmit) {
             actions[idx++] = {
                 text: shouldShowMarkAsDone({policy, report, isTrackIntentUser, rules}) ? translate('common.markAsDone') : translate('common.submit'),
-                icon: expensifyIcons.Send,
+                icon: sendIcon,
                 value: CONST.REPORT.PRIMARY_ACTIONS.SUBMIT,
                 onSelected: handleSubmitReport,
             };
@@ -267,9 +267,9 @@ function useSelectionModeReportActions({
         if (hasApproveAction && !isBlockSubmitDueToPreventSelfApproval) {
             actions[idx++] = {
                 text: translate('iou.approve'),
-                icon: expensifyIcons.ThumbsUp,
+                icon: thumbsUpIcon,
                 value: CONST.REPORT.PRIMARY_ACTIONS.APPROVE,
-                rightIcon: shouldShowApproveSubMenu ? expensifyIcons.ArrowRight : undefined,
+                rightIcon: shouldShowApproveSubMenu ? arrowRightIcon : undefined,
                 backButtonText: shouldShowApproveSubMenu ? translate('iou.approve') : undefined,
                 subMenuItems: shouldShowApproveSubMenu ? approveSubMenuItems : undefined,
                 subMenuHeaderText: shouldShowApproveSubMenu ? approveSubMenuHeaderText : undefined,
@@ -280,9 +280,9 @@ function useSelectionModeReportActions({
         if (hasPayAction && !(isOffline && !canAllowSettlement)) {
             actions[idx++] = {
                 text: translate('iou.settlePayment', totalAmount),
-                icon: expensifyIcons.Cash,
+                icon: cashIcon,
                 value: CONST.REPORT.PRIMARY_ACTIONS.PAY,
-                rightIcon: expensifyIcons.ArrowRight,
+                rightIcon: arrowRightIcon,
                 backButtonText: translate('iou.settlePayment', totalAmount),
                 subMenuItems: paymentSubMenuItems,
                 onSelected: () => {},

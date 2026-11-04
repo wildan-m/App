@@ -47,7 +47,7 @@ type ImageCropViewProps = {
 };
 
 function ImageCropView({imageUri = '', containerSize = 0, panGesture, maskImage, ...props}: ImageCropViewProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ImageCropCircleMask']);
+    const {ImageCropCircleMask: imageCropCircleMaskIcon} = useMemoizedLazyExpensifyIcons(['ImageCropCircleMask']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const containerStyle = StyleUtils.getWidthAndHeightStyle(containerSize, containerSize);
@@ -87,7 +87,7 @@ function ImageCropView({imageUri = '', containerSize = 0, panGesture, maskImage,
                 />
                 <View style={[containerStyle, styles.l0, styles.b0, styles.pAbsolute]}>
                     <Icon
-                        src={maskImage ?? icons.ImageCropCircleMask}
+                        src={maskImage ?? imageCropCircleMaskIcon}
                         // TODO uncomment the line once the tint color issue for android(https://github.com/expo/expo/issues/21530#issuecomment-1836283564) is fixed
                         // fill={theme.iconReversed}
                         width={containerSize}

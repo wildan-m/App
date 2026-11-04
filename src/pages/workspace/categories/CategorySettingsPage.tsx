@@ -65,7 +65,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {convertToDisplayString} = useCurrencyListActions();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan', 'Plus', 'Bolt']);
+    const {Trashcan: trashcanIcon, Plus: plusIcon, Bolt: boltIcon} = useMemoizedLazyExpensifyIcons(['Trashcan', 'Plus', 'Bolt']);
     const {showConfirmModal} = useConfirmModal();
     const policyData = usePolicyData(policyID);
     const {policy, categories: policyCategories} = policyData;
@@ -349,7 +349,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                     )}
                     {canWriteCategories && !isThereAnyAccountingConnection && (
                         <MenuItemAction
-                            icon={expensifyIcons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('workspace.categories.deleteCategory')}
                             onPress={async () => {
                                 if (shouldPreventDisableOrDelete) {
@@ -381,7 +381,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                                     pendingAction={rule.pendingAction}
                                 >
                                     <MenuItem
-                                        icon={expensifyIcons.Bolt}
+                                        icon={boltIcon}
                                         title={rule.summary}
                                         numberOfLinesTitle={3}
                                         shouldShowBasicTitle
@@ -394,7 +394,7 @@ function CategorySettingsPage({route: {params, name}, navigation}: CategorySetti
                             ))}
                             {canWriteRules && (
                                 <MenuItemAction
-                                    icon={expensifyIcons.Plus}
+                                    icon={plusIcon}
                                     title={translate('workspace.rules.categoryRules.createNewRule')}
                                     onPress={() => navigateToCategoryRule(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_RULES_NEW.path)}
                                 />

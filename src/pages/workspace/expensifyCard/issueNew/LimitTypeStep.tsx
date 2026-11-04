@@ -48,7 +48,7 @@ function LimitTypeStep({policy, stepNames, startStepIndex}: LimitTypeStepProps) 
     const theme = useTheme();
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
 
     const policyID = policy?.id;
     const formRef = useRef<FormRef | null>(null);
@@ -111,7 +111,7 @@ function LimitTypeStep({policy, stepNames, startStepIndex}: LimitTypeStepProps) 
         alternateTextComponent: areApprovalsConfigured ? undefined : <RenderHTML html={translate('workspace.card.issueNewCard.smartLimitDisabledDescription', workspaceWorkflowsPageURL)} />,
         rightElement: areApprovalsConfigured ? undefined : (
             <Icon
-                src={expensifyIcons.Lock}
+                src={lockIcon}
                 fill={theme.icon}
             />
         ),

@@ -26,7 +26,7 @@ function GettingStartedRow({item}: GettingStartedRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {cardPaddingHorizontal} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
 
     const navigateToItem = () => {
         if (item.onPress) {
@@ -62,7 +62,7 @@ function GettingStartedRow({item}: GettingStartedRowProps) {
                     {item.isComplete ? (
                         <Badge
                             text={translate('homePage.gettingStartedSection.done')}
-                            icon={icons.Checkmark}
+                            icon={checkmarkIcon}
                             badgeStyles={[styles.widgetItemButton, styles.justifyContentCenter]}
                         />
                     ) : (

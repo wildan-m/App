@@ -50,7 +50,7 @@ function ReportReassignApproverPage({report, policy, isLoadingReportData}: Repor
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
     const [personalDetails] = useAllPersonalDetails();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [selectedMemberEmail, setSelectedMemberEmail] = useState<string>();
     const {isLoading, startWithLoading} = usePressLoading();
     const currentUserDetails = useCurrentUserPersonalDetails();
@@ -109,7 +109,7 @@ function ReportReassignApproverPage({report, policy, isLoadingReportData}: Repor
                     login: email,
                     value: accountID,
                     isSelected: selectedMemberEmail === email,
-                    icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    icons: [{source: avatar ?? fallbackAvatarIcon, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
                     rightElement: employee.role === CONST.POLICY.ROLE.ADMIN ? <Badge text={translate('common.admin')} /> : undefined,
                 };
             })

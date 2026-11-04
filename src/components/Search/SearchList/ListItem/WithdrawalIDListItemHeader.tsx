@@ -73,7 +73,7 @@ function WithdrawalIDListItemHeader({
     const StyleUtils = useStyleUtils();
     const {translate, dateFnsLocale} = useLocalize();
     const {environmentURL} = useEnvironment();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
 
     const formattedBankName = CONST.BANK_NAMES_USER_FRIENDLY[withdrawalIDItem.bankName] ?? CONST.BANK_NAMES_USER_FRIENDLY[CONST.BANK_NAMES.GENERIC_BANK];
     const maskedNumber = withdrawalIDItem.accountNumber ? `xx${withdrawalIDItem.accountNumber.slice(-4)}` : '';
@@ -281,7 +281,7 @@ function WithdrawalIDListItemHeader({
             {settlementStatus === CONST.SEARCH.SETTLEMENT_STATUS.FAILED && (
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1, styles.ph3, styles.pb1]}>
                     <Icon
-                        src={expensifyIcons.DotIndicator}
+                        src={dotIndicatorIcon}
                         fill={theme.danger}
                         height={variables.iconSizeExtraSmall}
                         width={variables.iconSizeExtraSmall}

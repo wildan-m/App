@@ -45,7 +45,7 @@ function InsightsPageControls({filters, defaultFilters, onChange, onExport, isEx
     const {pageGutter} = useLayoutSpacing();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Export']);
+    const {Export: exportIcon} = useMemoizedLazyExpensifyIcons(['Export']);
 
     const controls = (
         <>
@@ -85,7 +85,7 @@ function InsightsPageControls({filters, defaultFilters, onChange, onExport, isEx
                     color={theme.text}
                 />
             ) : (
-                <Button.Icon src={icons.Export} />
+                <Button.Icon src={exportIcon} />
             )}
             <Button.Text style={styles.textMicroBold}>{translate('common.export')}</Button.Text>
         </Button>

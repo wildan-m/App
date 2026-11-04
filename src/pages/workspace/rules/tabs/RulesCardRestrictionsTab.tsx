@@ -37,7 +37,10 @@ function RulesCardRestrictionsTab({policyID, canWriteRules, selectedKeys, onSele
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardCoins', 'ExpensifyCardProtectionIllustration']);
+    const {ExpensifyCardCoins: expensifyCardCoinsIllustration, ExpensifyCardProtectionIllustration: expensifyCardProtectionIllustrationIllustration} = useMemoizedLazyIllustrations([
+        'ExpensifyCardCoins',
+        'ExpensifyCardProtectionIllustration',
+    ]);
     const {showConfirmModal} = useConfirmModal();
     const policy = usePolicy(policyID);
     const {canWrite: canWriteMoreFeatures, showReadOnlyModal: showMoreFeaturesReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.MORE_FEATURES);
@@ -46,7 +49,7 @@ function RulesCardRestrictionsTab({policyID, canWriteRules, selectedKeys, onSele
 
     const showBuiltInProtectionModal = () => {
         showConfirmModal({
-            image: illustrations.ExpensifyCardProtectionIllustration,
+            image: expensifyCardProtectionIllustrationIllustration,
             imageStyles: [styles.w100],
             shouldFitImageToContainer: true,
             title: translate('workspace.rules.spendRules.builtInProtectionModal.title'),
@@ -105,7 +108,7 @@ function RulesCardRestrictionsTab({policyID, canWriteRules, selectedKeys, onSele
     const cardRulesEmptyState: TableEmptyStateProps = {
         minModalHeight: 0,
         cardContentStyles: styles.ph0,
-        headerMedia: illustrations.ExpensifyCardCoins,
+        headerMedia: expensifyCardCoinsIllustration,
         headerContentStyles: shouldUseNarrowLayout ? styles.expensifyCardEmptyIllustration : styles.cardRulesEmptyStateIllustration,
         title: translate('workspace.rules.spendRules.cardRulesUpsell.title'),
         subtitle: translate('workspace.rules.spendRules.cardRulesUpsell.subtitle'),

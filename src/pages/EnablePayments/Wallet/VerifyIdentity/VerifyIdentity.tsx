@@ -32,7 +32,7 @@ const ONFIDO_ERROR_DISPLAY_DURATION = 10000;
 function VerifyIdentity() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
     const [walletOnfidoData] = useOnyx(ONYXKEYS.RAM_ONLY_WALLET_ONFIDO);
 
     const handleOnfidoSuccess = (onfidoData: OnfidoData) => {
@@ -84,7 +84,7 @@ function VerifyIdentity() {
                         <>
                             <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.m5, styles.ph5]}>
                                 <Icon
-                                    src={illustrations.ToddBehindCloud}
+                                    src={toddBehindCloudIllustration}
                                     width={100}
                                     height={100}
                                 />

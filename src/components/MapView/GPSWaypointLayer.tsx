@@ -26,7 +26,11 @@ type GPSWaypointLayerProps = {
  * Waypoints need to be rendered as a layer to be able to render them below the LocationPuck component.
  */
 function GPSWaypointLayer({waypoints, belowLayerID}: GPSWaypointLayerProps) {
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MapStartWaypoint', 'MapStopWaypoint', 'MapWaypoint']);
+    const {
+        MapStartWaypoint: mapStartWaypointIcon,
+        MapStopWaypoint: mapStopWaypointIcon,
+        MapWaypoint: mapWaypointIcon,
+    } = useMemoizedLazyExpensifyIcons(['MapStartWaypoint', 'MapStopWaypoint', 'MapWaypoint']);
 
     const waypointFeatures = !waypoints?.length
         ? []
@@ -52,21 +56,21 @@ function GPSWaypointLayer({waypoints, belowLayerID}: GPSWaypointLayerProps) {
             <Mapbox.Images>
                 <Mapbox.Image name={WAYPOINT_ICON_NAMES.START_WAYPOINT}>
                     <ImageSVG
-                        src={expensifyIcons.MapStartWaypoint}
+                        src={mapStartWaypointIcon}
                         width={getMapMarkerSize('START_WAYPOINT').width}
                         height={getMapMarkerSize('START_WAYPOINT').height}
                     />
                 </Mapbox.Image>
                 <Mapbox.Image name={WAYPOINT_ICON_NAMES.STOP_WAYPOINT}>
                     <ImageSVG
-                        src={expensifyIcons.MapStopWaypoint}
+                        src={mapStopWaypointIcon}
                         width={getMapMarkerSize('STOP_WAYPOINT').width}
                         height={getMapMarkerSize('STOP_WAYPOINT').height}
                     />
                 </Mapbox.Image>
                 <Mapbox.Image name={WAYPOINT_ICON_NAMES.WAYPOINT}>
                     <ImageSVG
-                        src={expensifyIcons.MapWaypoint}
+                        src={mapWaypointIcon}
                         width={getMapMarkerSize('WAYPOINT').width}
                         height={getMapMarkerSize('WAYPOINT').height}
                     />

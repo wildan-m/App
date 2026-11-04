@@ -42,12 +42,12 @@ function ConnectToCertiniaFlow({policyID}: ConnectToCertiniaFlowProps) {
     const {popoverAnchorRefs} = useAccountingState();
     const threeDotsMenuContainerRef = popoverAnchorRefs?.current?.[CONST.POLICY.CONNECTIONS.NAME.CERTINIA];
 
-    const icons = useMemoizedLazyExpensifyIcons(['Copy', 'LinkCopy']);
+    const {Copy: copyIcon, LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['Copy', 'LinkCopy']);
     const {calculatePopoverPosition} = usePopoverPosition();
 
     const connectionOptions = [
         {
-            icon: icons.LinkCopy,
+            icon: linkCopyIcon,
             text: translate('workspace.certinia.prerequisites.connectButton'),
             onSelected: () => {
                 Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_PREREQUISITES.getRoute(policyID));
@@ -55,7 +55,7 @@ function ConnectToCertiniaFlow({policyID}: ConnectToCertiniaFlowProps) {
             },
         },
         {
-            icon: icons.LinkCopy,
+            icon: linkCopyIcon,
             text: translate('workspace.certinia.prerequisites.connectSandboxButton'),
             onSelected: () => {
                 const isSandbox = true;
@@ -66,7 +66,7 @@ function ConnectToCertiniaFlow({policyID}: ConnectToCertiniaFlowProps) {
         ...(hasReusablePoliciesConnectedToCertinia
             ? [
                   {
-                      icon: icons.Copy,
+                      icon: copyIcon,
                       text: translate('workspace.common.reuseExistingConnection'),
                       onSelected: () => {
                           Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_EXISTING_CONNECTIONS.getRoute(policyID));

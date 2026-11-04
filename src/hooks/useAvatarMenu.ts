@@ -33,7 +33,7 @@ type UseAvatarMenuParams = {
  * Custom hook to create avatar menu items
  */
 function useAvatarMenu({shouldHideAvatarEdit, accountID, onImageRemoved, showAvatarCropModal, clearError, source, originalFileName}: UseAvatarMenuParams) {
-    const icons = useMemoizedLazyExpensifyIcons(['Upload', 'Trashcan', 'Eye']);
+    const {Upload: uploadIcon, Trashcan: trashcanIcon, Eye: eyeIcon} = useMemoizedLazyExpensifyIcons(['Upload', 'Trashcan', 'Eye']);
     const {translate} = useLocalize();
     const attachmentContext = useContext(AttachmentModalContext);
 
@@ -43,7 +43,7 @@ function useAvatarMenu({shouldHideAvatarEdit, accountID, onImageRemoved, showAva
     const createMenuItems = (openPicker: OpenPicker): Array<DropdownOption<null>> => {
         const menuItems: Array<DropdownOption<null>> = [
             {
-                icon: icons.Upload,
+                icon: uploadIcon,
                 text: translate('avatarWithImagePicker.uploadPhoto'),
                 onSelected: () => {
                     openPicker({
@@ -59,7 +59,7 @@ function useAvatarMenu({shouldHideAvatarEdit, accountID, onImageRemoved, showAva
         }
         if (!source) {
             menuItems.push({
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('avatarWithImagePicker.removePhoto'),
                 value: null,
                 onSelected: () => {
@@ -73,7 +73,7 @@ function useAvatarMenu({shouldHideAvatarEdit, accountID, onImageRemoved, showAva
             ...menuItems,
             {
                 value: null,
-                icon: icons.Eye,
+                icon: eyeIcon,
                 text: translate('avatarWithImagePicker.viewPhoto'),
                 onSelected: () => {
                     attachmentContext.setCurrentAttachment({source, originalFileName});

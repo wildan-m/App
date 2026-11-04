@@ -152,7 +152,8 @@ function ExpenseHeaderApprovalButton({
 }: ExpenseHeaderApprovalButtonProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyExpensifyIcons(['ThumbsUp', 'DocumentCheck']);
+    const {ThumbsUp: thumbsUpIcon, DocumentCheck: documentCheckIcon} = useMemoizedLazyExpensifyIcons(['ThumbsUp', 'DocumentCheck']);
+    const illustrations = {ThumbsUp: thumbsUpIcon, DocumentCheck: documentCheckIcon};
     const {convertToDisplayString} = useCurrencyListActions();
 
     const shouldShowDropdown = isAnyTransactionOnHold && !isDelegateAccessRestricted;

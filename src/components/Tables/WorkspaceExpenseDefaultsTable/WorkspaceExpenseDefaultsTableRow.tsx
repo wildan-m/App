@@ -63,7 +63,7 @@ function WorkspaceExpenseDefaultsTableRow({item, rowIndex, shouldUseNarrowTableL
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Pencil', 'Lock']);
+    const {ArrowRight: arrowRightIcon, Pencil: pencilIcon, Lock: lockIcon2} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Pencil', 'Lock']);
     const {processedData} = useTableContext<ExpenseDefaultTableItem>();
     const {translate} = useLocalize();
 
@@ -84,7 +84,7 @@ function WorkspaceExpenseDefaultsTableRow({item, rowIndex, shouldUseNarrowTableL
         <Tooltip text={translate('workspace.rules.spendRules.defaultRulesCannotBeDeleted')}>
             <View>
                 <Icon
-                    src={Expensicons.Lock}
+                    src={lockIcon2}
                     width={variables.iconSizeNormal}
                     height={variables.iconSizeNormal}
                     fill={theme.icon}
@@ -125,7 +125,7 @@ function WorkspaceExpenseDefaultsTableRow({item, rowIndex, shouldUseNarrowTableL
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                     <Badge
                                         text={item.typeLabel}
-                                        icon={Expensicons.Pencil}
+                                        icon={pencilIcon}
                                         iconFill={badgeColors.textColor}
                                         badgeStyles={[
                                             styles.ml0,
@@ -161,7 +161,7 @@ function WorkspaceExpenseDefaultsTableRow({item, rowIndex, shouldUseNarrowTableL
                                 >
                                     <Badge
                                         text={item.typeLabel}
-                                        icon={Expensicons.Pencil}
+                                        icon={pencilIcon}
                                         iconFill={badgeColors.textColor}
                                         badgeStyles={[
                                             styles.ml0,
@@ -201,7 +201,7 @@ function WorkspaceExpenseDefaultsTableRow({item, rowIndex, shouldUseNarrowTableL
 
                         <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                             <Icon
-                                src={Expensicons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, (!hovered || isDeleting) && styles.opacitySemiTransparent]}
                                 width={variables.iconSizeNormal}

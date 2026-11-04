@@ -55,7 +55,11 @@ function AddCardToDigitalWalletPage({
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['CardIntoWallet', 'ThumbsUpStars', 'CardDenied']);
+    const {
+        CardIntoWallet: cardIntoWalletIllustration,
+        ThumbsUpStars: thumbsUpStarsIllustration,
+        CardDenied: cardDeniedIllustration,
+    } = useMemoizedLazyIllustrations(['CardIntoWallet', 'ThumbsUpStars', 'CardDenied']);
     const primaryLogin = usePrimaryContactMethod();
 
     const [card, cardMetadata] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(cardID)});
@@ -175,7 +179,7 @@ function AddCardToDigitalWalletPage({
                 <ConfirmationPageDefault
                     heading={translate(isSuccess ? 'addCardToDigitalWallet.successHeading' : 'addCardToDigitalWallet.deniedHeading')}
                     description={translate(isSuccess ? 'addCardToDigitalWallet.successDescription' : 'addCardToDigitalWallet.deniedDescription', {walletName})}
-                    illustration={isSuccess ? illustrations.ThumbsUpStars : illustrations.CardDenied}
+                    illustration={isSuccess ? thumbsUpStarsIllustration : cardDeniedIllustration}
                     illustrationStyle={styles.digitalWalletResultIllustration}
                     descriptionStyle={styles.textSupporting}
                     buttonText={translate('common.buttonConfirm')}
@@ -202,7 +206,7 @@ function AddCardToDigitalWalletPage({
                 <View style={[styles.screenCenteredContainer, styles.alignItemsCenter]}>
                     <View style={styles.digitalWalletConfirmIllustration}>
                         <ImageSVG
-                            src={illustrations.CardIntoWallet}
+                            src={cardIntoWalletIllustration}
                             contentFit="contain"
                         />
                     </View>

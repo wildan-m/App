@@ -37,7 +37,7 @@ function CopyableTextField({value, isLoading = false, style, textStyle, shouldDi
     const {translate} = useLocalize();
 
     const [expanded, setExpanded] = useState(false);
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
 
     return (
         <View style={[styles.qbdSetupLinkBox, styles.border, styles.gap4, styles.justifyContentCenter, styles.alignItemsCenter, style]}>
@@ -67,7 +67,7 @@ function CopyableTextField({value, isLoading = false, style, textStyle, shouldDi
                             onPress={() => setExpanded((current) => !current)}
                         >
                             <Button.Text>{translate(expanded ? 'common.showLess' : 'common.showMore')}</Button.Text>
-                            <Button.Icon src={expanded ? icons.UpArrow : icons.DownArrow} />
+                            <Button.Icon src={expanded ? upArrowIcon : downArrowIcon} />
                         </Button>
                     )}
                 </>

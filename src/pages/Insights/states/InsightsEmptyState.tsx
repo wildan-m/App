@@ -10,11 +10,11 @@ import React from 'react';
 function InsightsEmptyState() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['MagnifyingGlassChart']);
+    const {MagnifyingGlassChart: magnifyingGlassChartIllustration} = useMemoizedLazyIllustrations(['MagnifyingGlassChart']);
 
     return (
         <GenericEmptyStateComponent
-            headerMedia={illustrations.MagnifyingGlassChart}
+            headerMedia={magnifyingGlassChartIllustration}
             headerStyles={styles.emptyStateCardIllustrationContainer}
             headerContentStyles={[styles.insightsEmptyStateIllustration]}
             title={translate('insightsPage.emptyState.title')}

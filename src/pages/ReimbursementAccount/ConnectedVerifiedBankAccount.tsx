@@ -67,7 +67,7 @@ function ConnectedVerifiedBankAccount({
     const errors = reimbursementAccount?.errors ?? {};
     const pendingAction = reimbursementAccount?.pendingAction;
     const {asset: ThumbsUpStars} = useMemoizedLazyAsset(() => loadIllustration('ThumbsUpStars' as IllustrationName));
-    const icons = useMemoizedLazyExpensifyIcons(['Bank', 'Close']);
+    const {Bank: bankIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Bank', 'Close']);
     const policyID = reimbursementAccount?.achData?.policyID;
     const currency = reimbursementAccount?.achData?.currency;
     const shouldShowChangeBankAccount = !!policyID && !!currency;
@@ -127,14 +127,14 @@ function ConnectedVerifiedBankAccount({
                             {shouldShowChangeBankAccount && (
                                 <MenuItemNavigation
                                     title={translate('workspace.bankAccount.changeBankAccount')}
-                                    icon={icons.Bank}
+                                    icon={bankIcon}
                                     onPress={handleChangeBankAccount}
                                     isDisabled={!!pendingAction || !isEmptyObject(errors)}
                                 />
                             )}
                             <MenuItemAction
                                 title={translate('workspace.bankAccount.disconnectBankAccount')}
-                                icon={icons.Close}
+                                icon={closeIcon}
                                 onPress={requestResetBankAccount}
                                 isDisabled={!!pendingAction || !isEmptyObject(errors)}
                             />

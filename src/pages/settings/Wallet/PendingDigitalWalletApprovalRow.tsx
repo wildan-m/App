@@ -37,14 +37,14 @@ function PendingDigitalWalletApprovalRow({cardID, walletProvider, style}: Pendin
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const walletName = translate(`addCardToDigitalWallet.${getWalletProviderNameKey(walletProvider, true)}`);
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, style]}>
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1, styles.mr2]}>
                 <Icon
-                    src={icons.DotIndicator}
+                    src={dotIndicatorIcon}
                     fill={theme.success}
                     additionalStyles={[styles.mr2]}
                 />

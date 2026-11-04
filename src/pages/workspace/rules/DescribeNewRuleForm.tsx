@@ -96,7 +96,7 @@ function DescribeNewRuleForm({policyID, children}: DescribeNewRuleFormProps) {
     const styles = useThemeStyles();
     const isFocused = useIsFocused();
     const policy = usePolicy(policyID);
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {Sparkles: sparklesIcon} = useMemoizedLazyExpensifyIcons(['Sparkles']);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
     const domainAccountID = useDefaultFundID(policyID);
     const [expensifyCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
@@ -161,7 +161,7 @@ function DescribeNewRuleForm({policyID, children}: DescribeNewRuleFormProps) {
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2, styles.mt5, styles.mb3]}>
                 <Text style={styles.textHeadlineLineHeightXXL}>{translate('workspace.rules.newRule.describeItBelow')}</Text>
                 <Icon
-                    src={icons.Sparkles}
+                    src={sparklesIcon}
                     fill={theme.icon}
                     width={variables.iconSizeSmall}
                     height={variables.iconSizeSmall}

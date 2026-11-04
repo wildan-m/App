@@ -34,7 +34,7 @@ function DynamicQuickbooksDesktopFxExpenseAccountSelectPage({policy}: WithPolicy
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const canConfigureCurrencyConversionFees = useCanConfigureCurrencyConversionFees(policy);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id;
     const qbdConfig = policy?.connections?.quickbooksDesktop?.config;
@@ -68,7 +68,7 @@ function DynamicQuickbooksDesktopFxExpenseAccountSelectPage({policy}: WithPolicy
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbd.noAccountsFound')}

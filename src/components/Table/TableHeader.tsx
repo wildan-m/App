@@ -262,7 +262,7 @@ function TableHeaderColumn<DataType extends TableData, ColumnKey extends string 
     const theme = useTheme();
     const toggleCount = useRef(0);
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowUpLong', 'ArrowDownLong']);
+    const {ArrowUpLong: arrowUpLongIcon, ArrowDownLong: arrowDownLongIcon} = useMemoizedLazyExpensifyIcons(['ArrowUpLong', 'ArrowDownLong']);
 
     const {
         activeSorting,
@@ -270,7 +270,7 @@ function TableHeaderColumn<DataType extends TableData, ColumnKey extends string 
     } = useTableContext<DataType, ColumnKey>();
 
     const isSortingByColumn = column.key === activeSorting.columnKey;
-    const sortIcon = activeSorting.order === 'asc' ? expensifyIcons.ArrowUpLong : expensifyIcons.ArrowDownLong;
+    const sortIcon = activeSorting.order === 'asc' ? arrowUpLongIcon : arrowDownLongIcon;
 
     /**
      * Handles column header press for sorting.

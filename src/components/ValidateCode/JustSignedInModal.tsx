@@ -25,16 +25,16 @@ function JustSignedInModal({is2FARequired}: JustSignedInModalProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Safe', 'Abracadabra']);
+    const {Safe: safeIllustration, Abracadabra: abracadabraIllustration} = useMemoizedLazyIllustrations(['Safe', 'Abracadabra']);
     return (
         <View style={styles.deeplinkWrapperContainer}>
             <View style={styles.deeplinkWrapperMessage}>
                 <View style={styles.mb2}>
                     {isReduceMotionEnabled ? (
                         <ImageSVG
-                            src={is2FARequired ? illustrations.Safe : illustrations.Abracadabra}
+                            src={is2FARequired ? safeIllustration : abracadabraIllustration}
                             style={styles.justSignedInModalAnimation(is2FARequired)}
                         />
                     ) : (
@@ -59,7 +59,7 @@ function JustSignedInModal({is2FARequired}: JustSignedInModalProps) {
                     width={variables.modalWordmarkWidth}
                     height={variables.modalWordmarkHeight}
                     fill={theme.success}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
             </View>
         </View>

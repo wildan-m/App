@@ -8,11 +8,11 @@ import React from 'react';
 // tintColor on iOS causes the image to render at 3x resolution.
 // On Android, the SVG fill doesn't work, so the color is passed via the fill prop instead (see index.android.tsx).
 function EReceiptBody() {
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptBody']);
+    const {ReceiptBody: receiptBodyIcon} = useMemoizedLazyExpensifyIcons(['ReceiptBody']);
 
     return (
         <ImageSVG
-            src={icons.ReceiptBody}
+            src={receiptBodyIcon}
             contentFit="fill"
         />
     );

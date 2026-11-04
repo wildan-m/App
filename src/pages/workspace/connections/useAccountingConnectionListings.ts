@@ -40,7 +40,20 @@ function useAccountingConnectionListings(policy: OnyxEntry<Policy>): ConnectionL
     const {activeIntegration, popoverAnchorRefs} = useAccountingState();
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
     const {canWrite, showReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.ACCOUNTING);
-    const accountingIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        IntacctSquare,
+        IntuitSquare,
+        QBOSquare,
+        XeroSquare,
+        NetSuiteSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        BusinessCentralSquare,
+        ZohoBooksSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'IntacctSquare',
         'IntuitSquare',
         'QBOSquare',
@@ -54,6 +67,20 @@ function useAccountingConnectionListings(policy: OnyxEntry<Policy>): ConnectionL
         'BusinessCentralSquare',
         'ZohoBooksSquare',
     ]);
+    const accountingIcons = {
+        IntacctSquare,
+        IntuitSquare,
+        QBOSquare,
+        XeroSquare,
+        NetSuiteSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        BusinessCentralSquare,
+        ZohoBooksSquare,
+    };
 
     if (!policyID) {
         return [];

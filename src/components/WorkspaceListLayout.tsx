@@ -51,20 +51,20 @@ function WorkspaceListHeaderContent({activeTabKey, headerButton, shouldShowHeade
     const {pageGutterRight, pageGutter} = useLayoutSpacing();
     const {translate} = useLocalize();
     const shouldRenderTopBar = useIsMobileWebLandscape();
-    const icons = useMemoizedLazyExpensifyIcons(['Globe', 'Building']);
+    const {Globe: globeIcon, Building: buildingIcon} = useMemoizedLazyExpensifyIcons(['Globe', 'Building']);
     const {badgeText: domainsBadgeText, hasDomainErrors} = useDomainsTabBadge();
     const navigationOptions = [
         {
             key: 'workspaces',
             title: translate('common.workspaces'),
-            icon: icons.Building,
+            icon: buildingIcon,
             route: ROUTES.WORKSPACES_LIST.getRoute(),
             screenName: SCREENS.WORKSPACES_LIST,
         },
         {
             key: 'domains',
             title: translate('common.domains'),
-            icon: icons.Globe,
+            icon: globeIcon,
             route: ROUTES.DOMAINS_LIST.getRoute(),
             screenName: SCREENS.DOMAINS_LIST,
             badgeText: domainsBadgeText,

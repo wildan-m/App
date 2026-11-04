@@ -102,7 +102,7 @@ function ListField({rows, addTitle, addDescription, canAddMore = true, errorText
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Close']);
+    const {Plus: plusIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Close']);
     const editButtonRefs = useRef(new Map<string, ComponentRef<typeof View>>());
     const addRowRef = useRef<ComponentRef<typeof View>>(null);
 
@@ -168,7 +168,7 @@ function ListField({rows, addTitle, addDescription, canAddMore = true, errorText
                                     onPress={() => onRemove(row.id)}
                                 >
                                     <Icon
-                                        src={icons.Close}
+                                        src={closeIcon}
                                         fill={theme.icon}
                                         width={variables.iconSizeSmall}
                                         height={variables.iconSizeSmall}
@@ -187,7 +187,7 @@ function ListField({rows, addTitle, addDescription, canAddMore = true, errorText
                     <AddRowErrorAnnouncement errorText={errorText} />
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.Plus} />
+                            <MenuItem.Icon src={plusIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{addTitle}</MenuItem.Title>

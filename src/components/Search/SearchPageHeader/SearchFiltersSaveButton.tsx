@@ -20,7 +20,7 @@ import SearchFiltersBarButton from './SearchFiltersBarButton';
 
 function SearchFiltersSaveButton() {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark']);
+    const {Bookmark: bookmarkIcon} = useMemoizedLazyExpensifyIcons(['Bookmark']);
     // We need isSmallScreenWidth (not just shouldUseNarrowLayout) because DecisionModal requires it for correct modal type
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
@@ -60,7 +60,7 @@ function SearchFiltersSaveButton() {
     return (
         <>
             <SearchFiltersBarButton
-                icon={expensifyIcons.Bookmark}
+                icon={bookmarkIcon}
                 text={translate('common.save')}
                 onPress={savePressed}
                 sentryLabel={CONST.SENTRY_LABEL.SEARCH.SAVE_FILTERS_BUTTON}

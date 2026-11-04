@@ -44,7 +44,7 @@ function DynamicVerifyPage() {
     const {translate} = useLocalize();
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const {Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Copy']);
     const contactMethod = getContactMethod(account?.primaryLogin, session?.email);
     const formRef = useRef<BaseTwoFactorAuthFormRef>(null);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.TWO_FACTOR_AUTH_VERIFY.path);
@@ -131,7 +131,7 @@ function DynamicVerifyPage() {
                             tooltipText=""
                             tooltipTextChecked=""
                             accessibilityLabel={`${translate('twoFactorAuth.copy')}, ${translate('twoFactorAuth.secretKey')}`}
-                            icon={icons.Copy}
+                            icon={copyIcon}
                             inline={false}
                             onPress={() => Clipboard.setString(account?.twoFactorAuthSecretKey ?? '')}
                             styles={[styles.button, styles.buttonMedium, styles.twoFactorAuthCopyCodeButton]}

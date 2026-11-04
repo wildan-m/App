@@ -25,7 +25,7 @@ type SymbolButtonProps = {
 };
 
 function SymbolButton({onSymbolButtonPress, symbol, isSymbolPressable = true, textStyle}: SymbolButtonProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -39,7 +39,7 @@ function SymbolButton({onSymbolButtonPress, symbol, isSymbolPressable = true, te
             >
                 <Icon
                     size={CONST.ICON_SIZE.SMALL}
-                    src={icons.DownArrow}
+                    src={downArrowIcon}
                     fill={theme.icon}
                 />
                 <Text style={[styles.iouAmountText, styles.lineHeightUndefined, textStyle]}>{symbol}</Text>

@@ -50,7 +50,7 @@ function ReportAddApproverPage({report, isLoadingReportData, policy}: ReportAddA
     const {isBetaEnabled} = usePermissions();
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const {isLoading, startWithLoading} = usePressLoading();
     const currentUserDetails = useCurrentUserPersonalDetails();
@@ -93,7 +93,7 @@ function ReportAddApproverPage({report, isLoadingReportData, policy}: ReportAddA
                     isSelected: selectedApproverEmail === email,
                     login: email,
                     value: accountID,
-                    icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    icons: [{source: avatar ?? fallbackAvatarIcon, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
                     rightElement: isAdmin ? <Badge text={translate('common.admin')} /> : undefined,
                 };
             })

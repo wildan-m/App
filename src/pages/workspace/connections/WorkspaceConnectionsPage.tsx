@@ -105,8 +105,8 @@ function WorkspaceConnectionsPage({policy}: WithPolicyConnectionsProps) {
     const policyID = policy?.id;
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
-    const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {EmptyShelves: emptyShelvesIllustration2} = useMemoizedLazyIllustrations(['EmptyShelves']);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const shouldUseSingleColumn = shouldUseNarrowLayout || isMediumScreenWidth;
@@ -343,7 +343,7 @@ function WorkspaceConnectionsPage({policy}: WithPolicyConnectionsProps) {
                 </View>
                 {shouldShowEmptyState ? (
                     <GenericEmptyStateComponent
-                        headerMedia={illustrations.EmptyShelves}
+                        headerMedia={emptyShelvesIllustration2}
                         headerContentStyles={styles.emptyShelvesIllustration}
                         headerStyles={styles.emptyStateCardIllustrationContainer}
                         title={isSearching ? translate('common.noResultsFound') : translate('workspace.connections.allConnectedTitle')}
@@ -374,7 +374,7 @@ function WorkspaceConnectionsPage({policy}: WithPolicyConnectionsProps) {
                     >
                         <Text style={[styles.textLabelSupporting, styles.flexShrink1]}>{translate('workspace.connections.suggestIntegration')}</Text>
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             width={variables.iconSizeExtraSmall}
                             height={variables.iconSizeExtraSmall}
                             fill={theme.icon}

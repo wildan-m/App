@@ -40,7 +40,7 @@ type BusinessCentralBankAccountSelectPageProps = WithPolicyConnectionsProps &
 function BusinessCentralBankAccountSelectPage({policy, route}: BusinessCentralBankAccountSelectPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const settingName = route.params.settingName;
     const isSettlementsBankAccount = settingName === CONST.BUSINESS_CENTRAL_CONFIG.SETTLEMENTS_BANK_ACCOUNT_ID;
@@ -71,7 +71,7 @@ function BusinessCentralBankAccountSelectPage({policy, route}: BusinessCentralBa
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.businessCentral.noBankAccountsFound')}

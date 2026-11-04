@@ -28,7 +28,7 @@ type DefaultAttachmentViewProps = {
 };
 
 function DefaultAttachmentView({fileName = '', shouldShowLoadingSpinnerIcon = false, shouldShowDownloadIcon, containerStyles, icon, isUploading, isDeleted}: DefaultAttachmentViewProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'Paperclip']);
+    const {Download: downloadIcon, Paperclip: paperclipIcon} = useMemoizedLazyExpensifyIcons(['Download', 'Paperclip']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -38,7 +38,7 @@ function DefaultAttachmentView({fileName = '', shouldShowLoadingSpinnerIcon = fa
             <View style={styles.mr2}>
                 <Icon
                     fill={theme.icon}
-                    src={icon ?? icons.Paperclip}
+                    src={icon ?? paperclipIcon}
                 />
             </View>
 
@@ -48,7 +48,7 @@ function DefaultAttachmentView({fileName = '', shouldShowLoadingSpinnerIcon = fa
                     <View style={styles.ml2}>
                         <Icon
                             fill={theme.icon}
-                            src={icons.Download}
+                            src={downloadIcon}
                         />
                     </View>
                 </Tooltip>

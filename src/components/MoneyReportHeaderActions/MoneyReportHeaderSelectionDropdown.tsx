@@ -97,7 +97,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
 
     const {showConfirmModal} = useConfirmModal();
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(PAYMENT_ICONS);
+    const {Send: sendIcon, ThumbsUp: thumbsUpIcon, Cash: cashIcon, ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(PAYMENT_ICONS);
 
     const {beginExportWithTemplate, showOfflineModal, showDownloadErrorModal} = useExportActions({
         reportID,
@@ -267,7 +267,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
             ? [
                   {
                       text: submitButtonText,
-                      icon: expensifyIcons.Send,
+                      icon: sendIcon,
                       value: CONST.REPORT.PRIMARY_ACTIONS.SUBMIT,
                       onSelected: () => handleSubmitReport(true),
                   },
@@ -277,9 +277,9 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
             ? [
                   {
                       text: approveButtonText,
-                      icon: expensifyIcons.ThumbsUp,
+                      icon: thumbsUpIcon,
                       value: CONST.REPORT.PRIMARY_ACTIONS.APPROVE,
-                      rightIcon: shouldShowApproveSubMenu ? expensifyIcons.ArrowRight : undefined,
+                      rightIcon: shouldShowApproveSubMenu ? arrowRightIcon : undefined,
                       backButtonText: shouldShowApproveSubMenu ? approveButtonText : undefined,
                       subMenuItems: shouldShowApproveSubMenu ? approveSubMenuItems : undefined,
                       subMenuHeaderText: shouldShowApproveSubMenu ? approveSubMenuHeaderText : undefined,
@@ -292,9 +292,9 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
             ? [
                   {
                       text: translate('iou.settlePayment', totalAmount),
-                      icon: expensifyIcons.Cash,
+                      icon: cashIcon,
                       value: CONST.REPORT.PRIMARY_ACTIONS.PAY as string,
-                      rightIcon: expensifyIcons.ArrowRight,
+                      rightIcon: arrowRightIcon,
                       backButtonText: translate('iou.settlePayment', totalAmount),
                       subMenuItems: paymentSubMenuItems,
                   },

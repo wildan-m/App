@@ -65,7 +65,7 @@ type TaskPreviewProps = WithCurrentUserPersonalDetailsProps & {
 
 function TaskPreview({action, chatReportID, currentUserPersonalDetails, isHovered = false, style}: TaskPreviewProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'DotIndicator']);
+    const {ArrowRight: arrowRightIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'DotIndicator']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
@@ -233,13 +233,13 @@ function TaskPreview({action, chatReportID, currentUserPersonalDetails, isHovere
                 {shouldShowGreenDotIndicator && (
                     <View style={iconWrapperStyle}>
                         <Icon
-                            src={icons.DotIndicator}
+                            src={dotIndicatorIcon}
                             fill={theme.success}
                         />
                     </View>
                 )}
                 <Icon
-                    src={icons.ArrowRight}
+                    src={arrowRightIcon}
                     fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: isHovered})})}
                     additionalStyles={iconWrapperStyle}
                 />

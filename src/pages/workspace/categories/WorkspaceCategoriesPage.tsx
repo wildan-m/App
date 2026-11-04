@@ -109,7 +109,14 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
     const [selectedCategoryKeys, setSelectedCategoryKeys] = useState<string[]>([]);
     const canSelectMultiple = canWriteCategories && (isSmallScreenWidth ? isMobileSelectionModeEnabled : true);
     const isControlPolicyWithWideLayout = !shouldUseNarrowLayout && isControlPolicy(policy);
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Download', 'Gear', 'Plus', 'Table', 'Trashcan']);
+    const {
+        Checkmark: checkmarkIcon,
+        Close: closeIcon,
+        Download: downloadIcon,
+        Plus: plusIcon,
+        Table: tableIcon,
+        Trashcan: trashcanIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Download', 'Gear', 'Plus', 'Table', 'Trashcan']);
 
     const {
         taskReport: setupCategoryTaskReport,
@@ -388,7 +395,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
     }
     if (canWriteCategories && !policyHasAccountingConnections) {
         menuItems.push({
-            icon: icons.Table,
+            icon: tableIcon,
             text: translate('spreadsheet.importSpreadsheet'),
             onSelected: navigateToImportSpreadsheet,
             value: CONST.POLICY.SECONDARY_ACTIONS.IMPORT_SPREADSHEET,
@@ -398,7 +405,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
     }
     if (hasVisibleCategories) {
         menuItems.push({
-            icon: icons.Download,
+            icon: downloadIcon,
             text: translate('spreadsheet.downloadCSV'),
             onSelected: () => {
                 if (isOffline) {
@@ -428,7 +435,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
         if (canWriteCategories && (isSmallScreenWidth ? canSelectMultiple : selectedCategoryKeys.length > 0)) {
             if (!isThereAnyAccountingConnection) {
                 options.push({
-                    icon: icons.Trashcan,
+                    icon: trashcanIcon,
                     text: translate(selectedCategoryKeys.length === 1 ? 'workspace.categories.deleteCategory' : 'workspace.categories.deleteCategories'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
                     shouldSkipFocusRestore: true,
@@ -464,7 +471,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         return acc;
                     }, {});
                 options.push({
-                    icon: icons.Close,
+                    icon: closeIcon,
                     text: translate(enabledCategories.length === 1 ? 'workspace.categories.disableCategory' : 'workspace.categories.disableCategories'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
                     shouldSkipFocusRestore: isDisablingOrDeletingLastEnabledCategory(policy, policyCategories, selectedCategoriesObject),
@@ -508,7 +515,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         return acc;
                     }, {});
                 options.push({
-                    icon: icons.Checkmark,
+                    icon: checkmarkIcon,
                     text: translate(disabledCategories.length === 1 ? 'workspace.categories.enableCategory' : 'workspace.categories.enableCategories'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
                     onSelected: () => {
@@ -561,7 +568,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.CATEGORIES.ADD_BUTTON}
                         style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                     >
-                        <Button.Icon src={icons.Plus} />
+                        <Button.Icon src={plusIcon} />
                         <Button.Text>{translate('workspace.categories.addCategory')}</Button.Text>
                     </Button>
                 )}
@@ -616,12 +623,12 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
     const emptyStateButtons: EmptyStateButton[] | undefined = !policyHasAccountingConnections
         ? [
               {
-                  icon: icons.Table,
+                  icon: tableIcon,
                   buttonText: translate('common.import'),
                   buttonAction: navigateToImportSpreadsheet,
               },
               {
-                  icon: icons.Plus,
+                  icon: plusIcon,
                   buttonText: translate('workspace.categories.addCategory'),
                   buttonAction: navigateToCreateCategoryPage,
                   buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,

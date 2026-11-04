@@ -34,7 +34,7 @@ function FlightTripDetails({reservation, prevReservation, personalDetails}: Flig
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, dateFnsLocale} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Hourglass']);
+    const {Hourglass: hourglassIcon} = useMemoizedLazyExpensifyIcons(['Hourglass']);
 
     const cabinClassMapping: Record<string, string> = {
         UNKNOWN_CABIN: translate('travel.flightDetails.cabinClasses.unknown'),
@@ -68,7 +68,7 @@ function FlightTripDetails({reservation, prevReservation, personalDetails}: Flig
             {!!layover && (
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.mh5, styles.mv3, styles.gap2]}>
                     <Icon
-                        src={expensifyIcons.Hourglass}
+                        src={hourglassIcon}
                         height={variables.iconSizeNormal}
                         width={variables.iconSizeNormal}
                         fill={theme.icon}

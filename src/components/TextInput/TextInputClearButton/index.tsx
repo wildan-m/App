@@ -26,7 +26,7 @@ function TextInputClearButton({iconSize = variables.iconSizeNormal, style, onPre
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Clear']);
+    const {Clear: clearIcon} = useMemoizedLazyExpensifyIcons(['Clear']);
     return (
         <Tooltip text={translate('common.clear')}>
             <PressableWithoutFeedback
@@ -41,7 +41,7 @@ function TextInputClearButton({iconSize = variables.iconSizeNormal, style, onPre
                 sentryLabel={sentryLabel}
             >
                 <Icon
-                    src={icons.Clear}
+                    src={clearIcon}
                     width={iconSize}
                     height={iconSize}
                     fill={theme.icon}

@@ -32,7 +32,7 @@ function UpdateRequiredView() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['UpgradeRocket']);
+    const {UpgradeRocket: upgradeRocketIllustration} = useMemoizedLazyIllustrations(['UpgradeRocket']);
     const {isProduction} = useEnvironment();
 
     return (
@@ -45,7 +45,7 @@ function UpdateRequiredView() {
             <View style={[styles.flex1, StyleUtils.getUpdateRequiredViewStyles(shouldUseNarrowLayout)]}>
                 {isReduceMotionEnabled ? (
                     <ImageSVG
-                        src={illustrations.UpgradeRocket}
+                        src={upgradeRocketIllustration}
                         width={variables.updateRocketW}
                         height={variables.updateRocketH}
                     />

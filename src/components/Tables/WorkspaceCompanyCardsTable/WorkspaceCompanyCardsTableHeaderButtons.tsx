@@ -71,7 +71,7 @@ function WorkspaceCompanyCardsTableHeaderButtons({
     const {translate} = useLocalize();
     const {currencyList} = useCurrencyListState();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'DotIndicator']);
+    const {Gear: gearIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['Gear', 'DotIndicator']);
 
     const [cardFeeds] = useCardFeeds(policyID);
     const policy = usePolicy(policyID);
@@ -143,7 +143,7 @@ function WorkspaceCompanyCardsTableHeaderButtons({
                         accessibilityLabel={translate('common.settings')}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.SETTINGS_BUTTON}
                     >
-                        <Button.Icon src={icons.Gear} />
+                        <Button.Icon src={gearIcon} />
                         <Button.Text>{translate('common.settings')}</Button.Text>
                     </Button>
                 )}
@@ -164,7 +164,7 @@ function WorkspaceCompanyCardsTableHeaderButtons({
             {!isLoading && canWriteCompanyCards && shouldShowBrokenConnectionError && (
                 <View style={[styles.flexRow, styles.ph5, styles.alignItemsCenter]}>
                     <Icon
-                        src={icons.DotIndicator}
+                        src={dotIndicatorIcon}
                         fill={theme.danger}
                         additionalStyles={styles.mr1}
                     />

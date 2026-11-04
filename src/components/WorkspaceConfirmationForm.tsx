@@ -81,7 +81,7 @@ function WorkspaceConfirmationForm({
     addBottomSafeAreaPadding = true,
     isLoading = false,
 }: WorkspaceConfirmationFormProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Camera', 'ImageCropSquareMask']);
+    const {Camera: cameraIcon, ImageCropSquareMask: imageCropSquareMaskIcon} = useMemoizedLazyExpensifyIcons(['Camera', 'ImageCropSquareMask']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {inputCallbackRef} = useAutoFocusInput();
@@ -201,10 +201,10 @@ function WorkspaceConfirmationForm({
                         setAvatarFile(undefined);
                         setWorkspaceAvatar({avatarUri: null, avatarFileName: null, avatarFileType: null});
                     }}
-                    editIcon={icons.Camera}
+                    editIcon={cameraIcon}
                     editIconStyle={styles.smallEditIconAccount}
                     style={[styles.w100, styles.alignItemsCenter, styles.mv4, styles.mb6, styles.alignSelfCenter, styles.ph5]}
-                    editorMaskImage={icons.ImageCropSquareMask}
+                    editorMaskImage={imageCropSquareMaskIcon}
                 />
                 <FormProvider
                     formID={ONYXKEYS.FORMS.WORKSPACE_CONFIRMATION_FORM}

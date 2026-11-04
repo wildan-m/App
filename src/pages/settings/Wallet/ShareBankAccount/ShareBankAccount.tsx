@@ -43,7 +43,7 @@ type ShareBankAccountProps = PlatformStackScreenProps<SettingsNavigatorParamList
 function ShareBankAccount({route}: ShareBankAccountProps) {
     const bankAccountID = route.params?.bankAccountID;
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ShareBank', 'Telescope']);
+    const {ShareBank: shareBankIllustration, Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['ShareBank', 'Telescope']);
 
     const {isOffline} = useNetwork();
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
@@ -191,7 +191,7 @@ function ShareBankAccount({route}: ShareBankAccountProps) {
                     <ConfirmationPageDefault
                         heading={translate('walletPage.shareBankAccountSuccess')}
                         description={translate('walletPage.shareBankAccountSuccessDescription')}
-                        illustration={illustrations.ShareBank}
+                        illustration={shareBankIllustration}
                         descriptionStyle={[styles.ph4, styles.textSupporting]}
                         illustrationStyle={styles.successBankSharedCardIllustration}
                         onButtonPress={onButtonPress}
@@ -214,7 +214,7 @@ function ShareBankAccount({route}: ShareBankAccountProps) {
                         shouldUpdateFocusedIndex
                         listEmptyContent={
                             <BlockingView
-                                icon={illustrations.Telescope}
+                                icon={telescopeIllustration}
                                 iconWidth={variables.emptyListIconWidth}
                                 iconHeight={variables.emptyListIconHeight}
                                 title={translate('walletPage.shareBankAccountEmptyTitle')}

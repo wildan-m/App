@@ -91,7 +91,7 @@ function TransactionItemRowNarrow({
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
-    const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     // While scanning the merchant slot already says "Scanning...", so the amount and type on the right would only repeat it.
     const isTransactionScanning = isScanning(transactionItem);
 
@@ -170,7 +170,7 @@ function TransactionItemRowNarrow({
                     {!!shouldShowArrowRightOnNarrowLayout && !!onArrowRightPress && (
                         <View style={[styles.justifyContentEnd, styles.alignItemsEnd, styles.mbHalf, styles.ml3]}>
                             <Icon
-                                src={expensicons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={styles.opacitySemiTransparent}
                                 width={variables.iconSizeNormal}

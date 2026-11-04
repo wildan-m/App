@@ -27,7 +27,7 @@ function TrackDistanceMenuItem({reportID}: TrackDistanceMenuItemProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Location']);
+    const {Location: locationIcon} = useMemoizedLazyExpensifyIcons(['Location']);
     const [lastDistanceExpenseType] = useOnyx(ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
@@ -43,7 +43,7 @@ function TrackDistanceMenuItem({reportID}: TrackDistanceMenuItemProps) {
         <FABFocusableMenuItem
             itemId={ITEM_ID}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.TRACK_DISTANCE}
-            icon={icons.Location}
+            icon={locationIcon}
             title={translate('iou.trackDistance')}
             onPress={() =>
                 interceptAnonymousUser(() => {

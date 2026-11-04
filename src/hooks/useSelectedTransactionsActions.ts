@@ -114,7 +114,20 @@ function useSelectedTransactionsActions({
     const {getCurrencyDecimals, getCurrencySymbol} = useCurrencyListActions();
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Stopwatch: stopwatchIcon,
+        Trashcan: trashcanIcon,
+        ArrowRight: arrowRightIcon,
+        Table: tableIcon,
+        TablePencil: tablePencilIcon,
+        DocumentMerge: documentMergeIcon,
+        Export: exportIcon,
+        ArrowCollapse: arrowCollapseIcon,
+        ArrowSplit: arrowSplitIcon,
+        ThumbsDown: thumbsDownIcon,
+        ExpenseCopy: expenseCopyIcon,
+        Pencil: pencilIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'Stopwatch',
         'Trashcan',
         'ArrowRight',
@@ -318,7 +331,7 @@ function useSelectedTransactionsActions({
         if (canEditMultiple) {
             options.push({
                 text: translate('search.bulkActions.editMultiple'),
-                icon: expensifyIcons.Pencil,
+                icon: pencilIcon,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.EDIT,
                 onSelected: () => {
                     initBulkEditDraftTransaction(selectedTransactionIDs);
@@ -353,7 +366,7 @@ function useSelectedTransactionsActions({
         if (canHoldTransactions) {
             options.push({
                 text: translate('iou.hold'),
-                icon: expensifyIcons.Stopwatch,
+                icon: stopwatchIcon,
                 value: HOLD,
                 onSelected: () => {
                     if (isDelegateAccessRestricted) {
@@ -372,7 +385,7 @@ function useSelectedTransactionsActions({
         if (canUnholdTransactions) {
             options.push({
                 text: translate('iou.unhold'),
-                icon: expensifyIcons.Stopwatch,
+                icon: stopwatchIcon,
                 value: UNHOLD,
                 onSelected: () => {
                     if (isDelegateAccessRestricted) {
@@ -412,7 +425,7 @@ function useSelectedTransactionsActions({
         if (canRejectTransactions) {
             options.push({
                 text: translate('search.bulkActions.reject'),
-                icon: expensifyIcons.ThumbsDown,
+                icon: thumbsDownIcon,
                 value: CONST.REPORT.SECONDARY_ACTIONS.REJECT,
                 onSelected: () => {
                     if (isDelegateAccessRestricted) {
@@ -448,7 +461,7 @@ function useSelectedTransactionsActions({
                 const isBasicExport = template.templateName === CONST.REPORT.EXPORT_OPTIONS.DOWNLOAD_CSV;
                 return {
                     text: template.name,
-                    icon: isDefaultTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil,
+                    icon: isDefaultTemplate ? tableIcon : tablePencilIcon,
                     description: template.description,
                     onSelected: isBasicExport
                         ? () => {
@@ -490,8 +503,8 @@ function useSelectedTransactionsActions({
             value: CONST.REPORT.SECONDARY_ACTIONS.EXPORT,
             text: translate('common.export'),
             backButtonText: translate('common.export'),
-            icon: expensifyIcons.Export,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: exportIcon,
+            rightIcon: arrowRightIcon,
             subMenuItems: getExportOptions(),
         });
 
@@ -523,7 +536,7 @@ function useSelectedTransactionsActions({
             if (transactionID) {
                 options.push({
                     text: translate('common.merge'),
-                    icon: expensifyIcons.ArrowCollapse,
+                    icon: arrowCollapseIcon,
                     value: MERGE,
                     onSelected: () =>
                         setupMergeTransactionDataAndNavigate(
@@ -544,7 +557,7 @@ function useSelectedTransactionsActions({
         if (canSelectedExpensesBeMoved && canUserPerformWriteAction && !hasTransactionsFromMultipleOwners) {
             options.push({
                 text: translate('iou.moveExpenses'),
-                icon: expensifyIcons.DocumentMerge,
+                icon: documentMergeIcon,
                 value: MOVE,
                 onSelected: () => {
                     const shouldTurnOffSelectionMode = allTransactionsLength - selectedTransactionIDs.length <= 1;
@@ -579,7 +592,7 @@ function useSelectedTransactionsActions({
         if (canSplitTransaction) {
             options.push({
                 text: translate('iou.split'),
-                icon: expensifyIcons.ArrowSplit,
+                icon: arrowSplitIcon,
                 value: SPLIT,
                 onSelected: () => {
                     initSplitExpense(
@@ -601,7 +614,7 @@ function useSelectedTransactionsActions({
             // eslint-disable-next-line react-hooks/refs -- invokeDuplicateHandler reads a ref, but only at event-handler time (onSelected), never during render
             options.push({
                 text: translate('search.bulkActions.duplicateExpense', {count: selectedTransactionIDs.length}),
-                icon: expensifyIcons.ExpenseCopy,
+                icon: expenseCopyIcon,
                 value: DUPLICATE,
                 shouldCloseModalOnSelect: true,
                 onSelected: () => {
@@ -661,7 +674,7 @@ function useSelectedTransactionsActions({
         if (canRemoveReportTransaction && canAllSelectedTransactionsBeRemoved) {
             options.push({
                 text: shouldShowEditSplitOnDeleteAction ? translate('iou.editSplits') : translate('common.delete'),
-                icon: shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan,
+                icon: shouldShowEditSplitOnDeleteAction ? arrowSplitIcon : trashcanIcon,
                 value: CONST.REPORT.SECONDARY_ACTIONS.DELETE,
                 shouldSkipDeleteModal: shouldShowEditSplitOnDeleteAction,
                 onSelected: () => {

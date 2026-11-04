@@ -79,7 +79,7 @@ function WorkflowsLoadMoreCard({count, onPress}: {count: number; onPress: () => 
     const theme = useTheme();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CircularArrowBackwards']);
+    const {CircularArrowBackwards: circularArrowBackwardsIcon} = useMemoizedLazyExpensifyIcons(['CircularArrowBackwards']);
     const label = translate('workflowsPage.loadMoreWorkflows', {count});
 
     return (
@@ -93,7 +93,7 @@ function WorkflowsLoadMoreCard({count, onPress}: {count: number; onPress: () => 
         >
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentCenter, styles.minHeightComponentSizeSmall]}>
                 <Icon
-                    src={expensifyIcons.CircularArrowBackwards}
+                    src={circularArrowBackwardsIcon}
                     fill={theme.textSupporting}
                     size={CONST.ICON_SIZE.EXTRA_SMALL}
                     additionalStyles={styles.mr1}
@@ -109,7 +109,7 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Plus']);
+    const {Info: infoIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Info', 'Plus']);
     const policy = usePolicy(policyID);
     const {showConfirmModal} = useConfirmModal();
     const {isBetaEnabledOrUnknown} = usePermissions();
@@ -345,7 +345,7 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
                     {isDEWEnabled && (
                         <View style={[styles.border, shouldUseNarrowLayout ? styles.p3 : styles.p4, styles.mt6, styles.mbn3, styles.flexRow, styles.alignItemsCenter]}>
                             <Icon
-                                src={expensifyIcons.Info}
+                                src={infoIcon}
                                 fill={theme.textSupporting}
                                 additionalStyles={styles.popoverMenuIcon}
                             />
@@ -435,7 +435,7 @@ function WorkflowsApprovalsTab({policyID}: WorkflowsApprovalsTabProps) {
                                     >
                                         <MenuItem.Row>
                                             <MenuItem.Leading>
-                                                <MenuItem.Icon src={expensifyIcons.Plus} />
+                                                <MenuItem.Icon src={plusIcon} />
                                             </MenuItem.Leading>
                                             <MenuItem.Content>
                                                 <MenuItem.Title>{translate('workflowsPage.addApprovalButton')}</MenuItem.Title>

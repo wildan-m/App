@@ -49,7 +49,7 @@ const getItemLayout = (data: ArrayLike<PersonalDetails> | null | undefined, inde
 });
 
 function BaseReactionList({hasUserReacted = false, users, isVisible = false, emojiCodes, emojiCount, emojiName, onClose}: BaseReactionListProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const {translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {hoveredComponentBG, reactionListContainer, reactionListContainerFixedWidth, pv2} = useThemeStyles();
@@ -87,7 +87,7 @@ function BaseReactionList({hasUserReacted = false, users, isVisible = false, emo
                     icons: [
                         {
                             id: item.accountID,
-                            source: item.avatar ?? icons.FallbackAvatar,
+                            source: item.avatar ?? fallbackAvatarIcon,
                             name: item.login ?? '',
                             type: CONST.ICON_TYPE_AVATAR,
                         },

@@ -22,7 +22,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 function ImTeacherUpdateEmailPage() {
-    const illustrations = useMemoizedLazyIllustrations(['EmailAddress']);
+    const {EmailAddress: emailAddressIllustration} = useMemoizedLazyIllustrations(['EmailAddress']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
@@ -37,7 +37,7 @@ function ImTeacherUpdateEmailPage() {
             <BlockingView
                 linkTranslationKey="notFound.goBackHome"
                 shouldEmbedLinkWithSubtitle
-                icon={illustrations.EmailAddress}
+                icon={emailAddressIllustration}
                 title={translate('teachersUnitePage.updateYourEmail')}
                 CustomSubtitle={
                     <View style={[styles.textAlignCenter, styles.flexRow, styles.w100]}>

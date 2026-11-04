@@ -451,7 +451,8 @@ function BasePopoverMenu({
         isActive: isVisible,
         onFocusedIndexChange: scrollFocusedRowIntoView,
     });
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
+    const {BackArrow: backArrowIcon, ReceiptScan, MoneyCircle} = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
+    const expensifyIcons = {BackArrow: backArrowIcon, ReceiptScan, MoneyCircle};
     const prevMenuItems = usePrevious(menuItems);
     let headerMenuItems = menuItems;
     let currentHeaderText = headerText ?? '';
@@ -556,7 +557,7 @@ function BasePopoverMenu({
         return (
             <MenuItem
                 key={previouslySelectedItem?.text}
-                icon={expensifyIcons.BackArrow}
+                icon={backArrowIcon}
                 iconFill={(isHovered) => (isHovered ? theme.iconHovered : theme.icon)}
                 style={hasBackButtonText ? styles.pv0 : undefined}
                 additionalIconStyles={[{width: variables.iconSizeNormal, height: variables.iconSizeNormal}, styles.opacitySemiTransparent, styles.mr1]}

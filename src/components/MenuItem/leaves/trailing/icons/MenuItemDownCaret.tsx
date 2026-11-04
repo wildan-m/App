@@ -19,7 +19,7 @@ import {View} from 'react-native';
  * caret and a clear button in the same form line up with each other.
  */
 function MenuItemDownCaret() {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isDisabled} = useMenuItemConfig();
@@ -30,7 +30,7 @@ function MenuItemDownCaret() {
             testID="menu-item-down-caret"
         >
             <Icon
-                src={icons.DownArrow}
+                src={downArrowIcon}
                 fill={theme.icon}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}

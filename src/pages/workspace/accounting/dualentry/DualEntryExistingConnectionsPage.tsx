@@ -27,7 +27,7 @@ type DualEntryExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNa
 function DualEntryExistingConnectionsPage({route}: DualEntryExistingConnectionsPageProps) {
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToDualEntry} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.DUALENTRY, policyID);
 
@@ -64,7 +64,7 @@ function DualEntryExistingConnectionsPage({route}: DualEntryExistingConnectionsP
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.DUALENTRY)}</Text>
                 <MenuItem
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     iconStyles={styles.br2}
                     shouldShowRightIcon
                     onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_DUALENTRY_SETUP.getRoute(policyID))}

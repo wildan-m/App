@@ -29,7 +29,7 @@ type ShowPreviousMessagesButtonProps = {
 function ShowPreviousMessagesButton({reportID, actionType, hasPreviousMessages, showFullHistory, onPress}: ShowPreviousMessagesButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['UpArrow']);
+    const {UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow']);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const isConciergeChat = reportID === conciergeReportID;
 
@@ -58,7 +58,7 @@ function ShowPreviousMessagesButton({reportID, actionType, hasPreviousMessages, 
                     onPress={onPress}
                 >
                     <Button.Text>{translate('common.concierge.showHistory')}</Button.Text>
-                    <Button.Icon src={expensifyIcons.UpArrow} />
+                    <Button.Icon src={upArrowIcon} />
                 </Button>
             </View>
             <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />

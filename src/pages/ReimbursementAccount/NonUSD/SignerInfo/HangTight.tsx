@@ -31,7 +31,7 @@ function HangTight({policyID, bankAccountID}: HangTightProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {paddingBottom: safeAreaInsetPaddingBottom} = useSafeAreaPaddings();
-    const icons = useMemoizedLazyExpensifyIcons(['Bell']);
+    const {Bell: bellIcon} = useMemoizedLazyExpensifyIcons(['Bell']);
     const [reimbursementAccount] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT);
     const signerEmail = reimbursementAccount?.achData?.corpay?.signerEmail;
     const secondSignerEmail = reimbursementAccount?.achData?.corpay?.secondSignerEmail;
@@ -91,7 +91,7 @@ function HangTight({policyID, bankAccountID}: HangTightProps) {
                     size={CONST.BUTTON_SIZE.LARGE}
                     isLoading={reimbursementAccount?.isSendingReminderForCorpaySignerInformation}
                 >
-                    {!reimbursementAccount?.isSendingReminderForCorpaySignerInformation && <Button.Icon src={icons.Bell} />}
+                    {!reimbursementAccount?.isSendingReminderForCorpaySignerInformation && <Button.Icon src={bellIcon} />}
                     <Button.Text>{translate('signerInfoStep.sendReminder')}</Button.Text>
                 </Button>
             </View>

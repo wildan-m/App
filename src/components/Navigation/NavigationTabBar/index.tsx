@@ -45,7 +45,7 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [isDebugModeEnabled] = useOnyx(ONYXKEYS.IS_DEBUG_MODE_ENABLED);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ExpensifyAppIcon', 'Home']);
+    const {ExpensifyAppIcon: expensifyAppIconIcon, Home: homeIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyAppIcon', 'Home']);
 
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
@@ -93,7 +93,7 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
                                 >
                                     <ImageSVG
                                         style={StyleUtils.getAvatarStyle(CONST.AVATAR_SIZE.DEFAULT)}
-                                        src={expensifyIcons.ExpensifyAppIcon}
+                                        src={expensifyAppIconIcon}
                                         aria-hidden
                                     />
                                 </PressableWithFeedback>
@@ -106,7 +106,7 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
                                 >
                                     {({hovered}) => (
                                         <TabBarItem
-                                            icon={expensifyIcons.Home}
+                                            icon={homeIcon}
                                             label={translate('common.home')}
                                             isSelected={selectedTab === NAVIGATION_TABS.HOME}
                                             isHovered={hovered}
@@ -162,7 +162,7 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
                     sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.HOME}
                 >
                     <TabBarItem
-                        icon={expensifyIcons.Home}
+                        icon={homeIcon}
                         label={translate('common.home')}
                         isSelected={selectedTab === NAVIGATION_TABS.HOME}
                         numberOfLines={1}

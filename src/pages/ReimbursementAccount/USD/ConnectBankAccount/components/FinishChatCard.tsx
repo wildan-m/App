@@ -76,26 +76,26 @@ function FinishChatCard({requiresTwoFactorAuth, reimbursementAccount, policy, se
             reportActionID: reimbursementAccount?.achData?.ACHRequestReportActionID,
         });
 
-    const icons = useMemoizedLazyExpensifyIcons(['ChatBubble', 'Pencil', 'RotateLeft']);
-    const illustrations = useMemoizedLazyIllustrations(['ConciergeBubble']);
+    const {ChatBubble: chatBubbleIcon, Pencil: pencilIcon, RotateLeft: rotateLeftIcon} = useMemoizedLazyExpensifyIcons(['ChatBubble', 'Pencil', 'RotateLeft']);
+    const {ConciergeBubble: conciergeBubbleIllustration} = useMemoizedLazyIllustrations(['ConciergeBubble']);
 
     return (
         <ScrollView style={[styles.flex1]}>
             <Section
                 title={translate('workspace.bankAccount.letsFinishInChat')}
-                icon={illustrations.ConciergeBubble}
+                icon={conciergeBubbleIllustration}
                 containerStyles={styles.mb8}
                 titleStyles={[styles.mb3]}
             >
                 <Text style={styles.mb6}>{translate('connectBankAccountStep.letsChatText')}</Text>
                 <View style={styles.mhn5}>
                     <MenuItemNavigation
-                        icon={icons.ChatBubble}
+                        icon={chatBubbleIcon}
                         title={translate('workspace.bankAccount.finishInChat')}
                         onPress={handleNavigateToConciergeChat}
                     />
                     <MenuItemNavigation
-                        icon={icons.Pencil}
+                        icon={pencilIcon}
                         title={translate('workspace.bankAccount.updateDetails')}
                         onPress={() => {
                             setBankAccountSubStep(CONST.BANK_ACCOUNT.SETUP_TYPE.MANUAL).then(() => {
@@ -112,7 +112,7 @@ function FinishChatCard({requiresTwoFactorAuth, reimbursementAccount, policy, se
                         }}
                     />
                     <MenuItemNavigation
-                        icon={icons.RotateLeft}
+                        icon={rotateLeftIcon}
                         title={translate('workspace.bankAccount.startOver')}
                         onPress={requestResetBankAccount}
                     />

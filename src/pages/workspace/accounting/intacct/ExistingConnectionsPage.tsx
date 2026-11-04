@@ -27,7 +27,7 @@ type ExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNavigatorPa
 function ExistingConnectionsPage({route}: ExistingConnectionsPageProps) {
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToSageIntacct} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT, policyID);
 
@@ -64,7 +64,7 @@ function ExistingConnectionsPage({route}: ExistingConnectionsPageProps) {
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT)}</Text>
                 <MenuItemNavigation
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.SAGE_INTACCT_PREREQUISITES.path))}
                 />
                 <Text style={[styles.sectionTitle, styles.pl5, styles.pr5, styles.pb2, styles.mt3]}>{translate('workspace.common.existingConnections')}</Text>

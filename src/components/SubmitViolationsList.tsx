@@ -27,7 +27,7 @@ function SubmitViolationsList({violations}: SubmitViolationsListProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
 
     return (
         <View style={styles.gap3}>
@@ -38,7 +38,7 @@ function SubmitViolationsList({violations}: SubmitViolationsListProps) {
                 >
                     <View style={[styles.alignItemsCenter, dotColumnStyle]}>
                         <Icon
-                            src={icons.DotIndicator}
+                            src={dotIndicatorIcon}
                             fill={theme.danger}
                             height={variables.iconSizeExtraSmall}
                             width={variables.iconSizeExtraSmall}

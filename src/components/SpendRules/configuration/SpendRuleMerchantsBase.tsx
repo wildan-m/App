@@ -38,8 +38,8 @@ type SpendRuleMerchantsBaseProps = {
 function SpendRuleMerchantsBase({policyID, action, merchants, getEditMerchantRoute}: SpendRuleMerchantsBaseProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
-    const illustrations = useMemoizedLazyIllustrations(['FoodTruck']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {FoodTruck: foodTruckIllustration} = useMemoizedLazyIllustrations(['FoodTruck']);
     const canWriteCardSpendRules = useCanWriteCardSpendRules(policyID);
 
     const emptyStateTitle =
@@ -84,7 +84,7 @@ function SpendRuleMerchantsBase({policyID, action, merchants, getEditMerchantRou
                 <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                     <MenuItemAction
                         title={translate('workspace.rules.spendRules.addMerchant')}
-                        icon={expensifyIcons.Plus}
+                        icon={plusIcon}
                         onPress={addMerchant}
                     />
                     {merchants.length > 0 ? (
@@ -108,7 +108,7 @@ function SpendRuleMerchantsBase({policyID, action, merchants, getEditMerchantRou
                         })
                     ) : (
                         <BlockingView
-                            icon={illustrations.FoodTruck}
+                            icon={foodTruckIllustration}
                             iconHeight={68}
                             iconWidth={68}
                             title={emptyStateTitle}

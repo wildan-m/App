@@ -103,7 +103,7 @@ function DynamicIOURequestStepSubrate({
     const navigation = useNavigation();
     const isFocused = navigation.isFocused();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const {showConfirmModal} = useConfirmModal();
     const textInputRef = useRef<AnimatedTextInputRef>(null);
     const parsedIndex = parseInt(pageIndex, 10);
@@ -234,7 +234,7 @@ function DynamicIOURequestStepSubrate({
                     shouldSetModalVisibility={false}
                     threeDotsMenuItems={[
                         {
-                            icon: expensifyIcons.Trashcan,
+                            icon: trashcanIcon,
                             text: translate('iou.deleteSubrate'),
                             onSelected: () => {
                                 handleDeleteSubrate();

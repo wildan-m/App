@@ -33,7 +33,7 @@ function RuleTaxesDisabledEmptyState({policyID}: RuleTaxesDisabledEmptyStateProp
     const {translate} = useLocalize();
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
-    const illustrations = useMemoizedLazyIllustrations(['Coins']);
+    const {Coins: coinsIllustration} = useMemoizedLazyIllustrations(['Coins']);
     const policyData = usePolicyData(policyID);
     const {showConfirmModal} = useConfirmModal();
     const isConnectedToAccounting = hasAccountingConnections(policyData.policy);
@@ -62,7 +62,7 @@ function RuleTaxesDisabledEmptyState({policyID}: RuleTaxesDisabledEmptyStateProp
             <ScrollView contentContainerStyle={[styles.flexGrow1, styles.justifyContentCenter, styles.alignItemsCenter]}>
                 <WorkspaceEmptyStateSection
                     shouldStyleAsCard={false}
-                    icon={illustrations.Coins}
+                    icon={coinsIllustration}
                     title={translate('workspace.rules.taxesDisabledEmptyState.title')}
                     subtitle={translate('workspace.rules.taxesDisabledEmptyState.subtitle')}
                 />

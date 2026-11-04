@@ -40,7 +40,7 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['TreasureChest']);
+    const {TreasureChest: treasureChestIllustration} = useMemoizedLazyIllustrations(['TreasureChest']);
 
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL);
@@ -48,7 +48,7 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
     const initialDiscountInfo = getEarlyDiscountInfo(firstDayFreeTrial);
     const [discountInfo, setDiscountInfo] = useState(initialDiscountInfo);
     const [isDismissed, setIsDismissed] = useState(false);
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
     useEffect(() => {
         const intervalID = setInterval(() => {
             setDiscountInfo(getEarlyDiscountInfo(firstDayFreeTrial));
@@ -69,7 +69,7 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
                 sentryLabel={CONST.SENTRY_LABEL.EARLY_DISCOUNT_BANNER.DISMISS_BUTTON}
             >
                 <Icon
-                    src={icons.Close}
+                    src={closeIcon}
                     fill={theme.icon}
                 />
             </PressableWithFeedback>
@@ -119,7 +119,7 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
             style={!isSubscriptionPage && [styles.hoveredComponentBG, styles.borderBottom]}
             subtitle={translate('subscription.billingBanner.earlyDiscount.subtitle', discountInfo?.days, discountInfo?.hours, discountInfo?.minutes, discountInfo?.seconds)}
             subtitleStyle={[styles.mt1, styles.mutedNormalTextLabel, isSubscriptionPage && StyleUtils.getTextColorStyle(theme.trialTimer)]}
-            icon={illustrations.TreasureChest}
+            icon={treasureChestIllustration}
             rightComponent={!isSubscriptionPage && rightComponent}
         />
     );

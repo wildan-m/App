@@ -105,7 +105,14 @@ function SettlementButton({
     hasOnlyHeldExpenses = false,
     sentryLabel,
 }: SettlementButtonProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['CheckCircle', 'Bank', 'Cash', 'Wallet', 'Building', 'User']);
+    const {
+        CheckCircle: checkCircleIcon,
+        Bank: bankIcon,
+        Cash: cashIcon,
+        Wallet: walletIcon,
+        Building: buildingIcon,
+        User: userIcon,
+    } = useMemoizedLazyExpensifyIcons(['CheckCircle', 'Bank', 'Cash', 'Wallet', 'Building', 'User']);
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
@@ -262,7 +269,7 @@ function SettlementButton({
 
     const shortFormPayElsewhereButton = {
         text: translate('iou.pay'),
-        icon: icons.CheckCircle,
+        icon: checkCircleIcon,
         value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
         shouldUpdateSelectedIndex: false,
     };
@@ -292,7 +299,7 @@ function SettlementButton({
                 buttonOptions.push({
                     text: translate('iou.settleWallet', ''),
                     value: CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT,
-                    icon: icons.Wallet,
+                    icon: walletIcon,
                 });
             } else if (canUsePersonalBankAccount) {
                 buttonOptions.push(paymentMethods[CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT]);
@@ -312,7 +319,7 @@ function SettlementButton({
                 for (const account of businessBankAccountOptionList) {
                     buttonOptions.push({
                         text: account.text,
-                        icon: typeof account.icon === 'number' ? icons.Bank : account.icon,
+                        icon: typeof account.icon === 'number' ? bankIcon : account.icon,
                         additionalIconStyles: typeof account.icon === 'number' ? undefined : account.iconStyles,
                         iconWidth: typeof account.icon === 'number' ? undefined : account.iconSize,
                         iconHeight: typeof account.icon === 'number' ? undefined : account.iconSize,
@@ -339,7 +346,7 @@ function SettlementButton({
                 const policyName = p.name;
                 buttonOptions.push({
                     text: translate('iou.payWithPolicy', truncate(policyName, {length: CONST.ADDITIONAL_ALLOWED_CHARACTERS}), ''),
-                    icon: icons.Building,
+                    icon: buildingIcon,
                     value: p.id,
                     shouldUpdateSelectedIndex: false,
                 });
@@ -430,7 +437,7 @@ function SettlementButton({
             const getInvoicesOptions = (payAsBusiness: boolean) => {
                 const addBankAccountItem = {
                     text: translate('bankAccount.addBankAccount'),
-                    icon: icons.Bank,
+                    icon: bankIcon,
                     onSelected: () => {
                         if (payAsBusiness) {
                             navigateToBusinessBankAccountRoute();
@@ -446,7 +453,7 @@ function SettlementButton({
                     ...(showPayViaExpensifyOptions && isPolicyCurrencySupported ? [addBankAccountItem] : []),
                     {
                         text: translate('iou.payElsewhere', ''),
-                        icon: icons.Cash,
+                        icon: cashIcon,
                         value: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                         shouldUpdateSelectedIndex: true,
                         onSelected: () => runPaymentAction(CONST.IOU.PAYMENT_TYPE.ELSEWHERE, () => onPress({paymentType: CONST.IOU.PAYMENT_TYPE.ELSEWHERE, payAsBusiness})),
@@ -464,14 +471,14 @@ function SettlementButton({
                 }
                 buttonOptions.push({
                     text: translate('iou.settlePersonal', formattedAmount),
-                    icon: icons.User,
+                    icon: userIcon,
                     value: invoiceDefaultValue,
                     backButtonText: translate('iou.individual'),
                     subMenuItems: getInvoicesOptions(false),
                 });
                 buttonOptions.push({
                     text: translate('iou.settleBusiness', formattedAmount),
-                    icon: icons.Building,
+                    icon: buildingIcon,
                     value: invoiceDefaultValue,
                     backButtonText: translate('iou.business'),
                     subMenuItems: getInvoicesOptions(true),

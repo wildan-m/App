@@ -33,7 +33,7 @@ type VendorListItem = ListItem & {
 function DualEntryDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const dualentryConfig = policy?.connections?.dualEntry?.config;
     const defaultCompanyCardVendorID = dualentryConfig?.export?.defaultVendorID;
@@ -67,7 +67,7 @@ function DualEntryDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsPr
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.dualEntry.noVendorsFound')}

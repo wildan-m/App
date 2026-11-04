@@ -31,12 +31,12 @@ function MoneyReportHeaderStatusBar({nextStep}: MoneyReportHeaderStatusBarProps)
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Hourglass', 'Checkmark', 'Stopwatch', 'Box']);
+    const {Hourglass: hourglassIcon, Checkmark: checkmarkIcon, Stopwatch: stopwatchIcon, Box: boxIcon} = useMemoizedLazyExpensifyIcons(['Hourglass', 'Checkmark', 'Stopwatch', 'Box']);
     const iconMap: IconMap = {
-        [CONST.NEXT_STEP.ICONS.HOURGLASS]: icons.Hourglass,
-        [CONST.NEXT_STEP.ICONS.CHECKMARK]: icons.Checkmark,
-        [CONST.NEXT_STEP.ICONS.STOPWATCH]: icons.Stopwatch,
-        [CONST.NEXT_STEP.ICONS.BOX]: icons.Box,
+        [CONST.NEXT_STEP.ICONS.HOURGLASS]: hourglassIcon,
+        [CONST.NEXT_STEP.ICONS.CHECKMARK]: checkmarkIcon,
+        [CONST.NEXT_STEP.ICONS.STOPWATCH]: stopwatchIcon,
+        [CONST.NEXT_STEP.ICONS.BOX]: boxIcon,
     };
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
@@ -47,7 +47,7 @@ function MoneyReportHeaderStatusBar({nextStep}: MoneyReportHeaderStatusBarProps)
         <View style={[styles.dFlex, styles.flexRow, styles.alignItemsCenter, styles.overflowHidden, styles.w100, styles.headerStatusBarContainer]}>
             <View style={[styles.mr3]}>
                 <Icon
-                    src={(nextStep?.icon && iconMap?.[nextStep.icon]) ?? icons.Hourglass}
+                    src={(nextStep?.icon && iconMap?.[nextStep.icon]) ?? hourglassIcon}
                     height={variables.iconSizeSmall}
                     width={variables.iconSizeSmall}
                     fill={nextStep?.iconFill ?? theme.icon}

@@ -53,7 +53,7 @@ function BasePickerImpl({
     additionalPickerEvents = () => {},
     ref,
 }: BasePickerProps<unknown>) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const {translate} = useLocalize();
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -111,7 +111,7 @@ function BasePickerImpl({
         iconToRender = () => (
             <Icon
                 fill={theme.icon}
-                src={icons.DownArrow}
+                src={downArrowIcon}
                 {...(size === 'small'
                     ? {
                           width: styles.pickerSmall().icon.width,

@@ -46,8 +46,8 @@ function AgentPromotionalBanner({title, subtitle, onDismiss, dismissSentryLabel,
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['AiBot']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {AiBot: aiBotIllustration} = useMemoizedLazyIllustrations(['AiBot']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const hasCta = !!ctaText && !!onCtaPress;
 
@@ -95,12 +95,12 @@ function AgentPromotionalBanner({title, subtitle, onDismiss, dismissSentryLabel,
     return (
         <View style={style}>
             <BillingBanner
-                icon={illustrations.AiBot}
+                icon={aiBotIllustration}
                 title={titleNode}
                 subtitle={subtitle}
                 subtitleStyle={[styles.mt1, styles.textLabel]}
                 style={[styles.borderRadiusComponentLarge]}
-                rightIcon={expensifyIcons.Close}
+                rightIcon={closeIcon}
                 onRightIconPress={onDismiss}
                 rightIconAccessibilityLabel={translate('common.dismiss')}
                 rightIconSentryLabel={dismissSentryLabel}

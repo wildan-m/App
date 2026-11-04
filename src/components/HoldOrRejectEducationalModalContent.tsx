@@ -26,23 +26,29 @@ type SectionMenuItem = {
 function HoldOrRejectEducationalModalContent() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Stopwatch', 'Rules', 'RealtimeReport', 'ThumbsDown', 'ModalHoldOrReject']);
+    const {
+        Stopwatch: stopwatchIllustration,
+        Rules: rulesIllustration,
+        RealtimeReport: realtimeReportIllustration,
+        ThumbsDown: thumbsDownIllustration,
+        ModalHoldOrReject: modalHoldOrRejectIllustration,
+    } = useMemoizedLazyIllustrations(['Stopwatch', 'Rules', 'RealtimeReport', 'ThumbsDown', 'ModalHoldOrReject']);
 
     const menuSections: SectionMenuItem[] = [
         {
-            icon: illustrations.Stopwatch,
+            icon: stopwatchIllustration,
             titleTranslationKey: 'iou.reject.holdExpenseTitle',
         },
         {
-            icon: illustrations.Rules,
+            icon: rulesIllustration,
             titleTranslationKey: 'iou.reject.approveExpenseTitle',
         },
         {
-            icon: illustrations.RealtimeReport,
+            icon: realtimeReportIllustration,
             titleTranslationKey: 'iou.reject.heldExpenseLeftBehindTitle',
         },
         {
-            icon: illustrations.ThumbsDown,
+            icon: thumbsDownIllustration,
             titleTranslationKey: 'iou.reject.rejectExpenseTitle',
         },
     ];
@@ -50,7 +56,7 @@ function HoldOrRejectEducationalModalContent() {
     return (
         <>
             <FeatureTraining.Illustration
-                image={illustrations.ModalHoldOrReject}
+                image={modalHoldOrRejectIllustration}
                 contentFitImage="cover"
                 aspectRatio={CONST.ILLUSTRATION_ASPECT_RATIO}
                 outerContainerStyle={styles.p0}

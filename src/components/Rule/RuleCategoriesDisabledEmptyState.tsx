@@ -31,7 +31,7 @@ function RuleCategoriesDisabledEmptyState({policyID}: RuleCategoriesDisabledEmpt
     const {translate} = useLocalize();
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
-    const illustrations = useMemoizedLazyIllustrations(['FolderOpen']);
+    const {FolderOpen: folderOpenIllustration} = useMemoizedLazyIllustrations(['FolderOpen']);
     const policyData = usePolicyData(policyID);
     const {showConfirmModal} = useConfirmModal();
     const isConnectedToAccounting = hasAccountingConnections(policyData.policy);
@@ -64,7 +64,7 @@ function RuleCategoriesDisabledEmptyState({policyID}: RuleCategoriesDisabledEmpt
             <ScrollView contentContainerStyle={[styles.flexGrow1, styles.justifyContentCenter, styles.alignItemsCenter]}>
                 <WorkspaceEmptyStateSection
                     shouldStyleAsCard={false}
-                    icon={illustrations.FolderOpen}
+                    icon={folderOpenIllustration}
                     title={translate('workspace.rules.categoriesDisabledEmptyState.title')}
                     subtitle={translate('workspace.rules.categoriesDisabledEmptyState.subtitle')}
                 />

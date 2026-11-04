@@ -67,7 +67,7 @@ function SageIntacctEditUserDimensionsPage({route}: SageIntacctEditUserDimension
         }
         return errors;
     };
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     return (
         <ConnectionLayout
@@ -131,7 +131,7 @@ function SageIntacctEditUserDimensionsPage({route}: SageIntacctEditUserDimension
                     <View style={[styles.mhn5]}>
                         <MenuItemAction
                             title={translate('common.remove')}
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             onPress={() => {
                                 showConfirmModal({
                                     title: translate('workspace.intacct.removeDimension'),

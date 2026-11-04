@@ -165,7 +165,7 @@ function DebugTabView({selectedTab}: Props) {
     const reportAttributes = useReportAttributes();
     const {status, indicatorColor, indicatorPolicyID} = useIndicatorStatus();
     const {orderedReportIDs, chatTabBrickRoad} = useSidebarOrderedReportsState();
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
 
     const isAtRoot = useRootNavigationState((rootState) => {
         const activeRoute = getActiveTabRoute(rootState);
@@ -256,7 +256,7 @@ function DebugTabView({selectedTab}: Props) {
             >
                 <View style={[styles.flexRow, styles.gap2, styles.flex1, styles.alignItemsCenter]}>
                     <Icon
-                        src={icons.DotIndicator}
+                        src={dotIndicatorIcon}
                         fill={indicator}
                     />
                     {!!message && <Text style={[StyleUtils.getColorStyle(theme.text), styles.lh20]}>{translate(message)}</Text>}

@@ -95,7 +95,7 @@ function NewChatPage({ref}: NewChatPageProps) {
     const getPersonalDetailsByLogin = useGetPersonalDetailsByLogin();
     const {singleExecution} = useSingleExecution();
     const isSupportalSession = useIsSupportalSession();
-    const icons = useMemoizedLazyExpensifyIcons(['UserPlus']);
+    const {UserPlus: userPlusIcon} = useMemoizedLazyExpensifyIcons(['UserPlus']);
 
     const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [didScreenTransitionEnd, setDidScreenTransitionEnd] = useState(false);
@@ -408,7 +408,7 @@ function NewChatPage({ref}: NewChatPageProps) {
     const importContactsButton = contactState?.pickContact ? (
         <MenuItemNavigation
             title={translate('contact.importContacts')}
-            icon={icons.UserPlus}
+            icon={userPlusIcon}
             onPress={contactState.pickContact}
             sentryLabel={CONST.SENTRY_LABEL.NEW_CHAT.IMPORT_CONTACTS_ITEM}
         />

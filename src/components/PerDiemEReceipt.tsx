@@ -58,7 +58,7 @@ function PerDiemEReceipt({transactionID}: PerDiemEReceiptProps) {
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const {getCurrencySymbol, convertToDisplayStringWithoutCurrency} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
 
     // Get receipt colorway, or default to Yellow.
@@ -114,7 +114,7 @@ function PerDiemEReceipt({transactionID}: PerDiemEReceiptProps) {
                         width={variables.eReceiptWordmarkWidth}
                         height={variables.eReceiptWordmarkHeight}
                         fill={secondaryColor}
-                        src={icons.ExpensifyWordmark}
+                        src={expensifyWordmarkIcon}
                     />
                     <Text style={styles.eReceiptGuaranteed}>{translate('eReceipt.guaranteed')}</Text>
                 </View>

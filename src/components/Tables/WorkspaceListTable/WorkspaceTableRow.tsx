@@ -48,7 +48,7 @@ export default function WorkspaceRow({item, shouldUseNarrowTableLayout, rowIndex
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Building', 'Hourglass']);
+    const {ArrowRight: arrowRightIcon, Hourglass: hourglassIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Building', 'Hourglass']);
     const threeDotsMenuRef = useRef<ThreeDotsMenuHandle>(null);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
@@ -71,7 +71,7 @@ export default function WorkspaceRow({item, shouldUseNarrowTableLayout, rowIndex
     const JoinRequestPendingBadge = (
         <View style={[styles.flexRow, styles.gap2, styles.alignItemsCenter, styles.justifyContentEnd]}>
             <Badge
-                icon={icons.Hourglass}
+                icon={hourglassIcon}
                 textStyles={styles.textStrong}
                 text={translate('workspace.common.requested')}
                 isCondensed={shouldUseNarrowTableLayout}
@@ -162,7 +162,7 @@ export default function WorkspaceRow({item, shouldUseNarrowTableLayout, rowIndex
                             {!item.isJoinRequestPending && ThreeDotsMenuWithBrickRoadIndicator}
 
                             <Icon
-                                src={icons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
                                 width={variables.iconSizeNormal}
@@ -229,7 +229,7 @@ export default function WorkspaceRow({item, shouldUseNarrowTableLayout, rowIndex
                                 {!item.isJoinRequestPending && ThreeDotsMenuWithBrickRoadIndicator}
 
                                 <Icon
-                                    src={icons.ArrowRight}
+                                    src={arrowRightIcon}
                                     fill={theme.icon}
                                     additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
                                     width={variables.iconSizeNormal}

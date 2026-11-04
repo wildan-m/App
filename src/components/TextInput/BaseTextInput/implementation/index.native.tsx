@@ -213,7 +213,7 @@ function BaseTextInput({
 
     // The ref is needed when the component is uncontrolled and we don't have a value prop
     const hasValueRef = useRef(initialValue.length > 0);
-    const icons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
+    const {Eye: eyeIcon, EyeDisabled: eyeDisabledIcon} = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
     const inputValue = value ?? '';
     const hasValue = inputValue.length > 0 || hasValueRef.current;
 
@@ -495,7 +495,7 @@ function BaseTextInput({
                                     accessibilityLabel={translate('common.visible')}
                                 >
                                     <Icon
-                                        src={passwordHidden ? icons.Eye : icons.EyeDisabled}
+                                        src={passwordHidden ? eyeIcon : eyeDisabledIcon}
                                         fill={theme.icon}
                                     />
                                 </Checkbox>

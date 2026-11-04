@@ -31,7 +31,7 @@ import useInsightData from './useInsightData';
 function InsightsSectionContent() {
     const chartPaddingStyle = useInsightChartPaddingStyle();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Expand']);
+    const {Expand: expandIcon} = useMemoizedLazyExpensifyIcons(['Expand']);
 
     const {configs: insightConfigs, isResolved: isConfigResolved, shouldShowRunningTotal} = useHomeInsightConfigs();
     const [selectedKey, selectedKeyMetadata] = useOnyx(ONYXKEYS.NVP_HOME_SELECTED_INSIGHT);
@@ -72,7 +72,7 @@ function InsightsSectionContent() {
                         menuItems={[
                             {
                                 text: translate('common.view'),
-                                icon: icons.Expand,
+                                icon: expandIcon,
                                 onSelected: navigateToInsights,
                                 shouldCallAfterModalHide: true,
                             },

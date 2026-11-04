@@ -50,7 +50,7 @@ function TermsStep({policyID, resolvedDomain, firstIncompletePrerequisitePageNam
     const {translate} = useLocalize();
     const {showConfirmModal, closeModal} = useConfirmModal();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['RocketDude']);
+    const {RocketDude: rocketDudeIllustration} = useMemoizedLazyIllustrations(['RocketDude']);
     const {isBetaEnabled} = usePermissions();
     const isBlockedFromSpotnanaTravel = isBetaEnabled(CONST.BETAS.PREVENT_SPOTNANA_TRAVEL);
     const [hasAcceptedTravelTerms, setHasAcceptedTravelTerms] = useState(false);
@@ -122,7 +122,7 @@ function TermsStep({policyID, resolvedDomain, firstIncompletePrerequisitePageNam
                         promptStyles: styles.mb2,
                         confirmText: translate('travel.verifyCompany.confirmText'),
                         shouldShowCancelButton: false,
-                        image: illustrations.RocketDude,
+                        image: rocketDudeIllustration,
                         imageStyles: StyleUtils.getBackgroundColorStyle(colors.ice600),
                         // Disable browser history handling since we handle navigation ourselves
                         shouldHandleNavigationBack: false,

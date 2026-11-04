@@ -97,7 +97,7 @@ function ThumbnailImage({
     previewUri,
     recyclingKey,
 }: ThumbnailImageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Gallery', 'OfflineCloud']);
+    const {Gallery: galleryIcon, OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['Gallery', 'OfflineCloud']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {isOffline} = useNetwork();
@@ -132,7 +132,7 @@ function ThumbnailImage({
             <View style={[style, styles.overflowHidden, fallbackColor]}>
                 <View style={[...sizeStyles, styles.alignItemsCenter, styles.justifyContentCenter]}>
                     <Icon
-                        src={isOffline ? icons.OfflineCloud : (fallbackIcon ?? icons.Gallery)}
+                        src={isOffline ? offlineCloudIcon : (fallbackIcon ?? galleryIcon)}
                         height={fallbackIconSize}
                         width={fallbackIconSize}
                         fill={fallbackIconColor ?? theme.border}

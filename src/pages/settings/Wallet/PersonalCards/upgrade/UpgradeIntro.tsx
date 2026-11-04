@@ -42,8 +42,8 @@ function UpgradeIntro({onUpgrade, buttonDisabled}: Props) {
 
     const formattedPrice = getFormattedPrice();
 
-    const illustrations = useMemoizedLazyIllustrations(['CompanyCard']);
-    const illustrationIcons = useMemoizedLazyExpensifyIcons(['Unlock']);
+    const {CompanyCard: companyCardIllustration} = useMemoizedLazyIllustrations(['CompanyCard']);
+    const {Unlock: unlockIcon} = useMemoizedLazyExpensifyIcons(['Unlock']);
 
     const getSubscriptionLink = () => {
         if (!subscriptionPlan) {
@@ -60,12 +60,12 @@ function UpgradeIntro({onUpgrade, buttonDisabled}: Props) {
             <View style={[styles.highlightBG, styles.br4, styles.workspaceUpgradeIntroBox({isExtraSmallScreenWidth})]}>
                 <View style={[styles.mb3, styles.flexRow, styles.justifyContentBetween]}>
                     <Icon
-                        src={illustrations.CompanyCard}
+                        src={companyCardIllustration}
                         width={48}
                         height={48}
                     />
                     <Badge
-                        icon={illustrationIcons.Unlock}
+                        icon={unlockIcon}
                         text={translate('workspace.upgrade.upgradeToUnlock')}
                         success
                     />

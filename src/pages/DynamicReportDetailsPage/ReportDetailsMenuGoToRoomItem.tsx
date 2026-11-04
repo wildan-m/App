@@ -20,7 +20,7 @@ type ReportDetailsMenuGoToRoomItemProps = {
 
 function ReportDetailsMenuGoToRoomItem({reportID}: ReportDetailsMenuGoToRoomItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Hashtag']);
+    const {Hashtag: hashtagIcon} = useMemoizedLazyExpensifyIcons(['Hashtag']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const isRoomCurrentlyOpen = useIsRoomCurrentlyOpen(report?.reportID);
     const shouldShowGoToRoom = (isChatRoomUtil(report) || isPolicyExpenseChatUtil(report)) && !isRoomCurrentlyOpen;
@@ -32,7 +32,7 @@ function ReportDetailsMenuGoToRoomItem({reportID}: ReportDetailsMenuGoToRoomItem
     return (
         <MenuItemNavigation
             title={translate('reportDetailsPage.goToRoom')}
-            icon={expensifyIcons.Hashtag}
+            icon={hashtagIcon}
             onPress={() => {
                 Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report?.reportID));
             }}

@@ -48,7 +48,7 @@ function QuickbooksNonReimbursableVendorSelectPage({policy, configKey, updateVen
     const {translate, localeCompare} = useLocalize();
     const integrationName = getQuickbooksOnlineIntegrationName(policy, translate);
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const {vendors} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
     const currentVendor = qboConfig?.[configKey];
@@ -91,7 +91,7 @@ function QuickbooksNonReimbursableVendorSelectPage({policy, configKey, updateVen
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbo.noAccountsFound')}

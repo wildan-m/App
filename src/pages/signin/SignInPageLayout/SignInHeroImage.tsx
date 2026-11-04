@@ -18,7 +18,7 @@ function SignInHeroImage() {
     const styles = useThemeStyles();
     const session = useSession();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Hands']);
+    const {Hands: handsIllustration} = useMemoizedLazyIllustrations(['Hands']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     let imageSize;
     if (shouldUseNarrowLayout) {
@@ -36,7 +36,7 @@ function SignInHeroImage() {
     if (isReduceMotionEnabled) {
         return (
             <ImageSVG
-                src={illustrations.Hands}
+                src={handsIllustration}
                 style={{...styles.alignSelfCenter, ...imageSize}}
             />
         );

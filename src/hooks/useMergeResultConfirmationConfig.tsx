@@ -65,12 +65,12 @@ function useMergeResultConfirmationConfig({result, login}: {result: ValueOf<type
     const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {selector: isTrackingSelector});
     const {environmentURL} = useEnvironment();
     const buildDynamicRoute = useScreenBoundDynamicRoute();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['RunningTurtle', 'LockClosedOrange']);
+    const {RunningTurtle: runningTurtleIllustration, LockClosedOrange: lockClosedOrangeIllustration} = useMemoizedLazyIllustrations(['RunningTurtle', 'LockClosedOrange']);
     const isLoadingTryNewDot = isLoadingOnyxValue(tryNewDotMetadata);
     const isClassicRedirectBlocked = shouldHideOldAppRedirect(tryNewDot, isLoadingTryNewDot, CONFIG.IS_HYBRID_APP);
 
     const defaultResult = {
-        illustration: lazyIllustrations.LockClosedOrange,
+        illustration: lockClosedOrangeIllustration,
         onButtonPress: () => {},
     };
 
@@ -119,7 +119,7 @@ function useMergeResultConfirmationConfig({result, login}: {result: ValueOf<type
                 openOldDotLink(CONST.OLDDOT_URLS.INBOX, false);
             },
             shouldShowSecondaryButton: !isClassicRedirectBlocked,
-            illustration: lazyIllustrations.RunningTurtle,
+            illustration: runningTurtleIllustration,
             illustrationStyle: {width: 132, height: 150},
         },
         [CONST.MERGE_ACCOUNT_RESULTS.ERR_SAML_PRIMARY_LOGIN]: {

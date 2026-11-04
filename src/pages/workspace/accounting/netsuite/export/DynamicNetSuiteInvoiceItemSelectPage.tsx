@@ -28,7 +28,7 @@ import React from 'react';
 function DynamicNetSuiteInvoiceItemSelectPage({policy}: WithPolicyConnectionsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id;
     const config = policy?.connections?.netsuite?.options.config;
@@ -50,7 +50,7 @@ function DynamicNetSuiteInvoiceItemSelectPage({policy}: WithPolicyConnectionsPro
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noItemsFound')}

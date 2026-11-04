@@ -46,8 +46,8 @@ function AddAgentRuleSuggestionsTab({onSelectSuggestion}: AddAgentRuleSuggestion
     const shouldMoveFooterToScrollView = isInLandscapeMode && isKeyboardActive;
 
     const {data, isLoading} = useSuggestedAgentRules();
-    const illustrations = useMemoizedLazyIllustrations(['Lightbulb']);
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {Lightbulb: lightbulbIllustration} = useMemoizedLazyIllustrations(['Lightbulb']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const [searchValue, setSearchValue] = useState('');
     const [selectedSuggestionID, setSelectedSuggestionID] = useState<string | undefined>();
     const [collapsedCategories, setCollapsedCategories] = useState<string[]>([]);
@@ -99,7 +99,7 @@ function AddAgentRuleSuggestionsTab({onSelectSuggestion}: AddAgentRuleSuggestion
         return (
             <View style={styles.flex1}>
                 <BlockingView
-                    icon={illustrations.Lightbulb}
+                    icon={lightbulbIllustration}
                     title={translate('workspace.rules.agentRules.emptySuggestionsTitle')}
                     subtitle={isOffline ? translate('common.youAppearToBeOffline') : translate('workspace.rules.agentRules.emptySuggestionsSubtitle')}
                     subtitleStyle={[styles.textSupporting, styles.textNormal]}
@@ -171,7 +171,7 @@ function AddAgentRuleSuggestionsTab({onSelectSuggestion}: AddAgentRuleSuggestion
                                             {section.category}
                                         </Text>
                                         <Icon
-                                            src={isCollapsed ? icons.DownArrow : icons.UpArrow}
+                                            src={isCollapsed ? downArrowIcon : upArrowIcon}
                                             fill={theme.icon}
                                             width={variables.iconSizeSmall}
                                             height={variables.iconSizeSmall}

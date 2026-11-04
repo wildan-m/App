@@ -73,7 +73,7 @@ function WorkspaceCardLabel({title, description, displayValue, valueStyle, value
     const {windowWidth} = useWindowDimensions();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth -- must match Popover's dock decision (bottom-docked only when isSmallScreenWidth)
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Info']);
+    const {Info: infoIcon} = useMemoizedLazyExpensifyIcons(['Info']);
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({
         addBottomSafeAreaPadding: isSmallScreenWidth,
         addOfflineIndicatorBottomSafeAreaPadding: false,
@@ -116,7 +116,7 @@ function WorkspaceCardLabel({title, description, displayValue, valueStyle, value
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_CARDS_LIST.INFO_BUTTON}
                     >
                         <Icon
-                            src={icons.Info}
+                            src={infoIcon}
                             width={variables.iconSizeExtraSmall}
                             height={variables.iconSizeExtraSmall}
                             fill={theme.icon}

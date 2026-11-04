@@ -34,7 +34,7 @@ function ReceiptScanDropTarget({targetRef, dropWrapperStyle, onDraggingOverChang
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['SmartScan']);
+    const {SmartScan: smartScanIcon} = useMemoizedLazyExpensifyIcons(['SmartScan']);
     const {initScanRequest, auxiliaryUI, isDragDisabled} = useReceiptScanDrop();
 
     const {isDraggingOver} = useDragAndDrop({
@@ -57,7 +57,7 @@ function ReceiptScanDropTarget({targetRef, dropWrapperStyle, onDraggingOverChang
                     style={[styles.fullScreen, styles.pAbsolute, styles.invisibleOverlay]}
                 >
                     <DropZoneUI
-                        icon={expensifyIcons.SmartScan}
+                        icon={smartScanIcon}
                         dropTitle={translate('dropzone.scanReceipts')}
                         dropStyles={styles.receiptDropOverlay(true)}
                         dropTextStyles={styles.receiptDropText}

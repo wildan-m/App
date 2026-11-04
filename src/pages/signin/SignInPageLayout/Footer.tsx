@@ -152,7 +152,10 @@ function Footer({navigateFocus}: FooterProps) {
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyFooterLogo', 'ExpensifyFooterLogoVertical']);
+    const {ExpensifyFooterLogo: expensifyFooterLogoIcon, ExpensifyFooterLogoVertical: expensifyFooterLogoVerticalIcon} = useMemoizedLazyExpensifyIcons([
+        'ExpensifyFooterLogo',
+        'ExpensifyFooterLogoVertical',
+    ]);
     const isVertical = shouldUseNarrowLayout;
     const imageDirection = isVertical ? styles.flexRow : styles.flexColumn;
     const imageStyle = isVertical ? styles.pr0 : styles.alignSelfCenter;
@@ -225,10 +228,10 @@ function Footer({navigateFocus}: FooterProps) {
                     </View>
                     <View style={[!isVertical && styles.footerBottomLogo]}>
                         {!isVertical ? (
-                            <ImageSVG src={icons.ExpensifyFooterLogo} />
+                            <ImageSVG src={expensifyFooterLogoIcon} />
                         ) : (
                             <ImageSVG
-                                src={icons.ExpensifyFooterLogoVertical}
+                                src={expensifyFooterLogoVerticalIcon}
                                 height={variables.verticalLogoHeight}
                                 width={variables.verticalLogoWidth}
                             />

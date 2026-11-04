@@ -28,7 +28,7 @@ import IntuitEnterpriseSuiteOAuthFlow from './IntuitEnterpriseSuiteOAuthFlow';
 function IntuitEnterpriseSuiteEntitySelector({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const config = policy?.connections?.quickbooksOnline?.config;
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
     const [oauthAttempt, setOAuthAttempt] = useState(0);
@@ -71,7 +71,7 @@ function IntuitEnterpriseSuiteEntitySelector({policy}: WithPolicyConnectionsProp
     const listFooterContent = (
         <MenuItemAction
             title={translate('workspace.qbo.connectNewEntity')}
-            icon={icons.Plus}
+            icon={plusIcon}
             onPress={() => startOAuth()}
         />
     );

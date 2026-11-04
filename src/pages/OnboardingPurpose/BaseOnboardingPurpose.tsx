@@ -60,15 +60,22 @@ function getOnboardingChoices(customChoices: OnboardingPurpose[]) {
 function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, route}: BaseOnboardingPurposeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'BriefcaseHandshake', 'CalculatorMoney', 'ReceiptUpload', 'PiggyBank']);
+    const {
+        Abacus: abacusIllustration,
+        Binoculars: binocularsIllustration,
+        BriefcaseHandshake: briefcaseHandshakeIllustration,
+        CalculatorMoney: calculatorMoneyIllustration,
+        ReceiptUpload: receiptUploadIllustration,
+        PiggyBank: piggyBankIllustration,
+    } = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'BriefcaseHandshake', 'CalculatorMoney', 'ReceiptUpload', 'PiggyBank']);
 
     const menuIcons = {
-        [CONST.ONBOARDING_CHOICES.JOIN_WORKSPACE]: illustrations.BriefcaseHandshake,
-        [CONST.ONBOARDING_CHOICES.EMPLOYER]: illustrations.ReceiptUpload,
-        [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: illustrations.Abacus,
-        [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: illustrations.CalculatorMoney,
-        [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: illustrations.PiggyBank,
-        [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: illustrations.Binoculars,
+        [CONST.ONBOARDING_CHOICES.JOIN_WORKSPACE]: briefcaseHandshakeIllustration,
+        [CONST.ONBOARDING_CHOICES.EMPLOYER]: receiptUploadIllustration,
+        [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: abacusIllustration,
+        [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: calculatorMoneyIllustration,
+        [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: piggyBankIllustration,
+        [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: binocularsIllustration,
     };
     const {onboardingIsMediumOrLargerScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);

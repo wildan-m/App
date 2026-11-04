@@ -64,7 +64,7 @@ type AssigneeStepProps = {
 function AssigneeStep({policy, stepNames, startStepIndex, route}: AssigneeStepProps) {
     const {translate, formatPhoneNumber, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const {isOffline} = useNetwork();
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const policyID = route.params.policyID;
@@ -174,7 +174,7 @@ function AssigneeStep({policy, stepNames, startStepIndex, route}: AssigneeStepPr
                 isSelected: issueNewCard?.data?.assigneeEmail === email,
                 icons: [
                     {
-                        source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                        source: personalDetail?.avatar ?? fallbackAvatarIcon,
                         name: formatPhoneNumber(email),
                         type: CONST.ICON_TYPE_AVATAR,
                         id: personalDetail?.accountID,

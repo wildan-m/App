@@ -58,11 +58,11 @@ function CardFeedIcon({iconProps, selectedFeed, isExpensifyCardFeed = false, use
 function ExpensifyCardFeedIcon(iconProps: Partial<IconProps>) {
     const {src, ...restIconProps} = iconProps ?? {};
 
-    const memoizedIllustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
+    const {ExpensifyCardImage: expensifyCardImageIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
 
     return (
         <Icon
-            src={memoizedIllustrations.ExpensifyCardImage}
+            src={expensifyCardImageIllustration}
             {...restIconProps}
         />
     );

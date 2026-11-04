@@ -23,7 +23,7 @@ type MenuItemBrickRoadIndicatorProps = {
  * Render it before `MenuItem.Chevron` so it reads left of the navigation arrow
  */
 function MenuItemBrickRoadIndicator({status}: MenuItemBrickRoadIndicatorProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -37,7 +37,7 @@ function MenuItemBrickRoadIndicator({status}: MenuItemBrickRoadIndicatorProps) {
             testID="menu-item-brick-road-indicator"
         >
             <Icon
-                src={icons.DotIndicator}
+                src={dotIndicatorIcon}
                 fill={status === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR ? theme.danger : theme.success}
             />
         </View>

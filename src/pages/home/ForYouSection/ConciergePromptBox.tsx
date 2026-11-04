@@ -95,7 +95,7 @@ function ConciergePromptBox({isMenuVisible, setIsMenuVisible, isCopyLoading}: Co
     const {isKeyboardShown} = useKeyboardState();
     const {firstName} = useCurrentUserPersonalDetails();
     const {askConcierge, askConciergeWithAttachment, shouldShowAskConcierge, conciergeTargetReportID} = useAskConcierge({forceConcierge: true});
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Send', 'Paperclip']);
+    const {Plus: plusIcon, Send: sendIcon, Paperclip: paperclipIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Send', 'Paperclip']);
     const {calculatePopoverPosition} = usePopoverPosition();
     const [draft] = useOnyx(ONYXKEYS.CONCIERGE_PROMPT_DRAFT);
     const [value, setValue] = useState(draft ?? '');
@@ -319,7 +319,7 @@ function ConciergePromptBox({isMenuVisible, setIsMenuVisible, isCopyLoading}: Co
                                                     >
                                                         {({hovered, pressed}) => (
                                                             <Icon
-                                                                src={icons.Plus}
+                                                                src={plusIcon}
                                                                 fill={StyleUtils.getIconFillColor({
                                                                     buttonState: getButtonState({isActive: hovered && canAddAttachment, isPressed: pressed && canAddAttachment}),
                                                                 })}
@@ -348,7 +348,7 @@ function ConciergePromptBox({isMenuVisible, setIsMenuVisible, isCopyLoading}: Co
                                                     }}
                                                     menuItems={[
                                                         {
-                                                            icon: icons.Paperclip,
+                                                            icon: paperclipIcon,
                                                             text: translate('reportActionCompose.addAttachment'),
                                                             shouldCallAfterModalHide: shouldUseNarrowLayout,
                                                         },
@@ -449,7 +449,7 @@ function ConciergePromptBox({isMenuVisible, setIsMenuVisible, isCopyLoading}: Co
                             accessibilityLabel={translate('common.send')}
                             sentryLabel={CONST.SENTRY_LABEL.CONCIERGE_PROMPT_BOX.SEND}
                             isDisabled={!canSubmit}
-                            icon={icons.Send}
+                            icon={sendIcon}
                             label={translate('common.send')}
                             onPress={submit}
                             onMouseDown={(e) => e.preventDefault()}

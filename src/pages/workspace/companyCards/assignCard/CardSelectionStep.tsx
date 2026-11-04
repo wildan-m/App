@@ -52,7 +52,7 @@ function CardSelectionStep({route}: CardSelectionStepProps) {
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass']);
+    const {BrokenMagnifyingGlass: brokenMagnifyingGlassIllustration} = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass']);
     const [searchText, setSearchText] = useState('');
     const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
     const [list] = useCardsList(feed);
@@ -179,7 +179,7 @@ function CardSelectionStep({route}: CardSelectionStepProps) {
                 {!cardListOptions.length ? (
                     <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter, styles.ph5, styles.mb9, safeAreaPaddingBottomStyle]}>
                         <Icon
-                            src={lazyIllustrations.BrokenMagnifyingGlass}
+                            src={brokenMagnifyingGlassIllustration}
                             width={116}
                             height={168}
                         />

@@ -84,8 +84,8 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
     const insets = useSafeAreaInsets();
     const StyleUtils = useStyleUtils();
     const isInLandscapeMode = useIsInLandscapeMode();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'boltSlash', 'CameraFlip', 'Close']);
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Shutter', 'Hand']);
+    const {Bolt: boltIcon, boltSlash: boltSlashIcon, CameraFlip: cameraFlipIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Bolt', 'boltSlash', 'CameraFlip', 'Close']);
+    const {Shutter: shutterIllustration, Hand: handIllustration} = useMemoizedLazyIllustrations(['Shutter', 'Hand']);
     const isPlatformMuted = useIsPlatformMuted();
 
     const [cameraPosition, setCameraPosition] = useState<'back' | 'front'>('back');
@@ -281,7 +281,7 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
                         <Icon
                             height={variables.iconSizeNormal}
                             width={variables.iconSizeNormal}
-                            src={lazyIcons.Close}
+                            src={closeIcon}
                             fill={theme.icon}
                         />
                     </PressableWithFeedback>
@@ -294,7 +294,7 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
                                 <View style={[styles.cameraView, isInLandscapeMode ? styles.permissionViewLandscape : styles.permissionView, styles.userSelectNone]}>
                                     <ImageSVG
                                         contentFit="contain"
-                                        src={lazyIllustrations.Hand}
+                                        src={handIllustration}
                                         width={CONST.RECEIPT.HAND_ICON_WIDTH}
                                         height={CONST.RECEIPT.HAND_ICON_HEIGHT}
                                         style={styles.pb5}
@@ -393,7 +393,7 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
                                 <Icon
                                     height={variables.iconSizeMenuItem}
                                     width={variables.iconSizeMenuItem}
-                                    src={flash ? lazyIcons.Bolt : lazyIcons.boltSlash}
+                                    src={flash ? boltIcon : boltSlashIcon}
                                     fill={theme.textSupporting}
                                 />
                             </PressableWithFeedback>
@@ -407,7 +407,7 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
                             >
                                 <ImageSVG
                                     contentFit="contain"
-                                    src={lazyIllustrations.Shutter}
+                                    src={shutterIllustration}
                                     width={CONST.RECEIPT.SHUTTER_SIZE}
                                     height={CONST.RECEIPT.SHUTTER_SIZE}
                                 />
@@ -424,7 +424,7 @@ function AttachmentCamera({isVisible, onCapture, onClose, onModalHide}: Attachme
                                 <Icon
                                     height={variables.iconSizeMenuItem}
                                     width={variables.iconSizeMenuItem}
-                                    src={lazyIcons.CameraFlip}
+                                    src={cameraFlipIcon}
                                     fill={theme.textSupporting}
                                 />
                             </PressableWithFeedback>

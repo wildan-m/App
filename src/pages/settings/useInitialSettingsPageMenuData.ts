@@ -48,7 +48,12 @@ import useSettingsNavigationMenuData from './useSettingsNavigationMenuData';
 
 function useInitialSettingsPageMenuData(currentUserPersonalDetails: CurrentUserPersonalDetails): {accountMenuItemsData: MenuSection; generalMenuItemsData: MenuSection} {
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['NewWindow', 'ExpensifyLogoNew', 'TreasureChest', 'Exit']);
+    const {
+        NewWindow: newWindowIcon,
+        ExpensifyLogoNew: expensifyLogoNewIcon,
+        TreasureChest: treasureChestIcon,
+        Exit: exitIcon,
+    } = useMemoizedLazyExpensifyIcons(['NewWindow', 'ExpensifyLogoNew', 'TreasureChest', 'Exit']);
     const {accountMenuItemsData: navigationAccountMenuItemsData, generalMenuItemsData: navigationGeneralMenuItemsData} = useSettingsNavigationMenuData();
     const [userWallet] = useOnyx(ONYXKEYS.USER_WALLET);
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
@@ -204,7 +209,7 @@ function useInitialSettingsPageMenuData(currentUserPersonalDetails: CurrentUserP
 
         classicRedirectMenuItem = {
             translationKey: 'exitSurvey.goToExpensifyClassic',
-            icon: icons.ExpensifyLogoNew,
+            icon: expensifyLogoNewIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.GO_TO_CLASSIC,
             ...(CONFIG.IS_HYBRID_APP
                 ? {
@@ -232,8 +237,8 @@ function useInitialSettingsPageMenuData(currentUserPersonalDetails: CurrentUserP
     const signOutTranslationKey = isSupportAuthToken(session) && hasStashedSession(stashedSession, stashedCredentials) ? 'initialSettingsPage.restoreStashed' : 'initialSettingsPage.signOut';
     const whatIsNewMenuItem: MenuData = {
         translationKey: 'initialSettingsPage.whatIsNew',
-        icon: icons.TreasureChest,
-        iconRight: icons.NewWindow,
+        icon: treasureChestIcon,
+        iconRight: newWindowIcon,
         shouldShowRightIcon: true,
         sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.WHATS_NEW,
         link: CONST.WHATS_NEW_URL,
@@ -248,7 +253,7 @@ function useInitialSettingsPageMenuData(currentUserPersonalDetails: CurrentUserP
             ...navigationGeneralMenuItemsData.items.flatMap((item) => (item.screenName === SCREENS.SETTINGS.HELP ? [item, whatIsNewMenuItem] : [item])),
             {
                 translationKey: signOutTranslationKey,
-                icon: icons.Exit,
+                icon: exitIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_GENERAL.SIGN_OUT,
                 action: () => {
                     signOut(false);

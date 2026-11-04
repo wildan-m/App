@@ -13,11 +13,11 @@ type SearchFiltersResetButtonProps = {
 
 function SearchFiltersResetButton({onPress}: SearchFiltersResetButtonProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['RotateLeft']);
+    const {RotateLeft: rotateLeftIcon} = useMemoizedLazyExpensifyIcons(['RotateLeft']);
 
     return (
         <SearchFiltersBarButton
-            icon={expensifyIcons.RotateLeft}
+            icon={rotateLeftIcon}
             text={translate('common.reset')}
             onPress={onPress}
             sentryLabel={CONST.SENTRY_LABEL.SEARCH.RESET_FILTERS_BUTTON}

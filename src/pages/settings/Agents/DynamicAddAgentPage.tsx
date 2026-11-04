@@ -84,7 +84,7 @@ function DynamicAddAgentPageContent({route, template}: DynamicAddAgentPageConten
     const {accountID: currentUserAccountID, login: currentUserLogin, displayName} = useCurrentUserPersonalDetails();
     const defaultAgentName = template?.name ?? (displayName ? translate('addAgentPage.defaultAgentName', displayName) : undefined);
     const defaultPrompt = template?.prompt ?? translate('addAgentPage.defaultPrompt');
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil']);
+    const {Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Pencil']);
     const [avatarDraft, avatarDraftMetadata] = useOnyx(ONYXKEYS.AGENT_NEW_AVATAR_DRAFT);
     const isDraftLoading = isLoadingOnyxValue(avatarDraftMetadata);
     const hasSubmittedRef = useRef(false);
@@ -284,7 +284,7 @@ function DynamicAddAgentPageContent({route, template}: DynamicAddAgentPageConten
                                 text={translate('addAgentPage.editAvatar')}
                                 avatar={agentAvatar}
                                 onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.AGENT_ADD_AVATAR.getRoute()))}
-                                editIcon={expensifyIcons.Pencil}
+                                editIcon={pencilIcon}
                                 editIconStyle={styles.smallEditIconAccount}
                                 sentryLabel={CONST.SENTRY_LABEL.ADD_AGENT_PAGE.AVATAR}
                             />

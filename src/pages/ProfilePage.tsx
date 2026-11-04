@@ -102,7 +102,13 @@ function ProfilePage({route}: ProfilePageProps) {
     const [guidedSetupAndTourStatus] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: guidedSetupAndTourStatusSelector});
     const switchToDelegator = useSwitchToDelegator();
     const guideCalendarLink = account?.guideDetails?.calendarLink ?? '';
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bug', 'History', 'Pencil', 'Phone', 'UserPlus']);
+    const {
+        Bug: bugIcon,
+        History: historyIcon,
+        Pencil: pencilIcon,
+        Phone: phoneIcon,
+        UserPlus: userPlusIcon,
+    } = useMemoizedLazyExpensifyIcons(['Bug', 'History', 'Pencil', 'Phone', 'UserPlus']);
     const accountID = Number(route.params?.accountID ?? CONST.DEFAULT_NUMBER_ID);
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.AGENT}${accountID}`);
     const isCurrentUser = currentUserAccountID === accountID;
@@ -312,7 +318,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         {isCurrentUser && (
                             <MenuItemNavigation
                                 title={translate('common.editYourProfile')}
-                                icon={expensifyIcons.Pencil}
+                                icon={pencilIcon}
                                 onPress={() => Navigation.navigate(ROUTES.SETTINGS_PROFILE.getRoute(Navigation.getActiveRoute()))}
                             />
                         )}
@@ -336,14 +342,14 @@ function ProfilePage({route}: ProfilePageProps) {
                         {isOwnedAgent && (
                             <MenuItemAction
                                 title={translate('profilePage.copilotIntoAccount')}
-                                icon={expensifyIcons.UserPlus}
+                                icon={userPlusIcon}
                                 onPress={() => switchToDelegator(login)}
                             />
                         )}
                         {!!accountID && !isAnonymousUserSession() && (
                             <MenuItemNavigation
                                 title={translate(isCustomAgent || isAgentEmail(login) ? 'profilePage.viewAgentHistory' : 'profilePage.seeChatHistory')}
-                                icon={expensifyIcons.History}
+                                icon={historyIcon}
                                 onPress={() => {
                                     const query = buildQueryStringFromFilterFormValues({
                                         type: CONST.SEARCH.DATA_TYPES.CHAT,
@@ -366,7 +372,7 @@ function ProfilePage({route}: ProfilePageProps) {
                             <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => navigateToPrivateNotes(report, currentUserAccountID, true), false, session)}>
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
-                                        <MenuItem.Icon src={expensifyIcons.Pencil} />
+                                        <MenuItem.Icon src={pencilIcon} />
                                     </MenuItem.Leading>
                                     <MenuItem.Content>
                                         <MenuItem.Title>{translate('privateNotes.title')}</MenuItem.Title>
@@ -381,7 +387,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         {isConcierge && !!guideCalendarLink && (
                             <MenuItemAction
                                 title={translate('videoChatButtonAndMenu.tooltip')}
-                                icon={expensifyIcons.Phone}
+                                icon={phoneIcon}
                                 onPress={() => {
                                     openExternalLink(guideCalendarLink);
                                 }}
@@ -390,7 +396,7 @@ function ProfilePage({route}: ProfilePageProps) {
                         {!!report?.reportID && !!isDebugModeEnabled && (
                             <MenuItemNavigation
                                 title={translate('debug.debug')}
-                                icon={expensifyIcons.Bug}
+                                icon={bugIcon}
                                 onPress={() => Navigation.navigate(ROUTES.DEBUG_REPORT.getRoute(report.reportID))}
                             />
                         )}

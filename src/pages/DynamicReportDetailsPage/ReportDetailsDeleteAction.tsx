@@ -28,7 +28,7 @@ type ReportDetailsDeleteActionProps = {
 
 /** The Delete row of the money cases, deleting a track expense or a regular expense, or opening the split edit flow */
 function ReportDetailsDeleteAction({reportID, caseID, requestData}: ReportDetailsDeleteActionProps) {
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowSplit', 'Trashcan']);
+    const {ArrowSplit: arrowSplitIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['ArrowSplit', 'Trashcan']);
     const {removeTransaction} = useSearchSelectionActions();
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -99,7 +99,7 @@ function ReportDetailsDeleteAction({reportID, caseID, requestData}: ReportDetail
     return (
         <MenuItemAction
             key={CONST.REPORT_DETAILS_MENU_ITEM.DELETE}
-            icon={shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan}
+            icon={shouldShowEditSplitOnDeleteAction ? arrowSplitIcon : trashcanIcon}
             title={deleteMenuItemTitle}
             onPress={shouldShowEditSplitOnDeleteAction ? () => deleteTransaction() : () => showDeleteModal(requestData, () => deleteTransaction())}
         />

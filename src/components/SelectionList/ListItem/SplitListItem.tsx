@@ -32,7 +32,7 @@ import SplitListItemInput from './SplitListItem/SplitListItemInput';
  * Used in split expense flows to allocate amounts across participants.
  */
 function SplitListItem<TItem extends SplitListItemType>({item, isFocused, showTooltip, isDisabled, onSelectRow, shouldPreventEnterKeySubmit, onFocus}: ListItemProps<TItem>) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Folder', 'Tag']);
+    const {ArrowRight: arrowRightIcon, Folder: folderIcon, Tag: tagIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Folder', 'Tag']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -149,7 +149,7 @@ function SplitListItem<TItem extends SplitListItemType>({item, isFocused, showTo
                             {!!item.category && (
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1, styles.pr1, styles.flexShrink1, !!item.tags?.at(0) && styles.mw50]}>
                                     <Icon
-                                        src={icons.Folder}
+                                        src={folderIcon}
                                         height={variables.iconSizeExtraSmall}
                                         width={variables.iconSizeExtraSmall}
                                         fill={theme.icon}
@@ -165,7 +165,7 @@ function SplitListItem<TItem extends SplitListItemType>({item, isFocused, showTo
                             {!!item.tags?.at(0) && (
                                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.gap1, styles.pl1, !!item.category && styles.mw50]}>
                                     <Icon
-                                        src={icons.Tag}
+                                        src={tagIcon}
                                         height={variables.iconSizeExtraSmall}
                                         width={variables.iconSizeExtraSmall}
                                         fill={theme.icon}
@@ -205,7 +205,7 @@ function SplitListItem<TItem extends SplitListItemType>({item, isFocused, showTo
                                 sentryLabel={CONST.SENTRY_LABEL.SELECTION_LIST.SPLIT_LIST_ITEM_EDIT_BUTTON}
                             >
                                 <Icon
-                                    src={icons.ArrowRight}
+                                    src={arrowRightIcon}
                                     fill={theme.icon}
                                 />
                             </PressableWithFeedback>

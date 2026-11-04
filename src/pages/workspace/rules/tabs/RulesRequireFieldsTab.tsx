@@ -36,7 +36,7 @@ function RulesRequireFieldsTab({policyID, canWriteRules, selectedKeys, onSelecti
     const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['SortingMachine']);
+    const {SortingMachine: sortingMachineIllustration} = useMemoizedLazyIllustrations(['SortingMachine']);
     const policy = usePolicy(policyID);
     const StyleUtils = useStyleUtils();
     const policyData = usePolicyData(policyID);
@@ -65,7 +65,7 @@ function RulesRequireFieldsTab({policyID, canWriteRules, selectedKeys, onSelecti
     const requireFieldsEmptyState: TableEmptyStateProps = {
         minModalHeight: 0,
         cardContentStyles: styles.ph0,
-        headerMedia: illustrations.SortingMachine,
+        headerMedia: sortingMachineIllustration,
         headerContentStyles: styles.sortingMachineRulesEmptyStateIllustration,
         title: translate('workspace.rules.requireFieldsEmptyState.title'),
         subtitle: translate('workspace.rules.requireFieldsEmptyState.subtitle'),

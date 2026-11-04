@@ -31,7 +31,7 @@ function NetSuiteReimbursementAccountSelectPage({policy}: WithPolicyConnectionsP
     const {translate} = useLocalize();
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const config = policy?.connections?.netsuite?.options.config;
     const netsuiteReimbursableAccountOptions: SelectorType[] = getNetSuiteReimbursableAccountOptions(policy ?? undefined, config?.reimbursementAccountID);
@@ -47,7 +47,7 @@ function NetSuiteReimbursementAccountSelectPage({policy}: WithPolicyConnectionsP
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noAccountsFound')}

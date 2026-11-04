@@ -19,13 +19,13 @@ function SetupMethod() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
-    const icons = useMemoizedLazyExpensifyIcons(['Bank', 'ArrowRight']);
-    const illustrations = useMemoizedLazyIllustrations(['MoneyWings']);
+    const {Bank: bankIcon, ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['Bank', 'ArrowRight']);
+    const {MoneyWings: moneyWingsIllustration} = useMemoizedLazyIllustrations(['MoneyWings']);
 
     return (
         <View>
             <Section
-                icon={illustrations.MoneyWings}
+                icon={moneyWingsIllustration}
                 title={translate('walletPage.addYourBankAccount')}
                 titleStyles={[styles.textHeadlineLineHeightXXL]}
             >
@@ -42,12 +42,12 @@ function SetupMethod() {
                     size={CONST.BUTTON_SIZE.LARGE}
                 >
                     <Button.Icon
-                        src={icons.Bank}
+                        src={bankIcon}
                         style={styles.buttonCTAIcon}
                     />
                     <Button.Text>{translate('bankAccount.addBankAccount')}</Button.Text>
                     <Button.Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         style={styles.mlAuto}
                     />
                 </Button>

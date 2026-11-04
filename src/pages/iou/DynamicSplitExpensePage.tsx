@@ -246,7 +246,7 @@ function DynamicSplitExpensePage({route}: DynamicSplitExpensePageProps) {
     const splitFieldDataFromOriginalTransaction = initSplitExpenseItemData(transaction, transactionReport, {isManuallyEdited: true, policy: effectivePolicy, getCurrencyDecimals});
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'Plus']);
+    const {ArrowsLeftRight: arrowsLeftRightIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'Plus']);
 
     const {isBetaEnabled, isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
@@ -567,7 +567,7 @@ function DynamicSplitExpensePage({route}: DynamicSplitExpensePageProps) {
                 >
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.Plus} />
+                            <MenuItem.Icon src={plusIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('iou.addSplit')}</MenuItem.Title>
@@ -582,7 +582,7 @@ function DynamicSplitExpensePage({route}: DynamicSplitExpensePageProps) {
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.ArrowsLeftRight} />
+                                <MenuItem.Icon src={arrowsLeftRightIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>{translate('iou.makeSplitsEven')}</MenuItem.Title>

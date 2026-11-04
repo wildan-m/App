@@ -155,7 +155,7 @@ function MoneyReportView({
             style={styles.reportHorizontalRule}
         />
     );
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
 
     return (
         <>
@@ -188,7 +188,7 @@ function MoneyReportView({
                                     {isSettled && !isPartiallyPaid && (
                                         <View style={[styles.defaultCheckmarkWrapper, styles.mh2]}>
                                             <Icon
-                                                src={icons.Checkmark}
+                                                src={checkmarkIcon}
                                                 fill={theme.success}
                                             />
                                         </View>

@@ -34,7 +34,7 @@ function QuickbooksAccountSelectPage({policy}: WithPolicyConnectionsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const integrationName = getQuickbooksOnlineIntegrationName(policy, translate);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
     const {bankAccounts, creditCards} = policy?.connections?.quickbooksOnline?.data ?? {};
@@ -62,7 +62,7 @@ function QuickbooksAccountSelectPage({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbo.noAccountsFound')}

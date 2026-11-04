@@ -68,7 +68,7 @@ function BillingBanner({
     const styles = useThemeStyles();
     const theme = useTheme();
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
 
     let rightIconComponent;
     if (rightIcon) {
@@ -99,7 +99,7 @@ function BillingBanner({
     } else {
         rightIconComponent = !!brickRoadIndicator && (
             <Icon
-                src={expensifyIcons.DotIndicator}
+                src={dotIndicatorIcon}
                 fill={brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR ? theme.danger : theme.success}
             />
         );

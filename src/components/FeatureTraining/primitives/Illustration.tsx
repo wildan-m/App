@@ -86,7 +86,7 @@ function Illustration({
 }: IllustrationProps) {
     const styles = useThemeStyles();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Hands']);
+    const {Hands: handsIllustration} = useMemoizedLazyIllustrations(['Hands']);
     const {onboardingIsMediumOrLargerScreenWidth, shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const videoStatus = useVideoStatus();
     const {windowHeight} = useWindowDimensions();
@@ -149,7 +149,7 @@ function Illustration({
                     <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, !!videoURL && {aspectRatio}, animationStyle]}>
                         {isReduceMotionEnabled && (animation ?? LottieAnimations.Hands) === LottieAnimations.Hands ? (
                             <ImageSVG
-                                src={illustrations.Hands}
+                                src={handsIllustration}
                                 style={styles.h100}
                             />
                         ) : (

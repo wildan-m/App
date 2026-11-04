@@ -53,14 +53,14 @@ function CardListItem<TItem extends ListItem>({
     shouldSyncFocus,
     titleNumberOfLines = 1,
 }: CardListItemProps<TItem>) {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate, formatPhoneNumber} = useLocalize();
     const theme = useTheme();
 
     const ownersAvatar = {
-        source: item.cardOwnerPersonalDetails?.avatar ?? icons.FallbackAvatar,
+        source: item.cardOwnerPersonalDetails?.avatar ?? fallbackAvatarIcon,
         id: item.cardOwnerPersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
         type: CONST.ICON_TYPE_AVATAR,
         name: item.cardOwnerPersonalDetails?.displayName ?? '',

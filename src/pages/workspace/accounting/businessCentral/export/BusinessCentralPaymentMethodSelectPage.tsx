@@ -32,7 +32,7 @@ type PaymentMethodListItem = ListItem & {
 function BusinessCentralPaymentMethodSelectPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const businessCentralConfig = policy?.connections?.businessCentral?.config;
     const paymentMethodCode = businessCentralConfig?.export?.paymentMethodCode;
@@ -67,7 +67,7 @@ function BusinessCentralPaymentMethodSelectPage({policy}: WithPolicyConnectionsP
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.businessCentral.noPaymentMethodsFound')}

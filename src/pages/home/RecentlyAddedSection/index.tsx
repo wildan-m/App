@@ -42,7 +42,7 @@ function RecentlyAddedSection() {
     // The hovered receipt preview is a portal on document.body, so it isn't dismissed by navigation alone.
     // Once the screen blurs (e.g. after opening an expense), we hide the preview instead of leaving it floating over the RHP.
     const isFocused = useIsFocused();
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
+    const {Receipt: receiptIcon} = useMemoizedLazyExpensifyIcons(['Receipt']);
     const {markReportRHPWidth} = useWideRHPActions();
     const {email: currentUserEmail, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
@@ -123,7 +123,7 @@ function RecentlyAddedSection() {
             menuItems={[
                 {
                     text: translate('homePage.recentlyAddedSection.viewAll'),
-                    icon: icons.Receipt,
+                    icon: receiptIcon,
                     onSelected: navigateToExpensesPage,
                     shouldCallAfterModalHide: true,
                 },

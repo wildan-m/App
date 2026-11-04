@@ -44,7 +44,7 @@ import withReportOrNotFound from './inbox/report/withReportOrNotFound';
 type DynamicRoomMemberDetailsPageProps = WithReportOrNotFoundProps & PlatformStackScreenProps<RoomMembersNavigatorParamList, typeof SCREENS.ROOM_MEMBERS.DYNAMIC_DETAILS>;
 
 function DynamicRoomMemberDetailsPage({report, route}: DynamicRoomMemberDetailsPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info']);
+    const {RemoveMembers: removeMembersIcon, Info: infoIcon} = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info']);
     const styles = useThemeStyles();
     const {formatPhoneNumber, translate} = useLocalize();
     const StyleUtils = useStyleUtils();
@@ -124,7 +124,7 @@ function DynamicRoomMemberDetailsPage({report, route}: DynamicRoomMemberDetailsP
                         style={styles.mv5}
                     >
                         <Button.Icon
-                            src={icons.RemoveMembers}
+                            src={removeMembersIcon}
                             style={StyleUtils.getTransformScaleStyle(0.8)}
                         />
                         <Button.Text>{translate('workspace.people.removeRoomMemberButtonTitle')}</Button.Text>
@@ -133,7 +133,7 @@ function DynamicRoomMemberDetailsPage({report, route}: DynamicRoomMemberDetailsP
                 <View style={styles.w100}>
                     <MenuItemNavigation
                         title={translate('common.profile')}
-                        icon={icons.Info}
+                        icon={infoIcon}
                         onPress={navigateToProfile}
                     />
                 </View>

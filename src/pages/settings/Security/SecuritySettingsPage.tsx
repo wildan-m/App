@@ -57,7 +57,14 @@ type BaseMenuItemType = WithSentryLabel & {
 };
 
 function SecuritySettingsPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCollapse', 'ClosedSign', 'Fingerprint', 'Monitor', 'Shield', 'UserLock']);
+    const {
+        ArrowCollapse: arrowCollapseIcon,
+        ClosedSign: closedSignIcon,
+        Fingerprint: fingerprintIcon,
+        Monitor: monitorIcon,
+        Shield: shieldIcon,
+        UserLock: userLockIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowCollapse', 'ClosedSign', 'Fingerprint', 'Monitor', 'Shield', 'UserLock']);
     const securitySettingsIllustration = useSecuritySettingsSectionIllustration();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -100,7 +107,7 @@ function SecuritySettingsPage() {
     if (isAgentAccount === false) {
         baseMenuItems.push({
             translationKey: 'twoFactorAuth.headerTitle',
-            icon: icons.Shield,
+            icon: shieldIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.TWO_FACTOR_AUTH,
             action: () => {
                 if (isActingAsDelegate) {
@@ -118,7 +125,7 @@ function SecuritySettingsPage() {
     if (isAgentAccount === false && hasEverRegisteredForMultifactorAuthentication) {
         baseMenuItems.push({
             translationKey: 'multifactorAuthentication.revoke.title',
-            icon: icons.Fingerprint,
+            icon: fingerprintIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.REVOKE_MFA,
             action: () => {
                 Navigation.navigate(ROUTES.MULTIFACTOR_AUTHENTICATION_REVOKE);
@@ -130,7 +137,7 @@ function SecuritySettingsPage() {
     if (!isCopilotingIntoAgent) {
         baseMenuItems.push({
             translationKey: 'mergeAccountsPage.mergeAccount',
-            icon: icons.ArrowCollapse,
+            icon: arrowCollapseIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.MERGE_ACCOUNTS,
             action: () => {
                 if (isAccountLocked) {
@@ -154,14 +161,14 @@ function SecuritySettingsPage() {
     if (isAccountLocked) {
         baseMenuItems.push({
             translationKey: 'lockAccountPage.unlockAccount',
-            icon: icons.UserLock,
+            icon: userLockIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.LOCK_UNLOCK_ACCOUNT,
             action: waitForNavigate(() => Navigation.navigate(ROUTES.SETTINGS_UNLOCK_ACCOUNT)),
         });
     } else {
         baseMenuItems.push({
             translationKey: 'lockAccountPage.reportSuspiciousActivity',
-            icon: icons.UserLock,
+            icon: userLockIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.LOCK_UNLOCK_ACCOUNT,
             action: waitForNavigate(() => Navigation.navigate(ROUTES.SETTINGS_LOCK_ACCOUNT)),
         });
@@ -172,7 +179,7 @@ function SecuritySettingsPage() {
         const deviceManagementBrickRoadIndicator = hasDeviceManagementErrorValue ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined;
         baseMenuItems.push({
             translationKey: 'deviceManagementPage.title',
-            icon: icons.Monitor,
+            icon: monitorIcon,
             brickRoadIndicator: deviceManagementBrickRoadIndicator,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DEVICE_MANAGEMENT,
             action: () => Navigation.navigate(ROUTES.SETTINGS_DEVICE_MANAGEMENT),
@@ -180,7 +187,7 @@ function SecuritySettingsPage() {
     }
     baseMenuItems.push({
         translationKey: 'closeAccountPage.closeAccount',
-        icon: icons.ClosedSign,
+        icon: closedSignIcon,
         sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.CLOSE_ACCOUNT,
         action: async () => {
             // Copiloting into an agent is also a delegate session and must fall through to the

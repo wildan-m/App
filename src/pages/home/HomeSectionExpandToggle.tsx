@@ -35,7 +35,7 @@ function HomeSectionExpandToggle({isExpanded, onPress, collapsedLabel, wrapperSt
     const theme = useTheme();
     const {translate} = useLocalize();
     const {cardPaddingHorizontal} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
 
     const label = isExpanded ? translate('common.showLess') : collapsedLabel;
 
@@ -49,7 +49,7 @@ function HomeSectionExpandToggle({isExpanded, onPress, collapsedLabel, wrapperSt
         >
             <View style={[styles.alignItemsCenter, styles.justifyContentCenter, {width: variables.componentSizeNormal, height: variables.componentSizeNormal}]}>
                 <Icon
-                    src={isExpanded ? icons.UpArrow : icons.DownArrow}
+                    src={isExpanded ? upArrowIcon : downArrowIcon}
                     fill={theme.icon}
                     width={variables.iconSizeNormal}
                     height={variables.iconSizeNormal}

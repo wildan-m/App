@@ -32,7 +32,7 @@ type BankAccountListItem = ListItem & {
 function RilletExpensifyCardSettlementAccountPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const rilletConfig = policy?.connections?.rillet?.config;
     const rilletData = policy?.connections?.rillet?.data;
@@ -61,7 +61,7 @@ function RilletExpensifyCardSettlementAccountPage({policy}: WithPolicyConnection
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.rillet.noBankAccountsFound')}

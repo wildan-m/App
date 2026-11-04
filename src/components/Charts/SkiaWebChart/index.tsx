@@ -48,7 +48,7 @@ const locateCanvasKitFile = (file: string) => (file === 'canvaskit.wasm' ? __CAN
 function ChartUnavailable({description = 'common.webGLNotSupported'}: ChartUnavailableProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['MonitorSyncNo']);
+    const {MonitorSyncNo: monitorSyncNoIllustration} = useMemoizedLazyIllustrations(['MonitorSyncNo']);
 
     // This state never loads, and Skia draws none of it, so an enclosing ChartReveal shows it at once
     useReportChartLoading(false, false);
@@ -56,7 +56,7 @@ function ChartUnavailable({description = 'common.webGLNotSupported'}: ChartUnava
     return (
         <View style={styles.chartWebFallback}>
             <Icon
-                src={illustrations.MonitorSyncNo}
+                src={monitorSyncNoIllustration}
                 width={variables.iconSizeSuperLarge}
                 height={variables.iconSizeSuperLarge}
             />

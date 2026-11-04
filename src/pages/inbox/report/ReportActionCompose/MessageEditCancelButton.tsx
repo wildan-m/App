@@ -27,7 +27,7 @@ function MessageEditCancelButton({onCancel, testID, ...restProps}: MessageEditCa
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const closeButtonStyles = [styles.composerSizeButton];
 
@@ -47,7 +47,7 @@ function MessageEditCancelButton({onCancel, testID, ...restProps}: MessageEditCa
                     {({hovered, pressed}) => (
                         <Icon
                             fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered, isPressed: pressed})})}
-                            src={icons.Close}
+                            src={closeIcon}
                         />
                     )}
                 </PressableWithoutFeedback>

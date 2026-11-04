@@ -17,13 +17,13 @@ function PendingMapView({title = '', subtitle = '', style, isSmallerIcon = false
     const hasTextContent = !isEmpty(title) || !isEmpty(subtitle);
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['EmptyStateRoutePending']);
+    const {EmptyStateRoutePending: emptyStateRoutePendingIcon} = useMemoizedLazyExpensifyIcons(['EmptyStateRoutePending']);
     const iconSize = isSmallerIcon ? variables.iconSizeSuperLarge : variables.iconSizeUltraLarge;
     return (
         <View style={[styles.mapPendingView, style]}>
             {hasTextContent ? (
                 <BlockingView
-                    icon={icons.EmptyStateRoutePending}
+                    icon={emptyStateRoutePendingIcon}
                     iconColor={theme.border}
                     title={title}
                     subtitle={subtitle}
@@ -32,7 +32,7 @@ function PendingMapView({title = '', subtitle = '', style, isSmallerIcon = false
             ) : (
                 <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph10]}>
                     <Icon
-                        src={icons.EmptyStateRoutePending}
+                        src={emptyStateRoutePendingIcon}
                         width={iconSize}
                         height={iconSize}
                         fill={theme.border}

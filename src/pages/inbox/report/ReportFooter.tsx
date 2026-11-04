@@ -71,7 +71,7 @@ function ReportFooter() {
     // must keep rendering their own inline one.
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
+    const {Lightbulb: lightbulbIcon} = useMemoizedLazyExpensifyIcons(['Lightbulb']);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
 
@@ -227,7 +227,7 @@ function ReportFooter() {
                 <Banner
                     containerStyles={[styles.chatFooterBanner, isEditingWithComposer && styles.mt2]}
                     text={translate('adminOnlyCanPost')}
-                    icon={expensifyIcons.Lightbulb}
+                    icon={lightbulbIcon}
                     shouldShowIcon
                 />
                 {!isSmallScreenWidth && (
@@ -251,7 +251,7 @@ function ReportFooter() {
                 <Banner
                     containerStyles={[styles.chatFooterBanner]}
                     text={translate('readOnlyConversation')}
-                    icon={expensifyIcons.Lightbulb}
+                    icon={lightbulbIcon}
                     shouldShowIcon
                 />
                 {!isSmallScreenWidth && (

@@ -19,7 +19,7 @@ function Enable2FACard() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {asset: ShieldYellow} = useMemoizedLazyAsset(() => loadIllustration('ShieldYellow' as IllustrationName));
-    const icons = useMemoizedLazyExpensifyIcons(['Shield']);
+    const {Shield: shieldIcon} = useMemoizedLazyExpensifyIcons(['Shield']);
     const {getTwoFactorAuthRoute} = useTwoFactorAuthRoute();
 
     return (
@@ -34,7 +34,7 @@ function Enable2FACard() {
             <MenuItemSectionRoot onPress={() => Navigation.navigate(getTwoFactorAuthRoute())}>
                 <MenuItem.Row>
                     <MenuItem.Leading>
-                        <MenuItem.Icon src={icons.Shield} />
+                        <MenuItem.Icon src={shieldIcon} />
                     </MenuItem.Leading>
                     <MenuItem.Content>
                         <MenuItem.Title>{translate('connectBankAccountStep.secureYourAccount')}</MenuItem.Title>

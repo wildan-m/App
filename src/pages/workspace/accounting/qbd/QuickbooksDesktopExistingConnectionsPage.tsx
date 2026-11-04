@@ -30,7 +30,7 @@ type QuickbooksDesktopExistingConnectionsPageProps = PlatformStackScreenProps<Se
 function QuickbooksDesktopExistingConnectionsPage({route}: QuickbooksDesktopExistingConnectionsPageProps) {
     const {translate, datetimeToRelative, getLocalDateFromDatetime} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToQBD} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.QBD, policyID);
     const [connectionSyncProgressCollection] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS);
@@ -69,7 +69,7 @@ function QuickbooksDesktopExistingConnectionsPage({route}: QuickbooksDesktopExis
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.QBD)}</Text>
                 <MenuItemNavigation
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     onPress={() => Navigation.navigate(getQuickbooksDesktopSetupEntryRoute(policyID))}
                 />
                 <Text style={[styles.sectionTitle, styles.pl5, styles.pr5, styles.pb2, styles.mt3]}>{translate('workspace.common.existingConnections')}</Text>

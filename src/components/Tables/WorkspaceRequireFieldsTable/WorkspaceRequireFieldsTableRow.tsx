@@ -28,7 +28,7 @@ function WorkspaceRequireFieldsTableRow({item, rowIndex, shouldUseNarrowTableLay
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Task']);
+    const {ArrowRight: arrowRightIcon, Task: taskIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Task']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -55,7 +55,7 @@ function WorkspaceRequireFieldsTableRow({item, rowIndex, shouldUseNarrowTableLay
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                 <Badge
                                     text={item.typeLabel}
-                                    icon={Expensicons.Task}
+                                    icon={taskIcon}
                                     iconFill={badgeColors.textColor}
                                     badgeStyles={[
                                         styles.ml0,
@@ -91,7 +91,7 @@ function WorkspaceRequireFieldsTableRow({item, rowIndex, shouldUseNarrowTableLay
                             >
                                 <Badge
                                     text={item.typeLabel}
-                                    icon={Expensicons.Task}
+                                    icon={taskIcon}
                                     iconFill={badgeColors.textColor}
                                     badgeStyles={[
                                         styles.ml0,
@@ -131,7 +131,7 @@ function WorkspaceRequireFieldsTableRow({item, rowIndex, shouldUseNarrowTableLay
 
                     <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                         <Icon
-                            src={Expensicons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

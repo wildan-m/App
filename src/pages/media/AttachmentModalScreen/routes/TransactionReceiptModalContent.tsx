@@ -70,7 +70,16 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {isOffline} = useNetwork();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera', 'Download', 'Crop', 'Trashcan', 'Rotate', 'Close', 'Checkmark', 'AttachmentNotFound']);
+    const {
+        Camera: cameraIcon,
+        Download: downloadIcon,
+        Crop: cropIcon,
+        Trashcan: trashcanIcon,
+        Rotate: rotateIcon,
+        Close: closeIcon,
+        Checkmark: checkmarkIcon,
+        AttachmentNotFound: attachmentNotFoundIcon,
+    } = useMemoizedLazyExpensifyIcons(['Camera', 'Download', 'Crop', 'Trashcan', 'Rotate', 'Close', 'Checkmark', 'AttachmentNotFound']);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [hasReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {selector: Boolean});
@@ -485,7 +494,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         const menuItems = [];
         if ((!isOffline && allowDownload && !isLocalSource) || !!draftTransactionID) {
             menuItems.push({
-                icon: expensifyIcons.Download,
+                icon: downloadIcon,
                 text: translate('common.download'),
                 onSelected: () => onDownloadAttachment({source: innerSource, file}),
                 sentryLabel: CONST.SENTRY_LABEL.RECEIPT_MODAL.DOWNLOAD_RECEIPT,
@@ -498,7 +507,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         const isDraftOdometer = isOdometerImage && isDraftTransaction;
         if (isDeletableReceipt || isDraftOdometer) {
             menuItems.push({
-                icon: expensifyIcons.Trashcan,
+                icon: trashcanIcon,
                 text: isOdometerImage ? translate('distance.odometer.deleteOdometerPhoto') : translate('receipt.deleteReceipt'),
                 onSelected: async () => {
                     const result = await showConfirmModal({
@@ -534,7 +543,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                     onPress={exitCropMode}
                     style={styles.transactionReceiptButton}
                 >
-                    <Button.Icon src={expensifyIcons.Close} />
+                    <Button.Icon src={closeIcon} />
                     <Button.Text>{translate('common.cancel')}</Button.Text>
                 </Button>
                 <Button
@@ -544,7 +553,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                     isDisabled={!cropRect || isCropSaving}
                     style={styles.transactionReceiptButton}
                 >
-                    <Button.Icon src={expensifyIcons.Checkmark} />
+                    <Button.Icon src={checkmarkIcon} />
                     <Button.Text>{translate('common.save')}</Button.Text>
                 </Button>
             </View>
@@ -561,7 +570,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         isDisabled={isRotating}
                         style={styles.transactionReceiptButton}
                     >
-                        <Button.Icon src={expensifyIcons.Rotate} />
+                        <Button.Icon src={rotateIcon} />
                         <Button.Text>{translate('common.rotate')}</Button.Text>
                     </Button>
                 )}
@@ -570,7 +579,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         onPress={enterCropMode}
                         style={styles.transactionReceiptButton}
                     >
-                        <Button.Icon src={expensifyIcons.Crop} />
+                        <Button.Icon src={cropIcon} />
                         <Button.Text>{translate('receipt.crop')}</Button.Text>
                     </Button>
                 )}
@@ -579,7 +588,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         onPress={() => setPdfRotation((prev) => ((prev + 270) % 360) as RotationDegrees)}
                         style={styles.transactionReceiptButton}
                     >
-                        <Button.Icon src={expensifyIcons.Rotate} />
+                        <Button.Icon src={rotateIcon} />
                         <Button.Text>{translate('common.rotate')}</Button.Text>
                     </Button>
                 )}
@@ -605,7 +614,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         }}
                         style={styles.transactionReceiptButton}
                     >
-                        <Button.Icon src={expensifyIcons.Camera} />
+                        <Button.Icon src={cameraIcon} />
                         <Button.Text>{translate('common.replace')}</Button.Text>
                     </Button>
                 )}
@@ -644,7 +653,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
         footerActionButtons,
         customAttachmentContent,
         attachmentViewContainerStyles: [styles.pv5, styles.ph2],
-        fallbackSource: expensifyIcons.AttachmentNotFound,
+        fallbackSource: attachmentNotFoundIcon,
     };
 
     return (

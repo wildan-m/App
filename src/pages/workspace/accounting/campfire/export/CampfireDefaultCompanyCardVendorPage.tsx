@@ -33,7 +33,7 @@ type VendorListItem = ListItem & {
 function CampfireDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const campfireConfig = policy?.connections?.campfire?.config;
     const defaultCompanyCardVendorID = campfireConfig?.export?.defaultVendorID;
@@ -67,7 +67,7 @@ function CampfireDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsPro
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.campfire.noVendorsFound')}

@@ -13,13 +13,13 @@ import {View} from 'react-native';
 function ExitSurveyOffline() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
     return (
         <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
             <Icon
                 width={variables.modalTopIconWidth}
                 height={variables.modalTopIconHeight}
-                src={illustrations.ToddBehindCloud}
+                src={toddBehindCloudIllustration}
             />
             <Text style={[styles.headerAnonymousFooter, styles.textAlignCenter]}>{translate('exitSurvey.offlineTitle')}</Text>
             <Text style={[styles.mt2, styles.textAlignCenter]}>{translate('exitSurvey.offline')}</Text>

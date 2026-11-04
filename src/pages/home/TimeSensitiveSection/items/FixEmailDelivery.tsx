@@ -12,11 +12,11 @@ import React from 'react';
 
 function FixEmailDelivery() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Mail']);
+    const {Mail: mailIcon} = useMemoizedLazyExpensifyIcons(['Mail']);
 
     return (
         <BaseWidgetItem
-            icon={icons.Mail}
+            icon={mailIcon}
             title={translate('homePage.timeSensitiveSection.emailDeliveryFailure.title')}
             subtitle={translate('homePage.timeSensitiveSection.emailDeliveryFailure.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

@@ -27,7 +27,7 @@ function PinButton({report}: PinButtonProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Pin']);
+    const {Pin: pinIcon} = useMemoizedLazyExpensifyIcons(['Pin']);
 
     return (
         <Tooltip text={report.isPinned ? translate('common.unPin') : translate('common.pin')}>
@@ -39,7 +39,7 @@ function PinButton({report}: PinButtonProps) {
                 sentryLabel={CONST.SENTRY_LABEL.PIN_BUTTON.TOGGLE}
             >
                 <Icon
-                    src={icons.Pin}
+                    src={pinIcon}
                     fill={report.isPinned ? theme.heading : theme.icon}
                 />
             </PressableWithFeedback>

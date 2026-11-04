@@ -71,7 +71,7 @@ function SearchMergeReports() {
     const delegateAccountID = useDelegateAccountID();
     const {getCurrencyDecimals, getCurrencySymbol} = useCurrencyListActions();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+    const {EmptyShelves: emptyShelvesIllustration} = useMemoizedLazyIllustrations(['EmptyShelves']);
 
     const [destinationReportID, setDestinationReportID] = useState<string | undefined>();
 
@@ -289,7 +289,7 @@ function SearchMergeReports() {
                     <EmptyStateComponent
                         cardStyles={[styles.appBG]}
                         cardContentStyles={[styles.p0]}
-                        headerMedia={illustrations.EmptyShelves}
+                        headerMedia={emptyShelvesIllustration}
                         title={translate('search.mergeReports.listPage.noEligibleReportsFound')}
                         subtitleText={
                             <Text

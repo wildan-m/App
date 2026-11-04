@@ -36,7 +36,7 @@ function RulesFlagForReviewTab({policyID, canWriteRules, selectedKeys, onSelecti
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
     // Its own illustration, so Flag for review doesn't repeat the sorting machine that Field requirements uses.
-    const icons = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
+    const {EmptyStateSpyPigeon: emptyStateSpyPigeonIcon} = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
     const policy = usePolicy(policyID);
     const policyData = usePolicyData(policyID);
     const StyleUtils = useStyleUtils();
@@ -64,7 +64,7 @@ function RulesFlagForReviewTab({policyID, canWriteRules, selectedKeys, onSelecti
     const flagForReviewEmptyState: TableEmptyStateProps = {
         minModalHeight: 0,
         cardContentStyles: styles.ph0,
-        headerMedia: icons.EmptyStateSpyPigeon,
+        headerMedia: emptyStateSpyPigeonIcon,
         headerContentStyles: styles.spyPigeonRulesEmptyStateIllustration,
         title: translate('workspace.rules.flagForReviewEmptyState.title'),
         subtitle: translate('workspace.rules.flagForReviewEmptyState.subtitle'),

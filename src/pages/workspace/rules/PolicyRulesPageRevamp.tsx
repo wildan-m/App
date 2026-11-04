@@ -84,7 +84,17 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {pageGutter} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Feed', 'CreditCardExclamation', 'DocumentMagicWand', 'Task', 'Flag', 'Bot', 'Trashcan', 'Table']);
+    const {
+        Plus: plusIcon,
+        Feed: feedIcon,
+        CreditCardExclamation: creditCardExclamationIcon,
+        DocumentMagicWand: documentMagicWandIcon,
+        Task: taskIcon,
+        Flag: flagIcon,
+        Bot: botIcon,
+        Trashcan: trashcanIcon,
+        Table: tableIcon,
+    } = useMemoizedLazyExpensifyIcons(['Plus', 'Feed', 'CreditCardExclamation', 'DocumentMagicWand', 'Task', 'Flag', 'Bot', 'Trashcan', 'Table']);
     const {canWrite: canWriteRules, showReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
@@ -206,7 +216,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
     const getBulkActionsButtonOptions = (): Array<DropdownOption<DeepValueOf<typeof CONST.POLICY.BULK_ACTION_TYPES>>> => {
         return [
             {
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('workspace.rules.bulkActions.deleteMultiple', {
                     count: selectedRuleKeys.length,
                 }),
@@ -235,32 +245,32 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
         {
             key: RULES_TAB.GENERAL,
             title: translate('workspace.rules.tabs.general'),
-            icon: icons.Feed,
+            icon: feedIcon,
         },
         {
             key: RULES_TAB.CARD_RESTRICTIONS,
             title: translate('workspace.rules.tabs.cardRestrictions'),
-            icon: icons.CreditCardExclamation,
+            icon: creditCardExclamationIcon,
         },
         {
             key: RULES_TAB.EXPENSE_DEFAULTS,
             title: translate('workspace.rules.tabs.expenseDefaults'),
-            icon: icons.DocumentMagicWand,
+            icon: documentMagicWandIcon,
         },
         {
             key: RULES_TAB.REQUIRE_FIELDS,
             title: translate('workspace.rules.tabs.requireFields'),
-            icon: icons.Task,
+            icon: taskIcon,
         },
         {
             key: RULES_TAB.FLAG_FOR_REVIEW,
             title: translate('workspace.rules.tabs.flagForReview'),
-            icon: icons.Flag,
+            icon: flagIcon,
         },
         {
             key: RULES_TAB.AGENTS,
             title: translate('workspace.rules.tabs.agents'),
-            icon: icons.Bot,
+            icon: botIcon,
         },
     ];
 
@@ -326,7 +336,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
                 canWriteRules,
                 showReadOnlyModal,
                 translate,
-                icon: icons.Table,
+                icon: tableIcon,
                 // Collect sees More on General, so gate it like New rule. backTo only applies after a successful upgrade.
                 tryNavigateToUpgrade: () => tryNavigateToControlPolicyUpgrade(policy, rulesUpgradeAlias, ROUTES.RULES_MERCHANT_IMPORT.getRoute(policyID)),
             }),
@@ -339,7 +349,7 @@ function PolicyRulesPageRevamp({route}: PolicyRulesPageRevampProps) {
                     onPress={handleNewRule}
                     style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('workspace.rules.merchantRules.addRuleTitle')}</Button.Text>
                 </Button>
                 <ButtonWithDropdownMenu

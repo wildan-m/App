@@ -53,7 +53,12 @@ function InboxTabSelector() {
     const {setActiveTab, getReportIDsForTab} = useSidebarOrderedReportsActions();
     const [reportNameValuePairs] = useOnyx(ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS, {selector: reportNameValuePairsArchivedSelector});
     const reportAttributesDerived = useReportAttributes();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Feed', 'ChatBubbleUnread', 'Task']);
+    const {
+        Checkmark: checkmarkIcon,
+        Feed: feedIcon,
+        ChatBubbleUnread: chatBubbleUnreadIcon,
+        Task: taskIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Feed', 'ChatBubbleUnread', 'Task']);
     const {showConfirmModal} = useConfirmModal();
     // Only show the tooltip if we have unread message > 3 months old.
     const {renderProductTrainingTooltip, shouldShowProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(
@@ -114,7 +119,7 @@ function InboxTabSelector() {
     const menuItems: PopoverMenuItem[] = [
         {
             text: translate('inboxTabs.markAllAsRead'),
-            icon: icons.Checkmark,
+            icon: checkmarkIcon,
             // Wait for the popover to fully hide before showing the confirmation modal so they don't overlap.
             shouldCallAfterModalHide: true,
             onSelected: confirmMarkAllAsRead,
@@ -125,7 +130,7 @@ function InboxTabSelector() {
         {
             key: CONST.INBOX_TAB.ALL,
             title: translate('inboxTabs.all'),
-            icon: icons.Feed,
+            icon: feedIcon,
             tabRef: allTabRef,
             // Every tab opens the "Mark all as read" menu on long-press / right-click, so they all wire the secondary
             // interaction (which suppresses the native browser context menu on web).
@@ -134,7 +139,7 @@ function InboxTabSelector() {
         {
             key: CONST.INBOX_TAB.UNREAD,
             title: translate('inboxTabs.unread'),
-            icon: icons.ChatBubbleUnread,
+            icon: chatBubbleUnreadIcon,
             badgeText: getBadgeText(inboxTabCounts[CONST.INBOX_TAB.UNREAD]),
             isBadgeCondensed: true,
             badgeStyles: styles.tabSelectorBadge,
@@ -158,7 +163,7 @@ function InboxTabSelector() {
         {
             key: CONST.INBOX_TAB.TODO,
             title: translate('inboxTabs.todo'),
-            icon: icons.Task,
+            icon: taskIcon,
             badgeText: getBadgeText(inboxTabCounts[CONST.INBOX_TAB.TODO]),
             isBadgeCondensed: true,
             badgeStyles: styles.tabSelectorBadge,

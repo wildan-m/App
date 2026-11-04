@@ -20,7 +20,7 @@ import {View} from 'react-native';
 function RequireQuickBooksDesktopModal() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['LaptopWithSecondScreenX']);
+    const {LaptopWithSecondScreenX: laptopWithSecondScreenXIllustration} = useMemoizedLazyIllustrations(['LaptopWithSecondScreenX']);
 
     const confirm = () => Navigation.goBack();
 
@@ -39,7 +39,7 @@ function RequireQuickBooksDesktopModal() {
             <View style={[styles.flex1, styles.gap2]}>
                 <ScrollView contentContainerStyle={[styles.flexGrow1, styles.justifyContentCenter, styles.ph5]}>
                     <View style={[styles.alignSelfCenter, styles.pendingStateCardIllustration]}>
-                        <ImageSVG src={illustrations.LaptopWithSecondScreenX} />
+                        <ImageSVG src={laptopWithSecondScreenXIllustration} />
                     </View>
 
                     <Text style={[styles.textAlignCenter, styles.textHeadlineH1, styles.pt5]}>{translate('workspace.qbd.requiredSetupDevice.title')}</Text>

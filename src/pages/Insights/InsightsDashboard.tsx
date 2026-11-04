@@ -102,7 +102,7 @@ function InsightsDashboardContent({
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isBetaEnabled} = usePermissions();
-    const icons = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
+    const {OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
     const triggerScrollEvent = useScrollEventEmitter();
     const isEmptyState = state === INSIGHTS_DASHBOARD_STATE.NO_EXPENSES || state === INSIGHTS_DASHBOARD_STATE.EMPTY;
     const scrollProps = useTabRootScrollProps(isEmptyState ? [styles.flexGrow1, styles.flexShrink0] : [styles.flexGrow1, !shouldScrollMainHeader && pageGutter, styles.pb5], {
@@ -157,7 +157,7 @@ function InsightsDashboardContent({
                     style={styles.flex1}
                 >
                     <BlockingView
-                        icon={icons.OfflineCloud}
+                        icon={offlineCloudIcon}
                         iconColor={theme.offline}
                         title={translate('common.youAppearToBeOffline')}
                         subtitle={translate('common.thisFeatureRequiresInternet')}

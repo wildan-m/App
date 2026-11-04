@@ -47,7 +47,7 @@ function WiseGlobalReimbursementsIntroPage({route}: WiseGlobalReimbursementsIntr
     const isWiseReimbursementsBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.WISE_REIMBURSEMENTS);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['EarthWithCoins']);
+    const {EarthWithCoins: earthWithCoinsIllustration} = useMemoizedLazyIllustrations(['EarthWithCoins']);
 
     const goBackToEntryPoint = () => Navigation.goBack(backPath);
 
@@ -79,7 +79,7 @@ function WiseGlobalReimbursementsIntroPage({route}: WiseGlobalReimbursementsIntr
                 <ConfirmationPage>
                     <ConfirmationPage.Content>
                         <ConfirmationPage.Illustration
-                            illustration={illustrations.EarthWithCoins}
+                            illustration={earthWithCoinsIllustration}
                             illustrationStyle={StyleUtils.getWidthAndHeightStyle(variables.wiseGlobalReimbursementsIntroIllustrationSize)}
                         />
                         <ConfirmationPage.Heading>{translate('walletPage.wiseGlobalReimbursementsIntro.title')}</ConfirmationPage.Heading>

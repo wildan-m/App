@@ -44,7 +44,19 @@ import type {BaseOnboardingInterestedFeaturesProps, Feature, SectionObject} from
 function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardingInterestedFeaturesProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['FolderOpen', 'Accounting', 'CompanyCard', 'Workflows', 'Rules', 'Car', 'Tag', 'PerDiem', 'HandCard', 'Luggage', 'Clock']);
+    const {
+        FolderOpen: folderOpenIllustration,
+        Accounting: accountingIllustration,
+        CompanyCard: companyCardIllustration,
+        Workflows: workflowsIllustration,
+        Rules: rulesIllustration,
+        Car: carIllustration,
+        Tag: tagIllustration,
+        PerDiem: perDiemIllustration,
+        HandCard: handCardIllustration,
+        Luggage: luggageIllustration,
+        Clock: clockIllustration,
+    } = useMemoizedLazyIllustrations(['FolderOpen', 'Accounting', 'CompanyCard', 'Workflows', 'Rules', 'Car', 'Tag', 'PerDiem', 'HandCard', 'Luggage', 'Clock']);
 
     // We need to use isSmallScreenWidth, see navigateAfterOnboarding function comment
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -65,80 +77,80 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                     ...feature,
                     title: translate('workspace.moreFeatures.categories.title'),
                     subtitle: translate('workspace.moreFeatures.categories.subtitle'),
-                    icon: illustrations.FolderOpen,
+                    icon: folderOpenIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.connections.title'),
                     subtitle: translate('workspace.moreFeatures.connections.subtitle'),
-                    icon: illustrations.Accounting,
+                    icon: accountingIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_COMPANY_CARDS_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.companyCards.title'),
                     subtitle: translate('workspace.moreFeatures.companyCards.subtitle'),
-                    icon: illustrations.CompanyCard,
+                    icon: companyCardIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.workflows.title'),
                     subtitle: translate('workspace.moreFeatures.workflows.subtitle'),
-                    icon: illustrations.Workflows,
+                    icon: workflowsIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.travel.title'),
                     subtitle: translate('workspace.moreFeatures.travel.subtitle'),
-                    icon: illustrations.Luggage,
+                    icon: luggageIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.rules.title'),
                     subtitle: translate('workspace.moreFeatures.rules.subtitle'),
-                    icon: illustrations.Rules,
+                    icon: rulesIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.distanceRates.title'),
                     subtitle: translate('workspace.moreFeatures.distanceRates.subtitle'),
-                    icon: illustrations.Car,
+                    icon: carIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.expensifyCard.title'),
                     subtitle: translate('workspace.moreFeatures.expensifyCard.subtitle'),
-                    icon: illustrations.HandCard,
+                    icon: handCardIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_TAGS_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.tags.title'),
                     subtitle: translate('workspace.moreFeatures.tags.subtitle'),
-                    icon: illustrations.Tag,
+                    icon: tagIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.perDiem.title'),
                     subtitle: translate('workspace.moreFeatures.perDiem.subtitle'),
-                    icon: illustrations.PerDiem,
+                    icon: perDiemIllustration,
                 };
             case CONST.POLICY.MORE_FEATURES.IS_TIME_TRACKING_ENABLED:
                 return {
                     ...feature,
                     title: translate('workspace.moreFeatures.timeTracking.title'),
                     subtitle: translate('workspace.moreFeatures.timeTracking.subtitle'),
-                    icon: illustrations.Clock,
+                    icon: clockIllustration,
                 };
             default:
-                return {...feature, title: feature.id, icon: illustrations.FolderOpen};
+                return {...feature, title: feature.id, icon: folderOpenIllustration};
         }
     });
 

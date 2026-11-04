@@ -28,14 +28,14 @@ type HoldMenuSectionListProps = {
 function HoldMenuSectionList({isDM}: HoldMenuSectionListProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['RealtimeReport', 'Stopwatch']);
+    const {RealtimeReport: realtimeReportIllustration, Stopwatch: stopwatchIllustration} = useMemoizedLazyIllustrations(['RealtimeReport', 'Stopwatch']);
     const holdMenuSections: HoldMenuSection[] = [
         {
-            icon: illustrations.Stopwatch,
+            icon: stopwatchIllustration,
             titleTranslationKey: isDM ? 'iou.holdIsLeftBehindDM' : 'iou.holdIsLeftBehind',
         },
         {
-            icon: illustrations.RealtimeReport,
+            icon: realtimeReportIllustration,
             titleTranslationKey: isDM ? 'iou.unholdWhenReadyDM' : 'iou.unholdWhenReady',
         },
     ];

@@ -22,7 +22,7 @@ function ChangePolicyEducationalModal() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['ReceiptFairy']);
+    const {ReceiptFairy: receiptFairyIllustration} = useMemoizedLazyIllustrations(['ReceiptFairy']);
 
     const handleConfirm = () => {
         dismissChangePolicyModal();
@@ -47,7 +47,7 @@ function ChangePolicyEducationalModal() {
                 shouldUseScrollView
             >
                 <FeatureTraining.Illustration
-                    image={illustrations.ReceiptFairy}
+                    image={receiptFairyIllustration}
                     imageWidth={variables.changePolicyEducationModalIconWidth}
                     imageHeight={variables.changePolicyEducationModalIconHeight}
                     contentFitImage="cover"

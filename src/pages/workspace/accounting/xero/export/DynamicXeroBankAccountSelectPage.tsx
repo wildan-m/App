@@ -29,7 +29,7 @@ import {View} from 'react-native';
 function DynamicXeroBankAccountSelectPage({policy}: WithPolicyConnectionsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id;
     const {config} = policy?.connections?.xero ?? {};
@@ -58,7 +58,7 @@ function DynamicXeroBankAccountSelectPage({policy}: WithPolicyConnectionsProps) 
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.xero.noAccountsFound')}

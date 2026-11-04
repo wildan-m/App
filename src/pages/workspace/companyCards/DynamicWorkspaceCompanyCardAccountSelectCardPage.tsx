@@ -63,7 +63,7 @@ function DynamicWorkspaceCompanyCardAccountSelectCardPage({route}: DynamicWorksp
     const defaultCard = translate('workspace.moreFeatures.companyCards.defaultCard');
     const defaultVendor = translate('workspace.accounting.defaultVendor');
     const defaultAccount = translate('workspace.accounting.defaultAccount');
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const [cardFeeds] = useCardFeeds(policyID);
     const domainOrWorkspaceAccountID = getDomainOrWorkspaceAccountID(workspaceAccountID, cardFeeds?.[feed]);
@@ -82,7 +82,7 @@ function DynamicWorkspaceCompanyCardAccountSelectCardPage({route}: DynamicWorksp
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.moreFeatures.companyCards.noAccountsFound')}

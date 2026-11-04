@@ -51,7 +51,7 @@ function WorkspaceTravelPage({
     const {translate} = useLocalize();
     const policy = usePolicy(policyID);
     useWorkspaceDocumentTitle(policy?.name, 'workspace.common.travel');
-    const icons = useMemoizedLazyExpensifyIcons(['Exit']);
+    const {Exit: exitIcon} = useMemoizedLazyExpensifyIcons(['Exit']);
     const workspaceAccountID = useWorkspaceAccountID(policyID);
 
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
@@ -100,7 +100,7 @@ function WorkspaceTravelPage({
 
     const secondaryActions = [
         {
-            icon: icons.Exit,
+            icon: exitIcon,
             text: translate('common.export'),
             value: CONST.POLICY.SECONDARY_ACTIONS.EXPORT,
             onSelected: () => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_EXPORT.getRoute(policyID)),

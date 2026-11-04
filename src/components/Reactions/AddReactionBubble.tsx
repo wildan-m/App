@@ -60,7 +60,7 @@ type AddReactionBubbleProps = {
 
 function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, onWillShowPicker = () => {}, isContextMenu = false, setIsEmojiPickerActive}: AddReactionBubbleProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['AddReaction']);
+    const {AddReaction: addReactionIcon} = useMemoizedLazyExpensifyIcons(['AddReaction']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const ref = useRef<ComponentRef<typeof View> | HTMLDivElement>(null);
@@ -128,7 +128,7 @@ function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, onWi
                         <Text style={[styles.opacity0, StyleUtils.getEmojiReactionBubbleTextStyle(isContextMenu)]}>{'\u2800\u2800'}</Text>
                         <View style={styles.pAbsolute}>
                             <Icon
-                                src={icons.AddReaction}
+                                src={addReactionIcon}
                                 width={isContextMenu ? variables.iconSizeNormal : variables.iconSizeSmall}
                                 height={isContextMenu ? variables.iconSizeNormal : variables.iconSizeSmall}
                                 fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered, isPressed: pressed})})}

@@ -100,7 +100,25 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
 
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        FreezeCard: freezeCardIcon,
+        MoneySearch: moneySearchIcon,
+        Trashcan: trashcanIcon,
+        CreditCardLock: creditCardLockIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'FreezeCard',
         'MoneySearch',
         'Trashcan',
@@ -119,7 +137,26 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
         'BusinessCentralSquare',
         'GustoSquare',
     ]);
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
+    const expensifyIcons = {
+        FreezeCard: freezeCardIcon,
+        MoneySearch: moneySearchIcon,
+        Trashcan: trashcanIcon,
+        CreditCardLock: creditCardLockIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    };
+    const {ExpensifyCardImage: expensifyCardImageIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {showConfirmModal} = useConfirmModal();
@@ -281,7 +318,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
         <>
             <ImageSVG
                 contentFit="contain"
-                src={illustrations.ExpensifyCardImage}
+                src={expensifyCardImageIllustration}
                 pointerEvents="none"
                 height={variables.cardPreviewHeight}
                 width={variables.cardPreviewWidth}
@@ -358,7 +395,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                                 innerStyles={styles.ph2}
                                 style={styles.w100}
                             >
-                                <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                                <CardDetailsActionButton.Icon src={moneySearchIcon} />
                                 <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                             </CardDetailsActionButton>
                         </FrozenCardHeader>
@@ -372,12 +409,12 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                                     onPress={handleFreezePress}
                                     isDisabled={isOffline}
                                 >
-                                    <CardDetailsActionButton.Icon src={expensifyIcons.FreezeCard} />
+                                    <CardDetailsActionButton.Icon src={freezeCardIcon} />
                                     <CardDetailsActionButton.Text>{translate('cardPage.freezeCard')}</CardDetailsActionButton.Text>
                                 </CardDetailsActionButton>
                             )}
                             <CardDetailsActionButton onPress={navigateToTransactions}>
-                                <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                                <CardDetailsActionButton.Icon src={moneySearchIcon} />
                                 <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                             </CardDetailsActionButton>
                         </CardDetailsActionButtons>
@@ -439,7 +476,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                     <View style={styles.mt6}>
                         {canEditSpendRules && (
                             <MenuItemAction
-                                icon={expensifyIcons.CreditCardLock}
+                                icon={creditCardLockIcon}
                                 title={translate('cardPage.editSpendRules')}
                                 onPress={navigateToSpendRules}
                             />
@@ -447,7 +484,7 @@ function DynamicWorkspaceExpensifyCardDetailsPage({route}: DynamicWorkspaceExpen
                         {canWriteExpensifyCard && !isDeactivated && (
                             <View style={styles.mb1}>
                                 <MenuItemAction
-                                    icon={expensifyIcons.Trashcan}
+                                    icon={trashcanIcon}
                                     title={translate('workspace.expensifyCard.deactivate')}
                                     onPress={() => (isOffline ? showOfflineModal() : deactivateCard())}
                                 />

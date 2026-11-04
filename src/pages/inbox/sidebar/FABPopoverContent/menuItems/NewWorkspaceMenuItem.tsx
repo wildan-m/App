@@ -33,7 +33,7 @@ function NewWorkspaceMenuItem() {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['NewWorkspace']);
+    const {NewWorkspace: newWorkspaceIcon} = useMemoizedLazyExpensifyIcons(['NewWorkspace']);
     const {isOffline} = useNetwork();
     const [isLoading = false] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
@@ -51,7 +51,7 @@ function NewWorkspaceMenuItem() {
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.NEW_WORKSPACE}
             displayInDefaultIconColor
             contentFit={'contain' as ImageContentFit}
-            icon={icons.NewWorkspace}
+            icon={newWorkspaceIcon}
             iconWidth={variables.w46}
             iconHeight={variables.h40}
             title={translate('workspace.new.newWorkspace')}

@@ -22,11 +22,11 @@ const story = {
 };
 
 function Template(props: ButtonWithDropdownMenuProps<unknown>) {
-    const icons = useMemoizedLazyExpensifyIcons(['Wallet']);
+    const {Wallet: walletIcon} = useMemoizedLazyExpensifyIcons(['Wallet']);
 
     const options = [
-        {value: 'One', text: 'One', icon: icons.Wallet},
-        {value: 'Two', text: 'Two', icon: icons.Wallet},
+        {value: 'One', text: 'One', icon: walletIcon},
+        {value: 'Two', text: 'Two', icon: walletIcon},
     ];
 
     return (

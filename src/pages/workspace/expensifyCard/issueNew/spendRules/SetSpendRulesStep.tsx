@@ -53,7 +53,7 @@ function SetSpendRulesStep({policyID, stepNames, startStepIndex}: SetSpendRulesS
     const {translate} = useLocalize();
     const personalDetails = usePersonalDetails();
     const domainAccountID = useDefaultFundID(policyID);
-    const icons = useMemoizedLazyExpensifyIcons(['Copy', 'Pencil']);
+    const {Copy: copyIcon, Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Copy', 'Pencil']);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
     const [issueNewCard] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD}${policyID}`);
@@ -94,12 +94,12 @@ function SetSpendRulesStep({policyID, stepNames, startStepIndex}: SetSpendRulesS
         {
             key: CONST.EXPENSIFY_CARD.SPEND_RULE_OPTION.COPY_EXISTING,
             title: translate('workspace.card.issueNewCard.copyExisting'),
-            icon: icons.Copy,
+            icon: copyIcon,
         },
         {
             key: CONST.EXPENSIFY_CARD.SPEND_RULE_OPTION.CREATE_NEW,
             title: translate('workspace.card.issueNewCard.createNew'),
-            icon: icons.Pencil,
+            icon: pencilIcon,
         },
     ];
 

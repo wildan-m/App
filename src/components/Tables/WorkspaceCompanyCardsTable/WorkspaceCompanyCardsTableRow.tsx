@@ -82,7 +82,7 @@ function WorkspaceCompanyCardTableRow({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
     const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, isCardDeleted, onDismissError} = item;
@@ -232,7 +232,7 @@ function WorkspaceCompanyCardTableRow({
 
                         {canPressRow && (
                             <Icon
-                                src={Expensicons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
                                 width={variables.iconSizeNormal}

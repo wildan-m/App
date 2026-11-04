@@ -48,7 +48,11 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
         }
     };
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera', 'FallbackAvatar', 'ImageCropSquareMask']);
+    const {
+        Camera: cameraIcon,
+        FallbackAvatar: fallbackAvatarIcon,
+        ImageCropSquareMask: imageCropSquareMaskIcon,
+    } = useMemoizedLazyExpensifyIcons(['Camera', 'FallbackAvatar', 'ImageCropSquareMask']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const canEditRoomAvatar = isUserCreatedPolicyRoom(report) && participants.includes(currentUserAccountID) && !!policy && !hasReadOnlyAllReportsAccess(policy) && !isPolicyGuest(policy);
@@ -92,14 +96,14 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                     onViewPhotoPress={() => Navigation.navigate(ROUTES.REPORT_AVATAR.getRoute(report.reportID))}
                     onImageRemoved={() => updatePolicyRoomAvatar(report.reportID, currentUserAccountID, report.avatarUrl)}
                     onImageSelected={(file) => updatePolicyRoomAvatar(report.reportID, currentUserAccountID, report.avatarUrl, file)}
-                    editIcon={expensifyIcons.Camera}
+                    editIcon={cameraIcon}
                     editIconStyle={styles.smallEditIconAccount}
                     pendingAction={report.pendingFields?.avatar}
                     errors={report.errorFields?.avatar ?? null}
                     errorRowStyles={styles.mt6}
                     onErrorClose={() => clearAvatarErrors(report.reportID)}
                     style={[styles.mb3, styles.w100, styles.alignItemsCenter]}
-                    editorMaskImage={expensifyIcons.ImageCropSquareMask}
+                    editorMaskImage={imageCropSquareMaskIcon}
                 />
             );
         }
@@ -110,7 +114,7 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                 onPress={() => navigateToAvatarPage(icon)}
                 accessibilityRole={CONST.ROLE.BUTTON}
                 accessibilityLabel={icon.name ?? ''}
-                disabled={icon.source === expensifyIcons.FallbackAvatar}
+                disabled={icon.source === fallbackAvatarIcon}
             >
                 <AvatarFromIcon
                     icon={icon}
@@ -149,7 +153,7 @@ function RoomHeaderAvatars({icons, report, policy, participants, currentUserAcco
                             onPress={() => navigateToAvatarPage(icon)}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={icon.name ?? ''}
-                            disabled={icon.source === expensifyIcons.FallbackAvatar}
+                            disabled={icon.source === fallbackAvatarIcon}
                         >
                             <AvatarFromIcon
                                 icon={icon}

@@ -35,7 +35,7 @@ function CopyPolicySettingsUpgradePage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const illustrations = useMemoizedLazyIllustrations(['ShieldYellow']);
+    const {ShieldYellow: shieldYellowIllustration} = useMemoizedLazyIllustrations(['ShieldYellow']);
 
     const [policies, policiesMetadata] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [copyPolicySettingsState, copyPolicySettingsMetadata] = useOnyx(ONYXKEYS.COPY_POLICY_SETTINGS);
@@ -132,7 +132,7 @@ function CopyPolicySettingsUpgradePage() {
                 ) : (
                     <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                         <UpgradeIntroView
-                            iconSrc={illustrations.ShieldYellow}
+                            iconSrc={shieldYellowIllustration}
                             isIllustration
                             title={translate('workspace.copyPolicySettings.upgrade.title')}
                             description={translate('workspace.copyPolicySettings.upgrade.description', {workspaceName: sourcePolicy?.name ?? '', features: displayedControlOnlyFeatures})}

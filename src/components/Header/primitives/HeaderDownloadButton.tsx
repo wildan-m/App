@@ -27,7 +27,7 @@ function HeaderDownloadButton({onPress, isLoading = false, iconFill}: HeaderDown
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Download']);
+    const {Download: downloadIcon} = useMemoizedLazyExpensifyIcons(['Download']);
     const [isDownloadButtonActive, temporarilyDisableDownloadButton] = useThrottledButtonState();
 
     if (isLoading) {
@@ -49,7 +49,7 @@ function HeaderDownloadButton({onPress, isLoading = false, iconFill}: HeaderDown
                 onPress();
                 temporarilyDisableDownloadButton();
             }}
-            iconSrc={icons.Download}
+            iconSrc={downloadIcon}
             iconFill={iconFill ?? StyleUtils.getIconFillColor({buttonState: getButtonState({isComplete: !isDownloadButtonActive})})}
             sentryLabel={CONST.SENTRY_LABEL.HEADER.DOWNLOAD_BUTTON}
         />

@@ -90,7 +90,7 @@ function useBlockDistanceRequest({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {showConfirmModal} = useConfirmModal();
-    const illustrations = useMemoizedLazyIllustrations(['HouseWithMap']);
+    const {HouseWithMap: houseWithMapIllustration} = useMemoizedLazyIllustrations(['HouseWithMap']);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [policiesRequiringMapOrGPS] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createPoliciesRequiringMapOrGPSSelector(session?.email)});
     const [hasHomeAddress] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {selector: hasHomeAddressSelector});
@@ -111,7 +111,7 @@ function useBlockDistanceRequest({
 
     const showBlockModal = (reason: BlockDistanceRequestReason, policyIDToCheck: string | undefined) => {
         const baseModalProps = {
-            image: illustrations.HouseWithMap,
+            image: houseWithMapIllustration,
             titleStyles: styles.textHeadline,
             titleContainerStyles: styles.mb2,
             promptStyles: [styles.textSupporting, styles.mb4],

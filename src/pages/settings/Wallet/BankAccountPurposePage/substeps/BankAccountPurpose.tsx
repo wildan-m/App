@@ -30,7 +30,7 @@ type BankAccountPurposeProps = {
 function BankAccountPurpose({showCountrySelectionStep}: BankAccountPurposeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['BankCoin', 'WalletAlt2']);
+    const {BankCoin: bankCoinIllustration, WalletAlt2: walletAlt2Illustration} = useMemoizedLazyIllustrations(['BankCoin', 'WalletAlt2']);
     const [isCollectingDepositAccounts = false] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: isCollectingDepositAccountsSelector});
 
     // A workspace collecting deposit accounts needs the bank details its country requires, which the wallet setup does not ask for.
@@ -47,7 +47,7 @@ function BankAccountPurpose({showCountrySelectionStep}: BankAccountPurposeProps)
             <View style={styles.mh5}>
                 <Text style={[styles.textHeadlineLineHeightXXL, styles.mb6]}>{translate('bankAccount.bankAccountPurposeTitle')}</Text>
                 <MenuItem
-                    icon={illustrations.WalletAlt2}
+                    icon={walletAlt2Illustration}
                     title={translate('bankAccount.getReimbursed')}
                     description={translate('bankAccount.getReimbursedDescription')}
                     shouldShowRightIcon
@@ -59,7 +59,7 @@ function BankAccountPurpose({showCountrySelectionStep}: BankAccountPurposeProps)
                     wrapperStyle={styles.purposeMenuItem}
                 />
                 <MenuItem
-                    icon={illustrations.BankCoin}
+                    icon={bankCoinIllustration}
                     title={translate('bankAccount.makePayments')}
                     description={translate('bankAccount.makePaymentsDescription')}
                     shouldShowRightIcon

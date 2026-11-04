@@ -48,7 +48,7 @@ function DetailsStep({policyID, cardFeeds, workspaceAccountID}: DetailsStepProps
     const theme = useTheme();
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
-    const icons = useMemoizedLazyExpensifyIcons(['QuestionMark']);
+    const {QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['QuestionMark']);
 
     const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
     const [lastSelectedFeed] = useOnyx(`${ONYXKEYS.COLLECTION.LAST_SELECTED_FEED}${policyID}`);
@@ -209,7 +209,7 @@ function DetailsStep({policyID, cardFeeds, workspaceAccountID}: DetailsStepProps
                 {!!feedProvider && !isStripeFeedProvider && (
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
                         <Icon
-                            src={icons.QuestionMark}
+                            src={questionMarkIcon}
                             width={variables.iconSizeExtraSmall}
                             height={variables.iconSizeExtraSmall}
                             fill={theme.icon}

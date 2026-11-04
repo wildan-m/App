@@ -26,7 +26,7 @@ type PersonalExpenseRulesTableRowProps = {
 export default function PersonalExpenseRulesTableRow({item, rowIndex, shouldUseNarrowTableLayout}: PersonalExpenseRulesTableRowProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
     const accessibilityLabel = `${item.merchant}, ${item.changes}`;
@@ -87,7 +87,7 @@ export default function PersonalExpenseRulesTableRow({item, rowIndex, shouldUseN
 
                     <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             width={variables.iconSizeNormal}
                             height={variables.iconSizeNormal}

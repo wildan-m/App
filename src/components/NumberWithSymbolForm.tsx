@@ -210,7 +210,7 @@ function NumberWithSymbolForm({
     shouldUseBorderlessButtons = false,
     ...props
 }: NumberWithSymbolFormProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'PlusMinus', 'CoinsButton']);
+    const {PlusMinus: plusMinusIcon, CoinsButton: coinsButtonIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'PlusMinus', 'CoinsButton']);
     const isInLandscapeMode = useIsInLandscapeMode();
 
     const styles = useThemeStyles();
@@ -514,7 +514,7 @@ function NumberWithSymbolForm({
                     isDisabled={disabled}
                 >
                     <Button.Icon
-                        src={icons.PlusMinus}
+                        src={plusMinusIcon}
                         accessibilityLabel={translate('iou.flip')}
                     />
                     <Button.Text style={borderlessButtonTextStyle}>{translate('iou.flip')}</Button.Text>
@@ -538,7 +538,7 @@ function NumberWithSymbolForm({
                     isDisabled={disabled}
                 >
                     <Button.Icon
-                        src={icons.CoinsButton}
+                        src={coinsButtonIcon}
                         accessibilityLabel={translate('common.currency')}
                     />
                     <Button.Text style={borderlessButtonTextStyle}>{currencyOrUnitButtonText}</Button.Text>
@@ -662,7 +662,7 @@ function NumberWithSymbolForm({
                                     accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
                                 >
                                     <Button.Icon
-                                        src={icons.CoinsButton}
+                                        src={coinsButtonIcon}
                                         accessibilityLabel={translate('common.currency')}
                                     />
                                     <Button.Text>{currency}</Button.Text>
@@ -677,7 +677,7 @@ function NumberWithSymbolForm({
                                     accessibilityLabel={translate('iou.flip')}
                                 >
                                     <Button.Icon
-                                        src={icons.PlusMinus}
+                                        src={plusMinusIcon}
                                         accessibilityLabel={translate('iou.flip')}
                                     />
                                     <Button.Text>{translate('iou.flip')}</Button.Text>
@@ -748,7 +748,7 @@ function NumberWithSymbolForm({
                                 accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
                             >
                                 <Button.Icon
-                                    src={icons.CoinsButton}
+                                    src={coinsButtonIcon}
                                     accessibilityLabel={translate('common.currency')}
                                 />
                                 <Button.Text>{currency}</Button.Text>
@@ -777,7 +777,7 @@ function NumberWithSymbolForm({
                         accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
                     >
                         <Button.Icon
-                            src={icons.CoinsButton}
+                            src={coinsButtonIcon}
                             accessibilityLabel={translate('common.currency')}
                         />
                         <Button.Text>{currency}</Button.Text>
@@ -792,7 +792,7 @@ function NumberWithSymbolForm({
                         accessibilityLabel={translate('iou.flip')}
                     >
                         <Button.Icon
-                            src={icons.PlusMinus}
+                            src={plusMinusIcon}
                             accessibilityLabel={translate('iou.flip')}
                         />
                         <Button.Text>{translate('iou.flip')}</Button.Text>

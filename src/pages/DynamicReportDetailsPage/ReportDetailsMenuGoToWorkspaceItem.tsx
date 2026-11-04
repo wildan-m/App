@@ -23,7 +23,7 @@ type ReportDetailsMenuGoToWorkspaceItemProps = {
 
 function ReportDetailsMenuGoToWorkspaceItem({reportID}: ReportDetailsMenuGoToWorkspaceItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Building']);
+    const {Building: buildingIcon} = useMemoizedLazyExpensifyIcons(['Building']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -43,7 +43,7 @@ function ReportDetailsMenuGoToWorkspaceItem({reportID}: ReportDetailsMenuGoToWor
     return (
         <MenuItemNavigation
             title={translate('workspace.common.goToWorkspace')}
-            icon={expensifyIcons.Building}
+            icon={buildingIcon}
             onPress={() => {
                 if (!report?.policyID) {
                     return;

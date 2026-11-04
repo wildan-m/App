@@ -28,7 +28,7 @@ function ConnectionsHRPage({
     const policy = usePolicy(policyID);
     const policyEmployeePersonalDetails = usePersonalDetailsByLogins([...Object.keys(policy?.employeeList ?? {})]);
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['GustoSquare', 'TriNetSquare']);
+    const {GustoSquare: gustoSquareIcon, TriNetSquare: triNetSquareIcon} = useMemoizedLazyExpensifyIcons(['GustoSquare', 'TriNetSquare']);
 
     const cards = getHRCards({
         policy,
@@ -38,8 +38,8 @@ function ConnectionsHRPage({
         translate,
         formatPhoneNumber,
         policyID,
-        gustoIcon: icons.GustoSquare,
-        trinetIcon: icons.TriNetSquare,
+        gustoIcon: gustoSquareIcon,
+        trinetIcon: triNetSquareIcon,
     });
 
     return (

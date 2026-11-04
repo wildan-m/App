@@ -59,7 +59,7 @@ function AddPaymentMethodMenu({
     onItemSelected,
     shouldShowPersonalBankAccountOption = false,
 }: AddPaymentMethodMenuProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'Bank']);
+    const {Building: buildingIcon, Bank: bankIcon} = useMemoizedLazyExpensifyIcons(['Building', 'Bank']);
     const {translate} = useLocalize();
     const [restoreFocusType, setRestoreFocusType] = useState<BaseModalProps['restoreFocusType']>();
     const [session] = useOnyx(ONYXKEYS.SESSION);
@@ -115,7 +115,7 @@ function AddPaymentMethodMenu({
                     ? [
                           {
                               text: translate('common.personalBankAccount'),
-                              icon: icons.Bank,
+                              icon: bankIcon,
                               onSelected: () => {
                                   completePaymentOnboarding(CONST.PAYMENT_SELECTED.PBA, introSelected, isSelfTourViewed, currentUserAccountID, conciergeChat, delegateAccountID);
                                   onItemSelected(CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT);
@@ -127,7 +127,7 @@ function AddPaymentMethodMenu({
                     ? [
                           {
                               text: translate('common.businessBankAccount'),
-                              icon: icons.Building,
+                              icon: buildingIcon,
                               onSelected: () => {
                                   onItemSelected(CONST.PAYMENT_METHODS.BUSINESS_BANK_ACCOUNT);
                               },

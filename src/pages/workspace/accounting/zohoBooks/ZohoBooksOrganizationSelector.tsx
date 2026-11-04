@@ -37,7 +37,7 @@ function ZohoBooksOrganizationSelector({policy}: WithPolicyConnectionsProps) {
     const currentOrganizationID = zohoBooksConfig?.subsidiaryID ?? CONST.DEFAULT_NUMBER_ID.toString();
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
 
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     // Multi-location organizations are not supported yet, so they are listed but can't be selected.
     const data: OrganizationListItem[] = organizations
@@ -63,7 +63,7 @@ function ZohoBooksOrganizationSelector({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.zohoBooks.noOrganizationsFound')}

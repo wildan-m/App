@@ -36,7 +36,7 @@ type SearchApproverPageProps = {
 function SearchApproverPage({isReassignment = false}: SearchApproverPageProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [selectedApproverEmail, setSelectedApproverEmail] = useState<string | undefined>(undefined);
     const [personalDetails] = useAllPersonalDetails();
     const {isBetaEnabled} = usePermissions();
@@ -128,7 +128,7 @@ function SearchApproverPage({isReassignment = false}: SearchApproverPageProps) {
                     isSelected: selectedApproverEmail === email,
                     login: email,
                     value: accountID,
-                    icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    icons: [{source: avatar ?? fallbackAvatarIcon, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
                     rightElement: employee.role === CONST.POLICY.ROLE.ADMIN ? <Badge text={translate('common.admin')} /> : undefined,
                 };
             })

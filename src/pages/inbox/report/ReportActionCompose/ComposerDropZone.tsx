@@ -39,14 +39,14 @@ function SimpleDropZone({onAttachmentDrop, children}: {onAttachmentDrop: (dragEv
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle']);
+    const {MessageInABottle: messageInABottleIcon} = useMemoizedLazyExpensifyIcons(['MessageInABottle']);
 
     return (
         <>
             {children}
             <DragAndDropConsumer onDrop={onAttachmentDrop}>
                 <DropZoneUI
-                    icon={icons.MessageInABottle}
+                    icon={messageInABottleIcon}
                     dropTitle={translate('dropzone.addAttachments')}
                     dropStyles={styles.attachmentDropOverlay(true)}
                     dropTextStyles={styles.attachmentDropText}
@@ -61,7 +61,7 @@ function RichDropZone({reportID, shouldAddOrReplaceReceipt, transactionID, onAtt
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle']);
+    const {MessageInABottle: messageInABottleIcon2} = useMemoizedLazyExpensifyIcons(['MessageInABottle']);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
@@ -103,7 +103,7 @@ function RichDropZone({reportID, shouldAddOrReplaceReceipt, transactionID, onAtt
             {children}
             <DragAndDropConsumer onDrop={onAttachmentDrop}>
                 <DropZoneUI
-                    icon={icons.MessageInABottle}
+                    icon={messageInABottleIcon2}
                     dropTitle={translate('dropzone.addAttachments')}
                     dropStyles={styles.attachmentDropOverlay(true)}
                     dropTextStyles={styles.attachmentDropText}

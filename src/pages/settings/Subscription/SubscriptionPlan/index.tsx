@@ -24,7 +24,7 @@ function SubscriptionPlan() {
     const styles = useThemeStyles();
     const subscriptionPlan = useSubscriptionPlan();
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const illustrations = useMemoizedLazyIllustrations(['HandCard']);
+    const {HandCard: handCardIllustration} = useMemoizedLazyIllustrations(['HandCard']);
 
     const renderTitle = () => {
         return (
@@ -54,7 +54,7 @@ function SubscriptionPlan() {
             <SubscriptionPlanCard subscriptionPlan={subscriptionPlan} />
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt6]}>
                 <Icon
-                    src={illustrations.HandCard}
+                    src={handCardIllustration}
                     width={variables.iconHeader}
                     height={variables.iconHeader}
                     additionalStyles={styles.mr2}

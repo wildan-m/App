@@ -23,7 +23,7 @@ import React from 'react';
 function SystemChatReportFooterMessage() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
+    const {Lightbulb: lightbulbIcon} = useMemoizedLazyExpensifyIcons(['Lightbulb']);
     const {environmentURL} = useEnvironment();
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const [choice] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
@@ -62,7 +62,7 @@ function SystemChatReportFooterMessage() {
         <Banner
             containerStyles={[styles.chatFooterBanner]}
             shouldShowIcon
-            icon={expensifyIcons.Lightbulb}
+            icon={lightbulbIcon}
             content={
                 <Text
                     suppressHighlighting

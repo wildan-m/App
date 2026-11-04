@@ -18,14 +18,14 @@ import React from 'react';
 function InsightsNoExpensesState() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Chart']);
+    const {Chart: chartIllustration} = useMemoizedLazyIllustrations(['Chart']);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {
         selector: validTransactionDraftIDsSelector,
     });
 
     return (
         <GenericEmptyStateComponent
-            headerMedia={illustrations.Chart}
+            headerMedia={chartIllustration}
             headerStyles={styles.emptyStateCardIllustrationContainer}
             headerContentStyles={[styles.insightsEmptyStateIllustration]}
             title={translate('insightsPage.noExpensesState.title')}

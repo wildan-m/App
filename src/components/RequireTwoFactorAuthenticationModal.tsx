@@ -46,7 +46,7 @@ function RequireTwoFactorAuthenticationModal({onCancel = () => {}, description, 
     const {translate} = useLocalize();
     const StyleUtils = useStyleUtils();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Safe']);
+    const {Safe: safeIllustration} = useMemoizedLazyIllustrations(['Safe']);
 
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: isSmallScreenWidth, addOfflineIndicatorBottomSafeAreaPadding: false});
     return (
@@ -63,7 +63,7 @@ function RequireTwoFactorAuthenticationModal({onCancel = () => {}, description, 
                 <View style={[styles.cardSectionIllustration, styles.alignItemsCenter, StyleUtils.getBackgroundColorStyle(LottieAnimations.Safe.backgroundColor)]}>
                     {isReduceMotionEnabled ? (
                         <ImageSVG
-                            src={illustrations.Safe}
+                            src={safeIllustration}
                             style={styles.h100}
                         />
                     ) : (

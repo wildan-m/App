@@ -54,7 +54,7 @@ function ImportTagsOptionsPage({route}: ImportTagsOptionsPageProps) {
     const styles = useThemeStyles();
     const {showConfirmModal} = useConfirmModal();
     const {showDownloadErrorModal} = useAlertModals();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MultiTag', 'Tag']);
+    const {MultiTag: multiTagIcon, Tag: tagIcon} = useMemoizedLazyExpensifyIcons(['MultiTag', 'Tag']);
 
     // The download link lives inside a confirm modal prompt, so close that modal first. Otherwise it stays under the alert and reappears after the alert is dismissed.
     const showDownloadErrorModalAfterClose = () => {
@@ -195,7 +195,7 @@ function ImportTagsOptionsPage({route}: ImportTagsOptionsPageProps) {
 
                     <MenuItemNavigation
                         title={translate('workspace.tags.tagLevel.singleLevel')}
-                        icon={expensifyIcons.Tag}
+                        icon={tagIcon}
                         onPress={async () => {
                             setImportedSpreadsheetIsImportingMultiLevelTags(false);
                             if (hasVisibleTags && isMultiLevelTags) {
@@ -228,7 +228,7 @@ function ImportTagsOptionsPage({route}: ImportTagsOptionsPageProps) {
                     <MenuItemNavigation
                         title={translate('workspace.tags.tagLevel.multiLevel')}
                         // TODO: Update icon to multi-level tag icon once it's provided by design team
-                        icon={expensifyIcons.MultiTag}
+                        icon={multiTagIcon}
                         onPress={() => {
                             if (!isControlPolicy(policy)) {
                                 setShouldRunPostUpgradeFlow(true);

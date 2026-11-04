@@ -14,7 +14,7 @@ import ROUTES from '@src/ROUTES';
 import React from 'react';
 
 function FailedToLockAccountPage() {
-    const illustrations = useMemoizedLazyIllustrations(['LockOpen']);
+    const {LockOpen: lockOpenIllustration} = useMemoizedLazyIllustrations(['LockOpen']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
@@ -29,7 +29,7 @@ function FailedToLockAccountPage() {
             />
             <ScrollView contentContainerStyle={styles.flexGrow1}>
                 <ConfirmationPageDefault
-                    illustration={illustrations.LockOpen}
+                    illustration={lockOpenIllustration}
                     heading={translate('failedToLockAccountPage.failedToLockAccount')}
                     description={translate('failedToLockAccountPage.failedToLockAccountDescription')}
                     descriptionStyle={styles.colorMuted}

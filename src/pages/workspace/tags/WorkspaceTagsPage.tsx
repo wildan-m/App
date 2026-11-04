@@ -135,7 +135,14 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
     const connectedIntegration = getConnectedIntegration(policy) ?? syncingAccountingIntegration;
     const isConnectionVerified = connectedIntegration && !isConnectionUnverified(policy, connectedIntegration);
     const currentConnectionName = getCurrentAccountingIntegrationName(policy, translate);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Gear', 'Table', 'Download', 'Plus', 'Trashcan', 'Close', 'Trashcan', 'Checkmark']);
+    const {
+        Table: tableIcon,
+        Download: downloadIcon,
+        Plus: plusIcon,
+        Trashcan: trashcanIcon,
+        Close: closeIcon,
+        Checkmark: checkmarkIcon,
+    } = useMemoizedLazyExpensifyIcons(['Gear', 'Table', 'Download', 'Plus', 'Trashcan', 'Close', 'Trashcan', 'Checkmark']);
     const buildDynamicRoute = useScreenBoundDynamicRoute();
 
     const [policyTagLists, isMultiLevelTags, hasDependentTags, hasIndependentTags] = [
@@ -507,7 +514,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
     }
     if (canWriteTags && !hasAccountingConnections) {
         menuItems.push({
-            icon: expensifyIcons.Table,
+            icon: tableIcon,
             text: translate('spreadsheet.importSpreadsheet'),
             onSelected: navigateToImportSpreadsheet,
             value: CONST.POLICY.SECONDARY_ACTIONS.IMPORT_SPREADSHEET,
@@ -517,7 +524,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
     }
     if (shouldShowAppendCustomTagList) {
         menuItems.push({
-            icon: expensifyIcons.Table,
+            icon: tableIcon,
             text: translate('workspace.tags.appendCustomTagList'),
             onSelected: navigateToAppendCustomTagList,
             value: CONST.POLICY.SECONDARY_ACTIONS.APPEND_CUSTOM_TAG_LIST,
@@ -525,7 +532,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
     }
     if (hasVisibleTags) {
         menuItems.push({
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             text: translate('spreadsheet.downloadCSV'),
             onSelected: () => {
                 if (isOffline) {
@@ -572,7 +579,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAGS.ADD_BUTTON}
                             style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                         >
-                            <Button.Icon src={expensifyIcons.Plus} />
+                            <Button.Icon src={plusIcon} />
                             <Button.Text>{translate('workspace.tags.addTag')}</Button.Text>
                         </Button>
                     )}
@@ -595,7 +602,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
 
         if (!hasAccountingConnections && !isMultiLevelTags) {
             options.push({
-                icon: expensifyIcons.Trashcan,
+                icon: trashcanIcon,
                 text: translate(selectedTagKeys.length === 1 ? 'workspace.tags.deleteTag' : 'workspace.tags.deleteTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
                 shouldSkipFocusRestore: true,
@@ -646,7 +653,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
 
         if (enabledTagCount > 0 && !isMultiLevelTags) {
             options.push({
-                icon: expensifyIcons.Close,
+                icon: closeIcon,
                 text: translate(enabledTagCount === 1 ? 'workspace.tags.disableTag' : 'workspace.tags.disableTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
                 shouldSkipFocusRestore: isDisablingOrDeletingLastEnabledTag(policyTagLists.at(0), selectedTagsObject),
@@ -670,7 +677,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
 
         if (disabledTagCount > 0 && !isMultiLevelTags) {
             options.push({
-                icon: expensifyIcons.Checkmark,
+                icon: checkmarkIcon,
                 text: translate(disabledTagCount === 1 ? 'workspace.tags.enableTag' : 'workspace.tags.enableTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
                 onSelected: () => {
@@ -759,14 +766,14 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
             canWriteTags && !hasAccountingConnections
                 ? [
                       {
-                          icon: expensifyIcons.Table,
+                          icon: tableIcon,
                           buttonText: translate('common.import'),
                           buttonAction: navigateToImportSpreadsheet,
                       },
                       {
                           buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,
                           buttonAction: navigateToCreateTagPage,
-                          icon: expensifyIcons.Plus,
+                          icon: plusIcon,
                           buttonText: translate('workspace.tags.addTag'),
                       },
                   ]

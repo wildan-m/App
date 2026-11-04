@@ -25,7 +25,7 @@ function WhisperBanner({whisperedTo}: WhisperBannerProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate, formatPhoneNumber, localeCompare} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye']);
+    const {Eye: eyeIcon} = useMemoizedLazyExpensifyIcons(['Eye']);
     const personalDetails = usePersonalDetails();
 
     const isMultipleParticipant = whisperedTo.length > 1;
@@ -40,7 +40,7 @@ function WhisperBanner({whisperedTo}: WhisperBannerProps) {
             <View style={[styles.pl6, styles.mr3]}>
                 <Icon
                     fill={theme.icon}
-                    src={expensifyIcons.Eye}
+                    src={eyeIcon}
                     size={CONST.ICON_SIZE.SMALL}
                 />
             </View>

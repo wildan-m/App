@@ -44,7 +44,7 @@ function IdologyQuestions({questions, idNumber}: IdologyQuestionsProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['QuestionMark']);
+    const {QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['QuestionMark']);
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [shouldHideSkipAnswer, setShouldHideSkipAnswer] = useState(false);
@@ -141,7 +141,7 @@ function IdologyQuestions({questions, idNumber}: IdologyQuestionsProps) {
                     />
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt6, styles.mh5]}>
                         <Icon
-                            src={icons.QuestionMark}
+                            src={questionMarkIcon}
                             width={12}
                             height={12}
                             fill={theme.icon}

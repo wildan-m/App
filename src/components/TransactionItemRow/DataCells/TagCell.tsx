@@ -27,7 +27,7 @@ type TagCellProps = TransactionDataCellProps &
     };
 
 function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, transactionItem, policyID, policy: policyProp}: TagCellProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Tag']);
+    const {Tag: tagIcon} = useMemoizedLazyExpensifyIcons(['Tag']);
     const styles = useThemeStyles();
 
     const [livePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -48,7 +48,7 @@ function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, tra
 
     const displayContent = shouldUseNarrowLayout ? (
         <TextWithIconCell
-            icon={icons.Tag}
+            icon={tagIcon}
             showTooltip={shouldShowTooltip}
             text={tagForDisplay}
             textStyle={[styles.textMicro, styles.mnh0]}

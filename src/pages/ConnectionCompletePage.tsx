@@ -15,7 +15,7 @@ function ConnectionCompletePage() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ConnectionComplete', 'ExpensifyWordmark']);
+    const {ConnectionComplete: connectionCompleteIcon, ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ConnectionComplete', 'ExpensifyWordmark']);
     return (
         <View style={styles.deeplinkWrapperContainer}>
             <View style={styles.deeplinkWrapperMessage}>
@@ -23,7 +23,7 @@ function ConnectionCompletePage() {
                     <Icon
                         width={272}
                         height={188}
-                        src={icons.ConnectionComplete}
+                        src={connectionCompleteIcon}
                     />
                 </View>
                 <Text style={[styles.textHeadline, styles.textAlignCenter]}>{translate('connectionComplete.title')}</Text>
@@ -36,7 +36,7 @@ function ConnectionCompletePage() {
                     width={variables.modalWordmarkWidth}
                     height={variables.modalWordmarkHeight}
                     fill={theme.success}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
             </View>
         </View>

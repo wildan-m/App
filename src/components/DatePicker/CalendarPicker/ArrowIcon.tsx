@@ -21,7 +21,7 @@ type ArrowIconProps = {
 };
 
 function ArrowIcon({disabled = false, direction = CONST.DIRECTION.RIGHT}: ArrowIconProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -29,7 +29,7 @@ function ArrowIcon({disabled = false, direction = CONST.DIRECTION.RIGHT}: ArrowI
         <View style={[styles.p1, StyleUtils.getDirectionStyle(direction), disabled ? styles.buttonOpacityDisabled : {}]}>
             <Icon
                 fill={theme.icon}
-                src={icons.ArrowRight}
+                src={arrowRightIcon}
             />
         </View>
     );

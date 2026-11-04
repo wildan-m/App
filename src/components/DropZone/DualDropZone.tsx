@@ -35,7 +35,11 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['MessageInABottle', 'SmartScan', 'ReplaceReceipt']);
+    const {
+        MessageInABottle: messageInABottleIcon,
+        SmartScan: smartScanIcon,
+        ReplaceReceipt: replaceReceiptIcon,
+    } = useMemoizedLazyExpensifyIcons(['MessageInABottle', 'SmartScan', 'ReplaceReceipt']);
 
     const {isWideRHPFocused} = useWideRHPState();
     const shouldStackVertically = (shouldUseNarrowLayout || isMediumScreenWidth) && !isWideRHPFocused;
@@ -54,7 +58,7 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
                 <DropZoneWrapper onDrop={onAttachmentDrop}>
                     {({isDraggingOver}) => (
                         <DropZoneUI
-                            icon={icons.MessageInABottle}
+                            icon={messageInABottleIcon}
                             dropTitle={translate('dropzone.addAttachments')}
                             dropStyles={styles.attachmentDropOverlay(isDraggingOver)}
                             dropTextStyles={styles.attachmentDropText}
@@ -71,7 +75,7 @@ function DualDropZone({isEditing, onAttachmentDrop, onReceiptDrop, shouldAcceptS
                     <DropZoneWrapper onDrop={onReceiptDrop}>
                         {({isDraggingOver}) => (
                             <DropZoneUI
-                                icon={isEditing ? icons.ReplaceReceipt : icons.SmartScan}
+                                icon={isEditing ? replaceReceiptIcon : smartScanIcon}
                                 dropTitle={translate(isEditing ? 'dropzone.replaceReceipt' : scanReceiptsText)}
                                 dropStyles={styles.receiptDropOverlay(isDraggingOver)}
                                 dropTextStyles={styles.receiptDropText}

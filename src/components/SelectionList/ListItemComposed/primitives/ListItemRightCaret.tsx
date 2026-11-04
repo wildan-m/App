@@ -14,14 +14,14 @@ import {View} from 'react-native';
 function ListItemRightCaret() {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isHovered = useListItemHovered();
     const {isDisabled, isInteractive} = useListItemContext();
 
     return (
         <View style={[styles.popoverMenuIcon, styles.pointerEventsAuto, isDisabled && styles.cursorDisabled]}>
             <Icon
-                src={icons.ArrowRight}
+                src={arrowRightIcon}
                 fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: isHovered, isDisabled, isInteractive})})}
             />
         </View>

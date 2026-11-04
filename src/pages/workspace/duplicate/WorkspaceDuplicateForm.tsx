@@ -35,9 +35,9 @@ type WorkspaceDuplicateFormProps = {
 };
 
 function WorkspaceDuplicateForm({policyID}: WorkspaceDuplicateFormProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ImageCropSquareMask']);
+    const {ImageCropSquareMask: imageCropSquareMaskIcon} = useMemoizedLazyExpensifyIcons(['ImageCropSquareMask']);
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera']);
+    const {Camera: cameraIcon} = useMemoizedLazyExpensifyIcons(['Camera']);
     const {translate} = useLocalize();
     const {inputCallbackRef} = useAutoFocusInput();
     const policy = usePolicy(policyID);
@@ -109,10 +109,10 @@ function WorkspaceDuplicateForm({policyID}: WorkspaceDuplicateFormProps) {
                         setAvatarFile(undefined);
                         setWorkspaceAvatar({avatarUri: null, avatarFileName: null, avatarFileType: null});
                     }}
-                    editIcon={expensifyIcons.Camera}
+                    editIcon={cameraIcon}
                     editIconStyle={styles.smallEditIconAccount}
                     style={[styles.w100, styles.alignItemsCenter, styles.mv4, styles.mb6, styles.alignSelfCenter, styles.ph5]}
-                    editorMaskImage={icons.ImageCropSquareMask}
+                    editorMaskImage={imageCropSquareMaskIcon}
                 />
                 <FormProvider
                     formID={ONYXKEYS.FORMS.WORKSPACE_DUPLICATE_FORM}

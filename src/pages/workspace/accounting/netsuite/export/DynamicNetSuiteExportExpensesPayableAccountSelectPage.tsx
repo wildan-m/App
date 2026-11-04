@@ -34,7 +34,7 @@ function DynamicNetSuiteExportExpensesPayableAccountSelectPage({policy}: WithPol
     const {translate} = useLocalize();
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_NETSUITE_EXPORT_EXPENSES_PAYABLE_ACCOUNT_SELECT>>();
     const params = route.params;
@@ -65,7 +65,7 @@ function DynamicNetSuiteExportExpensesPayableAccountSelectPage({policy}: WithPol
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noAccountsFound')}

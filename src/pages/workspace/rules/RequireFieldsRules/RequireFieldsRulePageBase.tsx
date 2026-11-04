@@ -90,7 +90,7 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
     const {policy} = policyData;
     const {canWrite: canWriteRules} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
     const isAttendeeFieldApplicable = isAttendeeTrackingEnabled(policy);
-    const icons = useMemoizedLazyExpensifyIcons(['Folder']);
+    const {Folder: folderIcon} = useMemoizedLazyExpensifyIcons(['Folder']);
     const isEditing = !!categoryName;
     const isCategoryLocked = isCategoryLockedProp ?? !!initialCategoryName;
     const shouldShowDescribeRule = !isEditing && !isCategoryLocked;
@@ -511,7 +511,7 @@ function RequireFieldsRulePageBase({policyID, categoryName, initialCategoryName,
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.IconNarrow src={icons.Folder} />
+                                <MenuItem.IconNarrow src={folderIcon} />
                             </MenuItem.Leading>
                             <MenuItemField.Content name={translate('common.category')}>
                                 {!!categoryDisplayName && <MenuItem.FieldValue>{categoryDisplayName}</MenuItem.FieldValue>}

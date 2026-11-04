@@ -37,7 +37,7 @@ import TwoFactorAuthWrapper from './TwoFactorAuthWrapper';
 const TWO_FACTOR_AUTH_RECOVERY_CODES_FILENAME = 'DO-NOT-DELETE_Expensify-2FA-RecoveryCodes.txt';
 
 function DynamicTwoFactorAuthPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const {Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Copy']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to use correct style
@@ -159,7 +159,7 @@ function DynamicTwoFactorAuthPage() {
                                     <PressableWithDelayToggle
                                         text={translate('twoFactorAuth.copyCodes')}
                                         textChecked={translate('common.copied')}
-                                        icon={icons.Copy}
+                                        icon={copyIcon}
                                         inline={false}
                                         onPress={() => {
                                             Clipboard.setString(account?.recoveryCodes ?? '');

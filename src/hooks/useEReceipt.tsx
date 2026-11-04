@@ -22,7 +22,8 @@ const backgroundImages = {
 
 export default function useEReceipt(transactionData: Transaction | TransactionListItemType | undefined, fileExtension?: string, isReceiptThumbnail?: boolean) {
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plane', 'Bed']);
+    const {Plane, Bed} = useMemoizedLazyExpensifyIcons(['Plane', 'Bed']);
+    const expensifyIcons = {Plane, Bed};
 
     const colorCode = isReceiptThumbnail ? StyleUtils.getFileExtensionColorCode(fileExtension) : StyleUtils.getEReceiptColorCode(transactionData);
     const colorStyles = StyleUtils.getEReceiptColorStyles(colorCode);

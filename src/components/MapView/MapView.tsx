@@ -64,7 +64,7 @@ function MapView({
     const {translate, preferredLocale} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Crosshair', 'Expand', 'MapCurrentLocation']);
+    const {Crosshair: crosshairIcon, Expand: expandIcon, MapCurrentLocation: mapCurrentLocationIcon} = useMemoizedLazyExpensifyIcons(['Crosshair', 'Expand', 'MapCurrentLocation']);
     const cameraRef = useRef<Mapbox.Camera>(null);
     const pendingFramingRef = useRef<CancelHandle | null>(null);
     const [isIdle, setIsIdle] = useState(false);
@@ -387,7 +387,7 @@ function MapView({
                         allowOverlap
                     >
                         <ImageSVG
-                            src={expensifyIcons.MapCurrentLocation}
+                            src={mapCurrentLocationIcon}
                             width={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.width}
                             height={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.height}
                         />
@@ -436,7 +436,7 @@ function MapView({
                         accessibilityLabel={translate('common.center')}
                     >
                         <Button.Icon
-                            src={shouldShowWaypointsCenterIcon ? expensifyIcons.Expand : expensifyIcons.Crosshair}
+                            src={shouldShowWaypointsCenterIcon ? expandIcon : crosshairIcon}
                             fill={theme.icon}
                             hoverFill={theme.icon}
                         />

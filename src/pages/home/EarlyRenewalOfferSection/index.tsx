@@ -40,7 +40,7 @@ function EarlyRenewalOfferSection() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
     const {cardPaddingHorizontal} = useLayoutSpacing();
-    const illustrations = useMemoizedLazyIllustrations(['SubscriptionAnnual']);
+    const {SubscriptionAnnual: subscriptionAnnualIllustration} = useMemoizedLazyIllustrations(['SubscriptionAnnual']);
 
     const adminsRoomReportID = policy?.chatReportIDAdmins?.toString();
     const canClaim = !!eligibility?.canClaim && (isNonIncentivizedPeriod || isIncentivizedPeriod);
@@ -83,7 +83,7 @@ function EarlyRenewalOfferSection() {
             >
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3, styles.pt3, styles.pb8, cardPaddingHorizontal]}>
                     <Icon
-                        src={illustrations.SubscriptionAnnual}
+                        src={subscriptionAnnualIllustration}
                         width={ICON_SIZE}
                         height={ICON_SIZE}
                     />

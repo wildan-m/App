@@ -33,7 +33,7 @@ function SubTrigger({text, disabled = false, rightIcon, testID, iconWidth, iconH
     useContentSubActions(SubTrigger.displayName);
 
     const {ref, focused, onPress: enterSub, onFocus, isAtActiveLevel} = useSubTrigger({disabled, text});
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
     if (!isAtActiveLevel) {
         return null;
@@ -56,7 +56,7 @@ function SubTrigger({text, disabled = false, rightIcon, testID, iconWidth, iconH
             iconHeight={iconHeight ?? variables.iconSizeNormal}
             disabled={disabled}
             interactive
-            iconRight={rightIcon ?? icons.ArrowRight}
+            iconRight={rightIcon ?? arrowRightIcon}
             shouldShowRightIcon
             onPress={handlePress}
             onFocus={onFocus}

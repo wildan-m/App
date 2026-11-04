@@ -29,7 +29,7 @@ function AddReceiptButton() {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
+    const {ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
     const {iouType, transactionID, reportID} = useConfirmationFields();
 
     return (
@@ -48,7 +48,7 @@ function AddReceiptButton() {
                 sentryLabel={CONST.SENTRY_LABEL.REQUEST_CONFIRMATION_LIST.ADD_RECEIPT_BUTTON}
             >
                 <Icon
-                    src={icons.ReceiptPlus}
+                    src={receiptPlusIcon}
                     fill={theme.icon}
                     width={variables.iconSizeNormal}
                     height={variables.iconSizeNormal}

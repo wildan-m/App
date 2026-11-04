@@ -32,7 +32,7 @@ type ValidateCodeModalProps = {
 function ValidateCodeModal({code, accountID}: ValidateCodeModalProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ValidateCode']);
+    const {ValidateCode: validateCodeIllustration} = useMemoizedLazyIllustrations(['ValidateCode']);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE);
     const signInHere = () => signInWithValidateCode(accountID, code, preferredLocale, undefined, undefined, undefined, session);
@@ -59,7 +59,7 @@ function ValidateCodeModal({code, accountID}: ValidateCodeModalProps) {
                         <Icon
                             width={variables.modalTopIconWidth}
                             height={variables.modalTopIconHeight}
-                            src={illustrations.ValidateCode}
+                            src={validateCodeIllustration}
                         />
                     </View>
                     <Text style={[styles.textHeadline, styles.textAlignCenter]}>{translate('validateCodeModal.title')}</Text>

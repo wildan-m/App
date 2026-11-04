@@ -33,7 +33,7 @@ type DynamicWorkspaceOwnerChangeErrorPageProps = PlatformStackScreenProps<Settin
 function DynamicWorkspaceOwnerChangeErrorPage({route}: DynamicWorkspaceOwnerChangeErrorPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['MoneyWaving']);
+    const {MoneyWaving: moneyWavingIcon} = useMemoizedLazyExpensifyIcons(['MoneyWaving']);
 
     const policyID = route.params.policyID;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_OWNER_CHANGE_ERROR.path);
@@ -63,7 +63,7 @@ function DynamicWorkspaceOwnerChangeErrorPage({route}: DynamicWorkspaceOwnerChan
                 />
                 <View style={[styles.screenCenteredContainer, styles.alignItemsCenter]}>
                     <Icon
-                        src={icons.MoneyWaving}
+                        src={moneyWavingIcon}
                         width={187}
                         height={173}
                         fill=""

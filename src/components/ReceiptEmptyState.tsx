@@ -87,7 +87,7 @@ function ReceiptEmptyState({
     const theme = useTheme();
     const isLoadedRef = useRef(false);
     const [isHovered, setIsHovered] = useState(false);
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt', 'ReceiptPlus']);
+    const {Receipt: receiptIcon, ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['Receipt', 'ReceiptPlus']);
 
     const {validateFiles, PDFValidationComponent} = useFilesValidation(setReceiptFile);
 
@@ -140,7 +140,7 @@ function ReceiptEmptyState({
                         {isCompact ? (
                             <View style={[styles.flexRow, styles.justifyContentCenter, styles.alignItemsCenter, styles.gap2]}>
                                 <Icon
-                                    src={icons.ReceiptPlus}
+                                    src={receiptPlusIcon}
                                     fill={isHovered ? theme.success : theme.icon}
                                     width={variables.iconSizeNormal}
                                     height={variables.iconSizeNormal}
@@ -158,7 +158,7 @@ function ReceiptEmptyState({
                                     <View style={styles.pRelative}>
                                         <Icon
                                             fill={theme.border}
-                                            src={icons.Receipt}
+                                            src={receiptIcon}
                                             width={variables.eReceiptEmptyIconWidth}
                                             height={variables.eReceiptEmptyIconWidth}
                                         />

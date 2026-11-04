@@ -44,7 +44,7 @@ import withReportOrNotFound from './inbox/report/withReportOrNotFound';
 type DynamicReportParticipantDetailsPageProps = WithReportOrNotFoundProps & PlatformStackScreenProps<ParticipantsNavigatorParamList, typeof SCREENS.REPORT_PARTICIPANTS.DYNAMIC_DETAILS>;
 
 function DynamicReportParticipantDetails({report, route}: DynamicReportParticipantDetailsPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info']);
+    const {RemoveMembers: removeMembersIcon, Info: infoIcon} = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Info']);
     const isInLandscapeMode = useIsInLandscapeMode();
     const styles = useThemeStyles();
     const {formatPhoneNumber, translate} = useLocalize();
@@ -121,7 +121,7 @@ function DynamicReportParticipantDetails({report, route}: DynamicReportParticipa
                             style={styles.mv5}
                         >
                             <Button.Icon
-                                src={icons.RemoveMembers}
+                                src={removeMembersIcon}
                                 style={StyleUtils.getTransformScaleStyle(0.8)}
                             />
                             <Button.Text>{translate('workspace.people.removeGroupMemberButtonTitle')}</Button.Text>
@@ -141,7 +141,7 @@ function DynamicReportParticipantDetails({report, route}: DynamicReportParticipa
                     )}
                     <MenuItemNavigation
                         title={translate('common.profile')}
-                        icon={icons.Info}
+                        icon={infoIcon}
                         onPress={navigateToProfile}
                     />
                 </View>

@@ -25,7 +25,7 @@ type UseReceiptPartnersSettingsOptions = {
 
 /** State and actions for the workspace's receipt partner connections, used by the Connections receipt partners panel */
 function useReceiptPartnersSettings(policyID: string, {onDisconnectConfirmed}: UseReceiptPartnersSettingsOptions = {}) {
-    const icons = useMemoizedLazyExpensifyIcons(['Key', 'NewWindow', 'Trashcan']);
+    const {Key: keyIcon, NewWindow: newWindowIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Key', 'NewWindow', 'Trashcan']);
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const policy = usePolicy(policyID);
@@ -79,7 +79,7 @@ function useReceiptPartnersSettings(policyID: string, {onDisconnectConfirmed}: U
                 if (shouldShowEnterCredentialsError) {
                     return [
                         {
-                            icon: icons.Key,
+                            icon: keyIcon,
                             text: translate('workspace.accounting.enterCredentials'),
                             onSelected: () =>
                                 startIntegrationFlow({
@@ -87,14 +87,14 @@ function useReceiptPartnersSettings(policyID: string, {onDisconnectConfirmed}: U
                                 }),
                             shouldCallAfterModalHide: true,
                             disabled: isOffline,
-                            iconRight: icons.NewWindow,
+                            iconRight: newWindowIcon,
                         },
                     ];
                 }
 
                 return [
                     {
-                        icon: icons.Trashcan,
+                        icon: trashcanIcon,
                         text: translate('workspace.accounting.disconnect'),
                         onSelected: () => {
                             showConfirmModal({

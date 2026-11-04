@@ -136,7 +136,7 @@ function CameraViewport({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt']);
+    const {Bolt: boltIcon} = useMemoizedLazyExpensifyIcons(['Bolt']);
     const [isPreviewLive, setIsPreviewLive] = useState(false);
     // iOS keeps showing the previous session's last frame until the restarted session delivers a new one. Restarting on the
     // ultra-wide (zoom 1) also lets close receipts focus at once, instead of waiting on the wide lens to hand over to macro.
@@ -216,7 +216,7 @@ function CameraViewport({
                         <Icon
                             height={variables.iconSizeSmall}
                             width={variables.iconSizeSmall}
-                            src={lazyIcons.Bolt}
+                            src={boltIcon}
                             fill={flash ? theme.white : theme.icon}
                         />
                     </PressableWithFeedback>

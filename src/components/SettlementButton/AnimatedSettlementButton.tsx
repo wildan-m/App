@@ -56,7 +56,7 @@ function AnimatedSettlementButton({
 }: AnimatedSettlementButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ThumbsUp', 'Checkmark']);
+    const {ThumbsUp: thumbsUpIcon, Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['ThumbsUp', 'Checkmark']);
     const isAnimationRunning = isPaidAnimationRunning || isApprovedAnimationRunning;
     const [pendingExpenseAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {selector: pendingExpenseActionSelector});
 
@@ -136,9 +136,9 @@ function AnimatedSettlementButton({
 
     let icon;
     if (isApprovedAnimationRunning) {
-        icon = expensifyIcons.ThumbsUp;
+        icon = thumbsUpIcon;
     } else if (isPaidAnimationRunning) {
-        icon = expensifyIcons.Checkmark;
+        icon = checkmarkIcon;
     }
 
     const animatedViewRef = (el: ComponentRef<typeof View> | null) => {

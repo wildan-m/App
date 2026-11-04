@@ -49,7 +49,7 @@ type FieldsValueSettingsPageProps = {
 function FieldsValueSettingsPage({policy, policyID, valueIndex, reportFieldID, isInvoicePage, featureName, policyFeature, getEditValueRoute, testID}: FieldsValueSettingsPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const {showConfirmModal} = useConfirmModal();
     const [formDraft] = useOnyx(ONYXKEYS.FORMS.WORKSPACE_REPORT_FIELDS_FORM_DRAFT);
     const {canWrite, withReadOnlyFallback} = usePolicyFeatureWriteAccess(policy, policyFeature);
@@ -165,7 +165,7 @@ function FieldsValueSettingsPage({policy, policyID, valueIndex, reportFieldID, i
                     />
                     {canWrite && !isImportedReportField && (
                         <MenuItemAction
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('common.delete')}
                             onPress={showDeleteModal}
                         />

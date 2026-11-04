@@ -44,7 +44,7 @@ function WiseMoreInfoNeededPage({route}: WiseMoreInfoNeededPageProps) {
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isWiseReimbursementsBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.WISE_REIMBURSEMENTS);
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['UserShield']);
+    const {UserShield: userShieldIllustration} = useMemoizedLazyIllustrations(['UserShield']);
 
     // The flow is finished on our side, so back leaves it instead of reopening the form
     const goBackToEntryPoint = () => Navigation.goBack(entryPath);
@@ -90,7 +90,7 @@ function WiseMoreInfoNeededPage({route}: WiseMoreInfoNeededPageProps) {
             </Header>
             <ConfirmationPage>
                 <ConfirmationPage.Content requestErrors={embeddedLink?.errors}>
-                    <ConfirmationPage.Illustration illustration={illustrations.UserShield} />
+                    <ConfirmationPage.Illustration illustration={userShieldIllustration} />
                     <ConfirmationPage.Heading>{translate('walletPage.wiseOnboarding.moreInfoNeeded.title')}</ConfirmationPage.Heading>
                     <ConfirmationPage.Description style={styles.textSupporting}>{translate('walletPage.wiseOnboarding.moreInfoNeeded.subtitle')}</ConfirmationPage.Description>
                 </ConfirmationPage.Content>

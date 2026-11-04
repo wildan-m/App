@@ -50,7 +50,19 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'ReceiptScan', 'Car', 'Task', 'Clock', 'MoneyCircle', 'Coins', 'Receipt', 'Cash', 'Transfer']);
+    const {
+        CalendarSolid,
+        ReceiptScan: receiptScanIcon,
+        Car,
+        Task,
+        Clock,
+        MoneyCircle,
+        Coins,
+        Receipt,
+        Cash,
+        Transfer,
+    } = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'ReceiptScan', 'Car', 'Task', 'Clock', 'MoneyCircle', 'Coins', 'Receipt', 'Cash', 'Transfer']);
+    const icons = {CalendarSolid, ReceiptScan: receiptScanIcon, Car, Task, Clock, MoneyCircle, Coins, Receipt, Cash, Transfer};
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
@@ -214,7 +226,7 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
                 horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
             }}
             shouldTeleportPortalToModalLayer
-            icon={icons.ReceiptScan}
+            icon={receiptScanIcon}
             title={translate('quickAction.scanReceipt')}
             description={getReportName(policyChatForActivePolicy, derivedPolicyChatReportName)}
             rightIconReportID={policyChatForActivePolicy?.reportID}

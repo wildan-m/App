@@ -44,7 +44,8 @@ function InsightTitleDropdown({configs, selectedKey, onSelect}: InsightTitleDrop
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow', 'CalendarSolid', 'User', 'Folder', 'Basket']) as Partial<Record<ExpensifyIconName, IconAsset>>;
+    const {DownArrow, UpArrow, CalendarSolid, User, Folder, Basket} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow', 'CalendarSolid', 'User', 'Folder', 'Basket']);
+    const icons: Partial<Record<ExpensifyIconName, IconAsset>> = {DownArrow, UpArrow, CalendarSolid, User, Folder, Basket};
     const {calculatePopoverPosition} = usePopoverPosition();
 
     const triggerRef = useRef<ComponentRef<typeof View>>(null);
@@ -84,7 +85,7 @@ function InsightTitleDropdown({configs, selectedKey, onSelect}: InsightTitleDrop
             >
                 <Text style={styles.getWidgetContainerTitleStyle(theme.text)}>{title}</Text>
                 <Icon
-                    src={isMenuOpen ? icons.UpArrow : icons.DownArrow}
+                    src={isMenuOpen ? UpArrow : DownArrow}
                     fill={theme.icon}
                     width={variables.iconSizeSmall}
                     height={variables.iconSizeSmall}

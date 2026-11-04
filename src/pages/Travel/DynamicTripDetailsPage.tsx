@@ -46,7 +46,20 @@ function pickTravelerPersonalDetails(personalDetails: OnyxEntry<PersonalDetailsL
 type DynamicTripDetailsPageProps = StackScreenProps<TravelNavigatorParamList, typeof SCREENS.TRAVEL.DYNAMIC_TRIP_DETAILS>;
 
 function DynamicTripDetailsPage({route}: DynamicTripDetailsPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons([
+    const {
+        NewWindow: newWindowIcon,
+        Plane,
+        PlaneCircleSlash,
+        Bed,
+        BedCircleSlash,
+        CarWithKey,
+        CarCircleSlash,
+        Train,
+        TrainCircleSlash,
+        Luggage,
+        Pencil: pencilIcon,
+        Phone: phoneIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'NewWindow',
         'Plane',
         'PlaneCircleSlash',
@@ -60,6 +73,20 @@ function DynamicTripDetailsPage({route}: DynamicTripDetailsPageProps) {
         'Pencil',
         'Phone',
     ]);
+    const icons = {
+        NewWindow: newWindowIcon,
+        Plane,
+        PlaneCircleSlash,
+        Bed,
+        BedCircleSlash,
+        CarWithKey,
+        CarCircleSlash,
+        Train,
+        TrainCircleSlash,
+        Luggage,
+        Pencil: pencilIcon,
+        Phone: phoneIcon,
+    };
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -148,8 +175,8 @@ function DynamicTripDetailsPage({route}: DynamicTripDetailsPageProps) {
                     )}
                     <MenuItem
                         title={translate('travel.modifyTrip')}
-                        icon={icons.Pencil}
-                        iconRight={icons.NewWindow}
+                        icon={pencilIcon}
+                        iconRight={newWindowIcon}
                         shouldShowRightIcon
                         onPress={() => {
                             setIsModifyTripLoading(true);
@@ -163,8 +190,8 @@ function DynamicTripDetailsPage({route}: DynamicTripDetailsPageProps) {
                     />
                     <MenuItem
                         title={translate('travel.tripSupport')}
-                        icon={icons.Phone}
-                        iconRight={icons.NewWindow}
+                        icon={phoneIcon}
+                        iconRight={newWindowIcon}
                         shouldShowRightIcon
                         onPress={() => {
                             setIsTripSupportLoading(true);

@@ -20,7 +20,7 @@ type ReportDetailsMenuSettingsItemProps = {
 
 function ReportDetailsMenuSettingsItem({reportID}: ReportDetailsMenuSettingsItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Gear']);
+    const {Gear: gearIcon} = useMemoizedLazyExpensifyIcons(['Gear']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
 
     const isMoneyRequestReport = isMoneyRequestReportUtil(report);
@@ -35,7 +35,7 @@ function ReportDetailsMenuSettingsItem({reportID}: ReportDetailsMenuSettingsItem
     return (
         <MenuItemNavigation
             title={translate('common.settings')}
-            icon={expensifyIcons.Gear}
+            icon={gearIcon}
             onPress={() => {
                 Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REPORT_SETTINGS.path));
             }}

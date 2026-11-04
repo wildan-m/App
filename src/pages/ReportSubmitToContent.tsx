@@ -114,7 +114,7 @@ function ReportSubmitToContent({
     const {currentSearchQueryJSON, currentSearchKey} = useSearchQueryContext();
     const {currentSearchResults} = useSearchResultsContext();
     const shouldCalculateTotals = useSearchShouldCalculateTotals(currentSearchKey, true);
-    const lazyIllustrations = useMemoizedLazyIllustrations(['PaperAirplane']);
+    const {PaperAirplane: paperAirplaneIllustration} = useMemoizedLazyIllustrations(['PaperAirplane']);
     const isASAPSubmitBetaEnabled = isBetaEnabled(CONST.BETAS.ASAP_SUBMIT);
     const hasViolations = hasViolationsReportUtils(report?.reportID, transactionViolations, currentUserDetails.accountID, currentUserDetails.login ?? '');
     const reportTransactions = useReportTransactions(report?.reportID);
@@ -375,7 +375,7 @@ function ReportSubmitToContent({
     const listEmptyContent = (
         <View style={[styles.flex1, styles.w100]}>
             <BlockingView
-                icon={lazyIllustrations.PaperAirplane}
+                icon={paperAirplaneIllustration}
                 iconWidth={variables.iconSizeSuperLarge}
                 iconHeight={variables.iconSizeSuperLarge}
                 title={translate('iou.submitReportTo.sendExpense')}

@@ -73,7 +73,7 @@ function DynamicTagSettingsPage({route, navigation}: DynamicTagSettingsPageProps
     const policyTag = getTagListByOrderWeight(policyTags, orderWeight);
     const {environmentURL} = useEnvironment();
     const hasAccountingConnections = hasAccountingConnectionsPolicyUtils(policy);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock', 'Trashcan']);
+    const {Lock: lockIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Lock', 'Trashcan']);
     const isQuickSettingsFlow = route.name === SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_SETTINGS;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.SETTINGS_TAG_SETTINGS.path);
     const buildDynamicRoute = useScreenBoundDynamicRoute();
@@ -213,7 +213,7 @@ function DynamicTagSettingsPage({route, navigation}: DynamicTagSettingsPageProps
                             description={translate(`workspace.tags.glCode`)}
                             title={currentPolicyTag?.['GL Code']}
                             onPress={navigateToEditGlCode}
-                            iconRight={hasAccountingConnections ? expensifyIcons.Lock : undefined}
+                            iconRight={hasAccountingConnections ? lockIcon : undefined}
                             interactive={canWriteTags && !hasAccountingConnections}
                             shouldShowRightIcon={canWriteTags}
                         />
@@ -240,7 +240,7 @@ function DynamicTagSettingsPage({route, navigation}: DynamicTagSettingsPageProps
 
                     {canWriteTags && shouldShowDeleteMenuItem && (
                         <MenuItemAction
-                            icon={expensifyIcons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('common.delete')}
                             onPress={async () => {
                                 if (shouldPreventDisableOrDelete) {

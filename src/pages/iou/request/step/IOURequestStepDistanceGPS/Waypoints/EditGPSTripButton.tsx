@@ -26,7 +26,7 @@ function EditGPSTripButton({action, iouType, transactionID, reportID, backToRepo
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Pencil']);
+    const {Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Pencil']);
 
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
 
@@ -44,7 +44,7 @@ function EditGPSTripButton({action, iouType, transactionID, reportID, backToRepo
             <View style={styles.primaryMediumIcon}>
                 <Icon
                     fill={theme.icon}
-                    src={icons.Pencil}
+                    src={pencilIcon}
                     width={variables.iconSizeSmall}
                     height={variables.iconSizeSmall}
                 />

@@ -87,8 +87,8 @@ function DynamicNewAgentPage({route}: DynamicNewAgentPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['Bot']);
-    const illustrations = useMemoizedLazyIllustrations(['Lightbulb']);
+    const {Bot: botIcon} = useMemoizedLazyExpensifyIcons(['Bot']);
+    const {Lightbulb: lightbulbIllustration} = useMemoizedLazyIllustrations(['Lightbulb']);
     const {data: templates, isLoading} = useSuggestedAgents();
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
 
@@ -127,7 +127,7 @@ function DynamicNewAgentPage({route}: DynamicNewAgentPageProps) {
             onPress={handleBuildCustomAgent}
             style={styles.w100}
         >
-            <Button.Icon src={icons.Bot} />
+            <Button.Icon src={botIcon} />
             <Button.Text>{translate('newAgentPage.buildCustomAgent')}</Button.Text>
         </Button>
     );
@@ -155,7 +155,7 @@ function DynamicNewAgentPage({route}: DynamicNewAgentPageProps) {
                 {templateSectionLabel}
                 <View style={styles.flex1}>
                     <BlockingView
-                        icon={illustrations.Lightbulb}
+                        icon={lightbulbIllustration}
                         title={translate('newAgentPage.emptyTemplatesTitle')}
                         subtitle={isOffline ? translate('common.youAppearToBeOffline') : translate('newAgentPage.emptyTemplatesSubtitle')}
                         subtitleStyle={[styles.textSupporting, styles.textNormal]}

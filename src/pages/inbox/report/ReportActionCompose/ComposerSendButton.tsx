@@ -17,7 +17,7 @@ function ComposerSendButton() {
     const {reportID} = useComposerState();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Send', 'Checkmark']);
+    const {Send: sendIcon, Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Send', 'Checkmark']);
 
     const {isEditingInComposer} = useComposerEditState();
     const {isSendDisabled} = useComposerSendState();
@@ -35,7 +35,7 @@ function ComposerSendButton() {
     });
 
     const label = translate(isEditingInComposer ? 'common.saveChanges' : 'common.send');
-    const icon = isEditingInComposer ? icons.Checkmark : icons.Send;
+    const icon = isEditingInComposer ? checkmarkIcon : sendIcon;
 
     return (
         <View

@@ -61,7 +61,8 @@ function MoneyRequestReportListFooter({report, policy, transactions, hasPendingA
     const {convertToDisplayString} = useCurrencyListActions();
     const {shouldUseNarrowLayout} = useResponsiveLayoutOnWideRHP();
     const {pageGutter} = resolveLayoutSpacing(shouldUseNarrowLayout);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Location', 'ReceiptPlus', 'Plus']);
+    const {Location, ReceiptPlus, Plus} = useMemoizedLazyExpensifyIcons(['Location', 'ReceiptPlus', 'Plus']);
+    const expensifyIcons = {Location, ReceiptPlus, Plus};
     const currentUserDetails = useCurrentUserPersonalDetails();
     const isReportArchived = useReportIsArchived(report?.reportID);
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);

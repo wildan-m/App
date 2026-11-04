@@ -20,7 +20,7 @@ type DelegatorListProps = {
 function DelegatorList({delegators, message}: DelegatorListProps) {
     const styles = useThemeStyles();
     const {formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const personalDetailsByLogin = usePersonalDetailsByLogin();
 
@@ -38,7 +38,7 @@ function DelegatorList({delegators, message}: DelegatorListProps) {
                             <MenuItem.Row>
                                 <MenuItem.Leading>
                                     <UserAvatar
-                                        source={delegatorDetails?.avatar ?? icons.FallbackAvatar}
+                                        source={delegatorDetails?.avatar ?? fallbackAvatarIcon}
                                         accountID={delegatorDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID}
                                     />
                                 </MenuItem.Leading>

@@ -24,8 +24,8 @@ function ExpiredValidateCodeModal() {
     const styles = useThemeStyles();
     const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
     return (
         <View style={styles.deeplinkWrapperContainer}>
             <View style={styles.deeplinkWrapperMessage}>
@@ -33,7 +33,7 @@ function ExpiredValidateCodeModal() {
                     <Icon
                         width={variables.modalTopIconWidth}
                         height={variables.modalTopIconHeight}
-                        src={illustrations.ToddBehindCloud}
+                        src={toddBehindCloudIllustration}
                     />
                 </View>
                 <Text style={[styles.textHeadline, styles.textAlignCenter]}>{translate('validateCodeModal.expiredCodeTitle')}</Text>
@@ -65,7 +65,7 @@ function ExpiredValidateCodeModal() {
                     width={variables.modalWordmarkWidth}
                     height={variables.modalWordmarkHeight}
                     fill={theme.success}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
             </View>
         </View>

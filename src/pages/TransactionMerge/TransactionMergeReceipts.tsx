@@ -29,7 +29,7 @@ type TransactionMergeReceiptsProps = {
 function TransactionMergeReceipts({transactions, selectedReceiptID, onSelect}: TransactionMergeReceiptsProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Zoom']);
+    const {Zoom: zoomIcon} = useMemoizedLazyExpensifyIcons(['Zoom']);
 
     return (
         <View style={[styles.flexRow, styles.flexWrap, styles.justifyContentBetween]}>
@@ -84,7 +84,7 @@ function TransactionMergeReceipts({transactions, selectedReceiptID, onSelect}: T
                                             );
                                         }}
                                     >
-                                        <Button.Icon src={expensifyIcons.Zoom} />
+                                        <Button.Icon src={zoomIcon} />
                                     </Button>
                                 </View>
                             </View>

@@ -61,7 +61,7 @@ function CategoryPickerModal({
 }: CategoryPickerModalProps) {
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(policyID)}`, {selector: getEnabledCategoriesCount});
     const [renderedRowCount, setRenderedRowCount] = useState<number>();
@@ -103,7 +103,7 @@ function CategoryPickerModal({
                             sentryLabel={addCategorySentryLabel}
                         >
                             <Icon
-                                src={icons.Plus}
+                                src={plusIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeNormal}
                                 height={variables.iconSizeNormal}

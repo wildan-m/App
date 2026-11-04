@@ -58,7 +58,11 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, isSelectab
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'DotIndicator', 'Download']);
+    const {
+        ArrowCircleClockwise: arrowCircleClockwiseIcon,
+        DotIndicator: dotIndicatorIcon,
+        Download: downloadIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'DotIndicator', 'Download']);
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth, isInNarrowPaneModal} = useResponsiveLayout();
 
@@ -148,7 +152,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, isSelectab
                         size={CONST.BUTTON_SIZE.SMALL}
                         onPress={onRetryReceiptUpload}
                     >
-                        <Button.Icon src={expensifyIcons.ArrowCircleClockwise} />
+                        <Button.Icon src={arrowCircleClockwiseIcon} />
                         <Button.Text>{translate('common.tryAgain')}</Button.Text>
                     </Button>
                 )}
@@ -158,7 +162,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, isSelectab
                         fileDownload(translate, receiptError.source, receiptError.filename);
                     }}
                 >
-                    <Button.Icon src={expensifyIcons.Download} />
+                    <Button.Icon src={downloadIcon} />
                     <Button.Text>{translate('common.save')}</Button.Text>
                 </Button>
             </View>
@@ -197,7 +201,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, isSelectab
                 accessibilityLabel={isErrorMessage ? (CONST.ACCESSIBILITY_LABELS.ERROR as string) : undefined}
             >
                 <Icon
-                    src={expensifyIcons.DotIndicator}
+                    src={dotIndicatorIcon}
                     fill={isErrorMessage ? theme.danger : theme.success}
                 />
             </View>

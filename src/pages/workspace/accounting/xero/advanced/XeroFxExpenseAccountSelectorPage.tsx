@@ -33,7 +33,7 @@ function XeroFxExpenseAccountSelectorPage({policy}: WithPolicyConnectionsProps) 
     const canConfigureCurrencyConversionFees = useCanConfigureCurrencyConversionFees(policy);
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const {config, data} = policy?.connections?.xero ?? {};
     const {syncReimbursedReports} = config?.sync ?? {};
     const expenseAccounts = data?.expenseAccounts ?? [];
@@ -58,7 +58,7 @@ function XeroFxExpenseAccountSelectorPage({policy}: WithPolicyConnectionsProps) 
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.xero.noAccountsFound')}

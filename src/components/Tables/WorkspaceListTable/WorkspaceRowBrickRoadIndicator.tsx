@@ -50,7 +50,7 @@ const createPolicyErrorsSelector = (connectionSyncProgress: OnyxEntry<PolicyConn
 function WorkspaceRowBrickRoadIndicator({policyID}: WorkspaceRowBrickRoadIndicatorProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const workspaceAccountID = useWorkspaceAccountID(policyID);
     const [hasReimbursementAccountErrors] = useOnyx(ONYXKEYS.REIMBURSEMENT_ACCOUNT, {selector: hasReimbursementAccountErrorsSelector});
     const [hasCardFeedErrors] = useOnyx(ONYXKEYS.DERIVED.CARD_FEED_ERRORS, {selector: createCardFeedErrorsSelector(workspaceAccountID)});
@@ -71,7 +71,7 @@ function WorkspaceRowBrickRoadIndicator({policyID}: WorkspaceRowBrickRoadIndicat
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
             <Icon
-                src={icons.DotIndicator}
+                src={dotIndicatorIcon}
                 fill={hasError ? theme.danger : theme.iconSuccessFill}
             />
         </View>

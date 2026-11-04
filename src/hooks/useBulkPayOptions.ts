@@ -70,7 +70,7 @@ function useBulkPayOptions({
     formattedAmount,
     onlyShowPayElsewhere,
 }: UseBulkPayOptionProps): UseBulkPayOptionReturnType {
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'User', 'Bank', 'Cash', 'Wallet']);
+    const {Building: buildingIcon, User: userIcon, Bank: bankIcon, Cash: cashIcon, Wallet: walletIcon} = useMemoizedLazyExpensifyIcons(['Building', 'User', 'Bank', 'Cash', 'Wallet']);
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const {accountID} = useCurrentUserPersonalDetails();
@@ -157,7 +157,7 @@ function useBulkPayOptions({
                     bulkPayButtonOptions.push({
                         text: account.text,
                         description: account.description,
-                        icon: typeof account.icon === 'number' ? icons.Bank : account.icon,
+                        icon: typeof account.icon === 'number' ? bankIcon : account.icon,
                         iconStyles: account.iconStyles,
                         iconWidth: typeof account.icon === 'number' ? undefined : account.iconSize,
                         iconHeight: typeof account.icon === 'number' ? undefined : account.iconSize,
@@ -178,7 +178,7 @@ function useBulkPayOptions({
                 bulkPayButtonOptions.push({
                     text: translate('iou.settleWallet', ''),
                     key: CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT,
-                    icon: icons.Wallet,
+                    icon: walletIcon,
                 });
             } else if (canUsePersonalBankAccount) {
                 bulkPayButtonOptions.push(paymentMethods[CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT]);
@@ -195,7 +195,7 @@ function useBulkPayOptions({
                 const policyName = activePolicy.name;
                 bulkPayButtonOptions.push({
                     text: translate('iou.payWithPolicy', truncate(policyName, {length: CONST.ADDITIONAL_ALLOWED_CHARACTERS}), ''),
-                    icon: icons.Building,
+                    icon: buildingIcon,
                     key: activePolicy.id,
                     shouldUpdateSelectedIndex: false,
                 });
@@ -211,7 +211,7 @@ function useBulkPayOptions({
             const getInvoicesOptions = (payAsBusiness: boolean) => {
                 const addBankAccountItem = {
                     text: translate('bankAccount.addBankAccount'),
-                    icon: icons.Bank,
+                    icon: bankIcon,
                     onSelected: () => {
                         const bankAccountRoute = getBankAccountRoute(chatReport, areInvoicesEnabled);
                         Navigation.navigate(bankAccountRoute);
@@ -222,7 +222,7 @@ function useBulkPayOptions({
                     ...(showPayViaExpensifyOptions ? [addBankAccountItem] : []),
                     {
                         text: translate('iou.payElsewhere', ''),
-                        icon: icons.Cash,
+                        icon: cashIcon,
                         key: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
                         additionalData: {
                             payAsBusiness,
@@ -234,13 +234,13 @@ function useBulkPayOptions({
             if (isIndividualInvoiceRoomUtil(chatReport)) {
                 bulkPayButtonOptions.push({
                     text: translate('iou.settlePersonal', formattedAmount),
-                    icon: icons.User,
+                    icon: userIcon,
                     backButtonText: translate('iou.individual'),
                     subMenuItems: getInvoicesOptions(false),
                 });
                 bulkPayButtonOptions.push({
                     text: translate('iou.settleBusiness', formattedAmount),
-                    icon: icons.Building,
+                    icon: buildingIcon,
                     backButtonText: translate('iou.business'),
                     subMenuItems: getInvoicesOptions(true),
                 });

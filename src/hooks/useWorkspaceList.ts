@@ -39,7 +39,7 @@ function useWorkspaceList({
     policyIDsToSortToTop,
     includeArchivedPolicy = false,
 }: UseWorkspaceListParams) {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackWorkspaceAvatar']);
+    const {FallbackWorkspaceAvatar: fallbackWorkspaceAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackWorkspaceAvatar']);
     let usersWorkspaces: WorkspaceListItem[];
     if (!policies || isEmptyObject(policies)) {
         usersWorkspaces = [];
@@ -60,7 +60,7 @@ function useWorkspaceList({
                 icons: [
                     {
                         source: policy.avatarURL ? policy.avatarURL : getDefaultWorkspaceAvatar(policy.name),
-                        fallbackIcon: icons.FallbackWorkspaceAvatar,
+                        fallbackIcon: fallbackWorkspaceAvatarIcon,
                         name: policy.name,
                         type: CONST.ICON_TYPE_WORKSPACE,
                         id: policy.id,

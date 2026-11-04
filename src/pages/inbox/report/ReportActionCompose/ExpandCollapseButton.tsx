@@ -37,7 +37,7 @@ function ExpandCollapseButton({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['Collapse', 'Expand'] as const);
+    const {Collapse: collapseIcon, Expand: expandIcon} = useMemoizedLazyExpensifyIcons(['Collapse', 'Expand'] as const);
 
     if (!isFullComposerAvailable && !isComposerFullSize) {
         return null;
@@ -46,7 +46,7 @@ function ExpandCollapseButton({
     const shouldCollapse = isComposerFullSize;
     const tooltipText = shouldCollapse ? translate('reportActionCompose.collapse') : translate('reportActionCompose.expand');
     const nextComposerFullSizeValue = !shouldCollapse;
-    const iconSrc = shouldCollapse ? icons.Collapse : icons.Expand;
+    const iconSrc = shouldCollapse ? collapseIcon : expandIcon;
     const sentryLabel = shouldCollapse ? CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_COLLAPSE_BUTTON : CONST.SENTRY_LABEL.REPORT.ATTACHMENT_PICKER_EXPAND_BUTTON;
 
     return (

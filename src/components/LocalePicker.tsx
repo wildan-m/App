@@ -32,7 +32,7 @@ function LocalePicker({size = 'normal'}: LocalePickerProps) {
     const {translate} = useLocalize();
     const [preferredLocale] = useOnyx(ONYXKEYS.NVP_PREFERRED_LOCALE);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
-    const icons = useMemoizedLazyExpensifyIcons(['Globe']);
+    const {Globe: globeIcon} = useMemoizedLazyExpensifyIcons(['Globe']);
 
     const sortedLocales = SORTED_LOCALES;
     const locales = sortedLocales.map((locale) => ({
@@ -47,7 +47,7 @@ function LocalePicker({size = 'normal'}: LocalePickerProps) {
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter]}>
             <Icon
-                src={icons.Globe}
+                src={globeIcon}
                 fill={theme.icon}
                 width={variables.iconSizeSmall}
                 height={variables.iconSizeSmall}

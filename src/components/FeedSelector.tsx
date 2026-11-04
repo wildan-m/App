@@ -33,7 +33,7 @@ type Props = {
 function FeedSelector({onFeedSelect, CardFeedIcon, feedName, supportingText, shouldShowRBR = false, isLoading = false, wrapperStyle}: Props) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
 
     if (isLoading) {
         return <SearchInputSelectionSkeleton />;
@@ -62,7 +62,7 @@ function FeedSelector({onFeedSelect, CardFeedIcon, feedName, supportingText, sho
                     </CaretWrapper>
                     {shouldShowRBR && (
                         <Icon
-                            src={expensifyIcons.DotIndicator}
+                            src={dotIndicatorIcon}
                             fill={theme.danger}
                         />
                     )}

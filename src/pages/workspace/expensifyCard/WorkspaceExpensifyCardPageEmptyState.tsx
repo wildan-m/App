@@ -47,7 +47,12 @@ type WorkspaceExpensifyCardPageEmptyStateProps = {
 } & WithPolicyAndFullscreenLoadingProps;
 
 function WorkspaceExpensifyCardPageEmptyState({route, policy}: WorkspaceExpensifyCardPageEmptyStateProps) {
-    const illustrations = useMemoizedLazyIllustrations(['MoneyReceipts', 'CreditCardsNew', 'MoneyWings', 'ExpensifyCardIllustration']);
+    const {
+        MoneyReceipts: moneyReceiptsIllustration,
+        CreditCardsNew: creditCardsNewIllustration,
+        MoneyWings: moneyWingsIllustration,
+        ExpensifyCardIllustration: expensifyCardIllustrationIllustration,
+    } = useMemoizedLazyIllustrations(['MoneyReceipts', 'CreditCardsNew', 'MoneyWings', 'ExpensifyCardIllustration']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -112,15 +117,15 @@ function WorkspaceExpensifyCardPageEmptyState({route, policy}: WorkspaceExpensif
 
     const expensifyCardFeatures: FeatureListItem[] = [
         {
-            icon: illustrations.MoneyReceipts,
+            icon: moneyReceiptsIllustration,
             translationKey: 'workspace.moreFeatures.expensifyCard.feed.features.cashBack' as const,
         },
         {
-            icon: illustrations.CreditCardsNew,
+            icon: creditCardsNewIllustration,
             translationKey: 'workspace.moreFeatures.expensifyCard.feed.features.unlimited' as const,
         },
         {
-            icon: illustrations.MoneyWings,
+            icon: moneyWingsIllustration,
             translationKey: 'workspace.moreFeatures.expensifyCard.feed.features.spend' as const,
         },
     ];
@@ -181,7 +186,7 @@ function WorkspaceExpensifyCardPageEmptyState({route, policy}: WorkspaceExpensif
                         startFlow();
                     }}
                     illustrationBackgroundColor={theme.fallbackIconColor}
-                    illustration={illustrations.ExpensifyCardIllustration}
+                    illustration={expensifyCardIllustrationIllustration}
                     illustrationStyle={styles.expensifyCardIllustrationContainer}
                     titleStyles={styles.textHeadlineH1}
                     buttonInnerStyles={shouldDisableCTA ? styles.buttonOpacityDisabled : undefined}

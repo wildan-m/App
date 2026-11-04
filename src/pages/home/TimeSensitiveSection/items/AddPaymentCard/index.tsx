@@ -11,11 +11,11 @@ import React from 'react';
 
 function AddPaymentCard() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCard']);
+    const {CreditCard: creditCardIcon} = useMemoizedLazyExpensifyIcons(['CreditCard']);
 
     return (
         <BaseWidgetItem
-            icon={icons.CreditCard}
+            icon={creditCardIcon}
             title={translate('homePage.timeSensitiveSection.addPaymentCard.title')}
             subtitle={translate('homePage.timeSensitiveSection.addPaymentCard.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.addPaymentCard.cta')}

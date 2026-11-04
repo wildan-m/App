@@ -23,7 +23,7 @@ function GetStartedTravel({policyID, canWriteTravelFeature, showReadOnlyModal}: 
 
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['PendingTravel']);
+    const {PendingTravel: pendingTravelIllustration} = useMemoizedLazyIllustrations(['PendingTravel']);
 
     return (
         <FeatureList
@@ -32,7 +32,7 @@ function GetStartedTravel({policyID, canWriteTravelFeature, showReadOnlyModal}: 
             subtitle={translate('workspace.moreFeatures.travel.getStarted.subtitle')}
             onCtaPress={handleCtaPress}
             illustrationBackgroundColor={colors.tangerine700}
-            illustration={illustrations.PendingTravel}
+            illustration={pendingTravelIllustration}
             illustrationStyle={styles.travelCardIllustration}
             illustrationContainerStyle={[styles.emptyStateCardIllustrationContainer, styles.justifyContentCenter, styles.cardSectionIllustrationContainer]}
             titleStyles={styles.textHeadlineH1}

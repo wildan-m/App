@@ -59,7 +59,21 @@ function ExportWithDropdownMenu({
     const {showConfirmModal} = useConfirmModal();
     const [exportMethods] = useOnyx(ONYXKEYS.LAST_EXPORT_METHOD);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'XeroSquare',
         'QBOSquare',
         'IntuitSquare',
@@ -74,6 +88,21 @@ function ExportWithDropdownMenu({
         'BusinessCentralSquare',
         'GustoSquare',
     ]);
+    const expensifyIcons = {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    };
 
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons, policy);
     const canBeExported = canBeExportedUtils(report);

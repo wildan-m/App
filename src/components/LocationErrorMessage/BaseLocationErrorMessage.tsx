@@ -29,7 +29,7 @@ function BaseLocationErrorMessage({onClose, onAllowLocationLinkPress, locationEr
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Close', 'DotIndicator']);
+    const {Close: closeIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['Close', 'DotIndicator']);
 
     if (!locationErrorCode) {
         return null;
@@ -41,7 +41,7 @@ function BaseLocationErrorMessage({onClose, onAllowLocationLinkPress, locationEr
         <View style={[styles.dotIndicatorMessage, styles.mt4]}>
             <View style={styles.offlineFeedbackErrorDot}>
                 <Icon
-                    src={icons.DotIndicator}
+                    src={dotIndicatorIcon}
                     fill={colors.red}
                 />
             </View>
@@ -73,7 +73,7 @@ function BaseLocationErrorMessage({onClose, onAllowLocationLinkPress, locationEr
                     >
                         <Icon
                             fill={theme.icon}
-                            src={icons.Close}
+                            src={closeIcon}
                         />
                     </PressableWithoutFeedback>
                 </Tooltip>

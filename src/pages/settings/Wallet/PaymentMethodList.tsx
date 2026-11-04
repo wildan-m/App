@@ -200,7 +200,7 @@ function PaymentMethodList({
     const {isOffline} = useNetwork();
     const {isBetaEnabled} = usePermissions();
     const isWiseGlobalReimbursementsEnabled = isBetaEnabled(CONST.BETAS.WISE_REIMBURSEMENTS);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus', 'ThreeDots', 'LuggageWithLines']);
+    const {Plus: plusIcon, ThreeDots: threeDotsIcon, LuggageWithLines: luggageWithLinesIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'ThreeDots', 'LuggageWithLines']);
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {
@@ -549,7 +549,7 @@ function PaymentMethodList({
                 travelCardGrouped.push({
                     title: translate('walletPage.travelCVV.title'),
                     description: translate('walletPage.travelCVV.subtitle'),
-                    icon: expensifyIcons.LuggageWithLines,
+                    icon: luggageWithLinesIcon,
                     iconFill: colors.productLight100,
                     iconStyles: styles.travelBillingIcon,
                     shouldShowRightIcon: true,
@@ -647,7 +647,7 @@ function PaymentMethodList({
                 onThreeDotsMenuPress: paymentMethodThreeDotsPress,
                 disabled: paymentMethod.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
                 isMethodActive,
-                iconRight: itemIconRight ?? expensifyIcons.ThreeDots,
+                iconRight: itemIconRight ?? threeDotsIcon,
                 shouldShowRightIcon,
                 canDismissError: true,
                 isMissingPersonalInfo,
@@ -682,7 +682,7 @@ function PaymentMethodList({
         <MenuItem
             onPress={onPressItem}
             title={translate('bankAccount.addBankAccount')}
-            icon={expensifyIcons.Plus}
+            icon={plusIcon}
             wrapperStyle={[styles.paymentMethod, listItemStyle, addBankAccountItemStyle]}
             sentryLabel={CONST.SENTRY_LABEL.SETTINGS_WALLET.ADD_BANK_ACCOUNT}
         />

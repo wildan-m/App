@@ -190,7 +190,14 @@ function MerchantRulePageBase({
     const isEditingSavedRule = isEditing || isEditingCategoryTaxRule;
     const isInLandscapeMode = useIsInLandscapeMode();
     const {isBetaEnabled} = usePermissions();
-    const icons = useMemoizedLazyExpensifyIcons(['Basket', 'Folder', 'Pencil', 'InvoiceGeneric', 'Tag', 'Paycheck']);
+    const {
+        Basket: basketIcon,
+        Folder: folderIcon,
+        Pencil: pencilIcon,
+        InvoiceGeneric: invoiceGenericIcon,
+        Tag: tagIcon,
+        Paycheck: paycheckIcon,
+    } = useMemoizedLazyExpensifyIcons(['Basket', 'Folder', 'Pencil', 'InvoiceGeneric', 'Tag', 'Paycheck']);
 
     const [form] = useOnyx(ONYXKEYS.FORMS.MERCHANT_RULE_FORM);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
@@ -533,7 +540,7 @@ function MerchantRulePageBase({
                               Navigation.navigate(
                                   getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_MERCHANT_TO_MATCH_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_MERCHANT_TO_MATCH.getRoute(policyID, ruleID)),
                               ),
-                          icon: icons.Basket,
+                          icon: basketIcon,
                       },
                 isScopedToCategory
                     ? {
@@ -543,7 +550,7 @@ function MerchantRulePageBase({
                           title: categoriesToMatchDisplayName,
                           onPress: () => Navigation.navigate(ROUTES.RULES_CATEGORY_TO_MATCH.getRoute(policyID, ruleID, editCategoryTaxRuleFor)),
                           isLocked: isCategoryLocked,
-                          icon: icons.Folder,
+                          icon: folderIcon,
                       }
                     : undefined,
             ],
@@ -556,7 +563,7 @@ function MerchantRulePageBase({
                     description: translate('common.merchant'),
                     title: form?.merchant,
                     onPress: () => Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_MERCHANT_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_MERCHANT.getRoute(policyID, ruleID))),
-                    icon: icons.Basket,
+                    icon: basketIcon,
                 },
                 hasCategories()
                     ? {
@@ -565,7 +572,7 @@ function MerchantRulePageBase({
                           title: categoryDisplayName,
                           onPress: () =>
                               Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_CATEGORY_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_CATEGORY.getRoute(policyID, ruleID))),
-                          icon: icons.Folder,
+                          icon: folderIcon,
                       }
                     : undefined,
                 ...(hasTags()
@@ -586,7 +593,7 @@ function MerchantRulePageBase({
                                               ROUTES.RULES_MERCHANT_TAG.getRoute(policyID, ruleID, orderWeight),
                                           ),
                                       ),
-                                  icon: icons.Tag,
+                                  icon: tagIcon,
                               };
                           })
                     : []),
@@ -601,7 +608,7 @@ function MerchantRulePageBase({
                               Navigation.navigate(
                                   getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_TAX_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_TAX.getRoute(policyID, ruleID, editCategoryTaxRuleFor)),
                               ),
-                          icon: icons.InvoiceGeneric,
+                          icon: invoiceGenericIcon,
                       }
                     : undefined,
                 isVendorFeatureEnabled
@@ -610,7 +617,7 @@ function MerchantRulePageBase({
                           description: translate('common.vendor'),
                           title: vendorDisplayName,
                           onPress: () => Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_VENDOR_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_VENDOR.getRoute(policyID, ruleID))),
-                          icon: icons.Basket,
+                          icon: basketIcon,
                       }
                     : undefined,
                 {
@@ -620,7 +627,7 @@ function MerchantRulePageBase({
                     onPress: () =>
                         Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_DESCRIPTION_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_DESCRIPTION.getRoute(policyID, ruleID))),
                     shouldRenderAsHTML: true,
-                    icon: icons.Pencil,
+                    icon: pencilIcon,
                 },
                 {
                     key: 'reimbursable',
@@ -628,7 +635,7 @@ function MerchantRulePageBase({
                     title: getBooleanTitle(form?.reimbursable, translate),
                     onPress: () =>
                         Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_REIMBURSABLE_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_REIMBURSABLE.getRoute(policyID, ruleID))),
-                    icon: icons.Paycheck,
+                    icon: paycheckIcon,
                 },
                 isBillableEnabled
                     ? {
@@ -637,7 +644,7 @@ function MerchantRulePageBase({
                           title: getBooleanTitle(form?.billable, translate),
                           onPress: () =>
                               Navigation.navigate(getRuleRoute(DYNAMIC_ROUTES.RULES_MERCHANT_BILLABLE_FROM_EXPENSE.path, ROUTES.RULES_MERCHANT_BILLABLE.getRoute(policyID, ruleID))),
-                          icon: icons.Paycheck,
+                          icon: paycheckIcon,
                       }
                     : undefined,
                 // Tax is the only default a category rule can set, so the other rows are dropped rather than shown.

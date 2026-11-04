@@ -17,12 +17,12 @@ import React from 'react';
 
 function AddBankAccount() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Bank']);
+    const {Bank: bankIcon} = useMemoizedLazyExpensifyIcons(['Bank']);
     const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {selector: isUserValidatedSelector});
 
     return (
         <BaseWidgetItem
-            icon={icons.Bank}
+            icon={bankIcon}
             title={translate('homePage.timeSensitiveSection.addBankAccount.title')}
             subtitle={translate('common.wallet')}
             ctaText={translate('common.add')}

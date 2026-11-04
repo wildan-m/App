@@ -44,7 +44,7 @@ function EmojiPickerButton({isDisabled = false, emojiPickerID = '', shiftVertica
     const emojiPopoverAnchor = useRef(null);
     const {translate} = useLocalize();
     const isFocused = useIsFocused();
-    const icons = useMemoizedLazyExpensifyIcons(['Emoji']);
+    const {Emoji: emojiIcon} = useMemoizedLazyExpensifyIcons(['Emoji']);
 
     const openEmojiPicker: PressableProps['onPress'] = (e) => {
         if (!isFocused) {
@@ -94,7 +94,7 @@ function EmojiPickerButton({isDisabled = false, emojiPickerID = '', shiftVertica
             >
                 {({hovered, pressed}) => (
                     <Icon
-                        src={icons.Emoji}
+                        src={emojiIcon}
                         fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered && !isDisabled, isPressed: pressed && !isDisabled})})}
                     />
                 )}

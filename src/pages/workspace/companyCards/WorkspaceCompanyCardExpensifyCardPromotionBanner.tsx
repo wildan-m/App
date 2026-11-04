@@ -38,7 +38,7 @@ function WorkspaceCompanyCardExpensifyCardPromotionBanner({policy, canWriteCompa
     const areExpensifyCardsEnabled = policy?.areExpensifyCardsEnabled;
     const canUseLearnMore = areExpensifyCardsEnabled ? canWriteCompanyCards : canWriteMoreFeatures;
 
-    const illustrations = useMemoizedLazyIllustrations(['CreditCardsNewGreen']);
+    const {CreditCardsNewGreen: creditCardsNewGreenIllustration} = useMemoizedLazyIllustrations(['CreditCardsNewGreen']);
 
     const handleLearnMore = () => {
         if (!policyID) {
@@ -76,7 +76,7 @@ function WorkspaceCompanyCardExpensifyCardPromotionBanner({policy, canWriteCompa
     return (
         <View style={[styles.ph4, styles.mb4]}>
             <BillingBanner
-                icon={illustrations.CreditCardsNewGreen}
+                icon={creditCardsNewGreenIllustration}
                 title={translate('workspace.moreFeatures.companyCards.expensifyCardBannerTitle')}
                 titleStyle={StyleUtils.getTextColorStyle(theme.text)}
                 subtitle={translate('workspace.moreFeatures.companyCards.expensifyCardBannerSubtitle')}

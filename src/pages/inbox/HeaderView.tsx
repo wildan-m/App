@@ -121,7 +121,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`, {selector: getStableReportSelector});
     const parentReportAction = useParentReportAction(report, {shouldIgnoreThreadReplies: true});
 
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow', 'Close', 'DotIndicator', 'Plus']);
+    const {BackArrow: backArrowIcon, Close: closeIcon, DotIndicator: dotIndicatorIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['BackArrow', 'Close', 'DotIndicator', 'Plus']);
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth, shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const isInSidePanel = useIsInSidePanel();
@@ -339,7 +339,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
             variant={CONST.BUTTON_VARIANT.SUCCESS}
             onPress={startNewConciergeChat}
         >
-            <Button.Icon src={icons.Plus} />
+            <Button.Icon src={plusIcon} />
             <Button.Text>{translate('common.concierge.newChat')}</Button.Text>
         </Button>
     );
@@ -433,7 +433,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
                                     >
                                         <View>
                                             <Icon
-                                                src={icons.BackArrow}
+                                                src={backArrowIcon}
                                                 fill={theme.icon}
                                             />
                                         </View>
@@ -517,7 +517,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
                                     {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
                                         <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
                                             <Icon
-                                                src={icons.DotIndicator}
+                                                src={dotIndicatorIcon}
                                                 fill={theme.danger}
                                             />
                                         </View>
@@ -547,7 +547,7 @@ function HeaderView({onNavigationMenuButtonClicked, reportID}: HeaderViewProps) 
                                             sentryLabel={CONST.SENTRY_LABEL.HEADER_VIEW.BACK_BUTTON}
                                         >
                                             <Icon
-                                                src={icons.Close}
+                                                src={closeIcon}
                                                 fill={theme.icon}
                                             />
                                         </PressableWithoutFeedback>

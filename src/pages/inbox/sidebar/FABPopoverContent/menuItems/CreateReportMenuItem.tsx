@@ -31,7 +31,7 @@ const ITEM_ID = CONST.FAB_MENU_ITEM_IDS.CREATE_REPORT;
 function CreateReportMenuItem() {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Document']);
+    const {Document: documentIcon} = useMemoizedLazyExpensifyIcons(['Document']);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencyDecimals} = useCurrencyListActions();
     const {isBetaEnabled} = usePermissions();
@@ -82,7 +82,7 @@ function CreateReportMenuItem() {
             itemId={ITEM_ID}
             isVisible={isVisible}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.CREATE_REPORT}
-            icon={icons.Document}
+            icon={documentIcon}
             title={translate('report.newReport.createReport')}
             onPress={createReport}
             shouldCallAfterModalHide={shouldUseNarrowLayout}

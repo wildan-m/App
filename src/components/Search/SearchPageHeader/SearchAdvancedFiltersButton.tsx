@@ -36,7 +36,7 @@ function SearchAdvancedFiltersButton({queryJSON}: SearchAdvancedFiltersButtonPro
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth -- advanced filters page is only rendered on the small screen
     const {isSmallScreenWidth, isMediumScreenWidth} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Filter']);
+    const {Filter: filterIcon} = useMemoizedLazyExpensifyIcons(['Filter']);
     const {isOffline} = useNetwork();
     const filterFormValues = useFilterFormValues(queryJSON);
     const filterSearchInputRef = useRef<BaseTextInputRef | null>(null);
@@ -56,7 +56,7 @@ function SearchAdvancedFiltersButton({queryJSON}: SearchAdvancedFiltersButtonPro
                 onPress={() => Navigation.navigate(ROUTES.SEARCH_ADVANCED_FILTERS)}
             >
                 <Icon
-                    src={expensifyIcons.Filter}
+                    src={filterIcon}
                     fill={theme.icon}
                     size={CONST.ICON_SIZE.SMALL}
                 />
@@ -76,7 +76,7 @@ function SearchAdvancedFiltersButton({queryJSON}: SearchAdvancedFiltersButtonPro
                   onPress={onPress}
               >
                   <Icon
-                      src={expensifyIcons.Filter}
+                      src={filterIcon}
                       fill={theme.icon}
                       size={CONST.ICON_SIZE.EXTRA_SMALL}
                   />
@@ -91,7 +91,7 @@ function SearchAdvancedFiltersButton({queryJSON}: SearchAdvancedFiltersButtonPro
                   innerStyles={isExpanded ? styles.buttonDefaultHovered : undefined}
                   sentryLabel={CONST.SENTRY_LABEL.SEARCH.ADVANCED_FILTERS_BUTTON}
               >
-                  <Button.Icon src={expensifyIcons.Filter} />
+                  <Button.Icon src={filterIcon} />
                   <Button.Text>{translate('search.filtersHeader')}</Button.Text>
               </Button>
           );

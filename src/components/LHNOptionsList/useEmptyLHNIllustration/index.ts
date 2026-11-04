@@ -4,11 +4,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type UseEmptyLHNIllustration from './types';
 
 const useEmptyLHNIllustration: UseEmptyLHNIllustration = () => {
-    const illustrations = useMemoizedLazyIllustrations(['Fireworks']);
+    const {Fireworks: fireworksIllustration} = useMemoizedLazyIllustrations(['Fireworks']);
     const styles = useThemeStyles();
 
     return {
-        icon: illustrations.Fireworks,
+        icon: fireworksIllustration,
         iconWidth: styles.emptyStateFireworksStaticIllustration.width,
         iconHeight: styles.emptyStateFireworksStaticIllustration.height,
     };

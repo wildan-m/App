@@ -37,7 +37,7 @@ function CertiniaFxExpenseAccountSelectPage({policy}: WithPolicyConnectionsProps
     const expenseAccounts = data?.expenseAccounts ?? [];
     const {selectedAccountID, hasChanges, selectAccount, buildList} = useFxExpenseAccountPicker(config?.fxExpenseAccount);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_CERTINIA_FX_EXPENSE_ACCOUNT.path);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const accountOptions: SelectorType[] = expenseAccounts.map((account) => ({
         value: account.id,
@@ -66,7 +66,7 @@ function CertiniaFxExpenseAccountSelectPage({policy}: WithPolicyConnectionsProps
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.certinia.noExpenseAccountsFound')}

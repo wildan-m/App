@@ -59,7 +59,12 @@ function WorkspaceCompanyCardsTableControls({
     const {pageGutter} = useLayoutSpacing();
     const {translate, getLocalDateFromDatetime} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Export', 'MoneySearch', 'RemoveMembers']);
+    const {
+        CalendarSolid: calendarSolidIcon,
+        Export: exportIcon,
+        MoneySearch: moneySearchIcon,
+        RemoveMembers: removeMembersIcon,
+    } = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Export', 'MoneySearch', 'RemoveMembers']);
     const {processedData, shouldUseNarrowTableLayout} = useTableContext<WorkspaceCompanyCardTableItemData>();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
@@ -166,7 +171,7 @@ function WorkspaceCompanyCardsTableControls({
         if (isOnlyAssignedCardsSelected) {
             if (canWriteCompanyCards) {
                 options.push({
-                    icon: icons.RemoveMembers,
+                    icon: removeMembersIcon,
                     text: translate(isSingleAssignedCard ? 'workspace.moreFeatures.companyCards.unassignCard' : 'workspace.moreFeatures.companyCards.unassignCards'),
                     value: 'unassign',
                     shouldSkipFocusRestore: !!bankName,
@@ -174,14 +179,14 @@ function WorkspaceCompanyCardsTableControls({
                 });
             }
             options.push({
-                icon: icons.MoneySearch,
+                icon: moneySearchIcon,
                 text: translate('workspace.common.viewTransactions'),
                 value: 'viewTransactions',
                 onSelected: viewSelectedCardTransactions,
             });
             if (canWriteCompanyCards) {
                 options.push({
-                    icon: icons.CalendarSolid,
+                    icon: calendarSolidIcon,
                     text: translate('workspace.moreFeatures.companyCards.bulkUpdateTransactionStartDate'),
                     value: 'editTransactionStartDate',
                     onSelected: editSelectedCardTransactionStartDates,
@@ -190,7 +195,7 @@ function WorkspaceCompanyCardsTableControls({
         }
 
         options.push({
-            icon: icons.Export,
+            icon: exportIcon,
             text: translate('workspace.expensifyCard.exportAsCSV'),
             value: 'exportCSV',
             onSelected: exportSelectedCardsToCSV,

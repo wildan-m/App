@@ -149,7 +149,24 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
     const {clearSelectedTransactions} = useSearchSelectionActions();
     const shouldCalculateTotals = useSearchShouldCalculateTotals(currentSearchKey, true);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Send', 'ThumbsUp', 'CircularArrowBackwards', 'Clear', 'MoneyBag', 'ArrowRight', 'DocumentCheck']);
+    const {
+        Send: sendIcon,
+        ThumbsUp: thumbsUpIcon,
+        CircularArrowBackwards: circularArrowBackwardsIcon,
+        Clear: clearIcon,
+        MoneyBag: moneyBagIcon,
+        ArrowRight: arrowRightIcon,
+        DocumentCheck,
+    } = useMemoizedLazyExpensifyIcons(['Send', 'ThumbsUp', 'CircularArrowBackwards', 'Clear', 'MoneyBag', 'ArrowRight', 'DocumentCheck']);
+    const expensifyIcons = {
+        Send: sendIcon,
+        ThumbsUp: thumbsUpIcon,
+        CircularArrowBackwards: circularArrowBackwardsIcon,
+        Clear: clearIcon,
+        MoneyBag: moneyBagIcon,
+        ArrowRight: arrowRightIcon,
+        DocumentCheck,
+    };
 
     const isBlockSubmitDueToPreventSelfApproval = shouldBlockSubmitDueToPreventSelfApproval(moneyRequestReport, policy, rules);
 
@@ -354,16 +371,16 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.SUBMIT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.SUBMIT,
             text: shouldShowMarkAsDoneCopy ? translate('common.markAsDone') : translate('common.submit'),
-            icon: expensifyIcons.Send,
+            icon: sendIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SUBMIT,
             onSelected: () => handleSubmitReport(),
         },
         [CONST.REPORT.SECONDARY_ACTIONS.APPROVE]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.APPROVE,
             text: translate('iou.approve'),
-            rightIcon: shouldShowApprovalSecondaryActions ? expensifyIcons.ArrowRight : undefined,
+            rightIcon: shouldShowApprovalSecondaryActions ? arrowRightIcon : undefined,
             backButtonText: shouldShowApprovalSecondaryActions ? translate('iou.approve') : undefined,
-            icon: expensifyIcons.ThumbsUp,
+            icon: thumbsUpIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.APPROVE,
             subMenuItems: secondaryApprovalActions,
             shouldUpdateSelectedIndex: true,
@@ -374,7 +391,7 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT,
             text: translate('iou.receivedPayment'),
-            icon: expensifyIcons.MoneyBag,
+            icon: moneyBagIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.RECEIVED_PAYMENT,
             onSelected: async () => {
                 if (isDelegateAccessRestricted) {
@@ -432,7 +449,7 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.UNAPPROVE]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.UNAPPROVE,
             text: translate('iou.unapprove'),
-            icon: expensifyIcons.CircularArrowBackwards,
+            icon: circularArrowBackwardsIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.UNAPPROVE,
             onSelected: async () => {
                 if (isDelegateAccessRestricted) {
@@ -478,7 +495,7 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.CANCEL_PAYMENT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.CANCEL_PAYMENT,
             text: translate('iou.cancelPayment'),
-            icon: expensifyIcons.Clear,
+            icon: clearIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.CANCEL_PAYMENT,
             onSelected: async () => {
                 const result = await showConfirmModalAfterMoreMenuDismiss(showConfirmModal, {
@@ -499,7 +516,7 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.RETRACT]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.RETRACT,
             text: translate('iou.retract'),
-            icon: expensifyIcons.CircularArrowBackwards,
+            icon: circularArrowBackwardsIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.RETRACT,
             onSelected: async () => {
                 if (isExported) {
@@ -533,7 +550,7 @@ function useLifecycleActions({reportID, startApprovedAnimation, startAnimation, 
         [CONST.REPORT.SECONDARY_ACTIONS.REOPEN]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.REOPEN,
             text: translate('iou.retract'),
-            icon: expensifyIcons.CircularArrowBackwards,
+            icon: circularArrowBackwardsIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.REOPEN,
             onSelected: async () => {
                 if (isExported) {

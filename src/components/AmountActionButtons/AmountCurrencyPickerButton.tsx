@@ -14,7 +14,7 @@ type AmountCurrencyPickerButtonProps = Pick<ButtonProps, 'accessibilityLabel' | 
 
 /** Presentational currency selector button shared by KeypadAmountEditor and AmountFormField. */
 function AmountCurrencyPickerButton({currency, accessibilityLabel, isDisabled = false, onPress, style, testID}: AmountCurrencyPickerButtonProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['CoinsButton']);
+    const {CoinsButton: coinsButtonIcon} = useMemoizedLazyExpensifyIcons(['CoinsButton']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const buttonAccessibilityLabel = accessibilityLabel ?? `${translate('common.selectCurrency')}, ${currency}`;
@@ -31,7 +31,7 @@ function AmountCurrencyPickerButton({currency, accessibilityLabel, isDisabled = 
             style={style}
             testID={testID}
         >
-            <Button.Icon src={icons.CoinsButton} />
+            <Button.Icon src={coinsButtonIcon} />
             <Button.Text>{currency}</Button.Text>
         </Button>
     );

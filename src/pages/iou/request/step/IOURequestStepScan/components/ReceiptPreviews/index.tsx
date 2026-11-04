@@ -87,7 +87,7 @@ function ReceiptPreviewItem({item, isInLandscapeMode}: ReceiptPreviewItemProps) 
 }
 
 function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false, isInLandscapeMode = false}: ReceiptPreviewsProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const isPreviewsVisible = useSharedValue(false);
@@ -177,7 +177,7 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false, 
                         sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.RECEIPT_PREVIEW_SUBMIT_BUTTON}
                     >
                         <Button.Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.white}
                             hoverFill={theme.white}
                         />

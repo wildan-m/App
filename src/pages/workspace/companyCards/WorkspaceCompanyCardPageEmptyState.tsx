@@ -50,28 +50,28 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer, c
     const shouldShowExpensifyCardPromotionBanner = !hasIssuedExpensifyCard(workspaceAccountID, allWorkspaceCards);
     const otherFeeds = useOtherFeedsForFeedSelector(policyID);
 
-    const illustrations = useMemoizedLazyIllustrations([
-        'CreditCardsNew',
-        'HandCard',
-        'MagnifyingGlassMoney',
-        'CompanyCardsEmptyStateUSCA',
-        'CompanyCardsEmptyStateUKEU',
-        'CompanyCardsEmptyStateGeneric',
-    ]);
+    const {
+        CreditCardsNew: creditCardsNewIllustration,
+        HandCard: handCardIllustration,
+        MagnifyingGlassMoney: magnifyingGlassMoneyIllustration,
+        CompanyCardsEmptyStateUSCA: companyCardsEmptyStateUSCAIllustration,
+        CompanyCardsEmptyStateUKEU: companyCardsEmptyStateUKEUIllustration,
+        CompanyCardsEmptyStateGeneric: companyCardsEmptyStateGenericIllustration,
+    } = useMemoizedLazyIllustrations(['CreditCardsNew', 'HandCard', 'MagnifyingGlassMoney', 'CompanyCardsEmptyStateUSCA', 'CompanyCardsEmptyStateUKEU', 'CompanyCardsEmptyStateGeneric']);
 
     const features = [
         {
-            icon: illustrations.CreditCardsNew,
+            icon: creditCardsNewIllustration,
             translationKey: 'workspace.moreFeatures.companyCards.feed.features.support' as const,
         },
 
         {
-            icon: illustrations.HandCard,
+            icon: handCardIllustration,
             translationKey: 'workspace.moreFeatures.companyCards.feed.features.assignCards' as const,
         },
 
         {
-            icon: illustrations.MagnifyingGlassMoney,
+            icon: magnifyingGlassMoneyIllustration,
             translationKey: 'workspace.moreFeatures.companyCards.feed.features.automaticImport' as const,
         },
     ];
@@ -86,14 +86,14 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer, c
         const currency = policy?.outputCurrency ?? '';
 
         if (currency === CONST.CURRENCY.USD || currency === CONST.CURRENCY.CAD) {
-            return illustrations.CompanyCardsEmptyStateUSCA;
+            return companyCardsEmptyStateUSCAIllustration;
         }
 
         if (currency === CONST.CURRENCY.GBP || currency === CONST.CURRENCY.EUR) {
-            return illustrations.CompanyCardsEmptyStateUKEU;
+            return companyCardsEmptyStateUKEUIllustration;
         }
 
-        return illustrations.CompanyCardsEmptyStateGeneric;
+        return companyCardsEmptyStateGenericIllustration;
     };
 
     const continueAddCardsFlow = () => {

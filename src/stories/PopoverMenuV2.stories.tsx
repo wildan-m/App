@@ -57,24 +57,24 @@ function StoryTrigger({iconSrc, label, accessibilityLabel}: {iconSrc: React.Comp
 }
 
 function Default() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
+    const {Plus: plusIcon, Bank: bankIcon, CreditCard: creditCardIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon}
                     label="Add payment method"
                     accessibilityLabel="Open menu"
                 />
                 <PopoverMenu.Content>
                     <PopoverMenu.Item
                         text="Bank account"
-                        icon={icons.Bank}
+                        icon={bankIcon}
                         onSelect={() => {}}
                     />
                     <PopoverMenu.Item
                         text="Debit card"
-                        icon={icons.CreditCard}
+                        icon={creditCardIcon}
                         onSelect={() => {}}
                     />
                 </PopoverMenu.Content>
@@ -84,12 +84,12 @@ function Default() {
 }
 
 function WithHeader() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
+    const {Plus: plusIcon2, Bank: bankIcon2, CreditCard: creditCardIcon2} = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon2}
                     label="Pick a payment method"
                     accessibilityLabel="Open menu"
                 />
@@ -97,12 +97,12 @@ function WithHeader() {
                     <PopoverMenu.Header>Payment methods</PopoverMenu.Header>
                     <PopoverMenu.Item
                         text="Bank account"
-                        icon={icons.Bank}
+                        icon={bankIcon2}
                         onSelect={() => {}}
                     />
                     <PopoverMenu.Item
                         text="Debit card"
-                        icon={icons.CreditCard}
+                        icon={creditCardIcon2}
                         onSelect={() => {}}
                     />
                 </PopoverMenu.Content>
@@ -112,43 +112,43 @@ function WithHeader() {
 }
 
 function WithSubmenu() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard', 'Wallet']);
+    const {Plus: plusIcon3, Bank: bankIcon3, CreditCard: creditCardIcon3, Wallet: walletIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard', 'Wallet']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon3}
                     label="More"
                     accessibilityLabel="Open menu"
                 />
                 <PopoverMenu.Content>
                     <PopoverMenu.Item
                         text="Bank account"
-                        icon={icons.Bank}
+                        icon={bankIcon3}
                         onSelect={() => {}}
                     />
                     <PopoverMenu.Sub id="cards">
                         <PopoverMenu.Sub.Trigger
                             text="Cards"
-                            icon={icons.CreditCard}
+                            icon={creditCardIcon3}
                         />
                         <PopoverMenu.Sub.Content>
                             <PopoverMenu.Sub.BackButton text="Cards" />
                             <PopoverMenu.Item
                                 text="Debit card"
-                                icon={icons.CreditCard}
+                                icon={creditCardIcon3}
                                 onSelect={() => {}}
                             />
                             <PopoverMenu.Item
                                 text="Credit card"
-                                icon={icons.CreditCard}
+                                icon={creditCardIcon3}
                                 onSelect={() => {}}
                             />
                         </PopoverMenu.Sub.Content>
                     </PopoverMenu.Sub>
                     <PopoverMenu.Item
                         text="Wallet"
-                        icon={icons.Wallet}
+                        icon={walletIcon}
                         onSelect={() => {}}
                     />
                 </PopoverMenu.Content>
@@ -159,13 +159,13 @@ function WithSubmenu() {
 
 function WithRadioItems() {
     const [selected, setSelected] = React.useState('1x');
-    const icons = useMemoizedLazyExpensifyIcons(['Meter']);
+    const {Meter: meterIcon} = useMemoizedLazyExpensifyIcons(['Meter']);
     const speeds = ['0.5x', '1x', '1.5x', '2x'];
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Meter}
+                    iconSrc={meterIcon}
                     label={`Playback speed: ${selected}`}
                     accessibilityLabel="Open speed menu"
                 />
@@ -187,14 +187,14 @@ function WithRadioItems() {
 }
 
 function ScrollableVariant() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon4} = useMemoizedLazyExpensifyIcons(['Plus']);
     // 100 items exercises the documented worst case for `<ScrollableContent>` (bounded-N regime).
     const items = Array.from({length: 100}, (_, i) => `Option ${i + 1}`);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon4}
                     label="Open 100-item menu"
                     accessibilityLabel="Open long menu"
                 />
@@ -214,12 +214,18 @@ function ScrollableVariant() {
 }
 
 function GroupedWithSeparator() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard', 'Wallet', 'Trashcan']);
+    const {
+        Plus: plusIcon5,
+        Bank: bankIcon4,
+        CreditCard: creditCardIcon4,
+        Wallet: walletIcon2,
+        Trashcan: trashcanIcon,
+    } = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard', 'Wallet', 'Trashcan']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon5}
                     label="Account actions"
                     accessibilityLabel="Open menu"
                 />
@@ -227,24 +233,24 @@ function GroupedWithSeparator() {
                     <PopoverMenu.Group>
                         <PopoverMenu.Item
                             text="Bank account"
-                            icon={icons.Bank}
+                            icon={bankIcon4}
                             onSelect={() => {}}
                         />
                         <PopoverMenu.Item
                             text="Debit card"
-                            icon={icons.CreditCard}
+                            icon={creditCardIcon4}
                             onSelect={() => {}}
                         />
                         <PopoverMenu.Item
                             text="Wallet"
-                            icon={icons.Wallet}
+                            icon={walletIcon2}
                             onSelect={() => {}}
                         />
                     </PopoverMenu.Group>
                     <PopoverMenu.Separator />
                     <PopoverMenu.Item
                         text="Remove account"
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon}
                         onSelect={() => {}}
                     />
                 </PopoverMenu.Content>
@@ -254,24 +260,24 @@ function GroupedWithSeparator() {
 }
 
 function DisabledRow() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
+    const {Plus: plusIcon6, Bank: bankIcon5, CreditCard: creditCardIcon5} = useMemoizedLazyExpensifyIcons(['Plus', 'Bank', 'CreditCard']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
                 <StoryTrigger
-                    iconSrc={icons.Plus}
+                    iconSrc={plusIcon6}
                     label="Add payment method"
                     accessibilityLabel="Open menu"
                 />
                 <PopoverMenu.Content>
                     <PopoverMenu.Item
                         text="Bank account"
-                        icon={icons.Bank}
+                        icon={bankIcon5}
                         onSelect={() => {}}
                     />
                     <PopoverMenu.Item
                         text="Debit card (coming soon)"
-                        icon={icons.CreditCard}
+                        icon={creditCardIcon5}
                         onSelect={() => {}}
                         disabled
                     />
@@ -282,7 +288,7 @@ function DisabledRow() {
 }
 
 function WithSecondaryInteraction() {
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Trashcan', 'Copy']);
+    const {Plus: plusIcon7, Trashcan: trashcanIcon2, Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Trashcan', 'Copy']);
     return (
         <SafeAreaProvider>
             <PopoverMenu.Root>
@@ -294,7 +300,7 @@ function WithSecondaryInteraction() {
                         accessibilityLabel="Right-click or long-press to open menu"
                     >
                         <Icon
-                            src={icons.Plus}
+                            src={plusIcon7}
                             width={variables.iconSizeSmall}
                             height={variables.iconSizeSmall}
                         />
@@ -304,12 +310,12 @@ function WithSecondaryInteraction() {
                 <PopoverMenu.Content>
                     <PopoverMenu.Item
                         text="Copy"
-                        icon={icons.Copy}
+                        icon={copyIcon}
                         onSelect={() => {}}
                     />
                     <PopoverMenu.Item
                         text="Delete"
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon2}
                         onSelect={() => {}}
                     />
                 </PopoverMenu.Content>

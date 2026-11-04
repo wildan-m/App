@@ -91,7 +91,7 @@ type WorkspaceExpensifyCardListPageProps = {
 };
 
 function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExpensifyCardListPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Export', 'Gear', 'Plus']);
+    const {Export: exportIcon, Gear: gearIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Export', 'Gear', 'Plus']);
     const {shouldUseNarrowLayout, isMediumScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
@@ -280,7 +280,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
 
     const bulkExportOptions: Array<DropdownOption<typeof CONST.EXPENSIFY_CARD.BULK_ACTIONS.EXPORT_CSV>> = [
         {
-            icon: icons.Export,
+            icon: exportIcon,
             text: translate('workspace.expensifyCard.exportAsCSV'),
             value: CONST.EXPENSIFY_CARD.BULK_ACTIONS.EXPORT_CSV,
             onSelected: () => {
@@ -318,7 +318,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
     const secondaryActions = canWriteExpensifyCard
         ? [
               {
-                  icon: icons.Gear,
+                  icon: gearIcon,
                   text: translate('common.settings'),
                   onSelected: () => Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD_SETTINGS.getRoute(policyID)),
                   value: CONST.POLICY.SECONDARY_ACTIONS.SETTINGS,
@@ -361,7 +361,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                         hoverStyles={!canWriteExpensifyCard ? styles.buttonOpacityDisabled : undefined}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.EXPENSIFY_CARD.ISSUE_CARD_BUTTON}
                     >
-                        <Button.Icon src={icons.Plus} />
+                        <Button.Icon src={plusIcon} />
                         <Button.Text>{translate('workspace.expensifyCard.issueCard')}</Button.Text>
                     </Button>
                 )}

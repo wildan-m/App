@@ -28,19 +28,19 @@ function WiseGlobalReimbursementsBanner({onGetStartedPress, onDismissPress, sent
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['EarthWithCoins']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {EarthWithCoins: earthWithCoinsIllustration} = useMemoizedLazyIllustrations(['EarthWithCoins']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const shouldDisplayButtonInSeparateLine = shouldUseNarrowLayout && !isInLandscapeMode;
 
     return (
         <BillingBanner
-            icon={illustrations.EarthWithCoins}
+            icon={earthWithCoinsIllustration}
             title={translate('walletPage.wiseGlobalReimbursementsBanner.title')}
             subtitle={translate('walletPage.wiseGlobalReimbursementsBanner.subtitle')}
             subtitleStyle={[styles.mt1, styles.textLabel]}
             style={styles.borderRadiusComponentLarge}
-            rightIcon={expensifyIcons.Close}
+            rightIcon={closeIcon}
             onRightIconPress={onDismissPress}
             rightIconAccessibilityLabel={translate('common.dismiss')}
             rightIconTooltipText={translate('common.close')}

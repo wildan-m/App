@@ -25,7 +25,7 @@ import BillingBanner from './BillingBanner';
 function PreTrialBillingBanner() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['TreasureChest']);
+    const {TreasureChest: treasureChestIllustration} = useMemoizedLazyIllustrations(['TreasureChest']);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [onboarding] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
@@ -66,7 +66,7 @@ function PreTrialBillingBanner() {
                     />
                 </View>
             }
-            icon={illustrations.TreasureChest}
+            icon={treasureChestIllustration}
         />
     );
 }

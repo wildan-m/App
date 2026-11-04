@@ -24,7 +24,7 @@ import type {CustomRendererProps, TBlock} from 'react-native-render-html';
 import React from 'react';
 
 function ImageRenderer({tnode}: CustomRendererProps<TBlock>) {
-    const icons = useMemoizedLazyExpensifyIcons(['Document', 'GalleryNotFound']);
+    const {Document: documentIcon, GalleryNotFound: galleryNotFoundIcon} = useMemoizedLazyExpensifyIcons(['Document', 'GalleryNotFound']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
@@ -72,7 +72,7 @@ function ImageRenderer({tnode}: CustomRendererProps<TBlock>) {
     const imagePreviewModalDisabled = htmlAttribs['data-expensify-preview-modal-disabled'] === 'true';
 
     const fileType = getFileType(attachmentSourceAttribute);
-    const fallbackIcon = fileType === CONST.ATTACHMENT_FILE_TYPE.FILE ? icons.Document : icons.GalleryNotFound;
+    const fallbackIcon = fileType === CONST.ATTACHMENT_FILE_TYPE.FILE ? documentIcon : galleryNotFoundIcon;
     const theme = useTheme();
 
     let fileName = htmlAttribs[CONST.ATTACHMENT_ORIGINAL_FILENAME_ATTRIBUTE] || getFileName(`${isAttachmentOrReceipt ? attachmentSourceAttribute : htmlAttribs.src}`);

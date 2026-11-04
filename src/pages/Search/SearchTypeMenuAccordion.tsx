@@ -77,7 +77,7 @@ function AnimatedBadge({text, isExpanded}: AnimatedBadgeProps) {
 }
 
 function SearchTypeMenuAccordion({title, isExpanded, badgeText, children, onSectionHeaderPress}: SearchTypeMenuAccordionProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['UpArrow']);
+    const {UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isAccordionExpanded, shouldAnimateAccordionSection} = useAccordionAnimation(isExpanded);
@@ -144,7 +144,7 @@ function SearchTypeMenuAccordion({title, isExpanded, badgeText, children, onSect
                                 <Animated.View style={arrowAnimatedStyle}>
                                     <Icon
                                         fill={theme.icon}
-                                        src={icons.UpArrow}
+                                        src={upArrowIcon}
                                         width={variables.iconSizeSmall}
                                         height={variables.iconSizeSmall}
                                     />

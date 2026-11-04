@@ -199,7 +199,7 @@ function TableContent<DataType extends TableData, ColumnKey extends string = str
 
         turnOffMobileSelectionMode();
     };
-    const icons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
+    const {CheckSquare: checkSquareIcon} = useMemoizedLazyExpensifyIcons(['CheckSquare']);
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, addOfflineIndicatorBottomSafeAreaPadding: false});
@@ -519,7 +519,7 @@ function TableContent<DataType extends TableData, ColumnKey extends string = str
                 >
                     <View style={bottomSafeAreaPaddingStyle}>
                         <MenuItemAction
-                            icon={icons.CheckSquare}
+                            icon={checkSquareIcon}
                             title={translate('common.select')}
                             onPress={handleMobileSelectionPress}
                             testID={CONST.SELECTION_LIST_WITH_MODAL_TEST_ID}

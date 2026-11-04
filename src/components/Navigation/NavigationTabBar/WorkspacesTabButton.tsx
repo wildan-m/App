@@ -23,7 +23,7 @@ type WorkspacesTabButtonProps = {
 function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonProps) {
     const styles = useThemeStyles();
     const {translate, preferredLocale} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Buildings']);
+    const {Buildings: buildingsIcon} = useMemoizedLazyExpensifyIcons(['Buildings']);
     const {indicatorColor: workspacesTabIndicatorColor, status: workspacesTabIndicatorStatus} = useWorkspacesTabIndicatorStatus();
 
     const navigateToWorkspaces = useRestoreWorkspacesTabOnNavigate();
@@ -43,7 +43,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
             >
                 {({hovered}) => (
                     <TabBarItem
-                        icon={expensifyIcons.Buildings}
+                        icon={buildingsIcon}
                         label={translate('common.workspacesTabTitle')}
                         isSelected={selectedTab === NAVIGATION_TABS.WORKSPACES}
                         isHovered={hovered}
@@ -66,7 +66,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.WORKSPACES}
         >
             <TabBarItem
-                icon={expensifyIcons.Buildings}
+                icon={buildingsIcon}
                 label={translate('common.workspacesTabTitle')}
                 isSelected={selectedTab === NAVIGATION_TABS.WORKSPACES}
                 statusIndicatorColor={workspacesStatusIndicatorColor}

@@ -35,7 +35,7 @@ function SubmitPlanWelcomeModal() {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['ReceiptWranglerSpaceCowgirl']);
+    const {ReceiptWranglerSpaceCowgirl: receiptWranglerSpaceCowgirlIllustration} = useMemoizedLazyIllustrations(['ReceiptWranglerSpaceCowgirl']);
     const {firstName, lastName} = useCurrentUserPersonalDetails();
     const autoCreateSubmitWorkspace = useAutoCreateSubmitWorkspace();
 
@@ -61,7 +61,7 @@ function SubmitPlanWelcomeModal() {
                 shouldUseScrollView
             >
                 <FeatureTraining.Illustration
-                    image={illustrations.ReceiptWranglerSpaceCowgirl}
+                    image={receiptWranglerSpaceCowgirlIllustration}
                     contentFitImage="contain"
                     aspectRatio={variables.submitPlanWelcomeModalIllustrationAspectRatio}
                     innerContainerStyle={[styles.alignItemsCenter, styles.justifyContentCenter, styles.p5, StyleUtils.getBackgroundColorStyle(colors.yellow400)]}

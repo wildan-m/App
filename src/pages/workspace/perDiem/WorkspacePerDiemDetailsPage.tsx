@@ -50,7 +50,7 @@ function WorkspacePerDiemDetailsPage({route}: WorkspacePerDiemDetailsPageProps) 
     const selectedRate = customUnit?.rates?.[rateID];
     const fetchedSubRate = selectedRate?.subRates?.find((subRate) => subRate.id === subRateID);
     const previousFetchedSubRate = usePrevious(fetchedSubRate);
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     const selectedSubRate = fetchedSubRate ?? previousFetchedSubRate;
 
@@ -112,7 +112,7 @@ function WorkspacePerDiemDetailsPage({route}: WorkspacePerDiemDetailsPageProps) 
                     />
                     {canWritePerDiem && (
                         <MenuItemAction
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('common.delete')}
                             onPress={async () => {
                                 const {action} = await showConfirmModal({

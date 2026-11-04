@@ -50,7 +50,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {isLargeScreenWidth, isSmallScreenWidth} = useResponsiveLayout(); // eslint-disable-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Columns']);
+    const {Columns: columnsIcon} = useMemoizedLazyExpensifyIcons(['Columns']);
     const {updateFilterQueryParams} = useUpdateFilterQuery(queryJSON);
     const shouldReturnTripRooms = useShouldReturnTripRooms(queryJSON.type);
     const [searchAdvancedFilters = getEmptyObject<SearchAdvancedFiltersForm>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
@@ -143,9 +143,7 @@ function DisplayPopup({queryJSON, searchResults, closeOverlay, onSort}: DisplayP
                             sentryLabel={CONST.SENTRY_LABEL.SEARCH.COLUMNS_BUTTON}
                         >
                             <MenuItem.Row>
-                                <MenuItem.Leading>
-                                    {isSmallScreenWidth ? <MenuItem.Icon src={expensifyIcons.Columns} /> : <MenuItem.IconNarrow src={expensifyIcons.Columns} />}
-                                </MenuItem.Leading>
+                                <MenuItem.Leading>{isSmallScreenWidth ? <MenuItem.Icon src={columnsIcon} /> : <MenuItem.IconNarrow src={columnsIcon} />}</MenuItem.Leading>
                                 <MenuItem.Content>
                                     <MenuItem.Title>{translate('search.editColumns')}</MenuItem.Title>
                                 </MenuItem.Content>

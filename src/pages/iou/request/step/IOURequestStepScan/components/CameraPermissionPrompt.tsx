@@ -29,14 +29,14 @@ type CameraPermissionPromptProps = {
 function CameraPermissionPrompt({isInLandscapeMode, onPress, subtitle, sentryLabel = CONST.SENTRY_LABEL.IOU_REQUEST_STEP.SCAN_CAMERA_PERMISSION_PROMPT_BUTTON}: CameraPermissionPromptProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Hand']);
+    const {Hand: handIllustration} = useMemoizedLazyIllustrations(['Hand']);
 
     return (
         <ScrollView contentContainerStyle={styles.flexGrow1}>
             <View style={[styles.cameraView, isInLandscapeMode ? styles.permissionViewLandscape : styles.permissionView, styles.userSelectNone]}>
                 <ImageSVG
                     contentFit="contain"
-                    src={lazyIllustrations.Hand}
+                    src={handIllustration}
                     width={CONST.RECEIPT.HAND_ICON_WIDTH}
                     height={CONST.RECEIPT.HAND_ICON_HEIGHT}
                     style={styles.pb5}

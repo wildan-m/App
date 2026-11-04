@@ -90,7 +90,7 @@ function VacationDelegateForm({
 }: VacationDelegateFormProps) {
     const styles = useThemeStyles();
     const {translate, dateFnsLocale, getLocalDateFromDatetime} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Trashcan']);
+    const {CalendarSolid: calendarSolidIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Trashcan']);
     const {timezone: currentUserTimezone} = useCurrentUserPersonalDetails();
     const timezone = timezoneProp ?? currentUserTimezone?.selected;
     const [draftValues] = useOnyx(ONYXKEYS.FORMS.VACATION_DELEGATE_FORM_DRAFT);
@@ -171,7 +171,7 @@ function VacationDelegateForm({
                         label={translate('statusPage.vacationDelegate.clearAfterRecommended')}
                         defaultValue={savedClearDate}
                         minDate={getLocalDateFromDatetime(undefined, timezone)}
-                        icon={icons.CalendarSolid}
+                        icon={calendarSolidIcon}
                         shouldSaveDraft
                     />
                 </View>
@@ -196,7 +196,7 @@ function VacationDelegateForm({
                 <View style={styles.mt4}>
                     <MenuItemAction
                         title={translate('statusPage.vacationDelegate.removeDelegate')}
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon}
                         onPress={onRemove}
                     />
                 </View>

@@ -27,7 +27,7 @@ function ReceiptAudit({notes, shouldShowAuditResult, hasReceiptUploadError = fal
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'DotIndicator']);
+    const {Checkmark: checkmarkIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'DotIndicator']);
 
     const hasIssues = hasReceiptUploadError || notes.length > 0;
     let auditText = '';
@@ -54,7 +54,7 @@ function ReceiptAudit({notes, shouldShowAuditResult, hasReceiptUploadError = fal
                         <Icon
                             width={12}
                             height={12}
-                            src={hasIssues ? icons.DotIndicator : icons.Checkmark}
+                            src={hasIssues ? dotIndicatorIcon : checkmarkIcon}
                             fill={hasIssues ? theme.danger : theme.success}
                             additionalStyles={styles.ml1}
                         />

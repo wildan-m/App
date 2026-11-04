@@ -11,7 +11,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 function AccessMoneyRequestReportPreviewPlaceHolder() {
-    const icons = useMemoizedLazyExpensifyIcons(['EyeDisabled']);
+    const {EyeDisabled: eyeDisabledIcon} = useMemoizedLazyExpensifyIcons(['EyeDisabled']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -25,7 +25,7 @@ function AccessMoneyRequestReportPreviewPlaceHolder() {
                         fill={theme.border}
                         height={64}
                         width={64}
-                        src={icons.EyeDisabled}
+                        src={eyeDisabledIcon}
                     />
                     <Text style={[styles.textAlignCenter, styles.textSupporting, styles.fontSizeLabel]}>{translate('search.moneyRequestReport.accessPlaceHolder')}</Text>
                 </View>

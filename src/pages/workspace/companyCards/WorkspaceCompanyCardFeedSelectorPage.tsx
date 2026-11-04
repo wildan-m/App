@@ -74,7 +74,7 @@ function WorkspaceCompanyCardFeedSelectorPage({route}: WorkspaceCompanyCardFeedS
     const companyCardFeedIcons = useCompanyCardFeedIcons();
     const {isBlockedToAddNewFeeds} = useIsBlockedToAddFeed(policyID);
     const {canWrite: canWriteCompanyCards} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.COMPANY_CARDS);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const [feedWithError, setFeedWithError] = useState<{feed?: string; error?: Errors} | undefined>(undefined);
 
     const {companyCardFeeds: liveCompanyCardFeeds, feedName: selectedFeedName} = useCompanyCards({policyID});
@@ -227,7 +227,7 @@ function WorkspaceCompanyCardFeedSelectorPage({route}: WorkspaceCompanyCardFeedS
         <View style={[styles.w100, styles.flexColumn]}>
             <MenuItemAction
                 title={translate('workspace.companyCards.addCards')}
-                icon={icons.Plus}
+                icon={plusIcon}
                 onPress={onAddCardsPress}
                 sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.ACCOUNTING.CARD_SECTION_ADD_BUTTON}
             />

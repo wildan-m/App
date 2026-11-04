@@ -46,7 +46,7 @@ function SpendRuleSelectionPage({route}: SpendRuleSelectionPageProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+    const {EmptyShelves: emptyShelvesIllustration2} = useMemoizedLazyIllustrations(['EmptyShelves']);
     const {cardRules, isLoadingCardRules} = useExpensifyCardRules(policyID);
     const [issueCardForm, issueCardFormMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD}${policyID}`);
 
@@ -155,7 +155,7 @@ function SpendRuleSelectionPage({route}: SpendRuleSelectionPageProps) {
                         addBottomSafeAreaPadding
                     >
                         <GenericEmptyStateComponent
-                            headerMedia={illustrations.EmptyShelves}
+                            headerMedia={emptyShelvesIllustration2}
                             headerContentStyles={styles.emptyShelvesIllustration}
                             title={translate('workspace.card.issueNewCard.spendRulesEmptyStateTitle')}
                             subtitle={translate('workspace.card.issueNewCard.spendRulesEmptyStateSubtitle')}

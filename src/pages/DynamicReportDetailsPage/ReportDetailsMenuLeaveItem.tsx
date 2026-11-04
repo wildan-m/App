@@ -34,7 +34,7 @@ type ReportDetailsMenuLeaveItemProps = {
 
 function ReportDetailsMenuLeaveItem({reportID}: ReportDetailsMenuLeaveItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Exit']);
+    const {Exit: exitIcon} = useMemoizedLazyExpensifyIcons(['Exit']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
@@ -125,7 +125,7 @@ function ReportDetailsMenuLeaveItem({reportID}: ReportDetailsMenuLeaveItemProps)
         >
             <MenuItem.Row>
                 <MenuItem.Leading>
-                    <MenuItem.Icon src={expensifyIcons.Exit} />
+                    <MenuItem.Icon src={exitIcon} />
                 </MenuItem.Leading>
                 <MenuItem.Content>
                     <MenuItem.Title>{translate('common.leave')}</MenuItem.Title>

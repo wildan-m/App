@@ -22,7 +22,7 @@ export default function TableNoResultsState(emptyStateProps: TableNoResultsState
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isEmptyResult, isDefaultViewEmpty, tableListMetadata} = useTableContext();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+    const {EmptyShelves: emptyShelvesIllustration2} = useMemoizedLazyIllustrations(['EmptyShelves']);
 
     // The default view hiding every row is not a search/filter result, so the empty state handles it instead.
     if (!isEmptyResult || isDefaultViewEmpty) {
@@ -31,7 +31,7 @@ export default function TableNoResultsState(emptyStateProps: TableNoResultsState
 
     const content = (
         <GenericEmptyStateComponent
-            headerMedia={illustrations.EmptyShelves}
+            headerMedia={emptyShelvesIllustration2}
             headerContentStyles={styles.emptyShelvesIllustration}
             headerStyles={styles.emptyStateCardIllustrationContainer}
             title={translate('common.noResultsFound')}

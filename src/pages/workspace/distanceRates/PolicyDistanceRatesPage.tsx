@@ -66,7 +66,13 @@ function PolicyDistanceRatesPage({
         params: {policyID},
     },
 }: PolicyDistanceRatesPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Gear', 'Plus', 'Trashcan']);
+    const {
+        Checkmark: checkmarkIcon,
+        Close: closeIcon,
+        Gear: gearIcon,
+        Plus: plusIcon,
+        Trashcan: trashcanIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Gear', 'Plus', 'Trashcan']);
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const styles = useThemeStyles();
     const {pageGutter} = useLayoutSpacing();
@@ -322,7 +328,7 @@ function PolicyDistanceRatesPage({
             {
                 text: translate('workspace.distanceRates.deleteRates', {count: selectedDistanceRates.length}),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 shouldSkipFocusRestore: true,
                 onSelected: async () => {
                     if (!canDisableOrDeleteSelectedRates) {
@@ -348,7 +354,7 @@ function PolicyDistanceRatesPage({
             options.push({
                 text: translate('workspace.distanceRates.disableRates', {count: enabledRates.length}),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
-                icon: icons.Close,
+                icon: closeIcon,
                 shouldSkipFocusRestore: !canDisableOrDeleteSelectedRates,
                 onSelected: () => (canDisableOrDeleteSelectedRates ? disableRates() : showWarningModal()),
             });
@@ -359,7 +365,7 @@ function PolicyDistanceRatesPage({
             options.push({
                 text: translate('workspace.distanceRates.enableRates', {count: disabledRates.length}),
                 value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
-                icon: icons.Checkmark,
+                icon: checkmarkIcon,
                 onSelected: enableRates,
             });
         }
@@ -371,7 +377,7 @@ function PolicyDistanceRatesPage({
 
     const secondaryActions = [
         {
-            icon: icons.Gear,
+            icon: gearIcon,
             text: translate('common.settings'),
             onSelected: openSettings,
             value: CONST.POLICY.SECONDARY_ACTIONS.SETTINGS,
@@ -390,7 +396,7 @@ function PolicyDistanceRatesPage({
                         style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                         variant={CONST.BUTTON_VARIANT.SUCCESS}
                     >
-                        <Button.Icon src={icons.Plus} />
+                        <Button.Icon src={plusIcon} />
                         <Button.Text>{translate('workspace.distanceRates.addRate')}</Button.Text>
                     </Button>
                     <ButtonWithDropdownMenu

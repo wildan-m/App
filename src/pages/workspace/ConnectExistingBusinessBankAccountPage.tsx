@@ -36,7 +36,7 @@ import {View} from 'react-native';
 type ConnectExistingBusinessBankAccountPageProps = PlatformStackScreenProps<ConnectExistingBankAccountNavigatorParamList, typeof SCREENS.CONNECT_EXISTING_BUSINESS_BANK_ACCOUNT_ROOT>;
 
 function ConnectExistingBusinessBankAccountPage({route}: ConnectExistingBusinessBankAccountPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const policyID = route.params?.policyID;
     const backTo = route.params?.backTo;
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -136,7 +136,7 @@ function ConnectExistingBusinessBankAccountPage({route}: ConnectExistingBusiness
                         onAddBankAccountPress={handleAddBankAccountPress}
                         style={[styles.mt5, styles.mhn5]}
                         listItemStyle={styles.ph5}
-                        itemIconRight={icons.ArrowRight}
+                        itemIconRight={arrowRightIcon}
                         filterType={CONST.BANK_ACCOUNT.TYPE.BUSINESS}
                         filterCurrency={policyCurrency}
                         excludeStates={[CONST.BANK_ACCOUNT.STATE.LOCKED]}

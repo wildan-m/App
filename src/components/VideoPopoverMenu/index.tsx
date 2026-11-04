@@ -14,7 +14,7 @@ function VideoPopoverMenu() {
     const {isOffline} = useNetwork();
     const {currentPlaybackSpeed, isLocalFile} = useVideoPopoverMenuState();
     const {updatePlaybackSpeed, downloadAttachment} = useVideoPopoverMenuActions();
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'Meter']);
+    const {Download: downloadIcon, Meter: meterIcon} = useMemoizedLazyExpensifyIcons(['Download', 'Meter']);
 
     const showDownload = !isOffline && !isLocalFile;
     const playbackSpeedLabel = translate('videoPlayer.playbackSpeed');
@@ -25,14 +25,14 @@ function VideoPopoverMenu() {
             {showDownload && (
                 <Item
                     text={translate('common.download')}
-                    icon={icons.Download}
+                    icon={downloadIcon}
                     onSelect={downloadAttachment}
                 />
             )}
             <Sub id="playbackSpeed">
                 <Sub.Trigger
                     text={playbackSpeedLabel}
-                    icon={icons.Meter}
+                    icon={meterIcon}
                 />
                 <Sub.Content>
                     <Sub.BackButton text={playbackSpeedLabel} />

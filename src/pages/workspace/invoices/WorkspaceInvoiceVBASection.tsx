@@ -50,7 +50,7 @@ type CurrencyType = TupleToUnion<typeof CONST.DIRECT_REIMBURSEMENT_CURRENCIES>;
 
 // TODO: can be refactored to use ThreeDotsMenu component instead handling the popover and positioning
 function WorkspaceInvoiceVBASection({policyID, canWriteMoreFeatures, showReadOnlyModal}: WorkspaceInvoiceVBASectionProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Star', 'Trashcan']);
+    const {Star: starIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Star', 'Trashcan']);
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {cardPaddingHorizontal, cardEdgeToEdge} = useLayoutSpacing();
@@ -210,7 +210,7 @@ function WorkspaceInvoiceVBASection({policyID, canWriteMoreFeatures, showReadOnl
     if (shouldShowMakeDefaultButton) {
         items.push({
             text: translate('walletPage.setDefaultConfirmation'),
-            icon: icons.Star,
+            icon: starIcon,
             onSelected: () => {
                 makeDefaultPaymentMethod();
             },
@@ -219,7 +219,7 @@ function WorkspaceInvoiceVBASection({policyID, canWriteMoreFeatures, showReadOnl
     }
     items.push({
         text: translate('common.delete'),
-        icon: icons.Trashcan,
+        icon: trashcanIcon,
         onSelected: () => {
             closeModal(() => {
                 showConfirmModal({

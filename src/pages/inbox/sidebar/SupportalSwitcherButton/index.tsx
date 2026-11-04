@@ -45,7 +45,7 @@ function SupportalSwitcherButton({isSidebarHovered}: SupportalSwitcherButtonProp
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['UserSearch']);
+    const {UserSearch: userSearchIcon} = useMemoizedLazyExpensifyIcons(['UserSearch']);
     const {calculatePopoverPosition} = usePopoverPosition();
     const {isOffline} = useNetwork();
 
@@ -140,7 +140,7 @@ function SupportalSwitcherButton({isSidebarHovered}: SupportalSwitcherButtonProp
                                 ]}
                             >
                                 <Icon
-                                    src={icons.UserSearch}
+                                    src={userSearchIcon}
                                     fill={theme.icon}
                                     width={variables.iconSizeSmall}
                                     height={variables.iconSizeSmall}

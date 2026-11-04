@@ -37,10 +37,10 @@ function useMergeProviderCardDetails({card, policy, handleConnect, canWriteMoreF
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['Sync', 'Trashcan', 'Building', 'CheckCircle']);
+    const {Sync: syncIcon, Trashcan: trashcanIcon, Building: buildingIcon, CheckCircle: checkCircleIcon} = useMemoizedLazyExpensifyIcons(['Sync', 'Trashcan', 'Building', 'CheckCircle']);
     const {showConfirmModal} = useConfirmModal();
 
-    const fallbackIcon = icons.Building;
+    const fallbackIcon = buildingIcon;
     const cardIcon = card.icon || fallbackIcon;
 
     let connectionDescription: string;
@@ -96,7 +96,7 @@ function useMergeProviderCardDetails({card, policy, handleConnect, canWriteMoreF
     const getPrimaryMenuItem = (): ThreeDotsMenuProps['menuItems'][number] => {
         if (card.needsReconnect) {
             return {
-                icon: icons.Sync,
+                icon: syncIcon,
                 text: translate('workspace.merge.reconnect'),
                 onSelected: handleConnect,
                 disabled: isOffline,
@@ -104,7 +104,7 @@ function useMergeProviderCardDetails({card, policy, handleConnect, canWriteMoreF
         }
         if (card.completeSetupRoute) {
             return {
-                icon: icons.CheckCircle,
+                icon: checkCircleIcon,
                 text: translate('workspace.merge.completeSetup'),
                 onSelected: () => {
                     if (!canWriteMoreFeatures) {
@@ -119,7 +119,7 @@ function useMergeProviderCardDetails({card, policy, handleConnect, canWriteMoreF
             };
         }
         return {
-            icon: icons.Sync,
+            icon: syncIcon,
             text: translate('workspace.merge.syncNow'),
             onSelected: () => {
                 if (showMergeManualSyncLimitModalIfReached(policy, card.connectionName, translate, showConfirmModal)) {
@@ -135,7 +135,7 @@ function useMergeProviderCardDetails({card, policy, handleConnect, canWriteMoreF
     const overflowMenu: ThreeDotsMenuProps['menuItems'] = [
         getPrimaryMenuItem(),
         {
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             text: translate('workspace.merge.disconnect'),
             onSelected: () => {
                 showConfirmModal({

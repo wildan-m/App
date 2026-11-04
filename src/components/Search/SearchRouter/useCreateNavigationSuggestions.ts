@@ -94,7 +94,32 @@ function openBookTravel(policyID: string | undefined, isTravelEnabled: boolean) 
 function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceItem[] {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Coins', 'Receipt', 'Cash', 'Transfer', 'MoneyCircle', 'Location', 'Document', 'ChatBubble', 'InvoiceGeneric', 'Suitcase', 'NewWorkspace']);
+    const {
+        Coins,
+        Receipt,
+        Cash,
+        Transfer,
+        MoneyCircle,
+        Location: locationIcon,
+        Document: documentIcon,
+        ChatBubble: chatBubbleIcon,
+        InvoiceGeneric: invoiceGenericIcon,
+        Suitcase: suitcaseIcon,
+        NewWorkspace: newWorkspaceIcon,
+    } = useMemoizedLazyExpensifyIcons(['Coins', 'Receipt', 'Cash', 'Transfer', 'MoneyCircle', 'Location', 'Document', 'ChatBubble', 'InvoiceGeneric', 'Suitcase', 'NewWorkspace']);
+    const icons = {
+        Coins,
+        Receipt,
+        Cash,
+        Transfer,
+        MoneyCircle,
+        Location: locationIcon,
+        Document: documentIcon,
+        ChatBubble: chatBubbleIcon,
+        InvoiceGeneric: invoiceGenericIcon,
+        Suitcase: suitcaseIcon,
+        NewWorkspace: newWorkspaceIcon,
+    };
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencyDecimals} = useCurrencyListActions();
     const {isBetaEnabled} = usePermissions();
@@ -196,7 +221,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: isCreateReportVisible,
             text: translate('report.newReport.createReport'),
-            icon: icons.Document,
+            icon: documentIcon,
             matchTerms: createReportMatchTerms,
             action: () => replaceTopmostModalWithAction(createReport),
             keyForList: 'create_report',
@@ -204,7 +229,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: true,
             text: translate('iou.trackDistance'),
-            icon: icons.Location,
+            icon: locationIcon,
             matchTerms: trackDistanceMatchTerms,
             action: () =>
                 replaceTopmostModalWithAction(() => {
@@ -217,7 +242,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: true,
             text: translate('sidebarScreen.fabNewChat'),
-            icon: icons.ChatBubble,
+            icon: chatBubbleIcon,
             matchTerms: chatMatchTerms,
             action: () =>
                 replaceTopmostModalWithAction(() => {
@@ -233,7 +258,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: isInvoiceVisible,
             text: translate('workspace.invoices.sendInvoice'),
-            icon: icons.InvoiceGeneric,
+            icon: invoiceGenericIcon,
             matchTerms: invoiceMatchTerms,
             action: () =>
                 replaceTopmostModalWithAction(() => {
@@ -246,7 +271,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: isTravelVisible,
             text: bookTravelLabel,
-            icon: icons.Suitcase,
+            icon: suitcaseIcon,
             matchTerms: travelMatchTerms,
             action: () =>
                 replaceTopmostModalWithAction(() => {
@@ -257,7 +282,7 @@ function useCreateNavigationSuggestions(query = ''): NavigationSuggestionSourceI
         {
             visible: shouldShowNewWorkspaceButton,
             text: translate('workspace.new.newWorkspace'),
-            icon: icons.NewWorkspace,
+            icon: newWorkspaceIcon,
             matchTerms: workspaceMatchTerms,
             action: () =>
                 replaceTopmostModalWithAction(() => {

@@ -25,7 +25,7 @@ type WorkspaceAdminRestrictedActionProps = {
 };
 
 function WorkspaceAdminRestrictedAction({policyID}: WorkspaceAdminRestrictedActionProps) {
-    const illustrations = useMemoizedLazyIllustrations(['LockClosedOrange']);
+    const {LockClosedOrange: lockClosedOrangeIllustration} = useMemoizedLazyIllustrations(['LockClosedOrange']);
     const {translate} = useLocalize();
     const policy = usePolicy(policyID);
     const styles = useThemeStyles();
@@ -51,7 +51,7 @@ function WorkspaceAdminRestrictedAction({policyID}: WorkspaceAdminRestrictedActi
             >
                 <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.mb15]}>
                     <ImageSVG
-                        src={illustrations.LockClosedOrange}
+                        src={lockClosedOrangeIllustration}
                         width={variables.restrictedActionIllustrationHeight}
                         height={variables.restrictedActionIllustrationHeight}
                     />

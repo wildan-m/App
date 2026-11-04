@@ -44,7 +44,7 @@ import {View} from 'react-native';
 const initialEmoji = '💬';
 
 function StatusPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Trashcan']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -216,7 +216,7 @@ function StatusPage() {
                     {(!!currentUserEmojiCode || !!currentUserStatusText) && (
                         <MenuItemAction
                             title={translate('statusPage.clearStatus')}
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             onPress={clearStatus}
                         />
                     )}

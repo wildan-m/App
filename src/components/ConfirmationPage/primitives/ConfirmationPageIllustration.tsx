@@ -23,7 +23,7 @@ type ConfirmationPageIllustrationProps = {
 function ConfirmationPageIllustration({illustration = LottieAnimations.Fireworks, illustrationStyle}: ConfirmationPageIllustrationProps) {
     const styles = useThemeStyles();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Fireworks']);
+    const {Fireworks: fireworksIllustration} = useMemoizedLazyIllustrations(['Fireworks']);
     const isLottie = isIllustrationLottieAnimation(illustration);
     const flattenedIllustrationStyle = StyleSheet.flatten(illustrationStyle);
     const flattenedIllustrationWidth = flattenedIllustrationStyle?.width;
@@ -37,7 +37,7 @@ function ConfirmationPageIllustration({illustration = LottieAnimations.Fireworks
         return (
             <View style={[styles.confirmationAnimation, illustrationStyle]}>
                 <ImageSVG
-                    src={illustrations.Fireworks}
+                    src={fireworksIllustration}
                     contentFit="contain"
                     aria-hidden
                 />

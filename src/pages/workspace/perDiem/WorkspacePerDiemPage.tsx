@@ -108,7 +108,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
     useWorkspaceDocumentTitle(policy?.name, 'workspace.common.perDiem');
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Gear', 'Table', 'Download', 'Trashcan']);
+    const {Gear: gearIcon, Table: tableIcon, Download: downloadIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Gear', 'Table', 'Download', 'Trashcan']);
 
     const customUnits = getPerDiemCustomUnit(policy);
     const customUnitRates: Record<string, Rate> = customUnits?.rates ?? {};
@@ -215,7 +215,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
     const menuItems = [];
     if (canWritePerDiem && policy?.areCategoriesEnabled && hasEnabledOptions(policyCategories ?? {})) {
         menuItems.push({
-            icon: expensifyIcons.Gear,
+            icon: gearIcon,
             text: translate('common.settings'),
             onSelected: openSettings,
             value: CONST.POLICY.SECONDARY_ACTIONS.SETTINGS,
@@ -223,7 +223,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
     }
     if (canWritePerDiem) {
         menuItems.push({
-            icon: expensifyIcons.Table,
+            icon: tableIcon,
             text: translate('spreadsheet.importSpreadsheet'),
             onSelected: () => {
                 if (isOffline) {
@@ -238,7 +238,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
     // Admins can download the CSV before adding rates, to use it as an import template
     if (hasVisibleSubRates || canWritePerDiem) {
         menuItems.push({
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             text: translate('spreadsheet.downloadCSV'),
             onSelected: () => {
                 if (isOffline) {
@@ -259,7 +259,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
 
         if (canWritePerDiem && (shouldUseNarrowLayout ? isMobileSelectionModeEnabled : selectedSubRateKeys.length > 0)) {
             options.push({
-                icon: expensifyIcons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('workspace.perDiem.deleteRates', {count: selectedSubRateKeys.length}),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
                 shouldSkipFocusRestore: true,

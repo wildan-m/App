@@ -32,7 +32,7 @@ function Waypoints({unit, isInLandscapeMode, action, iouType, transactionID, rep
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
     const {translate} = useLocalize();
 
-    const icons = useMemoizedLazyExpensifyIcons(['Location', 'DotIndicatorUnfilled']);
+    const {Location: locationIcon, DotIndicatorUnfilled: dotIndicatorUnfilledIcon} = useMemoizedLazyExpensifyIcons(['Location', 'DotIndicatorUnfilled']);
 
     // eslint-disable-next-line rulesdir/no-negated-variables
     const isTripNotInitialized = getTotalGpsTripPoints(gpsDraftDetails) === 0 && !gpsDraftDetails?.isTracking;
@@ -84,7 +84,7 @@ function Waypoints({unit, isInLandscapeMode, action, iouType, transactionID, rep
                 description={translate('gps.start')}
                 shouldShowLoadingSpinnerIcon={shouldShowLoadingStartAddress}
                 title={shouldShowLoadingStartAddress ? '...' : firstPoint?.address?.value}
-                icon={icons.DotIndicatorUnfilled}
+                icon={dotIndicatorUnfilledIcon}
                 style={styles.pv3}
                 shouldIconUseAutoWidthStyle
             />
@@ -94,7 +94,7 @@ function Waypoints({unit, isInLandscapeMode, action, iouType, transactionID, rep
                 description={translate('gps.stop')}
                 shouldShowLoadingSpinnerIcon={shouldShowLoadingEndAddress}
                 title={getEndAddressTitle()}
-                icon={icons.Location}
+                icon={locationIcon}
                 style={styles.pv3}
                 shouldIconUseAutoWidthStyle
             />

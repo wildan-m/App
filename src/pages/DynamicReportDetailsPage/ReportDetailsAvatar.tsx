@@ -48,7 +48,7 @@ function ReportDetailsAvatarContent({report}: ReportDetailsAvatarContentProps) {
     const reportID = report.reportID;
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera']);
+    const {Camera: cameraIcon} = useMemoizedLazyExpensifyIcons(['Camera']);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [pendingDeleteMemberAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`, {selector: pendingDeleteMemberAccountIDsSelector});
@@ -123,7 +123,7 @@ function ReportDetailsAvatarContent({report}: ReportDetailsAvatarContentProps) {
                 updateGroupChatAvatar(report.reportID, report.avatarUrl);
             }}
             onImageSelected={(file) => updateGroupChatAvatar(report.reportID, report.avatarUrl, file)}
-            editIcon={expensifyIcons.Camera}
+            editIcon={cameraIcon}
             editIconStyle={styles.smallEditIconAccount}
             pendingAction={report.pendingFields?.avatar ?? undefined}
             errors={report.errorFields?.avatar ?? null}

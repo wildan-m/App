@@ -24,7 +24,7 @@ type RoomMembersTableRowProps = {
 export default function RoomMembersTableRow({item, rowIndex}: RoomMembersTableRowProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
     const accessibilityLabel = `${item.name}, ${item.email}`;
 
@@ -66,7 +66,7 @@ export default function RoomMembersTableRow({item, rowIndex}: RoomMembersTableRo
                     </View>
 
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={theme.icon}
                         additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                         width={variables.iconSizeNormal}

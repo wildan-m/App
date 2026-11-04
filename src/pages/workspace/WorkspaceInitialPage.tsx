@@ -105,7 +105,32 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
     const {shouldShowEnterCredentialsError} = useGetReceiptPartnersIntegrationData(policyID);
     const {shouldShowRbrForWorkspaceAccountID} = useCardFeedErrors();
     const hasApprovalWorkflowWithNonMemberApprover = useHasApprovalWorkflowWithNonMemberApprover(policyID);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Building,
+        CalendarSolid,
+        Car,
+        Coins,
+        CreditCard,
+        Document,
+        ExpensifyAppIcon: expensifyAppIconIcon,
+        ExpensifyCard,
+        Folder,
+        Gear,
+        Hashtag,
+        InvoiceGeneric,
+        Receipt,
+        Briefcase,
+        Sync,
+        Connect,
+        Tag,
+        Users,
+        Workflows,
+        LuggageWithLines,
+        Clock,
+        Bolt,
+        Bot,
+        UserPlus,
+    } = useMemoizedLazyExpensifyIcons([
         'Building',
         'CalendarSolid',
         'Car',
@@ -131,13 +156,39 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
         'Bot',
         'UserPlus',
     ]);
+    const expensifyIcons = {
+        Building,
+        CalendarSolid,
+        Car,
+        Coins,
+        CreditCard,
+        Document,
+        ExpensifyAppIcon: expensifyAppIconIcon,
+        ExpensifyCard,
+        Folder,
+        Gear,
+        Hashtag,
+        InvoiceGeneric,
+        Receipt,
+        Briefcase,
+        Sync,
+        Connect,
+        Tag,
+        Users,
+        Workflows,
+        LuggageWithLines,
+        Clock,
+        Bolt,
+        Bot,
+        UserPlus,
+    };
 
     const policyName = policy?.name ?? '';
     const hasPolicyCreationError = policy?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD && !isEmptyObject(policy.errors);
     const shouldShowRBR = shouldShowRbrForWorkspaceAccountID[workspaceAccountID];
 
     const policyAvatar = !policy
-        ? {source: expensifyIcons.ExpensifyAppIcon, name: CONST.EXPENSIFY_ICON_NAME, type: CONST.ICON_TYPE_AVATAR}
+        ? {source: expensifyAppIconIcon, name: CONST.EXPENSIFY_ICON_NAME, type: CONST.ICON_TYPE_AVATAR}
         : {
               source: policy.avatarURL ?? '',
               name: policy.name ?? '',

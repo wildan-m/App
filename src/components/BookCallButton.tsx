@@ -33,7 +33,7 @@ type BookCallButtonProps = {
 function BookCallButton({calendarLink, avatarAccountID, isNested = false, style}: BookCallButtonProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Phone']);
+    const {Phone: phoneIcon} = useMemoizedLazyExpensifyIcons(['Phone']);
     const personalDetails = usePersonalDetails();
     const avatarDetails = avatarAccountID ? personalDetails?.[avatarAccountID] : undefined;
 
@@ -54,7 +54,7 @@ function BookCallButton({calendarLink, avatarAccountID, isNested = false, style}
     if (!avatarAccountID) {
         return (
             <Button {...commonProps}>
-                <Button.Icon src={icons.Phone} />
+                <Button.Icon src={phoneIcon} />
                 <Button.Text>{label}</Button.Text>
             </Button>
         );

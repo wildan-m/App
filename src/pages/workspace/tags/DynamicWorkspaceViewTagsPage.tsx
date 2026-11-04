@@ -71,7 +71,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const styles = useThemeStyles();
     const {pageGutter} = useLayoutSpacing();
-    const icons = useMemoizedLazyExpensifyIcons(['Close', 'Checkmark', 'Trashcan']);
+    const {Close: closeIcon, Checkmark: checkmarkIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Close', 'Checkmark', 'Trashcan']);
     const {translate} = useLocalize();
     const {isBetaEnabledOrUnknown} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
@@ -198,7 +198,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
 
         if (!isThereAnyAccountingConnection && !isMultiLevelTags && selectedTags.length > 0) {
             options.push({
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 text: translate(selectedTags.length === 1 ? 'workspace.tags.deleteTag' : 'workspace.tags.deleteTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
                 shouldSkipFocusRestore: true,
@@ -241,7 +241,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
         if (enabledTagCount > 0) {
             const selectedTagsObject = selectedTags.map((key) => currentPolicyTag?.tags[key]);
             options.push({
-                icon: icons.Close,
+                icon: closeIcon,
                 text: translate(enabledTagCount === 1 ? 'workspace.tags.disableTag' : 'workspace.tags.disableTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
                 shouldSkipFocusRestore: isDisablingOrDeletingLastEnabledTag(currentPolicyTag, selectedTagsObject),
@@ -263,7 +263,7 @@ function DynamicWorkspaceViewTagsPage({route}: DynamicWorkspaceViewTagsProps) {
 
         if (disabledTagCount > 0) {
             options.push({
-                icon: icons.Checkmark,
+                icon: checkmarkIcon,
                 text: translate(disabledTagCount === 1 ? 'workspace.tags.enableTag' : 'workspace.tags.enableTags'),
                 value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
                 onSelected: () => {

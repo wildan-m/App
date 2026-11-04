@@ -64,7 +64,7 @@ function IOURequestStepOdometerImage({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['OdometerStart', 'OdometerEnd']);
+    const {OdometerStart: odometerStartIcon, OdometerEnd: odometerEndIcon} = useMemoizedLazyExpensifyIcons(['OdometerStart', 'OdometerEnd']);
 
     const viewfinderLayout = useRef<LayoutRectangle>(null);
     // Ref for double-tap protection
@@ -100,7 +100,7 @@ function IOURequestStepOdometerImage({
 
     const title = imageType === 'start' ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
     const snapPhotoText = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.snapPhotoStart') : translate('distance.odometer.snapPhotoEnd');
-    const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? lazyIcons.OdometerStart : lazyIcons.OdometerEnd;
+    const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? odometerStartIcon : odometerEndIcon;
 
     const goBackRoute =
         isEditingConfirmation === 'true'

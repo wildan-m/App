@@ -95,7 +95,7 @@ export default function AgentsTable({
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot', 'AiBot']);
+    const {TvScreenRobot: tvScreenRobotIllustration} = useMemoizedLazyIllustrations(['TvScreenRobot', 'AiBot']);
 
     const [areAgentsLoaded] = useOnyx(ONYXKEYS.ARE_AGENTS_LOADED);
 
@@ -199,7 +199,7 @@ export default function AgentsTable({
         >
             <Table.ListHeader>{tableHeaderComponent}</Table.ListHeader>
             <Table.EmptyState
-                headerMedia={illustrations.TvScreenRobot}
+                headerMedia={tvScreenRobotIllustration}
                 headerStyles={styles.emptyStateCardIllustrationContainer}
                 headerContentStyles={styles.agentsPageEmptyStateIllustration}
                 title={translate('agentsPage.emptyAgents.title')}

@@ -102,7 +102,13 @@ function VerifiedBankAccountFlowEntryPoint({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bank', 'Connect', 'Lightbulb', 'Lock', 'RotateLeft']);
+    const {
+        Bank: bankIcon,
+        Connect: connectIcon,
+        Lightbulb: lightbulbIcon,
+        Lock: lockIcon,
+        RotateLeft: rotateLeftIcon,
+    } = useMemoizedLazyExpensifyIcons(['Bank', 'Connect', 'Lightbulb', 'Lock', 'RotateLeft']);
 
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
@@ -263,7 +269,7 @@ function VerifiedBankAccountFlowEntryPoint({
                     {!!personalBankAccounts.length && (
                         <View style={[styles.flexRow, styles.mt4, styles.alignItemsCenter, styles.pb1, styles.pt1]}>
                             <Icon
-                                src={expensifyIcons.Lightbulb}
+                                src={lightbulbIcon}
                                 fill={theme.icon}
                                 additionalStyles={styles.mr2}
                                 size={CONST.ICON_SIZE.MEDIUM}
@@ -289,21 +295,21 @@ function VerifiedBankAccountFlowEntryPoint({
                             >
                                 <MenuItemNavigation
                                     title={translate('workspace.bankAccount.continueWithSetup')}
-                                    icon={expensifyIcons.Connect}
+                                    icon={connectIcon}
                                     onPress={onContinuePress}
                                     isDisabled={!!pendingAction || (!isEmptyObject(errors) && !reimbursementAccount?.maxAttemptsReached)}
                                 />
                                 {shouldShowChangeBankAccount && (
                                     <MenuItemNavigation
                                         title={translate('workspace.bankAccount.changeBankAccount')}
-                                        icon={expensifyIcons.Bank}
+                                        icon={bankIcon}
                                         onPress={handleChangeBankAccount}
                                         isDisabled={!!pendingAction || (!isEmptyObject(errors) && !reimbursementAccount?.maxAttemptsReached)}
                                     />
                                 )}
                                 <MenuItemNavigation
                                     title={translate('workspace.bankAccount.startOver')}
-                                    icon={expensifyIcons.RotateLeft}
+                                    icon={rotateLeftIcon}
                                     onPress={requestResetBankAccount}
                                     isDisabled={!!pendingAction || (!isEmptyObject(errors) && !reimbursementAccount?.maxAttemptsReached)}
                                 />
@@ -313,14 +319,14 @@ function VerifiedBankAccountFlowEntryPoint({
                                 {!isNonUSDWorkspace && !shouldShowContinueSetupButton && (
                                     <MenuItemNavigation
                                         title={translate('bankAccount.connectOnlineWithPlaid')}
-                                        icon={expensifyIcons.Bank}
+                                        icon={bankIcon}
                                         isDisabled={!!isPlaidDisabled}
                                         onPress={handleConnectPlaid}
                                     />
                                 )}
                                 <MenuItemNavigation
                                     title={translate('bankAccount.connectManually')}
-                                    icon={expensifyIcons.Connect}
+                                    icon={connectIcon}
                                     onPress={handleConnectManually}
                                 />
                             </View>
@@ -338,7 +344,7 @@ function VerifiedBankAccountFlowEntryPoint({
                         <TextLink href={CONST.ENCRYPTION_AND_SECURITY_HELP_URL}>{translate('bankAccount.yourDataIsSecure')}</TextLink>
                         <View style={styles.ml1}>
                             <Icon
-                                src={expensifyIcons.Lock}
+                                src={lockIcon}
                                 fill={theme.link}
                             />
                         </View>

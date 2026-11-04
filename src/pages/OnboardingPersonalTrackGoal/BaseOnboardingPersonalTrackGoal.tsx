@@ -49,8 +49,13 @@ function BaseOnboardingPersonalTrackGoal({shouldUseNativeStyles, route}: BaseOnb
     const scrollViewRef = useRef<ComponentRef<typeof ScrollView>>(null);
     const scrollContentRef = useRef<View>(null);
     const inputRef = useRef<AnimatedTextInputRef>(null);
-    const illustrations = useMemoizedLazyIllustrations(['RealEstate', 'HouseMoney', 'TargetWithArrow', 'Binoculars']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {
+        RealEstate: realEstateIllustration,
+        HouseMoney: houseMoneyIllustration,
+        TargetWithArrow: targetWithArrowIllustration,
+        Binoculars: binocularsIllustration,
+    } = useMemoizedLazyIllustrations(['RealEstate', 'HouseMoney', 'TargetWithArrow', 'Binoculars']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [personalDetailsForm] = useOnyx(ONYXKEYS.FORMS.ONBOARDING_PERSONAL_DETAILS_FORM);
     const [personalTrackGoal] = useOnyx(ONYXKEYS.ONBOARDING_PERSONAL_TRACK_GOAL);
@@ -94,10 +99,10 @@ function BaseOnboardingPersonalTrackGoal({shouldUseNativeStyles, route}: BaseOnb
     };
 
     const menuIcons = {
-        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.INVESTMENT_TRACKING]: illustrations.RealEstate,
-        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.HOUSEHOLD_TRACKING]: illustrations.HouseMoney,
-        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.SIDEPROJECT_TRACKING]: illustrations.TargetWithArrow,
-        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.SOMETHING_ELSE]: illustrations.Binoculars,
+        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.INVESTMENT_TRACKING]: realEstateIllustration,
+        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.HOUSEHOLD_TRACKING]: houseMoneyIllustration,
+        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.SIDEPROJECT_TRACKING]: targetWithArrowIllustration,
+        [CONST.ONBOARDING_PERSONAL_TRACK_GOALS.SOMETHING_ELSE]: binocularsIllustration,
     };
 
     const paddingHorizontal = onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5;
@@ -162,7 +167,7 @@ function BaseOnboardingPersonalTrackGoal({shouldUseNativeStyles, route}: BaseOnb
                                 wrapperStyle={[styles.purposeMenuItem, isSelected && styles.activeComponentBG]}
                                 numberOfLinesTitle={0}
                                 shouldShowRightIcon={isSelected}
-                                iconRight={expensifyIcons.Checkmark}
+                                iconRight={checkmarkIcon}
                                 success={isSelected}
                                 shouldRemoveHoverBackground={isSelected}
                                 onPress={() => {

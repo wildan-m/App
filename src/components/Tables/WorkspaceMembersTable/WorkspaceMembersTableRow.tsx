@@ -65,7 +65,7 @@ export default function WorkspaceMembersTableRow({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -249,7 +249,7 @@ export default function WorkspaceMembersTableRow({
 
                     <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, !hovered && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

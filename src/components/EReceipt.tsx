@@ -78,7 +78,7 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false, 
     const {translate, dateFnsLocale} = useLocalize();
     const {convertToDisplayString, getCurrencySymbol} = useCurrencyListActions();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     const cardList = useNonPersonalCardList();
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
 
@@ -198,7 +198,7 @@ function EReceipt({transactionID, transactionItem, onLoad, isThumbnail = false, 
                                                 width={variables.eReceiptWordmarkWidth}
                                                 height={variables.eReceiptWordmarkHeight}
                                                 fill={secondaryColor}
-                                                src={icons.ExpensifyWordmark}
+                                                src={expensifyWordmarkIcon}
                                             />
                                         </View>
                                     </View>

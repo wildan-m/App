@@ -68,7 +68,7 @@ function ImportSpreadsheet({
     onStatementPicked,
 }: ImportSpreadsheetProps) {
     const [importedSpreadsheet] = useOnyx(ONYXKEYS.IMPORTED_SPREADSHEET);
-    const icons = useMemoizedLazyExpensifyIcons(['SpreadsheetComputer']);
+    const {SpreadsheetComputer: spreadsheetComputerIcon} = useMemoizedLazyExpensifyIcons(['SpreadsheetComputer']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
@@ -240,7 +240,7 @@ function ImportSpreadsheet({
         <>
             <View onLayout={({nativeEvent}) => setFileTopPosition(PixelRatio.roundToNearestPixel((nativeEvent.layout as DOMRect).top))}>
                 <ImageSVG
-                    src={icons.SpreadsheetComputer}
+                    src={spreadsheetComputerIcon}
                     contentFit="contain"
                     style={styles.mb4}
                     width={CONST.IMPORT_SPREADSHEET.ICON_WIDTH}
@@ -314,7 +314,7 @@ function ImportSpreadsheet({
                                     <View style={[styles.fileDropOverlay, styles.w100, styles.h100, styles.justifyContentCenter, styles.alignItemsCenter]}>
                                         <View style={[styles.pAbsolute, styles.fileUploadImageWrapper(fileTopPosition)]}>
                                             <ImageSVG
-                                                src={icons.SpreadsheetComputer}
+                                                src={spreadsheetComputerIcon}
                                                 contentFit="contain"
                                                 style={styles.mb4}
                                                 width={CONST.IMPORT_SPREADSHEET.ICON_WIDTH}

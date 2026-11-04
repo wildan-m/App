@@ -56,7 +56,7 @@ function MerchantTypeRulePageBase({policyID, groupID, testID}: MerchantTypeRuleP
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Folder', 'Lock']);
+    const {Folder: folderIcon, Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Folder', 'Lock']);
     const policyData = usePolicyData(policyID);
     const {policy} = policyData;
     const {canWrite: canWriteRules} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
@@ -175,7 +175,7 @@ function MerchantTypeRulePageBase({policyID, groupID, testID}: MerchantTypeRuleP
                         description={translate('workspace.rules.merchantTypeRule.merchantType')}
                         title={merchantTypeDisplayName}
                         shouldShowRightIcon
-                        iconRight={icons.Lock}
+                        iconRight={lockIcon}
                         interactive={false}
                     />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv3]} />
@@ -190,7 +190,7 @@ function MerchantTypeRulePageBase({policyID, groupID, testID}: MerchantTypeRuleP
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.IconNarrow src={icons.Folder} />
+                                <MenuItem.IconNarrow src={folderIcon} />
                             </MenuItem.Leading>
                             <MenuItemField.Content name={translate('common.category')}>
                                 {!!categoryDisplayName && <MenuItem.FieldValue>{categoryDisplayName}</MenuItem.FieldValue>}

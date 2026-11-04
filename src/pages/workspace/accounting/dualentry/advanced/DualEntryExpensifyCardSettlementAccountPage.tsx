@@ -34,7 +34,7 @@ type AccountListItem = ListItem & {
 function DualEntryExpensifyCardSettlementAccountPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const dualentryConfig = policy?.connections?.dualEntry?.config;
     const dualentryData = policy?.connections?.dualEntry?.data;
@@ -65,7 +65,7 @@ function DualEntryExpensifyCardSettlementAccountPage({policy}: WithPolicyConnect
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.dualEntry.noAccountsFound')}

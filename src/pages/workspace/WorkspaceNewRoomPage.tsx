@@ -52,12 +52,12 @@ function EmptyWorkspaceView() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, additionalPaddingBottom: styles.mb5.marginBottom, styleProperty: 'marginBottom'});
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     return (
         <>
             <BlockingView
-                icon={illustrations.Telescope}
+                icon={telescopeIllustration}
                 iconWidth={variables.emptyListIconWidth}
                 iconHeight={variables.emptyListIconHeight}
                 title={translate('workspace.emptyWorkspace.notFound')}

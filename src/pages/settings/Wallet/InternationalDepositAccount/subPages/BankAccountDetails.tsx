@@ -52,7 +52,7 @@ function BankAccountDetails({isEditing, onNext, onMove, formValues, fieldsMap}: 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.INTERNATIONAL_BANK_ACCOUNT_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.INTERNATIONAL_BANK_ACCOUNT_FORM> => {
         return getValidationErrors(values, fieldsMap[CONST.CORPAY_FIELDS.PAGE_NAME.ACCOUNT_DETAILS], translate);
     };
-    const icons = useMemoizedLazyExpensifyIcons(['QuestionMark']);
+    const {QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['QuestionMark']);
 
     const currencyHeaderContent = (
         <View style={styles.ph5}>
@@ -107,7 +107,7 @@ function BankAccountDetails({isEditing, onNext, onMove, formValues, fieldsMap}: 
                 })}
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt4]}>
                     <Icon
-                        src={icons.QuestionMark}
+                        src={questionMarkIcon}
                         width={12}
                         height={12}
                         fill={theme.icon}

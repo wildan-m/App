@@ -49,7 +49,7 @@ function BaseVacationDelegateSelectionComponent({
 }: BaseVacationDelegateSelectionComponentProps) {
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [isSearchingForUsers] = useOnyx(ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_USERS);
 
@@ -101,7 +101,7 @@ function BaseVacationDelegateSelectionComponent({
               accountID: pinnedDelegatePersonalDetails?.accountID ?? CONST.DEFAULT_MISSING_ID,
               icons: [
                   {
-                      source: pinnedDelegatePersonalDetails?.avatar ?? icons.FallbackAvatar,
+                      source: pinnedDelegatePersonalDetails?.avatar ?? fallbackAvatarIcon,
                       name: formatPhoneNumber(pinnedDelegateLogin),
                       type: CONST.ICON_TYPE_AVATAR,
                       id: pinnedDelegatePersonalDetails?.accountID ?? CONST.DEFAULT_MISSING_ID,

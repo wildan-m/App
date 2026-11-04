@@ -17,7 +17,7 @@ type ReportDetailsMenuDebugItemProps = {
 
 function ReportDetailsMenuDebugItem({reportID}: ReportDetailsMenuDebugItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bug']);
+    const {Bug: bugIcon} = useMemoizedLazyExpensifyIcons(['Bug']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isDebugModeEnabled = false] = useOnyx(ONYXKEYS.IS_DEBUG_MODE_ENABLED);
 
@@ -32,7 +32,7 @@ function ReportDetailsMenuDebugItem({reportID}: ReportDetailsMenuDebugItemProps)
         >
             <MenuItem.Row>
                 <MenuItem.Leading>
-                    <MenuItem.Icon src={expensifyIcons.Bug} />
+                    <MenuItem.Icon src={bugIcon} />
                 </MenuItem.Leading>
                 <MenuItem.Content>
                     <MenuItem.Title>{translate('debug.debug')}</MenuItem.Title>

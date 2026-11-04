@@ -65,7 +65,7 @@ function SettlementAccountSelector({
 }: SettlementAccountSelectorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const handleSelectRow = ({value}: BankAccountListItem) => {
         onSelectAccount(value ?? 0);
@@ -75,7 +75,7 @@ function SettlementAccountSelector({
     const addNewBankAccountItem =
         showAddNewAccountOption && onAddNewBankAccount ? (
             <MenuItemAction
-                icon={icons.Plus}
+                icon={plusIcon}
                 title={translate('workspace.expensifyCard.addNewBankAccount')}
                 onPress={onAddNewBankAccount}
             />

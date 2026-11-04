@@ -26,7 +26,7 @@ type CertiniaExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNav
 function CertiniaExistingConnectionsPage({route}: CertiniaExistingConnectionsPageProps) {
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToCertinia} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.CERTINIA, policyID);
 
@@ -63,7 +63,7 @@ function CertiniaExistingConnectionsPage({route}: CertiniaExistingConnectionsPag
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.CERTINIA)}</Text>
                 <MenuItemNavigation
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_PREREQUISITES.getRoute(policyID))}
                 />
                 <Text style={[styles.sectionTitle, styles.pl5, styles.pr5, styles.pb2, styles.mt3]}>{translate('workspace.common.existingConnections')}</Text>

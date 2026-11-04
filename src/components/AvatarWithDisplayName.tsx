@@ -229,7 +229,7 @@ function AvatarWithDisplayName({
     const derivedReportNames = useDerivedReportNamesByReportIDs([report?.reportID, report?.parentReportID]);
     const isReportArchived = useReportIsArchived(report?.reportID);
     const isParentReportArchived = useReportIsArchived(report?.parentReportID);
-    const icons = useMemoizedLazyExpensifyIcons(['Pencil']);
+    const {Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Pencil']);
 
     const parentReportAction = report?.parentReportActionID ? parentReportActions?.[report.parentReportActionID] : undefined;
     const parentReportActionActorAccountID = parentReportAction?.actorAccountID;
@@ -374,7 +374,7 @@ function AvatarWithDisplayName({
                             >
                                 <View style={styles.flexShrink1}>{displayNameContent}</View>
                                 <Icon
-                                    src={icons.Pencil}
+                                    src={pencilIcon}
                                     width={variables.iconSizeExtraSmall}
                                     height={variables.iconSizeExtraSmall}
                                     additionalStyles={styles.ml1}

@@ -41,7 +41,7 @@ type EReceiptThumbnailProps = {
 };
 
 function EReceiptThumbnail({transactionID, borderRadius, fileExtension, isReceiptThumbnail = false, centerIconV = true, iconSize = 'large'}: EReceiptThumbnailProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'EReceiptIcon']);
+    const {CalendarSolid: calendarSolidIcon, EReceiptIcon: eReceiptIconIcon} = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'EReceiptIcon']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
@@ -94,7 +94,7 @@ function EReceiptThumbnail({transactionID, borderRadius, fileExtension, isReceip
             <View style={[styles.alignItemsCenter, styles.ph8, styles.pt8, styles.pb8]}>
                 <View style={[StyleUtils.getWidthAndHeightStyle(receiptIconWidth, receiptIconHeight), styles.alignItemsCenter, styles.justifyContentCenter]}>
                     <Icon
-                        src={icons.EReceiptIcon}
+                        src={eReceiptIconIcon}
                         height={receiptIconHeight}
                         width={receiptIconWidth}
                         fill={secondaryColor}
@@ -115,7 +115,7 @@ function EReceiptThumbnail({transactionID, borderRadius, fileExtension, isReceip
                     )}
                     {isPerDiemRequest ? (
                         <Icon
-                            src={icons.CalendarSolid}
+                            src={calendarSolidIcon}
                             height={receiptMCCSize}
                             width={receiptMCCSize}
                             fill={primaryColor}

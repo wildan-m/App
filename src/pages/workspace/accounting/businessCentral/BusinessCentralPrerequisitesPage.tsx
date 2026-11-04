@@ -33,8 +33,8 @@ type BusinessCentralPrerequisitesPageProps = PlatformStackScreenProps<SettingsNa
 function BusinessCentralPrerequisitesPage({route}: BusinessCentralPrerequisitesPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['NewWindow', 'Task']);
-    const illustrations = useMemoizedLazyIllustrations(['Computer']);
+    const {NewWindow: newWindowIcon, Task: taskIcon} = useMemoizedLazyExpensifyIcons(['NewWindow', 'Task']);
+    const {Computer: computerIllustration} = useMemoizedLazyIllustrations(['Computer']);
     const popoverAnchor = useRef<ComponentRef<typeof View>>(null);
     const policyID: string = route.params.policyID;
 
@@ -42,8 +42,8 @@ function BusinessCentralPrerequisitesPage({route}: BusinessCentralPrerequisitesP
         {
             title: translate('workspace.businessCentral.followSteps'),
             key: 'workspace.businessCentral.followSteps',
-            icon: icons.Task,
-            iconRight: icons.NewWindow,
+            icon: taskIcon,
+            iconRight: newWindowIcon,
             shouldShowRightIcon: true,
             onPress: () => {
                 openExternalLink(CONST.BUSINESS_CENTRAL_HELP_URL);
@@ -74,7 +74,7 @@ function BusinessCentralPrerequisitesPage({route}: BusinessCentralPrerequisitesP
             />
             <ScrollView>
                 <View style={[styles.alignSelfCenter, styles.computerIllustrationContainer]}>
-                    <ImageSVG src={illustrations.Computer} />
+                    <ImageSVG src={computerIllustration} />
                 </View>
 
                 <Text style={[styles.textHeadlineH1, styles.p5, styles.p6]}>{translate('workspace.businessCentral.prerequisitesTitle')}</Text>

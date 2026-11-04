@@ -33,7 +33,23 @@ function ExportedToSelector({value = [], policyID, selectionListTextInputStyle, 
     const {localeCompare} = useLocalize();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare: intuitSquareIcon,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        Table: tableIcon2,
+        TablePencil: tablePencilIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'XeroSquare',
         'QBOSquare',
         'IntuitSquare',
@@ -50,6 +66,23 @@ function ExportedToSelector({value = [], policyID, selectionListTextInputStyle, 
         'Table',
         'TablePencil',
     ]);
+    const expensifyIcons = {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare: intuitSquareIcon,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        Table: tableIcon2,
+        TablePencil: tablePencilIcon,
+    };
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyID);
@@ -78,7 +111,7 @@ function ExportedToSelector({value = [], policyID, selectionListTextInputStyle, 
                 const searchValues = getExportLabelsForConnection(connectionName, policiesToLoadTemplatesFrom);
                 return searchValues.map((searchValue) => {
                     const isIntuitEnterpriseSuite = searchValue === CONST.EXPORT_LABELS.INTUIT_ENTERPRISE_SUITE;
-                    const icon = isIntuitEnterpriseSuite ? expensifyIcons.IntuitSquare : getIntegrationIcon(connectionName, expensifyIcons);
+                    const icon = isIntuitEnterpriseSuite ? intuitSquareIcon : getIntegrationIcon(connectionName, expensifyIcons);
                     return {
                         text: searchValue,
                         value: searchValue,
@@ -92,7 +125,7 @@ function ExportedToSelector({value = [], policyID, selectionListTextInputStyle, 
                                 />
                             </View>
                         ) : (
-                            tableIconForExportOption(expensifyIcons.Table)
+                            tableIconForExportOption(tableIcon2)
                         ),
                     };
                 });
@@ -120,7 +153,7 @@ function ExportedToSelector({value = [], policyID, selectionListTextInputStyle, 
             standardAndIntegrationCustomTemplatePickerItems.push({
                 text: displayName,
                 value: filterValue,
-                leftElement: tableIconForExportOption(isStandardTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil),
+                leftElement: tableIconForExportOption(isStandardTemplate ? tableIcon2 : tablePencilIcon),
             });
         }
 

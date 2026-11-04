@@ -26,7 +26,7 @@ type RilletExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNavig
 function RilletExistingConnectionsPage({route}: RilletExistingConnectionsPageProps) {
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToRillet} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.RILLET, policyID);
 
@@ -63,7 +63,7 @@ function RilletExistingConnectionsPage({route}: RilletExistingConnectionsPagePro
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.RILLET)}</Text>
                 <MenuItemNavigation
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_RILLET_SETUP.getRoute(policyID))}
                 />
                 <Text style={[styles.sectionTitle, styles.pl5, styles.pr5, styles.pb2, styles.mt3]}>{translate('workspace.common.existingConnections')}</Text>

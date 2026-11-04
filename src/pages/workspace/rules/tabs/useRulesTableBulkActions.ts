@@ -63,7 +63,7 @@ function useRulesTableBulkActions({policyID, activeTab, selectedRuleKeysByTab, c
     const StyleUtils = useStyleUtils();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardProtectionIllustration']);
+    const {ExpensifyCardProtectionIllustration: expensifyCardProtectionIllustrationIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardProtectionIllustration']);
     const {isOffline} = useNetwork();
     const policy = usePolicy(policyID);
     const policyData = usePolicyData(policyID);
@@ -111,7 +111,7 @@ function useRulesTableBulkActions({policyID, activeTab, selectedRuleKeysByTab, c
 
     const showBuiltInProtectionModal = () => {
         showConfirmModal({
-            image: illustrations.ExpensifyCardProtectionIllustration,
+            image: expensifyCardProtectionIllustrationIllustration,
             imageStyles: [styles.w100],
             shouldFitImageToContainer: true,
             title: translate('workspace.rules.spendRules.builtInProtectionModal.title'),

@@ -31,7 +31,7 @@ type OnboardingMergingAccountBlockedViewProps = {
 function OnboardingMergingAccountBlockedView({workEmail, isVsb, onConfirm}: OnboardingMergingAccountBlockedViewProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
     const [onboardingErrorMessage] = useOnyx(ONYXKEYS.ONBOARDING_ERROR_MESSAGE_TRANSLATION_KEY);
 
     const getErrorSubtitle = () => {
@@ -52,7 +52,7 @@ function OnboardingMergingAccountBlockedView({workEmail, isVsb, onConfirm}: Onbo
     return (
         <>
             <BlockingView
-                icon={illustrations.ToddBehindCloud}
+                icon={toddBehindCloudIllustration}
                 iconWidth={variables.modalTopIconWidth}
                 iconHeight={variables.modalTopIconHeight}
                 title={translate('onboarding.mergeBlockScreen.title')}

@@ -319,9 +319,10 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         policyID: policy?.id,
         isDistanceRequest: true,
     });
+    const {Plus, ReceiptPlus, Location} = useMemoizedLazyExpensifyIcons(['Plus', 'ReceiptPlus', 'Location']);
     const addExpenseDropdownOptions = getAddExpenseDropdownOptions({
         translate,
-        icons: useMemoizedLazyExpensifyIcons(['Plus', 'ReceiptPlus', 'Location', 'Feed', 'ArrowRight']),
+        icons: {Plus, ReceiptPlus, Location},
         sentryLabels: {
             createExpense: CONST.SENTRY_LABEL.MORE_MENU.ADD_EXPENSE_CREATE,
             trackDistance: CONST.SENTRY_LABEL.MORE_MENU.ADD_EXPENSE_TRACK_DISTANCE,
@@ -338,7 +339,19 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         blockDistanceRequestIfNeeded,
     });
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Plus: plusIcon,
+        ArrowSplit: arrowSplitIcon,
+        ArrowCollapse: arrowCollapseIcon,
+        ExpenseCopy: expenseCopyIcon,
+        ReportCopy: reportCopyIcon,
+        Checkmark: checkmarkIcon,
+        DocumentMerge: documentMergeIcon,
+        Workflows: workflowsIcon,
+        Trashcan: trashcanIcon,
+        Buildings: buildingsIcon,
+        ArrowRight: arrowRightIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'Plus',
         'ArrowSplit',
         'ArrowCollapse',
@@ -358,7 +371,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
     const actions: Partial<Record<ValueOf<typeof CONST.REPORT.SECONDARY_ACTIONS>, SecondaryActionEntry>> = {
         [CONST.REPORT.SECONDARY_ACTIONS.SPLIT]: {
             text: hasSplitIndicator ? translate('iou.editSplits') : translate('iou.split'),
-            icon: expensifyIcons.ArrowSplit,
+            icon: arrowSplitIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.SPLIT,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SPLIT,
             onSelected: () => {
@@ -379,7 +392,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.MERGE]: {
             text: translate('common.merge'),
-            icon: expensifyIcons.ArrowCollapse,
+            icon: arrowCollapseIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.MERGE,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.MERGE,
             onSelected: () => {
@@ -391,7 +404,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_EXPENSE]: {
             text: isDuplicateActive ? translate('common.duplicateExpense') : translate('common.duplicated'),
-            icon: isDuplicateActive ? expensifyIcons.ExpenseCopy : expensifyIcons.Checkmark,
+            icon: isDuplicateActive ? expenseCopyIcon : checkmarkIcon,
             iconFill: isDuplicateActive ? undefined : theme.icon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_EXPENSE,
             onSelected: () => {
@@ -442,7 +455,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT]: {
             text: isDuplicateReportActive ? translate('common.duplicateReport') : translate('common.duplicated'),
-            icon: isDuplicateReportActive ? expensifyIcons.ReportCopy : expensifyIcons.Checkmark,
+            icon: isDuplicateReportActive ? reportCopyIcon : checkmarkIcon,
             iconFill: isDuplicateReportActive ? undefined : theme.icon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DUPLICATE_REPORT,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.DUPLICATE_REPORT,
@@ -503,7 +516,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE]: {
             text: translate('iou.changeWorkspace'),
-            icon: expensifyIcons.Buildings,
+            icon: buildingsIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.CHANGE_WORKSPACE,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.CHANGE_WORKSPACE,
             shouldShow: (transactions.length === 0 || nonPendingDeleteTransactions.length > 0) && !hasCommuterExclusionDistanceRequest,
@@ -516,7 +529,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.MOVE_EXPENSE]: {
             text: translate('iou.moveExpenses'),
-            icon: expensifyIcons.DocumentMerge,
+            icon: documentMergeIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.MOVE_EXPENSE,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.MOVE_EXPENSE,
             shouldShow: canMoveSingleExpense,
@@ -537,7 +550,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.CHANGE_APPROVER]: {
             text: translate('iou.changeApprover.title'),
-            icon: expensifyIcons.Workflows,
+            icon: workflowsIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.CHANGE_APPROVER,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.CHANGE_APPROVER,
             onSelected: () => {
@@ -550,7 +563,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         },
         [CONST.REPORT.SECONDARY_ACTIONS.DELETE]: {
             text: shouldShowEditSplitOnDeleteAction ? translate('iou.editSplits') : translate('common.delete'),
-            icon: shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan,
+            icon: shouldShowEditSplitOnDeleteAction ? arrowSplitIcon : trashcanIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DELETE,
             sentryLabel: shouldShowEditSplitOnDeleteAction ? CONST.SENTRY_LABEL.MORE_MENU.SPLIT : CONST.SENTRY_LABEL.MORE_MENU.DELETE,
             onSelected: async () => {
@@ -670,8 +683,8 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
         [CONST.REPORT.SECONDARY_ACTIONS.ADD_EXPENSE]: {
             text: translate('iou.addExpense'),
             backButtonText: translate('iou.addExpense'),
-            icon: expensifyIcons.Plus,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: plusIcon,
+            rightIcon: arrowRightIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.ADD_EXPENSE,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.ADD_EXPENSE,
             subMenuItems: addExpenseDropdownOptions,

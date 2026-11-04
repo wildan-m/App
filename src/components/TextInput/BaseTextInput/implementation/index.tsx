@@ -111,7 +111,7 @@ function BaseTextInput({
     const {hasError = false} = inputProps;
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
+    const {Eye: eyeIcon, EyeDisabled: eyeDisabledIcon} = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
 
     // Disabling this line for safeness as nullish coalescing works only if value is undefined or null
     const initialValue = value || defaultValue || '';
@@ -606,7 +606,7 @@ function BaseTextInput({
                                         accessibilityLabel={translate('common.visible')}
                                     >
                                         <Icon
-                                            src={passwordHidden ? expensifyIcons.Eye : expensifyIcons.EyeDisabled}
+                                            src={passwordHidden ? eyeIcon : eyeDisabledIcon}
                                             fill={theme.icon}
                                         />
                                     </Checkbox>

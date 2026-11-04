@@ -25,7 +25,7 @@ import {View} from 'react-native';
 function PIN({onNext}: CustomSubPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
+    const {Eye: eyeIcon, EyeDisabled: eyeDisabledIcon} = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
     const {PIN: savedPIN, isConfirmStep, isPINHidden} = usePINState();
     const {setPIN, setIsConfirmStep, togglePINVisibility} = usePINActions();
     const [enteredPIN, setEnteredPIN] = useState(savedPIN);
@@ -112,7 +112,7 @@ function PIN({onNext}: CustomSubPageProps) {
 
                 <View style={[styles.flexRow, styles.justifyContentCenter, styles.mv4, styles.alignItemsCenter, styles.w100]}>
                     <Button onPress={togglePINVisibility}>
-                        <Button.Icon src={isPINHidden ? icons.Eye : icons.EyeDisabled} />
+                        <Button.Icon src={isPINHidden ? eyeIcon : eyeDisabledIcon} />
                         <Button.Text>{isPINHidden ? translate('cardPage.revealPin') : translate('cardPage.hidePin')}</Button.Text>
                     </Button>
                 </View>

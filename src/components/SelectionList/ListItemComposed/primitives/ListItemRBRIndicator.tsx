@@ -17,7 +17,7 @@ type ListItemRBRIndicatorProps<TItem extends ListItem> = {
 
 /** The brick road dot shown at the end of a row. */
 function ListItemRBRIndicator<TItem extends ListItem>({item}: ListItemRBRIndicatorProps<TItem>) {
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const styles = useThemeStyles();
     const theme = useTheme();
 
@@ -25,7 +25,7 @@ function ListItemRBRIndicator<TItem extends ListItem>({item}: ListItemRBRIndicat
         <View style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.ml3]}>
             <Icon
                 testID={CONST.DOT_INDICATOR_TEST_ID}
-                src={icons.DotIndicator}
+                src={dotIndicatorIcon}
                 fill={item.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO ? theme.iconSuccessFill : theme.danger}
             />
         </View>

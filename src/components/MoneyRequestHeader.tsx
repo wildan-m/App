@@ -87,8 +87,8 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
     const theme = useTheme();
     const {translate} = useLocalize();
     const {email, accountID} = useCurrentUserPersonalDetails();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Flag', 'Hourglass', 'Stopwatch']);
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCardHourglass', 'ReceiptScan']);
+    const {Flag: flagIcon, Hourglass: hourglassIcon, Stopwatch: stopwatchIcon} = useMemoizedLazyExpensifyIcons(['Flag', 'Hourglass', 'Stopwatch']);
+    const {CreditCardHourglass: creditCardHourglassIcon, ReceiptScan: receiptScanIcon} = useMemoizedLazyExpensifyIcons(['CreditCardHourglass', 'ReceiptScan']);
     const {wideRHPRouteKeys} = useWideRHPState();
 
     const isOnHold = isOnHoldTransactionUtils(transaction);
@@ -129,18 +129,18 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
 
     const getStatusBarProps: () => MoneyRequestHeaderStatusBarProps | undefined = () => {
         if (isOnHold) {
-            return {icon: getStatusIcon(expensifyIcons.Stopwatch), description: translate('iou.expenseOnHold')};
+            return {icon: getStatusIcon(stopwatchIcon), description: translate('iou.expenseOnHold')};
         }
         if (isMarkAsResolvedAction(parentReport, transactionViolations, policy)) {
-            return {icon: getStatusIcon(expensifyIcons.Hourglass), description: translate('iou.reject.rejectedStatus')};
+            return {icon: getStatusIcon(hourglassIcon), description: translate('iou.reject.rejectedStatus')};
         }
 
         if (isDuplicate) {
-            return {icon: getStatusIcon(expensifyIcons.Flag), description: translate('iou.expenseDuplicate')};
+            return {icon: getStatusIcon(flagIcon), description: translate('iou.expenseDuplicate')};
         }
 
         if (isPending(transaction) && (parentReport?.transactionCount ?? 0) <= 1) {
-            return {icon: getStatusIcon(icons.CreditCardHourglass), description: translate('iou.transactionPendingDescription')};
+            return {icon: getStatusIcon(creditCardHourglassIcon), description: translate('iou.transactionPendingDescription')};
         }
         if (!!transaction?.transactionID && !!transactionViolations.length && shouldShowBrokenConnectionViolation) {
             const brokenConnectionViolations = transactionViolations.filter(isBrokenConnectionViolation);
@@ -151,7 +151,7 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
                 return undefined;
             }
             return {
-                icon: getStatusIcon(expensifyIcons.Hourglass),
+                icon: getStatusIcon(hourglassIcon),
                 description: (
                     <BrokenConnectionDescription
                         transactionID={transaction?.transactionID}
@@ -162,10 +162,10 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
             };
         }
         if (hasPendingRTERViolation) {
-            return {icon: getStatusIcon(expensifyIcons.Hourglass), description: translate('iou.pendingMatchWithCreditCardDescription')};
+            return {icon: getStatusIcon(hourglassIcon), description: translate('iou.pendingMatchWithCreditCardDescription')};
         }
         if (isScanning(transaction)) {
-            return {icon: getStatusIcon(icons.ReceiptScan), description: translate('iou.receiptScanInProgressDescription')};
+            return {icon: getStatusIcon(receiptScanIcon), description: translate('iou.receiptScanInProgressDescription')};
         }
     };
 

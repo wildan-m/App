@@ -200,7 +200,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
     const theme = useTheme();
     const {shouldHideToolTip} = useSidePanelState();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close', 'Lightbulb']);
+    const {Close: closeIcon, Lightbulb: lightbulbIcon} = useMemoizedLazyExpensifyIcons(['Close', 'Lightbulb']);
 
     if (!context) {
         throw new Error('useProductTourContext must be used within a ProductTourProvider');
@@ -240,7 +240,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
             >
                 <View style={[styles.alignItemsCenter, styles.flexRow, styles.justifyContentCenter, styles.textAlignCenter, styles.gap3, styles.pv2, styles.ph2]}>
                     <Icon
-                        src={expensifyIcons.Lightbulb}
+                        src={lightbulbIcon}
                         fill={theme.tooltipHighlightText}
                         size={CONST.ICON_SIZE.MEDIUM}
                     />
@@ -255,7 +255,7 @@ const useProductTrainingContext = (tooltipName: ProductTrainingTooltipName, shou
                         onPress={() => hideTooltip(true)}
                     >
                         <Icon
-                            src={expensifyIcons.Close}
+                            src={closeIcon}
                             fill={theme.icon}
                             width={variables.iconSizeSemiSmall}
                             height={variables.iconSizeSemiSmall}

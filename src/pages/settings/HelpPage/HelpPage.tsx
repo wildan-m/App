@@ -45,8 +45,12 @@ function isConciergePersonalDetail(details: PersonalDetails | null | undefined):
 }
 
 function HelpPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['ChatBubbles', 'ConciergeAvatar', 'NewWindow', 'Monitor']);
-    const illustrations = useMemoizedLazyIllustrations(['Chalkboard', 'TopiaryDollarSign']);
+    const {
+        ChatBubbles: chatBubblesIcon,
+        ConciergeAvatar: conciergeAvatarIcon,
+        NewWindow: newWindowIcon,
+    } = useMemoizedLazyExpensifyIcons(['ChatBubbles', 'ConciergeAvatar', 'NewWindow', 'Monitor']);
+    const {Chalkboard: chalkboardIllustration, TopiaryDollarSign: topiaryDollarSignIllustration} = useMemoizedLazyIllustrations(['Chalkboard', 'TopiaryDollarSign']);
     const themeIllustrations = useThemeIllustrations();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -176,7 +180,7 @@ function HelpPage() {
         key: 'initialSettingsPage.helpPage.conciergeChat',
         title: translate('initialSettingsPage.helpPage.conciergeChat'),
         description: hasActiveItem ? undefined : translate('initialSettingsPage.helpPage.conciergeChatDescription'),
-        icon: icons.ConciergeAvatar,
+        icon: conciergeAvatarIcon,
         iconType: CONST.ICON_TYPE_AVATAR,
         onPress: () => openConciergeAnywhere(),
         shouldShowRightIcon: true,
@@ -188,9 +192,9 @@ function HelpPage() {
         key: 'initialSettingsPage.helpPage.helpSite',
         title: translate('initialSettingsPage.helpPage.helpSite'),
         description: translate('initialSettingsPage.helpPage.helpSiteDescription'),
-        icon: illustrations.Chalkboard,
+        icon: chalkboardIllustration,
         iconType: CONST.ICON_TYPE_AVATAR,
-        iconRight: icons.NewWindow,
+        iconRight: newWindowIcon,
         onPress: () => openExternalLink(CONST.NEWHELP_URL),
         shouldShowRightIcon: true,
         wrapperStyle: [styles.sectionMenuItemTopDescription],
@@ -202,7 +206,7 @@ function HelpPage() {
         key: 'initialSettingsPage.talkToAHuman',
         title: translate('initialSettingsPage.talkToAHuman'),
         description: translate('initialSettingsPage.helpPage.talkToAHumanDescription'),
-        icon: icons.ChatBubbles,
+        icon: chatBubblesIcon,
         iconType: CONST.ICON_TYPE_ICON,
         onPress: openSupportTicketOrConcierge,
         disabled: isOffline,
@@ -242,7 +246,7 @@ function HelpPage() {
                         isCentralPane
                         illustrationContainerStyle={styles.cardSectionIllustrationContainer}
                         illustrationBackgroundColor={colors.ice800}
-                        illustration={isApprovedAccountant ? themeIllustrations.ExpensifyApprovedBadge : illustrations.TopiaryDollarSign}
+                        illustration={isApprovedAccountant ? themeIllustrations.ExpensifyApprovedBadge : topiaryDollarSignIllustration}
                         illustrationStyle={styles.helpStaticIllustration}
                     >
                         {isApprovedAccountant ? (

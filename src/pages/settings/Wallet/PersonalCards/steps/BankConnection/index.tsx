@@ -41,7 +41,7 @@ type BankConnectionContentProps = {
 };
 
 function BankConnectionContent({hasImportError, errorMessage, isPlaid, onOpenBankConnectionFlow, bankName, plaidConnectedFeedName}: BankConnectionContentProps) {
-    const illustrations = useMemoizedLazyIllustrations(['PendingBank']);
+    const {PendingBank: pendingBankIllustration} = useMemoizedLazyIllustrations(['PendingBank']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     if (hasImportError) {
@@ -50,7 +50,7 @@ function BankConnectionContent({hasImportError, errorMessage, isPlaid, onOpenBan
     if (!isPlaid) {
         return (
             <BlockingView
-                icon={illustrations.PendingBank}
+                icon={pendingBankIllustration}
                 iconWidth={styles.pendingBankCardIllustration.width}
                 iconHeight={styles.pendingBankCardIllustration.height}
                 title={translate('workspace.moreFeatures.companyCards.pendingBankTitle')}

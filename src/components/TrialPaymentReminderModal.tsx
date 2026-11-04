@@ -37,7 +37,7 @@ function padZero(num: number): string {
 function TrialPaymentReminderModal({isVisible, variant, daysRemaining, countdownTime, onClose, onAddPaymentCard}: TrialPaymentReminderModalProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ArmWithCardPos']);
+    const {ArmWithCardPos: armWithCardPosIllustration} = useMemoizedLazyIllustrations(['ArmWithCardPos']);
     const {translate} = useLocalize();
 
     return (
@@ -52,7 +52,7 @@ function TrialPaymentReminderModal({isVisible, variant, daysRemaining, countdown
         >
             <View style={[styles.alignItemsCenter, styles.wAuto, styles.trialReminderIllustrationContainer, styles.pb7]}>
                 <ImageSVG
-                    src={illustrations.ArmWithCardPos}
+                    src={armWithCardPosIllustration}
                     contentFit="contain"
                 />
             </View>

@@ -202,7 +202,7 @@ function IOURequestStepConfirmationContent({
     const [reportNameValuePair] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${getNonEmptyStringOnyxID(transaction?.reportID)}`);
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
+    const {ReplaceReceipt: replaceReceiptIcon, SmartScan: smartScanIcon} = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
 
     /*
      * We want to use a report from the transaction if it exists
@@ -807,7 +807,7 @@ function IOURequestStepConfirmationContent({
                         {PDFValidationComponent}
                         <DragAndDropConsumer onDrop={handleDroppingReceipt}>
                             <DropZoneUI
-                                icon={isEditingReceipt ? expensifyIcons.ReplaceReceipt : expensifyIcons.SmartScan}
+                                icon={isEditingReceipt ? replaceReceiptIcon : smartScanIcon}
                                 dropStyles={styles.receiptDropOverlay(true)}
                                 dropTitle={translate(isEditingReceipt ? 'dropzone.replaceReceipt' : 'quickAction.scanReceipt')}
                                 dropTextStyles={styles.receiptDropText}

@@ -58,7 +58,7 @@ function AgentAIPromptSection({accountID, parentScrollViewRef}: AgentAIPromptSec
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.AGENT}${accountID}`);
     const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [draftPrompt, setDraftPrompt] = useState('');
@@ -246,7 +246,7 @@ function AgentAIPromptSection({accountID, parentScrollViewRef}: AgentAIPromptSec
                 style={[styles.alignSelfStart]}
                 testID="save-prompt-button"
             >
-                {showSavedConfirmation && <Button.Icon src={icons.Checkmark} />}
+                {showSavedConfirmation && <Button.Icon src={checkmarkIcon} />}
                 <Button.Text>{showSavedConfirmation ? translate('profilePage.aiPromptSection.saved') : translate('common.save')}</Button.Text>
             </Button>
             <ErrorMessageRow

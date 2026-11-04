@@ -77,7 +77,7 @@ function BaseValidateCodeForm({autoComplete, isUsingRecoveryCode, setIsUsingReco
     const [isCountdownRunning, setIsCountdownRunning] = useState(true);
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Exclamation']);
+    const {Exclamation: exclamationIcon} = useMemoizedLazyExpensifyIcons(['Exclamation']);
 
     const prevRequiresTwoFactorAuth = usePrevious(account?.requiresTwoFactorAuth);
     const prevValidateCode = usePrevious(credentials?.validateCode);
@@ -410,7 +410,7 @@ function BaseValidateCodeForm({autoComplete, isUsingRecoveryCode, setIsUsingReco
                     <View style={[styles.mt5, styles.flexRow, styles.alignItemsCenter]}>
                         <View style={[styles.mr3]}>
                             <Icon
-                                src={expensifyIcons.Exclamation}
+                                src={exclamationIcon}
                                 fill={theme.icon}
                                 size={CONST.ICON_SIZE.MEDIUM}
                             />

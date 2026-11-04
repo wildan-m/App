@@ -22,7 +22,7 @@ type SelectedDateModifierHeaderProps = {
 function SelectedDateModifierHeader({isCompact, title, onBackPress}: SelectedDateModifierHeaderProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const backArrowIcon = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon2} = useMemoizedLazyExpensifyIcons(['BackArrow']);
     const {translate} = useLocalize();
 
     if (isCompact) {
@@ -35,7 +35,7 @@ function SelectedDateModifierHeader({isCompact, title, onBackPress}: SelectedDat
                     sentryLabel="DateSelectPopup-Back"
                 >
                     <Icon
-                        src={backArrowIcon.BackArrow}
+                        src={backArrowIcon2}
                         fill={theme.icon}
                     />
                 </PressableWithoutFeedback>

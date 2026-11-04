@@ -36,14 +36,14 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
     const {popoverAnchorRefs} = useAccountingState();
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['Copy', 'LinkCopy']);
+    const {Copy: copyIcon, LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['Copy', 'LinkCopy']);
     const shouldGoToCredentialsPage = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.NETSUITE);
 
     const threeDotsMenuContainerRef = popoverAnchorRefs?.current?.[CONST.POLICY.CONNECTIONS.NAME.NETSUITE];
 
     const connectionOptions = [
         {
-            icon: icons.LinkCopy,
+            icon: linkCopyIcon,
             text: translate('workspace.common.createNewConnection'),
             onSelected: () => {
                 Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_TOKEN_INPUT.getRoute(policyID, getInitialSubPageForNetsuiteTokenInput(policy)));
@@ -51,7 +51,7 @@ function ConnectToNetSuiteFlow({policyID}: ConnectToNetSuiteFlowProps) {
             },
         },
         {
-            icon: icons.Copy,
+            icon: copyIcon,
             text: translate('workspace.common.reuseExistingConnection'),
             onSelected: () => {
                 Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_EXISTING_CONNECTIONS.getRoute(policyID));

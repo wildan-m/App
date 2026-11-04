@@ -18,12 +18,12 @@ type HoldSubmitterEducationalModalContentProps = {
 function HoldSubmitterEducationalModalContent({isDM}: HoldSubmitterEducationalModalContentProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['HoldExpense']);
+    const {HoldExpense: holdExpenseIllustration} = useMemoizedLazyIllustrations(['HoldExpense']);
 
     return (
         <>
             <FeatureTraining.Illustration
-                image={illustrations.HoldExpense}
+                image={holdExpenseIllustration}
                 contentFitImage="cover"
                 aspectRatio={CONST.ILLUSTRATION_ASPECT_RATIO}
                 outerContainerStyle={styles.p0}

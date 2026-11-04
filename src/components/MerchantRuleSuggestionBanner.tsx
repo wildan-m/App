@@ -68,7 +68,7 @@ function MerchantRuleSuggestionBannerContent({reportID, policyID, containerStyle
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Lightbulb']);
+    const {Lightbulb: lightbulbIcon} = useMemoizedLazyExpensifyIcons(['Lightbulb']);
     const {suggestion, fields, editedTagLevels, transaction, policy} = useMerchantRuleSuggestion(reportID, policyID);
     const isShowing = !!suggestion && !!policyID;
 
@@ -143,7 +143,7 @@ function MerchantRuleSuggestionBannerContent({reportID, policyID, containerStyle
                         <>
                             <View style={styles.mr3}>
                                 <Icon
-                                    src={icons.Lightbulb}
+                                    src={lightbulbIcon}
                                     fill={theme.tooltipHighlightText}
                                     width={variables.iconSizeNormal}
                                     height={variables.iconSizeNormal}

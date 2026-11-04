@@ -33,7 +33,7 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ReceiptMultiple']);
+    const {ReceiptMultiple: receiptMultipleIcon} = useMemoizedLazyExpensifyIcons(['ReceiptMultiple']);
     const [lastSearchParams] = useOnyx(ONYXKEYS.REPORT_NAVIGATION_LAST_SEARCH_QUERY);
     const [lastExpensesSearchQuery] = useOnyx(ONYXKEYS.SEARCH_FILTERS, {selector: lastExpensesSearchQuerySelector});
     const searchAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.SEARCH};
@@ -62,7 +62,7 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
             >
                 {({hovered}) => (
                     <TabBarItem
-                        icon={expensifyIcons.ReceiptMultiple}
+                        icon={receiptMultipleIcon}
                         label={translate('common.spend')}
                         isSelected={selectedTab === NAVIGATION_TABS.SEARCH}
                         isHovered={hovered}
@@ -83,7 +83,7 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.REPORTS}
         >
             <TabBarItem
-                icon={expensifyIcons.ReceiptMultiple}
+                icon={receiptMultipleIcon}
                 label={translate('common.spend')}
                 isSelected={selectedTab === NAVIGATION_TABS.SEARCH}
                 numberOfLines={1}

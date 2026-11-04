@@ -54,7 +54,14 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
     const {count: domainAdminRequestsCount, reviewDomainAdminRequests} = useReviewDomainAdminRequests();
     const timeSensitiveItems = useTimeSensitiveItems();
 
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptSearch', 'MoneyBag', 'Send', 'ThumbsUp', 'Export', 'UserShield']);
+    const {
+        ReceiptSearch: receiptSearchIcon,
+        MoneyBag: moneyBagIcon,
+        Send: sendIcon,
+        ThumbsUp: thumbsUpIcon,
+        Export: exportIcon,
+        UserShield: userShieldIcon,
+    } = useMemoizedLazyExpensifyIcons(['ReceiptSearch', 'MoneyBag', 'Send', 'ThumbsUp', 'Export', 'UserShield']);
 
     const submitCount = reportCounts[CONST.SEARCH.SEARCH_KEYS.SUBMIT];
     const approveCount = reportCounts[CONST.SEARCH.SEARCH_KEYS.APPROVE];
@@ -91,7 +98,7 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
         {
             key: 'reviewExpenses',
             count: flaggedExpensesCount,
-            icon: icons.ReceiptSearch,
+            icon: receiptSearchIcon,
             translationKey: 'homePage.forYouSection.reviewExpenses' as const,
             handler: reviewExpenses,
             buttonVariant: CONST.BUTTON_VARIANT.DANGER,
@@ -99,14 +106,14 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
         {
             key: 'submit',
             count: submitCount,
-            icon: icons.Send,
+            icon: sendIcon,
             translationKey: 'homePage.forYouSection.submit' as const,
             handler: createNavigationHandler(CONST.SEARCH.ACTION_FILTERS.SUBMIT, {from: [`${accountID}`]}, CONST.SEARCH.SEARCH_KEYS.SUBMIT, singleReportIDs[CONST.SEARCH.SEARCH_KEYS.SUBMIT]),
         },
         {
             key: 'approve',
             count: approveCount,
-            icon: icons.ThumbsUp,
+            icon: thumbsUpIcon,
             translationKey: 'homePage.forYouSection.approve' as const,
             handler: createNavigationHandler(
                 CONST.SEARCH.ACTION_FILTERS.APPROVE,
@@ -118,7 +125,7 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
         {
             key: 'pay',
             count: payCount,
-            icon: icons.MoneyBag,
+            icon: moneyBagIcon,
             translationKey: 'homePage.forYouSection.pay' as const,
             handler: createNavigationHandler(
                 CONST.SEARCH.ACTION_FILTERS.PAY,
@@ -130,7 +137,7 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
         {
             key: 'export',
             count: exportCount,
-            icon: icons.Export,
+            icon: exportIcon,
             translationKey: 'homePage.forYouSection.export' as const,
             handler: createNavigationHandler(
                 CONST.SEARCH.ACTION_FILTERS.EXPORT,
@@ -142,7 +149,7 @@ function ForYouSection({isInitialLoad, isConciergeMenuVisible, setIsConciergeMen
         {
             key: 'reviewDomainAdminRequests',
             count: domainAdminRequestsCount,
-            icon: icons.UserShield,
+            icon: userShieldIcon,
             translationKey: 'homePage.forYouSection.reviewDomainAdminRequests' as const,
             handler: reviewDomainAdminRequests,
         },

@@ -48,7 +48,7 @@ function ChangeReceiptBillingAccountPage({route}: ChangeReceiptBillingAccountPag
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const [selectedOptionState, setSelectedOption] = useState<string | undefined>(undefined);
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const policyID = route.params?.policyID;
     const integration = route.params?.integration;
@@ -78,7 +78,7 @@ function ChangeReceiptBillingAccountPage({route}: ChangeReceiptBillingAccountPag
                     accountID: personalDetail?.accountID,
                     icons: [
                         {
-                            source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                            source: personalDetail?.avatar ?? fallbackAvatarIcon,
                             name: formatPhoneNumber(email),
                             type: CONST.ICON_TYPE_AVATAR,
                             id: personalDetail?.accountID,

@@ -35,7 +35,7 @@ function InsightsTabButton({selectedTab, isWideLayout}: InsightsTabButtonProps) 
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['PieChart']);
+    const {PieChart: pieChartIcon} = useMemoizedLazyExpensifyIcons(['PieChart']);
     const [accessibleDashboards = getEmptyArray<InsightsDashboardID>()] = useAccessibleDashboards();
     const isSelected = selectedTab === NAVIGATION_TABS.INSIGHTS;
 
@@ -62,7 +62,7 @@ function InsightsTabButton({selectedTab, isWideLayout}: InsightsTabButtonProps) 
             >
                 {({hovered}) => (
                     <TabBarItem
-                        icon={expensifyIcons.PieChart}
+                        icon={pieChartIcon}
                         label={translate('common.insights')}
                         isSelected={isSelected}
                         isHovered={hovered}
@@ -83,7 +83,7 @@ function InsightsTabButton({selectedTab, isWideLayout}: InsightsTabButtonProps) 
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.INSIGHTS}
         >
             <TabBarItem
-                icon={expensifyIcons.PieChart}
+                icon={pieChartIcon}
                 label={translate('common.insights')}
                 isSelected={isSelected}
                 numberOfLines={1}

@@ -24,7 +24,8 @@ function ConnectionsRecruitingPage({
     },
 }: ConnectionsRecruitingPageProps) {
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Download']);
+    const {Download} = useMemoizedLazyExpensifyIcons(['Download']);
+    const icons = {Download};
     const policy = usePolicy(policyID);
     const policyEmployeePersonalDetails = usePersonalDetailsByLogins([...Object.keys(policy?.employeeList ?? {})]);
     const {isBetaEnabled} = usePermissions();

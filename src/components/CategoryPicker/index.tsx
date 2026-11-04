@@ -101,7 +101,7 @@ function CategoryPicker({
 }: CategoryPickerProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {inputCallbackRef} = useAutoFocusInput();
     const [shouldShowGLCodeFromPolicy] = useOnyxWithoutSnapshots(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(policyID)}`, {
         selector: (policy) => !!policy?.showCategoryGLCodes && !!policy?.glCodes,
@@ -194,7 +194,7 @@ function CategoryPicker({
                     leftElement: (
                         <View style={[styles.mr3, styles.justifyContentCenter]}>
                             <Icon
-                                src={icons.Plus}
+                                src={plusIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeNormal}
                                 height={variables.iconSizeNormal}

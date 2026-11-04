@@ -34,7 +34,7 @@ type ConnectionsReceiptPartnersPageProps = PlatformStackScreenProps<SettingsNavi
 
 function ConnectionsReceiptPartnersPage({route}: ConnectionsReceiptPartnersPageProps) {
     const policyID = route.params.policyID;
-    const icons = useMemoizedLazyExpensifyIcons(['Mail']);
+    const {Mail: mailIcon} = useMemoizedLazyExpensifyIcons(['Mail']);
     const {translate} = useLocalize();
     const buildDynamicRoute = useScreenBoundDynamicRoute();
     const styles = useThemeStyles();
@@ -156,7 +156,7 @@ function ConnectionsReceiptPartnersPage({route}: ConnectionsReceiptPartnersPageP
                                 )}
                                 {canWriteMoreFeatures && (
                                     <MenuItemNavigation
-                                        icon={icons.Mail}
+                                        icon={mailIcon}
                                         title={translate('workspace.receiptPartners.uber.manageInvites')}
                                         onPress={() =>
                                             Navigation.navigate(buildDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_RECEIPT_PARTNERS_INVITE_EDIT.getRoute(CONST.POLICY.RECEIPT_PARTNERS.NAME.UBER)))

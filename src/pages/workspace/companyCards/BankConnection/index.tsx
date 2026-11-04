@@ -58,7 +58,10 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
     const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
     const [cardFeeds] = useCardFeeds(policyID);
     const prevFeedsData = usePrevious(cardFeeds);
-    const illustrations = useMemoizedLazyIllustrations(['PendingBank', 'BrokenCompanyCardBankConnection']);
+    const {PendingBank: pendingBankIllustration, BrokenCompanyCardBankConnection: brokenCompanyCardBankConnectionIllustration} = useMemoizedLazyIllustrations([
+        'PendingBank',
+        'BrokenCompanyCardBankConnection',
+    ]);
     const [shouldBlockWindowOpen, setShouldBlockWindowOpen] = useState(false);
     const selectedBank = addNewCard?.data?.selectedBank;
     const bankName = feed ? getBankName(getCompanyCardFeed(feed)) : (addNewCard?.data?.plaidConnectedFeed ?? selectedBank);
@@ -205,7 +208,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
                 <ConfirmationPageDefault
                     heading={translate('workspace.companyCards.error.feedCouldNotBeLoadedTitle')}
                     description={translate('common.genericErrorMessage')}
-                    illustration={illustrations.BrokenCompanyCardBankConnection}
+                    illustration={brokenCompanyCardBankConnectionIllustration}
                     illustrationStyle={styles.errorStateCardIllustration}
                     buttonText={translate('common.buttonConfirm')}
                     onButtonPress={() => Navigation.closeRHPFlow()}
@@ -224,7 +227,7 @@ function BankConnection({policyID, feed, title}: BankConnectionProps) {
         if (!isPlaid && !isAllFeedsResultLoading && (!isBlockedToAddNewFeeds || !!feed)) {
             return (
                 <BlockingView
-                    icon={illustrations.PendingBank}
+                    icon={pendingBankIllustration}
                     iconWidth={styles.pendingBankCardIllustration.width}
                     iconHeight={styles.pendingBankCardIllustration.height}
                     title={translate('workspace.moreFeatures.companyCards.pendingBankTitle')}

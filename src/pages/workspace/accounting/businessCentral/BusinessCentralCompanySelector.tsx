@@ -37,7 +37,7 @@ function BusinessCentralCompanySelector({policy}: WithPolicyConnectionsProps) {
     const currentCompanyID = businessCentralConfig?.companyID;
     const policyID = policy?.id ?? CONST.DEFAULT_NUMBER_ID.toString();
 
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const data: CompanyListItem[] = companies
         ? companies.map((company) => ({
@@ -60,7 +60,7 @@ function BusinessCentralCompanySelector({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.businessCentral.noCompaniesFound')}

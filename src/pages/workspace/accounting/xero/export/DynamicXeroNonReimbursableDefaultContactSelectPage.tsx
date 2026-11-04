@@ -36,7 +36,7 @@ const CLEAR_DEFAULT_VENDOR_VALUE = '';
 function DynamicXeroNonReimbursableDefaultContactSelectPage({policy}: WithPolicyConnectionsProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id;
     const xeroConfig = policy?.connections?.xero?.config;
@@ -131,7 +131,7 @@ function DynamicXeroNonReimbursableDefaultContactSelectPage({policy}: WithPolicy
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.xero.noVendorsFound')}

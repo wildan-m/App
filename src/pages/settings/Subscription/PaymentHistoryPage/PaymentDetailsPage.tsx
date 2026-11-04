@@ -47,7 +47,7 @@ import {View} from 'react-native';
 type PaymentDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.SUBSCRIPTION.PAYMENT_DETAILS>;
 
 function PaymentDetailsPage({route}: PaymentDetailsPageProps) {
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Receipt', 'InvoiceGeneric']);
+    const {Receipt: receiptIcon, InvoiceGeneric: invoiceGenericIcon} = useMemoizedLazyExpensifyIcons(['Receipt', 'InvoiceGeneric']);
     const {translate, dateFnsLocale, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
@@ -151,7 +151,7 @@ function PaymentDetailsPage({route}: PaymentDetailsPageProps) {
                     style={[styles.ph5, styles.pv4]}
                 >
                     <MenuItem.Row>
-                        <MenuItem.Icon src={isInvoice ? expensifyIcons.InvoiceGeneric : expensifyIcons.Receipt} />
+                        <MenuItem.Icon src={isInvoice ? invoiceGenericIcon : receiptIcon} />
                         <MenuItem.Content>
                             <MenuItem.Title>{translate(isInvoice ? 'subscription.paymentHistory.viewInvoice' : 'subscription.paymentHistory.viewReceipt')}</MenuItem.Title>
                         </MenuItem.Content>

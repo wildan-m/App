@@ -67,7 +67,7 @@ function AssigneeStep({route}: AssigneeStepProps) {
     const {translate, formatPhoneNumber, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const shouldFooterBeInsideList = useShouldFooterBeInsideList();
     const policy = usePolicy(policyID);
     const [assignCard] = useOnyx(ONYXKEYS.ASSIGN_CARD);
@@ -244,7 +244,7 @@ function AssigneeStep({route}: AssigneeStepProps) {
                 isSelected: selectedAssignee?.login === email,
                 icons: [
                     {
-                        source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                        source: personalDetail?.avatar ?? fallbackAvatarIcon,
                         name: formatPhoneNumber(email),
                         type: CONST.ICON_TYPE_AVATAR,
                         id: personalDetail?.accountID,

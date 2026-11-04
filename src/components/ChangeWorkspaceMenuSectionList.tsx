@@ -25,15 +25,15 @@ type ChangeWorkspaceMenuSection = {
 function ChangeWorkspaceMenuSectionList() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['FolderOpen', 'Workflows']);
+    const {FolderOpen: folderOpenIllustration, Workflows: workflowsIllustration} = useMemoizedLazyIllustrations(['FolderOpen', 'Workflows']);
 
     const changeWorkspaceMenuSections: ChangeWorkspaceMenuSection[] = [
         {
-            icon: illustrations.FolderOpen,
+            icon: folderOpenIllustration,
             titleTranslationKey: 'iou.changePolicyEducational.reCategorize',
         },
         {
-            icon: illustrations.Workflows,
+            icon: workflowsIllustration,
             titleTranslationKey: 'iou.changePolicyEducational.workflows',
         },
     ];

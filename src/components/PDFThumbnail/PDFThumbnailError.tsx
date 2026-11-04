@@ -19,12 +19,12 @@ type PDFThumbnailErrorProps = {
 function PDFThumbnailError({style}: PDFThumbnailErrorProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptSlash']);
+    const {ReceiptSlash: receiptSlashIcon} = useMemoizedLazyExpensifyIcons(['ReceiptSlash']);
 
     return (
         <View style={[styles.justifyContentCenter, styles.pdfErrorPlaceholder, styles.alignItemsCenter, style]}>
             <Icon
-                src={icons.ReceiptSlash}
+                src={receiptSlashIcon}
                 width={variables.receiptPlaceholderIconWidth}
                 height={variables.receiptPlaceholderIconHeight}
                 fill={theme.icon}

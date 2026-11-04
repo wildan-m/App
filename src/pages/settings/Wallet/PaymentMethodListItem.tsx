@@ -149,7 +149,7 @@ function isAccountNeedingAction(account: PaymentMethodItem) {
 }
 
 function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems, listItemStyle}: PaymentMethodListItemProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'FreezeCard', 'QuestionMark']);
+    const {DotIndicator: dotIndicatorIcon, FreezeCard: freezeCardIcon, QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator', 'FreezeCard', 'QuestionMark']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -198,7 +198,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
 
     let badgeIcon: IconAsset | undefined;
     if (!item.connectionStatus && isInLockedState) {
-        badgeIcon = icons.DotIndicator;
+        badgeIcon = dotIndicatorIcon;
     }
 
     // Card state pills (below title, next to description)
@@ -215,7 +215,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
         descriptionAddon = (
             <Badge
                 text={translate('cardPage.frozen')}
-                icon={icons.FreezeCard}
+                icon={freezeCardIcon}
                 isCondensed
                 badgeStyles={[styles.ml0]}
                 iconStyles={[styles.mr1]}
@@ -333,7 +333,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween, styles.pv3, cardPaddingHorizontal]}>
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1, styles.mr2]}>
                         <Icon
-                            src={icons.DotIndicator}
+                            src={dotIndicatorIcon}
                             fill={theme.success}
                             additionalStyles={[styles.mr2]}
                         />
@@ -365,7 +365,7 @@ function PaymentMethodListItem({item, shouldShowDefaultBadge, threeDotsMenuItems
                         sentryLabel={CONST.SENTRY_LABEL.PAYMENT_METHOD_LIST_ITEM.CHASE_ACCOUNT_HELP}
                     >
                         <Icon
-                            src={icons.QuestionMark}
+                            src={questionMarkIcon}
                             height={variables.iconSizeSmall}
                             width={variables.iconSizeSmall}
                             fill={theme.textSupporting}

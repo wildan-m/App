@@ -14,13 +14,13 @@ function TrialStartedBillingBanner() {
     const {translate} = useLocalize();
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
     const [lastDayFreeTrial] = useOnyx(ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL);
-    const illustrations = useMemoizedLazyIllustrations(['TreasureChest']);
+    const {TreasureChest: treasureChestIllustration} = useMemoizedLazyIllustrations(['TreasureChest']);
     const subtitle = !doesUserHavePaymentCardAdded(userBillingFundID) ? translate('subscription.billingBanner.trialStarted.subtitle') : '';
     return (
         <BillingBanner
             title={translate('subscription.billingBanner.trialStarted.title', {count: calculateRemainingFreeTrialDays(lastDayFreeTrial)})}
             subtitle={subtitle}
-            icon={illustrations.TreasureChest}
+            icon={treasureChestIllustration}
         />
     );
 }

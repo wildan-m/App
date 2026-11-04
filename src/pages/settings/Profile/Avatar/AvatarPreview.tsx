@@ -48,7 +48,7 @@ type ImageData = {
 };
 
 function AvatarPreview({selected, isRemoved, onImageRemoved, imageData, setError, openCropper, openPicker}: AvatarPreviewProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Upload']);
+    const {Upload: uploadIcon} = useMemoizedLazyExpensifyIcons(['Upload']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
@@ -148,7 +148,7 @@ function AvatarPreview({selected, isRemoved, onImageRemoved, imageData, setError
                         });
                     }}
                 >
-                    <Button.Icon src={icons.Upload} />
+                    <Button.Icon src={uploadIcon} />
                     <Button.Text>{translate('avatarPage.uploadPhoto')}</Button.Text>
                 </Button>
             ) : (

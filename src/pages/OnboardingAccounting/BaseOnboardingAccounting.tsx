@@ -83,7 +83,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(integrationIconNames);
-    const illustrations = useMemoizedLazyIllustrations(['Pencil']);
+    const {Pencil: pencilIllustration} = useMemoizedLazyIllustrations(['Pencil']);
     // We need to use isSmallScreenWidth, see navigateAfterOnboarding function comment
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {onboardingIsMediumOrLargerScreenWidth, isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
@@ -191,7 +191,7 @@ function BaseOnboardingAccounting({shouldUseNativeStyles}: BaseOnboardingAccount
                     wrapperStyle={styles.onboardingTileSelectionButton}
                 />
                 <Icon
-                    src={isOtherOption ? illustrations.Pencil : expensifyIcons[accountingIntegrationDetails[optionKey].iconName]}
+                    src={isOtherOption ? pencilIllustration : expensifyIcons[accountingIntegrationDetails[optionKey].iconName]}
                     width={variables.iconSizeExtraLarge}
                     height={variables.iconSizeExtraLarge}
                     // The Other illustration has no circular badge.

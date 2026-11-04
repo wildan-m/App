@@ -80,7 +80,7 @@ function BulkActionBarContent<TValueType>({
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Close', 'DownArrow', 'UpArrow']);
+    const {Close: closeIcon, DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['Close', 'DownArrow', 'UpArrow']);
     const {calculatePopoverPosition} = usePopoverPosition();
 
     const isFocused = useIsFocused();
@@ -216,7 +216,7 @@ function BulkActionBarContent<TValueType>({
                         sentryLabel={CONST.SENTRY_LABEL.BULK_ACTION_BAR.MORE}
                     >
                         <Button.Text>{translate('common.more')}</Button.Text>
-                        <Button.Icon src={isMoreMenuVisible ? icons.UpArrow : icons.DownArrow} />
+                        <Button.Icon src={isMoreMenuVisible ? upArrowIcon : downArrowIcon} />
                     </Button>
                     {!!moreMenuAnchorPosition && (
                         <BulkActionBarMenuTheme>
@@ -253,7 +253,7 @@ function BulkActionBarContent<TValueType>({
                 sentryLabel={CONST.SENTRY_LABEL.BULK_ACTION_BAR.CLEAR_SELECTION}
             >
                 <Icon
-                    src={icons.Close}
+                    src={closeIcon}
                     fill={theme.icon}
                     size={CONST.ICON_SIZE.SMALL}
                 />

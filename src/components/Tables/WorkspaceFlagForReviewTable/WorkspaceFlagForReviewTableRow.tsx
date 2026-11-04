@@ -32,7 +32,7 @@ function WorkspaceFlagForReviewTableRow({item, rowIndex, shouldUseNarrowTableLay
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Flag']);
+    const {ArrowRight: arrowRightIcon, Flag: flagIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'Flag']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -58,7 +58,7 @@ function WorkspaceFlagForReviewTableRow({item, rowIndex, shouldUseNarrowTableLay
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
                                 <Badge
                                     text={item.typeLabel}
-                                    icon={Expensicons.Flag}
+                                    icon={flagIcon}
                                     iconFill={FLAG_BADGE_TEXT_COLOR}
                                     badgeStyles={[
                                         styles.ml0,
@@ -94,7 +94,7 @@ function WorkspaceFlagForReviewTableRow({item, rowIndex, shouldUseNarrowTableLay
                             >
                                 <Badge
                                     text={item.typeLabel}
-                                    icon={Expensicons.Flag}
+                                    icon={flagIcon}
                                     iconFill={FLAG_BADGE_TEXT_COLOR}
                                     badgeStyles={[
                                         styles.ml0,
@@ -134,7 +134,7 @@ function WorkspaceFlagForReviewTableRow({item, rowIndex, shouldUseNarrowTableLay
 
                     <View {...getCellAccessibilityProps(isTableSemanticsEnabled)}>
                         <Icon
-                            src={Expensicons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

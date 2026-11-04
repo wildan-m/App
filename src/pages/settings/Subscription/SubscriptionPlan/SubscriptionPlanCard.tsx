@@ -49,8 +49,9 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
     const privateSubscription = usePrivateSubscription();
     const preferredCurrency = usePreferredCurrency();
     const hasTeam2025Pricing = useHasTeam2025Pricing();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Mailbox', 'ShieldYellow']);
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Mailbox, ShieldYellow} = useMemoizedLazyIllustrations(['Mailbox', 'ShieldYellow']);
+    const lazyIllustrations = {Mailbox, ShieldYellow};
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
     const {title, src, description, benefits, note, subtitle} = getSubscriptionPlanInfo(
         translate,
         subscriptionPlan,
@@ -84,7 +85,7 @@ function SubscriptionPlanCard({subscriptionPlan, isFromComparisonModal = false, 
                                 importantForAccessibility="no-hide-descendants"
                             >
                                 <Icon
-                                    src={icons.Checkmark}
+                                    src={checkmarkIcon}
                                     fill={theme.iconSuccessFill}
                                     width={variables.iconSizeSmall}
                                     height={variables.iconSizeSmall}

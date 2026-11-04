@@ -55,7 +55,8 @@ function useMergeConnectionListings(policy: OnyxEntry<Policy>, onStartSetup: (se
     const {showConfirmModal} = useConfirmModal();
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
     const {canWrite, showReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.MORE_FEATURES);
-    const icons = useMemoizedLazyExpensifyIcons(['GustoSquare', 'TriNetSquare', 'Download']);
+    const {GustoSquare: gustoSquareIcon, TriNetSquare: triNetSquareIcon, Download} = useMemoizedLazyExpensifyIcons(['GustoSquare', 'TriNetSquare', 'Download']);
+    const icons = {GustoSquare: gustoSquareIcon, TriNetSquare: triNetSquareIcon, Download};
 
     if (!policyID) {
         return [];
@@ -70,8 +71,8 @@ function useMergeConnectionListings(policy: OnyxEntry<Policy>, onStartSetup: (se
         translate,
         formatPhoneNumber,
         policyID,
-        gustoIcon: icons.GustoSquare,
-        trinetIcon: icons.TriNetSquare,
+        gustoIcon: gustoSquareIcon,
+        trinetIcon: triNetSquareIcon,
     });
     const recruitingCards = isRecruitingBetaEnabled ? getRecruitingCards({policy, policyEmployeePersonalDetails: NO_PERSONAL_DETAILS, policyID, icons, translate, formatPhoneNumber}) : [];
 

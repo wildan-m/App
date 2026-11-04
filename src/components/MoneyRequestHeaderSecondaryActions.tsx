@@ -129,7 +129,19 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
     const delegateAccountID = useDelegateAccountID();
     const personalDetails = usePersonalDetails();
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        ArrowCollapse: arrowCollapseIcon,
+        ArrowSplit: arrowSplitIcon,
+        Building: buildingIcon,
+        Checkmark: checkmarkIcon,
+        DocumentMerge: documentMergeIcon,
+        ExpenseCopy: expenseCopyIcon,
+        Info: infoIcon,
+        Send: sendIcon,
+        Stopwatch: stopwatchIcon,
+        ThumbsDown: thumbsDownIcon,
+        Trashcan: trashcanIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'ArrowCollapse',
         'ArrowSplit',
         'Building',
@@ -426,7 +438,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
     > = {
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD]: {
             text: translate('iou.hold'),
-            icon: expensifyIcons.Stopwatch,
+            icon: stopwatchIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.HOLD,
             onSelected: () => {
                 if (!parentReportAction) {
@@ -462,7 +474,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REMOVE_HOLD]: {
             text: translate('iou.unhold'),
-            icon: expensifyIcons.Stopwatch,
+            icon: stopwatchIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REMOVE_HOLD,
             onSelected: () => {
                 if (!parentReportAction) {
@@ -490,7 +502,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SPLIT]: {
             text: shouldShowSplitIndicator ? translate('iou.editSplits') : translate('iou.split'),
-            icon: expensifyIcons.ArrowSplit,
+            icon: arrowSplitIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SPLIT,
             onSelected: () => {
                 initSplitExpense(transaction, report, splitEffectivePolicy, selfDMReportID, restrictedActionPolicyID, personalPolicy?.outputCurrency, getCurrencyDecimals, getCurrencySymbol);
@@ -498,7 +510,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MERGE]: {
             text: translate('common.merge'),
-            icon: expensifyIcons.ArrowCollapse,
+            icon: arrowCollapseIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MERGE,
             onSelected: () => {
                 if (!transaction) {
@@ -509,7 +521,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DUPLICATE]: {
             text: isDuplicateActive ? translate('common.duplicateExpense') : translate('common.duplicated'),
-            icon: isDuplicateActive ? expensifyIcons.ExpenseCopy : expensifyIcons.Checkmark,
+            icon: isDuplicateActive ? expenseCopyIcon : checkmarkIcon,
             iconFill: isDuplicateActive ? undefined : theme.icon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DUPLICATE,
             onSelected: () => {
@@ -561,14 +573,14 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.VIEW_DETAILS]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS,
             text: translate('iou.viewDetails'),
-            icon: expensifyIcons.Info,
+            icon: infoIcon,
             onSelected: () => {
                 navigateToDetailsPage(report, isInSidePanel);
             },
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.DELETE]: {
             text: shouldShowEditSplitOnDeleteAction ? translate('iou.editSplits') : translate('common.delete'),
-            icon: shouldShowEditSplitOnDeleteAction ? expensifyIcons.ArrowSplit : expensifyIcons.Trashcan,
+            icon: shouldShowEditSplitOnDeleteAction ? arrowSplitIcon : trashcanIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.DELETE,
             onSelected: () => {
                 if (shouldShowEditSplitOnDeleteAction && transaction?.transactionID) {
@@ -653,7 +665,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT]: {
             text: translate('common.reject'),
-            icon: expensifyIcons.ThumbsDown,
+            icon: thumbsDownIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.REJECT,
             onSelected: () => {
                 if (isDelegateAccessRestricted) {
@@ -672,7 +684,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MOVE_EXPENSE]: {
             text: translate('iou.moveExpenses'),
-            icon: expensifyIcons.DocumentMerge,
+            icon: documentMergeIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.MOVE_EXPENSE,
             onSelected: () => {
                 if (!parentReport || !transaction?.transactionID) {
@@ -700,7 +712,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SEND_TO_SOMEONE]: {
             text: translate('iou.sendToSomeone'),
-            icon: expensifyIcons.Send,
+            icon: sendIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SEND_TO_SOMEONE,
             onSelected: () => {
                 if (isDelegateAccessRestricted) {
@@ -713,7 +725,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
         },
         [CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SEND_TO_EMPLOYER]: {
             text: translate('iou.submitToEmployer'),
-            icon: expensifyIcons.Building,
+            icon: buildingIcon,
             value: CONST.REPORT.TRANSACTION_SECONDARY_ACTIONS.SEND_TO_EMPLOYER,
             onSelected: () => {
                 if (isDelegateAccessRestricted) {

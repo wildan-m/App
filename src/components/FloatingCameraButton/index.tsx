@@ -9,8 +9,8 @@ import React from 'react';
 import BaseFloatingCameraButton from './BaseFloatingCameraButton';
 
 function FloatingCameraButton() {
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Camera', 'ReceiptPlus']);
-    const icon = getPlatform(true) === CONST.PLATFORM.MOBILE_WEB ? expensifyIcons.Camera : expensifyIcons.ReceiptPlus;
+    const {Camera: cameraIcon, ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['Camera', 'ReceiptPlus']);
+    const icon = getPlatform(true) === CONST.PLATFORM.MOBILE_WEB ? cameraIcon : receiptPlusIcon;
 
     return <BaseFloatingCameraButton icon={icon} />;
 }

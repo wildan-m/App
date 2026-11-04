@@ -29,7 +29,7 @@ type SearchSelectAllMenuProps = {
 function SearchSelectAllMenu({isSelectAllChecked, isIndeterminate, selectedItemsLength, totalItems, shouldShowTextButton, onAllCheckboxPress}: SearchSelectAllMenuProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Checkmark', 'CheckSquare']);
+    const {Checkmark: checkmarkIcon, CheckSquare: checkSquareIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'CheckSquare']);
     const {currentSearchResults} = useSearchResultsContext();
     const {selectAllMatchingItems} = useSearchSelectionActions();
     const selectAllAnchorRef = useRef<ComponentRef<typeof View>>(null);
@@ -52,8 +52,8 @@ function SearchSelectAllMenu({isSelectAllChecked, isIndeterminate, selectedItems
     };
 
     const selectAllMenuItems: PopoverMenuItem[] = [
-        {icon: expensifyIcons.Checkmark, text: translate('search.exportAll.selectAllOnThisPage'), onSelected: selectAllOnPage},
-        {icon: expensifyIcons.CheckSquare, text: translate('workspace.people.selectAll'), onSelected: selectAllMatching},
+        {icon: checkmarkIcon, text: translate('search.exportAll.selectAllOnThisPage'), onSelected: selectAllOnPage},
+        {icon: checkSquareIcon, text: translate('workspace.people.selectAll'), onSelected: selectAllMatching},
     ];
 
     const showSelectAllMenu = () => {

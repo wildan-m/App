@@ -61,7 +61,7 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'ChatBubble', 'Globe']);
+    const {ArrowRight: arrowRightIcon, ChatBubble: chatBubbleIcon, Globe: globeIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'ChatBubble', 'Globe']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -149,7 +149,7 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
                             )}
                             {item.ownerType === CONST.AGENTS.OWNER_TYPE.DOMAIN && (
                                 <Icon
-                                    src={icons.Globe}
+                                    src={globeIcon}
                                     fill={theme.icon}
                                     additionalStyles={[styles.pr2, styles.alignSelfCenter]}
                                     size={CONST.ICON_SIZE.SMALL}
@@ -179,7 +179,7 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
                                     accessibilityLabel={translate('editAgentPage.chatWithAgent')}
                                     sentryLabel={CONST.SENTRY_LABEL.AGENTS.CHAT}
                                 >
-                                    <Button.Icon src={icons.ChatBubble} />
+                                    <Button.Icon src={chatBubbleIcon} />
                                 </Button>
                                 <Button
                                     size={CONST.BUTTON_SIZE.SMALL}
@@ -203,7 +203,7 @@ export default function AgentsTableRow({item, rowIndex, shouldUseNarrowTableLayo
                             </View>
                         )}
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.alignSelfCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

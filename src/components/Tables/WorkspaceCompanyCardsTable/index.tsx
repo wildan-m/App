@@ -120,7 +120,10 @@ function WorkspaceCompanyCardsTable({
     } = companyCards;
 
     const {cardFeedErrors} = useCardFeedErrors();
-    const illustrations = useMemoizedLazyIllustrations(['LaptopAssignCard', 'BrokenMagnifyingGlass']);
+    const {LaptopAssignCard: laptopAssignCardIllustration, BrokenMagnifyingGlass: brokenMagnifyingGlassIllustration} = useMemoizedLazyIllustrations([
+        'LaptopAssignCard',
+        'BrokenMagnifyingGlass',
+    ]);
     // Per-row errors are hidden while we surface the connection error for the whole feed instead. Keyed on the prompting flag
     // so that past the grace period an actionable card error (e.g. a failed unassignment) becomes visible and dismissible
     // again rather than being suppressed forever.
@@ -564,7 +567,7 @@ function WorkspaceCompanyCardsTable({
                 <ScrollView contentContainerStyle={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, bottomSafeAreaPaddingStyle]}>
                     <View style={[styles.alignItemsCenter]}>
                         <BlockingView
-                            icon={illustrations.BrokenMagnifyingGlass}
+                            icon={brokenMagnifyingGlassIllustration}
                             iconWidth={variables.companyCardsPageNotFoundIconWidth}
                             iconHeight={variables.companyCardsPageNotFoundIconHeight}
                             title={feedErrorTitle ?? ''}
@@ -584,7 +587,7 @@ function WorkspaceCompanyCardsTable({
             so the Table root can extract them and render them inside the scrolling list when cards are shown. */}
             {showCards && !shouldShowPendingUnassignmentLoading && (
                 <Table.EmptyState
-                    headerMedia={illustrations.LaptopAssignCard}
+                    headerMedia={laptopAssignCardIllustration}
                     containerStyles={styles.mt5}
                     headerStyles={styles.emptyStateCardIllustrationContainer}
                     headerContentStyles={styles.pendingStateCardIllustration}

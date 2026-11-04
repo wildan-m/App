@@ -49,8 +49,8 @@ function WorkspaceTravelBillingFeedSelectorPage({route}: WorkspaceTravelBillingF
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {ExpensifyCardImage: expensifyCardImageIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const startTravelBillingSetup = useTravelBillingSetupFlow(policyID);
     const {allFeeds} = useExpensifyCardFeedsForFeedSelector(policyID, [CONST.TRAVEL.PROGRAM_TRAVEL_US]);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
@@ -71,7 +71,7 @@ function WorkspaceTravelBillingFeedSelectorPage({route}: WorkspaceTravelBillingF
         errors: feedWithError?.fundID === entry.fundID ? feedWithError.error : undefined,
         leftElement: (
             <Icon
-                src={illustrations.ExpensifyCardImage}
+                src={expensifyCardImageIllustration}
                 height={variables.cardIconHeight}
                 width={variables.cardIconWidth}
                 additionalStyles={[styles.mr3, styles.cardIcon]}
@@ -121,7 +121,7 @@ function WorkspaceTravelBillingFeedSelectorPage({route}: WorkspaceTravelBillingF
                     listFooterContent={
                         <MenuItemAction
                             title={translate('workspace.moreFeatures.travel.travelBilling.travelBillingSection.setUpNewFeed')}
-                            icon={expensifyIcons.Plus}
+                            icon={plusIcon}
                             onPress={startTravelBillingSetup}
                         />
                     }

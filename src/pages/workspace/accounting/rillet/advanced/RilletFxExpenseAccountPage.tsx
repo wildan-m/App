@@ -29,7 +29,7 @@ import {View} from 'react-native';
 function RilletFxExpenseAccountPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const canConfigureCurrencyConversionFees = useCanConfigureCurrencyConversionFees(policy);
     const policyID = policy?.id;
     const rilletConfig = policy?.connections?.rillet?.config;
@@ -68,7 +68,7 @@ function RilletFxExpenseAccountPage({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.rillet.noAccountsFound')}

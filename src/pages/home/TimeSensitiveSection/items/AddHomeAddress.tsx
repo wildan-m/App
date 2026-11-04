@@ -11,11 +11,11 @@ import React from 'react';
 
 function AddHomeAddress() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Home']);
+    const {Home: homeIcon} = useMemoizedLazyExpensifyIcons(['Home']);
 
     return (
         <BaseWidgetItem
-            icon={icons.Home}
+            icon={homeIcon}
             title={translate('homePage.timeSensitiveSection.addHomeAddress.title')}
             subtitle={translate('homePage.timeSensitiveSection.addHomeAddress.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.addHomeAddress.cta')}

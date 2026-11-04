@@ -43,7 +43,7 @@ function SupportTicketPreview({action, isHovered, style}: SupportTicketPreviewPr
     const {showConfirmModal} = useConfirmModal();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const [supportTicket] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action?.childReportID)}`);
     const supportTicketReportID = supportTicket?.reportID ?? action?.childReportID;
     const supportRepAccountID = supportTicket?.managerID ?? CONST.DEFAULT_NUMBER_ID;
@@ -111,7 +111,7 @@ function SupportTicketPreview({action, isHovered, style}: SupportTicketPreviewPr
                     )}
                     <Text style={[supportRepAccountID <= 0 && styles.ml3, styles.flex1]}>{supportTicketName}</Text>
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: isHovered})})}
                     />
                 </PressableWithoutFeedback>

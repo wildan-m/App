@@ -87,7 +87,21 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const {showConfirmModal} = useConfirmModal();
-    const illustrations = useMemoizedLazyIllustrations([
+    const {
+        FolderOpen: folderOpenIllustration,
+        CompanyCard: companyCardIllustration,
+        Workflows: workflowsIllustration,
+        InvoiceBlue: invoiceBlueIllustration,
+        Flash: flashIllustration,
+        Tag: tagIllustration,
+        PerDiem: perDiemIllustration,
+        HandCard: handCardIllustration,
+        Coins: coinsIllustration,
+        Briefcase: briefcaseIllustration,
+        Luggage: luggageIllustration,
+        Car: carIllustration,
+        Clock: clockIllustration,
+    } = useMemoizedLazyIllustrations([
         'FolderOpen',
         'CompanyCard',
         'Workflows',
@@ -300,7 +314,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
 
                     <MoreFeaturesSection title={translate('workspace.moreFeatures.organizeSection.title')}>
                         <MoreFeatureToggle
-                            icon={illustrations.FolderOpen}
+                            icon={folderOpenIllustration}
                             title={translate('workspace.moreFeatures.categories.title')}
                             subtitle={translate('workspace.moreFeatures.categories.subtitle')}
                             isActive={policy?.areCategoriesEnabled ?? false}
@@ -321,7 +335,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Tag}
+                            icon={tagIllustration}
                             title={translate('workspace.moreFeatures.tags.title')}
                             subtitle={translate('workspace.moreFeatures.tags.subtitle')}
                             isActive={policy?.areTagsEnabled ?? false}
@@ -339,7 +353,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Coins}
+                            icon={coinsIllustration}
                             title={translate('workspace.moreFeatures.taxes.title')}
                             subtitle={translate('workspace.moreFeatures.taxes.subtitle')}
                             isActive={isPolicyTaxEnabled(policy)}
@@ -365,7 +379,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                         />
                         {shouldShowVendorsFeature && (
                             <MoreFeatureToggle
-                                icon={illustrations.Briefcase}
+                                icon={briefcaseIllustration}
                                 title={translate('workspace.moreFeatures.vendors.title')}
                                 subtitle={translate('workspace.moreFeatures.vendors.subtitle')}
                                 isActive={hasVendorFeature(policy, isVendorMatchingBetaEnabled ?? false)}
@@ -389,7 +403,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
 
                     <MoreFeaturesSection title={translate('workspace.moreFeatures.manageSection.title')}>
                         <MoreFeatureToggle
-                            icon={illustrations.Workflows}
+                            icon={workflowsIllustration}
                             title={translate('workspace.moreFeatures.workflows.title')}
                             subtitle={translate('workspace.moreFeatures.workflows.subtitle')}
                             isActive={policy?.areWorkflowsEnabled ?? false}
@@ -410,7 +424,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Flash}
+                            icon={flashIllustration}
                             title={translate('workspace.moreFeatures.rules.title')}
                             subtitle={translate('workspace.moreFeatures.rules.subtitle')}
                             isActive={arePolicyRulesEnabled(policy, policyCategories)}
@@ -443,7 +457,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
 
                     <MoreFeaturesSection title={translate('workspace.moreFeatures.spendSection.title')}>
                         <MoreFeatureToggle
-                            icon={illustrations.Car}
+                            icon={carIllustration}
                             title={translate('workspace.moreFeatures.distanceRates.title')}
                             subtitle={translate('workspace.moreFeatures.distanceRates.subtitle')}
                             isActive={policy?.areDistanceRatesEnabled ?? false}
@@ -468,7 +482,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Luggage}
+                            icon={luggageIllustration}
                             title={translate('workspace.moreFeatures.travel.title')}
                             subtitle={translate('workspace.moreFeatures.travel.subtitle')}
                             isActive={policy?.isTravelEnabled ?? false}
@@ -492,7 +506,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.HandCard}
+                            icon={handCardIllustration}
                             title={translate('workspace.moreFeatures.expensifyCard.title')}
                             subtitle={translate('workspace.moreFeatures.expensifyCard.subtitle')}
                             isActive={policy?.areExpensifyCardsEnabled ?? false}
@@ -516,7 +530,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.CompanyCard}
+                            icon={companyCardIllustration}
                             title={translate('workspace.moreFeatures.companyCards.title')}
                             subtitle={translate('workspace.moreFeatures.companyCards.subtitle')}
                             isActive={policy?.areCompanyCardsEnabled ?? false}
@@ -540,7 +554,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.PerDiem}
+                            icon={perDiemIllustration}
                             title={translate('workspace.moreFeatures.perDiem.title')}
                             subtitle={translate('workspace.moreFeatures.perDiem.subtitle')}
                             isActive={isPerDiemEnabled(policy) && canPolicyAccessFeature(policy, CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED)}
@@ -567,7 +581,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                             }}
                         />
                         <MoreFeatureToggle
-                            icon={illustrations.Clock}
+                            icon={clockIllustration}
                             title={translate('workspace.moreFeatures.timeTracking.title')}
                             subtitle={translate('workspace.moreFeatures.timeTracking.subtitle')}
                             isActive={isTimeTrackingEnabled(policy)}
@@ -591,7 +605,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
 
                     <MoreFeaturesSection title={translate('workspace.moreFeatures.earnSection.title')}>
                         <MoreFeatureToggle
-                            icon={illustrations.InvoiceBlue}
+                            icon={invoiceBlueIllustration}
                             title={translate('workspace.moreFeatures.invoices.title')}
                             subtitle={translate('workspace.moreFeatures.invoices.subtitle')}
                             isActive={policy?.areInvoicesEnabled ?? false}

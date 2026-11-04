@@ -68,7 +68,7 @@ function CategoryField({
     const {isBetaEnabled} = usePermissions();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {Sparkles: sparklesIcon} = useMemoizedLazyExpensifyIcons(['Sparkles']);
     const currentUserLogin = useCurrentUserPersonalDetails().login;
     const dropdownRef = useRef<ExpenseFieldDropdownHandle>(null);
 
@@ -90,7 +90,7 @@ function CategoryField({
     const isInvoice = iouType === CONST.IOU.TYPE.INVOICE;
     const shouldPromiseAutomaticCategory = isAutoCategorizationEnabled && !isInvoice && willAutoFill && (isAutoFillFromReceipt || !isCategoryRequired);
 
-    const getCategoryRightLabelIcon = () => (shouldPromiseAutomaticCategory ? icons.Sparkles : undefined);
+    const getCategoryRightLabelIcon = () => (shouldPromiseAutomaticCategory ? sparklesIcon : undefined);
     const getCategoryRightLabel = () => {
         if (shouldPromiseAutomaticCategory) {
             return translate('common.automatic');

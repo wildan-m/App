@@ -62,7 +62,7 @@ type VideoPlayerControlsProps = {
 /** Three-dots overflow trigger; records the active player + source before opening. */
 function MoreMenuTrigger({videoPlayerRef, url, fileName, small}: {videoPlayerRef: RefObject<VideoPlayer | null>; url: string; fileName: string | undefined; small: boolean}) {
     const {updateVideoPopoverMenuPlayerRef, updateSource} = useVideoPopoverMenuActions();
-    const icons = useMemoizedLazyExpensifyIcons(['ThreeDots']);
+    const {ThreeDots: threeDotsIcon} = useMemoizedLazyExpensifyIcons(['ThreeDots']);
     const {translate} = useLocalize();
 
     const handlePress = (event?: GestureResponderEvent | KeyboardEvent) => {
@@ -77,7 +77,7 @@ function MoreMenuTrigger({videoPlayerRef, url, fileName, small}: {videoPlayerRef
     return (
         <PopoverMenuTrigger>
             <IconButton
-                src={icons.ThreeDots}
+                src={threeDotsIcon}
                 tooltipText={translate('common.more')}
                 onPress={handlePress}
                 small={small}
@@ -103,7 +103,7 @@ function VideoPlayerControls({
     onSeekStart,
     onSeekEnd,
 }: VideoPlayerControlsProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Pause', 'Play', 'Fullscreen']);
+    const {Pause: pauseIcon, Play: playIcon, Fullscreen: fullscreenIcon} = useMemoizedLazyExpensifyIcons(['Pause', 'Play', 'Fullscreen']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {updateCurrentURLAndReportID} = usePlaybackActionsContext();
@@ -144,7 +144,7 @@ function VideoPlayerControls({
                 <View style={[styles.videoPlayerControlsButtonContainer, !small && styles.mb4]}>
                     <View style={[styles.videoPlayerControlsRow]}>
                         <IconButton
-                            src={isPlaying ? icons.Pause : icons.Play}
+                            src={isPlaying ? pauseIcon : playIcon}
                             tooltipText={isPlaying ? translate('videoPlayer.pause') : translate('videoPlayer.play')}
                             onPress={togglePlayCurrentVideo}
                             style={styles.mr2}
@@ -162,7 +162,7 @@ function VideoPlayerControls({
                     <View style={[styles.videoPlayerControlsRow]}>
                         <VolumeButton style={iconSpacing} />
                         <IconButton
-                            src={icons.Fullscreen}
+                            src={fullscreenIcon}
                             tooltipText={translate('videoPlayer.fullscreen')}
                             onPress={enterFullScreenMode}
                             style={iconSpacing}

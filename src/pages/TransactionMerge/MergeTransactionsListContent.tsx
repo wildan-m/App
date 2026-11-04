@@ -58,7 +58,7 @@ const reportsSelector = (reports: OnyxCollection<Report>): OnyxCollection<Report
     ) as OnyxCollection<Report>;
 
 function MergeTransactionsListContent({transactionID, mergeTransaction}: MergeTransactionsListContentProps) {
-    const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
+    const {EmptyShelves: emptyShelvesIllustration} = useMemoizedLazyIllustrations(['EmptyShelves']);
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const [searchValue, debouncedSearchValue, setSearchValue] = useDebouncedState('');
@@ -252,7 +252,7 @@ function MergeTransactionsListContent({transactionID, mergeTransaction}: MergeTr
                 <EmptyStateComponent
                     cardStyles={[styles.appBG]}
                     cardContentStyles={[styles.p0]}
-                    headerMedia={illustrations.EmptyShelves}
+                    headerMedia={emptyShelvesIllustration}
                     title={translate('transactionMerge.listPage.noEligibleExpenseFound')}
                     subtitleText={subTitleContent}
                     headerStyles={[styles.emptyStateCardIllustrationContainer, styles.mb5]}

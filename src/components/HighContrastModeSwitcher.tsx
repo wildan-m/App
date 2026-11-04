@@ -26,7 +26,7 @@ function HighContrastModeSwitcher() {
     const {translate} = useLocalize();
     const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME);
     const [highContrastIntent] = useOnyx(ONYXKEYS.SIGN_IN_HIGH_CONTRAST_INTENT);
-    const icons = useMemoizedLazyExpensifyIcons(['Moon']);
+    const {Moon: moonIcon} = useMemoizedLazyExpensifyIcons(['Moon']);
 
     const currentTheme = preferredTheme ?? CONST.THEME.DEFAULT;
     const isHighContrast = highContrastIntent ?? isHighContrastTheme(currentTheme);
@@ -47,7 +47,7 @@ function HighContrastModeSwitcher() {
             style={[styles.flexRow, styles.alignItemsCenter]}
         >
             <Icon
-                src={icons.Moon}
+                src={moonIcon}
                 fill={theme.icon}
                 width={variables.iconSizeSmall}
                 height={variables.iconSizeSmall}

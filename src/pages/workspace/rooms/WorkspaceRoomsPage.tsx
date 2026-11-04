@@ -54,7 +54,7 @@ function WorkspaceRoomsPage({route}: WorkspaceRoomsPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
-    const headerIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const policyID = route.params.policyID;
     const policy = usePolicy(policyID);
     const isAdmin = isPolicyAdmin(policy);
@@ -169,7 +169,7 @@ function WorkspaceRoomsPage({route}: WorkspaceRoomsPageProps) {
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACE_ROOM_CREATE.getRoute(policyID))}
                     style={styles.w100}
                 >
-                    <Button.Icon src={headerIcons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('common.create')}</Button.Text>
                 </Button>
             </View>
@@ -196,7 +196,7 @@ function WorkspaceRoomsPage({route}: WorkspaceRoomsPageProps) {
                             variant={CONST.BUTTON_VARIANT.SUCCESS}
                             onPress={() => Navigation.navigate(ROUTES.WORKSPACE_ROOM_CREATE.getRoute(policyID))}
                         >
-                            <Button.Icon src={headerIcons.Plus} />
+                            <Button.Icon src={plusIcon} />
                             <Button.Text>{translate('common.create')}</Button.Text>
                         </Button>
                     )}

@@ -23,7 +23,7 @@ function LongPressGlobalReimbursementsEnabledIcon({onPress}: GlobalReimbursement
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Globe']);
+    const {Globe: globeIcon} = useMemoizedLazyExpensifyIcons(['Globe']);
     const iconRef = useRef<View>(null);
     const label = translate('walletPage.globalReimbursementsEnabled');
 
@@ -52,7 +52,7 @@ function LongPressGlobalReimbursementsEnabledIcon({onPress}: GlobalReimbursement
                     sentryLabel={CONST.SENTRY_LABEL.PAYMENT_METHOD_LIST_ITEM.GLOBAL_REIMBURSEMENTS_ENABLED}
                 >
                     <Icon
-                        src={icons.Globe}
+                        src={globeIcon}
                         width={variables.iconSizeSemiSmall}
                         height={variables.iconSizeSemiSmall}
                         fill={theme.icon}

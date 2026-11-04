@@ -104,7 +104,13 @@ function createAvatarQRLogo(LocalAvatarLogo: React.FC<SvgProps>): React.FC<SvgPr
 }
 
 function ShareCodePage({report, policy, backTo, shouldShowQRCodeOnly = false}: ShareCodePageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Cash', 'Checkmark', 'Copy', 'Download', 'FallbackAvatar']);
+    const {
+        Cash: cashIcon,
+        Checkmark: checkmarkIcon,
+        Copy: copyIcon,
+        Download: downloadIcon,
+        FallbackAvatar: fallbackAvatarIcon,
+    } = useMemoizedLazyExpensifyIcons(['Cash', 'Checkmark', 'Copy', 'Download', 'FallbackAvatar']);
     const themeStyles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate, formatPhoneNumber} = useLocalize();
@@ -175,7 +181,7 @@ function ShareCodePage({report, policy, backTo, shouldShowQRCodeOnly = false}: S
     let svgLogoFillColor: string | undefined;
 
     if (!logo && !svgLogo && policy && !policy.avatarURL) {
-        svgLogo = getDefaultWorkspaceAvatar(policy.name) || icons.FallbackAvatar;
+        svgLogo = getDefaultWorkspaceAvatar(policy.name) || fallbackAvatarIcon;
 
         const defaultWorkspaceAvatarColors = StyleUtils.getDefaultWorkspaceAvatarColor(policy.id);
         logoBackgroundColor = defaultWorkspaceAvatarColors.backgroundColor?.toString();
@@ -217,8 +223,8 @@ function ShareCodePage({report, policy, backTo, shouldShowQRCodeOnly = false}: S
                         <ContextMenuItem
                             isAnonymousAction
                             text={translate('qrCodes.copy')}
-                            icon={icons.Copy}
-                            successIcon={icons.Checkmark}
+                            icon={copyIcon}
+                            successIcon={checkmarkIcon}
                             successText={translate('qrCodes.copied')}
                             onPress={() => Clipboard.setString(url)}
                             shouldLimitWidth={false}
@@ -230,7 +236,7 @@ function ShareCodePage({report, policy, backTo, shouldShowQRCodeOnly = false}: S
                             <MenuItem.Root onPress={() => qrCodeRef.current?.download?.()}>
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
-                                        <MenuItem.Icon src={icons.Download} />
+                                        <MenuItem.Icon src={downloadIcon} />
                                     </MenuItem.Leading>
                                     <MenuItem.Content>
                                         <MenuItem.Title>{translate('common.download')}</MenuItem.Title>
@@ -241,7 +247,7 @@ function ShareCodePage({report, policy, backTo, shouldShowQRCodeOnly = false}: S
 
                         <MenuItemNavigation
                             title={translate(`referralProgram.${CONST.REFERRAL_PROGRAM.CONTENT_TYPES.SHARE_CODE}.buttonText`)}
-                            icon={icons.Cash}
+                            icon={cashIcon}
                             onPress={() => {
                                 Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(CONST.REFERRAL_PROGRAM.CONTENT_TYPES.SHARE_CODE)));
                             }}

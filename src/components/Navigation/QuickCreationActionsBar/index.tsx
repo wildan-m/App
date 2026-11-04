@@ -39,7 +39,12 @@ import {View} from 'react-native';
 function QuickCreationActionsBar() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlus', 'DocumentPlus', 'LocationAdd', 'LuggageWithLinesPlus']);
+    const {
+        ReceiptPlus: receiptPlusIcon,
+        DocumentPlus: documentPlusIcon,
+        LocationAdd: locationAddIcon,
+        LuggageWithLinesPlus: luggageWithLinesPlusIcon,
+    } = useMemoizedLazyExpensifyIcons(['ReceiptPlus', 'DocumentPlus', 'LocationAdd', 'LuggageWithLinesPlus']);
 
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [email] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
@@ -134,7 +139,7 @@ function QuickCreationActionsBar() {
                 sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.QUICK_CREATE.EXPENSE}
                 accessibilityLabel={translate('common.expense')}
             >
-                <Button.Icon src={icons.ReceiptPlus} />
+                <Button.Icon src={receiptPlusIcon} />
                 <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('common.expense')}</Button.Text>
             </Button>
             <Button
@@ -146,7 +151,7 @@ function QuickCreationActionsBar() {
                 sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.QUICK_CREATE.REPORT}
                 accessibilityLabel={translate('common.report')}
             >
-                <Button.Icon src={icons.DocumentPlus} />
+                <Button.Icon src={documentPlusIcon} />
                 <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('common.report')}</Button.Text>
             </Button>
             <Button
@@ -157,7 +162,7 @@ function QuickCreationActionsBar() {
                 sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.QUICK_CREATE.DISTANCE}
                 accessibilityLabel={translate('common.distance')}
             >
-                <Button.Icon src={icons.LocationAdd} />
+                <Button.Icon src={locationAddIcon} />
                 <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('common.distance')}</Button.Text>
             </Button>
             {shouldShowBookTravel && (
@@ -169,7 +174,7 @@ function QuickCreationActionsBar() {
                     sentryLabel={CONST.SENTRY_LABEL.HOME_PAGE.QUICK_CREATE.BOOK_TRAVEL}
                     accessibilityLabel={translate('workspace.common.travel')}
                 >
-                    <Button.Icon src={icons.LuggageWithLinesPlus} />
+                    <Button.Icon src={luggageWithLinesPlusIcon} />
                     <Button.Text style={styles.quickCreationActionsBarButtonText}>{translate('workspace.common.travel')}</Button.Text>
                 </Button>
             )}

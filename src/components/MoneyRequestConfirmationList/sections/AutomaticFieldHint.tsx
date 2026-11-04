@@ -20,12 +20,12 @@ function AutomaticFieldHint() {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {Sparkles: sparklesIcon} = useMemoizedLazyExpensifyIcons(['Sparkles']);
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentCenter, styles.gap1]}>
             <Icon
-                src={icons.Sparkles}
+                src={sparklesIcon}
                 fill={theme.icon}
                 width={variables.iconSizeSmall}
                 height={variables.iconSizeSmall}

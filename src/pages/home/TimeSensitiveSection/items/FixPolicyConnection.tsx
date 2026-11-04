@@ -27,7 +27,7 @@ type FixPolicyConnectionProps = {
 
 function FixPolicyConnection({connectionName, policyID, policyName, integrationName}: FixPolicyConnectionProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Connect']);
+    const {Connect: connectIcon} = useMemoizedLazyExpensifyIcons(['Connect']);
 
     const subtitle = policyName
         ? translate('homePage.timeSensitiveSection.fixPolicyConnection.subtitle', {policyName})
@@ -39,7 +39,7 @@ function FixPolicyConnection({connectionName, policyID, policyName, integrationN
 
     return (
         <BaseWidgetItem
-            icon={icons.Connect}
+            icon={connectIcon}
             title={translate('homePage.timeSensitiveSection.fixPolicyConnection.title', {integrationName})}
             subtitle={subtitle}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

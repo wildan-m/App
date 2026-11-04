@@ -41,7 +41,12 @@ function DomainSamlPage({route}: DomainSamlPageProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['LaptopOnDeskWithCoffeeAndKey', 'LockClosed', 'OpenSafe', 'ShieldYellow']);
+    const {
+        LaptopOnDeskWithCoffeeAndKey: laptopOnDeskWithCoffeeAndKeyIllustration,
+        LockClosed: lockClosedIllustration,
+        OpenSafe: openSafeIllustration,
+        ShieldYellow: shieldYellowIllustration,
+    } = useMemoizedLazyIllustrations(['LaptopOnDeskWithCoffeeAndKey', 'LockClosed', 'OpenSafe', 'ShieldYellow']);
 
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
     const domainAccountID = route.params?.domainAccountID;
@@ -59,15 +64,15 @@ function DomainSamlPage({route}: DomainSamlPageProps) {
 
     const samlFeatures: FeatureListItem[] = [
         {
-            icon: illustrations.OpenSafe,
+            icon: openSafeIllustration,
             translationKey: 'domain.samlFeatureList.fasterAndEasierLogin',
         },
         {
-            icon: illustrations.ShieldYellow,
+            icon: shieldYellowIllustration,
             translationKey: 'domain.samlFeatureList.moreSecurityAndControl',
         },
         {
-            icon: illustrations.LockClosed,
+            icon: lockClosedIllustration,
             translationKey: 'domain.samlFeatureList.onePasswordForAnything',
         },
     ];
@@ -154,7 +159,7 @@ function DomainSamlPage({route}: DomainSamlPageProps) {
                                     Navigation.navigate(ROUTES.DOMAIN_SAML_VERIFY.getRoute(domainAccountID));
                                 }}
                                 illustrationBackgroundColor={colors.blue700}
-                                illustration={illustrations.LaptopOnDeskWithCoffeeAndKey}
+                                illustration={laptopOnDeskWithCoffeeAndKeyIllustration}
                                 illustrationStyle={styles.emptyStateSamlIllustration}
                                 illustrationContainerStyle={[styles.emptyStateCardIllustrationContainer, styles.justifyContentCenter, styles.cardSectionIllustrationContainer]}
                                 titleStyles={styles.textHeadlineH1}

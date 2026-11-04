@@ -52,7 +52,7 @@ function ExpenseReportListItemRowWide({
     const getSearchColumnStyles = useSearchColumnStyles();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {isSelected} = useRowSelection(item.keyForList);
     const isHovered = useListItemHovered();
     const {isDisabled} = useListItemContext();
@@ -394,7 +394,7 @@ function ExpenseReportListItemRowWide({
                 })}
             </View>
             <Icon
-                src={expensifyIcons.ArrowRight}
+                src={arrowRightIcon}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}
                 fill={theme.icon}

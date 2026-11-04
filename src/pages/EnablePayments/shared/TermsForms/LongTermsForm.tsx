@@ -16,7 +16,7 @@ import {View} from 'react-native';
 
 function LongTermsForm() {
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['Printer']);
+    const {Printer: printerIcon} = useMemoizedLazyExpensifyIcons(['Printer']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, numberFormat} = useLocalize();
@@ -104,7 +104,7 @@ function LongTermsForm() {
             <View style={styles.flexRow}>
                 <Icon
                     fill={theme.icon}
-                    src={icons.Printer}
+                    src={printerIcon}
                 />
                 <TextLink
                     style={styles.ml1}

@@ -29,7 +29,7 @@ export default function DomainAdminsTableRow({item, rowIndex}: DomainAdminsTable
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {shouldUseNarrowTableLayout} = useTableContext<DomainAdminRowData>();
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
@@ -89,7 +89,7 @@ export default function DomainAdminsTableRow({item, rowIndex}: DomainAdminsTable
                             />
                         )}
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.alignSelfCenter, (!hovered || item.disabled) && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

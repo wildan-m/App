@@ -47,7 +47,7 @@ function RegistrationNumberStepImpl({formID, onSubmit, inputID, defaultValue, is
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['QuestionMark']);
+    const {QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['QuestionMark']);
     const {inputCallbackRef} = useAutoFocusInput();
 
     const helpLink = CONST.REGISTRATION_NUMBER_HELP_URL[country as keyof typeof CONST.REGISTRATION_NUMBER_HELP_URL] ?? CONST.REGISTRATION_NUMBER_HELP_URL.EU;
@@ -87,7 +87,7 @@ function RegistrationNumberStepImpl({formID, onSubmit, inputID, defaultValue, is
             />
             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mt6]}>
                 <Icon
-                    src={icons.QuestionMark}
+                    src={questionMarkIcon}
                     width={12}
                     height={12}
                     fill={theme.icon}

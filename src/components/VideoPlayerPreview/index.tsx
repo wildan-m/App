@@ -48,7 +48,7 @@ type VideoPlayerPreviewProps = {
 const isOnAttachmentRoute = () => Navigation.getActiveRouteWithoutParams() === `/${ROUTES.REPORT_ATTACHMENTS.route}`;
 
 function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDimensions, videoDuration, onShowModalPress, isDeleted}: VideoPlayerPreviewProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Expand']);
+    const {Expand: expandIcon} = useMemoizedLazyExpensifyIcons(['Expand']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {currentlyPlayingURL, currentRouteReportID} = usePlaybackStateContext();
@@ -154,7 +154,7 @@ function VideoPlayerPreview({videoUrl, thumbnailUrl, reportID, fileName, videoDi
                     />
                     <View style={[styles.pAbsolute, styles.w100]}>
                         <IconButton
-                            src={icons.Expand}
+                            src={expandIcon}
                             style={[styles.videoExpandButton]}
                             tooltipText={translate('videoPlayer.expand')}
                             onPress={onShowModalPress}

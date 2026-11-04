@@ -53,18 +53,19 @@ function ReservationView({reservation, transactionID, tripRoomReportID, sequence
     const StyleUtils = useStyleUtils();
     const {translate, dateFnsLocale} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
-        'ArrowRightLong',
-        'Plane',
-        'PlaneCircleSlash',
-        'Bed',
-        'BedCircleSlash',
-        'CarWithKey',
-        'CarCircleSlash',
-        'Train',
-        'TrainCircleSlash',
-        'Luggage',
-    ]);
+    const {
+        ArrowRightLong: arrowRightLongIcon,
+        Plane,
+        PlaneCircleSlash,
+        Bed,
+        BedCircleSlash,
+        CarWithKey,
+        CarCircleSlash,
+        Train,
+        TrainCircleSlash,
+        Luggage,
+    } = useMemoizedLazyExpensifyIcons(['ArrowRightLong', 'Plane', 'PlaneCircleSlash', 'Bed', 'BedCircleSlash', 'CarWithKey', 'CarCircleSlash', 'Train', 'TrainCircleSlash', 'Luggage']);
+    const expensifyIcons = {ArrowRightLong: arrowRightLongIcon, Plane, PlaneCircleSlash, Bed, BedCircleSlash, CarWithKey, CarCircleSlash, Train, TrainCircleSlash, Luggage};
 
     const reservationIcon = getTripReservationIcon(expensifyIcons, reservation.type, isCancelled);
 
@@ -110,7 +111,7 @@ function ReservationView({reservation, transactionID, tripRoomReportID, sequence
                             <>
                                 <Text style={[titleTextStyle, styles.lh20, shouldUseNarrowLayout && styles.flex1]}>{formatTransitLocationLabel(reservation.start)}</Text>
                                 <Icon
-                                    src={expensifyIcons.ArrowRightLong}
+                                    src={arrowRightLongIcon}
                                     width={variables.iconSizeSmall}
                                     height={variables.iconSizeSmall}
                                     fill={theme.icon}

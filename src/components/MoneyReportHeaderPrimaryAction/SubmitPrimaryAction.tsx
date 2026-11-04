@@ -151,7 +151,7 @@ function SubmitPrimaryActionContent({reportID, isDisabled}: SubmitPrimaryActionP
     const {currentSearchResults} = useSearchResultsContext();
     const shouldCalculateTotals = useSearchShouldCalculateTotals(currentSearchKey, true);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Send', 'Document']);
+    const {Send: sendIcon, Document: documentIcon} = useMemoizedLazyExpensifyIcons(['Send', 'Document']);
 
     const handleSubmit = (shouldExportToPDF = false) => {
         if (!moneyRequestReport || shouldBlockSubmit) {
@@ -240,7 +240,7 @@ function SubmitPrimaryActionContent({reportID, isDisabled}: SubmitPrimaryActionP
             {
                 value: CONST.REPORT.SUBMISSION_METHOD.SUBMIT,
                 text: translate('common.submit'),
-                icon: expensifyIcons.Send,
+                icon: sendIcon,
                 onSelected: () => {
                     setPreferredReportSubmissionMethod(moneyRequestReport?.policyID, CONST.REPORT.SUBMISSION_METHOD.SUBMIT);
                     handleSubmit();
@@ -249,7 +249,7 @@ function SubmitPrimaryActionContent({reportID, isDisabled}: SubmitPrimaryActionP
             {
                 value: CONST.REPORT.SUBMISSION_METHOD.SUBMIT_VIA_PDF,
                 text: translate('common.submitViaPDF'),
-                icon: expensifyIcons.Document,
+                icon: documentIcon,
                 onSelected: () => {
                     setPreferredReportSubmissionMethod(moneyRequestReport?.policyID, CONST.REPORT.SUBMISSION_METHOD.SUBMIT_VIA_PDF);
                     handleSubmit(true);

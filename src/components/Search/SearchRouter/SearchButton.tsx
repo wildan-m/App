@@ -35,7 +35,7 @@ function SearchButton({style, shouldUseAutoHitSlop = false}: SearchButtonProps) 
     const theme = useTheme();
     const {translate} = useLocalize();
     const {openSearchRouter} = useSearchRouterActions();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
+    const {MagnifyingGlass: magnifyingGlassIcon} = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
 
     const onPress = () => {
         callFunctionIfActionIsAllowed(
@@ -69,7 +69,7 @@ function SearchButton({style, shouldUseAutoHitSlop = false}: SearchButtonProps) 
                 onPress={onPress}
             >
                 <Icon
-                    src={expensifyIcons.MagnifyingGlass}
+                    src={magnifyingGlassIcon}
                     fill={theme.icon}
                 />
             </PressableWithoutFeedback>

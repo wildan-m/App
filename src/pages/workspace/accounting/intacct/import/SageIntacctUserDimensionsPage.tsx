@@ -30,7 +30,7 @@ import {View} from 'react-native';
 function SageIntacctUserDimensionsPage({policy}: WithPolicyProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['FolderWithPapers']);
+    const {FolderWithPapers: folderWithPapersIllustration} = useMemoizedLazyIllustrations(['FolderWithPapers']);
 
     // eslint-disable-next-line rulesdir/no-default-id-values
     const policyID = policy?.id ?? '-1';
@@ -55,7 +55,7 @@ function SageIntacctUserDimensionsPage({policy}: WithPolicyProps) {
             {userDimensions?.length === 0 ? (
                 <View style={[styles.alignItemsCenter, styles.flex1, styles.justifyContentCenter]}>
                     <Icon
-                        src={illustrations.FolderWithPapers}
+                        src={folderWithPapersIllustration}
                         width={160}
                         height={100}
                     />

@@ -84,7 +84,7 @@ function FullPageNotFoundView({
     const styles = useThemeStyles();
     const {isMediumScreenWidth, isLargeScreenWidth} = useResponsiveLayout();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
 
     if (shouldShow) {
         StatsCounter('FullPageNotFoundView');
@@ -100,7 +100,7 @@ function FullPageNotFoundView({
                     testID={testID}
                 >
                     <BlockingView
-                        icon={illustrations.ToddBehindCloud}
+                        icon={toddBehindCloudIllustration}
                         iconWidth={variables.modalTopIconWidth}
                         iconHeight={variables.modalTopIconHeight}
                         title={translate(titleKey)}

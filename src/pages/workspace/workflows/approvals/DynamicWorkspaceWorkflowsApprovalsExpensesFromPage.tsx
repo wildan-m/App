@@ -71,7 +71,7 @@ function DynamicWorkspaceWorkflowsApprovalsExpensesFromPage({policy, isLoadingRe
     const [rulesCollection] = useOnyx(ONYXKEYS.COLLECTION.RULE);
     const [personalDetails] = useAllPersonalDetails();
     const [invitedEmailsToAccountIDsDraft] = useOnyx(`${ONYXKEYS.COLLECTION.WORKSPACE_INVITE_MEMBERS_DRAFT}${route.params.policyID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const {showConfirmModal} = useConfirmModal();
     const {isBetaEnabled} = usePermissions();
     const isMultipleApproversBetaEnabled = isBetaEnabled(CONST.BETAS.MULTIPLE_APPROVERS);
@@ -203,7 +203,7 @@ function DynamicWorkspaceWorkflowsApprovalsExpensesFromPage({policy, isLoadingRe
                     value: member.email,
                     icons: [
                         {
-                            source: avatar ?? icons.FallbackAvatar,
+                            source: avatar ?? fallbackAvatarIcon,
                             type: CONST.ICON_TYPE_AVATAR,
                             name: formattedDisplayName,
                             id: accountID,
@@ -253,7 +253,7 @@ function DynamicWorkspaceWorkflowsApprovalsExpensesFromPage({policy, isLoadingRe
                 value: member.email,
                 icons: [
                     {
-                        source: member.avatar ?? icons.FallbackAvatar,
+                        source: member.avatar ?? fallbackAvatarIcon,
                         type: CONST.ICON_TYPE_AVATAR,
                         name: formattedDisplayName,
                         id: accountID,

@@ -28,7 +28,7 @@ type CardPreviewProps = {
 
 function CardPreview({overlayImage, overlayContainerStyle}: CardPreviewProps) {
     const styles = useThemeStyles();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
+    const {ExpensifyCardImage: expensifyCardImageIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage']);
 
     const [privatePersonalDetails] = useOnyx(ONYXKEYS.PRIVATE_PERSONAL_DETAILS);
     const [session] = useOnyx(ONYXKEYS.SESSION);
@@ -50,7 +50,7 @@ function CardPreview({overlayImage, overlayContainerStyle}: CardPreviewProps) {
             <View style={styles.walletCard}>
                 <ImageSVG
                     contentFit="contain"
-                    src={lazyIllustrations.ExpensifyCardImage}
+                    src={expensifyCardImageIllustration}
                     pointerEvents="none"
                     height={variables.cardPreviewHeight}
                     width={variables.cardPreviewWidth}

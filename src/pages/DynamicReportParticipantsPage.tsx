@@ -73,7 +73,7 @@ function DynamicReportParticipantsPage({report}: DynamicReportParticipantsPagePr
     const navigateBackToReportDetails = () => {
         Navigation.goBack(backPath);
     };
-    const icons = useMemoizedLazyExpensifyIcons(['MakeAdmin', 'Plus', 'RemoveMembers', 'User']);
+    const {MakeAdmin: makeAdminIcon, Plus: plusIcon, RemoveMembers: removeMembersIcon, User: userIcon} = useMemoizedLazyExpensifyIcons(['MakeAdmin', 'Plus', 'RemoveMembers', 'User']);
     const {translate, formatPhoneNumber} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const styles = useThemeStyles();
@@ -208,7 +208,7 @@ function DynamicReportParticipantsPage({report}: DynamicReportParticipantsPagePr
         {
             text: translate('workspace.people.removeMembersTitle', {count: selectedMembers.length}),
             value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.REMOVE,
-            icon: icons.RemoveMembers,
+            icon: removeMembersIcon,
             shouldSkipFocusRestore: true,
             onSelected: showRemoveMembersModal,
         },
@@ -218,7 +218,7 @@ function DynamicReportParticipantsPage({report}: DynamicReportParticipantsPagePr
         bulkActionsButtonOptions.push({
             text: translate('workspace.people.makeMember', {count: selectedMembers.length}),
             value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.MAKE_MEMBER,
-            icon: icons.User,
+            icon: userIcon,
             onSelected: () => changeUserRole(CONST.REPORT.ROLE.MEMBER),
         });
     }
@@ -227,7 +227,7 @@ function DynamicReportParticipantsPage({report}: DynamicReportParticipantsPagePr
         bulkActionsButtonOptions.push({
             text: translate('workspace.people.makeGroupAdmin', {count: selectedMembers.length}),
             value: CONST.POLICY.MEMBERS_BULK_ACTION_TYPES.MAKE_ADMIN,
-            icon: icons.MakeAdmin,
+            icon: makeAdminIcon,
             onSelected: () => changeUserRole(CONST.REPORT.ROLE.ADMIN),
         });
     }
@@ -261,7 +261,7 @@ function DynamicReportParticipantsPage({report}: DynamicReportParticipantsPagePr
                     innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
                     style={[shouldUseNarrowLayout && styles.flexGrow1, styles.mb5]}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('workspace.invite.member')}</Button.Text>
                 </Button>
             )}

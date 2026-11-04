@@ -33,7 +33,7 @@ type VendorListItem = ListItem & {
 function RilletDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const rilletConfig = policy?.connections?.rillet?.config;
     const rilletData = policy?.connections?.rillet?.data;
@@ -69,7 +69,7 @@ function RilletDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsProps
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.rillet.noVendorsFound')}

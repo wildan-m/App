@@ -32,7 +32,7 @@ type WorkspaceCompanyCardsErrorConfirmationProps = {
 function WorkspaceCompanyCardsErrorConfirmation({policyID, newFeed, errorMessage}: WorkspaceCompanyCardsErrorConfirmationProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['BrokenCompanyCardBankConnection']);
+    const {BrokenCompanyCardBankConnection: brokenCompanyCardBankConnectionIllustration} = useMemoizedLazyIllustrations(['BrokenCompanyCardBankConnection']);
     const policy = usePolicy(policyID);
     const isExpensifyCardFeatureEnabled = !!policy?.areExpensifyCardsEnabled;
     const [cardsList] = useCardsList(newFeed);
@@ -91,7 +91,7 @@ function WorkspaceCompanyCardsErrorConfirmation({policyID, newFeed, errorMessage
         <ConfirmationPage>
             <ConfirmationPage.Content>
                 <ConfirmationPage.Illustration
-                    illustration={illustrations.BrokenCompanyCardBankConnection}
+                    illustration={brokenCompanyCardBankConnectionIllustration}
                     illustrationStyle={styles.errorStateCardIllustration}
                 />
                 <ConfirmationPage.Heading>{translate('workspace.moreFeatures.companyCards.bankConnectionError')}</ConfirmationPage.Heading>

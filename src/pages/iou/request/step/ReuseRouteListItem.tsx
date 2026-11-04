@@ -40,13 +40,13 @@ type ReuseRouteThumbnailProps = {
 function ReuseRouteThumbnail({transactionID, receiptSource}: ReuseRouteThumbnailProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt']);
+    const {Receipt: receiptIcon} = useMemoizedLazyExpensifyIcons(['Receipt']);
 
     if (!receiptSource) {
         return (
             <View style={[styles.w100, styles.h100, styles.alignItemsCenter, styles.justifyContentCenter]}>
                 <Icon
-                    src={icons.Receipt}
+                    src={receiptIcon}
                     width={variables.iconSizeExtraLarge}
                     height={variables.iconSizeExtraLarge}
                     fill={theme.icon}
@@ -62,7 +62,7 @@ function ReuseRouteThumbnail({transactionID, receiptSource}: ReuseRouteThumbnail
             shouldUseThumbnailImage
             shouldUseInitialObjectPosition
             isAuthTokenRequired
-            fallbackIcon={icons.Receipt}
+            fallbackIcon={receiptIcon}
             fallbackIconSize={variables.iconSizeExtraLarge}
             fallbackIconColor={theme.icon}
         />
@@ -77,7 +77,7 @@ function ReuseRouteListItem<TItem extends ListItem>({item, isFocused, isFocusVis
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Receipt', 'DotIndicatorUnfilled', 'Location']);
+    const {DotIndicatorUnfilled: dotIndicatorUnfilledIcon, Location: locationIcon} = useMemoizedLazyExpensifyIcons(['Receipt', 'DotIndicatorUnfilled', 'Location']);
 
     if (!isReuseRouteListItemData(item)) {
         return null;
@@ -115,7 +115,7 @@ function ReuseRouteListItem<TItem extends ListItem>({item, isFocused, isFocusVis
             <View style={styles.pv2}>
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3, styles.ph5, styles.pv3]}>
                     <Icon
-                        src={icons.DotIndicatorUnfilled}
+                        src={dotIndicatorUnfilledIcon}
                         width={variables.iconSizeNormal}
                         height={variables.iconSizeNormal}
                         fill={theme.icon}
@@ -127,7 +127,7 @@ function ReuseRouteListItem<TItem extends ListItem>({item, isFocused, isFocusVis
                 </View>
                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap3, styles.ph5, styles.pv3]}>
                     <Icon
-                        src={icons.Location}
+                        src={locationIcon}
                         width={variables.iconSizeNormal}
                         height={variables.iconSizeNormal}
                         fill={theme.icon}

@@ -74,7 +74,17 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
     // taken from the hook: its `canWrite` is the `canWriteRules` prop already.
     const {withReadOnlyFallback} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Coins', 'CreditCard', 'Receipt', 'ReceiptCheck', 'Task', 'Cash', 'Users', 'Eye']);
+    const {
+        CalendarSolid: calendarSolidIcon,
+        Coins: coinsIcon,
+        CreditCard: creditCardIcon,
+        Receipt: receiptIcon,
+        ReceiptCheck: receiptCheckIcon,
+        Task: taskIcon,
+        Cash: cashIcon,
+        Users: usersIcon,
+        Eye: eyeIcon,
+    } = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Coins', 'CreditCard', 'Receipt', 'ReceiptCheck', 'Task', 'Cash', 'Users', 'Eye']);
 
     const policyCurrency = policy?.outputCurrency ?? CONST.CURRENCY.USD;
 
@@ -182,7 +192,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.EXPENSES_OLDER_THAN,
             title: translate('workspace.rules.generalTab.expensesOlderThan'),
             description: maxExpenseAgeText,
-            icon: icons.CalendarSolid,
+            icon: calendarSolidIcon,
             route: ROUTES.RULES_MAX_EXPENSE_AGE.getRoute(policyID),
             pendingAction: policy?.pendingFields?.maxExpenseAge,
         },
@@ -190,7 +200,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.EXPENSES_ABOVE_AMOUNT,
             title: translate('workspace.rules.generalTab.expensesAboveAmount'),
             description: maxExpenseAmountText,
-            icon: icons.Coins,
+            icon: coinsIcon,
             route: ROUTES.RULES_MAX_EXPENSE_AMOUNT.getRoute(policyID),
             pendingAction: policy?.pendingFields?.maxExpenseAmount,
         },
@@ -198,7 +208,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.FLAG_RECEIPT_LINE_ITEMS,
             title: translate('workspace.rules.generalTab.flagReceiptLineItems'),
             description: prohibitedExpensesText,
-            icon: icons.Receipt,
+            icon: receiptIcon,
             route: ROUTES.RULES_PROHIBITED_DEFAULT.getRoute(policyID),
             pendingAction: !isEmptyObject(policy?.prohibitedExpenses?.pendingFields) ? CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE : undefined,
         },
@@ -206,7 +216,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.RECEIPT_REQUIREMENTS,
             title: translate('workspace.rules.generalTab.receiptRequirements'),
             description: receiptRequirementText,
-            icon: icons.ReceiptCheck,
+            icon: receiptCheckIcon,
             route: ROUTES.RULES_REQUIRE_RECEIPTS.getRoute(policyID),
             pendingAction: policy?.pendingFields?.maxExpenseAmountNoReceipt ?? policy?.pendingFields?.maxExpenseAmountNoItemizedReceipt,
         },
@@ -214,7 +224,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.REQUIRE_FIELDS,
             title: translate('workspace.rules.generalTab.requireFieldsForAllExpenses'),
             description: requiredFieldsList,
-            icon: icons.Task,
+            icon: taskIcon,
             route: ROUTES.RULES_REQUIRE_FIELDS.getRoute(policyID),
             pendingAction: policy?.pendingFields?.requiresCategory ?? policy?.pendingFields?.requiresTag,
         },
@@ -225,7 +235,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.CASH_EXPENSES,
             title: translate('workspace.rules.generalTab.cashExpenses'),
             description: reimbursableModeText,
-            icon: icons.Cash,
+            icon: cashIcon,
             route: ROUTES.RULES_REIMBURSABLE_DEFAULT.getRoute(policyID),
             pendingAction: policy?.pendingFields?.defaultReimbursable,
         },
@@ -233,7 +243,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
             key: RULE_MENU_ITEM_KEYS.BILLABLE_EXPENSES,
             title: translate('workspace.rules.generalTab.billableExpenses'),
             description: billableModeText,
-            icon: icons.Cash,
+            icon: cashIcon,
             route: ROUTES.RULES_BILLABLE_DEFAULT.getRoute(policyID),
             pendingAction: getBillableExpensesPendingAction(policy),
         },
@@ -291,7 +301,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
                     disabledAction={withReadOnlyFallback(isCollect ? navigateToRulesControlUpgrade : undefined)}
                     onToggle={() => (canWriteRules && policy ? setPolicyRequireCompanyCardsEnabled(policy, !requireCompanyCardsEnabled) : undefined)}
                     pendingAction={policy?.pendingFields?.requireCompanyCardsEnabled}
-                    rowIcon={icons.CreditCard}
+                    rowIcon={creditCardIcon}
                 />
                 <ToggleSettingOptionRow
                     title={translate('workspace.rules.individualExpenseRules.eReceipts')}
@@ -305,7 +315,7 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
                     disabledAction={withReadOnlyFallback(isCollect ? navigateToRulesControlUpgrade : undefined)}
                     onToggle={() => (canWriteRules ? setWorkspaceEReceiptsEnabled(policyID, !areEReceiptsEnabled, policy?.eReceipts) : undefined)}
                     pendingAction={policy?.pendingFields?.eReceipts}
-                    rowIcon={icons.Receipt}
+                    rowIcon={receiptIcon}
                 />
                 <ToggleSettingOptionRow
                     title={translate('workspace.rules.individualExpenseRules.attendeeTracking')}
@@ -318,13 +328,13 @@ function IndividualExpenseRulesSectionRevamp({policyID, canWriteRules}: Individu
                     disabledAction={withReadOnlyFallback(isCollect ? navigateToRulesControlUpgrade : undefined)}
                     onToggle={() => (canWriteRules ? handleAttendeeTrackingToggle(!isAttendeeTrackingEnabledForPolicy) : undefined)}
                     pendingAction={policy?.pendingFields?.isAttendeeTrackingEnabled}
-                    rowIcon={icons.Users}
+                    rowIcon={usersIcon}
                 />
                 <PublicReceiptVisibilityToggle
                     policyID={policyID}
                     canWriteRules={canWriteRules}
                     withReadOnlyFallback={withReadOnlyFallback}
-                    rowIcon={icons.Eye}
+                    rowIcon={eyeIcon}
                 />
             </View>
         </Section>

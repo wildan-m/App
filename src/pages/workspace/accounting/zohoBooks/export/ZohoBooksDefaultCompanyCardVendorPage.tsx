@@ -37,7 +37,7 @@ type VendorListItem = ListItem & {
 function ZohoBooksDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const zohoBooksConfig = policy?.connections?.zohoBooks?.config;
     const defaultCompanyCardVendorID = zohoBooksConfig?.export?.defaultVendorID;
@@ -71,7 +71,7 @@ function ZohoBooksDefaultCompanyCardVendorPage({policy}: WithPolicyConnectionsPr
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.zohoBooks.noVendorsFound')}

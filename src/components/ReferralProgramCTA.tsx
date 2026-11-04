@@ -38,7 +38,7 @@ function ReferralProgramCTA({referralContentType, style, onDismiss, onBeforeNavi
     const styles = useThemeStyles();
     const theme = useTheme();
     const {isDismissed, setAsDismissed} = useDismissedReferralBanners({referralContentType});
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const handleDismissCallToAction = () => {
         setAsDismissed();
@@ -91,7 +91,7 @@ function ReferralProgramCTA({referralContentType, style, onDismiss, onBeforeNavi
                     sentryLabel={CONST.SENTRY_LABEL.REFERRAL_PROGRAM.DISMISS_BUTTON}
                 >
                     <Icon
-                        src={icons.Close}
+                        src={closeIcon}
                         height={20}
                         width={20}
                         fill={theme.icon}

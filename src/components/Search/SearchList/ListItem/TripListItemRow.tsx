@@ -46,7 +46,7 @@ function TripListItemRow({item, columns, showTooltip, onViewPress}: TripListItem
     const StyleUtils = useStyleUtils();
     const getSearchColumnStyles = useSearchColumnStyles();
     const {isLargeScreenWidth} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const isHovered = useListItemHovered();
 
     const startDate = (
@@ -144,7 +144,7 @@ function TripListItemRow({item, columns, showTooltip, onViewPress}: TripListItem
                 ))}
             </View>
             <Icon
-                src={expensifyIcons.ArrowRight}
+                src={arrowRightIcon}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}
                 fill={theme.icon}

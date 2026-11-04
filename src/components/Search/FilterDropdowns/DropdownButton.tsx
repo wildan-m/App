@@ -42,7 +42,7 @@ type DropdownButtonProps = WithSentryLabel &
 function DropdownButton({label, value, medium = false, labelStyle, innerStyles, caretWrapperStyle, hoverStyles, sentryLabel, onClosePress, ...props}: DropdownButtonProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const shouldShowCloseButton = !!onClosePress;
 
@@ -108,7 +108,7 @@ function DropdownButton({label, value, medium = false, labelStyle, innerStyles, 
                                 onPress={onClosePress}
                             >
                                 <Icon
-                                    src={icons.Close}
+                                    src={closeIcon}
                                     fill={theme.icon}
                                     width={variables.iconSizeXXSmall}
                                     height={variables.iconSizeXXSmall}

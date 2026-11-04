@@ -40,7 +40,7 @@ function DynamicQuickbooksOutOfPocketExpenseAccountSelectPage({policy}: WithPoli
     const {bankAccounts, journalEntryAccounts, accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_ONLINE_EXPORT_OUT_OF_POCKET_EXPENSES_ACCOUNT_SELECT.path);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     let titleText: TranslationPaths | undefined;
     let descriptionText: string | undefined;
@@ -99,7 +99,7 @@ function DynamicQuickbooksOutOfPocketExpenseAccountSelectPage({policy}: WithPoli
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbo.noAccountsFound')}

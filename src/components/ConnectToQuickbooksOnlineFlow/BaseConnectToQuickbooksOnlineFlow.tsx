@@ -42,7 +42,7 @@ function BaseConnectToQuickbooksOnlineFlow({policyID, isIntuitEnterpriseSuite, o
     const isVendorMatchingBetaEnabled = isBetaEnabledOrUnknown(CONST.BETAS.VENDOR_MATCHING);
     const {popoverAnchorRefs} = useAccountingState();
     const {calculatePopoverPosition} = usePopoverPosition();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const isAuthError = isAuthenticationError(policy, CONST.POLICY.CONNECTIONS.NAME.QBO);
     const shouldShowConnectionOptions = !!isIntuitEnterpriseSuite && (environment === CONST.ENVIRONMENT.DEV || environment === CONST.ENVIRONMENT.STAGING) && !isAuthError;
@@ -88,12 +88,12 @@ function BaseConnectToQuickbooksOnlineFlow({policyID, isIntuitEnterpriseSuite, o
             onClose={() => setIsConnectionOptionsPopoverOpen(false)}
             menuItems={[
                 {
-                    icon: icons.LinkCopy,
+                    icon: linkCopyIcon,
                     text: translate('workspace.accounting.setup'),
                     onSelected: () => selectConnection(false),
                 },
                 {
-                    icon: icons.LinkCopy,
+                    icon: linkCopyIcon,
                     text: translate('workspace.accounting.connectToSandbox'),
                     onSelected: () => selectConnection(true),
                 },

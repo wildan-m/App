@@ -30,7 +30,7 @@ type ReportDetailsMenuPrivateNotesItemProps = {
 function ReportDetailsMenuPrivateNotesItem({reportID}: ReportDetailsMenuPrivateNotesItemProps) {
     const {translate} = useLocalize();
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil']);
+    const {Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Pencil']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails?.accountID;
@@ -53,7 +53,7 @@ function ReportDetailsMenuPrivateNotesItem({reportID}: ReportDetailsMenuPrivateN
         >
             <MenuItem.Row>
                 <MenuItem.Leading>
-                    <MenuItem.Icon src={expensifyIcons.Pencil} />
+                    <MenuItem.Icon src={pencilIcon} />
                 </MenuItem.Leading>
                 <MenuItem.Content>
                     <MenuItem.Title>{translate('privateNotes.title')}</MenuItem.Title>

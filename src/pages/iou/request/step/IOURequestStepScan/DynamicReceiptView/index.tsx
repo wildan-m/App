@@ -35,7 +35,7 @@ function DynamicReceiptView({route}: DynamicReceiptViewProps) {
     const {setAttachmentError} = useAttachmentErrors();
     const {shouldShowArrows, setShouldShowArrows, autoHideArrows, cancelAutoHideArrows} = useCarouselArrows();
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const [page, setPage] = useState<number>(-1);
     const {showConfirmModal} = useConfirmModal();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.MONEY_REQUEST_RECEIPT_VIEW.path);
@@ -113,7 +113,7 @@ function DynamicReceiptView({route}: DynamicReceiptViewProps) {
                     size={CONST.BUTTON_SIZE.LARGE}
                     sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.RECEIPT_DELETE_BUTTON}
                 >
-                    <Button.Icon src={expensifyIcons.Trashcan} />
+                    <Button.Icon src={trashcanIcon} />
                 </Button>
             </HeaderWithBackButton>
             <AttachmentCarouselView

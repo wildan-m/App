@@ -60,7 +60,7 @@ type ShareDetailsPageProps = StackScreenProps<ShareNavigatorParamList, typeof SC
 function ShareDetailsPage({route}: ShareDetailsPageProps) {
     const {reportOrAccountID} = route.params;
 
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const styles = useThemeStyles();
     const {translate, dateFnsLocale, formatPhoneNumber} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
@@ -126,7 +126,7 @@ function ShareDetailsPage({route}: ShareDetailsPageProps) {
             source: fileSource,
             headerTitle: validateFileName,
             originalFileName: validateFileName,
-            fallbackSource: icons.FallbackAvatar,
+            fallbackSource: fallbackAvatarIcon,
         });
         Navigation.navigate(ROUTES.SHARE_DETAILS_ATTACHMENT);
     };

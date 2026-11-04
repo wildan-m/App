@@ -47,7 +47,7 @@ type MiniQuickEmojiReactionsProps = BaseQuickEmojiReactionsProps & {
  */
 function MiniQuickEmojiReactions({reportAction, reportActionID, onEmojiSelected, onPressOpenPicker = () => {}, onEmojiPickerClosed = () => {}}: MiniQuickEmojiReactionsProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['AddReaction']);
+    const {AddReaction: addReactionIcon} = useMemoizedLazyExpensifyIcons(['AddReaction']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const ref = useRef<ComponentRef<typeof View>>(null);
@@ -113,7 +113,7 @@ function MiniQuickEmojiReactions({reportAction, reportActionID, onEmojiSelected,
                     <Icon
                         width={variables.iconSizeMedium}
                         height={variables.iconSizeMedium}
-                        src={icons.AddReaction}
+                        src={addReactionIcon}
                         fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: hovered, isPressed: pressed})})}
                     />
                 )}

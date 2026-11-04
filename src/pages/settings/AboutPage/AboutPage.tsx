@@ -67,7 +67,14 @@ type MenuItem = WithSentryLabel & {
 };
 
 function AboutPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['NewWindow', 'Link', 'Keyboard', 'Eye', 'MoneyBag', 'Bug']);
+    const {
+        NewWindow: newWindowIcon,
+        Link: linkIcon,
+        Keyboard: keyboardIcon,
+        Eye: eyeIcon,
+        MoneyBag: moneyBagIcon,
+        Bug: bugIcon,
+    } = useMemoizedLazyExpensifyIcons(['NewWindow', 'Link', 'Keyboard', 'Eye', 'MoneyBag', 'Bug']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const popoverAnchor = useRef<ComponentRef<typeof View>>(null);
@@ -88,20 +95,20 @@ function AboutPage() {
         const baseMenuItems: MenuItem[] = [
             {
                 translationKey: 'initialSettingsPage.aboutPage.appDownloadLinks',
-                icon: icons.Link,
+                icon: linkIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_ABOUT.APP_DOWNLOAD_LINKS,
                 action: waitForNavigate(() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.APP_DOWNLOAD_LINKS.path))),
             },
             {
                 translationKey: 'initialSettingsPage.aboutPage.viewKeyboardShortcuts',
-                icon: icons.Keyboard,
+                icon: keyboardIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_ABOUT.VIEW_KEYBOARD_SHORTCUTS,
                 action: waitForNavigate(() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.KEYBOARD_SHORTCUTS.path))),
             },
             {
                 translationKey: 'initialSettingsPage.aboutPage.viewTheCode',
-                icon: icons.Eye,
-                iconRight: icons.NewWindow,
+                icon: eyeIcon,
+                iconRight: newWindowIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_ABOUT.VIEW_THE_CODE,
                 action: () => {
                     openExternalLink(CONST.GITHUB_URL);
@@ -111,8 +118,8 @@ function AboutPage() {
             },
             {
                 translationKey: 'initialSettingsPage.aboutPage.viewOpenJobs',
-                icon: icons.MoneyBag,
-                iconRight: icons.NewWindow,
+                icon: moneyBagIcon,
+                iconRight: newWindowIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_ABOUT.VIEW_OPEN_JOBS,
                 action: () => {
                     openExternalLink(CONST.UPWORK_URL);
@@ -122,7 +129,7 @@ function AboutPage() {
             },
             {
                 translationKey: 'initialSettingsPage.aboutPage.reportABug',
-                icon: icons.Bug,
+                icon: bugIcon,
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_ABOUT.REPORT_A_BUG,
                 action: waitForNavigate(() => {
                     navigateToConciergeChat({
@@ -162,7 +169,12 @@ function AboutPage() {
             sentryLabel,
         }));
     }, [
-        icons,
+        newWindowIcon,
+        linkIcon,
+        keyboardIcon,
+        eyeIcon,
+        moneyBagIcon,
+        bugIcon,
         styles,
         translate,
         waitForNavigate,

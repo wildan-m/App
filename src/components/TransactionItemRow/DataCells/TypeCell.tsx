@@ -65,7 +65,19 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
     const {translate} = useLocalize();
     const [card] = useOnyx(ONYXKEYS.CARD_LIST, {selector: (cardList) => (transactionItem.cardID ? cardList?.[transactionItem.cardID] : undefined)});
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Car: carIcon,
+        CreditCard: creditCardIcon,
+        CreditCardHourglass: creditCardHourglassIcon,
+        CreditCardLock: creditCardLockIcon,
+        CreditCardWithPlane: creditCardWithPlaneIcon,
+        CreditCardWithPlaneHourglass: creditCardWithPlaneHourglassIcon,
+        ExpensifyCard: expensifyCardIcon,
+        ExpensifyCardHourglass: expensifyCardHourglassIcon,
+        Cash: cashIcon,
+        Clock: clockIcon,
+        CalendarSolid: calendarSolidIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'Car',
         'CreditCard',
         'CreditCardHourglass',
@@ -78,6 +90,19 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
         'Clock',
         'CalendarSolid',
     ]);
+    const expensifyIcons = {
+        Car: carIcon,
+        CreditCard: creditCardIcon,
+        CreditCardHourglass: creditCardHourglassIcon,
+        CreditCardLock: creditCardLockIcon,
+        CreditCardWithPlane: creditCardWithPlaneIcon,
+        CreditCardWithPlaneHourglass: creditCardWithPlaneHourglassIcon,
+        ExpensifyCard: expensifyCardIcon,
+        ExpensifyCardHourglass: expensifyCardHourglassIcon,
+        Cash: cashIcon,
+        Clock: clockIcon,
+        CalendarSolid: calendarSolidIcon,
+    };
     const type = getTransactionType(transactionItem, card);
     const isExpensifyCard = isExpensifyCardTransaction(transactionItem);
     const isManagedCard = isManagedCardTransaction(transactionItem);
@@ -85,12 +110,12 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
     const isPendingCardTransaction = isPending(transactionItem);
     const getPendingIcon = () => {
         if (isTravelBillingCard) {
-            return expensifyIcons.CreditCardWithPlaneHourglass;
+            return creditCardWithPlaneHourglassIcon;
         }
         if (isExpensifyCard) {
-            return expensifyIcons.ExpensifyCardHourglass;
+            return expensifyCardHourglassIcon;
         }
-        return expensifyIcons.CreditCardHourglass;
+        return creditCardHourglassIcon;
     };
     const pendingIcon = getPendingIcon();
     const typeIcon = isPendingCardTransaction ? pendingIcon : getTypeIcon(expensifyIcons, type, isExpensifyCard, isManagedCard, isTravelBillingCard);

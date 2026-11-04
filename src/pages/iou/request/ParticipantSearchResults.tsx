@@ -160,7 +160,7 @@ function ParticipantSearchResults({
         action !== CONST.IOU.ACTION.SHARE &&
         action !== CONST.IOU.ACTION.SUBMIT &&
         action !== CONST.IOU.ACTION.CATEGORIZE;
-    const icons = useMemoizedLazyExpensifyIcons(['UserPlus']);
+    const {UserPlus: userPlusIcon} = useMemoizedLazyExpensifyIcons(['UserPlus']);
     const {translate, dateFnsLocale, formatPhoneNumber} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
     const {contactPermissionState, contacts, setContactPermissionState} = useContactImport();
@@ -536,7 +536,7 @@ function ParticipantSearchResults({
     const importContactsButtonComponent = shouldShowImportContactsButton ? (
         <MenuItemNavigation
             title={translate('contact.importContacts')}
-            icon={icons.UserPlus}
+            icon={userPlusIcon}
             onPress={importContacts}
             sentryLabel={CONST.SENTRY_LABEL.MONEY_REQUEST.PARTICIPANTS_IMPORT_CONTACTS_ITEM}
         />

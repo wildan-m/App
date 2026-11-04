@@ -44,7 +44,7 @@ function AccountFlowEntryPoint({policyName = '', onBackButtonPress}: AccountFlow
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {cardEdgeToEdge, cardMenuItemInset} = useLayoutSpacing();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bank', 'Connect', 'Lightbulb', 'Lock']);
+    const {Bank: bankIcon, Connect: connectIcon, Lightbulb: lightbulbIcon, Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Bank', 'Connect', 'Lightbulb', 'Lock']);
 
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
     const [personalBankAccount, personalBankAccountResult] = useOnyx(ONYXKEYS.PERSONAL_BANK_ACCOUNT);
@@ -105,7 +105,7 @@ function AccountFlowEntryPoint({policyName = '', onBackButtonPress}: AccountFlow
                 >
                     <View style={[styles.flexRow, styles.mt4, styles.alignItemsCenter, styles.pb1, styles.pt1]}>
                         <Icon
-                            src={expensifyIcons.Lightbulb}
+                            src={lightbulbIcon}
                             fill={theme.icon}
                             additionalStyles={styles.mr2}
                             size={CONST.ICON_SIZE.MEDIUM}
@@ -121,13 +121,13 @@ function AccountFlowEntryPoint({policyName = '', onBackButtonPress}: AccountFlow
                         <View style={cardMenuItemInset}>
                             <MenuItemNavigation
                                 title={translate('bankAccount.connectOnlineWithPlaid')}
-                                icon={expensifyIcons.Bank}
+                                icon={bankIcon}
                                 isDisabled={!!isPlaidDisabled}
                                 onPress={handleConnectPlaid}
                             />
                             <MenuItemNavigation
                                 title={translate('bankAccount.connectManually')}
-                                icon={expensifyIcons.Connect}
+                                icon={connectIcon}
                                 onPress={handleConnectManually}
                             />
                         </View>
@@ -144,7 +144,7 @@ function AccountFlowEntryPoint({policyName = '', onBackButtonPress}: AccountFlow
                         <TextLink href={CONST.ENCRYPTION_AND_SECURITY_HELP_URL}>{translate('bankAccount.yourDataIsSecure')}</TextLink>
                         <View style={styles.ml1}>
                             <Icon
-                                src={expensifyIcons.Lock}
+                                src={lockIcon}
                                 fill={theme.link}
                             />
                         </View>

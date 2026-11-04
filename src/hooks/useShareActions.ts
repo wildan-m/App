@@ -36,26 +36,32 @@ function useShareActions({reportID, policy}: UseShareActionsParams): UseShareAct
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Mail', 'QrCode', 'Cash', 'Copy', 'ArrowRight'] as const);
+    const {
+        Mail: mailIcon,
+        QrCode: qrCodeIcon,
+        Cash: cashIcon,
+        Copy: copyIcon,
+        ArrowRight: arrowRightIcon,
+    } = useMemoizedLazyExpensifyIcons(['Mail', 'QrCode', 'Cash', 'Copy', 'ArrowRight'] as const);
 
     const [moneyRequestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
 
     const shareSubMenuItems: PopoverMenuItem[] = [
         {
             text: translate('common.shareCode'),
-            icon: expensifyIcons.QrCode,
+            icon: qrCodeIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SHARE_CODE,
             onSelected: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REPORT_DETAILS_SHARE_CODE.getRoute(true))),
         },
         {
             text: translate(`referralProgram.${CONST.REFERRAL_PROGRAM.CONTENT_TYPES.REFER_FRIEND}.header`),
-            icon: expensifyIcons.Cash,
+            icon: cashIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.REFER_FRIEND,
             onSelected: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REFERRAL_DETAILS.getRoute(CONST.REFERRAL_PROGRAM.CONTENT_TYPES.REFER_FRIEND))),
         },
         {
             text: translate('qrCodes.copy'),
-            icon: expensifyIcons.Copy,
+            icon: copyIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.COPY_URL,
             onSelected: () => {
                 if (!moneyRequestReport?.reportID) {
@@ -69,7 +75,7 @@ function useShareActions({reportID, policy}: UseShareActionsParams): UseShareAct
     if (canShareReport(moneyRequestReport, policy, currentUserAccountID)) {
         shareSubMenuItems.unshift({
             text: translate('common.shareReport'),
-            icon: expensifyIcons.Mail,
+            icon: mailIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SHARE_REPORT,
             onSelected: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.REPORT_DETAILS_SHARE_REPORT.path)),
         });
@@ -80,8 +86,8 @@ function useShareActions({reportID, policy}: UseShareActionsParams): UseShareAct
             value: CONST.REPORT.SECONDARY_ACTIONS.SHARE,
             text: translate('common.share'),
             backButtonText: translate('common.share'),
-            icon: expensifyIcons.Mail,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: mailIcon,
+            rightIcon: arrowRightIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.SHARE,
             subMenuItems: shareSubMenuItems,
         },

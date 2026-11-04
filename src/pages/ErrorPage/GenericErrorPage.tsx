@@ -34,7 +34,7 @@ function GenericErrorPage({error}: {error?: Error}) {
     const {translate} = useLocalize();
     const chunkLoadError = isChunkLoadError(error);
     const refreshPage = usePageRefresh();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark', 'Bug']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon, Bug: bugIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark', 'Bug']);
 
     return (
         <SafeAreaConsumer>
@@ -44,7 +44,7 @@ function GenericErrorPage({error}: {error?: Error}) {
                         <View>
                             <View style={styles.mb5}>
                                 <Icon
-                                    src={icons.Bug}
+                                    src={bugIcon}
                                     height={variables.componentSizeNormal}
                                     width={variables.componentSizeNormal}
                                     fill={theme.iconSuccessFill}
@@ -97,7 +97,7 @@ function GenericErrorPage({error}: {error?: Error}) {
                         <View style={[styles.flex1, styles.flexRow, styles.justifyContentCenter]}>
                             <ImageSVG
                                 contentFit="contain"
-                                src={icons.ExpensifyWordmark}
+                                src={expensifyWordmarkIcon}
                                 height={30}
                                 width={80}
                                 fill={theme.text}

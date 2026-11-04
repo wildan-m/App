@@ -39,7 +39,14 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     const {transactions: reportTransactionsMap, violations} = useTransactionsAndViolationsForReport(moneyRequestReport?.reportID);
     const transactions = Object.values(reportTransactionsMap);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Hourglass', 'Box', 'Stopwatch', 'Flag', 'CreditCardHourglass', 'ReceiptScan']);
+    const {
+        Hourglass: hourglassIcon,
+        Box: boxIcon,
+        Stopwatch: stopwatchIcon,
+        Flag: flagIcon,
+        CreditCardHourglass: creditCardHourglassIcon,
+        ReceiptScan: receiptScanIcon,
+    } = useMemoizedLazyExpensifyIcons(['Hourglass', 'Box', 'Stopwatch', 'Flag', 'CreditCardHourglass', 'ReceiptScan']);
 
     if (!statusBarType) {
         return null;
@@ -57,7 +64,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.MARK_AS_RESOLVED) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Hourglass)}
+                icon={getStatusIcon(hourglassIcon)}
                 description={translate('iou.reject.rejectedStatus')}
             />
         );
@@ -66,7 +73,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.BOOKING_PENDING) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Hourglass)}
+                icon={getStatusIcon(hourglassIcon)}
                 description={translate('iou.bookingPendingDescription')}
             />
         );
@@ -75,7 +82,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.BOOKING_ARCHIVED) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Box)}
+                icon={getStatusIcon(boxIcon)}
                 description={translate('iou.bookingArchivedDescription')}
             />
         );
@@ -84,7 +91,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.ON_HOLD) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Stopwatch)}
+                icon={getStatusIcon(stopwatchIcon)}
                 description={translate(transactions.length > 1 ? 'iou.expensesOnHold' : 'iou.expenseOnHold')}
             />
         );
@@ -93,7 +100,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.DUPLICATES) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Flag)}
+                icon={getStatusIcon(flagIcon)}
                 description={translate('iou.duplicateTransaction', isProcessingReport(moneyRequestReport))}
             />
         );
@@ -107,7 +114,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
         }
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Hourglass)}
+                icon={getStatusIcon(hourglassIcon)}
                 description={
                     <BrokenConnectionDescription
                         transactionID={brokenConnectionTransactionID}
@@ -122,7 +129,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.PENDING_RTER) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.Hourglass)}
+                icon={getStatusIcon(hourglassIcon)}
                 description={translate('iou.pendingMatchWithCreditCardDescription')}
             />
         );
@@ -132,7 +139,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
         const pendingDescription = transactions.length <= 1 ? translate('iou.transactionPendingDescription') : translate('iou.allTransactionsPendingNextStep');
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.CreditCardHourglass)}
+                icon={getStatusIcon(creditCardHourglassIcon)}
                 description={pendingDescription}
             />
         );
@@ -141,7 +148,7 @@ function MoneyReportHeaderStatusBarSection({reportID, statusBarType, iouTransact
     if (statusBarType === CONST.REPORT.STATUS_BAR_TYPE.SCANNING_RECEIPT) {
         return (
             <MoneyRequestHeaderStatusBar
-                icon={getStatusIcon(expensifyIcons.ReceiptScan)}
+                icon={getStatusIcon(receiptScanIcon)}
                 description={translate('iou.receiptScanInProgressDescription')}
             />
         );

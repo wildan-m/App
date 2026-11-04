@@ -144,8 +144,8 @@ function SearchAdvancedFiltersPopup({queryJSON, closeOverlay, filterSearchInputR
     const [isDescribeMode, setIsDescribeMode] = useState(canUseNLFilters);
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const filterContentRef = useRef<ComponentRef<typeof View>>(null);
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles', 'ArrowRight']);
-    const illustrations = useMemoizedLazyIllustrations(['Filters']);
+    const {Sparkles: sparklesIcon, ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['Sparkles', 'ArrowRight']);
+    const {Filters: filtersIllustration} = useMemoizedLazyIllustrations(['Filters']);
     const [mountedFilterState, setMountedFilterState] = useState<MountedFilterState>(() => ({
         activeFilter: INITIAL_FILTER,
         mountedFilters: [INITIAL_FILTER],
@@ -318,14 +318,14 @@ function SearchAdvancedFiltersPopup({queryJSON, closeOverlay, filterSearchInputR
                                         {({pressed}) => (
                                             <>
                                                 <Icon
-                                                    src={icons.Sparkles}
+                                                    src={sparklesIcon}
                                                     fill={theme.icon}
                                                     width={variables.iconSizeSmall}
                                                     height={variables.iconSizeSmall}
                                                 />
                                                 <Text style={[styles.flex1]}>{translate('search.filters.describeSearch.title')}</Text>
                                                 <Icon
-                                                    src={icons.ArrowRight}
+                                                    src={arrowRightIcon}
                                                     fill={StyleUtils.getIconFillColor({buttonState: getButtonState({isActive: isDescribeMode, isPressed: pressed})})}
                                                     width={variables.iconSizeNormal}
                                                     height={variables.iconSizeNormal}
@@ -352,7 +352,7 @@ function SearchAdvancedFiltersPopup({queryJSON, closeOverlay, filterSearchInputR
                 >
                     {(isDescribeMode ? !isDescribeSearchListed : !isActiveFilterListed) && (
                         <BlockingView
-                            icon={illustrations.Filters}
+                            icon={filtersIllustration}
                             title={translate('search.filters.noFiltersSelected')}
                         />
                     )}

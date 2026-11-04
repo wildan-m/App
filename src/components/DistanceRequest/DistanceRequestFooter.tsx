@@ -58,7 +58,7 @@ function DistanceRequestFooter({waypoints, transaction, navigateToWaypointEditPa
     const theme = useTheme();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus', 'History']);
+    const {Plus: plusIcon, History: historyIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'History']);
     const [reusableDistanceRoutes] = useOnyx(ONYXKEYS.REUSABLE_DISTANCE_ROUTES);
     const hasAvailableReusableRouteSelector = (transactions: OnyxCollection<Transaction>) => getAvailableReusableDistanceRoutes(reusableDistanceRoutes, transactions, isOffline).length > 0;
     const [hasAvailableReusableRoute = false] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {
@@ -133,7 +133,7 @@ function DistanceRequestFooter({waypoints, transaction, navigateToWaypointEditPa
                             disabledStyle={styles.buttonOpacityDisabled}
                         >
                             <Icon
-                                src={expensifyIcons.Plus}
+                                src={plusIcon}
                                 size={CONST.ICON_SIZE.EXTRA_SMALL}
                                 fill={theme.icon}
                             />
@@ -150,7 +150,7 @@ function DistanceRequestFooter({waypoints, transaction, navigateToWaypointEditPa
                             hoverStyle={styles.hoveredComponentBG}
                         >
                             <Icon
-                                src={expensifyIcons.History}
+                                src={historyIcon}
                                 size={CONST.ICON_SIZE.EXTRA_SMALL}
                                 fill={theme.icon}
                             />

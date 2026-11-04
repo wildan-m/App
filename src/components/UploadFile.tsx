@@ -74,7 +74,7 @@ function UploadFile({
     accessibilityLabel,
     shouldExtendRemoveTouchArea = false,
 }: UploadFileProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Close', 'Paperclip']);
+    const {Close: closeIcon, Paperclip: paperclipIcon} = useMemoizedLazyExpensifyIcons(['Close', 'Paperclip']);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -147,7 +147,7 @@ function UploadFile({
                     key={file.name}
                 >
                     <Icon
-                        src={icons.Paperclip}
+                        src={paperclipIcon}
                         fill={theme.icon}
                         size={CONST.ICON_SIZE.MEDIUM}
                     />
@@ -165,7 +165,7 @@ function UploadFile({
                             shouldUseAutoHitSlop={shouldExtendRemoveTouchArea}
                         >
                             <Icon
-                                src={icons.Close}
+                                src={closeIcon}
                                 fill={theme.icon}
                                 size={CONST.ICON_SIZE.MEDIUM}
                             />

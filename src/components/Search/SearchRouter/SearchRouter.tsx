@@ -123,7 +123,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {windowHeight} = useWindowDimensions();
     const listRef = useRef<SelectionListWithSectionsHandle>(null);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'ConciergeAvatar']);
+    const {MagnifyingGlass: magnifyingGlassIcon, ConciergeAvatar: conciergeAvatarIcon} = useMemoizedLazyExpensifyIcons(['MagnifyingGlass', 'ConciergeAvatar']);
     const {askConcierge, shouldShowAskConcierge} = useAskConcierge();
     const isTrackIntentUser = isTrackOnboardingChoice(introSelected?.choice);
 
@@ -337,7 +337,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                                     : (reportForContextualSearch.text ?? reportForContextualSearch.alternateText ?? '')
                             }`,
                         ),
-                        singleIcon: expensifyIcons.MagnifyingGlass,
+                        singleIcon: magnifyingGlassIcon,
                         searchQuery: reportQueryValue,
                         autocompleteID,
                         keyForList: 'contextualSearch',
@@ -355,7 +355,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
         searchQueryItems = [
             {
                 text: textInputValue,
-                singleIcon: expensifyIcons.MagnifyingGlass,
+                singleIcon: magnifyingGlassIcon,
                 searchQuery: textInputValue,
                 keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.FIND_ITEM,
                 searchItemType: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.SEARCH,
@@ -364,7 +364,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
                 ? [
                       {
                           text: translate('search.askConcierge', textInputValue),
-                          singleIcon: expensifyIcons.ConciergeAvatar,
+                          singleIcon: conciergeAvatarIcon,
                           shouldIconApplyFill: false,
                           searchQuery: textInputValue,
                           keyForList: CONST.SEARCH.SEARCH_ROUTER_ITEM_TYPE.ASK_CONCIERGE,

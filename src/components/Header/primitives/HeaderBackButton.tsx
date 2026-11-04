@@ -24,7 +24,7 @@ type HeaderBackButtonProps = {
 function HeaderBackButton({onPress = () => Navigation.goBack(), iconFill}: HeaderBackButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
     const {shouldSkipFocusAfterTransition} = useHeaderContext();
     const setBackButtonRef = useInitialFocusRef({shouldSkip: shouldSkipFocusAfterTransition});
 
@@ -38,7 +38,7 @@ function HeaderBackButton({onPress = () => Navigation.goBack(), iconFill}: Heade
                 }
                 onPress();
             }}
-            iconSrc={icons.BackArrow}
+            iconSrc={backArrowIcon}
             iconFill={iconFill}
             // Header makes the space for this button with the padding, so we need to add negative margin to fill the space - instead of reducing the padding from pl5 to pl2
             style={styles.mln3}

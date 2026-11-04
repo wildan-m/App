@@ -50,7 +50,7 @@ type RuleDeleteHeaderPropsParams = {
 function useRuleDeleteHeaderProps({canDelete, onDelete, sentryLabel, backTo, titleKey, promptKey}: RuleDeleteHeaderPropsParams) {
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     const confirmDelete = () => {
         showConfirmModal({
@@ -78,7 +78,7 @@ function useRuleDeleteHeaderProps({canDelete, onDelete, sentryLabel, backTo, tit
             ? {
                   tooltipText: translate('common.delete'),
                   onPress: confirmDelete,
-                  iconSrc: icons.Trashcan,
+                  iconSrc: trashcanIcon,
                   sentryLabel,
               }
             : undefined,

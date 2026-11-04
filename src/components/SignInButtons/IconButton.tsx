@@ -21,15 +21,15 @@ type IconButtonProps = {
 function IconButton({onPress = () => {}, provider}: IconButtonProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['AppleLogo', 'GoogleLogo']);
+    const {AppleLogo: appleLogoIcon, GoogleLogo: googleLogoIcon} = useMemoizedLazyExpensifyIcons(['AppleLogo', 'GoogleLogo']);
 
     const providerData = {
         [CONST.SIGN_IN_METHOD.APPLE]: {
-            icon: icons.AppleLogo,
+            icon: appleLogoIcon,
             accessibilityLabel: 'common.signInWithApple' as const,
         },
         [CONST.SIGN_IN_METHOD.GOOGLE]: {
-            icon: icons.GoogleLogo,
+            icon: googleLogoIcon,
             accessibilityLabel: 'common.signInWithGoogle' as const,
         },
     } satisfies Record<

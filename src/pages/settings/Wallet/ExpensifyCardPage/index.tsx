@@ -139,7 +139,14 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
     const pageTitle = shouldDisplayCardDomain ? expensifyCardTitle : (cardList?.[cardID]?.nameValuePairs?.cardTitle ?? expensifyCardTitle);
     const {displayName} = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Flag', 'MoneySearch', 'FreezeCard', 'Key', 'Eye', 'CreditCardLock']);
+    const {
+        Flag: flagIcon,
+        MoneySearch: moneySearchIcon,
+        FreezeCard: freezeCardIcon,
+        Key: keyIcon,
+        Eye: eyeIcon,
+        CreditCardLock: creditCardLockIcon,
+    } = useMemoizedLazyExpensifyIcons(['Flag', 'MoneySearch', 'FreezeCard', 'Key', 'Eye', 'CreditCardLock']);
 
     const cardsToShow = shouldDisplayCardDomain
         ? (getDomainCards(cardList)[domain]?.filter((card) => !card?.nameValuePairs?.issuedBy || !card?.nameValuePairs?.isVirtual) ?? [])
@@ -342,7 +349,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                             innerStyles={styles.ph2}
                             style={styles.w100}
                         >
-                            <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                            <CardDetailsActionButton.Icon src={moneySearchIcon} />
                             <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                         </CardDetailsActionButton>
                     </FrozenCardHeader>
@@ -386,7 +393,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                         isDisabled={isOffline}
                                         style={styles.flexShrink0}
                                     >
-                                        <CardDetailsActionButton.Icon src={expensifyIcons.FreezeCard} />
+                                        <CardDetailsActionButton.Icon src={freezeCardIcon} />
                                         <CardDetailsActionButton.Text>{translate('cardPage.freezeCard')}</CardDetailsActionButton.Text>
                                     </CardDetailsActionButton>
                                 )}
@@ -394,7 +401,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                     onPress={navigateToTransactions}
                                     style={styles.flexShrink0}
                                 >
-                                    <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                                    <CardDetailsActionButton.Icon src={moneySearchIcon} />
                                     <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                                 </CardDetailsActionButton>
                             </CardDetailsActionButtons>
@@ -480,7 +487,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                                     });
                                                 }}
                                             >
-                                                <Button.Icon src={expensifyIcons.Eye} />
+                                                <Button.Icon src={eyeIcon} />
                                                 <Button.Text>{translate('cardPage.revealPin')}</Button.Text>
                                             </ButtonDisabledWhenOffline>
                                         )}
@@ -610,7 +617,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                 {shouldShowChangePINRow && (
                                     <MenuItemNavigation
                                         title={translate('cardPage.changePin')}
-                                        icon={expensifyIcons.Key}
+                                        icon={keyIcon}
                                         onPress={() => {
                                             const physicalCardID = String(currentPhysicalCard?.cardID);
                                             if (isOfflinePINMarket(countryByIp)) {
@@ -628,7 +635,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                                 <MenuItemNavigation
                                                     key={`virtual-fraud-${card.cardID}`}
                                                     title={translate('cardPage.reportFraud')}
-                                                    icon={expensifyIcons.Flag}
+                                                    icon={flagIcon}
                                                     onPress={() => {
                                                         if (isAccountLocked) {
                                                             showLockedAccountModal();
@@ -647,14 +654,14 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
                                                 <MenuItemNavigation
                                                     key={`travel-fraud-${card.cardID}`}
                                                     title={translate('cardPage.reportTravelFraud')}
-                                                    icon={expensifyIcons.Flag}
+                                                    icon={flagIcon}
                                                     onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WALLET_CARD_REPORT_FRAUD.getRoute(String(card.cardID))))}
                                                 />
                                             ))}
                                         {shouldShowReportLostCardButton && (
                                             <MenuItemNavigation
                                                 title={translate('reportCardLostOrDamaged.screenTitle')}
-                                                icon={expensifyIcons.Flag}
+                                                icon={flagIcon}
                                                 onPress={() => {
                                                     if (isAccountLocked) {
                                                         showLockedAccountModal();
@@ -667,7 +674,7 @@ function ExpensifyCardPage({route}: ExpensifyCardPageProps) {
 
                                         {shouldShowEditSpendRules && (
                                             <MenuItemAction
-                                                icon={expensifyIcons.CreditCardLock}
+                                                icon={creditCardLockIcon}
                                                 title={translate('cardPage.editSpendRules')}
                                                 onPress={navigateToSpendRulesPage}
                                             />

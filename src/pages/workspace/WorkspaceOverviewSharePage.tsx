@@ -39,7 +39,12 @@ import AccessOrNotFoundWrapper from './AccessOrNotFoundWrapper';
 import withPolicy from './withPolicy';
 
 function WorkspaceOverviewSharePage({policy}: WithPolicyProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Copy', 'Download', 'FallbackAvatar']);
+    const {
+        Checkmark: checkmarkIcon,
+        Copy: copyIcon,
+        Download: downloadIcon,
+        FallbackAvatar: fallbackAvatarIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Copy', 'Download', 'FallbackAvatar']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
@@ -58,7 +63,7 @@ function WorkspaceOverviewSharePage({policy}: WithPolicyProps) {
     const hasAvatar = !!policy?.avatarURL;
     const logo = hasAvatar ? (policy?.avatarURL as ImageSourcePropType) : undefined;
 
-    const defaultWorkspaceAvatar = getDefaultWorkspaceAvatar(policyName) || icons.FallbackAvatar;
+    const defaultWorkspaceAvatar = getDefaultWorkspaceAvatar(policyName) || fallbackAvatarIcon;
     const defaultWorkspaceAvatarColors = policyID ? StyleUtils.getDefaultWorkspaceAvatarColor(policyID) : StyleUtils.getDefaultWorkspaceAvatarColor('');
 
     const svgLogo = !hasAvatar ? defaultWorkspaceAvatar : undefined;
@@ -112,8 +117,8 @@ function WorkspaceOverviewSharePage({policy}: WithPolicyProps) {
                             <ContextMenuItem
                                 isAnonymousAction
                                 text={translate('qrCodes.copy')}
-                                icon={icons.Copy}
-                                successIcon={icons.Checkmark}
+                                icon={copyIcon}
+                                successIcon={checkmarkIcon}
                                 successText={translate('qrCodes.copied')}
                                 onPress={() => Clipboard.setString(url)}
                                 shouldLimitWidth={false}
@@ -126,7 +131,7 @@ function WorkspaceOverviewSharePage({policy}: WithPolicyProps) {
                                 <MenuItemSectionRoot onPress={() => qrCodeRef.current?.download?.()}>
                                     <MenuItem.Row>
                                         <MenuItem.Leading>
-                                            <MenuItem.Icon src={icons.Download} />
+                                            <MenuItem.Icon src={downloadIcon} />
                                         </MenuItem.Leading>
                                         <MenuItem.Content>
                                             <MenuItem.Title>{translate('common.download')}</MenuItem.Title>

@@ -39,7 +39,7 @@ type AttachmentPreviewProps = {
 
 function AttachmentPreview({source, aspectRatio = 1, onPress, onLoadError}: AttachmentPreviewProps) {
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Play']);
+    const {Play: playIcon} = useMemoizedLazyExpensifyIcons(['Play']);
 
     const fillStyle = aspectRatio < 1 ? styles.h100 : styles.w100;
     const [isEncryptedPDF, setIsEncryptedPDF] = useState(false);
@@ -82,7 +82,7 @@ function AttachmentPreview({source, aspectRatio = 1, onPress, onLoadError}: Atta
                 <View style={[styles.h100, styles.w100, styles.pAbsolute, styles.justifyContentCenter, styles.alignItemsCenter]}>
                     <View style={styles.videoThumbnailPlayButton}>
                         <Icon
-                            src={icons.Play}
+                            src={playIcon}
                             fill="white"
                             width={variables.iconSizeXLarge}
                             height={variables.iconSizeXLarge}

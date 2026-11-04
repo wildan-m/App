@@ -134,7 +134,7 @@ function useSelectionModePayment({
     // Store the pending payment and resume it after the user validates, instead of dropping it on the way to the magic-code screen.
     const {isUserValidated, verifyAccountAndResume} = useVerifyAccountAndResume((retry?: () => void) => retry?.());
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Cash', 'ArrowRight', 'Building'] as const);
+    const {Building: buildingIcon} = useMemoizedLazyExpensifyIcons(['Cash', 'ArrowRight', 'Building'] as const);
 
     const hasViolations = hasViolationsReportUtils(moneyRequestReport?.reportID, allTransactionViolations, accountID, email ?? '');
     const isInvoiceReport = isInvoiceReportUtil(moneyRequestReport);
@@ -306,7 +306,7 @@ function useSelectionModePayment({
                 for (const wp of workspacePolicyOptions) {
                     const workspacePolicyItem: WorkspacePolicyPaymentOption = {
                         text: translate('iou.payWithPolicy', truncate(wp.name, {length: CONST.ADDITIONAL_ALLOWED_CHARACTERS}), ''),
-                        icon: expensifyIcons.Building,
+                        icon: buildingIcon,
                         workspacePolicy: wp,
                     };
                     result.push(workspacePolicyItem);

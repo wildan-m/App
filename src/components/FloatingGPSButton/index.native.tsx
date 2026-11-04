@@ -18,7 +18,7 @@ function FloatingGpsButton() {
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
     const {translate} = useLocalize();
 
-    const icons = useMemoizedLazyExpensifyIcons(['Crosshair']);
+    const {Crosshair: crosshairIcon} = useMemoizedLazyExpensifyIcons(['Crosshair']);
     const styles = useThemeStyles();
 
     if (!gpsDraftDetails?.isTracking) {
@@ -40,7 +40,7 @@ function FloatingGpsButton() {
             accessibilityLabel={translate('gps.gpsFloatingPillText')}
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.FLOATING_GPS_BUTTON}
         >
-            <Button.Icon src={icons.Crosshair} />
+            <Button.Icon src={crosshairIcon} />
             <Button.Text>{translate('gps.gpsFloatingPillText')}</Button.Text>
         </Button>
     );

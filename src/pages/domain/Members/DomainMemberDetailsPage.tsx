@@ -56,7 +56,12 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const {domainAccountID, accountID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Flag', 'Unlock', 'CircularArrowBackwards']);
+    const {
+        RemoveMembers: removeMembersIcon,
+        Flag: flagIcon,
+        Unlock: unlockIcon,
+        CircularArrowBackwards: circularArrowBackwardsIcon,
+    } = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Flag', 'Unlock', 'CircularArrowBackwards']);
     const {showConfirmModal} = useConfirmModal();
     const {showDecisionModal} = useDecisionModal();
 
@@ -128,7 +133,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
             }}
             style={styles.mb5}
         >
-            <Button.Icon src={icons.RemoveMembers} />
+            <Button.Icon src={removeMembersIcon} />
             <Button.Text>{translate('domain.members.closeAccount', {count: 1})}</Button.Text>
         </Button>
     );
@@ -199,7 +204,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
             {!!accountRequiresTwoFactorAuth && (
                 <MenuItemAction
                     title={translate('domain.common.resetTwoFactorAuth')}
-                    icon={icons.CircularArrowBackwards}
+                    icon={circularArrowBackwardsIcon}
                     onPress={() => {
                         clearValidateDomainTwoFactorCodeError();
                         Navigation.navigate(ROUTES.DOMAIN_MEMBER_RESET_TWO_FACTOR_AUTH.getRoute(domainAccountID, accountID));
@@ -211,7 +216,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 <MenuItemAction
                     key="UnlockAccount"
                     title={translate('lockAccountPage.unlockAccount')}
-                    icon={icons.Unlock}
+                    icon={unlockIcon}
                     onPress={showUnlockAccountModal}
                 />
             ) : (
@@ -221,7 +226,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
                 >
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.Flag} />
+                            <MenuItem.Icon src={flagIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('lockAccountPage.reportSuspiciousActivity')}</MenuItem.Title>

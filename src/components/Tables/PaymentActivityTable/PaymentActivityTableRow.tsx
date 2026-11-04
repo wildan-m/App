@@ -28,7 +28,7 @@ type PaymentActivityTableRowProps = {
 export default function PaymentActivityTableRow({item, rowIndex}: PaymentActivityTableRowProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
     const accessibilityLabel = [item.name, item.email].filter(Boolean).join(', ');
 
@@ -64,7 +64,7 @@ export default function PaymentActivityTableRow({item, rowIndex}: PaymentActivit
                     </View>
 
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={theme.icon}
                         additionalStyles={[styles.justifyContentCenter, styles.alignItemsCenter, !hovered && styles.opacitySemiTransparent]}
                         width={variables.iconSizeNormal}

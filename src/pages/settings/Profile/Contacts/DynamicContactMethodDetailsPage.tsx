@@ -74,7 +74,7 @@ function DynamicContactMethodDetailsPage({route}: DynamicContactMethodDetailsPag
 
     const {formatPhoneNumber, translate} = useLocalize();
     const themeStyles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Star', 'Trashcan']);
+    const {Star: starIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Star', 'Trashcan']);
 
     const validateCodeFormRef = useRef<ValidateCodeFormHandle>(null);
     // The contact methods list URL - i.e. the current URL with our own suffix stripped off.
@@ -214,13 +214,13 @@ function DynamicContactMethodDetailsPage({route}: DynamicContactMethodDetailsPag
         const menuItems = [];
         if (isValidateCodeFormVisible && !isDefaultContactMethod) {
             menuItems.push({
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('common.remove'),
                 onSelected: () => close(turnOnDeleteModal),
             });
         }
         return menuItems;
-    }, [isValidateCodeFormVisible, translate, turnOnDeleteModal, isDefaultContactMethod, icons.Trashcan]);
+    }, [isValidateCodeFormVisible, translate, turnOnDeleteModal, isDefaultContactMethod, trashcanIcon]);
 
     if (isLoadingOnyxValues || (isLoadingReportData && isEmptyObject(loginList))) {
         return <FullscreenLoadingIndicator onGoBack={() => Navigation.goBack(listPath)} />;
@@ -256,7 +256,7 @@ function DynamicContactMethodDetailsPage({route}: DynamicContactMethodDetailsPag
                 >
                     <MenuItemAction
                         title={translate('contacts.setAsDefault')}
-                        icon={icons.Star}
+                        icon={starIcon}
                         onPress={isAccountLocked ? showLockedAccountModal : navigateToSetDefaultConfirm}
                     />
                 </OfflineWithFeedback>
@@ -281,7 +281,7 @@ function DynamicContactMethodDetailsPage({route}: DynamicContactMethodDetailsPag
                 >
                     <MenuItemAction
                         title={translate('common.remove')}
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon}
                         onPress={() => {
                             if (isActingAsDelegate) {
                                 showDelegateNoAccessModal();

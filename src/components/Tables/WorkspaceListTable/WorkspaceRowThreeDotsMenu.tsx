@@ -68,7 +68,17 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
     const isFocused = useIsFocused();
     const {translate} = useLocalize();
     const {isBetaEnabled} = usePermissions();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Box', 'Building', 'Exit', 'Plus', 'Copy', 'Star', 'Trashcan', 'Transfer']);
+    const {
+        ArrowCircleClockwise: arrowCircleClockwiseIcon,
+        Box: boxIcon,
+        Building: buildingIcon,
+        Exit: exitIcon,
+        Plus: plusIcon,
+        Copy: copyIcon,
+        Star: starIcon,
+        Trashcan: trashcanIcon,
+        Transfer: transferIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Box', 'Building', 'Exit', 'Plus', 'Copy', 'Star', 'Trashcan', 'Transfer']);
     const canArchivePolicies = isBetaEnabled(CONST.BETAS.ARCHIVE_POLICIES);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
@@ -104,7 +114,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
 
     const menuItems: PopoverMenuItem[] = [
         {
-            icon: icons.Building,
+            icon: buildingIcon,
             text: translate('workspace.common.goToWorkspace'),
             onSelected: item.action,
         },
@@ -113,7 +123,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
     if (!item.isArchived) {
         if (!isOwner && (item.policyID !== preferredPolicyID || !isRestrictedToPreferredPolicy)) {
             menuItems.push({
-                icon: icons.Exit,
+                icon: exitIcon,
                 text: translate('common.leave'),
                 onSelected: callFunctionIfActionIsAllowed(() => setActiveAction(CONST.POLICY.THREE_DOT_MENU_ACTION.LEAVE), false, session),
                 shouldCallAfterModalHide: true,
@@ -122,13 +132,13 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
 
         if (isAdmin) {
             menuItems.push({
-                icon: icons.Plus,
+                icon: plusIcon,
                 text: translate('workspace.common.duplicateWorkspace'),
                 onSelected: () => (item.policyID ? Navigation.navigate(ROUTES.WORKSPACE_DUPLICATE.getRoute(item.policyID)) : undefined),
             });
             if (item.isEligibleToCopy) {
                 menuItems.push({
-                    icon: icons.Copy,
+                    icon: copyIcon,
                     text: translate('workspace.copyPolicySettings.title'),
                     onSelected: () => {
                         if (!item.policyID) {
@@ -144,7 +154,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
         // Making the workspace the default would break expense creation routing for members without create-expenses permission.
         if (!isDefault && !item?.isJoinRequestPending && !isRestrictedToPreferredPolicy && canRoleCreateExpenses(item.role)) {
             menuItems.push({
-                icon: icons.Star,
+                icon: starIcon,
                 text: translate('workspace.common.setAsDefault'),
                 onSelected: () => {
                     if (!item.policyID || !activePolicyID) {
@@ -157,7 +167,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
 
         if (isOwner) {
             menuItems.push({
-                icon: canArchivePolicies ? icons.Box : icons.Trashcan,
+                icon: canArchivePolicies ? boxIcon : trashcanIcon,
                 text: translate(canArchivePolicies ? 'workspace.common.archive' : 'workspace.common.delete'),
                 shouldShowLoadingSpinnerIcon: !canArchivePolicies && !!isLoadingBill && pendingDeletePolicyID === item.policyID,
                 onSelected: () => {
@@ -182,7 +192,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
 
     if (canUnarchivePolicy(item.isArchived, item.ownerAccountID, currentUserPersonalDetails.accountID, canArchivePolicies)) {
         menuItems.push({
-            icon: icons.ArrowCircleClockwise,
+            icon: arrowCircleClockwiseIcon,
             text: translate('workspace.common.unarchive'),
             onSelected: callFunctionIfActionIsAllowed(() => setActiveAction(CONST.POLICY.THREE_DOT_MENU_ACTION.UNARCHIVE), false, session),
             shouldCallAfterModalHide: true,
@@ -192,7 +202,7 @@ function WorkspaceRowThreeDotsMenu({item, onDeleteWorkspace, onArchiveWorkspace,
     // Transferring ownership applies to both active and archived workspaces, so it lives outside the split above.
     if (isAdmin && !isOwner && canRenderTransferOwnerButton) {
         menuItems.push({
-            icon: icons.Transfer,
+            icon: transferIcon,
             text: translate('workspace.people.transferOwner'),
             onSelected: () => setActiveAction(CONST.POLICY.THREE_DOT_MENU_ACTION.TRANSFER_OWNERSHIP),
             shouldCallAfterModalHide: true,

@@ -31,7 +31,7 @@ type MoneyRequestReportTransactionLongPressModalProps = {
 
 function MoneyRequestReportTransactionLongPressModal({isMobileSelectionModeEnabled, toggleTransaction, ref}: MoneyRequestReportTransactionLongPressModalProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
+    const {CheckSquare: checkSquareIcon} = useMemoizedLazyExpensifyIcons(['CheckSquare']);
     const [isVisible, setIsVisible] = useState(false);
     const [selectedTransactionID, setSelectedTransactionID] = useState('');
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, addOfflineIndicatorBottomSafeAreaPadding: false});
@@ -54,7 +54,7 @@ function MoneyRequestReportTransactionLongPressModal({isMobileSelectionModeEnabl
             <View style={bottomSafeAreaPaddingStyle}>
                 <MenuItemAction
                     title={translate('common.select')}
-                    icon={expensifyIcons.CheckSquare}
+                    icon={checkSquareIcon}
                     onPress={() => {
                         if (!isMobileSelectionModeEnabled) {
                             turnOnMobileSelectionMode();

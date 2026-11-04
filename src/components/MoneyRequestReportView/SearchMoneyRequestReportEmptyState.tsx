@@ -38,15 +38,15 @@ function SearchMoneyRequestReportEmptyState({report, policy, onLayout}: {report:
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report.reportID}`);
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['FolderWithPapersAndWatch']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Location', 'Plus']);
+    const {FolderWithPapersAndWatch: folderWithPapersAndWatchIllustration} = useMemoizedLazyIllustrations(['FolderWithPapersAndWatch']);
+    const {Location: locationIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Location', 'Plus']);
     const [lastDistanceExpenseType] = useOnyx(ONYXKEYS.NVP_LAST_DISTANCE_EXPENSE_TYPE);
     const distanceExpenseType = getDistanceExpenseTypeForPolicy(policy, lastDistanceExpenseType);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
     const reportId = report.reportID;
     const isReportArchived = isArchivedReport(reportNameValuePairs);
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
+    const {ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
     const canAddTransactionToReport = canAddTransaction(report, rules, isReportArchived);
     const blockDistanceRequestIfNeeded = useBlockDistanceRequest({
         policyID: policy?.id,
@@ -62,7 +62,7 @@ function SearchMoneyRequestReportEmptyState({report, policy, onLayout}: {report:
                       value: CONST.REPORT.ADD_EXPENSE_OPTIONS.CREATE_NEW_EXPENSE,
                       text: translate('iou.createExpense'),
                       sentryLabel: CONST.SENTRY_LABEL.REPORT.EMPTY_STATE.CREATE_EXPENSE,
-                      icon: expensifyIcons.Plus,
+                      icon: plusIcon,
                       onSelected: () => {
                           if (!reportId) {
                               return;
@@ -78,7 +78,7 @@ function SearchMoneyRequestReportEmptyState({report, policy, onLayout}: {report:
                       value: CONST.REPORT.ADD_EXPENSE_OPTIONS.TRACK_DISTANCE_EXPENSE,
                       text: translate('iou.trackDistance'),
                       sentryLabel: CONST.SENTRY_LABEL.REPORT.EMPTY_STATE.TRACK_DISTANCE,
-                      icon: expensifyIcons.Location,
+                      icon: locationIcon,
                       onSelected: () => {
                           if (!reportId) {
                               return;
@@ -98,7 +98,7 @@ function SearchMoneyRequestReportEmptyState({report, policy, onLayout}: {report:
             value: CONST.REPORT.ADD_EXPENSE_OPTIONS.ADD_EXISTING_EXPENSE,
             text: translate('iou.addExistingExpense'),
             sentryLabel: CONST.SENTRY_LABEL.REPORT.EMPTY_STATE.ADD_EXISTING_EXPENSE,
-            icon: icons.ReceiptPlus,
+            icon: receiptPlusIcon,
             onSelected: () => {
                 if (policy && shouldRestrictUserBillableActions(policy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID)) {
                     Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
@@ -121,7 +121,7 @@ function SearchMoneyRequestReportEmptyState({report, policy, onLayout}: {report:
             <EmptyStateComponent
                 cardStyles={[styles.appBG]}
                 cardContentStyles={[styles.pb0]}
-                headerMedia={illustrations.FolderWithPapersAndWatch}
+                headerMedia={folderWithPapersAndWatchIllustration}
                 title={translate('search.moneyRequestReport.emptyStateTitle')}
                 headerStyles={[styles.emptyStateMoneyRequestReport]}
                 headerContentStyles={[styles.emptyStateFolderStaticIllustration]}

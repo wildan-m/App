@@ -77,7 +77,7 @@ function NetSuiteImportCustomFieldPage({
     const policyID = policy?.id ?? '-1';
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['FolderWithPapers']);
+    const {FolderWithPapers: folderWithPapersIllustration} = useMemoizedLazyIllustrations(['FolderWithPapers']);
 
     const config = policy?.connections?.netsuite?.options?.config;
     const data = config?.syncOptions?.[importCustomField] ?? [];
@@ -86,7 +86,7 @@ function NetSuiteImportCustomFieldPage({
         <WorkspaceEmptyStateSection
             shouldStyleAsCard={false}
             title={translate(`workspace.netsuite.import.importCustomFields.${importCustomField}.emptyTitle`)}
-            icon={illustrations.FolderWithPapers}
+            icon={folderWithPapersIllustration}
             subtitleComponent={
                 <HelpLinkComponent
                     importCustomField={importCustomField}

@@ -25,7 +25,8 @@ function ExpenseMenuItem({reportID}: ExpenseMenuItemProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Coins', 'Receipt', 'Cash', 'Transfer', 'MoneyCircle']);
+    const {Coins, Receipt, Cash, Transfer, MoneyCircle} = useMemoizedLazyExpensifyIcons(['Coins', 'Receipt', 'Cash', 'Transfer', 'MoneyCircle']);
+    const icons = {Coins, Receipt, Cash, Transfer, MoneyCircle};
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
 
     return (

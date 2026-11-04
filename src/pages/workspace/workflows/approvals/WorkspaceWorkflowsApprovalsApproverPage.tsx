@@ -41,7 +41,7 @@ type WorkspaceWorkflowsApprovalsApproverPageProps = WithPolicyAndFullscreenLoadi
 function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoadingReportData = true, route}: WorkspaceWorkflowsApprovalsApproverPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const [approvalWorkflow, approvalWorkflowMetadata] = useOnyx(ONYXKEYS.APPROVAL_WORKFLOW);
     const isApprovalWorkflowLoading = isLoadingOnyxValue(approvalWorkflowMetadata);
     const personalDetailsByEmail = usePersonalDetailsByEmail();
@@ -126,7 +126,7 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
                     value: email,
                     icons: [
                         {
-                            source: avatar ?? icons.FallbackAvatar,
+                            source: avatar ?? fallbackAvatarIcon,
                             type: CONST.ICON_TYPE_AVATAR,
                             name: displayName,
                             id: accountID,
@@ -152,7 +152,7 @@ function WorkspaceWorkflowsApprovalsApproverPage({policy, personalDetails, isLoa
                 value: nonMemberApprover.email,
                 icons: [
                     {
-                        source: nonMemberApprover.avatar ?? icons.FallbackAvatar,
+                        source: nonMemberApprover.avatar ?? fallbackAvatarIcon,
                         type: CONST.ICON_TYPE_AVATAR,
                         name: nonMemberApprover.displayName,
                         id: nonMemberApproverAccountID,

@@ -20,7 +20,7 @@ function AttachmentDeletedIndicator({containerStyles}: AttachmentDeletedIndicato
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     if (!isOffline) {
         return null;
@@ -42,7 +42,7 @@ function AttachmentDeletedIndicator({containerStyles}: AttachmentDeletedIndicato
             <View style={[styles.pAbsolute, styles.deletedAttachmentIndicator, styles.alignItemsCenter, styles.justifyContentCenter, containerStyles]}>
                 <Icon
                     fill={theme.icon}
-                    src={icons.Trashcan}
+                    src={trashcanIcon}
                     width={variables.iconSizeSuperLarge}
                     height={variables.iconSizeSuperLarge}
                 />

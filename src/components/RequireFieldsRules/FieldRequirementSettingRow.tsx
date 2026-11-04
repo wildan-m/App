@@ -64,7 +64,7 @@ function FieldRequirementSettingRow({
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close', 'Lightbulb']);
+    const {Close: closeIcon, Lightbulb: lightbulbIcon} = useMemoizedLazyExpensifyIcons(['Close', 'Lightbulb']);
     const [dismissedProductTraining, dismissedProductTrainingMetadata] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
 
     const isCouplingDisabled = isRequireFieldsFieldCouplingDisabled(fieldKey, effectiveForm, category, touchedFields, isEditing, clearedFields);
@@ -91,7 +91,7 @@ function FieldRequirementSettingRow({
             <View fsClass={CONST.FULLSTORY.CLASS.UNMASK}>
                 <View style={[styles.alignItemsCenter, styles.flexRow, styles.justifyContentCenter, styles.textAlignCenter, styles.gap3, styles.pv2, styles.ph2]}>
                     <Icon
-                        src={expensifyIcons.Lightbulb}
+                        src={lightbulbIcon}
                         fill={theme.tooltipHighlightText}
                         width={variables.iconSizeNormal}
                         height={variables.iconSizeNormal}
@@ -107,7 +107,7 @@ function FieldRequirementSettingRow({
                         onPress={() => hideCouplingTooltip(true)}
                     >
                         <Icon
-                            src={expensifyIcons.Close}
+                            src={closeIcon}
                             fill={theme.icon}
                             width={variables.iconSizeSemiSmall}
                             height={variables.iconSizeSemiSmall}

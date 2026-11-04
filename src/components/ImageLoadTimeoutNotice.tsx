@@ -19,7 +19,7 @@ type ImageLoadTimeoutNoticeProps = {
 function ImageLoadTimeoutNotice({onRetry}: ImageLoadTimeoutNoticeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise']);
+    const {ArrowCircleClockwise: arrowCircleClockwiseIcon} = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise']);
 
     return (
         <View
@@ -32,7 +32,7 @@ function ImageLoadTimeoutNotice({onRetry}: ImageLoadTimeoutNoticeProps) {
                 onPress={onRetry}
                 sentryLabel={CONST.SENTRY_LABEL.IMAGE_LOAD.RETRY_BUTTON}
             >
-                <Button.Icon src={icons.ArrowCircleClockwise} />
+                <Button.Icon src={arrowCircleClockwiseIcon} />
                 <Button.Text>{translate('attachmentView.retry')}</Button.Text>
             </Button>
         </View>

@@ -61,7 +61,7 @@ function WorkspaceDistanceRatesTable({
 }: WorkspaceDistanceRatesTableProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
 
@@ -153,7 +153,7 @@ function WorkspaceDistanceRatesTable({
     const emptyStateButtons = canWriteDistanceRates
         ? [
               {
-                  icon: icons.Plus,
+                  icon: plusIcon,
                   buttonText: translate('workspace.distanceRates.addRate'),
 
                   buttonVariant: CONST.BUTTON_VARIANT.SUCCESS,

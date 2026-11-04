@@ -35,7 +35,7 @@ function CaretBackHeader({onBackButtonPress, onCloseButtonPress, shouldShowBackB
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
 
     return (
         <View style={styles.onboardingHeaderContainer}>
@@ -50,7 +50,7 @@ function CaretBackHeader({onBackButtonPress, onCloseButtonPress, shouldShowBackB
                     tabIndex={isFocusable ? 0 : -1}
                 >
                     <Icon
-                        src={icons.BackArrow}
+                        src={backArrowIcon}
                         fill={theme.icon}
                         width={variables.iconSizeNormal}
                         height={variables.iconSizeNormal}

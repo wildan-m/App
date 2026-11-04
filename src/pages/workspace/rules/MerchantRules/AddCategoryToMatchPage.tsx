@@ -51,7 +51,7 @@ function AddCategoryToMatchPage({route}: AddCategoryToMatchPageProps) {
     const isEditingCategoryTaxRule = !!editingCategoryName;
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policy = usePolicy(policyID);
 
     const [form] = useOnyx(ONYXKEYS.FORMS.MERCHANT_RULE_FORM);
@@ -182,7 +182,7 @@ function AddCategoryToMatchPage({route}: AddCategoryToMatchPageProps) {
                     listEmptyContent={
                         <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                             <BlockingView
-                                icon={illustrations.Telescope}
+                                icon={telescopeIllustration}
                                 iconWidth={variables.emptyListIconWidth}
                                 iconHeight={variables.emptyListIconHeight}
                                 title={translate('common.noResultsFound')}

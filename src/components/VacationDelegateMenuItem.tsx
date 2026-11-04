@@ -56,14 +56,14 @@ type VacationDelegateMenuItemRowProps = {
  */
 function VacationDelegateMenuItemRow({label, displayName, avatar, accountID, login, untilText, brickRoadIndicator}: VacationDelegateMenuItemRowProps) {
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     return (
         <MenuItem.Row>
             <MenuItem.Content>
                 <MenuItem.FieldName>{label}</MenuItem.FieldName>
                 <UserPill
-                    avatar={avatar ?? icons.FallbackAvatar}
+                    avatar={avatar ?? fallbackAvatarIcon}
                     displayName={displayName}
                     accountID={accountID}
                     email={login}

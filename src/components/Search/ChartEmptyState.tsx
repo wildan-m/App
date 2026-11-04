@@ -12,12 +12,12 @@ type ChartEmptyStateProps = {
 /** Stands in for a chart with too little data to plot. */
 function ChartEmptyState({testID}: ChartEmptyStateProps) {
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Chart']);
+    const {Chart: chartIllustration} = useMemoizedLazyIllustrations(['Chart']);
 
     return (
         <HomeSectionEmptyState
             testID={testID}
-            illustration={illustrations.Chart}
+            illustration={chartIllustration}
             title={translate('homePage.insightsSection.chartUnavailable')}
             description={translate('homePage.insightsSection.notEnoughData')}
         />

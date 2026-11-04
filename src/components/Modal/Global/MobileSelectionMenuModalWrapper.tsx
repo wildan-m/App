@@ -21,7 +21,7 @@ type MobileSelectionMenuModalWrapperProps = ModalProps & WithSentryLabel;
 // "Select" or CLOSE otherwise. What selecting does is up to the caller, which chains it off that promise.
 function MobileSelectionMenuModalWrapper({closeModal, resolveModal, sentryLabel}: MobileSelectionMenuModalWrapperProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
+    const {CheckSquare: checkSquareIcon} = useMemoizedLazyExpensifyIcons(['CheckSquare']);
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true, addOfflineIndicatorBottomSafeAreaPadding: false});
     const [isVisible, setIsVisible] = useState(true);
     const closeActionRef = useRef<typeof ModalActions.CONFIRM | typeof ModalActions.CLOSE>(ModalActions.CLOSE);
@@ -58,7 +58,7 @@ function MobileSelectionMenuModalWrapper({closeModal, resolveModal, sentryLabel}
             <View style={bottomSafeAreaPaddingStyle}>
                 <MenuItemAction
                     title={translate('common.select')}
-                    icon={expensifyIcons.CheckSquare}
+                    icon={checkSquareIcon}
                     onPress={handleSelect}
                     sentryLabel={sentryLabel}
                 />

@@ -110,7 +110,7 @@ function GroupHeader({
     const {pageGutterMargin} = useLayoutSpacing();
     const StyleUtils = useStyleUtils();
     const {isLargeScreenWidth} = useResponsiveLayout();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
+    const {UpArrow: upArrowIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
     const currentUserDetails = useCurrentUserPersonalDetails();
     const {policyForMovingExpensesID} = usePolicyForMovingExpenses();
     const isVendorColumnAvailable = useIsVendorColumnAvailable();
@@ -496,7 +496,7 @@ function GroupHeader({
                                     >
                                         {({hovered: arrowHovered}) => (
                                             <Icon
-                                                src={isExpanded ? expensifyIcons.UpArrow : expensifyIcons.DownArrow}
+                                                src={isExpanded ? upArrowIcon : downArrowIcon}
                                                 fill={theme.icon}
                                                 additionalStyles={!arrowHovered && styles.opacitySemiTransparent}
                                             />

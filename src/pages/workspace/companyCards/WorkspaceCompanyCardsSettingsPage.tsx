@@ -70,7 +70,7 @@ function WorkspaceCompanyCardsSettingsPage({
     const {showConfirmModal} = useConfirmModal();
 
     const [cardsList] = useCardsList(selectedFeed);
-    const icons = useMemoizedLazyExpensifyIcons(['Sync', 'Trashcan', 'Table']);
+    const {Sync: syncIcon, Trashcan: trashcanIcon, Table: tableIcon} = useMemoizedLazyExpensifyIcons(['Sync', 'Trashcan', 'Table']);
     const feedName = selectedFeed ? getCustomOrFormattedFeedName(translate, feed, cardFeeds?.[selectedFeed]?.customFeedName) : undefined;
     const companyFeeds = getCompanyFeeds(cardFeeds);
     const selectedFeedData = selectedFeed ? companyFeeds[selectedFeed] : undefined;
@@ -205,7 +205,7 @@ function WorkspaceCompanyCardsSettingsPage({
                             >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
-                                        <MenuItem.Icon src={icons.Sync} />
+                                        <MenuItem.Icon src={syncIcon} />
                                     </MenuItem.Leading>
                                     <MenuItem.Content>
                                         <MenuItem.Title>{translate('workspace.companyCards.assignNewCards.title')}</MenuItem.Title>
@@ -216,7 +216,7 @@ function WorkspaceCompanyCardsSettingsPage({
                         )}
                         {isCsvFeed && (
                             <MenuItemAction
-                                icon={icons.Table}
+                                icon={tableIcon}
                                 title={translate('spreadsheet.importSpreadsheet')}
                                 onPress={() => {
                                     setAddNewCompanyCardStepAndData({
@@ -232,7 +232,7 @@ function WorkspaceCompanyCardsSettingsPage({
                             />
                         )}
                         <MenuItemAction
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('workspace.moreFeatures.companyCards.removeCardFeed')}
                             onPress={() => {
                                 showConfirmModal({

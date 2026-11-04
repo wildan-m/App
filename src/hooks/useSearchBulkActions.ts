@@ -735,7 +735,42 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
     const getPersonalDetailsByLogin = useGetPersonalDetailsByLogin();
 
     const isExpenseReportType = queryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        Download: downloadIcon,
+        Export: exportIcon,
+        Table: tableIcon,
+        TablePencil: tablePencilIcon,
+        DocumentMerge: documentMergeIcon,
+        Send: sendIcon,
+        Trashcan: trashcanIcon,
+        ThumbsUp: thumbsUpIcon,
+        ThumbsDown: thumbsDownIcon,
+        ArrowRight: arrowRightIcon,
+        ArrowCollapse: arrowCollapseIcon,
+        Stopwatch: stopwatchIcon,
+        Exclamation: exclamationIcon,
+        MoneyBag: moneyBagIcon,
+        ArrowSplit: arrowSplitIcon,
+        ExpenseCopy: expenseCopyIcon,
+        ReportCopy: reportCopyIcon,
+        RotateLeft: rotateLeftIcon,
+        QBOSquare,
+        IntuitSquare,
+        XeroSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        Pencil: pencilIcon,
+        Workflows: workflowsIcon,
+        Document: documentIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'Download',
         'Export',
         'Table',
@@ -2448,7 +2483,25 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             for (const [, {integration, integrationPolicy, reports: reportsForIntegration}] of reportsByIntegration) {
                 const integrationGroupSize = reportsForIntegration.length;
                 const connectionNameFriendly = getAccountingIntegrationDisplayName(integrationPolicy, integration, translate);
-                const integrationIcon = getIntegrationIcon(integration, expensifyIcons, integrationPolicy);
+                const integrationIcon = getIntegrationIcon(
+                    integration,
+                    {
+                        QBOSquare,
+                        IntuitSquare,
+                        XeroSquare,
+                        NetSuiteSquare,
+                        IntacctSquare,
+                        QBDSquare,
+                        CertiniaSquare,
+                        RilletSquare,
+                        DualEntrySquare,
+                        CampfireSquare,
+                        ZohoBooksSquare,
+                        BusinessCentralSquare,
+                        GustoSquare,
+                    },
+                    integrationPolicy,
+                );
 
                 // Show the option when AT LEAST ONE report in the group is eligible, and act only on the eligible
                 // subset. Mixing eligible + ineligible reports naturally triggers the partial-export confirmation.
@@ -2525,7 +2578,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             exportOptions.push({
                 text: translate('export.currentView'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
-                icon: expensifyIcons.Table,
+                icon: tableIcon,
                 onSelected: () => {
                     handleExportCurrentView();
                 },
@@ -2539,7 +2592,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 exportOptions.push({
                     text: translate('export.currentViewGroupsOnly'),
                     value: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
-                    icon: expensifyIcons.Table,
+                    icon: tableIcon,
                     onSelected: () => {
                         handleExportCurrentView(true);
                     },
@@ -2556,7 +2609,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                     return {
                         text: template.name,
                         value: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
-                        icon: isDefaultTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil,
+                        icon: isDefaultTemplate ? tableIcon : tablePencilIcon,
                         description: template.description,
                         onSelected: () => {
                             if (isBasicExport) {
@@ -2583,7 +2636,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 exportOptions.push({
                     text: translate('export.basicExport'),
                     value: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
-                    icon: expensifyIcons.Table,
+                    icon: tableIcon,
                     onSelected: () => {
                         handleBasicExport();
                     },
@@ -2602,8 +2655,8 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         // Always open the Export submenu, even when there is only one option, so the user keeps the context that
         // they are entering an export flow instead of being navigated straight into the single option.
         const exportButtonOption: DropdownOption<SearchHeaderOptionValue> & Pick<PopoverMenuItem, 'rightIcon'> = {
-            icon: expensifyIcons.Export,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: exportIcon,
+            rightIcon: arrowRightIcon,
             text: translate('common.export'),
             backButtonText: translate('common.export'),
             value: CONST.SEARCH.BULK_ACTION_TYPES.EXPORT,
@@ -2669,7 +2722,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         const moveExpensesOption: DropdownOption<SearchHeaderOptionValue> = {
             text: translate('iou.moveExpenses'),
-            icon: expensifyIcons.DocumentMerge,
+            icon: documentMergeIcon,
             value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_REPORT,
             shouldCloseModalOnSelect: true,
             onSelected: () => {
@@ -2688,10 +2741,10 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             ? hasLoadedPayableReport && !!bulkPayButtonOptions?.length
             : !isAnyPayableTransactionOnHold && shouldEnableBulkPayOption && !!bulkPayButtonOptions?.length;
         const payButtonOption: DropdownOption<SearchHeaderOptionValue> & Pick<PopoverMenuItem, 'rightIcon'> = {
-            icon: expensifyIcons.MoneyBag,
+            icon: moneyBagIcon,
             text: translate('search.bulkActions.pay'),
             backButtonText: translate('search.bulkActions.pay'),
-            rightIcon: expensifyIcons.ArrowRight,
+            rightIcon: arrowRightIcon,
             value: CONST.SEARCH.BULK_ACTION_TYPES.PAY,
             shouldCloseModalOnSelect: true,
             subMenuItems: bulkPayButtonOptions,
@@ -2699,7 +2752,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         };
 
         const approveButtonOption: DropdownOption<SearchHeaderOptionValue> = {
-            icon: expensifyIcons.ThumbsUp,
+            icon: thumbsUpIcon,
             text: translate('search.bulkActions.approve'),
             value: CONST.SEARCH.BULK_ACTION_TYPES.APPROVE,
             shouldCloseModalOnSelect: true,
@@ -2709,7 +2762,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         };
 
         const submitButtonOption: DropdownOption<SearchHeaderOptionValue> = {
-            icon: expensifyIcons.Send,
+            icon: sendIcon,
             text: allReportsShouldMarkAsDone ? translate('common.markAsDone') : translate('common.submit'),
             value: CONST.SEARCH.BULK_ACTION_TYPES.SUBMIT,
             shouldCloseModalOnSelect: true,
@@ -2922,7 +2975,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         const isExpenseReportSearch = isExpenseReportType || searchResults?.search.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT;
 
         const downloadPDFOption: DropdownOption<SearchHeaderOptionValue> = {
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             text: translate('common.downloadReport', {count: selectedReportIDs.length}),
             value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_PDF,
             shouldCloseModalOnSelect: true,
@@ -3003,7 +3056,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         if (allSelectedAreDeleted) {
             const deletedTransactionOptions: Array<DropdownOption<SearchHeaderOptionValue>> = [
                 {
-                    icon: expensifyIcons.RotateLeft,
+                    icon: rotateLeftIcon,
                     text: translate('search.bulkActions.undelete'),
                     value: CONST.SEARCH.BULK_ACTION_TYPES.UNDELETE,
                     shouldCloseModalOnSelect: true,
@@ -3019,7 +3072,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             if (isDuplicateOptionVisible) {
                 deletedTransactionOptions.push({
                     text: translate('search.bulkActions.duplicateExpense', {count: selectedTransactionsKeys.length}),
-                    icon: expensifyIcons.ExpenseCopy,
+                    icon: expenseCopyIcon,
                     value: CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE,
                     shouldCloseModalOnSelect: true,
                     onSelected: () => {
@@ -3044,7 +3097,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         if (canEditMultiple) {
             options.push({
-                icon: expensifyIcons.Pencil,
+                icon: pencilIcon,
                 text: translate('search.bulkActions.editMultiple'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.EDIT,
                 shouldCloseModalOnSelect: true,
@@ -3089,7 +3142,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         if (shouldShowRejectOption) {
             options.push({
-                icon: expensifyIcons.ThumbsDown,
+                icon: thumbsDownIcon,
                 text: translate('search.bulkActions.reject'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.REJECT,
                 shouldCloseModalOnSelect: true,
@@ -3122,7 +3175,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         if (shouldShowChangeApproverOption) {
             options.push({
-                icon: expensifyIcons.Workflows,
+                icon: workflowsIcon,
                 text: translate('iou.changeApprover.title'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.CHANGE_APPROVER,
                 shouldCloseModalOnSelect: true,
@@ -3173,7 +3226,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             )
         ) {
             options.push({
-                icon: expensifyIcons.ArrowCollapse,
+                icon: arrowCollapseIcon,
                 text: translate('search.mergeReports.title'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.MERGE_REPORTS,
                 shouldCloseModalOnSelect: true,
@@ -3196,7 +3249,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         ).length;
         if (isExpenseReportSearch && selectedReportIDs.length > 0 && selectedReportReceiptCount > 0) {
             options.push({
-                icon: expensifyIcons.Download,
+                icon: downloadIcon,
                 text: translate('common.downloadReceipt', {count: selectedReportReceiptCount}),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_RECEIPTS,
                 shouldCloseModalOnSelect: true,
@@ -3226,7 +3279,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         });
         if (isExpenseSearch && transactionIDs.length > 0) {
             options.push({
-                icon: expensifyIcons.Download,
+                icon: downloadIcon,
                 text: translate('common.downloadReceipt', {count: transactionIDs.length}),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_RECEIPTS,
                 shouldCloseModalOnSelect: true,
@@ -3249,7 +3302,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         // the statement has no whole-query export path (unlike CSV/templates), so require an explicit selection.
         if (expensifyCardStatementSelection && !areAllMatchingItemsSelected) {
             options.push({
-                icon: expensifyIcons.Document,
+                icon: documentIcon,
                 text: translate('export.downloadStatementPDF'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DOWNLOAD_STATEMENT_PDF,
                 onSelected: exportExpensifyCardStatementPDF,
@@ -3261,7 +3314,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         if (shouldShowHoldOption) {
             options.push({
-                icon: expensifyIcons.Stopwatch,
+                icon: stopwatchIcon,
                 text: translate('search.bulkActions.hold'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.HOLD,
                 shouldCloseModalOnSelect: true,
@@ -3294,7 +3347,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
 
         if (shouldShowUnholdOption) {
             options.push({
-                icon: expensifyIcons.Stopwatch,
+                icon: stopwatchIcon,
                 text: translate('search.bulkActions.unhold'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.UNHOLD,
                 shouldCloseModalOnSelect: true,
@@ -3337,7 +3390,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 if (transactionID) {
                     options.push({
                         text: translate('common.merge'),
-                        icon: expensifyIcons.ArrowCollapse,
+                        icon: arrowCollapseIcon,
                         value: CONST.SEARCH.BULK_ACTION_TYPES.MERGE,
                         onSelected: () => setupMergeTransactionDataAndNavigate(transactionID, searchedTransactions, localeCompare, getCurrencyDecimals, reports, false, true, undefined),
                     });
@@ -3378,7 +3431,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         if (canSplitTransaction) {
             options.push({
                 text: translate('iou.split'),
-                icon: expensifyIcons.ArrowSplit,
+                icon: arrowSplitIcon,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
                     initSplitExpense(
@@ -3399,7 +3452,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             const exceedsBulkDuplicateLimit = selectedTransactionsKeys.length > CONST.SEARCH.BULK_DUPLICATE_LIMIT;
             options.push({
                 text: translate('search.bulkActions.duplicateExpense', {count: selectedTransactionsKeys.length}),
-                icon: expensifyIcons.ExpenseCopy,
+                icon: expenseCopyIcon,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE,
                 shouldCloseModalOnSelect: true,
                 onSelected: () => {
@@ -3424,7 +3477,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         if (isDuplicateReportOptionVisible) {
             options.push({
                 text: translate('search.bulkActions.duplicateReport', {count: selectedReports.length}),
-                icon: expensifyIcons.ReportCopy,
+                icon: reportCopyIcon,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DUPLICATE_REPORT,
                 shouldCloseModalOnSelect: true,
                 onSelected: invokeDuplicateReportHandler,
@@ -3432,7 +3485,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         }
         if (canShowDeleteAction && !isFirstTransactionPerDiemSplit) {
             options.push({
-                icon: expensifyIcons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('search.bulkActions.delete'),
                 value: CONST.SEARCH.BULK_ACTION_TYPES.DELETE,
                 shouldCloseModalOnSelect: true,
@@ -3451,7 +3504,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
             };
 
             options.push({
-                icon: expensifyIcons.Exclamation,
+                icon: exclamationIcon,
                 text: translate('search.bulkActions.noOptionsAvailable'),
                 value: undefined,
                 ...emptyOptionStyle,
@@ -3470,7 +3523,40 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         nonPersonalAndWorkspaceCards,
         isSearchCardListComplete,
         queryJSON,
-        expensifyIcons,
+        downloadIcon,
+        exportIcon,
+        tableIcon,
+        tablePencilIcon,
+        documentMergeIcon,
+        sendIcon,
+        trashcanIcon,
+        thumbsUpIcon,
+        thumbsDownIcon,
+        arrowRightIcon,
+        arrowCollapseIcon,
+        stopwatchIcon,
+        exclamationIcon,
+        moneyBagIcon,
+        arrowSplitIcon,
+        expenseCopyIcon,
+        reportCopyIcon,
+        rotateLeftIcon,
+        QBOSquare,
+        IntuitSquare,
+        XeroSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+        pencilIcon,
+        workflowsIcon,
+        documentIcon,
         translate,
         dateFnsLocale,
         convertToDisplayString,

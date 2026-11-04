@@ -84,7 +84,25 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        MoneySearch: moneySearchIcon,
+        RemoveMembers: removeMembersIcon,
+        Sync: syncIcon,
+        Trashcan: trashcanIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'MoneySearch',
         'RemoveMembers',
         'Sync',
@@ -103,6 +121,25 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
         'BusinessCentralSquare',
         'GustoSquare',
     ]);
+    const expensifyIcons = {
+        MoneySearch: moneySearchIcon,
+        RemoveMembers: removeMembersIcon,
+        Sync: syncIcon,
+        Trashcan: trashcanIcon,
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    };
     const {isOffline} = useNetwork();
     const {showConfirmModal} = useConfirmModal();
 
@@ -228,7 +265,7 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
                                     isLoading={card?.isLoadingLastUpdated}
                                     style={styles.flexShrink0}
                                 >
-                                    <CardDetailsActionButton.Icon src={expensifyIcons.Sync} />
+                                    <CardDetailsActionButton.Icon src={syncIcon} />
                                     <CardDetailsActionButton.Text>{translate('workspace.moreFeatures.companyCards.updateCard')}</CardDetailsActionButton.Text>
                                 </CardDetailsActionButton>
                             )}
@@ -236,7 +273,7 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
                                 onPress={navigateToTransactions}
                                 style={styles.flexShrink0}
                             >
-                                <CardDetailsActionButton.Icon src={expensifyIcons.MoneySearch} />
+                                <CardDetailsActionButton.Icon src={moneySearchIcon} />
                                 <CardDetailsActionButton.Text>{translate('workspace.common.viewTransactions')}</CardDetailsActionButton.Text>
                             </CardDetailsActionButton>
                         </CardDetailsActionButtons>
@@ -280,7 +317,7 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
                     </OfflineWithFeedback>
                     {canWriteCompanyCards && shouldShowBreakConnection && (
                         <MenuItemAction
-                            icon={expensifyIcons.Trashcan}
+                            icon={trashcanIcon}
                             isDisabled={isOffline || card?.isLoadingLastUpdated}
                             title="Break connection (Testing)"
                             onPress={breakConnection}
@@ -289,7 +326,7 @@ function DynamicWorkspaceCompanyCardDetailsPage({route}: DynamicWorkspaceCompany
                     {canWriteCompanyCards && (
                         <View style={styles.mb1}>
                             <MenuItemAction
-                                icon={expensifyIcons.RemoveMembers}
+                                icon={removeMembersIcon}
                                 title={translate('workspace.moreFeatures.companyCards.unassignCard')}
                                 onPress={() => {
                                     showConfirmModal({

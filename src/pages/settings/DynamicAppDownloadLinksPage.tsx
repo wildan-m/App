@@ -26,7 +26,7 @@ import React from 'react';
 
 function DynamicAppDownloadLinksPage() {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['Android', 'Apple']);
+    const {Android: androidIcon, Apple: appleIcon} = useMemoizedLazyExpensifyIcons(['Android', 'Apple']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.APP_DOWNLOAD_LINKS.path);
@@ -52,7 +52,7 @@ function DynamicAppDownloadLinksPage() {
                 <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => openExternalLink(CONST.APP_DOWNLOAD_LINKS.ANDROID), false, session)}>
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.Android} />
+                            <MenuItem.Icon src={androidIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('initialSettingsPage.appDownloadLinks.android.label')}</MenuItem.Title>
@@ -65,7 +65,7 @@ function DynamicAppDownloadLinksPage() {
                 <MenuItem.Root onPress={callFunctionIfActionIsAllowed(() => openExternalLink(CONST.APP_DOWNLOAD_LINKS.IOS, true), false, session)}>
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.Apple} />
+                            <MenuItem.Icon src={appleIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('initialSettingsPage.appDownloadLinks.ios.label')}</MenuItem.Title>

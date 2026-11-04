@@ -7,12 +7,12 @@ import React from 'react';
 
 function EmptyState() {
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['MoneyReceipts']);
+    const {MoneyReceipts: moneyReceiptsIllustration} = useMemoizedLazyIllustrations(['MoneyReceipts']);
 
     return (
         <HomeSectionEmptyState
             testID="recentlyAddedEmptyState"
-            illustration={illustrations.MoneyReceipts}
+            illustration={moneyReceiptsIllustration}
             title={translate('homePage.recentlyAddedSection.emptyStateTitle')}
             description={translate('homePage.recentlyAddedSection.emptyStateMessage')}
         />

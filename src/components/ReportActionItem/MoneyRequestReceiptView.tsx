@@ -236,7 +236,7 @@ function MoneyRequestReceiptView({
     const addButtonRef = useRef<ComponentRef<typeof View> | null>(null);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const deviceHasHoverSupport = hasHoverSupport();
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Expand', 'ReceiptPlus']);
+    const {Expand: expandIcon, ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['Expand', 'ReceiptPlus']);
 
     const [policyTagList] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     // Browsers don't fire mouseenter when an element mounts under the cursor
@@ -840,7 +840,7 @@ function MoneyRequestReceiptView({
                                                         sentryLabel={CONST.SENTRY_LABEL.RECEIPT.ADD_ATTACHMENT_BUTTON}
                                                     >
                                                         <Icon
-                                                            src={lazyIcons.ReceiptPlus}
+                                                            src={receiptPlusIcon}
                                                             height={variables.iconSizeSmall}
                                                             width={variables.iconSizeSmall}
                                                             fill={theme.icon}
@@ -866,7 +866,7 @@ function MoneyRequestReceiptView({
                                             sentryLabel={CONST.SENTRY_LABEL.RECEIPT.ENLARGE_BUTTON}
                                         >
                                             <Icon
-                                                src={lazyIcons.Expand}
+                                                src={expandIcon}
                                                 height={variables.iconSizeSmall}
                                                 width={variables.iconSizeSmall}
                                                 fill={theme.icon}

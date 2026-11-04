@@ -27,7 +27,7 @@ type CampfireExistingConnectionsPageProps = PlatformStackScreenProps<SettingsNav
 function CampfireExistingConnectionsPage({route}: CampfireExistingConnectionsPageProps) {
     const {translate, datetimeToRelative} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['LinkCopy']);
+    const {LinkCopy: linkCopyIcon} = useMemoizedLazyExpensifyIcons(['LinkCopy']);
     const policyID: string = route.params.policyID;
     const {reusablePoliciesConnectedTo: reusablePoliciesConnectedToCampfire} = useReusablePoliciesConnectedTo(CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE, policyID);
 
@@ -64,7 +64,7 @@ function CampfireExistingConnectionsPage({route}: CampfireExistingConnectionsPag
                 <Text style={[styles.mh5, styles.mb4]}>{translate('workspace.common.existingConnectionsDescription', CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE)}</Text>
                 <MenuItem
                     title={translate('workspace.common.createNewConnection')}
-                    icon={icons.LinkCopy}
+                    icon={linkCopyIcon}
                     iconStyles={styles.br2}
                     shouldShowRightIcon
                     onPress={() => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CAMPFIRE_SETUP.getRoute(policyID))}

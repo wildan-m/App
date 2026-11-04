@@ -14,7 +14,7 @@ const ILLUSTRATION_SIZE = 68;
 function AskConciergeEmptyState() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(ILLUSTRATION_NAMES);
+    const {ConciergeBot: conciergeBotIllustration} = useMemoizedLazyIllustrations(ILLUSTRATION_NAMES);
 
     return (
         <View
@@ -22,7 +22,7 @@ function AskConciergeEmptyState() {
             style={[styles.alignItemsCenter, styles.gap3, styles.ph5]}
         >
             <ImageSVG
-                src={illustrations.ConciergeBot}
+                src={conciergeBotIllustration}
                 width={ILLUSTRATION_SIZE}
                 height={ILLUSTRATION_SIZE}
             />

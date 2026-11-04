@@ -79,7 +79,7 @@ export default function WorkspaceListTable({ref, workspaces, headerComponent, on
     const {isBetaEnabled} = usePermissions();
     const canUseArchivePolicies = isBetaEnabled(CONST.BETAS.ARCHIVE_POLICIES);
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
-    const illustrations = useMemoizedLazyIllustrations(['PlanetWithMobileApp']);
+    const {PlanetWithMobileApp: planetWithMobileAppIllustration} = useMemoizedLazyIllustrations(['PlanetWithMobileApp']);
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const shouldUseNarrowTableLayout = shouldUseNarrowLayout || isMediumScreenWidth;
 
@@ -226,7 +226,7 @@ export default function WorkspaceListTable({ref, workspaces, headerComponent, on
                 containerStyles={styles.mb10}
                 headerStyles={styles.emptyStateCardIllustrationContainer}
                 headerContentStyles={styles.emptyWorkspaceListStaticIllustrationStyle}
-                headerMedia={illustrations.PlanetWithMobileApp}
+                headerMedia={planetWithMobileAppIllustration}
                 title={translate('workspace.emptyWorkspace.title')}
                 subtitle={translate('workspace.emptyWorkspace.subtitle')}
                 buttons={emptyStateButtons}

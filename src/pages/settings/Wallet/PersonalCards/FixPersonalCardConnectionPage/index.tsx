@@ -42,7 +42,7 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
     const {cardID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['PendingBank']);
+    const {PendingBank: pendingBankIllustration} = useMemoizedLazyIllustrations(['PendingBank']);
     const {card, bankDisplayName, url, isOffline, isPlaid, country, cardDetailsPath} = useFixPersonalCardConnection(cardID);
 
     const [plaidLinkToken] = useOnyx(ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN);
@@ -196,7 +196,7 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
                     renderPlaid()
                 ) : (
                     <BlockingView
-                        icon={illustrations.PendingBank}
+                        icon={pendingBankIllustration}
                         iconWidth={styles.pendingBankCardIllustration.width}
                         iconHeight={styles.pendingBankCardIllustration.height}
                         title={translate('workspace.moreFeatures.companyCards.pendingBankTitle')}

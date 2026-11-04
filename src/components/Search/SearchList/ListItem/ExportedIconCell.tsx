@@ -24,7 +24,22 @@ function ExportedIconCell({reportActions}: ExportedIconCellProps) {
     const StyleUtils = useStyleUtils();
 
     const actions = reportActions ?? [];
-    const icons = useMemoizedLazyExpensifyIcons([
+    const {
+        NetSuiteSquare: netSuiteSquareIcon,
+        XeroSquare: xeroSquareIcon,
+        IntacctSquare: intacctSquareIcon,
+        QBOSquare: qBOSquareIcon,
+        IntuitSquare: intuitSquareIcon,
+        Table: tableIcon,
+        TablePencil: tablePencilIcon,
+        ZenefitsSquare: zenefitsSquareIcon,
+        BillComSquare: billComSquareIcon,
+        CertiniaSquare: certiniaSquareIcon,
+        RilletSquare: rilletSquareIcon,
+        DualEntrySquare: dualEntrySquareIcon,
+        CampfireSquare: campfireSquareIcon,
+        ZohoBooksSquare: zohoBooksSquareIcon,
+    } = useMemoizedLazyExpensifyIcons([
         'NetSuiteSquare',
         'XeroSquare',
         'IntacctSquare',
@@ -97,98 +112,98 @@ function ExportedIconCell({reportActions}: ExportedIconCellProps) {
         <View style={[styles.flexRow, styles.gap2]}>
             {isExportedToStandardTemplate && (
                 <Icon
-                    src={icons.Table}
+                    src={tableIcon}
                     fill={theme.icon}
                     size={CONST.ICON_SIZE.SMALL}
                 />
             )}
             {isExportedToCustomTemplate && (
                 <Icon
-                    src={icons.TablePencil}
+                    src={tablePencilIcon}
                     fill={theme.icon}
                     size={CONST.ICON_SIZE.SMALL}
                 />
             )}
             {isExportedToNetsuite && (
                 <Icon
-                    src={icons.NetSuiteSquare}
+                    src={netSuiteSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToXero && (
                 <Icon
-                    src={icons.XeroSquare}
+                    src={xeroSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToIntacct && (
                 <Icon
-                    src={icons.IntacctSquare}
+                    src={intacctSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {(isExportedToQuickbooksOnline || isExportedToQuickbooksDesktop) && (
                 <Icon
-                    src={icons.QBOSquare}
+                    src={qBOSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToIntuitEnterpriseSuite && (
                 <Icon
-                    src={icons.IntuitSquare}
+                    src={intuitSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToCertinia && (
                 <Icon
-                    src={icons.CertiniaSquare}
+                    src={certiniaSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToRillet && (
                 <Icon
-                    src={icons.RilletSquare}
+                    src={rilletSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToDualEntry && (
                 <Icon
-                    src={icons.DualEntrySquare}
+                    src={dualEntrySquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToCampfire && (
                 <Icon
-                    src={icons.CampfireSquare}
+                    src={campfireSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToZohoBooks && (
                 <Icon
-                    src={icons.ZohoBooksSquare}
+                    src={zohoBooksSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToBillCom && (
                 <Icon
-                    src={icons.BillComSquare}
+                    src={billComSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />
             )}
             {isExportedToZenefits && (
                 <Icon
-                    src={icons.ZenefitsSquare}
+                    src={zenefitsSquareIcon}
                     size={CONST.ICON_SIZE.SMALL}
                     additionalStyles={[integrationIconStyle]}
                 />

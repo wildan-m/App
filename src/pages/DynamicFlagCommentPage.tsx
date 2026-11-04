@@ -61,7 +61,11 @@ function DynamicFlagCommentPage({parentReportAction, report, parentReport, repor
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.FLAG_COMMENT.path);
     const isReportArchived = useReportIsArchived(report?.reportID);
     let reportID: string | undefined = report?.reportID;
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['FlagLevelOne', 'FlagLevelTwo', 'FlagLevelThree']);
+    const {
+        FlagLevelOne: flagLevelOneIcon,
+        FlagLevelTwo: flagLevelTwoIcon,
+        FlagLevelThree: flagLevelThreeIcon,
+    } = useMemoizedLazyExpensifyIcons(['FlagLevelOne', 'FlagLevelTwo', 'FlagLevelThree']);
 
     if (isChatThread(report) && reportAction?.reportActionID === parentReportAction?.reportActionID) {
         reportID = parentReport?.reportID;
@@ -77,50 +81,50 @@ function DynamicFlagCommentPage({parentReportAction, report, parentReport, repor
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_SPAM,
             name: translate('moderation.spam'),
-            icon: expensifyIcons.FlagLevelOne,
+            icon: flagLevelOneIcon,
             description: translate('moderation.spamDescription'),
             furtherDetails: translate('moderation.levelOneResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelOne,
+            furtherDetailsIcon: flagLevelOneIcon,
         },
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_INCONSIDERATE,
             name: translate('moderation.inconsiderate'),
-            icon: expensifyIcons.FlagLevelOne,
+            icon: flagLevelOneIcon,
             description: translate('moderation.inconsiderateDescription'),
             furtherDetails: translate('moderation.levelOneResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelOne,
+            furtherDetailsIcon: flagLevelOneIcon,
         },
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_INTIMIDATION,
             name: translate('moderation.intimidation'),
-            icon: expensifyIcons.FlagLevelTwo,
+            icon: flagLevelTwoIcon,
             description: translate('moderation.intimidationDescription'),
             furtherDetails: translate('moderation.levelTwoResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelTwo,
+            furtherDetailsIcon: flagLevelTwoIcon,
         },
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_BULLYING,
             name: translate('moderation.bullying'),
-            icon: expensifyIcons.FlagLevelTwo,
+            icon: flagLevelTwoIcon,
             description: translate('moderation.bullyingDescription'),
             furtherDetails: translate('moderation.levelTwoResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelTwo,
+            furtherDetailsIcon: flagLevelTwoIcon,
         },
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_HARASSMENT,
             name: translate('moderation.harassment'),
-            icon: expensifyIcons.FlagLevelThree,
+            icon: flagLevelThreeIcon,
             description: translate('moderation.harassmentDescription'),
             furtherDetails: translate('moderation.levelThreeResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelThree,
+            furtherDetailsIcon: flagLevelThreeIcon,
         },
         {
             severity: CONST.MODERATION.FLAG_SEVERITY_ASSAULT,
             name: translate('moderation.assault'),
-            icon: expensifyIcons.FlagLevelThree,
+            icon: flagLevelThreeIcon,
             description: translate('moderation.assaultDescription'),
             furtherDetails: translate('moderation.levelThreeResult'),
-            furtherDetailsIcon: expensifyIcons.FlagLevelThree,
+            furtherDetailsIcon: flagLevelThreeIcon,
         },
     ];
 

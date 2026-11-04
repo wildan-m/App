@@ -73,7 +73,7 @@ function DynamicEditReportFieldPage({route}: DynamicEditReportFieldPageProps) {
     const isDisabled = isReportFieldDisabledForUser(report, reportField, policy, currentUserAccountID, rules) && reportField?.type !== CONST.REPORT_FIELD_TYPES.FORMULA;
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const isReportFieldTitle = isReportFieldOfTypeTitle(reportField);
     const isReportFieldsFeatureEnabled = report?.type === CONST.REPORT.TYPE.INVOICE ? policy?.areInvoiceFieldsEnabled : policy?.areReportFieldsEnabled;
     const reportFieldsEnabled = ((isGroupPolicyExpenseReport(report, policy?.type) || isInvoiceReport(report)) && !!isReportFieldsFeatureEnabled) || isReportFieldTitle;
@@ -137,7 +137,7 @@ function DynamicEditReportFieldPage({route}: DynamicEditReportFieldPageProps) {
 
     if (isReportFieldDeletable) {
         menuItems.push({
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             text: translate('common.delete'),
             onSelected: () => {
                 handleReportFieldDelete();

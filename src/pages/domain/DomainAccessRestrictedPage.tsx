@@ -32,7 +32,7 @@ type DomainAccessRestrictedPageProps = PlatformStackScreenProps<WorkspacesDomain
 
 function DomainAccessRestrictedPage({route}: DomainAccessRestrictedPageProps) {
     const {domainAccountID} = route.params;
-    const icons = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
+    const {EmptyStateSpyPigeon: emptyStateSpyPigeonIcon} = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
@@ -73,7 +73,7 @@ function DomainAccessRestrictedPage({route}: DomainAccessRestrictedPageProps) {
                             style={styles.p10}
                             requestErrors={requestError}
                         >
-                            <ConfirmationPage.Illustration illustration={icons.EmptyStateSpyPigeon} />
+                            <ConfirmationPage.Illustration illustration={emptyStateSpyPigeonIcon} />
                             <ConfirmationPage.Heading>{translate('domain.accessRestricted.title')}</ConfirmationPage.Heading>
                             <View style={[styles.renderHTML, styles.textAlignCenter, styles.alignItemsCenter, styles.w100]}>
                                 <RenderHTML html={translate('domain.accessRestricted.description', domainName)} />

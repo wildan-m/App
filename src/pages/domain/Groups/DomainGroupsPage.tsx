@@ -44,7 +44,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const {domainAccountID} = route.params;
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
     useDomainDocumentTitle(domainName, 'domain.groups.title');
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -99,7 +99,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
             style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow1, styles.mb3] : undefined}
             variant={CONST.BUTTON_VARIANT.SUCCESS}
         >
-            <Button.Icon src={icons.Plus} />
+            <Button.Icon src={plusIcon} />
             <Button.Text>{translate('domain.groups.createNewGroupButton')}</Button.Text>
         </Button>
     );

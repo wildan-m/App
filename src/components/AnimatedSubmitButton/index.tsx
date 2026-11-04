@@ -68,7 +68,7 @@ function SubmittingButton({variant, text, onAnimationFinish, shouldShowMarkAsDon
         setHasFailedSubmission(true);
     }
 
-    const icons = useMemoizedLazyExpensifyIcons(['Send']);
+    const {Send: sendIcon} = useMemoizedLazyExpensifyIcons(['Send']);
 
     useEffect(() => {
         // Synchronize the mounted loading phase with the clock; DEW submissions wait for the backend instead.
@@ -117,7 +117,7 @@ function SubmittingButton({variant, text, onAnimationFinish, shouldShowMarkAsDon
                 isDisabled
                 stayNormalOnDisable
             >
-                {shouldShowIcon && <Button.Icon src={icons.Send} />}
+                {shouldShowIcon && <Button.Icon src={sendIcon} />}
                 <Button.Text>{shouldShowIcon ? translate(shouldShowMarkAsDoneCopy ? 'common.markedAsDoneStatus' : 'common.submitted') : text}</Button.Text>
             </Button>
         </Animated.View>

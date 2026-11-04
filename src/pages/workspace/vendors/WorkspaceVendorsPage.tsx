@@ -57,7 +57,7 @@ function VendorBulkActions({policyID, selectedVendorKeys, policyVendors, default
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close']);
+    const {Checkmark: checkmarkIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close']);
     const policyData = usePolicyData(policyID);
     const {isBetaEnabled} = usePermissions();
     const isVendorMatchingBetaEnabled = isBetaEnabled(CONST.BETAS.VENDOR_MATCHING);
@@ -66,7 +66,7 @@ function VendorBulkActions({policyID, selectedVendorKeys, policyVendors, default
     const disabledVendors = selectedVendorKeys.filter((id) => !policyVendors?.[id]?.enabled);
     if (disabledVendors.length > 0) {
         options.push({
-            icon: icons.Checkmark,
+            icon: checkmarkIcon,
             text: translate(disabledVendors.length === 1 ? 'workspace.vendors.enableVendor' : 'workspace.vendors.enableVendors'),
             value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
             onSelected: () => {
@@ -86,7 +86,7 @@ function VendorBulkActions({policyID, selectedVendorKeys, policyVendors, default
     const vendorsToDisable = selectedVendorKeys.filter((id) => policyVendors?.[id]?.enabled && id !== defaultVendorID);
     if (vendorsToDisable.length > 0) {
         options.push({
-            icon: icons.Close,
+            icon: closeIcon,
             text: translate(vendorsToDisable.length === 1 ? 'workspace.vendors.disableVendor' : 'workspace.vendors.disableVendors'),
             value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
             onSelected: () => {

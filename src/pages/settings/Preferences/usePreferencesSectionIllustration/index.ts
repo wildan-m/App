@@ -4,11 +4,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type UsePreferencesSectionIllustration from './types';
 
 const usePreferencesSectionIllustration: UsePreferencesSectionIllustration = () => {
-    const illustrations = useMemoizedLazyIllustrations(['DjBoothReferenceHands']);
+    const {DjBoothReferenceHands: djBoothReferenceHandsIllustration} = useMemoizedLazyIllustrations(['DjBoothReferenceHands']);
     const styles = useThemeStyles();
 
     return {
-        illustration: illustrations.DjBoothReferenceHands,
+        illustration: djBoothReferenceHandsIllustration,
         illustrationStyle: styles.preferencesStaticIllustration,
     };
 };

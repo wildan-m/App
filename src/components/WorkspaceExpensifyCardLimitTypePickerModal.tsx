@@ -106,7 +106,7 @@ function WorkspaceExpensifyCardLimitTypePickerModal({
     const theme = useTheme();
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
     const [currentUserLogin] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const anchorRef = useRef<View>(null);
     const {popoverHeight: contentHeight} = useWorkspaceExpensifyCardLimitTypePickerPopover({card, policy});
@@ -126,7 +126,7 @@ function WorkspaceExpensifyCardLimitTypePickerModal({
             ),
             rightElement: areApprovalsConfigured ? undefined : (
                 <Icon
-                    src={expensifyIcons.Lock}
+                    src={lockIcon}
                     fill={theme.icon}
                 />
             ),

@@ -89,7 +89,13 @@ function WorkspaceTaxesPage({
 
     const enabledRatesCount = selectedTaxesIDs.filter((taxID) => !policy?.taxRates?.taxes[taxID]?.isDisabled).length;
     const disabledRatesCount = selectedTaxesIDs.length - enabledRatesCount;
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Gear', 'Plus', 'Trashcan']);
+    const {
+        Checkmark: checkmarkIcon,
+        Close: closeIcon,
+        Gear: gearIcon,
+        Plus: plusIcon,
+        Trashcan: trashcanIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Gear', 'Plus', 'Trashcan']);
 
     const fetchTaxes = () => {
         openPolicyTaxesPage(policyID);
@@ -223,7 +229,7 @@ function WorkspaceTaxesPage({
     const options: Array<DropdownOption<WorkspaceTaxRatesBulkActionType>> = [];
     if (!hasAccountingConnections) {
         options.push({
-            icon: icons.Trashcan,
+            icon: trashcanIcon,
             text: isMultiple ? translate('workspace.taxes.actions.deleteMultiple') : translate('workspace.taxes.actions.delete'),
             value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
             shouldSkipFocusRestore: true,
@@ -248,7 +254,7 @@ function WorkspaceTaxesPage({
     // `Disable rates` when at least one enabled rate is selected.
     if (selectedTaxesIDs.some((taxID) => !policy?.taxRates?.taxes[taxID]?.isDisabled)) {
         options.push({
-            icon: icons.Close,
+            icon: closeIcon,
             text: translate('workspace.taxes.actions.disableTaxRates', {
                 count: enabledRatesCount,
             }),
@@ -260,7 +266,7 @@ function WorkspaceTaxesPage({
     // `Enable rates` when at least one disabled rate is selected.
     if (selectedTaxesIDs.some((taxID) => policy?.taxRates?.taxes[taxID]?.isDisabled)) {
         options.push({
-            icon: icons.Checkmark,
+            icon: checkmarkIcon,
             text: translate('workspace.taxes.actions.enableTaxRates', {
                 count: disabledRatesCount,
             }),
@@ -274,7 +280,7 @@ function WorkspaceTaxesPage({
 
     const secondaryActions = [
         {
-            icon: icons.Gear,
+            icon: gearIcon,
             text: translate('common.settings'),
             onSelected: () => Navigation.navigate(ROUTES.WORKSPACE_TAXES_SETTINGS.getRoute(policyID)),
             value: CONST.POLICY.SECONDARY_ACTIONS.SETTINGS,
@@ -296,7 +302,7 @@ function WorkspaceTaxesPage({
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.ADD_BUTTON}
                             style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                         >
-                            <Button.Icon src={icons.Plus} />
+                            <Button.Icon src={plusIcon} />
                             <Button.Text>{translate('workspace.taxes.addRate')}</Button.Text>
                         </Button>
                     )}

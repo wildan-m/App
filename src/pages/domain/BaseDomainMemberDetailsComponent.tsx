@@ -41,7 +41,7 @@ type BaseDomainMemberDetailsComponentProps = {
 function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children, avatarButton}: BaseDomainMemberDetailsComponentProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Info']);
+    const {Info: infoIcon} = useMemoizedLazyExpensifyIcons(['Info']);
 
     const [personalDetails] = usePersonalDetail(accountID);
 
@@ -92,7 +92,7 @@ function BaseDomainMemberDetailsComponent({domainAccountID, accountID, children,
                             {children}
                             <MenuItemNavigation
                                 title={translate('common.profile')}
-                                icon={icons.Info}
+                                icon={infoIcon}
                                 onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.PROFILE.getRoute(accountID)))}
                             />
                         </View>

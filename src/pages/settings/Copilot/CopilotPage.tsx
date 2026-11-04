@@ -81,8 +81,14 @@ function getCopilotRowText(displayName: string | undefined, email: string, forma
 }
 
 function CopilotPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'CircleSlash', 'Pencil', 'ThreeDots', 'UserPlus']);
-    const illustrations = useMemoizedLazyIllustrations(['Copilots']);
+    const {
+        ArrowCircleClockwise: arrowCircleClockwiseIcon,
+        CircleSlash: circleSlashIcon,
+        Pencil: pencilIcon,
+        ThreeDots: threeDotsIcon,
+        UserPlus: userPlusIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'CircleSlash', 'Pencil', 'ThreeDots', 'UserPlus']);
+    const {Copilots: copilotsIllustration2} = useMemoizedLazyIllustrations(['Copilots']);
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -285,7 +291,7 @@ function CopilotPage() {
             icon: personalDetail?.avatar ?? (personalDetail ? getDefaultAvatarURL({accountID: personalDetail.accountID, accountEmail: email}) : undefined),
             iconType: CONST.ICON_TYPE_AVATAR,
             wrapperStyle: [styles.sectionMenuItemTopDescription],
-            iconRight: isOwnerRow || isPendingDelete ? undefined : icons.ThreeDots,
+            iconRight: isOwnerRow || isPendingDelete ? undefined : threeDotsIcon,
             shouldShowRightIcon: !isOwnerRow && !isPendingDelete,
             pendingAction,
             shouldForceOpacity: !!pendingAction,
@@ -329,7 +335,7 @@ function CopilotPage() {
                 clearDelegateErrorsByField({email, fieldName: 'connect', delegatedAccess: account?.delegatedAccess});
                 clearDelegateErrorsByField({email, fieldName: 'removeDelegator', delegatedAccess: account?.delegatedAccess});
             },
-            iconRight: icons.ThreeDots,
+            iconRight: threeDotsIcon,
             shouldShowRightIcon: !isCurrentUser,
             success: selectedEmail === email,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATOR_ITEM,
@@ -339,7 +345,7 @@ function CopilotPage() {
     const delegatePopoverMenuItems: PopoverMenuItem[] = [
         {
             text: translate('delegate.changeAccessLevel'),
-            icon: icons.Pencil,
+            icon: pencilIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_CHANGE_ACCESS,
             onPress: () => {
                 if (isActingAsDelegate) {
@@ -358,7 +364,7 @@ function CopilotPage() {
         },
         {
             text: translate('delegate.removeCopilot'),
-            icon: icons.CircleSlash,
+            icon: circleSlashIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_REMOVE,
             onPress: () => {
                 if (selectedDelegate?.email !== account?.delegatedAccess?.delegate && isActingAsDelegate) {
@@ -401,7 +407,7 @@ function CopilotPage() {
     const delegatorPopoverMenuItems: PopoverMenuItem[] = [
         {
             text: translate('delegate.switch'),
-            icon: icons.ArrowCircleClockwise,
+            icon: arrowCircleClockwiseIcon,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT_SWITCHER.SHOW_ACCOUNTS,
             onPress: () => {
                 setShouldShowDelegatorPopoverMenu(false);
@@ -412,7 +418,7 @@ function CopilotPage() {
         },
         {
             text: translate('delegate.removeCopilotAccess'),
-            icon: icons.CircleSlash,
+            icon: circleSlashIcon,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATOR_REMOVE,
             onPress: () => {
                 modalClose(() => {
@@ -472,7 +478,7 @@ function CopilotPage() {
                                 )}
                                 isCentralPane
                                 subtitleMuted
-                                illustration={illustrations.Copilots}
+                                illustration={copilotsIllustration2}
                                 illustrationContainerStyle={styles.cardSectionIllustrationContainer}
                                 illustrationStyle={styles.copilotsIllustration}
                                 illustrationBackgroundColor={colors.blue700}
@@ -521,7 +527,7 @@ function CopilotPage() {
                                         }}
                                     >
                                         <MenuItem.Row>
-                                            <MenuItem.Icon src={icons.UserPlus} />
+                                            <MenuItem.Icon src={userPlusIcon} />
                                             <MenuItem.Content>
                                                 <MenuItem.Title>{translate('delegate.addCopilot')}</MenuItem.Title>
                                             </MenuItem.Content>

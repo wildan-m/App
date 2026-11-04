@@ -18,7 +18,7 @@ type RepliesDividerProps = {
 };
 
 function RepliesDivider({shouldHideThreadDividerLine}: RepliesDividerProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Thread']);
+    const {Thread: threadIcon} = useMemoizedLazyExpensifyIcons(['Thread']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -29,7 +29,7 @@ function RepliesDivider({shouldHideThreadDividerLine}: RepliesDividerProps) {
             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
         >
             <Icon
-                src={icons.Thread}
+                src={threadIcon}
                 fill={theme.icon}
                 width={variables.iconSizeExtraSmall}
                 height={variables.iconSizeExtraSmall}

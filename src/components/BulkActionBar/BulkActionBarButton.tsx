@@ -28,7 +28,7 @@ import {defaultPopoverAnchorPosition, SUB_MENU_ANCHOR_ALIGNMENT} from './popover
 function BulkActionBarButton<TValueType>({option, onSubItemSelected}: BulkActionBarButtonProps<TValueType>) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const {calculatePopoverPosition} = usePopoverPosition();
 
     const anchorRef = useRef<ComponentRef<typeof View> | null>(null);
@@ -86,7 +86,7 @@ function BulkActionBarButton<TValueType>({option, onSubItemSelected}: BulkAction
                     />
                 )}
                 <Button.Text>{option.text}</Button.Text>
-                {hasSubMenu && <Button.Icon src={isMenuVisible ? icons.UpArrow : icons.DownArrow} />}
+                {hasSubMenu && <Button.Icon src={isMenuVisible ? upArrowIcon : downArrowIcon} />}
             </Button>
             {hasSubMenu && !!anchorPosition && (
                 <BulkActionBarMenuTheme>

@@ -54,7 +54,7 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const privateSubscription = usePrivateSubscription();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
 
     useEffect(() => {
         if (!policyID) {
@@ -95,7 +95,7 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
             actionElement:
                 isPlanTypeLocked && policyType === policy?.type ? (
                     <Icon
-                        src={expensifyIcons.Lock}
+                        src={lockIcon}
                         fill={theme.success}
                     />
                 ) : undefined,

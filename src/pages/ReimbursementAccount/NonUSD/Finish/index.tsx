@@ -29,8 +29,8 @@ import {View} from 'react-native';
 function Finish() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Shield', 'ChatBubble']);
-    const illustrations = useMemoizedLazyIllustrations(['ConciergeBubble', 'ShieldYellow']);
+    const {Shield: shieldIcon, ChatBubble: chatBubbleIcon} = useMemoizedLazyExpensifyIcons(['Shield', 'ChatBubble']);
+    const {ConciergeBubble: conciergeBubbleIllustration, ShieldYellow: shieldYellowIllustration} = useMemoizedLazyIllustrations(['ConciergeBubble', 'ShieldYellow']);
 
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
@@ -62,14 +62,14 @@ function Finish() {
             <ScrollView style={[styles.flex1]}>
                 <Section
                     title={translate('finishStep.letsFinish')}
-                    icon={illustrations.ConciergeBubble}
+                    icon={conciergeBubbleIllustration}
                     containerStyles={styles.mb8}
                     titleStyles={[styles.mb3, styles.textHeadline]}
                 >
                     <Text style={[styles.mb6, styles.mt3, styles.textLabelSupportingEmptyValue]}>{translate('finishStep.thanksFor')}</Text>
                     <View style={styles.mhn5}>
                         <MenuItemNavigation
-                            icon={icons.ChatBubble}
+                            icon={chatBubbleIcon}
                             title={translate('finishStep.iHaveA')}
                             onPress={handleNavigateToConciergeChat}
                         />
@@ -77,7 +77,7 @@ function Finish() {
                 </Section>
                 <Section
                     title={translate('finishStep.enable2FA')}
-                    icon={illustrations.ShieldYellow}
+                    icon={shieldYellowIllustration}
                     titleStyles={[styles.mb4, styles.textHeadline]}
                 >
                     <View style={styles.mb6}>
@@ -90,7 +90,7 @@ function Finish() {
                     >
                         <MenuItem.Row>
                             <MenuItem.Leading>
-                                <MenuItem.Icon src={icons.Shield} />
+                                <MenuItem.Icon src={shieldIcon} />
                             </MenuItem.Leading>
                             <MenuItem.Content>
                                 <MenuItem.Title>{translate('finishStep.secure')}</MenuItem.Title>

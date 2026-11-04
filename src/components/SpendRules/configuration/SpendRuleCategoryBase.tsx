@@ -36,7 +36,7 @@ type SpendRuleCategoryBaseProps = {
 export default function SpendRuleCategoryBase({categories, onCategoriesChange}: SpendRuleCategoryBaseProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const [selectedCategories, setSelectedCategories] = useState<SpendRuleCategory[]>(categories);
     const initialSelectedCategories = useInitialSelection(categories, {resetOnFocus: true});
 
@@ -127,7 +127,7 @@ export default function SpendRuleCategoryBase({categories, onCategoriesChange}: 
                 listEmptyContent={
                     <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                         <BlockingView
-                            icon={illustrations.Telescope}
+                            icon={telescopeIllustration}
                             iconWidth={variables.emptyListIconWidth}
                             iconHeight={variables.emptyListIconHeight}
                             title={translate('common.noResultsFound')}

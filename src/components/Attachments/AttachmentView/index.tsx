@@ -136,7 +136,7 @@ function AttachmentView({
     transaction: transactionProp,
     rotation,
 }: AttachmentViewProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Gallery']);
+    const {ArrowCircleClockwise: arrowCircleClockwiseIcon, Gallery: galleryIcon} = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Gallery']);
     const [transactionFromOnyx] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
     const transaction = transactionProp ?? transactionFromOnyx;
     const session = useSession();
@@ -345,7 +345,7 @@ function AttachmentView({
                         }}
                         sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_CAROUSEL.RETRY_BUTTON}
                     >
-                        <Button.Icon src={icons.ArrowCircleClockwise} />
+                        <Button.Icon src={arrowCircleClockwiseIcon} />
                         <Button.Text>{translate('attachmentView.retry')}</Button.Text>
                     </Button>
                 </View>
@@ -360,7 +360,7 @@ function AttachmentView({
                     <>
                         <View style={[styles.imageModalImageCenterContainer, styles.ph10]}>
                             <DefaultAttachmentView
-                                icon={icons.Gallery}
+                                icon={galleryIcon}
                                 fileName={file?.name}
                                 shouldShowDownloadIcon={shouldShowDownloadIcon}
                                 shouldShowLoadingSpinnerIcon={shouldShowLoadingSpinnerIcon}

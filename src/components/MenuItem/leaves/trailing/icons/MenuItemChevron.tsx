@@ -15,7 +15,7 @@ import {View} from 'react-native';
  * dimmed until the row is hovered
  */
 function MenuItemChevron() {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {isDisabled} = useMenuItemConfig();
@@ -27,7 +27,7 @@ function MenuItemChevron() {
             testID="menu-item-chevron"
         >
             <Icon
-                src={icons.ArrowRight}
+                src={arrowRightIcon}
                 fill={theme.icon}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}

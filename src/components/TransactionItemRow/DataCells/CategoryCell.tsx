@@ -22,7 +22,7 @@ type CategoryCellProps = TransactionDataCellProps &
     };
 
 function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem, canEdit, onSave, policyID}: CategoryCellProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Folder']);
+    const {Folder: folderIcon} = useMemoizedLazyExpensifyIcons(['Folder']);
     const styles = useThemeStyles();
 
     // For display: decoded category name for user-readable text
@@ -43,7 +43,7 @@ function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem
 
     const displayContent = shouldUseNarrowLayout ? (
         <TextWithIconCell
-            icon={icons.Folder}
+            icon={folderIcon}
             showTooltip={shouldShowTooltip}
             text={categoryForDisplay}
             textStyle={[styles.textMicro, styles.mnh0]}

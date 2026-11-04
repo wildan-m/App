@@ -33,7 +33,7 @@ type PerDiemFieldsProps = {
 function PerDiemFields({perDiemCustomUnit, transaction, isReadOnly, didConfirm, transactionID, shouldDisplayFieldError, formError}: PerDiemFieldsProps) {
     const styles = useThemeStyles();
     const {translate, dateFnsLocale} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Stopwatch', 'CalendarSolid']);
+    const {Stopwatch: stopwatchIcon, CalendarSolid: calendarSolidIcon} = useMemoizedLazyExpensifyIcons(['Stopwatch', 'CalendarSolid']);
 
     const subRates = getSubratesFields(perDiemCustomUnit, transaction);
     const shouldDisplaySubrateError = (shouldDisplayFieldError || formError === 'iou.error.invalidSubrateLength') && (subRates.length === 0 || (subRates.length === 1 && !subRates.at(0)));
@@ -64,7 +64,7 @@ function PerDiemFields({perDiemCustomUnit, transaction, isReadOnly, didConfirm, 
             badges.push(
                 <Badge
                     key="firstDay"
-                    icon={icons.Stopwatch}
+                    icon={stopwatchIcon}
                     text={translate('iou.firstDayText', {count: firstDay})}
                 />,
             );
@@ -73,7 +73,7 @@ function PerDiemFields({perDiemCustomUnit, transaction, isReadOnly, didConfirm, 
             badges.push(
                 <Badge
                     key="tripDays"
-                    icon={icons.CalendarSolid}
+                    icon={calendarSolidIcon}
                     text={translate('iou.tripLengthText', {count: tripDays})}
                 />,
             );
@@ -82,7 +82,7 @@ function PerDiemFields({perDiemCustomUnit, transaction, isReadOnly, didConfirm, 
             badges.push(
                 <Badge
                     key="lastDay"
-                    icon={icons.Stopwatch}
+                    icon={stopwatchIcon}
                     text={translate('iou.lastDayText', {count: lastDay})}
                 />,
             );

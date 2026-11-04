@@ -27,12 +27,12 @@ const story: Meta<typeof PopoverMenu> = {
 function Template(props: PopoverMenuProps) {
     const [isVisible, setIsVisible] = React.useState(false);
     const toggleVisibility = () => setIsVisible(!isVisible);
-    const icons = useMemoizedLazyExpensifyIcons(['Bank', 'CreditCard', 'Plus']);
+    const {Bank: bankIcon, CreditCard: creditCardIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Bank', 'CreditCard', 'Plus']);
     return (
         <>
             <MenuItem
                 title="Add payment Methods"
-                icon={icons.Plus}
+                icon={plusIcon}
                 onPress={toggleVisibility}
                 wrapperStyle={isVisible ? [{backgroundColor: themeColors.border}] : []}
             />
@@ -45,12 +45,12 @@ function Template(props: PopoverMenuProps) {
                     menuItems={[
                         {
                             text: 'Bank account',
-                            icon: icons.Bank,
+                            icon: bankIcon,
                             onSelected: toggleVisibility,
                         },
                         {
                             text: 'Debit card',
-                            icon: icons.CreditCard,
+                            icon: creditCardIcon,
                             onSelected: toggleVisibility,
                         },
                     ]}

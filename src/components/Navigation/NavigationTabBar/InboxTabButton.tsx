@@ -66,7 +66,7 @@ type WideInboxTabButtonProps = {
 function WideInboxTabButton({selectedTab, statusIndicatorColor, accessibilityLabel}: WideInboxTabButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Inbox']);
+    const {Inbox: inboxIcon} = useMemoizedLazyExpensifyIcons(['Inbox']);
     const hasVisitedInboxTab = useRef(selectedTab === NAVIGATION_TABS.INBOX);
 
     useEffect(() => {
@@ -191,7 +191,7 @@ function WideInboxTabButton({selectedTab, statusIndicatorColor, accessibilityLab
         >
             {({hovered}) => (
                 <TabBarItem
-                    icon={expensifyIcons.Inbox}
+                    icon={inboxIcon}
                     label={translate('common.inbox')}
                     isSelected={selectedTab === NAVIGATION_TABS.INBOX}
                     isHovered={hovered}
@@ -206,7 +206,7 @@ function InboxTabButton({selectedTab, isWideLayout}: InboxTabButtonProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {status: chatTabBrickRoad, indicatorColor: statusIndicatorColor} = useInboxTabIndicatorStatus();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Inbox']);
+    const {Inbox: inboxIcon2} = useMemoizedLazyExpensifyIcons(['Inbox']);
 
     const accessibilityLabel = chatTabBrickRoad ? `${translate('common.inbox')}. ${translate('common.yourReviewIsRequired')}` : translate('common.inbox');
 
@@ -238,7 +238,7 @@ function InboxTabButton({selectedTab, isWideLayout}: InboxTabButtonProps) {
             sentryLabel={CONST.SENTRY_LABEL.NAVIGATION_TAB_BAR.INBOX}
         >
             <TabBarItem
-                icon={expensifyIcons.Inbox}
+                icon={inboxIcon2}
                 label={translate('common.inbox')}
                 isSelected={selectedTab === NAVIGATION_TABS.INBOX}
                 statusIndicatorColor={statusIndicatorColor}

@@ -35,7 +35,7 @@ const padNumbers = [
 ] as const;
 
 function BigNumberPad({numberPressed, longPressHandlerStateChanged = () => {}, id = 'numPadView', isLongPressDisabled = false}: BigNumberPadProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
     const {toLocaleDigit} = useLocalize();
 
     const styles = useThemeStyles();
@@ -125,7 +125,7 @@ function BigNumberPad({numberPressed, longPressHandlerStateChanged = () => {}, i
                                 isLongPressDisabled={isLongPressDisabled}
                                 testID={`button_${column}`}
                             >
-                                {column === '<' ? <Button.Icon src={icons.BackArrow} /> : <Button.Text>{toLocaleDigit(column)}</Button.Text>}
+                                {column === '<' ? <Button.Icon src={backArrowIcon} /> : <Button.Text>{toLocaleDigit(column)}</Button.Text>}
                             </Button>
                         );
                     })}

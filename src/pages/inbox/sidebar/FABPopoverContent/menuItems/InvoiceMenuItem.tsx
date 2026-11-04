@@ -31,7 +31,7 @@ function InvoiceMenuItem({reportID}: InvoiceMenuItemProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['InvoiceGeneric']);
+    const {InvoiceGeneric: invoiceGenericIcon} = useMemoizedLazyExpensifyIcons(['InvoiceGeneric']);
     const [allPolicies] = useMappedPolicies(policyMapper);
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
@@ -42,7 +42,7 @@ function InvoiceMenuItem({reportID}: InvoiceMenuItemProps) {
             itemId={ITEM_ID}
             isVisible={canSendInvoice}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.SEND_INVOICE}
-            icon={icons.InvoiceGeneric}
+            icon={invoiceGenericIcon}
             title={translate('workspace.invoices.sendInvoice')}
             onPress={() =>
                 interceptAnonymousUser(() => {

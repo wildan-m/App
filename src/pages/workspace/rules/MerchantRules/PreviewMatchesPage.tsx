@@ -49,7 +49,7 @@ function PreviewMatchesPage({route}: PreviewMatchesPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const [form] = useOnyx(ONYXKEYS.FORMS.MERCHANT_RULE_FORM);
     const [isLoading] = useOnyx(ONYXKEYS.IS_LOADING_POLICY_CODING_RULES_PREVIEW);
@@ -117,7 +117,7 @@ function PreviewMatchesPage({route}: PreviewMatchesPageProps) {
 
                     {isLoadedAndEmpty && (
                         <BlockingView
-                            icon={illustrations.Telescope}
+                            icon={telescopeIllustration}
                             iconWidth={variables.emptyListIconWidth}
                             iconHeight={variables.emptyListIconHeight}
                             title={translate('workspace.rules.merchantRules.previewMatchesEmptyStateTitle')}

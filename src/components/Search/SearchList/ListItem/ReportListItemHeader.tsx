@@ -137,7 +137,7 @@ function HeaderFirstRow<TItem extends ListItem>({
     chatReport,
     shouldShowMarkAsDoneCopy,
 }: FirstRowReportHeaderProps<TItem>) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {isLargeScreenWidth} = useResponsiveLayout();
@@ -197,7 +197,7 @@ function HeaderFirstRow<TItem extends ListItem>({
                         >
                             {({hovered}) => (
                                 <Icon
-                                    src={isExpanded ? icons.UpArrow : icons.DownArrow}
+                                    src={isExpanded ? upArrowIcon : downArrowIcon}
                                     fill={theme.icon}
                                     additionalStyles={!hovered && styles.opacitySemiTransparent}
                                     size={CONST.ICON_SIZE.SMALL}

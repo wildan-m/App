@@ -43,7 +43,11 @@ function EarlyRenewalOfferPage() {
     const {translate} = useLocalize();
     const themePreference = useThemePreference();
     const IceCreamBackground = getBaseTheme(themePreference) === CONST.THEME.DARK ? IceCreamBackgroundDark : IceCreamBackgroundLight;
-    const illustrations = useMemoizedLazyIllustrations(['IceCreamMenu', 'IceCreamNumberOne', 'IceCreamNumberTwo']);
+    const {
+        IceCreamMenu: iceCreamMenuIllustration,
+        IceCreamNumberOne: iceCreamNumberOneIllustration,
+        IceCreamNumberTwo: iceCreamNumberTwoIllustration,
+    } = useMemoizedLazyIllustrations(['IceCreamMenu', 'IceCreamNumberOne', 'IceCreamNumberTwo']);
     const [selectedOfferID, setSelectedOfferID] = useState<IncentivizedOfferID | null>(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [eligibility, eligibilityMetadata] = useOnyx(ONYXKEYS.EARLY_RENEWAL_OFFER_ELIGIBILITY);
@@ -91,7 +95,7 @@ function EarlyRenewalOfferPage() {
                 />
                 <ScrollView contentContainerStyle={[styles.alignItemsCenter, styles.ph5, styles.pv3, styles.gap6]}>
                     <Icon
-                        src={illustrations.IceCreamMenu}
+                        src={iceCreamMenuIllustration}
                         width={variables.earlyRenewalOfferHeroWidth}
                         height={variables.earlyRenewalOfferHeroHeight}
                     />
@@ -106,13 +110,13 @@ function EarlyRenewalOfferPage() {
                     >
                         <EarlyRenewalOfferTile
                             label={translate('earlyRenewal.offer.oneYear')}
-                            illustration={illustrations.IceCreamNumberOne}
+                            illustration={iceCreamNumberOneIllustration}
                             isSelected={selectedOfferID === CONST.SUBSCRIPTION.EARLY_RENEWAL.OFFER_ID.INCENTIVIZED_ONE_YEAR}
                             onSelect={() => selectOffer(CONST.SUBSCRIPTION.EARLY_RENEWAL.OFFER_ID.INCENTIVIZED_ONE_YEAR)}
                         />
                         <EarlyRenewalOfferTile
                             label={translate('earlyRenewal.offer.twoYears')}
-                            illustration={illustrations.IceCreamNumberTwo}
+                            illustration={iceCreamNumberTwoIllustration}
                             isSelected={selectedOfferID === CONST.SUBSCRIPTION.EARLY_RENEWAL.OFFER_ID.INCENTIVIZED_TWO_YEARS}
                             onSelect={() => selectOffer(CONST.SUBSCRIPTION.EARLY_RENEWAL.OFFER_ID.INCENTIVIZED_TWO_YEARS)}
                         >

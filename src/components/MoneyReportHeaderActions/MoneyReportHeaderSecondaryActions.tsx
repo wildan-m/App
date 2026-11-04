@@ -324,7 +324,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
             ? sortPoliciesByName(activeAdminPolicies, localeCompare)
             : [];
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building']);
+    const {Info: infoIcon, Cash: cashIcon, ArrowRight: arrowRightIcon, Building: buildingIcon} = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building']);
 
     // Build PAY action sub-items. Workspace-policy entries carry the policy as data and have no onSelected;
     // MoneyReportHeaderKYCDropdown picks them up via onSubItemSelected where triggerKYCFlow is in scope.
@@ -344,7 +344,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
                             }),
                             '',
                         ),
-                        icon: expensifyIcons.Building,
+                        icon: buildingIcon,
                         workspacePolicy: wp,
                     };
                     paymentSubMenuItems.push(workspacePolicyItem);
@@ -434,7 +434,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
         [CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS]: {
             value: CONST.REPORT.SECONDARY_ACTIONS.VIEW_DETAILS,
             text: translate('iou.viewDetails'),
-            icon: expensifyIcons.Info,
+            icon: infoIcon,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.VIEW_DETAILS,
             onSelected: () => {
                 navigateToDetailsPage(moneyRequestReport, isInSidePanel);
@@ -447,8 +447,8 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
         ...holdRejectActions,
         [CONST.REPORT.SECONDARY_ACTIONS.PAY]: {
             text: translate('iou.settlePayment', totalAmount),
-            icon: expensifyIcons.Cash,
-            rightIcon: expensifyIcons.ArrowRight,
+            icon: cashIcon,
+            rightIcon: arrowRightIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.PAY,
             backButtonText: translate('iou.settlePayment', totalAmount),
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.PAY,
@@ -525,7 +525,7 @@ function MoneyReportHeaderSecondaryActionsPlaceholder({primaryAction, isDisabled
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout, isMediumScreenWidth, isInLandscapeMode} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const {DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow']);
     const shouldTakeRemainingWidth = (shouldUseNarrowLayout || isMediumScreenWidth) && !primaryAction && !isInLandscapeMode;
     const wrapperStyle = shouldTakeRemainingWidth ? [styles.w100, styles.mnw0] : undefined;
     // Match the inner styles the real ButtonWithDropdownMenu applies when isSplitButton=false so text placement stays put on swap.
@@ -540,7 +540,7 @@ function MoneyReportHeaderSecondaryActionsPlaceholder({primaryAction, isDisabled
                 onPress={() => {}}
             >
                 <Button.Text>{translate('common.more')}</Button.Text>
-                <Button.Icon src={icons.DownArrow} />
+                <Button.Icon src={downArrowIcon} />
             </Button>
         </View>
     );

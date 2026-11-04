@@ -90,7 +90,12 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
     const {showReadOnlyModal} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.RULES);
     const canWriteSpendRules = useCanWriteCardSpendRules(policyID);
     useControlOnlyRuleUpgradeRedirect(policyID, upgradeBackTo);
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCardHourglass', 'MoneyCircle', 'CoinsButton', 'Basket']);
+    const {
+        CreditCardHourglass: creditCardHourglassIcon,
+        MoneyCircle: moneyCircleIcon,
+        CoinsButton: coinsButtonIcon,
+        Basket: basketIcon,
+    } = useMemoizedLazyExpensifyIcons(['CreditCardHourglass', 'MoneyCircle', 'CoinsButton', 'Basket']);
     const domainAccountID = useDefaultFundID(policyID);
     const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
     const [expensifyCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
@@ -390,7 +395,7 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
         title: cardsMenuTitle,
         onPress: chooseCards,
         sentryLabel: spendRuleSectionSentryLabel,
-        icon: icons.CreditCardHourglass,
+        icon: creditCardHourglassIcon,
     });
 
     const merchantMenuItem = renderEditableMenuItem({
@@ -398,7 +403,7 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
         title: merchantsMenuTitle,
         onPress: chooseMerchants,
         sentryLabel: spendRuleSectionSentryLabel,
-        icon: icons.Basket,
+        icon: basketIcon,
     });
 
     const categoryMenuItem = renderEditableMenuItem({
@@ -406,7 +411,7 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
         title: categoriesMenuTitle,
         onPress: chooseCategories,
         sentryLabel: spendRuleSectionSentryLabel,
-        icon: icons.Basket,
+        icon: basketIcon,
     });
 
     const maxAmountMenuItem = renderEditableMenuItem({
@@ -414,7 +419,7 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
         title: maxAmountMenuTitle ? translate('workspace.rules.spendRules.maxAmountAbove', {amount: maxAmountMenuTitle}) : maxAmountMenuTitle,
         onPress: chooseMaxAmount,
         sentryLabel: spendRuleSectionSentryLabel,
-        icon: icons.CoinsButton,
+        icon: coinsButtonIcon,
     });
 
     const currenciesMenuItem = renderEditableMenuItem({
@@ -422,7 +427,7 @@ function SpendRulePageBase({policyID, ruleID, testID, upgradeBackTo}: SpendRuleP
         title: currenciesMenuTitle,
         onPress: chooseCurrencies,
         sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.RULES.CURRENCY_SELECTOR,
-        icon: icons.MoneyCircle,
+        icon: moneyCircleIcon,
     });
 
     const revampFormContent = (

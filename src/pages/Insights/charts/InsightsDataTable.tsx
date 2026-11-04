@@ -47,7 +47,7 @@ function InsightsDataTable({rows, formatValue, isLoading}: InsightsDataTableProp
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowUpLong', 'ArrowDownLong']);
+    const {ArrowUpLong: arrowUpLongIcon, ArrowDownLong: arrowDownLongIcon} = useMemoizedLazyExpensifyIcons(['ArrowUpLong', 'ArrowDownLong']);
     const {preferredLocale, translate} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
     const {cardPaddingHorizontal} = useLayoutSpacing();
@@ -115,7 +115,7 @@ function InsightsDataTable({rows, formatValue, isLoading}: InsightsDataTableProp
                                     accessibilityLabel={translate(isIncrease ? 'insightsPage.compare.increase' : 'insightsPage.compare.decrease', changePercentage)}
                                 >
                                     <Icon
-                                        src={isIncrease ? icons.ArrowUpLong : icons.ArrowDownLong}
+                                        src={isIncrease ? arrowUpLongIcon : arrowDownLongIcon}
                                         fill={changeColor}
                                         width={variables.iconSizeXXSmall}
                                         height={variables.iconSizeXXSmall}

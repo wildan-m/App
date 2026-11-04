@@ -47,7 +47,7 @@ function TransferBalancePage() {
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const {paddingBottom} = useSafeAreaPaddings();
-    const icons = useMemoizedLazyExpensifyIcons(['Bank']);
+    const {Bank: bankIcon} = useMemoizedLazyExpensifyIcons(['Bank']);
 
     const [userWallet] = useOnyx(ONYXKEYS.USER_WALLET);
     const [walletTransfer] = useOnyx(ONYXKEYS.WALLET_TRANSFER);
@@ -71,7 +71,7 @@ function TransferBalancePage() {
             key: CONST.WALLET.TRANSFER_METHOD_TYPE.ACH,
             title: translate('transferAmountPage.ach'),
             description: translate('transferAmountPage.achSummary'),
-            icon: icons.Bank,
+            icon: bankIcon,
             type: CONST.PAYMENT_METHODS.PERSONAL_BANK_ACCOUNT,
         },
     ];

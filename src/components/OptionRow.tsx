@@ -89,7 +89,7 @@ function OptionRow({
     const StyleUtils = useStyleUtils();
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const {getCurrencyDecimals} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Checkmark']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Checkmark']);
     const pressableRef = useRef<ComponentRef<typeof View> | HTMLDivElement>(null);
     const [isDisabled, setIsDisabled] = useState(isOptionDisabled);
 
@@ -264,7 +264,7 @@ function OptionRow({
                                 {!isSelected && option.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
                                     <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
                                         <Icon
-                                            src={icons.DotIndicator}
+                                            src={dotIndicatorIcon}
                                             fill={theme.danger}
                                         />
                                     </View>
@@ -272,7 +272,7 @@ function OptionRow({
                                 {!isSelected && option.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO && (
                                     <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
                                         <Icon
-                                            src={icons.DotIndicator}
+                                            src={dotIndicatorIcon}
                                             fill={theme.iconSuccessFill}
                                         />
                                     </View>

@@ -71,7 +71,8 @@ function FullPageErrorView({
     illustrationHeight = variables.errorPageIconHeight,
 }: FullPageErrorViewProps) {
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass', 'FolderSync', 'ChartSync']);
+    const {BrokenMagnifyingGlass, FolderSync, ChartSync} = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass', 'FolderSync', 'ChartSync']);
+    const illustrations = {BrokenMagnifyingGlass, FolderSync, ChartSync};
 
     if (shouldShow) {
         return (

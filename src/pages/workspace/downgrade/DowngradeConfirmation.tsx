@@ -23,7 +23,7 @@ type Props = {
 
 function DowngradeConfirmation({onConfirmDowngrade, policyID}: Props) {
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['MushroomTopHat']);
+    const {MushroomTopHat: mushroomTopHatIllustration} = useMemoizedLazyIllustrations(['MushroomTopHat']);
     const {login} = useCurrentUserPersonalDetails();
     const selector = (policies: OnyxCollection<Policy>) => {
         return activeAdminPoliciesSelector(policies, login ?? '');
@@ -34,7 +34,7 @@ function DowngradeConfirmation({onConfirmDowngrade, policyID}: Props) {
     return (
         <ConfirmationPage>
             <ConfirmationPage.Content>
-                <ConfirmationPage.Illustration illustration={illustrations.MushroomTopHat} />
+                <ConfirmationPage.Illustration illustration={mushroomTopHatIllustration} />
                 <ConfirmationPage.Heading>{translate('workspace.downgrade.completed.headline')}</ConfirmationPage.Heading>
                 {hasOtherControlWorkspaces && <ConfirmationPage.Description>{translate('workspace.downgrade.completed.description')}</ConfirmationPage.Description>}
             </ConfirmationPage.Content>

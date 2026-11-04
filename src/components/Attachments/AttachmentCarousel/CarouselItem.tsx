@@ -43,7 +43,7 @@ function CarouselItem({item, onPress, isFocused, isModalHovered, reportID}: Caro
     const {isAttachmentHidden} = useContext(AttachmentModalContext);
     const [isHidden, setIsHidden] = useState(() => (item.reportActionID && isAttachmentHidden(item.reportActionID)) ?? item.hasBeenFlagged);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['AttachmentNotFound']);
+    const {AttachmentNotFound: attachmentNotFoundIcon} = useMemoizedLazyExpensifyIcons(['AttachmentNotFound']);
 
     const renderButton = (style: StyleProp<ViewStyle>) => (
         <Button
@@ -102,7 +102,7 @@ function CarouselItem({item, onPress, isFocused, isModalHovered, reportID}: Caro
                     isFocused={isFocused}
                     isUsedInAttachmentModal
                     duration={item.duration}
-                    fallbackSource={icons.AttachmentNotFound}
+                    fallbackSource={attachmentNotFoundIcon}
                     reportID={reportID}
                     isUploaded={!isEmptyObject(report)}
                 />

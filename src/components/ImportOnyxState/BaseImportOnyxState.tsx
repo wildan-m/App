@@ -10,7 +10,7 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import React from 'react';
 
 function BaseImportOnyxState({onFileRead}: {onFileRead: (file: FileObject) => void}) {
-    const icons = useMemoizedLazyExpensifyIcons(['Upload']);
+    const {Upload: uploadIcon} = useMemoizedLazyExpensifyIcons(['Upload']);
     const {translate} = useLocalize();
 
     return (
@@ -29,7 +29,7 @@ function BaseImportOnyxState({onFileRead}: {onFileRead: (file: FileObject) => vo
                         }}
                     >
                         <MenuItem.Row>
-                            <MenuItem.Icon src={icons.Upload} />
+                            <MenuItem.Icon src={uploadIcon} />
                             <MenuItem.Content>
                                 <MenuItem.Title>{translate('initialSettingsPage.troubleshoot.importOnyxState')}</MenuItem.Title>
                             </MenuItem.Content>

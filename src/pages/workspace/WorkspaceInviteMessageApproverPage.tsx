@@ -29,7 +29,7 @@ type WorkspaceInviteMessageApproverPageProps = WithPolicyAndFullscreenLoadingPro
 
 function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingReportData, route}: WorkspaceInviteMessageApproverPageProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const policyID = route.params.policyID;
 
@@ -90,7 +90,7 @@ function WorkspaceInviteMessageApproverPage({policy, personalDetails, isLoadingR
                     isSelected: selectedApprover === email,
                     login: email,
                     value: email,
-                    icons: [{source: avatar ?? icons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    icons: [{source: avatar ?? fallbackAvatarIcon, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
                     rightElement: (
                         <MemberRightIcon
                             role={employee.role}

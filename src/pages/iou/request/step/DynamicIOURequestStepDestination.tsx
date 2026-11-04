@@ -109,7 +109,7 @@ function DynamicIOURequestStepDestination({
     const [selfDMReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${findSelfDMReportID()}`);
 
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
+    const {EmptyStateExpenses: emptyStateExpensesIllustration} = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
     const {translate} = useLocalize();
 
     const destinationSelectionListRef = useRef<SelectionListWithSectionsHandle | null>(null);
@@ -251,7 +251,7 @@ function DynamicIOURequestStepDestination({
                     <View style={[styles.flex1]}>
                         <WorkspaceEmptyStateSection
                             shouldStyleAsCard={false}
-                            icon={illustrations.EmptyStateExpenses}
+                            icon={emptyStateExpensesIllustration}
                             title={translate('workspace.perDiem.requestEmptyList.title')}
                             subtitle={
                                 isPolicyAdmin(policy) ? translate('workspace.perDiem.requestEmptyList.adminSubtitle') : translate('workspace.perDiem.requestEmptyList.subtitle', policy?.name)

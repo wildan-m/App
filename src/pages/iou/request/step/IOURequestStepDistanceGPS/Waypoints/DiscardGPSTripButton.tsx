@@ -23,7 +23,7 @@ function DiscardGPSTripButton() {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
 
@@ -61,7 +61,7 @@ function DiscardGPSTripButton() {
             <View style={styles.primaryMediumIcon}>
                 <Icon
                     fill={theme.icon}
-                    src={icons.Trashcan}
+                    src={trashcanIcon}
                     width={variables.iconSizeSmall}
                     height={variables.iconSizeSmall}
                 />

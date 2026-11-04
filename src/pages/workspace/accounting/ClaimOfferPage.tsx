@@ -55,7 +55,7 @@ function ClaimOfferPage({route, policy}: ClaimOfferPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {startIntegrationFlow} = useAccountingActions();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['TreasureChestGreenWithSparkle']);
+    const {TreasureChestGreenWithSparkle: treasureChestGreenWithSparkleIcon} = useMemoizedLazyExpensifyIcons(['TreasureChestGreenWithSparkle']);
     const integrations = policy?.receiptPartners;
     const {isUberConnected} = useGetReceiptPartnersIntegrationData(policyID);
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
@@ -157,7 +157,7 @@ function ClaimOfferPage({route, policy}: ClaimOfferPageProps) {
                     <View style={[styles.flexGrow1, styles.justifyContentCenter]}>
                         <View style={[styles.alignItemsCenter, styles.mb5]}>
                             <Icon
-                                src={expensifyIcons.TreasureChestGreenWithSparkle}
+                                src={treasureChestGreenWithSparkleIcon}
                                 width={194}
                                 height={192}
                                 additionalStyles={[styles.mb5]}

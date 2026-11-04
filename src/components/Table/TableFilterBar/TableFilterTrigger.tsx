@@ -19,7 +19,7 @@ export default function TableFilterTrigger() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Filter']);
+    const {Filter: filterIcon} = useMemoizedLazyExpensifyIcons(['Filter']);
     const {filterConfig, shouldUseNarrowTableLayout} = useTableContext();
 
     const hasFiltersAvailable = Object.keys(filterConfig ?? {}).length > 0;
@@ -45,7 +45,7 @@ export default function TableFilterTrigger() {
                         >
                             <Icon
                                 size={CONST.ICON_SIZE.SMALL}
-                                src={icons.Filter}
+                                src={filterIcon}
                                 fill={theme.icon}
                             />
                         </PressableWithFeedback>
@@ -60,7 +60,7 @@ export default function TableFilterTrigger() {
                         style={isExpanded ? [styles.buttonHoveredBG, styles.mt0Half] : [styles.mt0Half]}
                         onPress={onPress}
                     >
-                        <Button.Icon src={icons.Filter} />
+                        <Button.Icon src={filterIcon} />
                         <Button.Text>{translate('search.filtersHeader')}</Button.Text>
                     </Button>
                 );

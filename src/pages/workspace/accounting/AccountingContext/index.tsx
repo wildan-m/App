@@ -92,7 +92,20 @@ function AccountingContextProvider({children, policy}: AccountingContextProvider
         });
     };
 
-    const accountingIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        IntacctSquare,
+        IntuitSquare,
+        QBOSquare,
+        XeroSquare,
+        NetSuiteSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'IntacctSquare',
         'IntuitSquare',
         'QBOSquare',
@@ -139,7 +152,20 @@ function AccountingContextProvider({children, policy}: AccountingContextProvider
             {
                 integrationToDisconnect: newActiveIntegration.integrationToDisconnect,
                 shouldDisconnectIntegrationBeforeConnecting: newActiveIntegration.shouldDisconnectIntegrationBeforeConnecting,
-                expensifyIcons: accountingIcons,
+                expensifyIcons: {
+                    IntacctSquare,
+                    IntuitSquare,
+                    QBOSquare,
+                    XeroSquare,
+                    NetSuiteSquare,
+                    QBDSquare,
+                    CertiniaSquare,
+                    RilletSquare,
+                    DualEntrySquare,
+                    CampfireSquare,
+                    ZohoBooksSquare,
+                    BusinessCentralSquare,
+                },
                 cardFeeds,
                 cardList: cardLists,
                 isIntuitEnterpriseSuiteOverride: newActiveIntegration.isIntuitEnterpriseSuite,
@@ -245,7 +271,20 @@ function AccountingContextProvider({children, policy}: AccountingContextProvider
             {
                 policy,
                 key: activeIntegration.key,
-                expensifyIcons: accountingIcons,
+                expensifyIcons: {
+                    IntacctSquare,
+                    IntuitSquare,
+                    QBOSquare,
+                    XeroSquare,
+                    NetSuiteSquare,
+                    QBDSquare,
+                    CertiniaSquare,
+                    RilletSquare,
+                    DualEntrySquare,
+                    CampfireSquare,
+                    ZohoBooksSquare,
+                    BusinessCentralSquare,
+                },
                 cardFeeds,
                 cardList: cardLists,
                 isIntuitEnterpriseSuiteOverride: activeIntegration.isIntuitEnterpriseSuite,

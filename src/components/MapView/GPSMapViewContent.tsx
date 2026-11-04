@@ -58,7 +58,11 @@ function GPSMapViewContent({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Crosshair', 'MapCurrentLocationPuck', 'MapCurrentLocation']);
+    const {
+        Crosshair: crosshairIcon,
+        MapCurrentLocationPuck: mapCurrentLocationPuckIcon,
+        MapCurrentLocation: mapCurrentLocationIcon,
+    } = useMemoizedLazyExpensifyIcons(['Crosshair', 'MapCurrentLocationPuck', 'MapCurrentLocation']);
 
     const cameraRef = useRef<Mapbox.Camera>(null);
 
@@ -219,7 +223,7 @@ function GPSMapViewContent({
                         allowOverlap
                     >
                         <ImageSVG
-                            src={expensifyIcons.MapCurrentLocation}
+                            src={mapCurrentLocationIcon}
                             width={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.width}
                             height={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.height}
                         />
@@ -229,7 +233,7 @@ function GPSMapViewContent({
                 <Mapbox.Images>
                     <Mapbox.Image name={CURRENT_LOCATION_PUCK_IMAGE}>
                         <ImageSVG
-                            src={expensifyIcons.MapCurrentLocationPuck}
+                            src={mapCurrentLocationPuckIcon}
                             width={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.width}
                             height={CONST.MAP_MARKER_SIZES.CURRENT_LOCATION.height}
                         />
@@ -276,7 +280,7 @@ function GPSMapViewContent({
                     accessibilityLabel={translate('common.center')}
                 >
                     <Button.Icon
-                        src={expensifyIcons.Crosshair}
+                        src={crosshairIcon}
                         fill={theme.icon}
                         hoverFill={theme.icon}
                     />

@@ -52,8 +52,8 @@ function OnboardingHelpDropdownButton({reportID, shouldUseNarrowLayout, shouldSh
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const userTimezone = currentUserPersonalDetails?.timezone?.selected ? currentUserPersonalDetails?.timezone.selected : CONST.DEFAULT_TIME_ZONE.selected;
 
-    const icons = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Close', 'Monitor']);
-    const illustrations = useMemoizedLazyIllustrations(['HeadSet']);
+    const {CalendarSolid: calendarSolidIcon, Close: closeIcon, Monitor: monitorIcon} = useMemoizedLazyExpensifyIcons(['CalendarSolid', 'Close', 'Monitor']);
+    const {HeadSet: headSetIllustration} = useMemoizedLazyIllustrations(['HeadSet']);
 
     if (!reportID || !accountID) {
         return null;
@@ -64,7 +64,7 @@ function OnboardingHelpDropdownButton({reportID, shouldUseNarrowLayout, shouldSh
     if (!hasActiveScheduledCall && shouldShowGuideBooking) {
         options.push({
             text: translate('getAssistancePage.scheduleACall'),
-            icon: icons.CalendarSolid,
+            icon: calendarSolidIcon,
             value: CONST.ONBOARDING_HELP.SCHEDULE_CALL,
             onSelected: () => {
                 clearBookingDraft();
@@ -90,7 +90,7 @@ function OnboardingHelpDropdownButton({reportID, shouldUseNarrowLayout, shouldSh
             )} ${DateUtils.getZoneAbbreviation(new Date(latestScheduledCall.eventTime), userTimezone)}`,
             descriptionTextStyle: [styles.themeTextColor, styles.ml2],
             displayInDefaultIconColor: true,
-            icon: illustrations.HeadSet,
+            icon: headSetIllustration,
             iconWidth: StyleUtils.getAvatarSize(CONST.AVATAR_SIZE.LARGE),
             iconHeight: StyleUtils.getAvatarSize(CONST.AVATAR_SIZE.LARGE),
             wrapperStyle: [styles.mb3, styles.pl4, styles.pr5, styles.pt3, styles.pb6, styles.borderBottom],
@@ -102,20 +102,20 @@ function OnboardingHelpDropdownButton({reportID, shouldUseNarrowLayout, shouldSh
             text: translate('common.reschedule'),
             value: CONST.ONBOARDING_HELP.RESCHEDULE,
             onSelected: () => rescheduleBooking(latestScheduledCall),
-            icon: icons.CalendarSolid,
+            icon: calendarSolidIcon,
         });
         options.push({
             text: translate('common.cancel'),
             value: CONST.ONBOARDING_HELP.CANCEL,
             onSelected: () => cancelBooking(latestScheduledCall),
-            icon: icons.Close,
+            icon: closeIcon,
         });
     }
 
     if (shouldShowRegisterForWebinar) {
         options.push({
             text: translate('getAssistancePage.registerForWebinar'),
-            icon: icons.Monitor,
+            icon: monitorIcon,
             shouldShowButtonRightIcon: true,
             value: CONST.ONBOARDING_HELP.REGISTER_FOR_WEBINAR,
             onSelected: () => {

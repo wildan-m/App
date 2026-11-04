@@ -25,7 +25,7 @@ type ConciergeChatHistoryToggleProps = {
 function ConciergeChatHistoryToggle({isHistoryShown, onPress, containerStyles}: ConciergeChatHistoryToggleProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
+    const {UpArrow: upArrowIcon, DownArrow: downArrowIcon} = useMemoizedLazyExpensifyIcons(['UpArrow', 'DownArrow']);
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.pv3, styles.mh5, containerStyles]}>
@@ -35,7 +35,7 @@ function ConciergeChatHistoryToggle({isHistoryShown, onPress, containerStyles}: 
                 onPress={onPress}
             >
                 <Button.Text>{translate(isHistoryShown ? 'common.concierge.hideChatHistory' : 'common.concierge.viewChatHistory')}</Button.Text>
-                <Button.Icon src={isHistoryShown ? expensifyIcons.DownArrow : expensifyIcons.UpArrow} />
+                <Button.Icon src={isHistoryShown ? downArrowIcon : upArrowIcon} />
             </Button>
             <View style={[styles.threadDividerLine, styles.ml0, styles.mr0, styles.flexGrow1]} />
         </View>

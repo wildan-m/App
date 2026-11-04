@@ -57,7 +57,7 @@ function PersonalCardDetailsHeaderMenu({
 }: PersonalCardDetailsHeaderMenuProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Table', 'Trashcan']);
+    const {Table: tableIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Table', 'Trashcan']);
 
     // Guard against an invalid scrapeMinDate, since`format` throws `RangeError: Invalid time value`
     // when `parseISO` can't parse the value
@@ -124,14 +124,14 @@ function PersonalCardDetailsHeaderMenu({
             <View style={styles.mt4}>
                 {isCSVImportedPersonalCard && (
                     <MenuItemAction
-                        icon={icons.Table}
+                        icon={tableIcon}
                         title={translate('spreadsheet.importSpreadsheet')}
                         onPress={() => Navigation.navigate(ROUTES.SETTINGS_WALLET_IMPORT_TRANSACTIONS_SPREADSHEET.getRoute(Number(cardID)))}
                     />
                 )}
                 {shouldShowBreakConnection && (
                     <MenuItemAction
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon}
                         isDisabled={isOffline || card?.isLoadingLastUpdated}
                         title="Break connection (Testing)"
                         onPress={onBreakConnection}
@@ -140,7 +140,7 @@ function PersonalCardDetailsHeaderMenu({
                 {isCSVImportedPersonalCard ? (
                     <View style={styles.mb1}>
                         <MenuItemAction
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('common.delete')}
                             onPress={onDeleteCard}
                         />

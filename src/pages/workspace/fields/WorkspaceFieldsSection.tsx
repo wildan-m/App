@@ -106,7 +106,7 @@ function WorkspaceFieldsSection({
 }: WorkspaceFieldsSectionProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {cardPadding, cardPaddingHorizontal, cardEdgeToEdge} = useLayoutSpacing();
     const {showConfirmModal} = useConfirmModal();
     const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
@@ -264,7 +264,7 @@ function WorkspaceFieldsSection({
                                 >
                                     <MenuItem.Row>
                                         <MenuItem.Leading>
-                                            <MenuItem.Icon src={icons.Plus} />
+                                            <MenuItem.Icon src={plusIcon} />
                                         </MenuItem.Leading>
                                         <MenuItem.Content>
                                             <MenuItem.Title>{translate(addFieldKey)}</MenuItem.Title>

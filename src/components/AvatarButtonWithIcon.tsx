@@ -71,7 +71,7 @@ function AvatarButtonWithIcon({
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil']);
+    const {Pencil: pencilIcon} = useMemoizedLazyExpensifyIcons(['Pencil']);
 
     return (
         <Tooltip
@@ -93,7 +93,7 @@ function AvatarButtonWithIcon({
                     <View style={StyleSheet.flatten([styles.smallEditIcon, styles.smallAvatarEditIcon, editIconStyle])}>
                         <Icon
                             testID="avatar-button-edit-icon"
-                            src={editIcon ?? expensifyIcons.Pencil}
+                            src={editIcon ?? pencilIcon}
                             width={variables.iconSizeSmall}
                             height={variables.iconSizeSmall}
                             fill={theme.icon}

@@ -28,7 +28,7 @@ function useDefaultWorkspaceTravelGuard({shouldRequireCompletedSetup = true}: De
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['RocketDude']);
+    const {RocketDude: rocketDudeIllustration} = useMemoizedLazyIllustrations(['RocketDude']);
     const {showConfirmModal} = useConfirmModal();
     const [defaultPolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const defaultPolicy = usePolicy(defaultPolicyID);
@@ -54,7 +54,7 @@ function useDefaultWorkspaceTravelGuard({shouldRequireCompletedSetup = true}: De
             promptStyles: styles.mb2,
             confirmText: translate('common.buttonConfirm'),
             shouldShowCancelButton: false,
-            image: illustrations.RocketDude,
+            image: rocketDudeIllustration,
             imageStyles: StyleUtils.getBackgroundColorStyle(colors.ice600),
         });
 

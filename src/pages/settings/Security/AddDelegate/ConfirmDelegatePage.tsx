@@ -29,7 +29,7 @@ import {View} from 'react-native';
 type ConfirmDelegatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.DELEGATE.DELEGATE_CONFIRM>;
 
 function ConfirmDelegatePage({route}: ConfirmDelegatePageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const {translate, formatPhoneNumber} = useLocalize();
 
     const styles = useThemeStyles();
@@ -37,7 +37,7 @@ function ConfirmDelegatePage({route}: ConfirmDelegatePageProps) {
     const role = route.params.role as ValueOf<typeof CONST.DELEGATE_ROLE>;
 
     const personalDetails = usePersonalDetailByLogin(login);
-    const avatarIcon = personalDetails?.avatar ?? icons.FallbackAvatar;
+    const avatarIcon = personalDetails?.avatar ?? fallbackAvatarIcon;
     const formattedLogin = formatPhoneNumber(login ?? '');
     // An account that never set a name carries its login in `displayName`, which for SMS is the full
     // `@expensify.sms` string. Format the resolved value so the title matches the description below it.

@@ -37,7 +37,7 @@ function DistanceEReceiptPanel({transaction}: DistanceEReceiptPanelProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     const thumbnail = hasReceipt(transaction) ? getThumbnailAndImageURIs(transaction).thumbnail : null;
     const {amount: transactionAmount, currency: transactionCurrency, merchant: transactionMerchant, created: transactionDate} = getTransactionDetails(transaction) ?? {};
     const formattedTransactionAmount = convertToDisplayString(transactionAmount, transactionCurrency);
@@ -102,7 +102,7 @@ function DistanceEReceiptPanel({transaction}: DistanceEReceiptPanelProps) {
                 <Icon
                     width={86}
                     height={19.25}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
 
                 <Text style={styles.eReceiptGuaranteed}>{translate('eReceipt.guaranteed')}</Text>

@@ -56,7 +56,7 @@ function ImportFromFileStep() {
     const styles = useThemeStyles();
     const {environmentURL} = useEnvironment();
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['Download']);
+    const {Download: downloadIcon} = useMemoizedLazyExpensifyIcons(['Download']);
     const route = useRoute<PlatformStackRouteProp<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_COMPANY_CARDS_ADD_NEW>>();
     const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
     const companyCardLayoutName = addNewCard?.data?.companyCardLayoutName ?? '';
@@ -149,7 +149,7 @@ function ImportFromFileStep() {
                         style={[styles.w100]}
                         onPress={downloadTemplate}
                     >
-                        <Button.Icon src={icons.Download} />
+                        <Button.Icon src={downloadIcon} />
                         <Button.Text>{translate('workspace.companyCards.addNewCard.downloadTemplate')}</Button.Text>
                     </Button>
                     <ButtonDisabledWhenOffline

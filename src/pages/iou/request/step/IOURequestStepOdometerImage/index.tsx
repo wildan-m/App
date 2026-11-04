@@ -83,12 +83,17 @@ function IOURequestStepOdometerImage({
         capturePhotoWithFlash,
     } = useWebCamera();
 
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['OdometerStart', 'OdometerEnd', 'Bolt', 'Gallery']);
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
+    const {
+        OdometerStart: odometerStartIcon,
+        OdometerEnd: odometerEndIcon,
+        Bolt: boltIcon,
+        Gallery: galleryIcon,
+    } = useMemoizedLazyExpensifyIcons(['OdometerStart', 'OdometerEnd', 'Bolt', 'Gallery']);
+    const {Hand: handIllustration, Shutter: shutterIllustration} = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
     const title = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.startTitle') : translate('distance.odometer.endTitle');
     const message = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.startMessageWeb') : translate('distance.odometer.endMessageWeb');
     const snapPhotoText = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? translate('distance.odometer.snapPhotoStart') : translate('distance.odometer.snapPhotoEnd');
-    const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? lazyIcons.OdometerStart : lazyIcons.OdometerEnd;
+    const icon = imageType === CONST.IOU.ODOMETER_IMAGE_TYPE.START ? odometerStartIcon : odometerEndIcon;
     const messageHTML = `<centered-text><muted-text-label>${message}</muted-text-label></centered-text>`;
 
     const goBackRoute =
@@ -176,7 +181,7 @@ function IOURequestStepOdometerImage({
                 {cameraPermissionState !== 'granted' && isQueriedPermissionState && (
                     <View style={[styles.flex1, styles.permissionView, styles.userSelectNone]}>
                         <Icon
-                            src={lazyIllustrations.Hand}
+                            src={handIllustration}
                             width={CONST.RECEIPT.HAND_ICON_WIDTH}
                             height={CONST.RECEIPT.HAND_ICON_HEIGHT}
                             additionalStyles={[styles.pb5]}
@@ -233,7 +238,7 @@ function IOURequestStepOdometerImage({
                                 <Icon
                                     height={variables.iconSizeSmall}
                                     width={variables.iconSizeSmall}
-                                    src={lazyIcons.Bolt}
+                                    src={boltIcon}
                                     fill={isFlashLightOn ? theme.white : theme.icon}
                                 />
                             </PressableWithFeedback>
@@ -269,7 +274,7 @@ function IOURequestStepOdometerImage({
                             <Icon
                                 height={variables.iconSizeMenuItem}
                                 width={variables.iconSizeMenuItem}
-                                src={lazyIcons.Gallery}
+                                src={galleryIcon}
                                 fill={theme.textSupporting}
                             />
                         </PressableWithFeedback>
@@ -283,7 +288,7 @@ function IOURequestStepOdometerImage({
                     onPress={capturePhoto}
                 >
                     <Icon
-                        src={lazyIllustrations.Shutter}
+                        src={shutterIllustration}
                         width={CONST.RECEIPT.SHUTTER_SIZE}
                         height={CONST.RECEIPT.SHUTTER_SIZE}
                     />

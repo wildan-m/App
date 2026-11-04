@@ -64,7 +64,7 @@ function BookTravelButton({
 }: BookTravelButtonProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['RocketDude']);
+    const {RocketDude: rocketDudeIllustration} = useMemoizedLazyIllustrations(['RocketDude']);
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const policy = usePolicy(activePolicyID);
@@ -92,7 +92,7 @@ function BookTravelButton({
                 promptStyles: styles.mb2,
                 confirmText: translate('common.buttonConfirm'),
                 shouldShowCancelButton: false,
-                image: illustrations.RocketDude,
+                image: rocketDudeIllustration,
                 imageStyles: StyleUtils.getBackgroundColorStyle(colors.ice600),
             });
         }
@@ -125,7 +125,7 @@ function BookTravelButton({
                 promptStyles: styles.mb2,
                 confirmText: translate('common.buttonConfirm'),
                 shouldShowCancelButton: false,
-                image: illustrations.RocketDude,
+                image: rocketDudeIllustration,
                 imageStyles: StyleUtils.getBackgroundColorStyle(colors.ice600),
             });
             return;

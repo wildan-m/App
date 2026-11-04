@@ -38,7 +38,7 @@ function ConnectionCard({listing, shouldUseFullWidth}: ConnectionCardProps) {
     const theme = useTheme();
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['Building', 'Plus']);
+    const {Building: buildingIcon, Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Building', 'Plus']);
     const {title, icon, status, offer, onConnect, onConfigure, registerConnectButton, isLoading} = listing;
 
     const connectIcon = (
@@ -47,7 +47,7 @@ function ConnectionCard({listing, shouldUseFullWidth}: ConnectionCardProps) {
                 <ActivityIndicator />
             ) : (
                 <Icon
-                    src={icons.Plus}
+                    src={plusIcon}
                     width={variables.iconSizeSmall}
                     height={variables.iconSizeSmall}
                     fill={theme.icon}
@@ -95,7 +95,7 @@ function ConnectionCard({listing, shouldUseFullWidth}: ConnectionCardProps) {
                 iconType={CONST.ICON_TYPE_AVATAR}
                 // Many partner logos are transparent, so they need a white backdrop in both themes
                 avatarImageStyles={styles.backgroundWhite}
-                fallbackIcon={icons.Building}
+                fallbackIcon={buildingIcon}
                 // The badge and button leave little room for the status message, so it shows in full on hover once it's cut off
                 descriptionAddon={
                     status ? (

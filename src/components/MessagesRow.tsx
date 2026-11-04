@@ -40,7 +40,7 @@ function MessagesRow({messages = {}, type, onDismiss, containerStyles, dismissEr
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
 
     const hasReceiptUploadError = Object.values(messages).some((message) => isReceiptError(message));
     const showDismissButton = !!onDismiss && !hasReceiptUploadError;
@@ -72,7 +72,7 @@ function MessagesRow({messages = {}, type, onDismiss, containerStyles, dismissEr
                     >
                         <Icon
                             fill={theme.icon}
-                            src={icons.Close}
+                            src={closeIcon}
                         />
                     </PressableWithoutFeedback>
                 </Tooltip>

@@ -40,7 +40,7 @@ type FixCompanyCardConnectionProps = {
 
 function FixCompanyCardConnection({card, policyID, policyName}: FixCompanyCardConnectionProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Connect']);
+    const {Connect: connectIcon} = useMemoizedLazyExpensifyIcons(['Connect']);
     const policy = usePolicy(policyID);
     const employeePersonalDetails = usePersonalDetailsByLogins(Object.keys(policy?.employeeList ?? {}));
 
@@ -102,7 +102,7 @@ function FixCompanyCardConnection({card, policyID, policyName}: FixCompanyCardCo
 
     return (
         <BaseWidgetItem
-            icon={icons.Connect}
+            icon={connectIcon}
             title={translate('homePage.timeSensitiveSection.fixCompanyCardConnection.title', {feedName})}
             subtitle={subtitle}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

@@ -23,7 +23,7 @@ function ReportHeaderSkeletonView({shouldAnimate = true, onBackButtonPress = () 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
 
     return (
         <View style={[styles.appContentHeader, shouldUseNarrowLayout && styles.pl2, styles.h100]}>
@@ -38,7 +38,7 @@ function ReportHeaderSkeletonView({shouldAnimate = true, onBackButtonPress = () 
                     >
                         <Icon
                             fill={theme.icon}
-                            src={icons.BackArrow}
+                            src={backArrowIcon}
                         />
                     </PressableWithFeedback>
                 )}

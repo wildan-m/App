@@ -32,7 +32,7 @@ function SearchBar({
     emptyStateContainerStyle,
 }: SearchBarProps) {
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
+    const {MagnifyingGlass: magnifyingGlassIcon} = useMemoizedLazyExpensifyIcons(['MagnifyingGlass']);
 
     return (
         <BaseSearchBar
@@ -48,7 +48,7 @@ function SearchBar({
             emptyStateContainerStyle={emptyStateContainerStyle}
             textInputProps={{
                 label,
-                icon: inputValue?.length || !shouldShowIcon ? undefined : (icon ?? expensifyIcons.MagnifyingGlass),
+                icon: inputValue?.length || !shouldShowIcon ? undefined : (icon ?? magnifyingGlassIcon),
                 iconContainerStyle: styles.p0,
             }}
         />

@@ -32,10 +32,15 @@ import {showContextMenu} from './inbox/report/ContextMenu/ReportActionContextMen
 type DynamicReferralDetailsPageProps = PlatformStackScreenProps<ReferralDetailsNavigatorParamList, typeof SCREENS.DYNAMIC_REFERRAL_DETAILS>;
 
 function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Copy', 'NewWindow', 'QuestionMark']);
+    const {
+        Checkmark: checkmarkIcon,
+        Copy: copyIcon,
+        NewWindow: newWindowIcon,
+        QuestionMark: questionMarkIcon,
+    } = useMemoizedLazyExpensifyIcons(['Checkmark', 'Copy', 'NewWindow', 'QuestionMark']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['PaymentHands']);
+    const {PaymentHands: paymentHandsIllustration} = useMemoizedLazyIllustrations(['PaymentHands']);
     const {translate} = useLocalize();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const popoverAnchor = useRef(null);
@@ -58,7 +63,7 @@ function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
             title={translate('common.referral')}
             headerContent={
                 <Icon
-                    src={illustrations.PaymentHands}
+                    src={paymentHandsIllustration}
                     width={589}
                     height={232}
                 />
@@ -76,8 +81,8 @@ function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
                 <ContextMenuItem
                     isAnonymousAction
                     text={translate('referralProgram.copyReferralLink')}
-                    icon={icons.Copy}
-                    successIcon={icons.Checkmark}
+                    icon={copyIcon}
+                    successIcon={checkmarkIcon}
                     successText={translate('qrCodes.copied')}
                     onPress={() => Clipboard.setString(referralLink)}
                     shouldLimitWidth={false}
@@ -88,9 +93,9 @@ function DynamicReferralDetailsPage({route}: DynamicReferralDetailsPageProps) {
                 wrapperStyle={styles.mb4}
                 ref={popoverAnchor}
                 title={translate('requestorStep.learnMore')}
-                icon={icons.QuestionMark}
+                icon={questionMarkIcon}
                 shouldShowRightIcon
-                iconRight={icons.NewWindow}
+                iconRight={newWindowIcon}
                 disabled={isExecuting}
                 shouldBlockSelection
                 shouldShowContextMenuHint

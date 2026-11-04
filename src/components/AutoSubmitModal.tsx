@@ -31,15 +31,19 @@ function AutoSubmitModal() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['PaperAirplane', 'Pencil', 'ReceiptsStackedOnPin']);
+    const {
+        PaperAirplane: paperAirplaneIllustration,
+        Pencil: pencilIllustration,
+        ReceiptsStackedOnPin: receiptsStackedOnPinIllustration,
+    } = useMemoizedLazyIllustrations(['PaperAirplane', 'Pencil', 'ReceiptsStackedOnPin']);
     const menuSections = [
         {
-            icon: illustrations.PaperAirplane,
+            icon: paperAirplaneIllustration,
             titleTranslationKey: 'autoSubmitModal.submittedExpensesTitle',
             descriptionTranslationKey: 'autoSubmitModal.submittedExpensesDescription',
         },
         {
-            icon: illustrations.Pencil,
+            icon: pencilIllustration,
             titleTranslationKey: 'autoSubmitModal.pendingExpensesTitle',
             descriptionTranslationKey: 'autoSubmitModal.pendingExpensesDescription',
         },
@@ -89,7 +93,7 @@ function AutoSubmitModal() {
                 shouldUseScrollView
             >
                 <FeatureTraining.Illustration
-                    image={illustrations.ReceiptsStackedOnPin}
+                    image={receiptsStackedOnPinIllustration}
                     contentFitImage="cover"
                     imageWidth={variables.changePolicyEducationModalIconWidth}
                     imageHeight={variables.changePolicyEducationModalIconHeight}

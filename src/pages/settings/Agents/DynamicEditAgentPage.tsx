@@ -46,7 +46,12 @@ type DynamicEditAgentPageProps = PlatformStackScreenProps<SettingsNavigatorParam
 function DynamicEditAgentPage({route, navigation}: DynamicEditAgentPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan', 'ChatBubble', 'MagnifyingGlass', 'Users']);
+    const {
+        Trashcan: trashcanIcon,
+        ChatBubble: chatBubbleIcon,
+        MagnifyingGlass: magnifyingGlassIcon,
+        Users: usersIcon,
+    } = useMemoizedLazyExpensifyIcons(['Trashcan', 'ChatBubble', 'MagnifyingGlass', 'Users']);
     const [accountID, accountIDMetadata] = useAgentAccountID(route.params.accountID, navigation);
     const [agent, agentMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.AGENT}${accountID}`);
     const [personalDetails, personalDetailsMetadata] = usePersonalDetail(accountID);
@@ -165,25 +170,25 @@ function DynamicEditAgentPage({route, navigation}: DynamicEditAgentPageProps) {
                 </OfflineWithFeedback>
                 <MenuItemAction
                     title={translate('editAgentPage.viewAgentHistory')}
-                    icon={icons.MagnifyingGlass}
+                    icon={magnifyingGlassIcon}
                     onPress={handleViewHistoryPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
                     title={translate('editAgentPage.chatWithAgent')}
-                    icon={icons.ChatBubble}
+                    icon={chatBubbleIcon}
                     onPress={handleChatPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
                     title={translate('editAgentPage.copilotIntoAccount')}
-                    icon={icons.Users}
+                    icon={usersIcon}
                     onPress={handleCopilotPress}
                     isDisabled={areActionsDisabled}
                 />
                 <MenuItemAction
                     title={translate('editAgentPage.deleteAgent')}
-                    icon={icons.Trashcan}
+                    icon={trashcanIcon}
                     onPress={handleDeletePress}
                 />
             </ScrollView>

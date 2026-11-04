@@ -57,7 +57,7 @@ type LinkPlaidToBankAccountInnerProps = {
 function LinkPlaidToBankAccountInner({bankAccountID, backPath}: LinkPlaidToBankAccountInnerProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['BankCheck', 'BankX']);
+    const {BankCheck: bankCheckIllustration, BankX: bankXIllustration} = useMemoizedLazyIllustrations(['BankCheck', 'BankX']);
 
     const [plaidLinkToken] = useOnyx(ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN);
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
@@ -104,7 +104,7 @@ function LinkPlaidToBankAccountInner({bankAccountID, backPath}: LinkPlaidToBankA
                     heading={translate('walletPage.linkPlaid.successHeading')}
                     description={translate('walletPage.linkPlaid.successDescription')}
                     descriptionStyle={styles.textSupportingNormal}
-                    illustration={illustrations.BankCheck}
+                    illustration={bankCheckIllustration}
                     onButtonPress={() => Navigation.goBack(backPath)}
                     buttonText={translate('common.buttonConfirm')}
                     containerStyle={styles.h100}
@@ -120,7 +120,7 @@ function LinkPlaidToBankAccountInner({bankAccountID, backPath}: LinkPlaidToBankA
                     heading={translate('walletPage.linkPlaid.wrongAccountHeading')}
                     description={translate('walletPage.linkPlaid.wrongAccountDescription')}
                     descriptionStyle={styles.textSupportingNormal}
-                    illustration={illustrations.BankX}
+                    illustration={bankXIllustration}
                     onButtonPress={() => Navigation.goBack(backPath)}
                     buttonText={translate('common.buttonConfirm')}
                     containerStyle={styles.h100}
@@ -134,7 +134,7 @@ function LinkPlaidToBankAccountInner({bankAccountID, backPath}: LinkPlaidToBankA
             <ScrollView contentContainerStyle={styles.flexGrow1}>
                 <ConfirmationPage style={styles.h100}>
                     <ConfirmationPage.Content>
-                        <ConfirmationPage.Illustration illustration={illustrations.BankX} />
+                        <ConfirmationPage.Illustration illustration={bankXIllustration} />
                         <ConfirmationPage.Heading>{translate('walletPage.linkPlaid.failureHeading')}</ConfirmationPage.Heading>
                         <View style={[styles.renderHTML, styles.textAlignCenter, styles.mh5]}>
                             <RenderHTML html={translate('walletPage.linkPlaid.failureDescription')} />

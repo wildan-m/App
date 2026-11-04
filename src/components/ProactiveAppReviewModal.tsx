@@ -30,7 +30,7 @@ type ProactiveAppReviewModalProps = {
 function ProactiveAppReviewModal({isVisible, onPositive, onNegative, onSkip}: ProactiveAppReviewModalProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ToddWithPhones']);
+    const {ToddWithPhones: toddWithPhonesIllustration} = useMemoizedLazyIllustrations(['ToddWithPhones']);
     const {translate} = useLocalize();
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({
         addBottomSafeAreaPadding: shouldUseNarrowLayout,
@@ -51,7 +51,7 @@ function ProactiveAppReviewModal({isVisible, onPositive, onNegative, onSkip}: Pr
                 {/* Todd with phones illustration */}
                 <View style={[styles.alignItemsCenter, styles.mb3]}>
                     <ImageSVG
-                        src={illustrations.ToddWithPhones}
+                        src={toddWithPhonesIllustration}
                         contentFit="contain"
                         width={200}
                         height={200}

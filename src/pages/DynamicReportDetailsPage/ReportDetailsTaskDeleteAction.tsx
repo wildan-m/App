@@ -44,7 +44,7 @@ type ReportDetailsTaskDeleteActionContentProps = {
 
 function ReportDetailsTaskDeleteActionContent({report, parentReport, parentReportAction, currentUserAccountID, caseID}: ReportDetailsTaskDeleteActionContentProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const taskDeleteBackTo = Navigation.getTopmostSearchReportRouteParams()?.backTo;
     const hasOutstandingChildTask = useHasOutstandingChildTask(report);
     const [guideAccountIDs] = useOnyx(ONYXKEYS.DERIVED.GUIDE_ACCOUNT_IDS);
@@ -78,7 +78,7 @@ function ReportDetailsTaskDeleteActionContent({report, parentReport, parentRepor
     return (
         <MenuItemAction
             key={CONST.REPORT_DETAILS_MENU_ITEM.DELETE}
-            icon={expensifyIcons.Trashcan}
+            icon={trashcanIcon}
             title={translate('common.delete')}
             onPress={() => showDeleteModal(undefined, deleteTransaction)}
         />

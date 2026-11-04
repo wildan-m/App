@@ -35,7 +35,7 @@ function CardRow({cardRow, wrapperStyle}: CardRowProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {convertToDisplayString} = useCurrencyListActions();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {hovered, bind} = useHover();
     const {onMouseEnter, onMouseLeave} = bind;
 
@@ -93,7 +93,7 @@ function CardRow({cardRow, wrapperStyle}: CardRowProps) {
                         {cardRow.spentFraction !== undefined && <RemainingLimitCircle spentFraction={cardRow.spentFraction} />}
                         <View style={!hovered && styles.opacitySemiTransparent}>
                             <Icon
-                                src={icons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.icon}
                                 width={variables.iconSizeNormal}
                                 height={variables.iconSizeNormal}

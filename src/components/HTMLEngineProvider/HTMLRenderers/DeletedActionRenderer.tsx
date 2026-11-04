@@ -16,7 +16,7 @@ import {View} from 'react-native';
 import {TNodeChildrenRenderer} from 'react-native-render-html';
 
 function DeletedActionRenderer({tnode}: CustomRendererProps<TText | TPhrasing>) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'EyeDisabled', 'Trashcan']);
+    const {ArrowsLeftRight: arrowsLeftRightIcon, EyeDisabled: eyeDisabledIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['ArrowsLeftRight', 'EyeDisabled', 'Trashcan']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const htmlAttribs = tnode.attributes;
@@ -26,12 +26,12 @@ function DeletedActionRenderer({tnode}: CustomRendererProps<TText | TPhrasing>) 
 
     const getIcon = () => {
         if (reversedTransactionValue === 'true') {
-            return icons.ArrowsLeftRight;
+            return arrowsLeftRightIcon;
         }
         if (hiddenMessageValue === 'true') {
-            return icons.EyeDisabled;
+            return eyeDisabledIcon;
         }
-        return icons.Trashcan;
+        return trashcanIcon;
     };
 
     return (

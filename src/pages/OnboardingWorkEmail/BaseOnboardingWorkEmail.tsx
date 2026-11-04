@@ -76,7 +76,7 @@ const accountSelector = (account: OnyxEntry<Account>) => ({
 function BaseOnboardingWorkEmail({shouldUseNativeStyles, route}: BaseOnboardingWorkEmailProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['EnvelopeReceipt', 'Gears', 'Profile']);
+    const {EnvelopeReceipt: envelopeReceiptIllustration, Gears: gearsIllustration, Profile: profileIllustration} = useMemoizedLazyIllustrations(['EnvelopeReceipt', 'Gears', 'Profile']);
     const [onboardingValues] = useOnyx(ONYXKEYS.NVP_ONBOARDING);
     const hasCompletedGuidedSetupFlow = hasCompletedGuidedSetupFlowSelector(onboardingValues);
     const [session] = useOnyx(ONYXKEYS.SESSION);
@@ -389,16 +389,16 @@ function BaseOnboardingWorkEmail({shouldUseNativeStyles, route}: BaseOnboardingW
 
     const section: Item[] = [
         {
-            icon: illustrations.EnvelopeReceipt,
+            icon: envelopeReceiptIllustration,
             titleTranslationKey: 'onboarding.workEmail.explanationModal.descriptionOne',
             shouldRenderEmail: true,
         },
         {
-            icon: illustrations.Profile,
+            icon: profileIllustration,
             titleTranslationKey: 'onboarding.workEmail.explanationModal.descriptionTwo',
         },
         {
-            icon: illustrations.Gears,
+            icon: gearsIllustration,
             titleTranslationKey: 'onboarding.workEmail.explanationModal.descriptionThree',
         },
     ];

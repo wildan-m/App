@@ -97,7 +97,7 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
     const {isKeyboardShown} = useKeyboardState();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const emojisPresentBefore = useRef<Emoji[]>([]);
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
 
     const {currentEditMessageSelection, editingMessage} = useReportActionActiveEdit();
     const {setEditingMessage, setCurrentEditMessageSelection} = useReportActionActiveEditActions();
@@ -417,7 +417,7 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
                     <View style={styles.alignSelfEnd}>
                         <SubmitDraftButton
                             isDisabled={isExceedingMaxLength}
-                            icon={icons.Checkmark}
+                            icon={checkmarkIcon}
                             label={translate('common.saveChanges')}
                             sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_MESSAGE_EDIT_SAVE_BUTTON}
                             onPress={() => publishDraft(draft)}

@@ -79,7 +79,7 @@ function TransactionPreviewContent({
     isReviewDuplicateTransactionPage = false,
     shouldHighlight = false,
 }: TransactionPreviewContentProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate, dateFnsLocale} = useLocalize();
@@ -345,7 +345,7 @@ function TransactionPreviewContent({
                                 {!isIOUSettled && shouldShowRBR && (
                                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap1]}>
                                         <Icon
-                                            src={icons.DotIndicator}
+                                            src={dotIndicatorIcon}
                                             fill={theme.danger}
                                             height={variables.iconSizeExtraSmall}
                                             width={variables.iconSizeExtraSmall}

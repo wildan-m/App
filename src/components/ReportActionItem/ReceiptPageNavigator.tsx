@@ -86,7 +86,7 @@ type ReceiptPageNavigatorProps = {
 function ReceiptPageNavigator({page, pageCount, isLoading, onChangePage}: ReceiptPageNavigatorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
+    const {ArrowRight: arrowRightIcon, BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
     const labelStyle = [styles.badgeText, styles.textStrong, styles.badgeDefaultText, styles.textNoWrap];
 
     return (
@@ -95,7 +95,7 @@ function ReceiptPageNavigator({page, pageCount, isLoading, onChangePage}: Receip
             dataSet={{[CONST.RECEIPT.HOVER_ZOOM_EXCLUDED_ELEMENT]: true}}
         >
             <PageButton
-                icon={icons.BackArrow}
+                icon={backArrowIcon}
                 label={translate('common.previous')}
                 isDisabled={isLoading || page <= CONST.RECEIPT.FIRST_PDF_PAGE}
                 onPress={() => onChangePage(page - 1)}
@@ -118,7 +118,7 @@ function ReceiptPageNavigator({page, pageCount, isLoading, onChangePage}: Receip
                 </View>
             </View>
             <PageButton
-                icon={icons.ArrowRight}
+                icon={arrowRightIcon}
                 label={translate('common.next')}
                 isDisabled={isLoading || page >= pageCount}
                 onPress={() => onChangePage(page + 1)}

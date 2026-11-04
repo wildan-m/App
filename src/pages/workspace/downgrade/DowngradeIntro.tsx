@@ -37,7 +37,7 @@ function DowngradeIntro({onDowngrade, buttonDisabled, loading, policyID, backTo}
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
     const {isExtraSmallScreenWidth} = useResponsiveLayout();
 
-    const illustrations = useMemoizedLazyIllustrations(['Mailbox']);
+    const {Mailbox: mailboxIllustration} = useMemoizedLazyIllustrations(['Mailbox']);
 
     const note = translate('workspace.downgrade.commonFeatures.note');
     const noteAndMore = translate('workspace.downgrade.commonFeatures.noteAndMore');
@@ -73,7 +73,7 @@ function DowngradeIntro({onDowngrade, buttonDisabled, loading, policyID, backTo}
         <View style={[styles.m5, styles.highlightBG, styles.br4, styles.workspaceUpgradeIntroBox({isExtraSmallScreenWidth})]}>
             <View style={[styles.mb3]}>
                 <Icon
-                    src={illustrations.Mailbox}
+                    src={mailboxIllustration}
                     width={48}
                     height={48}
                 />

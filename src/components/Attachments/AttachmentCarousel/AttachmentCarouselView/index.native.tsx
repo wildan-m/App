@@ -35,7 +35,7 @@ function AttachmentCarouselView({
     const {translate} = useLocalize();
     const canUseTouchScreen = canUseTouchScreenUtil();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ToddBehindCloud']);
+    const {ToddBehindCloud: toddBehindCloudIllustration} = useMemoizedLazyIllustrations(['ToddBehindCloud']);
     const [activeAttachmentID, setActiveAttachmentID] = useState<AttachmentSource>(attachmentID ?? source);
 
     const pagerRef = useRef<AttachmentCarouselPagerHandle>(null);
@@ -79,7 +79,7 @@ function AttachmentCarouselView({
         >
             {page === -1 ? (
                 <BlockingView
-                    icon={illustrations.ToddBehindCloud}
+                    icon={toddBehindCloudIllustration}
                     iconWidth={variables.modalTopIconWidth}
                     iconHeight={variables.modalTopIconHeight}
                     title={translate('notFound.notHere')}

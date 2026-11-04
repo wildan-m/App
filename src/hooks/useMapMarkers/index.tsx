@@ -13,16 +13,20 @@ import type {MapMarkerType} from './types';
 import getMapMarkerSize from './getMapMarkerSize';
 
 function useMapMarkers() {
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['MapStartWaypoint', 'MapStopWaypoint', 'MapWaypoint']);
+    const {
+        MapStartWaypoint: mapStartWaypointIcon,
+        MapStopWaypoint: mapStopWaypointIcon,
+        MapWaypoint: mapWaypointIcon,
+    } = useMemoizedLazyExpensifyIcons(['MapStartWaypoint', 'MapStopWaypoint', 'MapWaypoint']);
 
     const getMapMarkerIconAsset = (markerType: MapMarkerType): IconAsset => {
         switch (markerType) {
             case 'START_WAYPOINT':
-                return expensifyIcons.MapStartWaypoint;
+                return mapStartWaypointIcon;
             case 'STOP_WAYPOINT':
-                return expensifyIcons.MapStopWaypoint;
+                return mapStopWaypointIcon;
             default:
-                return expensifyIcons.MapWaypoint;
+                return mapWaypointIcon;
         }
     };
 

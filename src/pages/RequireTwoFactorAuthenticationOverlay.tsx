@@ -54,7 +54,7 @@ const is2FARequiredBecauseOfXeroSelector = (email?: string) => {
 function RequireTwoFactorAuthenticationOverlay() {
     const {isRequire2FAOverlayVisible, isTestToolsRouteFocused} = useRequire2FAOverlayVisibility();
 
-    const illustrations = useMemoizedLazyIllustrations(['Encryption']);
+    const {Encryption: encryptionIllustration} = useMemoizedLazyIllustrations(['Encryption']);
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const testToolsTapResponder = useTestToolsTapResponder();
@@ -135,7 +135,7 @@ function RequireTwoFactorAuthenticationOverlay() {
                         <View style={styles.twoFARequiredContainer}>
                             <View style={[styles.twoFAIllustration, styles.alignItemsCenter]}>
                                 <Icon
-                                    src={illustrations.Encryption}
+                                    src={encryptionIllustration}
                                     width={variables.twoFAIconHeight}
                                     height={variables.twoFAIconHeight}
                                 />

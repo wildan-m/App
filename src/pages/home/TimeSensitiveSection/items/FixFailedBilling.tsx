@@ -11,11 +11,11 @@ import React from 'react';
 
 function FixFailedBilling() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCard']);
+    const {CreditCard: creditCardIcon} = useMemoizedLazyExpensifyIcons(['CreditCard']);
 
     return (
         <BaseWidgetItem
-            icon={icons.CreditCard}
+            icon={creditCardIcon}
             title={translate('homePage.timeSensitiveSection.fixFailedBilling.title')}
             subtitle={translate('homePage.timeSensitiveSection.fixFailedBilling.subtitle')}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

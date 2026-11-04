@@ -32,7 +32,7 @@ type ChangePINPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, t
 function ChangePINPageContent({cardID, wasPINBlocked}: {cardID: string; wasPINBlocked: boolean}) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
+    const {Eye: eyeIcon, EyeDisabled: eyeDisabledIcon} = useMemoizedLazyExpensifyIcons(['Eye', 'EyeDisabled']);
     const {executeScenario} = useMultifactorAuthentication();
     const {isConfirmStep, isPINHidden} = usePINState();
     const {setIsConfirmStep, togglePINVisibility} = usePINActions();
@@ -127,7 +127,7 @@ function ChangePINPageContent({cardID, wasPINBlocked}: {cardID: string; wasPINBl
 
                         <View style={[styles.flexRow, styles.justifyContentCenter, styles.mv4, styles.alignItemsCenter, styles.w100]}>
                             <Button onPress={togglePINVisibility}>
-                                <Button.Icon src={isPINHidden ? icons.Eye : icons.EyeDisabled} />
+                                <Button.Icon src={isPINHidden ? eyeIcon : eyeDisabledIcon} />
                                 <Button.Text>{isPINHidden ? translate('cardPage.revealPin') : translate('cardPage.hidePin')}</Button.Text>
                             </Button>
                         </View>

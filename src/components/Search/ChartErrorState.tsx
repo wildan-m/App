@@ -20,11 +20,11 @@ function ChartErrorState({onRetry}: ChartErrorStateProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const illustrations = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass']);
+    const {BrokenMagnifyingGlass: brokenMagnifyingGlassIllustration} = useMemoizedLazyIllustrations(['BrokenMagnifyingGlass']);
 
     return (
         <BlockingView
-            icon={illustrations.BrokenMagnifyingGlass}
+            icon={brokenMagnifyingGlassIllustration}
             iconHeight={variables.iconSizeMegaLarge}
             title={translate('errorPage.title', {isBreakLine: shouldUseNarrowLayout})}
             titleStyles={[styles.mt0, styles.mb2]}

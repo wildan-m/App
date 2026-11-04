@@ -63,8 +63,8 @@ function DynamicIOURequestStepCategory({
 }: DynamicIOURequestStepCategoryProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {EmptyStateExpenses: emptyStateExpensesIllustration} = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const requestType = getRequestType(transaction);
     const isPerDiemRequest = requestType === CONST.IOU.REQUEST_TYPE.PER_DIEM;
     const transactionReport = useReportOrReportDraft(transaction?.reportID);
@@ -108,7 +108,7 @@ function DynamicIOURequestStepCategory({
     const createCategoryMenuItems = canCreateCategory
         ? [
               {
-                  icon: expensifyIcons.Plus,
+                  icon: plusIcon,
                   text: translate('workspace.categories.addCategory'),
                   onSelected: () => {
                       const reportID = report?.reportID ?? routeReportID;
@@ -215,7 +215,7 @@ function DynamicIOURequestStepCategory({
                 <View style={[styles.flex1]}>
                     <WorkspaceEmptyStateSection
                         shouldStyleAsCard={false}
-                        icon={illustrations.EmptyStateExpenses}
+                        icon={emptyStateExpensesIllustration}
                         title={translate('workspace.categories.emptyCategories.title')}
                         subtitle={translate('workspace.categories.emptyCategories.subtitle')}
                         containerStyle={[styles.flex1, styles.justifyContentCenter, styles.alignSelfCenter]}

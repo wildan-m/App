@@ -50,7 +50,7 @@ type AddExistingExpensePageType = PlatformStackScreenProps<AddExistingExpensesPa
 function AddExistingExpense({route}: AddExistingExpensePageType) {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['FolderWithPapersAndWatch']);
+    const {FolderWithPapersAndWatch: folderWithPapersAndWatchIllustration} = useMemoizedLazyIllustrations(['FolderWithPapersAndWatch']);
     const [errorMessage, setErrorMessage] = useState<string>('');
     const [offset, setOffset] = useState(0);
     const {isOffline} = useNetwork();
@@ -172,7 +172,7 @@ function AddExistingExpense({route}: AddExistingExpensePageType) {
                         minModalHeight={isInLandscapeMode ? 0 : undefined}
                         cardStyles={[styles.appBG]}
                         cardContentStyles={[styles.pb0]}
-                        headerMedia={illustrations.FolderWithPapersAndWatch}
+                        headerMedia={folderWithPapersAndWatchIllustration}
                         title={translate('iou.emptyStateExistingExpenseTitle')}
                         subtitle={translate('iou.emptyStateExistingExpenseSubtitle')}
                         headerStyles={[styles.emptyStateMoneyRequestReport]}

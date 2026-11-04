@@ -34,7 +34,7 @@ function CertiniaCompanySelectorPage({policy}: WithPolicyConnectionsProps) {
     const companyID = getCertiniaSelectedCompanyID(config);
     const companyField = config?.hasPSA ? CONST.CERTINIA_CONFIG.COMPANY_ID : CONST.CERTINIA_CONFIG.COMPANY;
     const companies = data?.companies ?? [];
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const dataOptions: CompanyListItem[] = companies.map((company) => ({
         value: company.id,
@@ -44,7 +44,7 @@ function CertiniaCompanySelectorPage({policy}: WithPolicyConnectionsProps) {
     }));
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.certinia.noCompaniesFound')}

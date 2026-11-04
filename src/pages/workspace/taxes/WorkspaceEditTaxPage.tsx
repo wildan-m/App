@@ -45,7 +45,7 @@ function WorkspaceEditTaxPage({
     const currentTaxID = getCurrentTaxID(policy, taxID);
     const currentTaxRate = currentTaxID && policy?.taxRates?.taxes?.[currentTaxID];
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const {canWrite: canWriteTaxes, withReadOnlyFallback} = usePolicyFeatureWriteAccess(policy, CONST.POLICY.POLICY_FEATURE.TAXES);
     const canEditTaxFields = canWriteTaxes;
     const canDisableOrDeleteTaxRate = !!canWriteTaxes && !!policy && canDisableOrDeleteTaxRateUtil(policy, currentTaxID ?? taxID);
@@ -181,7 +181,7 @@ function WorkspaceEditTaxPage({
                     </OfflineWithFeedback>
                     {!!shouldShowDeleteMenuItem && (
                         <MenuItemAction
-                            icon={icons.Trashcan}
+                            icon={trashcanIcon}
                             title={translate('common.delete')}
                             onPress={async () => {
                                 const {action} = await showConfirmModal({

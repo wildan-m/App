@@ -21,7 +21,7 @@ function DistanceMapView({overlayStyle, requireRouteToDisplayMap, ...rest}: Dist
     const {translate} = useLocalize();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['EmptyStateRoutePending']);
+    const {EmptyStateRoutePending: emptyStateRoutePendingIcon} = useMemoizedLazyExpensifyIcons(['EmptyStateRoutePending']);
 
     return (
         <>
@@ -39,7 +39,7 @@ function DistanceMapView({overlayStyle, requireRouteToDisplayMap, ...rest}: Dist
                     {/* The "map pending" text should only be shown in the IOU create flow. In the created IOU preview, only the icon should be shown. */}
                     {!requireRouteToDisplayMap ? (
                         <BlockingView
-                            icon={icons.EmptyStateRoutePending}
+                            icon={emptyStateRoutePendingIcon}
                             title={translate('distance.mapPending.title')}
                             subtitle={isOffline ? translate('distance.mapPending.subtitle') : translate('distance.mapPending.onlineSubtitle')}
                             iconColor={theme.border}

@@ -27,7 +27,7 @@ type CollapsibleSectionProps = ChildrenProps & {
 };
 
 function CollapsibleSection({title, children, titleStyle, textStyle, wrapperStyle, shouldShowSectionBorder}: CollapsibleSectionProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
+    const {DownArrow: downArrowIcon, UpArrow: upArrowIcon} = useMemoizedLazyExpensifyIcons(['DownArrow', 'UpArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const [isExpanded, setIsExpanded] = useState(false);
@@ -39,7 +39,7 @@ function CollapsibleSection({title, children, titleStyle, textStyle, wrapperStyl
         setIsExpanded(!isExpanded);
     };
 
-    const src = isExpanded ? icons.UpArrow : icons.DownArrow;
+    const src = isExpanded ? upArrowIcon : downArrowIcon;
 
     return (
         <View style={[styles.mt4, wrapperStyle]}>

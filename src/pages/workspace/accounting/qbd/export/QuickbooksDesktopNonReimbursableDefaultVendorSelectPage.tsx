@@ -30,7 +30,7 @@ type CardListItem = ListItem & {
 function QuickbooksDesktopNonReimbursableDefaultVendorSelectPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const {vendors} = policy?.connections?.quickbooksDesktop?.data ?? {};
     const qbdConfig = policy?.connections?.quickbooksDesktop?.config;
     const nonReimbursableBillDefaultVendor = qbdConfig?.export?.nonReimbursableBillDefaultVendor;
@@ -65,7 +65,7 @@ function QuickbooksDesktopNonReimbursableDefaultVendorSelectPage({policy}: WithP
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbd.noAccountsFound')}

@@ -36,7 +36,7 @@ type CarouselButtonsProps = {
 };
 
 function CarouselButtons({page, attachments, shouldShowArrows, onBack, onForward, cancelAutoHideArrow, autoHideArrow}: CarouselButtonsProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
+    const {ArrowRight: arrowRightIcon, BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const isBackDisabled = page === 0;
@@ -58,7 +58,7 @@ function CarouselButtons({page, attachments, shouldShowArrows, onBack, onForward
                             sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_CAROUSEL.PREVIOUS_BUTTON}
                         >
                             <Button.Icon
-                                src={icons.BackArrow}
+                                src={backArrowIcon}
                                 fill={theme.text}
                                 hoverFill={theme.text}
                             />
@@ -78,7 +78,7 @@ function CarouselButtons({page, attachments, shouldShowArrows, onBack, onForward
                             sentryLabel={CONST.SENTRY_LABEL.ATTACHMENT_CAROUSEL.NEXT_BUTTON}
                         >
                             <Button.Icon
-                                src={icons.ArrowRight}
+                                src={arrowRightIcon}
                                 fill={theme.text}
                                 hoverFill={theme.text}
                             />

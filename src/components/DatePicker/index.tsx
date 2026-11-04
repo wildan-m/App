@@ -59,7 +59,7 @@ function DatePicker({
     textInputContainerStyles,
     shouldShowLabelTooltipWhenTruncated,
 }: DateInputWithPickerProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Calendar']);
+    const {Calendar: calendarIcon} = useMemoizedLazyExpensifyIcons(['Calendar']);
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     // The clear button takes the calendar icon's place once a date is picked, so it gets the same horizontal padding as the icon's
@@ -238,7 +238,7 @@ function DatePicker({
                     forceActiveLabel
                     // The icon, the clear button and any `rightHandSideComponent` share the right-hand slot. The icon
                     // gives way when the caller asks for the slot outright, or to a clear button that will actually render.
-                    icon={shouldHideCalendarIcon || (selectedDate && !shouldHideClearButton) ? null : (icon ?? icons.Calendar)}
+                    icon={shouldHideCalendarIcon || (selectedDate && !shouldHideClearButton) ? null : (icon ?? calendarIcon)}
                     iconContainerStyle={styles.pr0}
                     label={label}
                     accessibilityLabel={label}

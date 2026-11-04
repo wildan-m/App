@@ -26,7 +26,7 @@ type PrevNextButtonsProps = {
 };
 
 function PrevNextButtons({isPrevButtonDisabled, isNextButtonDisabled, onNext, onPrevious}: PrevNextButtonsProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
+    const {ArrowRight: arrowRightIcon, BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight', 'BackArrow']);
     const styles = useThemeStyles();
     const theme = useTheme();
 
@@ -43,7 +43,7 @@ function PrevNextButtons({isPrevButtonDisabled, isNextButtonDisabled, onNext, on
             >
                 <View style={[styles.reportActionContextMenuMiniButton, {backgroundColor: theme.borderLighter}, isPrevButtonDisabled && styles.buttonOpacityDisabled]}>
                     <Icon
-                        src={icons.BackArrow}
+                        src={backArrowIcon}
                         width={variables.iconSizeExtraSmall}
                         height={variables.iconSizeExtraSmall}
                         fill={theme.icon}
@@ -61,7 +61,7 @@ function PrevNextButtons({isPrevButtonDisabled, isNextButtonDisabled, onNext, on
             >
                 <View style={[styles.reportActionContextMenuMiniButton, {backgroundColor: theme.borderLighter}, isNextButtonDisabled && styles.buttonOpacityDisabled]}>
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={theme.icon}
                         width={variables.iconSizeExtraSmall}
                         height={variables.iconSizeExtraSmall}

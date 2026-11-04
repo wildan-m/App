@@ -40,7 +40,7 @@ function FreeTrial({badgeStyles, pressable = false, addSpacing = false, success 
     const {accountID} = useCurrentUserPersonalDetails();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Star']);
+    const {Star: starIcon} = useMemoizedLazyExpensifyIcons(['Star']);
 
     const freeTrialText =
         privateSubscription || isOffline ? getFreeTrialText(accountID, translate, policies, introSelected, firstDayFreeTrial, lastDayFreeTrial, privateSubscription) : undefined;
@@ -55,7 +55,7 @@ function FreeTrial({badgeStyles, pressable = false, addSpacing = false, success 
             contentContainerStyle={[styles.mw100]}
             onPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.getRoute(Navigation.getActiveRoute()))}
         >
-            <Button.Icon src={icons.Star} />
+            <Button.Icon src={starIcon} />
             <Button.Text>{freeTrialText}</Button.Text>
         </Button>
     ) : (

@@ -14,20 +14,20 @@ import {View} from 'react-native';
 
 function StaticSearchActionsBar() {
     const styles = useThemeStyles();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Filter', 'Gear']);
+    const {Filter: filterIcon, Gear: gearIcon} = useMemoizedLazyExpensifyIcons(['Filter', 'Gear']);
     const theme = useTheme();
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.mr5, styles.mb4]}>
             <Icon
                 additionalStyles={[styles.touchableButtonImage]}
-                src={expensifyIcons.Filter}
+                src={filterIcon}
                 fill={theme.icon}
                 size={CONST.ICON_SIZE.SMALL}
             />
             <Icon
                 additionalStyles={[styles.touchableButtonImage]}
-                src={expensifyIcons.Gear}
+                src={gearIcon}
                 fill={theme.icon}
                 size={CONST.ICON_SIZE.SMALL}
             />

@@ -168,7 +168,7 @@ function FieldsListValuesPage({policy, policyID, reportFieldID, isInvoicePage, f
         onNavigationCallBack: () => Navigation.goBack(),
     });
 
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Plus', 'Trashcan']);
+    const {Checkmark: checkmarkIcon, Close: closeIcon, Plus: plusIcon, Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'Close', 'Plus', 'Trashcan']);
 
     const handleDeleteValues = () => {
         const valuesToDelete = selectedKeys.map((value) => listValues.indexOf(value)).filter((index) => index !== -1);
@@ -201,7 +201,7 @@ function FieldsListValuesPage({policy, policyID, reportFieldID, isInvoicePage, f
         if (canWrite && (isSmallScreenWidth ? isMobileSelectionModeEnabled : selectedKeys.length > 0)) {
             if (selectedKeys.length > 0 && !isImportedReportField) {
                 options.push({
-                    icon: icons.Trashcan,
+                    icon: trashcanIcon,
                     text: translate(selectedKeys.length === 1 ? 'workspace.reportFields.deleteValue' : 'workspace.reportFields.deleteValues'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.DELETE,
                     shouldSkipFocusRestore: true,
@@ -239,7 +239,7 @@ function FieldsListValuesPage({policy, policyID, reportFieldID, isInvoicePage, f
                 }, []);
 
                 options.push({
-                    icon: icons.Close,
+                    icon: closeIcon,
                     text: translate(enabledValues.length === 1 ? 'workspace.reportFields.disableValue' : 'workspace.reportFields.disableValues'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.DISABLE,
                     onSelected: () => {
@@ -280,7 +280,7 @@ function FieldsListValuesPage({policy, policyID, reportFieldID, isInvoicePage, f
                 }, []);
 
                 options.push({
-                    icon: icons.Checkmark,
+                    icon: checkmarkIcon,
                     text: translate(disabledValues.length === 1 ? 'workspace.reportFields.enableValue' : 'workspace.reportFields.enableValues'),
                     value: CONST.POLICY.BULK_ACTION_TYPES.ENABLE,
                     onSelected: () => {
@@ -327,7 +327,7 @@ function FieldsListValuesPage({policy, policyID, reportFieldID, isInvoicePage, f
                     variant={CONST.BUTTON_VARIANT.SUCCESS}
                     onPress={() => Navigation.navigate(getAddValueRoute(isInvoicePage, policyID, reportFieldID))}
                 >
-                    <Button.Icon src={icons.Plus} />
+                    <Button.Icon src={plusIcon} />
                     <Button.Text>{translate('workspace.reportFields.addValue')}</Button.Text>
                 </Button>
             );

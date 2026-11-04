@@ -217,7 +217,12 @@ function MoneyRequestView({
     mergeTransactionID,
 }: MoneyRequestViewProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Checkmark', 'Suitcase', 'NewWindow']);
+    const {
+        DotIndicator: dotIndicatorIcon,
+        Checkmark: checkmarkIcon,
+        Suitcase: suitcaseIcon,
+        NewWindow: newWindowIcon,
+    } = useMemoizedLazyExpensifyIcons(['DotIndicator', 'Checkmark', 'Suitcase', 'NewWindow']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
@@ -711,7 +716,7 @@ function MoneyRequestView({
                 })}
             </Text>
             <Icon
-                src={icons.NewWindow}
+                src={newWindowIcon}
                 height={variables.iconSizeExtraSmall}
                 width={variables.iconSizeExtraSmall}
                 fill={theme.textSupporting}
@@ -1323,7 +1328,7 @@ function MoneyRequestView({
                         dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
                     >
                         <Icon
-                            src={icons.DotIndicator}
+                            src={dotIndicatorIcon}
                             fill={theme.danger}
                             height={16}
                             width={16}
@@ -1340,7 +1345,7 @@ function MoneyRequestView({
                     <MenuItemWithTopDescription
                         title={amountTitle}
                         shouldShowTitleIcon={shouldShowPaid}
-                        titleIcon={icons.Checkmark}
+                        titleIcon={checkmarkIcon}
                         description={amountDescription}
                         descriptionTextStyle={[styles.breakWord, styles.userSelectNone]}
                         hintText={amountHintText}
@@ -1890,7 +1895,7 @@ function MoneyRequestView({
                 {shouldShowViewTripDetails && (
                     <MenuItemAction
                         title={translate('travel.viewTripDetails')}
-                        icon={icons.Suitcase}
+                        icon={suitcaseIcon}
                         onPress={() => {
                             const reservations = transaction?.receipt?.reservationList?.length ?? 0;
                             if (reservations > 1) {

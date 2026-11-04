@@ -4,11 +4,11 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type UseAboutSectionIllustration from './types';
 
 const useAboutSectionIllustration: UseAboutSectionIllustration = () => {
-    const illustrations = useMemoizedLazyIllustrations(['TiltedCoinExpensify']);
+    const {TiltedCoinExpensify: tiltedCoinExpensifyIllustration} = useMemoizedLazyIllustrations(['TiltedCoinExpensify']);
     const styles = useThemeStyles();
 
     return {
-        illustration: illustrations.TiltedCoinExpensify,
+        illustration: tiltedCoinExpensifyIllustration,
         illustrationStyle: styles.aboutStaticIllustration,
     };
 };

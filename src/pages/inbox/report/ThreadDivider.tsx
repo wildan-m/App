@@ -20,7 +20,7 @@ type ThreadDividerProps = {
 };
 
 function ThreadDivider({shouldDisplayNewMarker, onPress}: ThreadDividerProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Thread']);
+    const {Thread: threadIcon} = useMemoizedLazyExpensifyIcons(['Thread']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -39,7 +39,7 @@ function ThreadDivider({shouldDisplayNewMarker, onPress}: ThreadDividerProps) {
                     sentryLabel={CONST.SENTRY_LABEL.REPORT.THREAD_DIVIDER}
                 >
                     <Icon
-                        src={icons.Thread}
+                        src={threadIcon}
                         fill={theme.link}
                         width={variables.iconSizeExtraSmall}
                         height={variables.iconSizeExtraSmall}
@@ -49,7 +49,7 @@ function ThreadDivider({shouldDisplayNewMarker, onPress}: ThreadDividerProps) {
             ) : (
                 <>
                     <Icon
-                        src={icons.Thread}
+                        src={threadIcon}
                         fill={theme.icon}
                         width={variables.iconSizeExtraSmall}
                         height={variables.iconSizeExtraSmall}

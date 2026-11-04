@@ -15,13 +15,13 @@ function SuccessReportCardLost({cardDetailsPath}: {cardDetailsPath: Route}) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const illustrations = useMemoizedLazyIllustrations(['CardReplacementSuccess']);
+    const {CardReplacementSuccess: cardReplacementSuccessIllustration} = useMemoizedLazyIllustrations(['CardReplacementSuccess']);
 
     return (
         <ConfirmationPageDefault
             heading={translate('reportCardLostOrDamaged.successTitle')}
             description={translate('reportCardLostOrDamaged.successDescription')}
-            illustration={illustrations.CardReplacementSuccess}
+            illustration={cardReplacementSuccessIllustration}
             onButtonPress={() => {
                 // Going back with compareParams: false collapses the flow onto the deleted card route and
                 // replaces its cardID with the replacement card instead of a stale/NotFound route.

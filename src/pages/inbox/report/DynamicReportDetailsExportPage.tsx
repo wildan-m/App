@@ -47,8 +47,22 @@ function DynamicReportDetailsExportPage({route}: DynamicReportDetailsExportPageP
     const {translate} = useLocalize();
     const {showConfirmModal} = useConfirmModal();
     const styles = useThemeStyles();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['LaptopWithSecondScreenAndHourglass']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {LaptopWithSecondScreenAndHourglass: laptopWithSecondScreenAndHourglassIllustration} = useMemoizedLazyIllustrations(['LaptopWithSecondScreenAndHourglass']);
+    const {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'XeroSquare',
         'QBOSquare',
         'IntuitSquare',
@@ -63,6 +77,21 @@ function DynamicReportDetailsExportPage({route}: DynamicReportDetailsExportPageP
         'BusinessCentralSquare',
         'GustoSquare',
     ]);
+    const expensifyIcons = {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    };
 
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons, policy);
     const canBeExported = canBeExportedUtil(report);
@@ -125,7 +154,7 @@ function DynamicReportDetailsExportPage({route}: DynamicReportDetailsExportPageP
                     onBackButtonPress={() => Navigation.goBack(navigateBackFromExportPath)}
                 />
                 <ConfirmationPageDefault
-                    illustration={lazyIllustrations.LaptopWithSecondScreenAndHourglass}
+                    illustration={laptopWithSecondScreenAndHourglassIllustration}
                     heading={translate('workspace.export.notReadyHeading')}
                     description={translate('workspace.export.notReadyDescription')}
                     buttonText={translate('common.buttonConfirm')}

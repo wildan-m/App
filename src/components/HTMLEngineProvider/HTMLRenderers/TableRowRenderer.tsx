@@ -50,7 +50,7 @@ function TableRowRenderer({tnode}: CustomRendererProps<TBlock>) {
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const session = useSession();
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {hovered, bind} = useHover();
     const {anchor, report, action, originalReportID} = useShowContextMenuState();
     const {onShowContextMenu, checkIfContextMenuActive} = useShowContextMenuActions();
@@ -69,7 +69,7 @@ function TableRowRenderer({tnode}: CustomRendererProps<TBlock>) {
             <View style={styles.htmlTableChevronCell}>
                 {!!rowLinkURL && (
                     <Icon
-                        src={icons.ArrowRight}
+                        src={arrowRightIcon}
                         fill={theme.icon}
                         additionalStyles={!hovered && styles.opacitySemiTransparent}
                         width={variables.iconSizeNormal}

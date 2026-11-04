@@ -17,11 +17,11 @@ function HighResolutionInfo({isUploaded}: {isUploaded: boolean}) {
     const styles = useThemeStyles();
     const stylesUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Info']);
+    const {Info: infoIcon} = useMemoizedLazyExpensifyIcons(['Info']);
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2, styles.justifyContentCenter, stylesUtils.getHighResolutionInfoWrapperStyle(isUploaded)]}>
             <Icon
-                src={icons.Info}
+                src={infoIcon}
                 height={variables.iconSizeExtraSmall}
                 width={variables.iconSizeExtraSmall}
                 fill={theme.icon}

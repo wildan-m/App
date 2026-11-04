@@ -20,16 +20,16 @@ const anchorAlignment = {
 
 function CardSectionActions() {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['CreditCard', 'MoneyCircle']);
+    const {CreditCard: creditCardIcon, MoneyCircle: moneyCircleIcon} = useMemoizedLazyExpensifyIcons(['CreditCard', 'MoneyCircle']);
 
     const overflowMenu: ThreeDotsMenuProps['menuItems'] = [
         {
-            icon: icons.CreditCard,
+            icon: creditCardIcon,
             text: translate('subscription.cardSection.changeCard'),
             onSelected: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.ADD_PAYMENT_CARD.path)),
         },
         {
-            icon: icons.MoneyCircle,
+            icon: moneyCircleIcon,
             text: translate('subscription.cardSection.changeCurrency'),
             onSelected: () => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION_CHANGE_BILLING_CURRENCY),
         },

@@ -30,7 +30,7 @@ function ComposerPlaceholder() {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Emoji', 'Send']);
+    const {Plus: plusIcon, Emoji: emojiIcon, Send: sendIcon} = useMemoizedLazyExpensifyIcons(['Plus', 'Emoji', 'Send']);
 
     const wrapperStyle = [styles.chatFooter, {minHeight: CONST.CHAT_FOOTER_MIN_HEIGHT}];
 
@@ -66,7 +66,7 @@ function ComposerPlaceholder() {
             >
                 <View style={plusButtonStyle}>
                     <Icon
-                        src={icons.Plus}
+                        src={plusIcon}
                         fill={theme.icon}
                     />
                 </View>
@@ -75,13 +75,13 @@ function ComposerPlaceholder() {
                 </View>
                 <View style={[styles.chatItemEmojiButton, styles.justifyContentCenter]}>
                     <Icon
-                        src={icons.Emoji}
+                        src={emojiIcon}
                         fill={theme.icon}
                     />
                 </View>
                 <View style={[styles.chatItemSubmitButton]}>
                     <Icon
-                        src={icons.Send}
+                        src={sendIcon}
                         fill={theme.icon}
                     />
                 </View>

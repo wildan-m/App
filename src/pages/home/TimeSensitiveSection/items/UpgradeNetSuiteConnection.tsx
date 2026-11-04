@@ -20,11 +20,11 @@ type Props = {
 
 function UpgradeNetSuiteConnection({policyID, policyName}: Props) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Connect']);
+    const {Connect: connectIcon} = useMemoizedLazyExpensifyIcons(['Connect']);
 
     return (
         <BaseWidgetItem
-            icon={icons.Connect}
+            icon={connectIcon}
             title={translate('homePage.timeSensitiveSection.upgradeNetSuiteConnection.title')}
             subtitle={policyName}
             ctaText={translate('homePage.timeSensitiveSection.ctaFix')}

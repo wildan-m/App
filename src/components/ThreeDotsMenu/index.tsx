@@ -70,7 +70,7 @@ function ThreeDotsMenu({
     const [position, setPosition] = useState<AnchorPosition>();
     const buttonRef = useRef<ComponentRef<typeof View>>(null);
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ThreeDots']);
+    const {ThreeDots: threeDotsIcon} = useMemoizedLazyExpensifyIcons(['ThreeDots']);
     const isBehindModal = modal?.willAlertModalBecomeVisible && !modal?.isPopover && !shouldOverlay;
     const {windowWidth, windowHeight} = useWindowDimensions();
     const showPopoverMenu = () => {
@@ -199,7 +199,7 @@ function ThreeDotsMenu({
                         testID={testID}
                     >
                         <Icon
-                            src={icon ?? expensifyIcons.ThreeDots}
+                            src={icon ?? threeDotsIcon}
                             fill={getIconFill()}
                             width={iconWidth}
                             height={iconHeight}

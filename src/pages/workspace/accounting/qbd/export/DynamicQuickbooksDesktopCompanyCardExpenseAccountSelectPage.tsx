@@ -42,7 +42,7 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: W
     const nonReimbursableAccount = qbdConfig?.export?.nonReimbursableAccount;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT_SELECT.path);
 
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const accounts = getQBDReimbursableAccounts(policy?.connections?.quickbooksDesktop, nonReimbursable);
     const data: CardListItem[] = accounts.map((card) => ({
         value: card,
@@ -64,7 +64,7 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: W
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.qbd.noAccountsFound')}

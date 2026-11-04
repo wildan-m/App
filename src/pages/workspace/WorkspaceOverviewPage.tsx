@@ -114,7 +114,18 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencySymbol} = useCurrencyListActions();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Box', 'Exit', 'ImageCropSquareMask', 'Plus', 'QrCode', 'Transfer', 'Trashcan', 'Upload', 'UserPlus']);
+    const {
+        ArrowCircleClockwise: arrowCircleClockwiseIcon,
+        Box: boxIcon,
+        Exit: exitIcon,
+        ImageCropSquareMask: imageCropSquareMaskIcon,
+        Plus: plusIcon,
+        QrCode: qrCodeIcon,
+        Transfer: transferIcon,
+        Trashcan: trashcanIcon,
+        Upload: uploadIcon,
+        UserPlus: userPlusIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowCircleClockwise', 'Box', 'Exit', 'ImageCropSquareMask', 'Plus', 'QrCode', 'Transfer', 'Trashcan', 'Upload', 'UserPlus']);
     const buildDynamicRoute = useScreenBoundDynamicRoute();
     const {isBetaEnabled} = usePermissions();
     const canArchivePolicies = isBetaEnabled(CONST.BETAS.ARCHIVE_POLICIES);
@@ -239,7 +250,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const getRulesDocumentMenuItems = (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
         {
             text: translate('common.replace'),
-            icon: expensifyIcons.Upload,
+            icon: uploadIcon,
             shouldCallAfterModalHide: true,
             onSelected: () => {
                 openPicker({
@@ -249,7 +260,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         },
         {
             text: translate('common.remove'),
-            icon: expensifyIcons.Trashcan,
+            icon: trashcanIcon,
             onSelected: () => {
                 if (!policyID || !rulesDocumentURL) {
                     return;
@@ -414,7 +425,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             secondaryActions.push({
                 value: 'unarchive',
                 text: translate('workspace.common.unarchive'),
-                icon: expensifyIcons.ArrowCircleClockwise,
+                icon: arrowCircleClockwiseIcon,
                 // The confirmation modal is handled by UnarchiveWorkspaceFlow, which mounts when this is set.
                 onSelected: () => setIsUnarchiveWorkspaceFlowVisible(true),
             });
@@ -423,7 +434,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             secondaryActions.push({
                 value: 'leave',
                 text: translate('common.leave'),
-                icon: expensifyIcons.Exit,
+                icon: exitIcon,
                 onSelected: () => close(handleLeave),
             });
         }
@@ -431,7 +442,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         secondaryActions.push({
             value: 'share',
             text: translate('common.share'),
-            icon: expensifyIcons.QrCode,
+            icon: qrCodeIcon,
             onSelected: isAccountLocked ? showLockedAccountModal : onPressShare,
             sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.OVERVIEW.SHARE,
         });
@@ -439,7 +450,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             secondaryActions.push({
                 value: canArchivePolicies ? 'archive' : 'delete',
                 text: translate(canArchivePolicies ? 'workspace.common.archive' : 'common.delete'),
-                icon: canArchivePolicies ? expensifyIcons.Box : expensifyIcons.Trashcan,
+                icon: canArchivePolicies ? boxIcon : trashcanIcon,
                 onSelected: () => {
                     // The confirmation modal is handled by ArchiveWorkspaceFlow, which mounts when this is set.
                     if (canArchivePolicies) {
@@ -465,7 +476,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             secondaryActions.push({
                 value: 'transferOwner',
                 text: translate('workspace.people.transferOwner'),
-                icon: expensifyIcons.Transfer,
+                icon: transferIcon,
                 onSelected: startChangeOwnershipFlow,
             });
         }
@@ -473,7 +484,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             secondaryActions.push({
                 value: 'leave',
                 text: translate('common.leave'),
-                icon: expensifyIcons.Exit,
+                icon: exitIcon,
                 onSelected: () => close(handleLeave),
             });
         }
@@ -505,7 +516,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                     innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
                     style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 >
-                    <Button.Icon src={expensifyIcons.UserPlus} />
+                    <Button.Icon src={userPlusIcon} />
                     <Button.Text>{translate('common.invite')}</Button.Text>
                 </Button>
             )}
@@ -618,7 +629,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                             }
                             deleteWorkspaceAvatar(policyID, policy.avatarURL, policy.originalFileName);
                         }}
-                        editorMaskImage={expensifyIcons.ImageCropSquareMask}
+                        editorMaskImage={imageCropSquareMaskIcon}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.OVERVIEW.AVATAR}
                         pendingAction={policy?.pendingFields?.avatarURL}
                         errors={policy?.errorFields?.avatarURL}
@@ -864,7 +875,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                             >
                                 <MenuItem.Row>
                                     <MenuItem.Leading>
-                                        <MenuItem.Icon src={expensifyIcons.Plus} />
+                                        <MenuItem.Icon src={plusIcon} />
                                     </MenuItem.Leading>
                                     <MenuItem.Content>
                                         <MenuItem.Title>{translate('workspace.officeLocations.addOfficeLocation')}</MenuItem.Title>

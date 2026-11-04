@@ -33,7 +33,7 @@ function FloatingReceiptButton({onPress, accessibilityLabel, role, sentryLabel}:
     const styles = useThemeStyles();
     const borderRadius = styles.floatingActionButton.borderRadius;
     const fabPressable = useRef<HTMLDivElement | ComponentRef<typeof ViewType> | ComponentRef<typeof Text> | null>(null);
-    const icons = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
+    const {ReceiptPlus: receiptPlusIcon} = useMemoizedLazyExpensifyIcons(['ReceiptPlus']);
     const {translate} = useLocalize();
 
     const toggleFabAction = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
@@ -68,7 +68,7 @@ function FloatingReceiptButton({onPress, accessibilityLabel, role, sentryLabel}:
                     >
                         <Icon
                             fill={textLight}
-                            src={icons.ReceiptPlus}
+                            src={receiptPlusIcon}
                             width={variables.iconSizeSmall}
                             height={variables.iconSizeSmall}
                         />

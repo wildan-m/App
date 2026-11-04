@@ -34,7 +34,7 @@ function WorkspaceOfficeLocationEditPage({route}: WorkspaceOfficeLocationEditPag
     const {translate} = useLocalize();
     const {isBetaEnabled} = usePermissions();
     const {showConfirmModal} = useConfirmModal();
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
     const policy = usePolicy(policyID);
     const officeLocations = policy?.officeLocations;
     const officeLocation = officeLocations?.[officeID];
@@ -109,7 +109,7 @@ function WorkspaceOfficeLocationEditPage({route}: WorkspaceOfficeLocationEditPag
                         <Header.IconButton
                             tooltipText={translate('common.delete')}
                             onPress={confirmDelete}
-                            iconSrc={icons.Trashcan}
+                            iconSrc={trashcanIcon}
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.OVERVIEW.DELETE_OFFICE_LOCATION}
                         />
                     )}

@@ -20,7 +20,7 @@ function UnlockAccountPage() {
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const styles = useThemeStyles();
-    const icons = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
+    const {EmptyStateSpyPigeon: emptyStateSpyPigeonIcon} = useMemoizedLazyExpensifyIcons(['EmptyStateSpyPigeon']);
 
     return (
         <ScreenWrapper
@@ -33,7 +33,7 @@ function UnlockAccountPage() {
             />
             <ScrollView contentContainerStyle={styles.flexGrow1}>
                 <ConfirmationPageDefault
-                    illustration={icons.EmptyStateSpyPigeon}
+                    illustration={emptyStateSpyPigeonIcon}
                     heading={translate('unlockAccountPage.yourAccountIsLocked')}
                     description={translate('unlockAccountPage.chatToConciergeToUnlock')}
                     descriptionStyle={styles.colorMuted}

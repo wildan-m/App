@@ -46,7 +46,7 @@ function UserInfoCellsWithArrow({
     shouldUseArrowIcon?: boolean;
     isLargeScreenWidth?: boolean;
 }) {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRightLong']);
+    const {ArrowRightLong: arrowRightLongIcon} = useMemoizedLazyExpensifyIcons(['ArrowRightLong']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -71,7 +71,7 @@ function UserInfoCellsWithArrow({
                 <>
                     {shouldUseArrowIcon ? (
                         <Icon
-                            src={icons.ArrowRightLong}
+                            src={arrowRightLongIcon}
                             width={variables.iconSizeXXSmall}
                             height={variables.iconSizeXXSmall}
                             fill={theme.icon}

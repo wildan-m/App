@@ -35,8 +35,8 @@ function CardAddedToWalletPage({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardAppleWalletIllustration']);
-    const icons = useMemoizedLazyExpensifyIcons(['Contactless', 'ApplePayMark']);
+    const {ExpensifyCardAppleWalletIllustration: expensifyCardAppleWalletIllustrationIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardAppleWalletIllustration']);
+    const {Contactless: contactlessIcon, ApplePayMark: applePayMarkIcon} = useMemoizedLazyExpensifyIcons(['Contactless', 'ApplePayMark']);
 
     const goToCardDetails = () => Navigation.goBack(createDynamicRoute(DYNAMIC_ROUTES.WALLET_DOMAIN_CARD.getRoute(cardID), ROUTES.SETTINGS_WALLET));
 
@@ -51,7 +51,7 @@ function CardAddedToWalletPage({
             />
             <ConfirmationPage>
                 <ConfirmationPage.Content>
-                    <ConfirmationPage.Illustration illustration={illustrations.ExpensifyCardAppleWalletIllustration} />
+                    <ConfirmationPage.Illustration illustration={expensifyCardAppleWalletIllustrationIllustration} />
                     <ConfirmationPage.Heading style={styles.ph8}>{translate('cardPage.cardAddedToWalletPage.description')}</ConfirmationPage.Heading>
                     <View style={[styles.alignItemsCenter, styles.w100, styles.ph8]}>
                         <Text style={[styles.textAlignCenter, styles.textSupporting, styles.mb2]}>{translate('cardPage.cardAddedToWalletPage.firstSupportingText')}</Text>
@@ -61,7 +61,7 @@ function CardAddedToWalletPage({
                                 width={APPLE_PAY_MARK_WIDTH}
                                 height={PAYMENT_MARK_HEIGHT}
                                 contentFit="contain"
-                                src={icons.ApplePayMark}
+                                src={applePayMarkIcon}
                                 accessibilityLabel={translate('cardPage.cardAddedToWalletPage.applePayMark')}
                             />
                             <Icon
@@ -69,7 +69,7 @@ function CardAddedToWalletPage({
                                 height={PAYMENT_MARK_HEIGHT}
                                 contentFit="contain"
                                 fill={theme.text}
-                                src={icons.Contactless}
+                                src={contactlessIcon}
                                 accessibilityLabel={translate('cardPage.cardAddedToWalletPage.contactlessMark')}
                             />
                         </View>

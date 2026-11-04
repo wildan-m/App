@@ -49,7 +49,12 @@ function RulesNewPage({route}: RulesNewPageProps) {
     const {policyID, categoryName} = route.params;
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['CardReaderAlt', 'Flag', 'CheckboxText', 'ReportReceipt']);
+    const {
+        CardReaderAlt: cardReaderAltIllustration,
+        Flag: flagIllustration,
+        CheckboxText: checkboxTextIllustration,
+        ReportReceipt: reportReceiptIllustration,
+    } = useMemoizedLazyIllustrations(['CardReaderAlt', 'Flag', 'CheckboxText', 'ReportReceipt']);
     const isCategorySettingsFlow = route.name === SCREENS.WORKSPACE.DYNAMIC_CATEGORY_RULES_NEW;
     const isCategoryScopedCreate = isCategorySettingsFlow || !!categoryName;
     const policy = usePolicy(policyID);
@@ -75,7 +80,7 @@ function RulesNewPage({route}: RulesNewPageProps) {
     const newRuleOptions: NewRuleOption[] = [
         {
             key: 'restrictCardSpend',
-            icon: illustrations.CardReaderAlt,
+            icon: cardReaderAltIllustration,
             title: translate('workspace.rules.newRule.restrictCardSpend'),
             description: translate('workspace.rules.newRule.restrictCardSpendDescription'),
             onPress: () => Navigation.navigate(ROUTES.RULES_SPEND_NEW.getRoute(policyID)),
@@ -84,7 +89,7 @@ function RulesNewPage({route}: RulesNewPageProps) {
         },
         {
             key: 'flagForReview',
-            icon: illustrations.Flag,
+            icon: flagIllustration,
             title: translate('workspace.rules.newRule.flagForReview'),
             description: translate('workspace.rules.newRule.flagForReviewDescription'),
             onPress: () =>
@@ -97,7 +102,7 @@ function RulesNewPage({route}: RulesNewPageProps) {
         },
         {
             key: 'requireFields',
-            icon: illustrations.CheckboxText,
+            icon: checkboxTextIllustration,
             title: translate('workspace.rules.newRule.requireFields'),
             description: translate('workspace.rules.newRule.requireFieldsDescription'),
             onPress: () =>
@@ -110,7 +115,7 @@ function RulesNewPage({route}: RulesNewPageProps) {
         },
         {
             key: 'applyExpenseDefaults',
-            icon: illustrations.ReportReceipt,
+            icon: reportReceiptIllustration,
             title: translate('workspace.rules.newRule.applyExpenseDefaults'),
             description: translate('workspace.rules.newRule.applyExpenseDefaultsDescription'),
             onPress: () => (isCategorySettingsFlow ? openCategoryTaxRule() : Navigation.navigate(ROUTES.RULES_EXPENSE_DEFAULT_TYPE.getRoute(policyID))),

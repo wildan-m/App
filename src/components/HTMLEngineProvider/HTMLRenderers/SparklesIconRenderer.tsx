@@ -13,14 +13,14 @@ import {View} from 'react-native';
  * Renders a Sparkles SVG icon as an inline custom HTML element <sparkles-icon/>
  */
 function SparklesIconRenderer() {
-    const icons = useMemoizedLazyExpensifyIcons(['Sparkles']);
+    const {Sparkles: sparklesIcon} = useMemoizedLazyExpensifyIcons(['Sparkles']);
     const theme = useTheme();
     const styles = useThemeStyles();
 
     return (
         <View>
             <Icon
-                src={icons.Sparkles}
+                src={sparklesIcon}
                 width={variables.iconSizeExtraSmall}
                 height={variables.iconSizeExtraSmall}
                 fill={theme.link}

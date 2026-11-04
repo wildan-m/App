@@ -36,20 +36,25 @@ function MigratedUserWelcomeModal() {
     const StyleUtils = useStyleUtils();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['ChatBubbles', 'ConciergeBot', 'PlanetWithMobileApp', 'MagnifyingGlassReceipt']);
+    const {
+        ChatBubbles: chatBubblesIllustration,
+        ConciergeBot: conciergeBotIllustration,
+        PlanetWithMobileApp: planetWithMobileAppIllustration,
+        MagnifyingGlassReceipt: magnifyingGlassReceiptIllustration,
+    } = useMemoizedLazyIllustrations(['ChatBubbles', 'ConciergeBot', 'PlanetWithMobileApp', 'MagnifyingGlassReceipt']);
     const isCurrentUserPolicyAdmin = useIsPaidPolicyAdmin();
 
     const ExpensifyFeatures: FeatureListItem[] = [
         {
-            icon: illustrations.MagnifyingGlassReceipt,
+            icon: magnifyingGlassReceiptIllustration,
             translationKey: 'migratedUserWelcomeModal.features.search',
         },
         {
-            icon: illustrations.ConciergeBot,
+            icon: conciergeBotIllustration,
             translationKey: 'migratedUserWelcomeModal.features.concierge',
         },
         {
-            icon: illustrations.ChatBubbles,
+            icon: chatBubblesIllustration,
             translationKey: 'migratedUserWelcomeModal.features.chat',
         },
     ];
@@ -89,7 +94,7 @@ function MigratedUserWelcomeModal() {
             >
                 {isReduceMotionEnabled ? (
                     <FeatureTraining.Illustration
-                        image={illustrations.PlanetWithMobileApp}
+                        image={planetWithMobileAppIllustration}
                         innerContainerStyle={[StyleUtils.getBackgroundColorStyle(LottieAnimations.WorkspacePlanet.backgroundColor), styles.cardSectionIllustration]}
                         outerContainerStyle={styles.p0}
                     />

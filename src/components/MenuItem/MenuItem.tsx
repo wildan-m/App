@@ -590,7 +590,12 @@ function MenuItem({
     shouldIgnoreCompactStyle = false,
 }: MenuItemProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark', 'NewWindow']);
+    const {
+        ArrowRight: arrowRightIcon,
+        FallbackAvatar: fallbackAvatarIcon,
+        DotIndicator: dotIndicatorIcon,
+        NewWindow: newWindowIcon,
+    } = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark', 'NewWindow']);
     const {translate} = useLocalize();
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -625,7 +630,7 @@ function MenuItem({
         descriptionVerticalMargin = styles.mt0Half;
     }
     const defaultAccessibilityLabel = (shouldShowDescriptionOnTop ? [description, title] : [title, description]).filter(Boolean).join(', ');
-    const isNewWindowIcon = iconRight === icons.NewWindow;
+    const isNewWindowIcon = iconRight === newWindowIcon;
     let enhancedAccessibilityLabel = accessibilityLabel ?? defaultAccessibilityLabel;
     if (isNewWindowIcon) {
         enhancedAccessibilityLabel = `${enhancedAccessibilityLabel}. ${translate('common.opensInNewTab')}`;
@@ -643,7 +648,7 @@ function MenuItem({
         accessibilityLabel: combinedAccessibilityLabel,
         contextMenuHint,
     });
-    const shouldDimIconRight = iconRight === icons.ArrowRight || !iconRight;
+    const shouldDimIconRight = iconRight === arrowRightIcon || !iconRight;
 
     const hasIcon = (!!icon || iconType === CONST.ICON_TYPE_WORKSPACE) && !Array.isArray(icon);
     let iconLeftPadding;
@@ -748,7 +753,7 @@ function MenuItem({
     }
     const processedHelperText = textToWrap ? `<comment><muted-text-label>${textToWrap}</muted-text-label></comment>` : '';
 
-    const hasPressableRightComponent = (iconRight ?? icons.ArrowRight) || (shouldShowRightComponent && rightComponent);
+    const hasPressableRightComponent = (iconRight ?? arrowRightIcon) || (shouldShowRightComponent && rightComponent);
 
     const hasTrailingElementAfterBrickRoad =
         (!title && !!rightLabel && !errorText) || shouldShowRightIcon || (shouldShowRightComponent && !!rightComponent) || (copyable && !!copyValue && !interactive);
@@ -1011,7 +1016,7 @@ function MenuItem({
                                                                     imageStyles={[styles.alignSelfCenter, avatarImageStyles]}
                                                                     source={icon}
                                                                     accountID={getAccountIDFromAvatarID(avatarID)}
-                                                                    fallbackIcon={fallbackIcon ?? icons.FallbackAvatar}
+                                                                    fallbackIcon={fallbackIcon ?? fallbackAvatarIcon}
                                                                     size={avatarSize}
                                                                 />
                                                             )}
@@ -1185,7 +1190,7 @@ function MenuItem({
                                                 {!!brickRoadIndicator && (
                                                     <View style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.ml1, hasTrailingElementAfterBrickRoad && styles.mr2]}>
                                                         <Icon
-                                                            src={icons.DotIndicator}
+                                                            src={dotIndicatorIcon}
                                                             fill={brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR ? theme.danger : theme.success}
                                                         />
                                                     </View>
@@ -1215,7 +1220,7 @@ function MenuItem({
                                                         ]}
                                                     >
                                                         <Icon
-                                                            src={iconRight ?? icons.ArrowRight}
+                                                            src={iconRight ?? arrowRightIcon}
                                                             fill={
                                                                 shouldDimIconRight
                                                                     ? theme.icon

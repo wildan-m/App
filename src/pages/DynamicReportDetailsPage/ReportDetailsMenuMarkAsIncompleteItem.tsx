@@ -25,7 +25,7 @@ type ReportDetailsMenuMarkAsIncompleteItemProps = {
 
 function ReportDetailsMenuMarkAsIncompleteItem({reportID}: ReportDetailsMenuMarkAsIncompleteItemProps) {
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`);
     const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
@@ -48,7 +48,7 @@ function ReportDetailsMenuMarkAsIncompleteItem({reportID}: ReportDetailsMenuMark
     return (
         <MenuItemAction
             title={translate('task.markAsIncomplete')}
-            icon={expensifyIcons.Checkmark}
+            icon={checkmarkIcon}
             onPress={() => {
                 Navigation.goBack(navigateBackFromReportDetailsPath);
                 reopenTask(report, parentReport, currentUserAccountID, delegateEmail);

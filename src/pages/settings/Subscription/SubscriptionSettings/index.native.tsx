@@ -56,7 +56,7 @@ function SubscriptionSettings() {
     const isAnnual = privateSubscription?.type === CONST.SUBSCRIPTION.TYPE.ANNUAL;
     const hasTeam2025Pricing = useHasTeam2025Pricing();
     const subscriptionPrice = getSubscriptionPrice(subscriptionPlan, preferredCurrency, privateSubscription?.type, hasTeam2025Pricing);
-    const illustrations = useMemoizedLazyIllustrations(['SubscriptionAnnual', 'SubscriptionPPU']);
+    const {SubscriptionAnnual: subscriptionAnnualIllustration, SubscriptionPPU: subscriptionPPUIllustration} = useMemoizedLazyIllustrations(['SubscriptionAnnual', 'SubscriptionPPU']);
     const priceDetails = translate(
         `subscription.yourPlan.${subscriptionPlan === CONST.POLICY.TYPE.CORPORATE ? 'control' : 'collect'}.${isAnnual ? 'priceAnnual' : 'pricePayPerUse'}`,
         convertToShortDisplayString(subscriptionPrice, preferredCurrency),
@@ -124,7 +124,7 @@ function SubscriptionSettings() {
                         <Text style={styles.mv1}>{translate('subscription.yourPlan.pricePerMemberPerMonth', collectPriceDisplay)}</Text>
                         <OptionItem
                             title="subscription.details.payPerUse"
-                            icon={illustrations.SubscriptionPPU}
+                            icon={subscriptionPPUIllustration}
                             style={[styles.mt5, styles.flex0]}
                             isDisabled
                         />
@@ -155,14 +155,14 @@ function SubscriptionSettings() {
                                 {privateSubscription?.type === CONST.SUBSCRIPTION.TYPE.PAY_PER_USE ? (
                                     <OptionItem
                                         title="subscription.details.payPerUse"
-                                        icon={illustrations.SubscriptionPPU}
+                                        icon={subscriptionPPUIllustration}
                                         style={[styles.mt5, styles.flex0]}
                                         isDisabled
                                     />
                                 ) : (
                                     <OptionItem
                                         title="subscription.details.annual"
-                                        icon={illustrations.SubscriptionAnnual}
+                                        icon={subscriptionAnnualIllustration}
                                         style={[styles.mt5, styles.flex0]}
                                         isDisabled
                                     />

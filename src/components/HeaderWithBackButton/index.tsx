@@ -97,7 +97,7 @@ function HeaderWithBackButton({
     // Avatar-header routes skip Header, so register the dialog label here.
     useDialogLabelRegistration(shouldShowReportAvatarWithDisplay ? (report?.reportName ?? '') : '');
 
-    const icons = useMemoizedLazyExpensifyIcons(['Download', 'Rotate', 'BackArrow', 'Close']);
+    const {Download: downloadIcon, Rotate: rotateIcon, BackArrow: backArrowIcon, Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Download', 'Rotate', 'BackArrow', 'Close']);
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -209,7 +209,7 @@ function HeaderWithBackButton({
                             sentryLabel={CONST.SENTRY_LABEL.HEADER.BACK_BUTTON}
                         >
                             <Icon
-                                src={icons.BackArrow}
+                                src={backArrowIcon}
                                 fill={iconFill ?? theme.icon}
                             />
                         </PressableWithoutFeedback>
@@ -267,7 +267,7 @@ function HeaderWithBackButton({
                                         sentryLabel={CONST.SENTRY_LABEL.HEADER.DOWNLOAD_BUTTON}
                                     >
                                         <Icon
-                                            src={icons.Download}
+                                            src={downloadIcon}
                                             fill={iconFill ?? StyleUtils.getIconFillColor({buttonState: getButtonState({isComplete: !isDownloadButtonActive})})}
                                         />
                                     </PressableWithoutFeedback>
@@ -286,7 +286,7 @@ function HeaderWithBackButton({
                                         sentryLabel={CONST.SENTRY_LABEL.HEADER.ROTATE_BUTTON}
                                     >
                                         <Icon
-                                            src={icons.Rotate}
+                                            src={rotateIcon}
                                             fill={iconFill ?? theme.icon}
                                         />
                                     </PressableWithoutFeedback>
@@ -307,7 +307,7 @@ function HeaderWithBackButton({
                                 sentryLabel={CONST.SENTRY_LABEL.HEADER.CLOSE_BUTTON}
                             >
                                 <Icon
-                                    src={icons.Close}
+                                    src={closeIcon}
                                     fill={iconFill ?? theme.icon}
                                 />
                             </PressableWithoutFeedback>

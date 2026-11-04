@@ -36,7 +36,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Globe', 'ArrowRight', 'DotIndicator']);
+    const {Globe: globeIcon, ArrowRight: arrowRightIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['Globe', 'ArrowRight', 'DotIndicator']);
 
     const isTableSemanticsEnabled = shouldUseTableSemantics(shouldUseNarrowTableLayout);
 
@@ -44,7 +44,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
 
     if (item.isAdmin) {
         threeDotMenuItems.push({
-            icon: icons.Globe,
+            icon: globeIcon,
             text: translate('domain.goToDomain'),
             onSelected: item.action,
         });
@@ -52,7 +52,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
 
     if (item.isAdmin && !item.isValidated) {
         threeDotMenuItems.push({
-            icon: icons.Globe,
+            icon: globeIcon,
             text: translate('domain.verifyDomain.title'),
             onSelected: () => Navigation.navigate(ROUTES.WORKSPACES_VERIFY_DOMAIN.getRoute(item.domainAccountID)),
         });
@@ -60,7 +60,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
 
     const brickRoadIndicator = !!item.brickRoadIndicator && (
         <Icon
-            src={icons.DotIndicator}
+            src={dotIndicatorIcon}
             fill={item.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR ? theme.danger : theme.iconSuccessFill}
         />
     );
@@ -111,7 +111,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
                         {...getCellAccessibilityProps(isTableSemanticsEnabled)}
                     >
                         <Icon
-                            src={icons.Globe}
+                            src={globeIcon}
                             fill={theme.icon}
                             additionalStyles={[shouldUseNarrowTableLayout ? styles.domainIconCompact : styles.domainIcon]}
                         />
@@ -140,7 +140,7 @@ export default function DomainListTableRow({item, rowIndex, shouldUseNarrowTable
                         )}
 
                         <Icon
-                            src={icons.ArrowRight}
+                            src={arrowRightIcon}
                             fill={theme.icon}
                             additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
                             width={variables.iconSizeNormal}

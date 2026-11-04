@@ -74,7 +74,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
     const {pageGutter} = useLayoutSpacing();
     const theme = useTheme();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator']);
+    const {Gear: gearIcon, Plus: plusIcon, DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator']);
 
     const [adminAccountIDs] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: adminAccountIDsSelector,
@@ -178,7 +178,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
                 innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
                 style={shouldDisplayButtonsInSeparateLine && [styles.flexGrow1, styles.mb3]}
             >
-                <Button.Icon src={icons.Plus} />
+                <Button.Icon src={plusIcon} />
                 <Button.Text>{translate('domain.admins.addAdmin')}</Button.Text>
             </Button>
             <Button
@@ -187,7 +187,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
                 style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow0, styles.mb3] : undefined}
             >
                 <Button.Icon
-                    src={hasSettingsErrors ? icons.DotIndicator : icons.Gear}
+                    src={hasSettingsErrors ? dotIndicatorIcon : gearIcon}
                     fill={hasSettingsErrors ? theme.danger : undefined}
                     hoverFill={hasSettingsErrors ? theme.dangerHover : undefined}
                 />

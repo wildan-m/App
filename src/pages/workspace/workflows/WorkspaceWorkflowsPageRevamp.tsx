@@ -69,7 +69,14 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {pageGutter} = useLayoutSpacing();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Table', 'Download', 'Send', 'ThumbsUp', 'MoneyBag', 'Wrench']);
+    const {
+        Table: tableIcon,
+        Download: downloadIcon,
+        Send: sendIcon,
+        ThumbsUp: thumbsUpIcon,
+        MoneyBag: moneyBagIcon,
+        Wrench: wrenchIcon,
+    } = useMemoizedLazyExpensifyIcons(['Table', 'Download', 'Send', 'ThumbsUp', 'MoneyBag', 'Wrench']);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
@@ -150,26 +157,26 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
         {
             key: WORKFLOWS_TAB.SUBMISSIONS,
             title: translate('workflowsPage.submissionFrequency'),
-            icon: expensifyIcons.Send,
+            icon: sendIcon,
             isDisabled: !canAccessSubmissions,
             disabledAction: showNoAccessModal,
         },
         {
             key: WORKFLOWS_TAB.APPROVALS,
             title: translate('workflowsPage.addApprovalsTitle'),
-            icon: expensifyIcons.ThumbsUp,
+            icon: thumbsUpIcon,
         },
         {
             key: WORKFLOWS_TAB.PAYMENTS,
             title: translate('workflowsPage.makeOrTrackPaymentsTitle'),
-            icon: expensifyIcons.MoneyBag,
+            icon: moneyBagIcon,
             isDisabled: !canReadPayments,
             disabledAction: showNoAccessModal,
         },
         {
             key: WORKFLOWS_TAB.ADVANCED,
             title: translate('workspace.rules.expenseReportRules.title'),
-            icon: expensifyIcons.Wrench,
+            icon: wrenchIcon,
         },
     ];
 
@@ -260,7 +267,7 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
     // Importing modifies the workflows, so only offer it when editing is allowed.
     if (!shouldBlockApprovalWorkflowEditing && !shouldHideImportWithoutApprovals) {
         approvalSecondaryActions.push({
-            icon: expensifyIcons.Table,
+            icon: tableIcon,
             text: translate('spreadsheet.importWorkflows'),
             onSelected: importWorkflowsAction,
             value: CONST.POLICY.SECONDARY_ACTIONS.IMPORT_SPREADSHEET,
@@ -270,7 +277,7 @@ function WorkspaceWorkflowsPageRevamp({policy, route}: WorkspaceWorkflowsPageRev
     // exported CSV is that workflow written out per member.
     if (!shouldHideApprovalWorkflows) {
         approvalSecondaryActions.push({
-            icon: expensifyIcons.Download,
+            icon: downloadIcon,
             text: translate('spreadsheet.downloadWorkflows'),
             onSelected: downloadWorkflowsAction,
             value: CONST.POLICY.SECONDARY_ACTIONS.DOWNLOAD_CSV,

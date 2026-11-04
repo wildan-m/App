@@ -22,7 +22,7 @@ function useContactPermissionModal({onDeny, onGrant, onFocusTextInput}: UseConta
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['ToddWithPhones']);
+    const {ToddWithPhones: toddWithPhonesIllustration} = useMemoizedLazyIllustrations(['ToddWithPhones']);
     const {showConfirmModal} = useConfirmModal();
 
     const isMountedRef = useRef(false);
@@ -54,7 +54,7 @@ function useContactPermissionModal({onDeny, onGrant, onFocusTextInput}: UseConta
                 title: translate('contact.importContactsTitle'),
                 titleContainerStyles: [styles.mt2, styles.mb0],
                 titleStyles: [styles.textHeadline],
-                iconSource: illustrations.ToddWithPhones,
+                iconSource: toddWithPhonesIllustration,
                 iconFill: false,
                 iconWidth: 176,
                 iconHeight: 178,

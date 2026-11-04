@@ -46,7 +46,21 @@ function ImportedFromAccountingSoftware({policyID, currentConnectionName, transl
     const {translate} = useLocalize();
     const {environmentURL} = useEnvironment();
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+    const {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    } = useMemoizedLazyExpensifyIcons([
         'XeroSquare',
         'QBOSquare',
         'IntuitSquare',
@@ -61,6 +75,21 @@ function ImportedFromAccountingSoftware({policyID, currentConnectionName, transl
         'BusinessCentralSquare',
         'GustoSquare',
     ]);
+    const expensifyIcons = {
+        XeroSquare,
+        QBOSquare,
+        IntuitSquare,
+        NetSuiteSquare,
+        IntacctSquare,
+        QBDSquare,
+        CertiniaSquare,
+        RilletSquare,
+        DualEntrySquare,
+        CampfireSquare,
+        ZohoBooksSquare,
+        BusinessCentralSquare,
+        GustoSquare,
+    };
     const icon = getIntegrationIcon(connectedIntegration, expensifyIcons, policy);
 
     if (!customTagName && shouldShow) {

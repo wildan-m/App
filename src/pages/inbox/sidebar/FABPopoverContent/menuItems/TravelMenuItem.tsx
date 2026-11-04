@@ -30,7 +30,7 @@ function TravelMenuItem() {
     const {translate} = useLocalize();
     const {isBetaEnabled} = usePermissions();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Suitcase', 'NewWindow']);
+    const {Suitcase: suitcaseIcon, NewWindow: newWindowIcon} = useMemoizedLazyExpensifyIcons(['Suitcase', 'NewWindow']);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
     const [travelSettings] = useOnyx(ONYXKEYS.NVP_TRAVEL_SETTINGS);
     const [primaryLogin] = useOnyx(ONYXKEYS.ACCOUNT, {selector: primaryLoginSelector});
@@ -66,9 +66,9 @@ function TravelMenuItem() {
             itemId={ITEM_ID}
             isVisible={isVisible}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.BOOK_TRAVEL}
-            icon={icons.Suitcase}
+            icon={suitcaseIcon}
             title={translate('travel.bookTravel')}
-            iconRight={isTravelEnabled && shouldOpenTravelDotLinkWeb() ? icons.NewWindow : undefined}
+            iconRight={isTravelEnabled && shouldOpenTravelDotLinkWeb() ? newWindowIcon : undefined}
             shouldShowRightIcon={!!(isTravelEnabled && shouldOpenTravelDotLinkWeb())}
             onPress={() => interceptAnonymousUser(() => openTravel(), session)}
             shouldCallAfterModalHide={shouldUseNarrowLayout}

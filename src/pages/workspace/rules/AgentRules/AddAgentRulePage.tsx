@@ -75,7 +75,7 @@ function AddAgentRulePage({
     const [activeTabPolicyID, setActiveTabPolicyID] = useState(policyID);
     const [draftValues] = useOnyx(ONYXKEYS.FORMS.ADD_AGENT_RULE_FORM_DRAFT);
     const [generatedRule] = useOnyx(ONYXKEYS.GENERATED_RULE);
-    const icons = useMemoizedLazyExpensifyIcons(['Feed', 'Pencil', 'Info']);
+    const {Feed: feedIcon, Pencil: pencilIcon, Info: infoIcon} = useMemoizedLazyExpensifyIcons(['Feed', 'Pencil', 'Info']);
 
     const hasDraftPrompt = !!draftValues?.[INPUT_IDS.PROMPT]?.trim();
     const [selectedSuggestion, setSelectedSuggestion] = useState<SuggestedAgentRule>();
@@ -117,12 +117,12 @@ function AddAgentRulePage({
         {
             key: CONST.TAB.AGENT_RULE.SUGGESTIONS,
             title: translate('workspace.rules.agentRules.suggestionsTab'),
-            icon: icons.Feed,
+            icon: feedIcon,
         },
         {
             key: CONST.TAB.AGENT_RULE.WRITE,
             title: translate('workspace.rules.agentRules.writeTab'),
-            icon: icons.Pencil,
+            icon: pencilIcon,
         },
     ];
 
@@ -263,7 +263,7 @@ function AddAgentRulePage({
                                             ? translate('workspace.rules.agentRules.fallbackBannerWithExplanation', fallbackExplanation)
                                             : translate('workspace.rules.agentRules.fallbackBanner')
                                     }
-                                    icon={icons.Info}
+                                    icon={infoIcon}
                                     iconSize={CONST.ICON_SIZE.SMALL}
                                     shouldShowIcon
                                     containerStyles={[styles.mh5, styles.ph0, styles.pt1, styles.pb4, styles.bgTransparent]}

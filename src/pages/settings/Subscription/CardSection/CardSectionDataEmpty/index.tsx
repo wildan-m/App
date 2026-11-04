@@ -22,7 +22,7 @@ const ILLUSTRATION_SIZE = 68;
 function CardSectionDataEmpty() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['HandCard']);
+    const {HandCard: handCardIllustration} = useMemoizedLazyIllustrations(['HandCard']);
     const {isActingAsDelegate} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
@@ -39,7 +39,7 @@ function CardSectionDataEmpty() {
     return (
         <View style={[styles.alignItemsCenter, styles.gap5, styles.pv4]}>
             <ImageSVG
-                src={illustrations.HandCard}
+                src={handCardIllustration}
                 width={ILLUSTRATION_SIZE}
                 height={ILLUSTRATION_SIZE}
             />

@@ -31,7 +31,7 @@ function DynamicNetSuiteCreditCardAccountSelectPage({policy}: WithPolicyConnecti
     const {translate} = useLocalize();
 
     const policyID = policy?.id;
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_NETSUITE_EXPORT_EXPENSES_CREDIT_CARD_ACCOUNT_SELECT.path);
 
@@ -55,7 +55,7 @@ function DynamicNetSuiteCreditCardAccountSelectPage({policy}: WithPolicyConnecti
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.netsuite.noAccountsFound')}

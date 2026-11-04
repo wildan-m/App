@@ -60,7 +60,18 @@ function ReservationView({reservation, onPress, isCancelled}: ReservationViewPro
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plane', 'PlaneCircleSlash', 'Bed', 'BedCircleSlash', 'CarWithKey', 'CarCircleSlash', 'Train', 'TrainCircleSlash', 'Luggage']);
+    const {Plane, PlaneCircleSlash, Bed, BedCircleSlash, CarWithKey, CarCircleSlash, Train, TrainCircleSlash, Luggage} = useMemoizedLazyExpensifyIcons([
+        'Plane',
+        'PlaneCircleSlash',
+        'Bed',
+        'BedCircleSlash',
+        'CarWithKey',
+        'CarCircleSlash',
+        'Train',
+        'TrainCircleSlash',
+        'Luggage',
+    ]);
+    const expensifyIcons = {Plane, PlaneCircleSlash, Bed, BedCircleSlash, CarWithKey, CarCircleSlash, Train, TrainCircleSlash, Luggage};
 
     const reservationIcon = getTripReservationIcon(expensifyIcons, reservation.type, isCancelled);
     const title = reservation.type === CONST.RESERVATION_TYPE.CAR ? reservation.carInfo?.name : Str.recapitalize(reservation.start.longName ?? '');

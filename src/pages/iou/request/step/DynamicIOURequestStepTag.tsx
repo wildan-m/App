@@ -73,7 +73,7 @@ function DynamicIOURequestStepTag({
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
 
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
+    const {EmptyStateExpenses: emptyStateExpensesIllustration} = useMemoizedLazyIllustrations(['EmptyStateExpenses']);
     const {translate} = useLocalize();
     useRestartOnReceiptFailure(transaction, reportIDFromRoute, iouType, action);
 
@@ -153,7 +153,7 @@ function DynamicIOURequestStepTag({
                 <View style={[styles.flex1]}>
                     <WorkspaceEmptyStateSection
                         shouldStyleAsCard={false}
-                        icon={illustrations.EmptyStateExpenses}
+                        icon={emptyStateExpensesIllustration}
                         title={translate('workspace.tags.emptyTags.title')}
                         subtitle={translate('workspace.tags.emptyTags.subtitle')}
                         containerStyle={[styles.flex1, styles.justifyContentCenter, styles.alignSelfCenter]}

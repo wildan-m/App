@@ -11,7 +11,7 @@ import React from 'react';
 import {View} from 'react-native';
 
 function EmptyMoneyRequestReportPreview() {
-    const icons = useMemoizedLazyExpensifyIcons(['Folder']);
+    const {Folder: folderIcon} = useMemoizedLazyExpensifyIcons(['Folder']);
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -25,7 +25,7 @@ function EmptyMoneyRequestReportPreview() {
                         fill={theme.border}
                         height={64}
                         width={64}
-                        src={icons.Folder}
+                        src={folderIcon}
                     />
                     <Text style={[styles.textAlignCenter, styles.textSupporting, styles.fontSizeLabel]}>{translate('search.moneyRequestReport.emptyStateTitle')}</Text>
                 </View>

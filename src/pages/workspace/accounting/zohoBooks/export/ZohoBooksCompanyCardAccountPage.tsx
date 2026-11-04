@@ -36,7 +36,7 @@ type AccountListItem = ListItem & {
 function ZohoBooksCompanyCardAccountPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
     const policyID = policy?.id;
     const zohoBooksConfig = policy?.connections?.zohoBooks?.config;
     const zohoBooksData = policy?.connections?.zohoBooks?.data;
@@ -60,7 +60,7 @@ function ZohoBooksCompanyCardAccountPage({policy}: WithPolicyConnectionsProps) {
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.zohoBooks.noAccountsFound')}

@@ -15,11 +15,11 @@ function ChartOfflineState() {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
+    const {OfflineCloud: offlineCloudIcon} = useMemoizedLazyExpensifyIcons(['OfflineCloud']);
 
     return (
         <BlockingView
-            icon={icons.OfflineCloud}
+            icon={offlineCloudIcon}
             iconColor={theme.offline}
             iconWidth={variables.iconSizeUltraLarge}
             title={translate('common.youAppearToBeOffline')}

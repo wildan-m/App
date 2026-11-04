@@ -23,7 +23,7 @@ function CloseButton() {
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Close']);
+    const {Close: closeIcon} = useMemoizedLazyExpensifyIcons(['Close']);
     const {handleClose} = useFeatureTrainingActions();
 
     return (
@@ -37,7 +37,7 @@ function CloseButton() {
                     style={[styles.p2, styles.opacitySemiTransparent]}
                 >
                     <Icon
-                        src={expensifyIcons.Close}
+                        src={closeIcon}
                         fill={theme.buttonSuccessText}
                     />
                 </PressableWithFeedback>

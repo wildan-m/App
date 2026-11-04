@@ -14,9 +14,9 @@ import Text from './Text';
 function SAMLLoadingIndicator() {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['RocketBlue']);
+    const {RocketBlue: rocketBlueIllustration} = useMemoizedLazyIllustrations(['RocketBlue']);
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
     return (
         <View style={[StyleSheet.absoluteFill, styles.deeplinkWrapperContainer]}>
             <View style={styles.deeplinkWrapperMessage}>
@@ -24,7 +24,7 @@ function SAMLLoadingIndicator() {
                     <Icon
                         width={200}
                         height={164}
-                        src={illustrations.RocketBlue}
+                        src={rocketBlueIllustration}
                     />
                 </View>
                 <Text style={[styles.textHeadline, styles.textAlignCenter]}>{translate('samlSignIn.launching')}</Text>
@@ -42,7 +42,7 @@ function SAMLLoadingIndicator() {
                     width={154}
                     height={34}
                     fill={theme.success}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
             </View>
         </View>

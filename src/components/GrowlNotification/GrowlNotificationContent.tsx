@@ -65,7 +65,7 @@ function GrowlNotificationContent({bodyText, type, duration, action, position, n
     const theme = useTheme();
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Exclamation', 'Checkmark']);
+    const {Exclamation: exclamationIcon, Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Exclamation', 'Checkmark']);
 
     // Derived live so that resizing the window flips position + slide direction during display.
     const useBottomPosition = shouldUseExplicitBottomPosition(position) || (!!action && !shouldUseNarrowLayout);
@@ -73,15 +73,15 @@ function GrowlNotificationContent({bodyText, type, duration, action, position, n
 
     const types: GrowlIconTypes = {
         [CONST.GROWL.SUCCESS]: {
-            icon: icons.Checkmark,
+            icon: checkmarkIcon,
             iconColor: theme.success,
         },
         [CONST.GROWL.ERROR]: {
-            icon: icons.Exclamation,
+            icon: exclamationIcon,
             iconColor: theme.danger,
         },
         [CONST.GROWL.WARNING]: {
-            icon: icons.Exclamation,
+            icon: exclamationIcon,
             iconColor: theme.warning,
         },
     };

@@ -86,8 +86,13 @@ function ScannerControlsBar({
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Shutter']);
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
+    const {Shutter: shutterIllustration} = useMemoizedLazyIllustrations(['Shutter']);
+    const {
+        Bolt: boltIcon,
+        Gallery: galleryIcon,
+        ReceiptMultiple: receiptMultipleIcon,
+        boltSlash: boltSlashIcon,
+    } = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
 
     return (
         <View style={[styles.justifyContentAround, styles.alignItemsCenter, styles.p3, !isInLandscapeMode && styles.flexRow]}>
@@ -119,7 +124,7 @@ function ScannerControlsBar({
                         <Icon
                             height={variables.iconSizeMenuItem}
                             width={variables.iconSizeMenuItem}
-                            src={lazyIcons.Gallery}
+                            src={galleryIcon}
                             fill={theme.textSupporting}
                         />
                     </PressableWithFeedback>
@@ -134,7 +139,7 @@ function ScannerControlsBar({
             >
                 <ImageSVG
                     contentFit="contain"
-                    src={lazyIllustrations.Shutter}
+                    src={shutterIllustration}
                     width={CONST.RECEIPT.SHUTTER_SIZE}
                     height={CONST.RECEIPT.SHUTTER_SIZE}
                 />
@@ -151,7 +156,7 @@ function ScannerControlsBar({
                     <Icon
                         height={variables.iconSizeMenuItem}
                         width={variables.iconSizeMenuItem}
-                        src={lazyIcons.ReceiptMultiple}
+                        src={receiptMultipleIcon}
                         fill={isMultiScanEnabled ? theme.iconMenu : theme.textSupporting}
                     />
                 </PressableWithFeedback>
@@ -168,7 +173,7 @@ function ScannerControlsBar({
                     <Icon
                         height={variables.iconSizeMenuItem}
                         width={variables.iconSizeMenuItem}
-                        src={flash ? lazyIcons.Bolt : lazyIcons.boltSlash}
+                        src={flash ? boltIcon : boltSlashIcon}
                         fill={theme.textSupporting}
                     />
                 </PressableWithFeedback>

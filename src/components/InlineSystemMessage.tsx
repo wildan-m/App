@@ -20,7 +20,7 @@ function InlineSystemMessage({message = ''}: InlineSystemMessageProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const icons = useMemoizedLazyExpensifyIcons(['Exclamation']);
+    const {Exclamation: exclamationIcon} = useMemoizedLazyExpensifyIcons(['Exclamation']);
     const selectableStyle = !canUseTouchScreen() || !shouldUseNarrowLayout ? styles.userSelectText : styles.userSelectNone;
     if (!message) {
         return null;
@@ -29,7 +29,7 @@ function InlineSystemMessage({message = ''}: InlineSystemMessageProps) {
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter]}>
             <Icon
-                src={icons.Exclamation}
+                src={exclamationIcon}
                 fill={theme.danger}
             />
             <Text style={[styles.inlineSystemMessage, selectableStyle]}>{message}</Text>

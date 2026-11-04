@@ -20,8 +20,8 @@ function SessionExpiredPage() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
-    const illustrations = useMemoizedLazyIllustrations(['RocketBlue']);
+    const {ExpensifyWordmark: expensifyWordmarkIcon} = useMemoizedLazyExpensifyIcons(['ExpensifyWordmark']);
+    const {RocketBlue: rocketBlueIllustration} = useMemoizedLazyIllustrations(['RocketBlue']);
 
     return (
         <View style={styles.deeplinkWrapperContainer}>
@@ -30,7 +30,7 @@ function SessionExpiredPage() {
                     <Icon
                         width={200}
                         height={164}
-                        src={illustrations.RocketBlue}
+                        src={rocketBlueIllustration}
                     />
                 </View>
                 <Text style={[styles.textHeadline]}>{translate('deeplinkWrapper.launching')}</Text>
@@ -53,7 +53,7 @@ function SessionExpiredPage() {
                     width={154}
                     height={34}
                     fill={theme.success}
-                    src={icons.ExpensifyWordmark}
+                    src={expensifyWordmarkIcon}
                 />
             </View>
         </View>

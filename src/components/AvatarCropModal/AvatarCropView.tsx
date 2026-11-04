@@ -61,7 +61,7 @@ function AvatarCropView({imageUri = '', imageName = '', imageType = '', onClose,
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Rotate', 'Zoom']);
+    const {Rotate: rotateIcon, Zoom: zoomIcon} = useMemoizedLazyExpensifyIcons(['Rotate', 'Zoom']);
     const isInLandscapeMode = useIsInLandscapeMode();
 
     const originalImageWidth = useSharedValue<number>(CONST.AVATAR_CROP_MODAL.INITIAL_SIZE);
@@ -377,7 +377,7 @@ function AvatarCropView({imageUri = '', imageName = '', imageType = '', onClose,
                                 ]}
                             >
                                 <Icon
-                                    src={expensifyIcons.Zoom}
+                                    src={zoomIcon}
                                     fill={theme.icon}
                                 />
 
@@ -401,7 +401,7 @@ function AvatarCropView({imageUri = '', imageName = '', imageType = '', onClose,
                                     <View>
                                         <Button onPress={rotateImage}>
                                             <Button.Icon
-                                                src={expensifyIcons.Rotate}
+                                                src={rotateIcon}
                                                 fill={theme.icon}
                                             />
                                         </Button>

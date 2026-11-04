@@ -31,7 +31,7 @@ function SubBackButton({text, testID, onPress: consumerOnPress}: SubBackButtonPr
     const {translate} = useLocalize();
     const labelText = text ?? translate('common.goBack');
     const {ref, focused, onPress: exitSub, onFocus, isAtActiveLevel} = useSubBackButton();
-    const icons = useMemoizedLazyExpensifyIcons(['BackArrow']);
+    const {BackArrow: backArrowIcon} = useMemoizedLazyExpensifyIcons(['BackArrow']);
     const styles = useThemeStyles();
     const theme = useTheme();
 
@@ -50,7 +50,7 @@ function SubBackButton({text, testID, onPress: consumerOnPress}: SubBackButtonPr
     return (
         <MenuItem
             ref={ref}
-            icon={icons.BackArrow}
+            icon={backArrowIcon}
             iconFill={(isHovered) => (isHovered ? theme.iconHovered : theme.icon)}
             additionalIconStyles={[{width: variables.iconSizeNormal, height: variables.iconSizeNormal}, styles.opacitySemiTransparent, styles.mr1]}
             iconStyles={[{width: variables.iconSizeNormal, height: variables.iconSizeNormal}]}

@@ -101,8 +101,13 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
+    const {Hand: handIllustration, Shutter: shutterIllustration} = useMemoizedLazyIllustrations(['Hand', 'Shutter']);
+    const {
+        Bolt: boltIcon,
+        Gallery: galleryIcon,
+        ReceiptMultiple: receiptMultipleIcon,
+        boltSlash: boltSlashIcon,
+    } = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
     const {isMultiScanEnabled, canUseMultiScan} = useMultiScanState();
     const {toggleMultiScan} = useMultiScanActions();
 
@@ -206,7 +211,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                     {cameraPermissionState !== 'granted' && isQueriedPermissionState && (
                         <View style={[styles.flex1, styles.permissionView, styles.userSelectNone]}>
                             <Icon
-                                src={lazyIllustrations.Hand}
+                                src={handIllustration}
                                 width={CONST.RECEIPT.HAND_ICON_WIDTH}
                                 height={CONST.RECEIPT.HAND_ICON_HEIGHT}
                                 additionalStyles={[styles.pb5]}
@@ -260,7 +265,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                                         <Icon
                                             height={variables.iconSizeSmall}
                                             width={variables.iconSizeSmall}
-                                            src={lazyIcons.Bolt}
+                                            src={boltIcon}
                                             fill={isFlashLightOn ? theme.white : theme.icon}
                                         />
                                     </PressableWithFeedback>
@@ -290,7 +295,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                                 <Icon
                                     height={variables.iconSizeMenuItem}
                                     width={variables.iconSizeMenuItem}
-                                    src={lazyIcons.Gallery}
+                                    src={galleryIcon}
                                     fill={theme.textSupporting}
                                 />
                             </PressableWithFeedback>
@@ -304,7 +309,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                         sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.SHUTTER}
                     >
                         <Icon
-                            src={lazyIllustrations.Shutter}
+                            src={shutterIllustration}
                             width={CONST.RECEIPT.SHUTTER_SIZE}
                             height={CONST.RECEIPT.SHUTTER_SIZE}
                         />
@@ -321,7 +326,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                             <Icon
                                 height={variables.iconSizeMenuItem}
                                 width={variables.iconSizeMenuItem}
-                                src={lazyIcons.ReceiptMultiple}
+                                src={receiptMultipleIcon}
                                 fill={isMultiScanEnabled ? theme.iconMenu : theme.textSupporting}
                             />
                         </PressableWithFeedback>
@@ -337,7 +342,7 @@ function CameraCapture({onCapture, onPicked, shouldAcceptMultipleFiles = false, 
                             <Icon
                                 height={variables.iconSizeMenuItem}
                                 width={variables.iconSizeMenuItem}
-                                src={isFlashLightOn ? lazyIcons.Bolt : lazyIcons.boltSlash}
+                                src={isFlashLightOn ? boltIcon : boltSlashIcon}
                                 fill={theme.textSupporting}
                             />
                         </PressableWithFeedback>

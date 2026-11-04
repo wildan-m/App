@@ -95,7 +95,7 @@ function ProfilePage() {
     const accountID = currentUserPersonalDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID;
     const isAgentAccount = useIsAgentAccount();
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.AGENT}${accountID}`);
-    const icons = useMemoizedLazyExpensifyIcons(['QrCode']);
+    const {QrCode: qrCodeIcon} = useMemoizedLazyExpensifyIcons(['QrCode']);
 
     const contactMethodBrickRoadIndicator = getLoginListBrickRoadIndicator(loginList, currentUserPersonalDetails?.email);
     const emojiCode = currentUserPersonalDetails?.status?.emojiCode ?? '';
@@ -362,7 +362,7 @@ function ProfilePage() {
                                 style={[styles.alignSelfStart, styles.mt6]}
                                 sentryLabel={CONST.SENTRY_LABEL.SETTINGS_PROFILE.SHARE_CODE}
                             >
-                                <Button.Icon src={icons.QrCode} />
+                                <Button.Icon src={qrCodeIcon} />
                                 <Button.Text>{translate('common.share')}</Button.Text>
                             </Button>
                         </Section>

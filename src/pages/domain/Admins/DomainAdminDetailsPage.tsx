@@ -35,7 +35,7 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
     const {domainAccountID, accountID} = route.params;
 
     const {translate, formatPhoneNumber} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Info', 'ClosedSign']);
+    const {ClosedSign: closedSignIcon} = useMemoizedLazyExpensifyIcons(['Info', 'ClosedSign']);
 
     const [primaryContact] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_DOMAIN_MEMBER}${domainAccountID}`, {
         selector: domainSettingsPrimaryContactSelector,
@@ -79,7 +79,7 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
             {domainHasOnlyOneAdmin && (
                 <MenuItemAction
                     title={translate('domain.admins.resetDomain')}
-                    icon={icons.ClosedSign}
+                    icon={closedSignIcon}
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_RESET_DOMAIN.getRoute(domainAccountID, accountID))}
                 />
             )}
@@ -90,7 +90,7 @@ function DomainAdminDetailsPage({route}: DomainAdminDetailsPageProps) {
                 >
                     <MenuItem.Row>
                         <MenuItem.Leading>
-                            <MenuItem.Icon src={icons.ClosedSign} />
+                            <MenuItem.Icon src={closedSignIcon} />
                         </MenuItem.Leading>
                         <MenuItem.Content>
                             <MenuItem.Title>{translate('domain.admins.revokeAdminAccess')}</MenuItem.Title>

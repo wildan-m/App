@@ -33,7 +33,7 @@ function BankAccountVerificationView({verificationState, children, onVerifiedBut
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const isReduceMotionEnabled = Accessibility.useReducedMotion();
-    const illustrations = useMemoizedLazyIllustrations(['Puzzle', 'Fireworks']);
+    const {Puzzle: puzzleIllustration, Fireworks: fireworksIllustration} = useMemoizedLazyIllustrations(['Puzzle', 'Fireworks']);
     const bottomSafeAreaPaddingStyle = useBottomSafeSafeAreaPaddingStyle({addBottomSafeAreaPadding: true});
 
     if (!verificationState) {
@@ -60,7 +60,7 @@ function BankAccountVerificationView({verificationState, children, onVerifiedBut
                     <BlockingView
                         title={translate('workspace.expensifyCard.oneMoreStep')}
                         subtitle={translate('workspace.expensifyCard.oneMoreStepDescription')}
-                        icon={illustrations.Puzzle}
+                        icon={puzzleIllustration}
                         subtitleStyle={styles.textLabelSupporting}
                         iconHeight={variables.cardPreviewHeight}
                         iconWidth={variables.cardPreviewHeight}
@@ -83,7 +83,7 @@ function BankAccountVerificationView({verificationState, children, onVerifiedBut
                         <BlockingView
                             title={verifiedTitle ?? translate('workspace.expensifyCard.bankAccountVerified')}
                             subtitle={verifiedSubtitle ?? translate('workspace.expensifyCard.bankAccountVerifiedDescription')}
-                            icon={illustrations.Fireworks}
+                            icon={fireworksIllustration}
                             iconWidth={Number(styles.loadingVBAAnimation.width)}
                             iconHeight={Number(styles.loadingVBAAnimation.height)}
                             subtitleStyle={styles.textLabelSupporting}

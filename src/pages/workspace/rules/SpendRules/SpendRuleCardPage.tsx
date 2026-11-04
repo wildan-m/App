@@ -71,7 +71,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
 
     const [expensifyCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${defaultFundID}`);
     const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
-    const illustrations = useMemoizedLazyIllustrations(['HandCard']);
+    const {HandCard: handCardIllustration} = useMemoizedLazyIllustrations(['HandCard']);
     const themeIllustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
 
@@ -240,7 +240,7 @@ function SpendRuleCardPage({route}: SpendRuleCardPageProps) {
                             !inputValue.trim() || hasCards ? (
                                 <ScrollView contentContainerStyle={[styles.flexGrow1]}>
                                     <BlockingView
-                                        icon={illustrations.HandCard}
+                                        icon={handCardIllustration}
                                         iconWidth={variables.iconSection}
                                         iconHeight={variables.iconSection}
                                         title={translate(hasAnyCards ? 'workspace.rules.spendRules.noAvailableCards' : 'workspace.rules.spendRules.noCardsIssuedTitle')}

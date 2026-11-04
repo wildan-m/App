@@ -43,7 +43,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Stopwatch', 'ThumbsDown'] as const);
+    const {Stopwatch: stopwatchIcon, ThumbsDown: thumbsDownIcon} = useMemoizedLazyExpensifyIcons(['Stopwatch', 'ThumbsDown'] as const);
 
     const [moneyRequestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(moneyRequestReport?.chatReportID)}`);
@@ -69,7 +69,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
     return {
         [CONST.REPORT.SECONDARY_ACTIONS.HOLD]: {
             text: translate('iou.hold'),
-            icon: expensifyIcons.Stopwatch,
+            icon: stopwatchIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.HOLD,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.HOLD,
             onSelected: () => {
@@ -107,7 +107,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
         },
         [CONST.REPORT.SECONDARY_ACTIONS.REMOVE_HOLD]: {
             text: translate('iou.unhold'),
-            icon: expensifyIcons.Stopwatch,
+            icon: stopwatchIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.REMOVE_HOLD,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.REMOVE_HOLD,
             onSelected: () => {
@@ -136,7 +136,7 @@ function useHoldRejectActions({reportID, onHoldEducationalOpen, onRejectModalOpe
         },
         [CONST.REPORT.SECONDARY_ACTIONS.REJECT]: {
             text: translate('common.reject'),
-            icon: expensifyIcons.ThumbsDown,
+            icon: thumbsDownIcon,
             value: CONST.REPORT.SECONDARY_ACTIONS.REJECT,
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.REJECT,
             onSelected: () => {

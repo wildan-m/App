@@ -52,7 +52,7 @@ function ChatBubbleCell({transaction, containerStyles, isInSingleTransactionRepo
     };
 
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['ChatBubbleCounter']);
+    const {ChatBubbleCounter: chatBubbleCounterIcon} = useMemoizedLazyExpensifyIcons(['ChatBubbleCounter']);
 
     const iconSize = shouldUseNarrowLayout ? variables.iconSizeSmall : variables.iconSizeNormal;
     const fontSize = shouldUseNarrowLayout ? variables.fontSizeXXSmall : variables.fontSizeExtraSmall;
@@ -72,7 +72,7 @@ function ChatBubbleCell({transaction, containerStyles, isInSingleTransactionRepo
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             >
                 <Icon
-                    src={icons.ChatBubbleCounter}
+                    src={chatBubbleCounterIcon}
                     additionalStyles={[styles.pAbsolute]}
                     fill={threadMessages.isUnread ? theme.iconMenu : theme.icon}
                     width={iconSize}

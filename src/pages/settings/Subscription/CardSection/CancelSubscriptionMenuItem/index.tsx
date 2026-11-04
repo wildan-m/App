@@ -13,7 +13,7 @@ import ROUTES from '@src/ROUTES';
 import React from 'react';
 
 function CancelSubscriptionMenuItem() {
-    const icons = useMemoizedLazyExpensifyIcons(['CircleSlash']);
+    const {CircleSlash: circleSlashIcon} = useMemoizedLazyExpensifyIcons(['CircleSlash']);
     const {translate} = useLocalize();
     const {isActingAsDelegate} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
@@ -31,7 +31,7 @@ function CancelSubscriptionMenuItem() {
             sentryLabel={CONST.SENTRY_LABEL.SETTINGS_SUBSCRIPTION.CANCEL_SUBSCRIPTION}
         >
             <MenuItem.Row>
-                <MenuItem.Icon src={icons.CircleSlash} />
+                <MenuItem.Icon src={circleSlashIcon} />
                 <MenuItem.Content>
                     <MenuItem.Title>{translate('subscription.cancelSubscription.title')}</MenuItem.Title>
                 </MenuItem.Content>

@@ -42,7 +42,7 @@ function FrozenCardHeader({cardPreview, children, style, onUnfreezePress, onAskT
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber, dateFnsLocale} = useLocalize();
     const {isOffline} = useNetwork();
-    const icons = useMemoizedLazyExpensifyIcons(['FreezeCard']);
+    const {FreezeCard: freezeCardIcon} = useMemoizedLazyExpensifyIcons(['FreezeCard']);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [frozenByPersonalDetails] = usePersonalDetail(frozenByAccountID);
     const isCurrentUser = frozenByAccountID === session?.accountID;
@@ -110,7 +110,7 @@ function FrozenCardHeader({cardPreview, children, style, onUnfreezePress, onAskT
                         innerStyles={equalButtonInnerStyles}
                         style={shouldUseEqualButtonWidths ? styles.w100 : styles.alignSelfStart}
                     >
-                        <Button.Icon src={icons.FreezeCard} />
+                        <Button.Icon src={freezeCardIcon} />
                         <Button.Text>{translate(canUnfreezeCard ? 'cardPage.unfreezeCard' : 'cardPage.askToUnfreeze')}</Button.Text>
                     </Button>
                 </View>

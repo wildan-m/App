@@ -186,7 +186,7 @@ function DebugReportPage({
         ];
     }
 
-    const icons = useMemoizedLazyExpensifyIcons(['Eye']);
+    const {Eye: eyeIcon} = useMemoizedLazyExpensifyIcons(['Eye']);
 
     const detailsTab = (
         <DebugDetails
@@ -235,7 +235,7 @@ function DebugReportPage({
                         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
                     }}
                 >
-                    <Button.Icon src={icons.Eye} />
+                    <Button.Icon src={eyeIcon} />
                     <Button.Text>{translate('debug.viewReport')}</Button.Text>
                 </Button>
                 {!!transactionID && (

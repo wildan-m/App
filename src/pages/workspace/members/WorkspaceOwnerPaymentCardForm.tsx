@@ -79,7 +79,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
         };
         addBillingCardAndRequestPolicyOwnerChange(policy, currentUserAccountID, currentUserEmail, cardData, route.name);
     };
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
+    const {Checkmark: checkmarkIcon} = useMemoizedLazyExpensifyIcons(['Checkmark']);
 
     return (
         <PaymentCardForm
@@ -102,7 +102,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
                         <View style={[styles.mt4, styles.ph2, styles.pb2]}>
                             <Text style={[styles.textSupportingNormal, styles.dFlex, styles.alignItemsCenter]}>
                                 <Icon
-                                    src={icons.Checkmark}
+                                    src={checkmarkIcon}
                                     additionalStyles={[styles.mr3]}
                                     fill={theme.iconSuccessFill}
                                 />
@@ -110,7 +110,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
                             </Text>
                             <Text style={[styles.mt3, styles.textSupportingNormal, styles.dFlex, styles.alignItemsCenter]}>
                                 <Icon
-                                    src={icons.Checkmark}
+                                    src={checkmarkIcon}
                                     additionalStyles={[styles.mr3]}
                                     fill={theme.iconSuccessFill}
                                 />
@@ -118,7 +118,7 @@ function WorkspaceOwnerPaymentCardForm({policy}: WorkspaceOwnerPaymentCardFormPr
                             </Text>
                             <Text style={[styles.mt3, styles.textSupportingNormal, styles.dFlex, styles.alignItemsCenter]}>
                                 <Icon
-                                    src={icons.Checkmark}
+                                    src={checkmarkIcon}
                                     additionalStyles={[styles.mr3]}
                                     fill={theme.iconSuccessFill}
                                 />

@@ -22,12 +22,12 @@ function PatriotActLink({containerStyles}: PatriotActLinkProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['QuestionMark']);
+    const {QuestionMark: questionMarkIcon} = useMemoizedLazyExpensifyIcons(['QuestionMark']);
 
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, containerStyles]}>
             <Icon
-                src={icons.QuestionMark}
+                src={questionMarkIcon}
                 width={12}
                 height={12}
                 fill={theme.icon}

@@ -56,7 +56,7 @@ function NetSuiteImportCustomFieldView({
 
     const config = policy?.connections?.netsuite?.options?.config;
     const allRecords = config?.syncOptions?.[importCustomField] ?? [];
-    const icons = useMemoizedLazyExpensifyIcons(['Trashcan']);
+    const {Trashcan: trashcanIcon} = useMemoizedLazyExpensifyIcons(['Trashcan']);
 
     const customField: CustomField | undefined = allRecords[valueIndex];
     const fieldList =
@@ -142,7 +142,7 @@ function NetSuiteImportCustomFieldView({
                         );
                     })}
                     <MenuItemAction
-                        icon={icons.Trashcan}
+                        icon={trashcanIcon}
                         title={translate('common.remove')}
                         isDisabled={!!config?.pendingFields?.[importCustomField]}
                         onPress={() => {

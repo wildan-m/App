@@ -18,7 +18,7 @@ function MultiScanEducationalModal() {
     const {dismissEducationalPopup} = useMultiScanActions();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan']);
+    const {MultiScan: multiScanIllustration} = useMemoizedLazyIllustrations(['MultiScan']);
 
     if (!showEducationalPopup || !dismissEducationalPopup) {
         return null;
@@ -30,7 +30,7 @@ function MultiScanEducationalModal() {
             onConfirm={dismissEducationalPopup}
         >
             <FeatureTraining.Illustration
-                image={lazyIllustrations.MultiScan}
+                image={multiScanIllustration}
                 imageHeight={220}
                 outerContainerStyle={styles.multiScanEducationalPopupImage}
             />

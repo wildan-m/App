@@ -64,7 +64,7 @@ function EditAgentAvatarContent({accountID, fallbackRoute, onSave, initialPreset
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['Upload']);
+    const {Upload: uploadIcon} = useMemoizedLazyExpensifyIcons(['Upload']);
     const presetAvatarSize = StyleUtils.getAvatarSize(CONST.AVATAR_SIZE.X_LARGE);
 
     const [personalDetails] = usePersonalDetail(accountID);
@@ -178,7 +178,7 @@ function EditAgentAvatarContent({accountID, fallbackRoute, onSave, initialPreset
                                     });
                                 }}
                             >
-                                <Button.Icon src={icons.Upload} />
+                                <Button.Icon src={uploadIcon} />
                                 <Button.Text>{translate('avatarPage.uploadPhoto')}</Button.Text>
                             </Button>
                         )}

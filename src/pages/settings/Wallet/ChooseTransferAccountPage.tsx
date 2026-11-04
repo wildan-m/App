@@ -62,7 +62,7 @@ function ChooseTransferAccountPage() {
     };
 
     const [bankAccountsList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
-    const icons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const selectedAccountID = walletTransfer?.selectedAccountID;
 
     const [draftAccountID, setDraftAccountID] = useState<string>();
@@ -148,7 +148,7 @@ function ChooseTransferAccountPage() {
                                 ? translate('paymentMethodList.addNewBankAccount')
                                 : translate('paymentMethodList.addNewDebitCard')
                         }
-                        icon={icons.Plus}
+                        icon={plusIcon}
                     />
                 }
             />

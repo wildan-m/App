@@ -59,7 +59,7 @@ type TaskViewProps = {
 
 function TaskView({report, parentReport, action}: TaskViewProps) {
     const [session] = useOnyx(ONYXKEYS.SESSION, {selector: authTokenTypeSelector});
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const {ArrowRight: arrowRightIcon} = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {translate, formatPhoneNumber} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -252,7 +252,7 @@ function TaskView({report, parentReport, action}: TaskViewProps) {
                                                     {!isDisableInteractive && (
                                                         <View style={[styles.taskRightIconContainer, !hovered && styles.opacitySemiTransparent]}>
                                                             <Icon
-                                                                src={icons.ArrowRight}
+                                                                src={arrowRightIcon}
                                                                 fill={theme.icon}
                                                             />
                                                         </View>

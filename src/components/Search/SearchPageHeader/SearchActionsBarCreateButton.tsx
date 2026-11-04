@@ -36,7 +36,17 @@ import {View} from 'react-native';
 function SearchActionsBarCreateButton() {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus', 'Location', 'Document', 'Receipt', 'Coins', 'Cash', 'Transfer', 'MoneyCircle']);
+    const {
+        Plus: plusIcon,
+        Location: locationIcon,
+        Document: documentIcon,
+        Receipt,
+        Coins,
+        Cash,
+        Transfer,
+        MoneyCircle,
+    } = useMemoizedLazyExpensifyIcons(['Plus', 'Location', 'Document', 'Receipt', 'Coins', 'Cash', 'Transfer', 'MoneyCircle']);
+    const expensifyIcons = {Plus: plusIcon, Location: locationIcon, Document: documentIcon, Receipt, Coins, Cash, Transfer, MoneyCircle};
 
     const createButtonRef = useRef<ComponentRef<typeof View>>(null);
     const [isCreateMenuActive, setIsCreateMenuActive] = useState(false);
@@ -109,7 +119,7 @@ function SearchActionsBarCreateButton() {
                 }, session),
         },
         {
-            icon: expensifyIcons.Location,
+            icon: locationIcon,
             text: translate('iou.trackDistance'),
             sentryLabel: CONST.SENTRY_LABEL.SEARCH.CREATE_MENU.TRACK_DISTANCE,
             onSelected: () =>
@@ -120,7 +130,7 @@ function SearchActionsBarCreateButton() {
         ...(isCreateReportVisible
             ? [
                   {
-                      icon: expensifyIcons.Document,
+                      icon: documentIcon,
                       text: translate('report.newReport.createReport'),
                       sentryLabel: CONST.SENTRY_LABEL.SEARCH.CREATE_MENU.CREATE_REPORT,
                       onSelected: createReport,
@@ -151,7 +161,7 @@ function SearchActionsBarCreateButton() {
                 onPress={showCreateMenu}
                 sentryLabel={CONST.SENTRY_LABEL.SEARCH.CREATE_BUTTON}
             >
-                <Button.Icon src={expensifyIcons.Plus} />
+                <Button.Icon src={plusIcon} />
                 <Button.Text>{translate('common.create')}</Button.Text>
             </Button>
         </View>

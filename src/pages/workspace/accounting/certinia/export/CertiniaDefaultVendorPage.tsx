@@ -34,7 +34,7 @@ function CertiniaDefaultVendorPage({policy}: WithPolicyConnectionsProps) {
     const exportConfig = config?.export;
     const vendors = getCertiniaVendors(policy);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_CERTINIA_DEFAULT_VENDOR.path);
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['Telescope']);
 
     const vendorOptions: VendorListItem[] = vendors.map((vendor) => ({
         value: vendor.id,
@@ -52,7 +52,7 @@ function CertiniaDefaultVendorPage({policy}: WithPolicyConnectionsProps) {
     const dataOptions: VendorListItem[] = shouldShowClearOption ? [clearOption, ...vendorOptions] : vendorOptions;
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.Telescope}
+            icon={telescopeIllustration}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
             title={translate('workspace.certinia.noVendorsFound')}

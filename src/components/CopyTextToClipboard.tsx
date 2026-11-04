@@ -36,7 +36,7 @@ function CopyTextToClipboard({
     inline,
 }: CopyTextToClipboardProps) {
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const {Copy: copyIcon} = useMemoizedLazyExpensifyIcons(['Copy']);
 
     const copyToClipboard = () => {
         Clipboard.setString(urlToCopy || text || '');
@@ -47,7 +47,7 @@ function CopyTextToClipboard({
             text={text}
             tooltipText={translate('common.copyToClipboard')}
             tooltipTextChecked={translate('common.copied')}
-            icon={icons.Copy}
+            icon={copyIcon}
             textStyles={textStyles}
             onPress={copyToClipboard}
             accessible

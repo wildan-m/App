@@ -8,7 +8,7 @@ import usePolicy from './usePolicy';
 export default function useGetReceiptPartnersIntegrationData(policyID?: string) {
     const policy = usePolicy(policyID);
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Uber']);
+    const {Uber: uberIcon} = useMemoizedLazyExpensifyIcons(['Uber']);
     const uber = policy?.receiptPartners?.uber;
     const isUberConnected = useIsPolicyConnectedToUberReceiptPartner({policyID});
     const shouldShowEnterCredentialsError = !!uber?.error;
@@ -19,7 +19,7 @@ export default function useGetReceiptPartnersIntegrationData(policyID?: string) 
                 return {
                     title: CONST.POLICY.RECEIPT_PARTNERS.NAME_USER_FRIENDLY[CONST.POLICY.RECEIPT_PARTNERS.NAME.UBER],
                     description: translate('workspace.receiptPartners.uber.subtitle', uber?.organizationName ?? ''),
-                    icon: icons.Uber,
+                    icon: uberIcon,
                     errorFields: uber?.errorFields,
                     errors: uber?.errors,
                 };

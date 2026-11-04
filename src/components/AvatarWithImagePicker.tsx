@@ -98,7 +98,7 @@ function AvatarWithImagePicker({
     editIcon,
     sentryLabel,
 }: AvatarWithImagePickerProps) {
-    const icons = useMemoizedLazyExpensifyIcons(['Eye', 'Pencil', 'Trashcan', 'Upload']);
+    const {Eye: eyeIcon, Pencil: pencilIcon, Trashcan: trashcanIcon, Upload: uploadIcon} = useMemoizedLazyExpensifyIcons(['Eye', 'Pencil', 'Trashcan', 'Upload']);
     const styles = useThemeStyles();
     const isFocused = useIsFocused();
     const [popoverPosition, setPopoverPosition] = useState({horizontal: 0, vertical: 0});
@@ -155,7 +155,7 @@ function AvatarWithImagePicker({
     const createMenuItems = (openPicker: OpenPicker): MenuItem[] => {
         const menuItems: MenuItem[] = [
             {
-                icon: icons.Upload,
+                icon: uploadIcon,
                 text: translate('avatarWithImagePicker.uploadPhoto'),
                 onSelected: () => {
                     if (isSafari()) {
@@ -172,7 +172,7 @@ function AvatarWithImagePicker({
         // If current avatar isn't a default avatar, allow Remove Photo option
         if (!isUsingDefaultAvatar) {
             menuItems.push({
-                icon: icons.Trashcan,
+                icon: trashcanIcon,
                 text: translate('avatarWithImagePicker.removePhoto'),
                 onSelected: () => {
                     setError(null, {});
@@ -220,7 +220,7 @@ function AvatarWithImagePicker({
                         // If the current avatar isn't a default avatar and we are not overriding this behavior allow the "View Photo" option
                         if (onViewPhotoPress && !isUsingDefaultAvatar) {
                             menuItems.push({
-                                icon: icons.Eye,
+                                icon: eyeIcon,
                                 text: translate('avatarWithImagePicker.viewPhoto'),
                                 onSelected: onViewPhotoPress,
                                 shouldCallAfterModalHide: true,
@@ -242,7 +242,7 @@ function AvatarWithImagePicker({
                                         avatarStyle={avatarStyle}
                                         pendingAction={pendingAction}
                                         anchorRef={anchorRef}
-                                        editIcon={editIcon ?? icons.Pencil}
+                                        editIcon={editIcon ?? pencilIcon}
                                         disabled={disabled}
                                         disabledStyle={disabledStyle}
                                         editIconStyle={editIconStyle}

@@ -39,8 +39,8 @@ function ExpenseDefaultTypePage({route}: ExpenseDefaultTypePageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const policy = usePolicy(policyID);
-    const illustrations = useMemoizedLazyIllustrations(['FoodTruck', 'FolderOpen']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Lock']);
+    const {FoodTruck: foodTruckIllustration, FolderOpen: folderOpenIllustration} = useMemoizedLazyIllustrations(['FoodTruck', 'FolderOpen']);
+    const {Lock: lockIcon} = useMemoizedLazyExpensifyIcons(['Lock']);
 
     const {showConfirmModal} = useConfirmModal();
 
@@ -72,7 +72,7 @@ function ExpenseDefaultTypePage({route}: ExpenseDefaultTypePageProps) {
     const options = [
         {
             key: 'merchant',
-            icon: illustrations.FoodTruck,
+            icon: foodTruckIllustration,
             title: translate('workspace.rules.expenseDefaultType.merchant'),
             description: translate('workspace.rules.expenseDefaultType.merchantDescription'),
             onPress: () => openEditorScopedTo(CONST.POLICY.EXPENSE_DEFAULT_RULE_TYPE.MERCHANT),
@@ -80,7 +80,7 @@ function ExpenseDefaultTypePage({route}: ExpenseDefaultTypePageProps) {
         },
         {
             key: 'category',
-            icon: illustrations.FolderOpen,
+            icon: folderOpenIllustration,
             title: translate('workspace.rules.expenseDefaultType.category'),
             description: translate('workspace.rules.expenseDefaultType.categoryDescription'),
             onPress: canPickCategoryTaxRate ? () => openEditorScopedTo(CONST.POLICY.EXPENSE_DEFAULT_RULE_TYPE.CATEGORY) : showMissingTaxRateExplainer,
@@ -114,7 +114,7 @@ function ExpenseDefaultTypePage({route}: ExpenseDefaultTypePageProps) {
                                 title={option.title}
                                 description={option.description}
                                 shouldShowRightIcon
-                                iconRight={option.isLocked ? expensifyIcons.Lock : undefined}
+                                iconRight={option.isLocked ? lockIcon : undefined}
                                 onPress={option.onPress}
                                 displayInDefaultIconColor
                                 iconWidth={variables.iconSizeExtraLarge}

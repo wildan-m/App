@@ -53,8 +53,8 @@ type UberEmployeeStatus = ValueOf<typeof CONST.POLICY.RECEIPT_PARTNERS.UBER_EMPL
 function DynamicEditInviteReceiptPartnerPolicyPage({route}: DynamicEditInviteReceiptPartnerPolicyPageProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'FallbackAvatar']);
-    const illustrations = useMemoizedLazyIllustrations(['SewerDino']);
+    const {Checkmark: checkmarkIcon, FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['Checkmark', 'FallbackAvatar']);
+    const {SewerDino: sewerDinoIllustration} = useMemoizedLazyIllustrations(['SewerDino']);
     const {translate, localeCompare, formatPhoneNumber} = useLocalize();
     const {isOffline} = useNetwork();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_RECEIPT_PARTNERS_INVITE_EDIT.path);
@@ -154,7 +154,7 @@ function DynamicEditInviteReceiptPartnerPolicyPage({route}: DynamicEditInviteRec
                     onPress={() => inviteOrResend(email)}
                     styles={[...buttonStyles, isInvite ? styles.buttonSuccess : undefined]}
                     textStyles={[...buttonTextStyles, isInvite ? styles.buttonSuccessText : undefined]}
-                    iconChecked={icons.Checkmark}
+                    iconChecked={checkmarkIcon}
                     inline={false}
                     sentryLabel={CONST.SENTRY_LABEL.RECEIPT_PARTNERS.INVITE_RESEND_BUTTON}
                     accessible={false}
@@ -178,7 +178,7 @@ function DynamicEditInviteReceiptPartnerPolicyPage({route}: DynamicEditInviteRec
             accountID: personalDetail?.accountID,
             icons: [
                 {
-                    source: personalDetail?.avatar ?? icons.FallbackAvatar,
+                    source: personalDetail?.avatar ?? fallbackAvatarIcon,
                     name: formatPhoneNumber(email),
                     type: CONST.ICON_TYPE_AVATAR,
                     id: personalDetail?.accountID,
@@ -240,7 +240,7 @@ function DynamicEditInviteReceiptPartnerPolicyPage({route}: DynamicEditInviteRec
 
     const listEmptyContent = (
         <BlockingView
-            icon={illustrations.SewerDino}
+            icon={sewerDinoIllustration}
             iconWidth={variables.uberEmptyListIconWidth}
             iconHeight={variables.uberEmptyListIconHeight}
             title={translate('workspace.receiptPartners.uber.emptyContent.title')}

@@ -45,7 +45,7 @@ function WorkspaceWorkflowsApprovalsOverLimitApproverPage({policy, personalDetai
     const {login: currentUserLogin = ''} = useCurrentUserPersonalDetails();
     const {isBetaEnabled} = usePermissions();
     const isMultipleApproversBetaEnabled = isBetaEnabled(CONST.BETAS.MULTIPLE_APPROVERS);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
+    const {FallbackAvatar: fallbackAvatarIcon} = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
 
     const policyID = route.params.policyID;
     const approverIndex = Number(route.params.approverIndex) ?? 0;
@@ -111,7 +111,7 @@ function WorkspaceWorkflowsApprovalsOverLimitApproverPage({policy, personalDetai
                     isSelected: currentApprover?.overLimitForwardsTo === email,
                     login: email,
                     value: email,
-                    icons: [{source: avatar ?? expensifyIcons.FallbackAvatar, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
+                    icons: [{source: avatar ?? fallbackAvatarIcon, type: CONST.ICON_TYPE_AVATAR, name: displayName, id: accountID}],
                     rightElement: (
                         <MemberRightIcon
                             role={employee.role}

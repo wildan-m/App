@@ -65,8 +65,8 @@ function WorkspaceExpensifyCardFeedSelectorPage({route}: WorkspaceExpensifyCardF
     const {translate} = useLocalize();
     const {isOffline} = useNetwork();
     const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['ExpensifyCardImage', 'Telescope']);
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
+    const {ExpensifyCardImage: expensifyCardImageIllustration, Telescope: telescopeIllustration} = useMemoizedLazyIllustrations(['ExpensifyCardImage', 'Telescope']);
+    const {Plus: plusIcon} = useMemoizedLazyExpensifyIcons(['Plus']);
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const {isAccountLocked} = useLockedAccountState();
@@ -133,7 +133,7 @@ function WorkspaceExpensifyCardFeedSelectorPage({route}: WorkspaceExpensifyCardF
             errors: feedWithError?.fundID === entry.fundID ? feedWithError.error : undefined,
             leftElement: (
                 <Icon
-                    src={illustrations.ExpensifyCardImage}
+                    src={expensifyCardImageIllustration}
                     height={variables.cardIconHeight}
                     width={variables.cardIconWidth}
                     additionalStyles={[styles.mr3, styles.cardIcon]}
@@ -228,7 +228,7 @@ function WorkspaceExpensifyCardFeedSelectorPage({route}: WorkspaceExpensifyCardF
             {shouldShowSetUpNewProgramButton && (
                 <MenuItemAction
                     title={translate('workspace.expensifyCard.issueNewCard')}
-                    icon={expensifyIcons.Plus}
+                    icon={plusIcon}
                     onPress={handleSetUpNewProgramPress}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.EXPENSIFY_CARD.ISSUE_CARD_BUTTON}
                 />
@@ -306,7 +306,7 @@ function WorkspaceExpensifyCardFeedSelectorPage({route}: WorkspaceExpensifyCardF
         return (
             <BlockingView
                 addBottomSafeAreaPadding
-                icon={illustrations.Telescope}
+                icon={telescopeIllustration}
                 iconWidth={variables.emptyListIconWidth}
                 iconHeight={variables.emptyListIconHeight}
                 title={translate('workspace.expensifyCard.noCardFeedsAvailable')}

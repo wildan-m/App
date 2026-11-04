@@ -123,7 +123,7 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
     const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportItem.reportID}`, {
         selector: isActionLoadingSelector,
     });
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
+    const {DotIndicator: dotIndicatorIcon} = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     const currentUserDetails = useCurrentUserPersonalDetails();
     const [isTrackIntentUser] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED, {selector: isTrackIntentUserSelector});
     const [rules] = useOnyx(ONYXKEYS.COLLECTION.RULE);
@@ -369,7 +369,7 @@ function ExpenseReportListItemInner<TItem extends ListItem>({
                 }}
             >
                 <Icon
-                    src={expensifyIcons.DotIndicator}
+                    src={dotIndicatorIcon}
                     fill={theme.danger}
                     additionalStyles={[styles.mr1]}
                     width={12}
