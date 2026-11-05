@@ -20,28 +20,36 @@ type GuardProps = {
     onDiscard: () => void;
 };
 
-const mockGuard = jest.fn((_props: GuardProps) => null);
+const mockGuard = jest.fn<null, [GuardProps]>(() => null);
 
 jest.mock('@components/Form/FormDiscardChangesGuard', () => ({
     __esModule: true,
     default: (props: GuardProps) => mockGuard(props),
 }));
 
-jest.mock('@components/Form/FormWrapper', () => {
-    const {Pressable: MockPressable, View: MockView} = jest.requireActual<typeof import('react-native')>('react-native');
-    return {
-        __esModule: true,
-        default: ({children, onSubmit}: {children: React.ReactNode; onSubmit: () => void}) => (
-            <MockView>
-                <MockPressable
-                    testID="submit"
-                    onPress={onSubmit}
-                />
-                {children}
-            </MockView>
-        ),
-    };
-});
+type MockFormWrapperProps = {
+    children?: React.ReactNode;
+    onSubmit: () => void;
+};
+
+const mockFormWrapper = jest.fn(({children, onSubmit}: MockFormWrapperProps) => (
+    <View>
+        <PressableWithFeedback
+            testID="submit"
+            onPress={onSubmit}
+            accessibilityRole="button"
+            accessibilityLabel="Submit"
+        >
+            <Text>Submit</Text>
+        </PressableWithFeedback>
+        {children}
+    </View>
+));
+
+jest.mock('@components/Form/FormWrapper', () => ({
+    __esModule: true,
+    default: (props: MockFormWrapperProps) => mockFormWrapper(props),
+}));
 
 jest.mock('@hooks/useIsFocusedRef', () => jest.fn(() => ({current: true})));
 jest.mock('@hooks/usePressLoading', () =>
@@ -213,7 +221,7 @@ describe('FormProvider discard changes', () => {
     it('restores only its own draft-backed inputs when changes are discarded', async () => {
         // Given a draft shared with an earlier step of the flow, and a form that edits one draft-backed input
         await act(async () => {
-            await Onyx.set(DRAFT_KEY, {earlierStep: 'keep me', name: 'original'});
+            await Onyx.set(DRAFT_KEY, {initialValue: 'keep me', name: 'original'});
         });
         await waitForBatchedUpdatesWithAct();
         renderForm(
@@ -231,6 +239,6 @@ describe('FormProvider discard changes', () => {
         await waitForBatchedUpdatesWithAct();
 
         // Then the discarded edit can't come back from the draft, and the earlier step keeps its value
-        expect(await Onyx.get(DRAFT_KEY)).toEqual({earlierStep: 'keep me', name: 'original'});
+        expect(await Onyx.get(DRAFT_KEY)).toEqual({initialValue: 'keep me', name: 'original'});
     });
 });
