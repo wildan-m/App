@@ -71,6 +71,7 @@ function PhoneNumberStep({onNext, onMove, isEditing, shouldDelayAutoFocus, enabl
             defaultValue={defaultPhoneNumber}
             shouldDelayAutoFocus={shouldDelayAutoFocus}
             enabledWhenOffline={enabledWhenOffline}
+            shouldConfirmDiscardChanges
         />
     );
 }

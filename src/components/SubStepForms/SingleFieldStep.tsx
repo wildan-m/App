@@ -61,6 +61,9 @@ type SingleFieldStepProps<TFormID extends keyof OnyxFormValuesMapping> = SubPage
 
         /** Whether to show the Patriot Act help link (EnablePayments-only) */
         shouldShowPatriotActLink?: boolean;
+
+        /** Whether leaving the form with edited inputs shows the "Discard changes?" modal */
+        shouldConfirmDiscardChanges?: boolean;
     };
 
 function SingleFieldStep<TFormID extends keyof OnyxFormValuesMapping>({
@@ -82,6 +85,7 @@ function SingleFieldStep<TFormID extends keyof OnyxFormValuesMapping>({
     placeholder,
     shouldDelayAutoFocus = false,
     shouldShowPatriotActLink = false,
+    shouldConfirmDiscardChanges,
     forwardedFSClass,
 }: SingleFieldStepProps<TFormID>) {
     const {translate} = useLocalize();
@@ -98,6 +102,7 @@ function SingleFieldStep<TFormID extends keyof OnyxFormValuesMapping>({
             submitButtonStyles={[styles.mb0]}
             enabledWhenOffline={enabledWhenOffline}
             shouldHideFixErrorsAlert
+            shouldConfirmDiscardChanges={shouldConfirmDiscardChanges}
         >
             <View>
                 <Text style={[styles.textHeadlineLineHeightXXL]}>{formTitle}</Text>

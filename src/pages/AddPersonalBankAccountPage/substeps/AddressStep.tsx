@@ -119,6 +119,7 @@ function AddressStep({onNext, isEditing, shouldSaveDraft = false, shouldHideCoun
                 shouldHideCountrySelector={shouldHideCountrySelector}
                 enabledWhenOffline={enabledWhenOffline}
                 shouldValidatePhysicalAddress
+                shouldConfirmDiscardChanges
             />
         </>
     );

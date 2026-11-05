@@ -120,6 +120,7 @@ function AddressPage({title, address, updateAddress, isLoadingApp = true, backTo
                         street2={street2}
                         zip={zipcode}
                         shouldRequireZip={shouldRequireZip}
+                        shouldConfirmDiscardChanges
                     />
                 )}
             </DelegateNoAccessWrapper>

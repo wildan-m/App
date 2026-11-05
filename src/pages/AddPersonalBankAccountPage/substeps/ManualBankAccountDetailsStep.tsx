@@ -66,6 +66,7 @@ function ManualBankAccountDetailsStep({onNext, isEditing}: ManualProps) {
             validate={validate}
             submitButtonText={translate(isEditing ? 'common.confirm' : 'common.next')}
             style={[styles.mh5, styles.flexGrow1]}
+            shouldConfirmDiscardChanges
         >
             <Text style={[styles.textHeadlineLineHeightXXL, styles.mb3]}>{translate('bankAccount.manuallyAdd')}</Text>
             <Text style={[styles.mb5, styles.textSupporting]}>{translate('bankAccount.checkHelpLine')}</Text>

@@ -53,6 +53,9 @@ type FullNameStepProps<TFormID extends keyof OnyxFormValuesMapping> = SubPagePro
 
         /** Whether the form submit button should be enabled when offline */
         enabledWhenOffline?: boolean;
+
+        /** Whether leaving the form with edited inputs shows the "Discard changes?" modal */
+        shouldConfirmDiscardChanges?: boolean;
     };
 
 type FullNameStepPropsWidened = Omit<FullNameStepProps<keyof OnyxFormValuesMapping>, never>;
@@ -78,6 +81,7 @@ function FullNameStepImpl({
     shouldShowPatriotActLink = false,
     forwardedFSClass,
     enabledWhenOffline: enabledWhenOfflineProp = true,
+    shouldConfirmDiscardChanges,
 }: FullNameStepPropsWidened) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -129,6 +133,7 @@ function FullNameStepImpl({
             onSubmit={onSubmit}
             style={[styles.mh5, styles.flexGrow1]}
             enabledWhenOffline={enabledWhenOfflineProp}
+            shouldConfirmDiscardChanges={shouldConfirmDiscardChanges}
         >
             <View>
                 <Text style={[styles.textHeadlineLineHeightXXL, formSubtitle ? styles.mb3 : styles.mb6]}>{formTitle}</Text>

@@ -37,6 +37,7 @@ import type {RegisterInput} from './FormContext';
 import type {FormInputErrors, FormOnyxValues, FormProps, FormRef, FormWrapperRef, InputComponentBaseProps, InputRefs, ValueTypeKey} from './types';
 
 import FormContext from './FormContext';
+import FormDiscardChangesGuard from './FormDiscardChangesGuard';
 import FormWrapper from './FormWrapper';
 import isNumericKeyboard from './isNumericKeyboard';
 
@@ -132,6 +133,9 @@ type FormProviderProps<TFormID extends OnyxFormKey = OnyxFormKey> = FormProps<TF
 
     /** Styles for the submit button itself (`submitButtonStyles` targets the wrapping container) */
     submitButtonInnerStyles?: StyleProp<ViewStyle>;
+
+    /** Whether leaving the form with edited inputs shows the "Discard changes?" modal. Leave it off when the edits survive leaving, because nothing would be lost. */
+    shouldConfirmDiscardChanges?: boolean;
 };
 
 function FormProvider({
@@ -154,6 +158,7 @@ function FormProvider({
     keyboardSubmitBehavior = CONST.KEYBOARD_SUBMIT_BEHAVIOR.DISMISS_THEN_SUBMIT,
     onBeforeSubmit,
     shouldShowLoadingImmediatelyOnPress = true,
+    shouldConfirmDiscardChanges = false,
     ref,
     ...rest
 }: FormProviderProps) {
@@ -167,6 +172,10 @@ function FormProvider({
     const [inputValues, setInputValues] = useState<Form>(() => ({...draftValues}));
     const isLoadingDraftValues = isLoadingOnyxValue(draftValuesMetadata);
     const previousDraftValues = useRef(draftValues);
+
+    // The values the inputs started with or were last submitted with, which is what leaving the form would fall back to.
+    const savedInputValues = useRef<Form>({});
+    const draftBackedInputIDs = useRef(new Set<string>());
 
     if (!isLoadingDraftValues && draftValues !== previousDraftValues.current) {
         previousDraftValues.current = draftValues;
@@ -337,6 +346,11 @@ function FormProvider({
                 return;
             }
 
+            // onSubmit usually navigates away right after this, so the values must count as saved before it runs or the save would prompt.
+            for (const inputID of Object.keys(savedInputValues.current)) {
+                savedInputValues.current[inputID] = inputValues[inputID];
+            }
+
             const runSubmit = () => {
                 if (keyboardSubmitBehavior === CONST.KEYBOARD_SUBMIT_BEHAVIOR.DISMISS_THEN_SUBMIT) {
                     return KeyboardUtils.dismiss().then(() => onSubmit(trimmedStringValues));
@@ -383,6 +397,7 @@ function FormProvider({
 
                     touchedInputs.current[inputID] = false;
                     copyPrevState[inputID] = optionalValue[inputID as keyof FormOnyxValues] || '';
+                    savedInputValues.current[inputID] = copyPrevState[inputID];
 
                     return copyPrevState;
                 });
@@ -440,6 +455,15 @@ function FormProvider({
             } else if (inputValues[inputID] === undefined) {
                 // We want to initialize the input value if it's undefined
                 inputValues[inputID] = inputProps.defaultValue ?? getInitialValueByType(inputProps.valueType);
+            }
+
+            // registerInput runs on every render, and only the first value registered is what the input started with.
+            // A draft that is still loading would change that value without any edit from the user, so it has to settle first.
+            if (shouldConfirmDiscardChanges && !isLoadingDraftValues && !(inputID in savedInputValues.current)) {
+                savedInputValues.current[inputID] = inputValues[inputID];
+                if (inputProps.shouldSaveDraft) {
+                    draftBackedInputIDs.current.add(inputID);
+                }
             }
 
             const errorFields = formState?.errorFields?.[inputID] ?? {};
@@ -580,8 +604,25 @@ function FormProvider({
             formID,
             shouldValidateOnChange,
             isFocusedRef,
+            shouldConfirmDiscardChanges,
+            isLoadingDraftValues,
         ],
     );
+
+    const getHasUnsavedChanges = () => Object.entries(savedInputValues.current).some(([inputID, savedValue]) => !deepEqual(inputValues[inputID], savedValue));
+
+    // Only the inputs this form owns are restored, because forms sharing a formID across steps keep the other steps' values in the same draft.
+    const restoreDraftValues = () => {
+        const savedDraftValues: Form = {};
+        for (const inputID of draftBackedInputIDs.current) {
+            savedDraftValues[inputID] = savedInputValues.current[inputID];
+        }
+        if (isEmptyObject(savedDraftValues)) {
+            return;
+        }
+        setDraftValues(formID, savedDraftValues);
+    };
+
     const fallbackAnnouncementMessage = !isGeneralAlertVisible ? firstFieldErrorMessage : '';
     const getErrorAnnouncementKey = useCallback(() => errorAnnouncementKey, [errorAnnouncementKey]);
     const getFallbackAnnouncementMessage = useCallback(() => fallbackAnnouncementMessage, [fallbackAnnouncementMessage]);
@@ -596,6 +637,12 @@ function FormProvider({
 
     return (
         <FormContext.Provider value={value}>
+            {shouldConfirmDiscardChanges && (
+                <FormDiscardChangesGuard
+                    getHasUnsavedChanges={getHasUnsavedChanges}
+                    onDiscard={restoreDraftValues}
+                />
+            )}
             <FormWrapper
                 {...rest}
                 formID={formID}

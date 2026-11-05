@@ -59,6 +59,9 @@ type AddressFormProps<TFormID extends AddressFormID> = {
     /** Whether or not should the form data should be saved as draft */
     shouldSaveDraft?: boolean;
 
+    /** Whether leaving the form with edited inputs shows the "Discard changes?" modal */
+    shouldConfirmDiscardChanges?: boolean;
+
     /** Text displayed on the bottom submit button */
     submitButtonText?: string;
 
@@ -242,6 +245,7 @@ function AddressForm<TFormID extends AddressFormID>({
     onAddressChanged = () => {},
     onSubmit,
     shouldSaveDraft = false,
+    shouldConfirmDiscardChanges,
     state = '',
     street1 = '',
     street2 = '',
@@ -345,6 +349,7 @@ function AddressForm<TFormID extends AddressFormID>({
             submitButtonText={submitButtonText}
             enabledWhenOffline={enabledWhenOfflineProp}
             addBottomSafeAreaPadding={addBottomSafeAreaPadding}
+            shouldConfirmDiscardChanges={shouldConfirmDiscardChanges}
         >
             <AddressFieldsContext.Provider value={{city, country, state, street1, street2, zip, onAddressChanged, shouldSaveDraft, shouldHideCountrySelector}}>
                 {children ?? <AddressFormFields />}
