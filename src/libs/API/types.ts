@@ -811,6 +811,10 @@ const WRITE_COMMANDS = {
     REMOVE_DOMAIN_ADMIN: 'RemoveDomainAdmin',
     REQUEST_DOMAIN_ADMINSHIP: 'RequestDomainAdminship',
     DECLINE_DOMAIN_ADMINSHIP_REQUEST: 'DeclineDomainAdminshipRequest',
+    CREATE_DOMAIN_ACCOUNT_MERGE_REQUEST: 'CreateDomainAccountMergeRequest',
+    APPROVE_DOMAIN_ACCOUNT_MERGE_REQUEST: 'ApproveDomainAccountMergeRequest',
+    DENY_DOMAIN_ACCOUNT_MERGE_REQUEST: 'DenyDomainAccountMergeRequest',
+    CANCEL_DOMAIN_ACCOUNT_MERGE_REQUEST: 'CancelDomainAccountMergeRequest',
     DELETE_DOMAIN: 'DeleteDomain',
     DELETE_DOMAIN_MEMBER: 'DeleteDomainMember',
     TOGGLE_TWO_FACTOR_AUTH_REQUIRED_FOR_DOMAIN: 'ToggleTwoFactorAuthRequiredForDomain',
@@ -1676,6 +1680,10 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.ADD_DOMAIN_ADMIN]: Parameters.AddAdminToDomainParams;
     [WRITE_COMMANDS.REQUEST_DOMAIN_ADMINSHIP]: Parameters.RequestDomainAdminshipParams;
     [WRITE_COMMANDS.DECLINE_DOMAIN_ADMINSHIP_REQUEST]: Parameters.DeclineDomainAdminshipRequestParams;
+    [WRITE_COMMANDS.CREATE_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.CreateDomainAccountMergeRequestParams;
+    [WRITE_COMMANDS.APPROVE_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.ApproveDomainAccountMergeRequestParams;
+    [WRITE_COMMANDS.DENY_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.DenyDomainAccountMergeRequestParams;
+    [WRITE_COMMANDS.CANCEL_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.CancelDomainAccountMergeRequestParams;
     [WRITE_COMMANDS.ADD_DOMAIN_MEMBER]: Parameters.AddMemberToDomainParams;
     [WRITE_COMMANDS.TOGGLE_TWO_FACTOR_AUTH_REQUIRED_FOR_DOMAIN]: Parameters.ToggleTwoFactorAuthRequiredForDomainParams;
     [WRITE_COMMANDS.SET_TWO_FACTOR_AUTH_EXEMPT_EMAIL_FOR_DOMAIN]: Parameters.SetTwoFactorAuthExemptEmailForDomainParams;

@@ -196,6 +196,15 @@ type Account = {
         errors: OnyxCommon.Errors;
     };
 
+    /** Model of the createDomainAccountMergeRequest API call */
+    createDomainAccountMergeRequest?: {
+        /** Whether the API call is loading */
+        isLoading?: boolean;
+
+        /** Errors while submitting the request */
+        errors?: OnyxCommon.Errors | null;
+    };
+
     isSubscribedToNewsletter?: boolean;
 
     /** Whether or not the user is on a public domain email account or not */

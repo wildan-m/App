@@ -1493,6 +1493,7 @@ const CONST = {
     },
     BETAS: {
         ALL: 'all',
+        MERGE_DOMAIN_ACCOUNTS: 'mergeDomainAccounts',
         ASAP_SUBMIT: 'asapSubmit',
         DEFAULT_ROOMS: 'defaultRooms',
         PREVENT_SPOTNANA_TRAVEL: 'preventSpotnanaTravel',
@@ -7511,6 +7512,14 @@ const CONST = {
         DISABLE: 'DISABLE',
         REPLACE_VERIFY_OLD: 'REPLACE_VERIFY_OLD',
         REPLACE_VERIFY_NEW: 'REPLACE_VERIFY_NEW',
+    },
+    DOMAIN_ACCOUNT_MERGE_REQUEST: {
+        EXPIRATION_MS: 24 * 60 * 60 * 1000,
+        RESOLUTION: {
+            APPROVED: 'approved',
+            DENIED: 'denied',
+            CANCELLED: 'cancelled',
+        },
     },
     MERGE_ACCOUNT_RESULTS: {
         SUCCESS: 'success',
