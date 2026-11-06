@@ -1493,6 +1493,7 @@ const CONST = {
     },
     BETAS: {
         ALL: 'all',
+        MERGE_DOMAIN_ACCOUNTS: 'mergeDomainAccounts',
         ASAP_SUBMIT: 'asapSubmit',
         DEFAULT_ROOMS: 'defaultRooms',
         PREVENT_SPOTNANA_TRAVEL: 'preventSpotnanaTravel',
@@ -7512,6 +7513,13 @@ const CONST = {
         REPLACE_VERIFY_OLD: 'REPLACE_VERIFY_OLD',
         REPLACE_VERIFY_NEW: 'REPLACE_VERIFY_NEW',
     },
+    DOMAIN_ACCOUNT_MERGE_REQUEST: {
+        EXPIRATION_MS: 24 * 60 * 60 * 1000,
+        DECISION: {
+            APPROVED: 'approved',
+            DENIED: 'denied',
+        },
+    },
     MERGE_ACCOUNT_RESULTS: {
         SUCCESS: 'success',
         ERR_2FA: 'err_2fa',
@@ -11949,6 +11957,8 @@ const CONST = {
             },
             MEMBERS: {
                 ROW: 'DomainMembers-Row',
+                ACCOUNT_MERGE_REQUEST_APPROVE: 'DomainMembers-AccountMergeRequestApprove',
+                ACCOUNT_MERGE_REQUEST_DENY: 'DomainMembers-AccountMergeRequestDeny',
                 FORCE_TWO_FACTOR_AUTH_SWITCH: 'DomainMembers-ForceTwoFactorAuthSwitch',
                 MEMBER_FORCE_TWO_FACTOR_AUTH_SWITCH: 'DomainMembers-MemberForceTwoFactorAuthSwitch',
             },

@@ -728,6 +728,8 @@ export type {default as SetTechnicalContactEmailParams} from './SetTechnicalCont
 export type {default as ToggleConsolidatedDomainBillingParams} from './ToggleConsolidatedDomainBillingParams';
 export type {default as RemoveDomainAdminParams} from './RemoveDomainAdminParams';
 export type {default as DeclineDomainAdminshipRequestParams} from './DeclineDomainAdminshipRequestParams';
+export type {default as ApproveDomainAccountMergeRequestParams} from './ApproveDomainAccountMergeRequestParams';
+export type {default as DenyDomainAccountMergeRequestParams} from './DenyDomainAccountMergeRequestParams';
 export type {default as DeleteDomainMemberParams} from './DeleteDomainMemberParams';
 export type {default as ChangeDomainSecurityGroupParams} from './ChangeDomainSecurityGroupParams';
 export type {default as DeleteDomainParams} from './DeleteDomainParams';

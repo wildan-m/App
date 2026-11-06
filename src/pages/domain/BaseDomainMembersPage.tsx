@@ -48,6 +48,9 @@ type BaseDomainMembersPageProps = {
 
     /** Whether the group column should be shown in the table */
     shouldShowGroupColumn: boolean;
+
+    /** Content rendered above the table's search bar, unaffected by search, filters and selection */
+    tableHeaderContent?: React.ReactElement;
 };
 
 function BaseDomainMembersPage({
@@ -63,6 +66,7 @@ function BaseDomainMembersPage({
     isItemInFilter,
     shouldShowGroupFilter,
     shouldShowGroupColumn,
+    tableHeaderContent,
 }: BaseDomainMembersPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
@@ -97,6 +101,7 @@ function BaseDomainMembersPage({
                     shouldShowGroupColumn={shouldShowGroupColumn}
                     filterConfig={shouldShowGroupFilter ? filterConfig : undefined}
                     isItemInFilter={shouldShowGroupFilter ? isItemInFilter : undefined}
+                    headerComponent={tableHeaderContent}
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>

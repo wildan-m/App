@@ -39,6 +39,7 @@ import type {DomainSplitNavigatorParamList} from '@navigation/types';
 
 import BaseDomainMembersPage from '@pages/domain/BaseDomainMembersPage';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
+import DomainAccountMergeRequestsSection from '@pages/domain/Members/AccountMergeRequests/DomainAccountMergeRequestsSection';
 
 import colors from '@styles/theme/colors';
 
@@ -342,6 +343,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             isItemInFilter={isItemInFilter}
             shouldShowGroupFilter={shouldShowGroupFilter}
             shouldShowGroupColumn={shouldShowGroupColumn}
+            tableHeaderContent={<DomainAccountMergeRequestsSection domainAccountID={domainAccountID} />}
             onBackButtonPress={() => {
                 if (isMobileSelectionModeEnabled) {
                     clearSelectedMembers();

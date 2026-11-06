@@ -13117,6 +13117,17 @@ const translations = {
         },
         domainMembers: 'Domain members',
         members: {
+            accountMergeRequests: {
+                title: 'Account merge requests',
+                // @context Describes the direction of an account merge. Both values are email addresses or phone numbers; the first account is merged into the second.
+                mergeDirection: (sourceLogin: string, targetLogin: string) => `Merge ${sourceLogin} into ${targetLogin}`,
+                requiresSharedTechnicalContact: 'Only the technical contact who administers both domains can approve or deny this request.',
+                approved: 'Account merge approved.',
+                denied: 'Account merge denied.',
+                noLongerPending: 'This merge request is no longer pending.',
+                approveError: 'Unable to approve this merge request. Please try again.',
+                denyError: 'Unable to deny this merge request. Please try again.',
+            },
             title: 'Members',
             findMember: 'Find member',
             addMember: 'Add member',
