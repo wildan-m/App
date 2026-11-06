@@ -7,6 +7,8 @@ import ValidateCodeActionForm from '@components/ValidateCodeActionForm';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useOutstandingDomainAccountMergeRequest from '@hooks/useOutstandingDomainAccountMergeRequest';
+import usePermissions from '@hooks/usePermissions';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -19,6 +21,7 @@ import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import {
     clearGetValidateCodeForAccountMerge,
     clearMergeWithValidateCode,
+    createDomainAccountMergeRequest,
     mergeWithValidateCode as mergeWithValidateCodeAction,
     requestValidationCodeForAccountMerge,
 } from '@userActions/MergeAccounts';
@@ -34,7 +37,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 
 import {useFocusEffect, useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 
 const getMergeErrorPage = (err: string): ValueOf<typeof CONST.MERGE_ACCOUNT_RESULTS> | null => {
@@ -110,6 +113,13 @@ function AccountValidatePage() {
     const latestError = getLatestErrorMessage(mergeWithValidateCode);
     const errorPage = getMergeErrorPage(latestError);
 
+    const {isBetaEnabled} = usePermissions();
+    const outstandingDomainMergeRequest = useOutstandingDomainAccountMergeRequest();
+    const [submittedValidateCode, setSubmittedValidateCode] = useState('');
+    const requesterAccountID = currentUserPersonalDetails.accountID;
+    const shouldRequestDomainApproval =
+        errorPage === CONST.MERGE_ACCOUNT_RESULTS.ERR_SAML_DOMAIN_CONTROL && isBetaEnabled(CONST.BETAS.MERGE_DOMAIN_ACCOUNTS) && !!submittedValidateCode && !!requesterAccountID;
+
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
@@ -121,11 +131,30 @@ function AccountValidatePage() {
     });
 
     useFocusEffect(() => {
-        if (!errorPage || !email) {
+        if (!errorPage || !email || shouldRequestDomainApproval) {
             return;
         }
         return Navigation.navigate(ROUTES.SETTINGS_MERGE_ACCOUNTS_RESULT.getRoute(email, errorPage), {forceReplace: true});
     });
+
+    useEffect(() => {
+        if (!shouldRequestDomainApproval || !email) {
+            return;
+        }
+        createDomainAccountMergeRequest(email, submittedValidateCode, requesterAccountID);
+    }, [shouldRequestDomainApproval, email, submittedValidateCode, requesterAccountID]);
+
+    // The details page renders the pending screen, so go there only once the server has confirmed the request. A failed submission must stay here to show its error.
+    const shouldShowPendingScreen = !!outstandingDomainMergeRequest && outstandingDomainMergeRequest.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
+
+    useFocusEffect(
+        useCallback(() => {
+            if (!shouldShowPendingScreen) {
+                return;
+            }
+            Navigation.goBack(ROUTES.SETTINGS_MERGE_ACCOUNTS.getRoute());
+        }, [shouldShowPendingScreen]),
+    );
 
     useFocusEffect(() => {
         const task = TransitionTracker.runAfterTransitions({
@@ -187,6 +216,7 @@ function AccountValidatePage() {
                     }
                     descriptionSecondaryStyles={styles.mb8}
                     handleSubmitForm={(code) => {
+                        setSubmittedValidateCode(code);
                         mergeWithValidateCodeAction(email, code);
                     }}
                     sendValidateCode={() => {

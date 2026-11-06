@@ -13,6 +13,7 @@ import useAutoFocusInput from '@hooks/useAutoFocusInput';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useOutstandingDomainAccountMergeRequest from '@hooks/useOutstandingDomainAccountMergeRequest';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useThemeStyles from '@hooks/useThemeStyles';
 
@@ -42,6 +43,8 @@ import {emailSelector} from '@selectors/Session';
 import {Str} from 'expensify-common';
 import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
+
+import DomainAccountMergePendingView from './DomainAccountMergePendingView';
 
 const getValidateCodeErrorKey = (err: string): ValueOf<typeof CONST.MERGE_ACCOUNT_RESULTS> | null => {
     if (err.includes('403')) {
@@ -80,6 +83,7 @@ function AccountDetailsPage() {
     const {params} = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.MERGE_ACCOUNTS.ACCOUNT_DETAILS>>();
     const [email, setEmail] = useState(params?.email ?? '');
     const {inputCallbackRef} = useAutoFocusInput();
+    const outstandingDomainMergeRequest = useOutstandingDomainAccountMergeRequest();
     const validateCodeSent = getValidateCodeForAccountMerge?.validateCodeSent;
     const latestError = getLatestErrorMessage(getValidateCodeForAccountMerge);
     const errorKey = getValidateCodeErrorKey(latestError);
@@ -166,6 +170,15 @@ function AccountDetailsPage() {
         }
         return errors;
     };
+
+    if (outstandingDomainMergeRequest) {
+        return (
+            <DomainAccountMergePendingView
+                request={outstandingDomainMergeRequest}
+                targetLogin={userEmailOrPhone ?? ''}
+            />
+        );
+    }
 
     return (
         <ScreenWrapper

@@ -769,6 +769,8 @@ const WRITE_COMMANDS = {
     DISMISS_PRODUCT_TRAINING: 'DismissProductTraining',
     GET_VALIDATE_CODE_FOR_ACCOUNT_MERGE: 'GetValidateCodeForAccountMerge',
     MERGE_WITH_VALIDATE_CODE: 'MergeWithValidateCode',
+    CREATE_DOMAIN_ACCOUNT_MERGE_REQUEST: 'CreateDomainAccountMergeRequest',
+    CANCEL_DOMAIN_ACCOUNT_MERGE_REQUEST: 'CancelDomainAccountMergeRequest',
     RESET_SMS_DELIVERY_FAILURE_STATUS: 'ResetSMSDeliveryFailureStatus',
     USER_UNBLOCK_EMAIL: 'User_UnblockEmail',
     SAVE_CORPAY_ONBOARDING_COMPANY_DETAILS: 'SaveCorpayOnboardingCompanyDetails',
@@ -1645,6 +1647,8 @@ type WriteCommandParameters = {
     // Merge accounts API
     [WRITE_COMMANDS.GET_VALIDATE_CODE_FOR_ACCOUNT_MERGE]: Parameters.GetValidateCodeForAccountMergeParams;
     [WRITE_COMMANDS.MERGE_WITH_VALIDATE_CODE]: Parameters.MergeWithValidateCodeParams;
+    [WRITE_COMMANDS.CREATE_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.CreateDomainAccountMergeRequestParams;
+    [WRITE_COMMANDS.CANCEL_DOMAIN_ACCOUNT_MERGE_REQUEST]: Parameters.CancelDomainAccountMergeRequestParams;
     // Change report policy
     [WRITE_COMMANDS.CHANGE_REPORT_POLICY]: Parameters.ChangeReportPolicyParams;
     [WRITE_COMMANDS.CHANGE_REPORT_POLICY_AND_INVITE_SUBMITTER]: Parameters.ChangeReportPolicyAndInviteSubmitterParams;

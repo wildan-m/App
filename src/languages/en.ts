@@ -2783,6 +2783,13 @@ const translations = {
             reachOutForHelp: '<muted-text><centered-text>Feel free to <concierge-link>reach out to Concierge</concierge-link> if you have any questions!</centered-text></muted-text>',
             goToExpensifyClassic: 'Go to Expensify Classic',
         },
+        domainAccountMergeRequest: {
+            heading: 'Waiting for admin approval',
+            description: (sourceLogin: string, targetLogin: string) =>
+                `<muted-text><centered-text>Your request to merge <strong>${sourceLogin}</strong> into <strong>${targetLogin}</strong> was sent to your domain admin. Requests expire 24 hours after they’re sent.</centered-text></muted-text>`,
+            cancelRequest: 'Cancel request',
+            cancelError: 'We couldn’t cancel your request. Please try again.',
+        },
         mergeFailureSAMLDomainControlDescription: (email: string) =>
             `<muted-text><centered-text>You can’t merge <strong>${email}</strong> because it’s controlled by <strong>${email.split('@').at(1) ?? ''}</strong>. Please <concierge-link>reach out to Concierge</concierge-link> for assistance.</centered-text></muted-text>`,
         mergeFailureSAMLAccountDescription: (email: string) =>
