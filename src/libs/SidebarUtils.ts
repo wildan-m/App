@@ -253,6 +253,7 @@ function shouldDisplayReportInLHN({
         isReportArchived,
         requiresAttention,
         derivedIsEmptyReport: reportAttributes?.[report?.reportID]?.isEmpty,
+        candidateOneTransactionThreadReportID: reportAttributes?.[report?.reportID]?.candidateOneTransactionThreadReportID,
         currentUserLogin,
         currentUserAccountID,
         conciergeReportID,
@@ -1085,7 +1086,8 @@ function getIsUnreadReportForInboxTab(report: Report, oneTransactionThreadReport
 
 /** Gets the transaction thread of a single-expense report, which the LHN hides in favor of the report itself. */
 function getOneTransactionThreadReportForLHN(report: Report, reports: OnyxCollection<Report>, reportAttributes: ReportAttributesDerivedValue['reports'] | undefined): OnyxEntry<Report> {
-    const oneTransactionThreadReportID = reportAttributes?.[report.reportID]?.oneTransactionThreadReportID;
+    const attributes = reportAttributes?.[report.reportID];
+    const oneTransactionThreadReportID = attributes?.oneTransactionThreadReportID ?? attributes?.candidateOneTransactionThreadReportID;
     if (!oneTransactionThreadReportID) {
         return undefined;
     }

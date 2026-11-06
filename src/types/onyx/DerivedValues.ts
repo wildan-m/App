@@ -40,6 +40,12 @@ type ReportAttributes = {
     oneTransactionThreadReportID?: string;
 
     /**
+     * The likely one-transaction thread of a single-expense report whose linking IOU action isn't loaded yet (e.g. after clearing the cache).
+     * Without that action the thread can't be confirmed, so only unread checks may read this, never the row's preview or navigation.
+     */
+    candidateOneTransactionThreadReportID?: string;
+
+    /**
      * True when this report (typically a child expense report) has an RBR-worthy reason that should
      * propagate up to its parent workspace chat. Set by the per-report pass; consumed by the propagation
      * loop. We track it separately from `brickRoadStatus` because we suppress the child's own RBR/Fix badge

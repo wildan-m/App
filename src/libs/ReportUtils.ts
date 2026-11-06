@@ -11490,6 +11490,8 @@ type ShouldReportBeInOptionListParams = {
     transactionViolations?: OnyxCollection<TransactionViolations>;
     /** Pre-computed isEmpty flag from reportAttributes derived value. When provided, skips the module-level reportAttributesDerivedValue read inside isEmptyReport. */
     derivedIsEmptyReport: boolean | undefined;
+    /** Pre-computed from reportAttributes derived value. Lets Focus mode see a single-expense report's unread thread before the IOU action linking them is loaded. */
+    candidateOneTransactionThreadReportID?: string;
     hasGuidesEmails: boolean;
 };
 
@@ -11513,6 +11515,7 @@ function reasonForReportToBeInOptionList({
     requiresAttention,
     transactionViolations,
     derivedIsEmptyReport,
+    candidateOneTransactionThreadReportID,
     hasGuidesEmails,
 }: ShouldReportBeInOptionListParams): ValueOf<typeof CONST.REPORT_IN_LHN_REASONS> | null {
     const isInDefaultMode = !isInFocusMode;
@@ -11634,7 +11637,7 @@ function reasonForReportToBeInOptionList({
 
     // All unread chats (even archived ones) in GSD mode will be shown. This is because GSD mode is specifically for focusing the user on the most relevant chats, primarily, the unread ones
     if (isInFocusMode) {
-        const oneTransactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, currentReportActions);
+        const oneTransactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, currentReportActions) ?? candidateOneTransactionThreadReportID;
         const oneTransactionThreadReport = deprecatedAllReports?.[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`];
         return isUnread(report, oneTransactionThreadReport, isReportArchived, derivedIsEmptyReport) && getReportNotificationPreference(report) !== CONST.REPORT.NOTIFICATION_PREFERENCE.MUTE
             ? CONST.REPORT_IN_LHN_REASONS.IS_UNREAD

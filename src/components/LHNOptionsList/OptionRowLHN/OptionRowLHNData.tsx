@@ -156,7 +156,10 @@ function OptionRowLHNData({isOptionFocused = false, viewMode = 'default', report
         return result;
     };
 
-    const [oneTransactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportAttributes?.oneTransactionThreadReportID)}`);
+    // Only the row's unread state reads this report, so the candidate thread can stand in until the IOU action linking it is loaded.
+    const [oneTransactionThreadReport] = useOnyx(
+        `${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportAttributes?.oneTransactionThreadReportID ?? reportAttributes?.candidateOneTransactionThreadReportID)}`,
+    );
     const [transactionThreadReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(reportAttributes?.oneTransactionThreadReportID)}`);
     const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS, {selector: visibleActionsSelector});
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(fullReport?.policyID)}`);

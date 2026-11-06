@@ -823,6 +823,86 @@ describe('OnyxDerived', () => {
                 expect(derivedReportAttributes?.reports[parentReport.reportID].brickRoadStatus).toBe(CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR);
             });
         });
+
+        describe('candidateOneTransactionThreadReportID', () => {
+            const expenseReport: Report = {
+                ...createRandomReport(100, undefined),
+                reportID: 'singleExpense',
+                type: CONST.REPORT.TYPE.EXPENSE,
+                transactionCount: 1,
+            };
+            const buildThread = (reportID: string, parentReportActionID: string, lastVisibleActionCreated: string): Report => ({
+                ...createRandomReport(101, undefined),
+                reportID,
+                type: CONST.REPORT.TYPE.CHAT,
+                parentReportID: expenseReport.reportID,
+                parentReportActionID,
+                lastVisibleActionCreated,
+            });
+            const buildIOUAction = (reportActionID: string, childReportID: string): ReportAction =>
+                getFakeReportAction(1, {
+                    reportActionID,
+                    actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+                    originalMessage: {IOUTransactionID: 'transaction', type: CONST.IOU.REPORT_ACTION_TYPE.CREATE, amount: 1000, currency: CONST.CURRENCY.USD},
+                    childReportID,
+                });
+            const getExpenseReportAttributes = async () => (await OnyxUtils.get(ONYXKEYS.DERIVED.REPORT_ATTRIBUTES))?.reports[expenseReport.reportID];
+            const setReports = async (...reports: Report[]) => {
+                for (const report of reports) {
+                    await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${report.reportID}`, report);
+                }
+                await waitForBatchedUpdates();
+            };
+
+            it('picks the newest thread while the IOU action is not loaded, even when the thread loads after its parent', async () => {
+                // Given a single-expense report whose report actions are not loaded
+                await setReports(expenseReport);
+                expect((await getExpenseReportAttributes())?.candidateOneTransactionThreadReportID).toBeUndefined();
+
+                // When its threads load afterwards
+                await setReports(buildThread('olderThread', 'olderAction', '2025-01-20 11:00:00.000'), buildThread('newerThread', 'newerAction', '2025-01-20 12:00:00.000'));
+
+                // Then the newest thread is the candidate, and it isn't presented as the confirmed thread
+                const attributes = await getExpenseReportAttributes();
+                expect(attributes?.candidateOneTransactionThreadReportID).toBe('newerThread');
+                expect(attributes?.oneTransactionThreadReportID).toBeUndefined();
+            });
+
+            it('skips a thread whose parent action is loaded, since that action does not link it as the transaction thread', async () => {
+                // Given a single-expense report whose loaded action is a plain comment with its own thread
+                const commentAction = getFakeReportAction(1, {reportActionID: 'commentAction', actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, childReportID: 'commentThread'});
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}`, {[commentAction.reportActionID]: commentAction});
+
+                // When that comment thread is the only child
+                await setReports(expenseReport, buildThread('commentThread', commentAction.reportActionID, '2025-01-20 12:00:00.000'));
+
+                // Then it is not a candidate
+                expect((await getExpenseReportAttributes())?.candidateOneTransactionThreadReportID).toBeUndefined();
+            });
+
+            it('hands over to the action-based lookup once the IOU action loads', async () => {
+                // Given a candidate thread found while the IOU action is not loaded
+                await setReports(expenseReport, buildThread('transactionThread', 'iouAction', '2025-01-20 12:00:00.000'));
+                expect((await getExpenseReportAttributes())?.candidateOneTransactionThreadReportID).toBe('transactionThread');
+
+                // When the IOU action loads
+                await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}`, {iouAction: buildIOUAction('iouAction', 'transactionThread')});
+                await waitForBatchedUpdates();
+
+                // Then the confirmed thread replaces the candidate
+                const attributes = await getExpenseReportAttributes();
+                expect(attributes?.oneTransactionThreadReportID).toBe('transactionThread');
+                expect(attributes?.candidateOneTransactionThreadReportID).toBeUndefined();
+            });
+
+            it('ignores reports with more than one expense', async () => {
+                // Given a report with two expenses and a child thread
+                await setReports({...expenseReport, transactionCount: 2}, buildThread('childThread', 'someAction', '2025-01-20 12:00:00.000'));
+
+                // Then no thread is a candidate
+                expect((await getExpenseReportAttributes())?.candidateOneTransactionThreadReportID).toBeUndefined();
+            });
+        });
     });
 
     describe('reportTransactionsAndViolations', () => {

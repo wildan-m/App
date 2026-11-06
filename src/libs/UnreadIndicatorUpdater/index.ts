@@ -97,7 +97,9 @@ function getUnreadReportsForUnreadIndicator(reports: OnyxCollection<Report>, cur
         const nameValuePairs = allReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${report?.reportID}`];
         const isReportArchived = ReportUtils.isArchivedReport(nameValuePairs);
         const chatReport = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`];
-        const oneTransactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`], isOffline);
+        const oneTransactionThreadReportID =
+            getOneTransactionThreadReportID(report, chatReport, allReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`], isOffline) ??
+            (report?.reportID ? reportAttributesDerived?.[report.reportID]?.candidateOneTransactionThreadReportID : undefined);
         const oneTransactionThreadReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${oneTransactionThreadReportID}`];
 
         const derivedIsEmptyReport = report?.reportID ? reportAttributesDerived?.[report.reportID]?.isEmpty : undefined;

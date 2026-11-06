@@ -5296,6 +5296,75 @@ describe('SidebarUtils', () => {
                 expect(displayedReports[expenseReportKey]).toBeUndefined();
                 expect(result[expenseReportKey]?.isUnreadReport).toBe(true);
             });
+
+            it('should show a single-expense report in Focus mode when its IOU action is not loaded but its candidate thread is unread', async () => {
+                // Given a read single-expense report after a cache clear: the thread with a new comment is in Onyx, but the IOU action linking them is not
+                const expenseReport: Report = {
+                    ...createRandomReport(1, undefined),
+                    type: CONST.REPORT.TYPE.EXPENSE,
+                    transactionCount: 1,
+                    isPinned: false,
+                    isOwnPolicyExpenseChat: false,
+                    participants: {[CURRENT_USER_ACCOUNT_ID]: {notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS}},
+                    lastReadTime: '2025-01-20 12:00:00.000',
+                    lastVisibleActionCreated: '2025-01-20 11:00:00.000',
+                    lastActorAccountID: CURRENT_USER_ACCOUNT_ID,
+                };
+                const transactionThread: Report = {
+                    ...createRandomReport(2, undefined),
+                    type: CONST.REPORT.TYPE.CHAT,
+                    isPinned: false,
+                    isOwnPolicyExpenseChat: false,
+                    parentReportID: expenseReport.reportID,
+                    parentReportActionID: '1',
+                    lastReadTime: '2025-01-20 12:00:00.000',
+                    lastVisibleActionCreated: '2025-01-20 13:00:00.000',
+                    lastActorAccountID: 18921695,
+                };
+                const expenseReportKey = `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}` as const;
+                const transactionThreadKey = `${ONYXKEYS.COLLECTION.REPORT}${transactionThread.reportID}` as const;
+                await act(async () => {
+                    await Onyx.set(ONYXKEYS.SESSION, {accountID: CURRENT_USER_ACCOUNT_ID, email: CURRENT_USER_LOGIN});
+                    await Onyx.set(expenseReportKey, expenseReport);
+                    await Onyx.set(transactionThreadKey, transactionThread);
+                });
+                const buildLHNReports = (candidateOneTransactionThreadReportID?: string) =>
+                    SidebarUtils.getReportsToDisplayInLHN({
+                        reports: {[expenseReportKey]: expenseReport, [transactionThreadKey]: transactionThread},
+                        policies: {},
+                        currentReportId: undefined,
+                        isDefaultRoomsBetaEnabled: false,
+                        priorityMode: CONST.PRIORITY_MODE.GSD,
+                        transactions: {},
+                        transactionViolations: {},
+                        reportNameValuePairs: {},
+                        reportAttributes: {
+                            [expenseReport.reportID]: {
+                                reportName: '',
+                                isEmpty: false,
+                                brickRoadStatus: undefined,
+                                requiresAttention: false,
+                                reportErrors: {},
+                                candidateOneTransactionThreadReportID,
+                            },
+                        },
+                        draftComments: {},
+                        isOffline: false,
+                        currentUserLogin: CURRENT_USER_LOGIN,
+                        currentUserAccountID: CURRENT_USER_ACCOUNT_ID,
+                        guideAccountIDs: [],
+                        conciergeReportID: undefined,
+                        session: undefined,
+                    });
+
+                // When the LHN report set is built in Focus mode with and without the candidate thread
+                const resultWithCandidate = buildLHNReports(transactionThread.reportID);
+                const resultWithoutCandidate = buildLHNReports();
+
+                // Then only the candidate thread's comment shows the report in the LHN and the Unread tab
+                expect(resultWithCandidate[expenseReportKey]?.isUnreadReport).toBe(true);
+                expect(resultWithoutCandidate[expenseReportKey]).toBeUndefined();
+            });
         });
 
         describe('getReportsToDisplayInLHN', () => {

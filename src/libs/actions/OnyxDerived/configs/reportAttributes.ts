@@ -64,6 +64,37 @@ const prepareReportKeys = (keys: string[]) => {
     ];
 };
 
+// Groups chat threads by their parent report, so a single-expense report can find its children without scanning every report.
+const buildChatThreadsByParentReportID = (reports: OnyxCollection<Report>) => {
+    const chatThreadsByParentReportID = new Map<string, Report[]>();
+    for (const report of Object.values(reports ?? {})) {
+        if (!report?.parentReportID || !report.parentReportActionID || report.type !== CONST.REPORT.TYPE.CHAT) {
+            continue;
+        }
+        const chatThreads = chatThreadsByParentReportID.get(report.parentReportID) ?? [];
+        chatThreads.push(report);
+        chatThreadsByParentReportID.set(report.parentReportID, chatThreads);
+    }
+    return chatThreadsByParentReportID;
+};
+
+const canHaveOneTransactionThread = (report: Report) =>
+    report.transactionCount === 1 && (report.type === CONST.REPORT.TYPE.EXPENSE || report.type === CONST.REPORT.TYPE.IOU || report.type === CONST.REPORT.TYPE.INVOICE);
+
+// The IOU action linking a single-expense report to its thread isn't loaded until the report opens, so use the newest thread whose parent action is also missing.
+const getCandidateOneTransactionThreadReportID = (chatThreads: Report[] | undefined, reportActionsList: OnyxEntry<ReportActions>) => {
+    let candidate: Report | undefined;
+    for (const chatThread of chatThreads ?? []) {
+        if (chatThread.parentReportActionID && reportActionsList?.[chatThread.parentReportActionID]) {
+            continue;
+        }
+        if (!candidate || (chatThread.lastVisibleActionCreated ?? '') > (candidate.lastVisibleActionCreated ?? '')) {
+            candidate = chatThread;
+        }
+    }
+    return candidate?.reportID;
+};
+
 const hasPolicyRelevantFieldChanged = (prev: Policy | null | undefined, next: Policy | null | undefined): boolean => {
     if (!prev && !next) {
         return false;
@@ -540,6 +571,12 @@ export default createOnyxDerivedValueConfig({
                         if (report?.chatReportID && report.reportID !== report.chatReportID) {
                             parentChatReportIDsToUpdate.add(`${ONYXKEYS.COLLECTION.REPORT}${report.chatReportID}`);
                         }
+
+                        // A thread loading or changing can change which thread its single-expense parent treats as the candidate.
+                        const parentReport = report?.parentReportID ? reports[`${ONYXKEYS.COLLECTION.REPORT}${report.parentReportID}`] : undefined;
+                        if (parentReport && canHaveOneTransactionThread(parentReport)) {
+                            parentChatReportIDsToUpdate.add(`${ONYXKEYS.COLLECTION.REPORT}${parentReport.reportID}`);
+                        }
                     }
                     if (parentChatReportIDsToUpdate.size > 0) {
                         dataToIterate.push(...Array.from(parentChatReportIDsToUpdate));
@@ -628,6 +665,9 @@ export default createOnyxDerivedValueConfig({
         }
         const reportsTransactions = previousReportsTransactions;
 
+        // Built on first use, since most computes don't touch a single-expense report without its IOU action loaded.
+        let chatThreadsByParentReportID: Map<string, Report[]> | undefined;
+
         const reportAttributes = dataToIterate.reduce<ReportAttributesDerivedValue['reports']>(
             (acc, key) => {
                 // source value sends partial data, so we need an entire report object to do computations
@@ -668,6 +708,12 @@ export default createOnyxDerivedValueConfig({
                     currentUserLogin: session?.email ?? '',
                     reportsTransactions,
                 });
+
+                let candidateOneTransactionThreadReportID: string | undefined;
+                if (!oneTransactionThreadReportID && canHaveOneTransactionThread(report)) {
+                    chatThreadsByParentReportID ??= buildChatThreadsByParentReportID(reports);
+                    candidateOneTransactionThreadReportID = getCandidateOneTransactionThreadReportID(chatThreadsByParentReportID.get(report.reportID), reportActionsList);
+                }
 
                 const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${report.policyID}`];
                 const hasFieldViolations = hasVisibleReportFieldViolations(
@@ -765,6 +811,7 @@ export default createOnyxDerivedValueConfig({
                     actionTargetReportActionID,
                     reportErrors,
                     oneTransactionThreadReportID,
+                    candidateOneTransactionThreadReportID,
                     needsParentChatErrorPropagation,
                 };
 

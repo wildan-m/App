@@ -222,7 +222,8 @@ function SidebarOrderedReportsContextProvider({
         // unread state also depends on the thread. So when the thread changes (e.g. a new comment), recheck its parent too.
         for (const key of Array.from(reportsToUpdate)) {
             const parentReportID = chatReports?.[key]?.parentReportID;
-            if (!parentReportID || reportAttributes?.[parentReportID]?.oneTransactionThreadReportID !== chatReports?.[key]?.reportID) {
+            const parentAttributes = parentReportID ? reportAttributes?.[parentReportID] : undefined;
+            if (!parentReportID || (parentAttributes?.oneTransactionThreadReportID ?? parentAttributes?.candidateOneTransactionThreadReportID) !== chatReports?.[key]?.reportID) {
                 continue;
             }
             reportsToUpdate.add(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`);
