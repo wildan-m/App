@@ -184,9 +184,15 @@ function BaseModal({
         };
     }, [isVisible, wasVisible, onClose, type, isModalCovering, handleDismissModal, coveringModalID]);
 
+    const hideModalOnUnmount = (callHideCallback: boolean) => {
+        // Unmounting while visible skips the dismiss effect, so resolve the ready-to-focus promise here or delayed composer focus waits on it forever.
+        handleDismissModal();
+        hideModal(callHideCallback);
+    };
+
     useEffect(() => {
-        hideModalCallbackRef.current = hideModal;
-    }, [hideModal]);
+        hideModalCallbackRef.current = hideModalOnUnmount;
+    }, [hideModalOnUnmount]);
 
     useEffect(() => {
         isVisibleRef.current = isVisible;
@@ -438,16 +444,15 @@ function BaseModal({
                             )}
                             <ColorSchemeWrapper>{shouldWrapChildrenInScrollView ? <ScrollView>{children}</ScrollView> : children}</ColorSchemeWrapper>
                         </Animated.View>
-                        {stackedResizableRHPWidth !== undefined &&
-                            isVisible && (
-                                // Shifts with the card when the Side Panel opens, since the handle straddles the card's edge.
-                                <Animated.View
-                                    pointerEvents="box-none"
-                                    style={[styles.fullScreen, sidePanelAnimatedStyle]}
-                                >
-                                    <RHPResizeHandle />
-                                </Animated.View>
-                            )}
+                        {stackedResizableRHPWidth !== undefined && isVisible && (
+                            // Shifts with the card when the Side Panel opens, since the handle straddles the card's edge.
+                            <Animated.View
+                                pointerEvents="box-none"
+                                style={[styles.fullScreen, sidePanelAnimatedStyle]}
+                            >
+                                <RHPResizeHandle />
+                            </Animated.View>
+                        )}
                         {!keyboardStateContextValue?.isKeyboardActive && <NavigationBar />}
                     </ReanimatedModal>
                 </View>
