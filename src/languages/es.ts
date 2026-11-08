@@ -7224,6 +7224,8 @@ ${amount} para ${merchant} - ${date}`,
                 statementCloseDateTitle: 'Fecha de cierre del estado de cuenta',
                 statementCloseDateDescription: 'Indícanos cuándo cierra el estado de cuenta de tu tarjeta y crearemos uno correspondiente en Expensify.',
                 exportAccount: 'Exportar cuenta',
+                lastSynced: 'Última sincronización',
+                lastSuccessfulSync: (date: string) => `Última sincronización correcta: ${date}`,
             },
             workflows: {
                 title: 'Flujos de trabajo',

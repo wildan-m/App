@@ -7904,6 +7904,10 @@ const translations = {
                 integrationExportTitle: (integration: string, exportPageLink?: string) =>
                     `Choose the ${integration} account where transactions should be exported.${exportPageLink ? ` Select a different <a href="${exportPageLink}">export option</a> to change the available accounts.` : ''}`,
                 lastUpdated: 'Last updated',
+                // @context Header of the company cards table column showing when each card last synced successfully with the bank.
+                lastSynced: 'Last synced',
+                // @context Tooltip on a card's last synced value in the company cards table. date is a formatted date and time, or "Never".
+                lastSuccessfulSync: (date: string) => `Last successful sync: ${date}`,
                 transactionStartDate: 'Transaction start date',
                 bulkUpdateTransactionStartDate: 'Update transaction start date',
                 updateCard: 'Update card',

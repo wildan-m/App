@@ -7309,6 +7309,8 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 statementCloseDateTitle: 'Sluitingsdatum afschrift',
                 statementCloseDateDescription: 'Laat ons weten wanneer je creditcardafschrift wordt afgesloten, dan maken wij een bijpassend afschrift in Expensify aan.',
                 exportAccount: 'Account exporteren',
+                lastSynced: 'Laatst gesynchroniseerd',
+                lastSuccessfulSync: (date: string) => `Laatste geslaagde synchronisatie: ${date}`,
             },
             workflows: {
                 title: 'Workflows',

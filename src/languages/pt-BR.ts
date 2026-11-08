@@ -7322,6 +7322,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 statementCloseDateTitle: 'Data de fechamento do extrato',
                 statementCloseDateDescription: 'Informe quando o seu fechamento da fatura do cartão ocorrer e criaremos uma fatura correspondente no Expensify.',
                 exportAccount: 'Exportar conta',
+                lastSynced: 'Última sincronização',
+                lastSuccessfulSync: (date: string) => `Última sincronização bem-sucedida: ${date}`,
             },
             workflows: {
                 title: 'Fluxos de trabalho',

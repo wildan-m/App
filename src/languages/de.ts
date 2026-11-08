@@ -7369,6 +7369,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 statementCloseDateTitle: 'Abrechnungsschlussdatum',
                 statementCloseDateDescription: 'Teile uns mit, wann dein Kreditkartenkontoauszug abgeschlossen wird, und wir erstellen einen passenden Auszug in Expensify.',
                 exportAccount: 'Konto exportieren',
+                lastSynced: 'Zuletzt synchronisiert',
+                lastSuccessfulSync: (date: string) => `Letzte erfolgreiche Synchronisierung: ${date}`,
             },
             workflows: {
                 title: 'Workflows',

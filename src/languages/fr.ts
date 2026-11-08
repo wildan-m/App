@@ -7392,6 +7392,8 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                 statementCloseDateTitle: 'Date de clôture du relevé',
                 statementCloseDateDescription: 'Indiquez-nous la date de clôture de votre relevé de carte, et nous créerons un relevé correspondant dans Expensify.',
                 exportAccount: 'Exporter le compte',
+                lastSynced: 'Dernière synchronisation',
+                lastSuccessfulSync: (date: string) => `Dernière synchronisation réussie : ${date}`,
             },
             workflows: {
                 title: 'Workflows',

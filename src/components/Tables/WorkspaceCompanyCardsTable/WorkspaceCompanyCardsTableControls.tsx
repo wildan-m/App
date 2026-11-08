@@ -78,7 +78,7 @@ function WorkspaceCompanyCardsTableControls({
             translate('workspace.expensifyCard.name'),
             translate('workspace.moreFeatures.companyCards.cardNumber'),
             translate('workspace.moreFeatures.companyCards.transactionStartDate'),
-            translate('workspace.moreFeatures.companyCards.lastUpdated'),
+            translate('workspace.moreFeatures.companyCards.lastSynced'),
             translate('workspace.moreFeatures.companyCards.assignedCards'),
         ]
             .map(escapeCsvField)

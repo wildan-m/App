@@ -7210,6 +7210,8 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 statementCloseDateTitle: '取引明細書の締め日',
                 statementCloseDateDescription: 'カード明細の締め日を教えていただければ、Expensify 内に対応する明細を作成します。',
                 exportAccount: 'アカウントを書き出す',
+                lastSynced: '最終同期日時',
+                lastSuccessfulSync: (date: string) => `直近の正常同期日時：${date}`,
             },
             workflows: {
                 title: 'ワークフロー',

@@ -7325,6 +7325,8 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 statementCloseDateTitle: 'Data di chiusura dell’estratto conto',
                 statementCloseDateDescription: 'Facci sapere quando si chiude l’estratto conto della tua carta e creeremo un estratto conto corrispondente in Expensify.',
                 exportAccount: 'Esporta conto',
+                lastSynced: 'Ultima sincronizzazione',
+                lastSuccessfulSync: (date: string) => `Ultima sincronizzazione riuscita: ${date}`,
             },
             workflows: {
                 title: 'Flussi di lavoro',

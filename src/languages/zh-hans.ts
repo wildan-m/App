@@ -7037,6 +7037,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 statementCloseDateTitle: '账单结算日',
                 statementCloseDateDescription: '请告诉我们您的信用卡账单结算日期，我们会在 Expensify 中创建一份相应的对账单。',
                 exportAccount: '导出账户',
+                lastSynced: '上次同步时间',
+                lastSuccessfulSync: (date: string) => `上次成功同步时间：${date}`,
             },
             workflows: {
                 title: '工作流程',
