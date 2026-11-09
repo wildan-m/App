@@ -120,3 +120,14 @@
 - Upstream PR/issue: [software-mansion/react-native-screens#5074](https://github.com/software-mansion/react-native-screens/pull/5074), the same change as [#4812](https://github.com/software-mansion/react-native-screens/pull/4812) rebased onto the current tabs layout. Once it ships in a release we consume, this patch can be dropped.
 - E/App issue: [#104505](https://github.com/Expensify/App/issues/104505)
 - PR introducing patch: [#105020](https://github.com/Expensify/App/pull/105020)
+
+### [react-native-screens+4.28.0+009+recover-dropped-modal-dismissal.patch](react-native-screens+4.28.0+009+recover-dropped-modal-dismissal.patch)
+
+- Reason: On iOS, a transparent modal screen (the migrated-user welcome, submit-plan, feature-training and onboarding popups) can stay presented after JS has removed it, leaving an invisible view over the whole window that swallows every tap until the app is restarted. `setModalViewControllers` sets `updatingModals` while a modal update runs and clears it only from the completion of the UIKit transition. Two paths never reach that completion:
+  - UIKit refuses `dismissViewControllerAnimated:completion:` when it is requested while another presentation or dismissal is in progress, and never calls the completion.
+  - When the controller to present on is itself being dismissed, the update returns early without clearing the guard. Upstream relies on `presentationControllerDidDismiss` for this case, which only fires for a dismissal started by the user's gesture.
+
+  Every later update then only sets `scheduleModalsUpdate`, which is replayed from the same completion, so the popped modal is never dismissed. The patch detects both cases. A refused dismissal is recognised right after the call: the modal is neither being dismissed nor gone. The patch then waits for the transition that blocked the request to end (or the next main queue turn when UIKit exposes none), checks that the modal is still presented and that no other modal update has started since, clears the guard and runs `updateContainer` again. If UIKit had only deferred the request, the check fails and its own completion clears the guard as usual. Only dismissals are retried: presenting a controller twice throws, while a repeated dismissal is harmless.
+- Upstream PR/issue: TBD
+- E/App issue: [#105796](https://github.com/Expensify/App/issues/105796)
+- PR introducing patch: TBD

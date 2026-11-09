@@ -1,0 +1,92 @@
+diff --git a/node_modules/react-native-screens/ios/RNSScreenStack.mm b/node_modules/react-native-screens/ios/RNSScreenStack.mm
+index 57d6480..6cb191d 100644
+--- a/node_modules/react-native-screens/ios/RNSScreenStack.mm
++++ b/node_modules/react-native-screens/ios/RNSScreenStack.mm
+@@ -183,6 +183,8 @@ @implementation RNSScreenStackView {
+   __weak UIViewController *_pendingPushController;
+   // An update was skipped while the push was pending.
+   BOOL _updateSkippedForPendingPush;
++  // Bumped each time setModalViewControllers takes the `updatingModals` guard.
++  NSUInteger _modalsUpdateGeneration;
+ }
+ 
+ - (instancetype)initWithFrame:(CGRect)frame
+@@ -407,6 +409,7 @@ - (void)setModalViewControllers:(NSArray<UIViewController *> *)controllers
+   }
+ 
+   _updatingModals = YES;
++  const NSUInteger modalsUpdateGeneration = ++_modalsUpdateGeneration;
+ 
+   // We need to find bottom-most view controller that should stay on the stack
+   // for the duration of transition.
+@@ -492,6 +495,12 @@ - (void)setModalViewControllers:(NSArray<UIViewController *> *)controllers
+       // https://github.com/software-mansion/react-native-screens/issues/1299 We call `updateContainer` again in
+       // `presentationControllerDidDismiss` to cover this case and present new controller
+       if (previous.beingDismissed) {
++        // Nothing else releases the guard when the dismissal was started from code, so release it ourselves.
++        [weakSelf releaseModalsUpdate:modalsUpdateGeneration
++                    afterTransitionOf:previous
++                       ifStillDropped:^BOOL {
++                         return YES;
++                       }];
+         return;
+       }
+ 
+@@ -548,6 +557,17 @@ - (void)setModalViewControllers:(NSArray<UIViewController *> *)controllers
+               : YES;
+           [changeRootController dismissViewControllerAnimated:firstModalToBeDismissedPrefersAnimation
+                                                    completion:finish];
++          // UIKit refuses a dismissal requested while another presentation or dismissal is in progress, and never
++          // calls its completion. The modal then stays on screen and `updatingModals` blocks every later update.
++          BOOL (^isDismissalDropped)(void) = ^BOOL {
++            return !firstModalToBeDismissed.isBeingDismissed &&
++                changeRootController.presentedViewController == firstModalToBeDismissed;
++          };
++          if (isDismissalDropped()) {
++            [self releaseModalsUpdate:modalsUpdateGeneration
++                    afterTransitionOf:changeRootController
++                       ifStillDropped:isDismissalDropped];
++          }
+         } else {
+           // We need to wait for its dismissal and then run our presentation code.
+           // This happens, e.g. when we have foreign modal presented on top of owned one & we dismiss foreign one and
+@@ -588,6 +608,39 @@ - (void)setModalViewControllers:(NSArray<UIViewController *> *)controllers
+   finish();
+ }
+ 
++// Releases the `updatingModals` guard of a modal update whose UIKit transition was refused, and applies the current
++// modal state again. Runs once, after the transition that blocked the request ends, or on the next main queue turn
++// when no transition is visible. `isStillDropped` is checked first: UIKit may have only deferred the request, and
++// then its completion releases the guard as usual.
++- (void)releaseModalsUpdate:(NSUInteger)generation
++          afterTransitionOf:(UIViewController *)controller
++             ifStillDropped:(BOOL (^)(void))isStillDropped
++{
++  __weak RNSScreenStackView *weakSelf = self;
++  void (^retry)(void) = ^{
++    RNSScreenStackView *strongSelf = weakSelf;
++    if (strongSelf == nil || !strongSelf->_updatingModals || strongSelf->_modalsUpdateGeneration != generation ||
++        !isStillDropped()) {
++      return;
++    }
++    strongSelf->_updatingModals = NO;
++    strongSelf->_scheduleModalsUpdate = NO;
++    [strongSelf updateContainer];
++  };
++
++  UIViewController *topMostVc = [RNSScreenStackView findTopMostPresentedViewControllerFromViewController:controller];
++  id<UIViewControllerTransitionCoordinator> coordinator =
++      controller.transitionCoordinator ?: topMostVc.transitionCoordinator;
++  if (coordinator != nil &&
++      [coordinator animateAlongsideTransition:nil
++                                   completion:^(id<UIViewControllerTransitionCoordinatorContext> _) {
++                                     dispatch_async(dispatch_get_main_queue(), retry);
++                                   }]) {
++    return;
++  }
++  dispatch_async(dispatch_get_main_queue(), retry);
++}
++
+ - (void)setPushViewControllers:(NSArray<UIViewController *> *)controllers
+ {
+   // iOS < 18 can hold an animated push until the next CA commit. Until then the controller is not in
