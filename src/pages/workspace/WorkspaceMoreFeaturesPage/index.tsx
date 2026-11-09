@@ -12,6 +12,7 @@ import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import useOtherFeedsForFeedSelector from '@hooks/useOtherFeedsForFeedSelector';
 import usePermissions from '@hooks/usePermissions';
 import {usePersonalDetailsByIDs} from '@hooks/usePersonalDetails';
 import usePolicyConnectionsPrefetch from '@hooks/usePolicyConnectionsPrefetch';
@@ -111,6 +112,10 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
     const distanceRateCustomUnit = getDistanceRateCustomUnit(policy);
 
     const [cardFeeds] = useCardFeeds(policyID);
+    const otherCardFeeds = useOtherFeedsForFeedSelector(policyID);
+    // Card feed data arrives via the domain-member shared NVP regardless of the feature toggle, so we can
+    // tell the admin that feeds (and their assigned cards) exist even while the feature is disabled.
+    const hasHiddenCompanyCardFeeds = !policy?.areCompanyCardsEnabled && (otherCardFeeds.length > 0 || !isEmptyObject(getCompanyFeeds(cardFeeds)));
     const policyData = usePolicyData(policyID);
     const {categories: policyCategories} = policyData;
     const defaultFundID = useDefaultFundID(policyID);
@@ -527,7 +532,7 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
                         <MoreFeatureToggle
                             icon={illustrations.CompanyCard}
                             title={translate('workspace.moreFeatures.companyCards.title')}
-                            subtitle={translate('workspace.moreFeatures.companyCards.subtitle')}
+                            subtitle={translate(hasHiddenCompanyCardFeeds ? 'workspace.moreFeatures.companyCards.hiddenFeedsHint' : 'workspace.moreFeatures.companyCards.subtitle')}
                             switchSentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MORE_FEATURES.COMPANY_CARDS_SWITCH}
                             isActive={policy?.areCompanyCardsEnabled ?? false}
                             pendingAction={policy?.pendingFields?.areCompanyCardsEnabled}

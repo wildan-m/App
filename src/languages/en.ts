@@ -7343,6 +7343,7 @@ const translations = {
                 remainingLimitDescriptionNoTimestamp: 'Remaining limit is reported by your bank.',
             },
             addCards: 'Add cards',
+            selectFeed: 'Select feed',
             selectCards: 'Select cards',
             fromOtherWorkspaces: 'From other workspaces',
             addWorkEmail: 'Add your work email',
@@ -7815,9 +7816,12 @@ const translations = {
             companyCards: {
                 title: 'Company cards',
                 subtitle: 'Connect the cards you already have.',
+                hiddenFeedsHint: 'You already have card feeds set up. Enable this feature to view and manage them and any assigned cards.',
                 feed: {
                     title: 'Bring your own cards (BYOC)',
                     subtitle: 'Link the cards you already have for automatic transaction import, receipt matching, and reconciliation.',
+                    selectFeedTitle: 'Select a card feed to get started',
+                    selectFeedSubtitle: 'Cards assigned to your workspace members will show up once you select their card feed.',
                     features: {
                         support: 'Connect cards from 10,000+ banks',
                         assignCards: 'Link your team’s existing cards',

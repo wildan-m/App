@@ -48,6 +48,9 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer, c
     const workspaceAccountID = policy?.policyAccountID ?? CONST.DEFAULT_NUMBER_ID;
     const shouldShowExpensifyCardPromotionBanner = !hasIssuedExpensifyCard(workspaceAccountID, allWorkspaceCards);
     const otherFeeds = useOtherFeedsForFeedSelector(policyID);
+    // Existing feeds (e.g. cards assigned in Expensify Classic) mean the admin should pick a feed to reveal
+    // its cards, so the empty state switches to guidance copy and its CTA already opens the feed selector.
+    const hasExistingFeeds = otherFeeds.length > 0;
 
     const illustrations = useMemoizedLazyIllustrations([
         'CreditCardsNew',
@@ -112,10 +115,10 @@ function WorkspaceCompanyCardPageEmptyState({policyID, shouldShowGBDisclaimer, c
                 />
             )}
             <FeatureList
-                title={translate('workspace.moreFeatures.companyCards.feed.title')}
-                subtitle={translate('workspace.moreFeatures.companyCards.feed.subtitle')}
-                ctaText={translate('workspace.companyCards.addCards')}
-                ctaAccessibilityLabel={translate('workspace.companyCards.addCards')}
+                title={translate(hasExistingFeeds ? 'workspace.moreFeatures.companyCards.feed.selectFeedTitle' : 'workspace.moreFeatures.companyCards.feed.title')}
+                subtitle={translate(hasExistingFeeds ? 'workspace.moreFeatures.companyCards.feed.selectFeedSubtitle' : 'workspace.moreFeatures.companyCards.feed.subtitle')}
+                ctaText={translate(hasExistingFeeds ? 'workspace.companyCards.selectFeed' : 'workspace.companyCards.addCards')}
+                ctaAccessibilityLabel={translate(hasExistingFeeds ? 'workspace.companyCards.selectFeed' : 'workspace.companyCards.addCards')}
                 onCtaPress={withReadOnlyFallback(handleCtaPress)}
                 buttonInnerStyles={!canWriteCompanyCards ? styles.buttonOpacityDisabled : undefined}
                 buttonHoverStyles={!canWriteCompanyCards ? styles.buttonOpacityDisabled : undefined}

@@ -39,7 +39,7 @@ type CardFeedListItem = ListItem & {
  * Returns feed list items for card feeds from other workspaces (not the current policy),
  * excluding feeds already linked to the current policy. Used in the workspace company card feed selector.
  */
-function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
+function useOtherFeedsForFeedSelector(policyID: string | undefined): CardFeedListItem[] {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
@@ -57,7 +57,7 @@ function useOtherFeedsForFeedSelector(policyID: string): CardFeedListItem[] {
     const getOtherFeeds = () => {
         const otherPolicyFeeds: CardFeedListItem[] = [];
         // `policyID` is stable for this hook invocation, so uppercase it once instead of per feed/linked-policy evaluation.
-        const upperPolicyID = policyID.toUpperCase();
+        const upperPolicyID = policyID?.toUpperCase();
         for (const feed of visibleFeeds) {
             // Feeds linked to the active policy are shown as available feeds, not under "From other workspaces".
             // Linked policy IDs can differ in casing, so compare case-insensitively (matches the Expensify-card path).
