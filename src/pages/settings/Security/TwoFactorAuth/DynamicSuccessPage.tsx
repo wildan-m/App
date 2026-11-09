@@ -7,7 +7,7 @@ import AccountUtils from '@libs/AccountUtils';
 import {getXeroSetupLink} from '@libs/actions/connections/Xero';
 import getPlatform from '@libs/getPlatform';
 import getStateFromPath from '@libs/Navigation/helpers/getStateFromPath';
-import Navigation from '@libs/Navigation/Navigation';
+import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {TwoFactorAuthNavigatorParamList} from '@libs/Navigation/types';
 import {shouldHideOldAppRedirect} from '@libs/TryNewDotUtils';
@@ -26,9 +26,11 @@ import SCREENS from '@src/SCREENS';
 import {hasCompletedGuidedSetupFlowSelector} from '@src/selectors/Onboarding';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
-import {findFocusedRoute} from '@react-navigation/native';
+import type {NavigationAction} from '@react-navigation/native';
+
+import {findFocusedRoute, usePreventRemove} from '@react-navigation/native';
 import {authTokenTypeSelector} from '@selectors/Session';
-import React from 'react';
+import React, {useRef} from 'react';
 
 import SuccessPageBase from './SuccessPageBase';
 
@@ -69,7 +71,11 @@ function DynamicSuccessPage({route}: DynamicSuccessPageProps) {
 
     const is2FAEnabled = !!account?.requiresTwoFactorAuth;
 
+    // Set once a forced-flow exit starts, so the dismiss it triggers is let through instead of being redirected again.
+    const isRedirectingRef = useRef(false);
+
     const completeForcedOnboarding2FAHandoff = () => {
+        isRedirectingRef.current = true;
         clearTwoFactorAuthData(is2FAEnabled, true);
         const onboardingFlowParams = buildOnboardingFlowParams(account, onboardingValues, onboardingCompanySize, onboardingPurposeSelected, onboardingInitialPath);
         Navigation.revealRouteBeforeDismissingModal(ROUTES.HOME, {
@@ -80,6 +86,7 @@ function DynamicSuccessPage({route}: DynamicSuccessPageProps) {
     };
 
     const sendForcedSetupUserHome = () => {
+        isRedirectingRef.current = true;
         Navigation.revealRouteBeforeDismissingModal(ROUTES.HOME, {
             afterTransition: () => {
                 clearTwoFactorAuthData(is2FAEnabled, true);
@@ -111,6 +118,19 @@ function DynamicSuccessPage({route}: DynamicSuccessPageProps) {
         }
         quitAndNavigateBack(is2FAEnabled, dynamicBackPath);
     };
+
+    // System back, browser back and the RHP overlay pop the modal directly and skip the header's goBack, which would reveal
+    // the Security page the require-2FA overlay opened underneath. Route those exits through goBack so they land on Home too.
+    usePreventRemove(shouldReturnToOnboardingAfter2FA || isForcedSetupFlow, ({data}: {data: {action: NavigationAction}}) => {
+        if (!isRedirectingRef.current) {
+            goBack();
+            return;
+        }
+
+        // Replayed through the container: this screen's own dispatch stamps its key as the action's source, and the root
+        // stack closing the whole RHP can't find that key, so it would drop the action.
+        navigationRef.dispatch(data.action);
+    });
 
     const onButtonPress = () => {
         if (CONFIG.IS_HYBRID_APP && isClassicRedirectDismissed && !isClassicRedirectBlocked) {
