@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {AppState} from 'react-native';
+import {AppState, Platform} from 'react-native';
 
 /**
  * Counts returns from the background. iOS also goes `inactive` for Control Center, the app switcher,
@@ -11,7 +11,7 @@ function useAppReturnCount(): number {
     const wasBackgroundedRef = useRef(false);
 
     useEffect(() => {
-        const subscription = AppState.addEventListener('change', (nextAppState) => {
+        const changeSubscription = AppState.addEventListener('change', (nextAppState) => {
             if (nextAppState === 'background') {
                 wasBackgroundedRef.current = true;
                 return;
@@ -23,7 +23,18 @@ function useAppReturnCount(): number {
             setReturnCount((count) => count + 1);
         });
 
-        return () => subscription.remove();
+        // The Android HybridApp can resume without ever reporting `background`, but the window always loses focus on the way out.
+        const blurSubscription =
+            Platform.OS === 'android'
+                ? AppState.addEventListener('blur', () => {
+                      wasBackgroundedRef.current = true;
+                  })
+                : undefined;
+
+        return () => {
+            changeSubscription.remove();
+            blurSubscription?.remove();
+        };
     }, []);
 
     return returnCount;
