@@ -574,6 +574,7 @@ const translations: TranslationDeepObject<typeof en> = {
         exportsTo: 'Exporteert naar',
         shareReport: 'Rapport delen',
         reportShared: 'Rapport gedeeld',
+        convertedAmount: 'Omgezette bedrag',
     },
     socials: {
         podcast: 'Volg ons op Podcast',

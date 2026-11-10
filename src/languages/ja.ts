@@ -573,6 +573,7 @@ const translations: TranslationDeepObject<typeof en> = {
         exportsTo: 'エクスポート先',
         shareReport: 'レポートを共有',
         reportShared: 'レポートを共有しました',
+        convertedAmount: '換算金額',
     },
     socials: {
         podcast: 'ポッドキャストでフォロー',

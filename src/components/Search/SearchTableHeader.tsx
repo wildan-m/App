@@ -174,6 +174,12 @@ const getExpenseHeaders = (groupBy?: SearchGroupBy): SearchColumnConfig[] => [
         translationKey: 'common.purchaseAmount',
     },
     {
+        // Sorting needs a backend sort key for the converted amount, so the column ships unsortable.
+        columnName: CONST.SEARCH.TABLE_COLUMNS.CONVERTED_AMOUNT,
+        translationKey: 'common.convertedAmount',
+        isColumnSortable: false,
+    },
+    {
         columnName: CONST.SEARCH.TABLE_COLUMNS.TOTAL,
         translationKey: 'common.total',
     },

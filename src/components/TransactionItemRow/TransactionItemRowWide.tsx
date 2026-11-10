@@ -690,6 +690,8 @@ function TransactionItemRowWide({
                         <ExportedIconCell reportActions={reportActions} />
                     </View>
                 );
+            // CONVERTED_AMOUNT is the Search-page counterpart of the report view's TOTAL column: same value, same fallback.
+            case CONST.SEARCH.TABLE_COLUMNS.CONVERTED_AMOUNT:
             case CONST.SEARCH.TABLE_COLUMNS.TOTAL: {
                 const isFromExpenseReport = isExpenseReport(transactionItem.report ?? report);
                 const hasConvertedAmount = transactionItem.convertedAmount != null;
@@ -699,10 +701,12 @@ function TransactionItemRowWide({
                 const totalAmount = hasConvertedAmount ? getConvertedAmount(transactionItem, isFromExpenseReport) : getAmount(transactionItem, isFromExpenseReport);
                 // When converted, display in the report's output currency; otherwise use the transaction's own currency.
                 const totalCurrency = hasConvertedAmount ? (report?.currency ?? policy?.outputCurrency ?? getCurrency(transactionItem)) : getCurrency(transactionItem);
+                // CONVERTED_AMOUNT styles under its own key so the Search table's per-column sizing targets it, not the Amount column.
+                const styleColumn = column === CONST.SEARCH.TABLE_COLUMNS.CONVERTED_AMOUNT ? CONST.SEARCH.TABLE_COLUMNS.CONVERTED_AMOUNT : CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT;
                 return (
                     <View
                         key={column}
-                        style={[getSearchColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
+                        style={[getSearchColumnStyles(styleColumn, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
                     >
                         <AmountCell
                             total={totalAmount}

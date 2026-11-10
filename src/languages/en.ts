@@ -595,6 +595,8 @@ const translations = {
         corpayPayModalTitle: 'Pay report',
         corpayPayModalPrompt: 'This submitter has a non-USD bank account. Enable global reimbursements to pay the report, or ask them to add a USD bank account.',
         purchaseAmount: 'Purchase amount',
+        // @context The amount of an expense converted into the currency of the workspace it was submitted to
+        convertedAmount: 'Converted amount',
         originalAmount: 'Original amount',
         frequency: 'Frequency',
         link: 'Link',

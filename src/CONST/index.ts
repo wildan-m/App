@@ -8497,6 +8497,12 @@ const CONST = {
                     search: true,
                     reportView: true,
                 },
+                // The single-report view already surfaces the converted amount as its TOTAL column, so this stays Search-only.
+                CONVERTED_AMOUNT: {
+                    column: this.TABLE_COLUMNS.CONVERTED_AMOUNT,
+                    search: true,
+                    reportView: false,
+                },
                 REPORT_ID: {
                     column: this.TABLE_COLUMNS.REPORT_ID,
                     search: true,
@@ -8874,6 +8880,7 @@ const CONST = {
             ATTENDEES: 'attendees',
             TOTAL_PER_ATTENDEE: 'totalPerAttendee',
             TOTAL: 'total',
+            CONVERTED_AMOUNT: 'convertedAmount',
             TYPE: 'type',
             ACTION: 'action',
             TAX_AMOUNT: 'taxAmount',
@@ -9172,6 +9179,7 @@ const CONST = {
                 [this.TABLE_COLUMNS.TAX_RATE]: 'tax-rate',
                 [this.TABLE_COLUMNS.TOTAL_AMOUNT]: 'amount',
                 [this.TABLE_COLUMNS.TOTAL]: 'total',
+                [this.TABLE_COLUMNS.CONVERTED_AMOUNT]: 'converted-amount',
                 [this.TABLE_COLUMNS.TYPE]: 'type',
                 [this.TABLE_COLUMNS.ACTION]: 'action',
                 [this.TABLE_COLUMNS.TAX_AMOUNT]: 'tax',
