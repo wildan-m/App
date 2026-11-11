@@ -3824,6 +3824,11 @@ ${amount} para ${merchant} - ${date}`,
         accounting: {
             title: '¿Utilizas algún software de contabilidad?',
             otherAccountingSoftware: 'Nombre del software',
+            searchPlaceholder: 'Buscar software de contabilidad',
+            comingSoon: 'Próximamente',
+            emptyStateTitle: ({softwareName}: {softwareName: string}) => `No encontramos "${softwareName}"`,
+            emptyStateSubtitle: 'Cuéntanos qué software usas y te avisaremos cuando esté disponible.',
+            expressInterest: 'Expresar interés',
         },
         interestedFeatures: {
             title: 'Selecciona las funciones que quieras',

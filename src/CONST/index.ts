@@ -117,26 +117,29 @@ const ONBOARDING_ACCOUNTING_MAPPING = {
     intacct: 'Sage Intacct',
     financialforce: 'Certinia',
     rillet: 'Rillet',
-    sap: 'SAP',
-    oracle: 'Oracle',
+    dualEntry: 'DualEntry',
+    campfire: 'Campfire',
+    // Keys are kept generic for saved-answer compatibility; only the labels are product-specific.
+    sap: 'SAP S/4HANA',
+    oracle: 'Oracle Fusion Cloud',
     microsoftDynamics: 'Microsoft Dynamics',
     other: 'accounting software',
 };
 
 type OnboardingAccountingOption = keyof typeof ONBOARDING_ACCOUNTING_MAPPING;
 
-/** Accounting connections not offered on the onboarding accounting step. Remove one from this union to offer it. */
-type UnofferedOnboardingAccountingConnection =
-    | typeof CONST.POLICY.CONNECTIONS.NAME.DUALENTRY
-    | typeof CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE
-    // Covered by the Microsoft Dynamics option, and still behind the BUSINESS_CENTRAL beta.
-    | typeof CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL
-    // Still behind the ZOHO_BOOKS beta.
-    | typeof CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS
-    // Still behind the DIGITS beta.
-    | typeof CONST.POLICY.CONNECTIONS.NAME.DIGITS;
+// Options offered on the onboarding accounting step as "Coming soon" expressions of interest, in display order.
+// Selecting one only records interest in the integration; it must not imply a working connection exists.
+const ONBOARDING_ACCOUNTING_COMING_SOON_MAPPING = {
+    exactOnline: 'Exact Online',
+    zohoBooks: 'Zoho Books',
+    digits: 'Digits',
+    businessCentral: 'Dynamics 365 Business Central',
+};
 
-type UnhandledAccountingConnection = Exclude<TupleToUnion<typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES>, OnboardingAccountingOption | UnofferedOnboardingAccountingConnection>;
+type OnboardingAccountingComingSoonOption = keyof typeof ONBOARDING_ACCOUNTING_COMING_SOON_MAPPING;
+
+type UnhandledAccountingConnection = Exclude<TupleToUnion<typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES>, OnboardingAccountingOption | OnboardingAccountingComingSoonOption>;
 
 // Fails typecheck if an accounting connection is neither offered on the onboarding step nor listed above.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -8078,6 +8081,7 @@ const CONST = {
         COUNTDOWN: 'countdown',
     },
     ONBOARDING_ACCOUNTING_MAPPING,
+    ONBOARDING_ACCOUNTING_COMING_SOON_MAPPING,
 
     REPORT_FIELD_TITLE_FIELD_ID: 'text_title',
 
@@ -10619,6 +10623,7 @@ export type {
     OnboardingInvite,
     OnboardingAccounting,
     OnboardingAccountingOption,
+    OnboardingAccountingComingSoonOption,
     OnboardingIntent,
     IOUActionParams,
     EnablePaymentsPageType,

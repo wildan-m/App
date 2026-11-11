@@ -4045,6 +4045,11 @@ const translations = {
         accounting: {
             title: 'Do you use any accounting software?',
             otherAccountingSoftware: 'Name of software',
+            searchPlaceholder: 'Search accounting software',
+            comingSoon: 'Coming soon',
+            emptyStateTitle: ({softwareName}: {softwareName: string}) => `We couldn't find "${softwareName}"`,
+            emptyStateSubtitle: "Tell us what you use and we'll let you know when it's supported.",
+            expressInterest: 'Express interest',
         },
         interestedFeatures: {
             title: 'Select the features you want',
