@@ -31,7 +31,14 @@ import {getParticipantsOption, getPolicyExpenseReportOption} from '@libs/Options
 import {getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {isPolicyExpenseChat} from '@libs/ReportUtils';
 import type {OptionData} from '@libs/ReportUtils';
-import {areRequiredFieldsEmpty, hasReceipt, isDistanceRequest as isDistanceRequestUtil, isMapDistanceRequest as isMapDistanceRequestUtil, isScanning} from '@libs/TransactionUtils';
+import {
+    areRequiredFieldsEmpty,
+    buildSplitTransactionFromReportAction,
+    hasReceipt,
+    isDistanceRequest as isDistanceRequestUtil,
+    isMapDistanceRequest as isMapDistanceRequestUtil,
+    isScanning,
+} from '@libs/TransactionUtils';
 
 import withReportAndReportActionOrNotFound from '@pages/inbox/report/withReportAndReportActionOrNotFound';
 import type {WithReportAndReportActionOrNotFoundProps} from '@pages/inbox/report/withReportAndReportActionOrNotFound';
@@ -65,7 +72,10 @@ function DynamicSplitBillDetailsPage({report, reportAction}: SplitBillDetailsPag
     const IOUTransactionID = originalMessage?.IOUTransactionID;
     const participantAccountIDs = originalMessage?.participantAccountIDs ?? [];
 
-    const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(IOUTransactionID)}`);
+    const [onyxTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(IOUTransactionID)}`);
+    // The split group transaction is never re-sent by the API once missing from Onyx, so fall back to the data on the split action
+    const fallbackTransaction = isEmptyObject(onyxTransaction) ? buildSplitTransactionFromReportAction(reportAction) : undefined;
+    const transaction = fallbackTransaction ?? onyxTransaction;
     const [draftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${IOUTransactionID}`);
     const [personalDetails] = useAllPersonalDetails();
     const [transactionReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transaction?.reportID}`);
@@ -128,8 +138,12 @@ function DynamicSplitBillDetailsPage({report, reportAction}: SplitBillDetailsPag
 
     const hasSmartScanFailed = hasReceipt(transaction) && transaction?.receipt?.state === CONST.IOU.RECEIPT_STATE.SCAN_FAILED;
     const isDistanceRequest = isDistanceRequestUtil(transaction);
+    // The fallback lacks the receipt and other details that completing the split needs, so it is shown read-only
     const isEditingSplitBill =
-        session?.accountID === actorAccountID && (areRequiredFieldsEmpty(transaction, transactionReport) || (transaction?.amount === 0 && !hasReceipt(transaction))) && !isDistanceRequest;
+        !fallbackTransaction &&
+        session?.accountID === actorAccountID &&
+        (areRequiredFieldsEmpty(transaction, transactionReport) || (transaction?.amount === 0 && !hasReceipt(transaction))) &&
+        !isDistanceRequest;
     const isMapDistanceRequest = isMapDistanceRequestUtil(transaction);
     const [isConfirmed, setIsConfirmed] = useState(false);
 

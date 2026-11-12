@@ -20,7 +20,7 @@ import {
     isAttendeeTrackingEnabled as isAttendeeTrackingEnabledForPolicy,
     isTimeTrackingEnabled,
 } from '@libs/PolicyUtils';
-import {getOriginalMessage, getReportAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
+import {getOriginalMessage, getReportAction, isMoneyRequestAction, isSplitBillAction} from '@libs/ReportActionsUtils';
 import {getReportOrDraftReport, getReportTransactions, getTransactionDetails, isInvoiceReport, isIOUReport, isThread} from '@libs/ReportUtils';
 import StringUtils from '@libs/StringUtils';
 import {isInvalidMerchantValue} from '@libs/ValidationUtils';
@@ -29,7 +29,7 @@ import type {IOURequestType, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Card, CardList, OnyxInputOrEntry, PersonalDetails, Policy, RecentWaypoint, Report, Transaction} from '@src/types/onyx';
+import type {Card, CardList, OnyxInputOrEntry, PersonalDetails, Policy, RecentWaypoint, Report, ReportAction, Transaction} from '@src/types/onyx';
 import type {Attendee, DistanceExpenseType} from '@src/types/onyx/IOU';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {Comment, Waypoint, WaypointCollection} from '@src/types/onyx/Transaction';
@@ -1467,6 +1467,33 @@ const getOriginalTransactionWithSplitInfo = (transaction: OnyxEntry<Transaction>
     return {isBillSplit: !!originalTransaction?.comment?.splits, isExpenseSplit: isExpenseSplit(transaction, originalTransaction), originalTransaction: originalTransaction ?? transaction};
 };
 
+/**
+ * The group transaction of a bill split lives in SPLIT_REPORT_ID, so no report-based API (OpenApp, ReconnectApp, OpenReport) sends it back
+ * once it is gone from Onyx (e.g. after "Clear cache and restart"). Rebuild a display-only copy from the SPLIT action's original message,
+ * which the server does return with the report actions, so the preview and details page can still render the split.
+ */
+function buildSplitTransactionFromReportAction(reportAction: OnyxEntry<ReportAction>): Transaction | undefined {
+    if (!isSplitBillAction(reportAction)) {
+        return undefined;
+    }
+    const originalMessage = getOriginalMessage(reportAction);
+    if (!originalMessage?.IOUTransactionID) {
+        return undefined;
+    }
+    return {
+        transactionID: originalMessage.IOUTransactionID,
+        reportID: CONST.REPORT.SPLIT_REPORT_ID,
+        amount: originalMessage.amount ?? 0,
+        currency: originalMessage.currency ?? CONST.CURRENCY.USD,
+        created: reportAction.created,
+        merchant: '',
+        comment: {
+            comment: originalMessage.comment ?? '',
+            splits: (originalMessage.participantAccountIDs ?? []).map((accountID) => ({accountID})),
+        },
+    };
+}
+
 function shouldRedirectDeleteToSplitExpenseEdit(transaction: OnyxEntry<Transaction>, originalTransaction: OnyxEntry<Transaction>, isSelfDMSplit?: boolean): boolean {
     const {isExpenseSplit: isExpenseSplitTransaction, originalTransaction: sourceTransaction} = getOriginalTransactionWithSplitInfo(transaction, originalTransaction);
 
@@ -1524,14 +1551,12 @@ function getChildTransactions(transactions: OnyxCollection<Transaction>, origina
 function createUnreportedExpenses(transactions: Array<OnyxEntry<Transaction> | undefined>): UnreportedExpenseListItemType[] {
     return transactions
         .filter((t): t is Transaction => t !== undefined)
-        .map(
-            (transaction): UnreportedExpenseListItemType => ({
-                ...transaction,
-                isDisabled: isTransactionPendingDelete(transaction),
-                keyForList: transaction.transactionID,
-                errors: transaction.errors as Errors | undefined,
-            }),
-        );
+        .map((transaction): UnreportedExpenseListItemType => ({
+            ...transaction,
+            isDisabled: isTransactionPendingDelete(transaction),
+            keyForList: transaction.transactionID,
+            errors: transaction.errors as Errors | undefined,
+        }));
 }
 
 type GetEligibleTransactionsToAddParams = {
@@ -1797,6 +1822,7 @@ function isTransactionOwner(transaction: OnyxEntry<Transaction>, cardList: OnyxE
 
 export {
     buildOptimisticTransaction,
+    buildSplitTransactionFromReportAction,
     calculateTaxAmount,
     getWorkspaceTaxesSettingsName,
     getDefaultTaxCode,

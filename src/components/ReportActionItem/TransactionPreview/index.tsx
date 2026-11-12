@@ -14,7 +14,13 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getOriginalMessage, isMoneyRequestAction as isMoneyRequestActionReportActionsUtils} from '@libs/ReportActionsUtils';
 import {getTransactionDetails} from '@libs/ReportUtils';
 import {getReviewNavigationRoute} from '@libs/TransactionPreviewUtils';
-import {getExpenseTypeTranslationKey, getOriginalTransactionWithSplitInfo, getTransactionType, removeSettledAndApprovedTransactions} from '@libs/TransactionUtils';
+import {
+    buildSplitTransactionFromReportAction,
+    getExpenseTypeTranslationKey,
+    getOriginalTransactionWithSplitInfo,
+    getTransactionType,
+    removeSettledAndApprovedTransactions,
+} from '@libs/TransactionUtils';
 
 import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
 import type {TransactionDuplicateNavigatorParamList} from '@navigation/types';
@@ -49,7 +55,9 @@ function TransactionPreview(props: TransactionPreviewProps) {
     const route = useRoute<PlatformStackRouteProp<TransactionDuplicateNavigatorParamList, typeof SCREENS.TRANSACTION_DUPLICATE.DYNAMIC_REVIEW>>();
     const isMoneyRequestAction = isMoneyRequestActionReportActionsUtils(action);
     const transactionID = transactionIDFromProps ?? (isMoneyRequestAction ? getOriginalMessage(action)?.IOUTransactionID : undefined);
-    const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
+    const [onyxTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
+    // The split group transaction is never re-sent by the API once missing from Onyx, so fall back to the data on the split action
+    const transaction = isEmptyObject(onyxTransaction) ? (buildSplitTransactionFromReportAction(action) ?? onyxTransaction) : onyxTransaction;
     const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(transaction?.comment?.originalTransactionID)}`);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(transaction?.reportID)}`, {selector: getStableReportSelector});
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(report?.policyID)}`);
