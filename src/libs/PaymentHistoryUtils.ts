@@ -345,16 +345,16 @@ function getReceiptPurchase(purchases: Purchases | null | undefined, purchaseID:
         return null;
     }
     const purchase = purchases[String(purchaseID)];
-    // Onyx can persist lookup completion without purchase data, despite these fields being required by the type.
-    // Reject placeholders before using their receipt or reading their message.
-    if (!purchase?.purchaseID || !purchase.message) {
+    // Onyx can persist lookup completion without purchase data, so reject entries without a purchaseID.
+    if (!purchase?.purchaseID) {
         return null;
     }
     if (purchase.receipt?.source) {
         return purchase;
     }
 
-    if (!isClear(purchase) || !purchase.message.failedPurchaseID) {
+    // A deeplink-loaded purchase may carry only detail fields, so the message is required only for the chain walk.
+    if (!purchase.message || !isClear(purchase) || !purchase.message.failedPurchaseID) {
         return null;
     }
 
@@ -364,13 +364,13 @@ function getReceiptPurchase(purchases: Purchases | null | undefined, purchaseID:
         visited.add(currentID);
         const current: Purchase | undefined = purchases[String(currentID)];
         // Linked purchases can also be persisted placeholders, so each entry needs the same validation.
-        if (!current?.purchaseID || !current.message) {
+        if (!current?.purchaseID) {
             return null;
         }
         if (current.receipt?.source) {
             return current;
         }
-        currentID = current.message.failedPurchaseID;
+        currentID = current.message?.failedPurchaseID;
     }
 
     return null;
@@ -381,7 +381,7 @@ function getReceiptSource(purchases: Purchases | null | undefined, purchaseID: n
 }
 
 function isInvoiceBilling(purchases: Purchases | null | undefined, purchaseID: number): boolean {
-    return getReceiptPurchase(purchases, purchaseID)?.message.billingType === CONST.BILLING.TYPE_INVOICING;
+    return getReceiptPurchase(purchases, purchaseID)?.message?.billingType === CONST.BILLING.TYPE_INVOICING;
 }
 
 function getReceiptFileName(source: string, purchaseID: number): string {

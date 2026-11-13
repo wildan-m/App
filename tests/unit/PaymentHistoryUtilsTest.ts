@@ -480,7 +480,6 @@ describe('incomplete receipt purchases', () => {
     it.each([
         {name: 'loaded placeholder', purchase: {isLoaded: true}},
         {name: 'missing ID', purchase: {message: {}}},
-        {name: 'missing message', purchase: {purchaseID: 1}},
     ])('rejects a $name with and without a receipt', ({purchase}) => {
         // Given partial persisted data that must not be treated as a valid receipt carrier
         const purchaseID = 1;
@@ -498,9 +497,42 @@ describe('incomplete receipt purchases', () => {
     });
 
     it.each([
+        {name: 'missing message', message: undefined},
+        {name: 'null message', message: null},
+    ])('resolves the receipt of a deeplink-loaded purchase with a $name', ({message}) => {
+        // Given a purchase loaded only through the payment details lookup, which carries the receipt but no list-row message
+        const purchases = createMock<Record<string, Purchase>>({
+            1: {purchaseID: 1, isLoaded: true, message, receipt: {receiptID: 100, source: 'https://example.com/receipt.pdf'}},
+        });
+
+        // When either receipt helper resolves it
+        const source = getReceiptSource(purchases, 1);
+        const isInvoice = isInvoiceBilling(purchases, 1);
+
+        // Then the receipt is shown and the missing message falls back to the receipt title
+        expect(source).toBe('https://example.com/receipt.pdf');
+        expect(isInvoice).toBe(false);
+    });
+
+    it.each([
+        {name: 'missing message', message: undefined},
+        {name: 'null message', message: null},
+    ])('returns no receipt for a purchase with a $name and no receipt', ({message}) => {
+        // Given a loaded purchase with neither a receipt nor a message to follow
+        const purchases = createMock<Record<string, Purchase>>({1: {purchaseID: 1, isLoaded: true, message}});
+
+        // When either receipt helper resolves it
+        const source = getReceiptSource(purchases, 1);
+        const isInvoice = isInvoiceBilling(purchases, 1);
+
+        // Then nothing resolves and the missing message is never dereferenced
+        expect(source).toBeNull();
+        expect(isInvoice).toBe(false);
+    });
+
+    it.each([
         {name: 'loaded placeholder', purchase: {isLoaded: true}},
         {name: 'missing ID', purchase: {message: {failedPurchaseID: 10}}},
-        {name: 'missing message', purchase: {purchaseID: 20}},
     ])('stops a receipt chain at a $name', ({purchase}) => {
         // Given a cleared bill whose chain contains an invalid entry before a valid invoice
         const failedPurchaseID = 20;
@@ -520,23 +552,20 @@ describe('incomplete receipt purchases', () => {
         }
     });
 
-    it('rejects a null message at the root or a linked purchase', () => {
-        // Given persisted data with a null message, including a direct receipt source
-        const invalid = createPurchase(1, '2026-01-01');
-        invalid.receipt = {receiptID: 100, source: 'https://example.com/receipt.pdf'};
-        Reflect.set(invalid, 'message', null);
+    it('uses a linked purchase receipt without a message and stops at one without a receipt', () => {
+        // Given a cleared bill linked to a purchase that has no message
+        const linked = createPurchase(1, '2026-01-01');
+        Reflect.set(linked, 'message', null);
         const clear = createPurchase(2, '2026-03-01', {billingType: CONST.BILLING.TYPE_CLEAR, failedPurchaseID: 1});
-        const purchases = toPurchases([invalid, clear]);
 
-        // When resolving the invalid purchase directly or through a cleared bill
-        for (const purchaseID of [1, 2]) {
-            const source = getReceiptSource(purchases, purchaseID);
-            const isInvoice = isInvoiceBilling(purchases, purchaseID);
+        // When the linked purchase has no receipt, there is nothing further to follow
+        expect(getReceiptSource(toPurchases([linked, clear]), 2)).toBeNull();
+        expect(isInvoiceBilling(toPurchases([linked, clear]), 2)).toBe(false);
 
-            // Then neither path treats the receipt as safe for billing classification
-            expect(source).toBeNull();
-            expect(isInvoice).toBe(false);
-        }
+        // When the linked purchase carries a receipt, it resolves without reading the missing message
+        linked.receipt = {receiptID: 100, source: 'https://example.com/receipt.pdf'};
+        expect(getReceiptSource(toPurchases([linked, clear]), 2)).toBe('https://example.com/receipt.pdf');
+        expect(isInvoiceBilling(toPurchases([linked, clear]), 2)).toBe(false);
     });
 
     it('terminates a cyclic receipt chain', () => {
