@@ -8,6 +8,7 @@ import useTabRootScrollProps from '@components/Navigation/TabBarBottomContent/us
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
+import Text from '@components/Text';
 
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
@@ -44,6 +45,7 @@ import {canMemberRead, shouldShowPolicy as checkIfShouldShowPolicy, goBackFromIn
 import type {WorkspaceSplitNavigatorParamList} from '@navigation/types';
 
 import CONST from '@src/CONST';
+import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
@@ -59,6 +61,7 @@ import {emailSelector} from '@selectors/Session';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {View} from 'react-native';
 
+import type {WorkspaceMenuSection} from './getWorkspaceMenuItems';
 import type {WithPolicyAndFullscreenLoadingProps} from './withPolicyAndFullscreenLoading';
 
 import useConnectionsMovedTooltip from './connections/useConnectionsMovedTooltip';
@@ -66,6 +69,15 @@ import getWorkspaceMenuItems from './getWorkspaceMenuItems';
 import withPolicyAndFullscreenLoading from './withPolicyAndFullscreenLoading';
 
 type WorkspaceInitialPageProps = WithPolicyAndFullscreenLoadingProps & PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.INITIAL>;
+
+/** Title shown above the first rendered item of each Workspace menu section; the titles are shared with the More features page groups. */
+const SECTION_TITLE_TRANSLATION_KEYS: Record<WorkspaceMenuSection, TranslationPaths> = {
+    organize: 'workspace.moreFeatures.organizeSection.title',
+    manage: 'workspace.moreFeatures.manageSection.title',
+    spend: 'workspace.moreFeatures.spendSection.title',
+    earn: 'workspace.moreFeatures.earnSection.title',
+    configure: 'workspace.moreFeatures.configureSection.title',
+};
 
 function dismissError(policyID: string | undefined, pendingAction: PendingAction | undefined) {
     if (!policyID || pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
@@ -315,10 +327,11 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
                                 Ideally we should use MenuList component for MenuItems with singleExecution/Navigation actions.
                                 In this case where user can click on workspace avatar or menu items, we need to have a check for `isExecuting`. So, we are directly mapping menuItems.
                             */}
-                            {workspaceMenuItems.map((item) => {
+                            {workspaceMenuItems.map((item, index) => {
                                 const isConnectionsItem = item.screenName === SCREENS.WORKSPACE.CONNECTIONS;
                                 const isItemFocused = getItemScreenNames(item).some((screenName) => activeRoute?.startsWith(screenName));
                                 const {shouldShowBasicTitle, titleStyle, hoveredTitleStyle, selectedStyle, hoveredStyle} = getFlatNavRowProps(isItemFocused);
+                                const previousSection = index === 0 ? undefined : workspaceMenuItems.at(index - 1)?.section;
                                 const onPress = () => {
                                     if (isConnectionsItem) {
                                         hideConnectionsTooltip();
@@ -326,37 +339,46 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
                                     item.action();
                                 };
                                 return (
-                                    <HighlightableMenuItem
-                                        key={item.translationKey}
-                                        disabled={hasPolicyCreationError || (isExecuting && !isItemFocused)}
-                                        interactive={!hasPolicyCreationError}
-                                        title={translate(item.translationKey)}
-                                        icon={item.icon}
-                                        onPress={onPress}
-                                        brickRoadIndicator={item.brickRoadIndicator}
-                                        wrapperStyle={[menuItemWrapperStyle, selectedStyle]}
-                                        hoveredStyle={hoveredStyle}
-                                        shouldShowBasicTitle={shouldShowBasicTitle}
-                                        titleStyle={titleStyle}
-                                        hoveredTitleStyle={hoveredTitleStyle}
-                                        highlighted={!!item?.highlighted}
-                                        focused={isItemFocused}
-                                        role={CONST.ROLE.TAB}
-                                        badgeText={item.badgeTranslationKey ? translate(item.badgeTranslationKey) : item.badgeText}
-                                        isBadgeSuccess={item.isBadgeSuccess}
-                                        shouldIconUseAutoWidthStyle
-                                        sentryLabel={item.sentryLabel}
-                                        shouldGreyOutWhenDisabled={hasPolicyCreationError}
-                                        shouldRenderTooltip={isConnectionsItem && shouldShowConnectionsTooltip}
-                                        renderTooltipContent={renderConnectionsTooltip}
-                                        tooltipWrapperStyle={styles.productTrainingTooltipWrapper}
-                                        tooltipAnchorAlignment={{horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT, vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP}}
-                                        onEducationTooltipPress={onPress}
-                                        // The workspace menu is the sidebar, which isn't the navigation-focused screen on wide layouts.
-                                        shouldHideTooltipOnNavigate={false}
-                                        shouldHideOnScroll
-                                        shouldCheckTooltipVisibilityOnFirstDisplay={shouldUseNarrowLayout}
-                                    />
+                                    <React.Fragment key={item.translationKey}>
+                                        {!!item.section && item.section !== previousSection && (
+                                            <Text
+                                                style={[styles.sectionTitle, styles.mt3]}
+                                                accessibilityRole={CONST.ROLE.HEADER}
+                                            >
+                                                {translate(SECTION_TITLE_TRANSLATION_KEYS[item.section])}
+                                            </Text>
+                                        )}
+                                        <HighlightableMenuItem
+                                            disabled={hasPolicyCreationError || (isExecuting && !isItemFocused)}
+                                            interactive={!hasPolicyCreationError}
+                                            title={translate(item.translationKey)}
+                                            icon={item.icon}
+                                            onPress={onPress}
+                                            brickRoadIndicator={item.brickRoadIndicator}
+                                            wrapperStyle={[menuItemWrapperStyle, selectedStyle]}
+                                            hoveredStyle={hoveredStyle}
+                                            shouldShowBasicTitle={shouldShowBasicTitle}
+                                            titleStyle={titleStyle}
+                                            hoveredTitleStyle={hoveredTitleStyle}
+                                            highlighted={!!item?.highlighted}
+                                            focused={isItemFocused}
+                                            role={CONST.ROLE.TAB}
+                                            badgeText={item.badgeTranslationKey ? translate(item.badgeTranslationKey) : item.badgeText}
+                                            isBadgeSuccess={item.isBadgeSuccess}
+                                            shouldIconUseAutoWidthStyle
+                                            sentryLabel={item.sentryLabel}
+                                            shouldGreyOutWhenDisabled={hasPolicyCreationError}
+                                            shouldRenderTooltip={isConnectionsItem && shouldShowConnectionsTooltip}
+                                            renderTooltipContent={renderConnectionsTooltip}
+                                            tooltipWrapperStyle={styles.productTrainingTooltipWrapper}
+                                            tooltipAnchorAlignment={{horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT, vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP}}
+                                            onEducationTooltipPress={onPress}
+                                            // The workspace menu is the sidebar, which isn't the navigation-focused screen on wide layouts.
+                                            shouldHideTooltipOnNavigate={false}
+                                            shouldHideOnScroll
+                                            shouldCheckTooltipVisibilityOnFirstDisplay={shouldUseNarrowLayout}
+                                        />
+                                    </React.Fragment>
                                 );
                             })}
                         </View>

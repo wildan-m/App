@@ -7738,6 +7738,9 @@ const translations = {
                 title: 'Organize',
                 subtitle: 'Group and analyze spend, record every tax paid.',
             },
+            configureSection: {
+                title: 'Configure',
+            },
             distanceRates: {
                 title: 'Distance rates',
                 subtitle: 'Add, update, and enforce rates.',

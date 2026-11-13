@@ -73,6 +73,9 @@ type WorkspaceMenuIconMap = Record<
 /** Workspace screens that can be opened from the top-level Workspace menu. */
 type WorkspaceTopLevelScreens = keyof typeof WORKSPACE_TO_RHP;
 
+/** Labeled group of the Workspace menu an item renders under; items without one (Overview) render ungrouped. */
+type WorkspaceMenuSection = 'organize' | 'manage' | 'spend' | 'earn' | 'configure';
+
 /** Data needed to render and navigate from a Workspace menu item. */
 type WorkspaceMenuItem = WithSentryLabel & {
     translationKey: TranslationPaths;
@@ -84,6 +87,9 @@ type WorkspaceMenuItem = WithSentryLabel & {
     badgeText?: string;
     isBadgeSuccess?: boolean;
     highlighted?: boolean;
+
+    /** Section the item renders under in the Workspace menu; the page shows a header above the first item of each section. */
+    section?: WorkspaceMenuSection;
 
     /** Other names the Search router also matches this item by */
     searchAliasKeys?: TranslationPaths[];
@@ -203,7 +209,9 @@ function getWorkspaceMenuItems({
     };
     const highlightedPolicyFeature = getObjectKeys(policyFeatureStates).find((key) => policyFeatureStates[key] && !previousPendingFields?.[key] && policy?.pendingFields?.[key]);
 
-    const defaultItems: WorkspaceMenuItem[] = [
+    const canShowProtectedItems = isGroupPolicy(policy) && shouldShowProtectedItems;
+
+    const items: WorkspaceMenuItem[] = [
         {
             translationKey: 'workspace.common.profile',
             icon: icons.Building,
@@ -212,48 +220,9 @@ function getWorkspaceMenuItems({
             screenName: SCREENS.WORKSPACE.PROFILE,
             sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.PROFILE,
         },
-        {
-            translationKey: 'workspace.common.members',
-            icon: icons.Users,
-            getRoute: () => ROUTES.WORKSPACE_MEMBERS.getRoute(policyID),
-            brickRoadIndicator: hasMembersError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-            screenName: SCREENS.WORKSPACE.MEMBERS,
-            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.MEMBERS,
-            badgeTranslationKey: shouldShowNewRolesBadge ? 'workspace.common.newRoles' : undefined,
-            isBadgeSuccess: shouldShowNewRolesBadge,
-        },
-        {
-            translationKey: 'workspace.common.rooms',
-            icon: icons.Hashtag,
-            getRoute: () => ROUTES.WORKSPACE_ROOMS.getRoute(policyID),
-            screenName: SCREENS.WORKSPACE.ROOMS,
-            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.ROOMS,
-        },
     ];
-    const items = defaultItems.filter((item) => {
-        if (item.screenName !== SCREENS.WORKSPACE.MEMBERS) {
-            return true;
-        }
-        if (!policy) {
-            return true;
-        }
-        return canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.MEMBERS);
-    });
 
-    if (isGroupPolicy(policy) && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.AGENTS) && !isAgentAccount) {
-        const membersItemIndex = items.findIndex((item) => item.screenName === SCREENS.WORKSPACE.MEMBERS);
-        items.splice(membersItemIndex + 1, 0, {
-            translationKey: 'agentsPage.title',
-            icon: icons.Bot,
-            getRoute: () => ROUTES.WORKSPACE_AGENTS.getRoute(policyID),
-            screenName: SCREENS.WORKSPACE.AGENTS,
-            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.AGENTS,
-            badgeTranslationKey: 'common.beta',
-            brickRoadIndicator: hasAgentErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-        });
-    }
-
-    if (isGroupPolicy(policy) && shouldShowProtectedItems) {
+    if (canShowProtectedItems) {
         if (canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.REPORT_FIELDS)) {
             items.push({
                 translationKey: 'common.reports',
@@ -261,6 +230,7 @@ function getWorkspaceMenuItems({
                 getRoute: () => ROUTES.WORKSPACE_REPORTS.getRoute(policyID),
                 screenName: SCREENS.WORKSPACE.REPORTS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.REPORTS,
+                section: 'organize',
             });
         }
 
@@ -274,6 +244,7 @@ function getWorkspaceMenuItems({
                 brickRoadIndicator: getConnectionsBrickRoadIndicator(),
                 screenName: SCREENS.WORKSPACE.CONNECTIONS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.CONNECTIONS,
+                section: 'organize',
             });
         }
 
@@ -286,6 +257,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.CATEGORIES,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.CATEGORIES,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_CATEGORIES_ENABLED,
+                section: 'organize',
             });
         }
 
@@ -297,6 +269,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.TAGS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.TAGS,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_TAGS_ENABLED,
+                section: 'organize',
             });
         }
 
@@ -309,6 +282,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.TAXES,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.TAXES,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_TAXES_ENABLED,
+                section: 'organize',
             });
         }
 
@@ -319,9 +293,26 @@ function getWorkspaceMenuItems({
                 getRoute: () => ROUTES.WORKSPACE_VENDORS.getRoute(policyID),
                 screenName: SCREENS.WORKSPACE.VENDORS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.VENDORS,
+                section: 'organize',
             });
         }
+    }
 
+    if (!policy || canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.MEMBERS)) {
+        items.push({
+            translationKey: 'workspace.common.members',
+            icon: icons.Users,
+            getRoute: () => ROUTES.WORKSPACE_MEMBERS.getRoute(policyID),
+            brickRoadIndicator: hasMembersError ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+            screenName: SCREENS.WORKSPACE.MEMBERS,
+            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.MEMBERS,
+            badgeTranslationKey: shouldShowNewRolesBadge ? 'workspace.common.newRoles' : undefined,
+            isBadgeSuccess: shouldShowNewRolesBadge,
+            section: 'manage',
+        });
+    }
+
+    if (canShowProtectedItems) {
         if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED] && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.WORKFLOWS)) {
             const hasWorkflowsError =
                 !isEmptyObject(policy?.errorFields?.reimburser ?? {}) || !isEmptyObject(policy?.errorFields?.reimbursementCountries ?? {}) || hasApprovalWorkflowWithNonMemberApprover;
@@ -333,6 +324,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.WORKFLOWS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.WORKFLOWS,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_WORKFLOWS_ENABLED,
+                section: 'manage',
             });
         }
 
@@ -345,32 +337,34 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.RULES,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.RULES,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED,
+                section: 'manage',
             });
         }
+    }
 
-        if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED] && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.DISTANCE_RATES)) {
-            items.push({
-                translationKey: 'workspace.common.distanceRates',
-                brickRoadIndicator: shouldShowUKFuelRateTaxError(policy) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                icon: icons.Car,
-                getRoute: () => ROUTES.WORKSPACE_DISTANCE_RATES.getRoute(policyID),
-                screenName: SCREENS.WORKSPACE.DISTANCE_RATES,
-                sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.DISTANCE_RATES,
-                highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED,
-            });
-        }
+    if (isGroupPolicy(policy) && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.AGENTS) && !isAgentAccount) {
+        items.push({
+            translationKey: 'agentsPage.title',
+            icon: icons.Bot,
+            getRoute: () => ROUTES.WORKSPACE_AGENTS.getRoute(policyID),
+            screenName: SCREENS.WORKSPACE.AGENTS,
+            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.AGENTS,
+            badgeTranslationKey: 'common.beta',
+            brickRoadIndicator: hasAgentErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+            section: 'manage',
+        });
+    }
 
-        if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED] && canReadMoreFeatures) {
-            items.push({
-                translationKey: 'workspace.common.travel',
-                icon: icons.LuggageWithLines,
-                getRoute: () => ROUTES.WORKSPACE_TRAVEL.getRoute(policyID),
-                screenName: SCREENS.WORKSPACE.TRAVEL,
-                sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.TRAVEL,
-                highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED,
-            });
-        }
+    items.push({
+        translationKey: 'workspace.common.rooms',
+        icon: icons.Hashtag,
+        getRoute: () => ROUTES.WORKSPACE_ROOMS.getRoute(policyID),
+        screenName: SCREENS.WORKSPACE.ROOMS,
+        sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.ROOMS,
+        section: 'manage',
+    });
 
+    if (canShowProtectedItems) {
         if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED] && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.EXPENSIFY_CARD)) {
             items.push({
                 translationKey: 'workspace.common.expensifyCard',
@@ -379,6 +373,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.EXPENSIFY_CARD,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.EXPENSIFY_CARD,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_EXPENSIFY_CARDS_ENABLED,
+                section: 'spend',
             });
         }
 
@@ -391,6 +386,32 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.COMPANY_CARDS,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.COMPANY_CARDS,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_COMPANY_CARDS_ENABLED,
+                section: 'spend',
+            });
+        }
+
+        if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED] && canReadMoreFeatures) {
+            items.push({
+                translationKey: 'workspace.common.travel',
+                icon: icons.LuggageWithLines,
+                getRoute: () => ROUTES.WORKSPACE_TRAVEL.getRoute(policyID),
+                screenName: SCREENS.WORKSPACE.TRAVEL,
+                sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.TRAVEL,
+                highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.IS_TRAVEL_ENABLED,
+                section: 'spend',
+            });
+        }
+
+        if (policyFeatureStates[CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED] && canReadPolicyFeature(CONST.POLICY.POLICY_FEATURE.DISTANCE_RATES)) {
+            items.push({
+                translationKey: 'workspace.common.distanceRates',
+                brickRoadIndicator: shouldShowUKFuelRateTaxError(policy) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                icon: icons.Car,
+                getRoute: () => ROUTES.WORKSPACE_DISTANCE_RATES.getRoute(policyID),
+                screenName: SCREENS.WORKSPACE.DISTANCE_RATES,
+                sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.DISTANCE_RATES,
+                highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_DISTANCE_RATES_ENABLED,
+                section: 'spend',
             });
         }
 
@@ -402,6 +423,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.PER_DIEM,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.PER_DIEM,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED,
+                section: 'spend',
             });
         }
 
@@ -413,6 +435,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.TIME_TRACKING,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.TIME_TRACKING,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.IS_TIME_TRACKING_ENABLED,
+                section: 'spend',
             });
         }
 
@@ -426,6 +449,7 @@ function getWorkspaceMenuItems({
                 screenName: SCREENS.WORKSPACE.INVOICES,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.INVOICES,
                 highlighted: highlightedPolicyFeature === CONST.POLICY.MORE_FEATURES.ARE_INVOICES_ENABLED,
+                section: 'earn',
             });
         }
 
@@ -436,6 +460,7 @@ function getWorkspaceMenuItems({
                 getRoute: () => ROUTES.WORKSPACE_MORE_FEATURES.getRoute(policyID),
                 screenName: SCREENS.WORKSPACE.MORE_FEATURES,
                 sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.MORE_FEATURES,
+                section: 'configure',
             });
         }
     }
@@ -444,3 +469,4 @@ function getWorkspaceMenuItems({
 }
 
 export default getWorkspaceMenuItems;
+export type {WorkspaceMenuSection};
