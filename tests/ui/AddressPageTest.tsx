@@ -33,7 +33,7 @@ jest.mock('@rnmapbox/maps', () => {
 
 const Stack = createPlatformStackNavigator<SettingsNavigatorParamList>();
 
-const renderPage = (initialRouteName: typeof SCREENS.SETTINGS.PROFILE.ADDRESS) => {
+const renderPage = (initialRouteName: typeof SCREENS.SETTINGS.PROFILE.ADDRESS, initialParams?: Record<string, string>) => {
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, CurrentReportIDContextProvider]}>
             <PortalProvider>
@@ -42,6 +42,7 @@ const renderPage = (initialRouteName: typeof SCREENS.SETTINGS.PROFILE.ADDRESS) =
                         <Stack.Screen
                             name={SCREENS.SETTINGS.PROFILE.ADDRESS}
                             component={PersonalAddressPage}
+                            initialParams={initialParams as SettingsNavigatorParamList[typeof SCREENS.SETTINGS.PROFILE.ADDRESS]}
                         />
                     </Stack.Navigator>
                 </NavigationContainer>
@@ -170,5 +171,63 @@ describe('AddressPageTest', () => {
         expect(screen.getByLabelText('Address line 1')).toBeOnTheScreen();
         expect(screen.queryByText(/Not a country/)).not.toBeOnTheScreen();
         expect(screen.queryByText('United States')).not.toBeOnTheScreen();
+    });
+
+    it('should show the state from the URL instead of the saved state', async () => {
+        // Given a saved US address with a state
+        await TestHelper.signInWithTestUser();
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {addresses: [{country: 'US', state: 'CA', city: 'Los Angeles', street: '123 Main St'}]});
+            await Onyx.merge(`${ONYXKEYS.IS_LOADING_APP}`, false);
+        });
+        await waitForBatchedUpdatesWithAct();
+
+        // When the page is opened with a state URL param
+        renderPage(SCREENS.SETTINGS.PROFILE.ADDRESS, {state: 'MO'});
+        await waitForBatchedUpdatesWithAct();
+
+        // Then the URL state is shown instead of the saved one
+        expect(screen.getByText('Missouri')).toBeOnTheScreen();
+        expect(screen.queryByText('California')).not.toBeOnTheScreen();
+    });
+
+    it('should keep the state from the URL when the saved address loads after mount', async () => {
+        // Given the saved address is not loaded yet
+        await TestHelper.signInWithTestUser();
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, null);
+            await Onyx.set(ONYXKEYS.COUNTRY, 'US');
+            await Onyx.merge(`${ONYXKEYS.IS_LOADING_APP}`, false);
+        });
+        await waitForBatchedUpdatesWithAct();
+
+        // When the page is opened with a state URL param and the saved address arrives afterwards
+        renderPage(SCREENS.SETTINGS.PROFILE.ADDRESS, {state: 'MO'});
+        await waitForBatchedUpdatesWithAct();
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {addresses: [{country: 'US', state: 'CA', city: 'Los Angeles', street: '123 Main St'}]});
+        });
+        await waitForBatchedUpdatesWithAct();
+
+        // Then the URL state is still shown
+        expect(screen.getByText('Missouri')).toBeOnTheScreen();
+        expect(screen.queryByText('California')).not.toBeOnTheScreen();
+    });
+
+    it('should show the saved state when there is no state URL param', async () => {
+        // Given a saved US address with a state
+        await TestHelper.signInWithTestUser();
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {addresses: [{country: 'US', state: 'CA', city: 'Los Angeles', street: '123 Main St'}]});
+            await Onyx.merge(`${ONYXKEYS.IS_LOADING_APP}`, false);
+        });
+        await waitForBatchedUpdatesWithAct();
+
+        // When the page is opened without a state URL param
+        renderPage(SCREENS.SETTINGS.PROFILE.ADDRESS);
+        await waitForBatchedUpdatesWithAct();
+
+        // Then the saved state is shown
+        expect(screen.getByText('California')).toBeOnTheScreen();
     });
 });
