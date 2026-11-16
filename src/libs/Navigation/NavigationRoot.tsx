@@ -179,8 +179,10 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
             // This allows restoration when app is killed and reopened without a deep link
             const isRootPath = !path || path === '' || path === '/';
             const isSpecificDeepLink = path && !isRootPath;
+            // An initial state skips OnboardingGuard, so leave resuming onboarding to useOnboardingFlowRouter once OpenApp has loaded
+            const isStaleOnboardingPath = isOnboardingPath(lastVisitedPath) && !isJoinWorkspaceTaskPath(lastVisitedPath);
 
-            if (!isSpecificDeepLink) {
+            if (!isSpecificDeepLink && !isStaleOnboardingPath) {
                 Log.info('Restoring last visited path on app startup', false, {lastVisitedPath, initialUrl, path});
                 return getAdaptedStateFromPath(lastVisitedPath);
             }
