@@ -3,10 +3,13 @@ import doneSound from '@assets/sounds/done.mp3';
 import receiveSound from '@assets/sounds/receive.mp3';
 import successSound from '@assets/sounds/success.mp3';
 
+import Log from '@libs/Log';
+
 import type {AudioSource} from 'expo-audio';
 import type {ValueOf} from 'type-fest';
 
 import {createAudioPlayer, setAudioModeAsync} from 'expo-audio';
+import {AppState} from 'react-native';
 
 import {getIsMuted, SOUNDS, withMinimalExecutionTime} from './BaseSound';
 
@@ -38,6 +41,11 @@ const playSound = async (soundFile: ValueOf<typeof SOUNDS>) => {
     // uses the .ambient category (which won't interrupt music or other audio)
     await audioModeConfigured;
 
+    // iOS refuses to activate the audio session when the app isn't active, and the sound can't be heard there anyway
+    if (AppState.currentState !== 'active') {
+        return;
+    }
+
     const player = createAudioPlayer(source);
 
     // Listen for playback completion to release resources
@@ -50,7 +58,14 @@ const playSound = async (soundFile: ValueOf<typeof SOUNDS>) => {
         player.remove();
     });
 
-    player.play();
+    try {
+        player.play();
+    } catch (error) {
+        // The OS can still refuse the audio session (e.g. during a phone call), so release the player instead of leaking it
+        subscription.remove();
+        player.remove();
+        Log.hmmm('[sound] Play error:', {message: error instanceof Error ? error.message : String(error)});
+    }
 };
 
 function clearSoundAssetsCache() {}
