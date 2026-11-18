@@ -334,6 +334,8 @@ function DescribeRuleForm({
                     role={CONST.ROLE.PRESENTATION}
                     onKeyPress={submitFormOnModEnter}
                     onFocus={scrollToInput}
+                    // Typing does not focus the box again, so the form also scrolls back to it when the text changes
+                    onValueChange={scrollToInput}
                     maxLength={CONST.GENERATED_RULE.PROMPT_MAX_LENGTH}
                     multiline
                     shouldSaveDraft

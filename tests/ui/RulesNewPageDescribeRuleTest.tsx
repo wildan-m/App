@@ -114,8 +114,9 @@ jest.mock('@components/Button', () => {
 });
 jest.mock('@components/Form/InputWrapper', () => {
     const ReactModule = jest.requireActual<typeof React>('react');
-    const {TextInput} = jest.requireActual<{TextInput: React.ComponentType<{accessibilityLabel?: string; onFocus?: () => void}>}>('react-native');
-    return ({accessibilityLabel, onFocus}: {accessibilityLabel: string; onFocus?: () => void}) => ReactModule.createElement(TextInput, {accessibilityLabel, onFocus});
+    const {TextInput} = jest.requireActual<{TextInput: React.ComponentType<{accessibilityLabel?: string; onFocus?: () => void; onChangeText?: (value: string) => void}>}>('react-native');
+    return ({accessibilityLabel, onFocus, onValueChange}: {accessibilityLabel: string; onFocus?: () => void; onValueChange?: (value: string) => void}) =>
+        ReactModule.createElement(TextInput, {accessibilityLabel, onFocus, onChangeText: onValueChange});
 });
 jest.mock('@components/Form/FormProvider', () => {
     const ReactModule = jest.requireActual<typeof React>('react');
@@ -268,6 +269,21 @@ describe('New rule describe section', () => {
         fireEvent(input, 'focus');
 
         // Then the form scrolls to the top of the box, because iOS and Android do not scroll it above the keyboard
+        expect(mockScrollTo).toHaveBeenCalledWith(420);
+    });
+
+    it('scrolls back to the describe box when the admin types after scrolling it out of view', async () => {
+        // Given an admin on New rule whose describe box has focus, and who then scrolls the form while the keyboard stays open
+        await renderRulesNewPage();
+        const input = screen.getByLabelText('workspace.rules.newRule.describeRuleInputLabel');
+        fireEvent(input, 'layout', {nativeEvent: {layout: {x: 0, y: 420, width: 300, height: 96}}});
+        fireEvent(input, 'focus');
+        mockScrollTo.mockClear();
+
+        // When the admin types, which does not focus the box again
+        fireEvent.changeText(input, 'Flag expenses over $100');
+
+        // Then the form scrolls back to the top of the box, so the text being typed stays in view
         expect(mockScrollTo).toHaveBeenCalledWith(420);
     });
 
