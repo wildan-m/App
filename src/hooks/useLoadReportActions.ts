@@ -99,7 +99,8 @@ function useLoadReportActions({
         }
     };
 
-    const loadNewerChats = (force = false) => {
+    /** Returns whether a GetNewerActions request was sent, so callers can tell a skipped call from a sent one. */
+    const loadNewerChats = (force = false): boolean => {
         if (
             !force &&
             (!isFocused ||
@@ -110,7 +111,7 @@ function useLoadReportActions({
                 // more in case we have cached messages.
                 newestReportAction.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)
         ) {
-            return;
+            return false;
         }
 
         // Use the Pusher-safe cursor when available instead of newestReportAction
@@ -122,15 +123,21 @@ function useLoadReportActions({
             if (isTransactionThreadReport) {
                 getNewerActions(transactionThreadReportID, transactionThreadNewestAction?.reportActionID);
             }
-            return;
+            return true;
         }
 
         if (isTransactionThreadReport) {
             getNewerActions(reportID, currentReportNewestAction?.reportActionID);
             getNewerActions(transactionThreadReportID, transactionThreadNewestAction?.reportActionID);
-        } else if (newestReportAction) {
-            getNewerActions(reportID, newestReportAction.reportActionID);
+            return true;
         }
+
+        if (newestReportAction) {
+            getNewerActions(reportID, newestReportAction.reportActionID);
+            return true;
+        }
+
+        return false;
     };
 
     return {
@@ -138,6 +145,8 @@ function useLoadReportActions({
         loadNewerChats,
         // The exact cursor `loadOlderChats` sends, which is not always the end of the rendered chain.
         currentReportOldestActionID: currentReportOldestAction?.reportActionID,
+        // The cursor `loadNewerChats` sends for the current report; it only advances when a newer page lands.
+        currentReportNewerActionsCursorID: newestFetchedReportActionID ?? (isTransactionThreadReport ? currentReportNewestAction?.reportActionID : newestReportAction?.reportActionID),
     };
 }
 

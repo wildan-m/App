@@ -79,7 +79,7 @@ function useReportActionsListModel(reportID: string, isReportLoadPending: boolea
 
     const [reportPaginationState] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_PAGINATION_STATE}${reportID}`);
 
-    const {loadOlderChats, loadNewerChats, currentReportOldestActionID} = useLoadReportActions({
+    const {loadOlderChats, loadNewerChats, currentReportOldestActionID, currentReportNewerActionsCursorID} = useLoadReportActions({
         reportID,
         reportActions,
         allReportActionIDs,
@@ -140,6 +140,7 @@ function useReportActionsListModel(reportID: string, isReportLoadPending: boolea
         report,
         hasOnceLoadedReportActions,
         hasNewerActions,
+        newerActionsCursorID: currentReportNewerActionsCursorID,
         sortedAllReportActions,
         oldestUnreadReportAction,
         transactionThreadReport,

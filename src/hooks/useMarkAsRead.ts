@@ -28,6 +28,7 @@ import useIsHiddenWideTabPreMount from './useIsHiddenWideTabPreMount';
 import useIsReportActionsLoaded from './useIsReportActionsLoaded';
 import useIsReportOutOfSight from './useIsReportOutOfSight';
 import useMarkReadAfterReveal from './useMarkReadAfterReveal';
+import usePrevious from './usePrevious';
 import {useDerivedIsEmptyReport} from './useReportAttributes';
 import useReportIsArchived from './useReportIsArchived';
 
@@ -350,11 +351,28 @@ function useMarkAsRead({
     };
 
     const completeSkippedMarkAsRead = () => {
-        if (!readActionSkippedRef.current || !Visibility.hasFocus()) {
+        // Same invariant as the automatic paths: a read held while newer actions are unloaded stays pending until they load.
+        if (!readActionSkippedRef.current || hasNewerActions || !Visibility.hasFocus()) {
             return;
         }
         markNewestActionAsRead();
     };
+
+    // Loading the newer actions clears hasNewerActions without a scroll, so finish the held read if the newest message is in view.
+    const completeReadHeldForNewerActions = useEffectEvent(() => {
+        if (isHiddenFromUser || !isFocused || !isScrolledToEnd || reportID !== getScopeReportID(scopeKey)) {
+            return;
+        }
+        completeSkippedMarkAsRead();
+    });
+
+    const prevHasNewerActions = usePrevious(hasNewerActions);
+    useEffect(() => {
+        if (!prevHasNewerActions || hasNewerActions) {
+            return;
+        }
+        completeReadHeldForNewerActions();
+    }, [prevHasNewerActions, hasNewerActions]);
 
     return {markNewestActionAsRead, completeSkippedMarkAsRead};
 }

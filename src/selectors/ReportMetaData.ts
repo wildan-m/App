@@ -33,6 +33,8 @@ const isLoadingInitialReportActionsSelector = (loadingState: OnyxEntry<ReportLoa
 
 const isLoadingReportStatusSelector = (loadingState: OnyxEntry<ReportLoadingState>) => loadingState?.isLoadingReportStatus;
 
+const isLoadingNewerReportActionsSelector = (loadingState: OnyxEntry<ReportLoadingState>) => loadingState?.isLoadingNewerReportActions;
+
 const pendingChatMembersSelector = (reportMetadata: OnyxEntry<ReportMetadata>): OnyxEntry<ReportMetadata> =>
     reportMetadata ? {pendingChatMembers: reportMetadata.pendingChatMembers} : undefined;
 
@@ -101,6 +103,7 @@ export {
     reportActionsListLoadingStateSelector,
     isLoadingInitialReportActionsSelector,
     isLoadingReportStatusSelector,
+    isLoadingNewerReportActionsSelector,
     isOptimisticReportSelector,
     pendingNewTransactionIDsSelector,
     pendingChatMembersSelector,

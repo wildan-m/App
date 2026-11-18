@@ -1,3 +1,4 @@
+import useLoadNewerActionsAtNewestEdge from '@hooks/useLoadNewerActionsAtNewestEdge';
 import useReportActionsScroll from '@hooks/useReportActionsScroll';
 import useReportScrollManager from '@hooks/useReportScrollManager';
 import useWindowDimensions from '@hooks/useWindowDimensions';
@@ -57,6 +58,7 @@ function useReportActionsListScroll({
         report,
         hasOnceLoadedReportActions,
         hasNewerActions,
+        newerActionsCursorID,
         sortedAllReportActions,
         oldestUnreadReportAction,
         transactionThreadReport,
@@ -161,15 +163,23 @@ function useReportActionsListScroll({
         loadOlderChats(false);
     };
 
+    const requestNewerChats = useLoadNewerActionsAtNewestEdge({
+        reportID,
+        hasNewerActions,
+        isAtNewestEdge: !hasScrolledOverThreshold,
+        newerActionsCursorID,
+        loadNewerChats,
+    });
+
     const loadNewerChatsAfterTransitions = () => {
         if (!isSearchTopmostFullScreenRoute()) {
-            loadNewerChats(false);
+            requestNewerChats();
             return;
         }
 
         TransitionTracker.runAfterTransitions({
             callback: () => {
-                requestAnimationFrame(() => loadNewerChats(false));
+                requestAnimationFrame(() => requestNewerChats());
             },
         });
     };
