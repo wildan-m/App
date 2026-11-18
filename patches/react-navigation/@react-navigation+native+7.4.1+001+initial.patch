@@ -84,7 +84,7 @@ index 0000000..b996822
 +}
 +//# sourceMappingURL=findFocusedRouteKey.js.map
 diff --git a/node_modules/@react-navigation/native/lib/module/useLinking.js b/node_modules/@react-navigation/native/lib/module/useLinking.js
-index af0cd61..2805780 100644
+index af0cd61..d453a36 100644
 --- a/node_modules/@react-navigation/native/lib/module/useLinking.js
 +++ b/node_modules/@react-navigation/native/lib/module/useLinking.js
 @@ -4,6 +4,7 @@ import { CommonActions, findFocusedRoute, getActionFromState as getActionFromSta
@@ -95,7 +95,44 @@ index af0cd61..2805780 100644
  import { ServerContext } from "./ServerContext.js";
  
  /**
-@@ -114,6 +115,43 @@ export const series = cb => {
+@@ -52,12 +53,12 @@ const getHistoryLength = state => state.history ? state.history.length : getRout
+  * Find the matching navigation state that changed between 2 navigation states
+  * e.g.: a -> b -> c -> d and a -> b -> c -> e -> f, if history in b changed, b is the matching state
+  */
+-const findMatchingState = (a, b) => {
++const findMatchingState = (a, b, getLength = getHistoryLength) => {
+   if (a === undefined || b === undefined || a.key !== b.key) {
+     return [undefined, undefined];
+   }
+-  const aHistoryLength = getHistoryLength(a);
+-  const bHistoryLength = getHistoryLength(b);
++  const aHistoryLength = getLength(a);
++  const bHistoryLength = getLength(b);
+   const aRoute = a.routes[a.index];
+   const bRoute = b.routes[b.index];
+   if (aRoute == null || bRoute == null) {
+@@ -74,7 +75,19 @@ const findMatchingState = (a, b) => {
+   if (aHistoryLength !== bHistoryLength || aRoute.key !== bRoute.key || aChildState === undefined || bChildState === undefined || aChildState.key !== bChildState.key) {
+     return [a, b];
+   }
+-  return findMatchingState(aChildState, bChildState);
++  return findMatchingState(aChildState, bChildState, getLength);
++};
++
++/**
++ * History length without leading custom string entries (e.g. reveal padding), which mark a replaced
++ * browser entry rather than a change in this navigator.
++ */
++const getHistoryLengthWithoutLeadingCustomEntries = state => {
++  if (!state.history) {
++    return getHistoryLength(state);
++  }
++  const firstRouteEntryIndex = state.history.findIndex(entry => typeof entry !== 'string');
++  return firstRouteEntryIndex === -1 ? state.history.length : state.history.length - firstRouteEntryIndex;
+ };
+ 
+ /**
+@@ -114,6 +127,43 @@ export const series = cb => {
    return callback;
  };
  const linkingHandlers = [];
@@ -139,17 +176,20 @@ index af0cd61..2805780 100644
  export function useLinking(ref, {
    enabled = true,
    config,
-@@ -266,12 +304,17 @@ export function useLinking(ref, {
+@@ -265,14 +315,20 @@ export function useLinking(ref, {
+       const record = history.get(index);
        if (record?.path === path && record?.state) {
          const currentState = navigation.getRootState();
-         const [currentFocused, recordFocused] = findMatchingState(currentState, record.state);
+-        const [currentFocused, recordFocused] = findMatchingState(currentState, record.state);
 -        if (previousIndex - index === 1 && currentFocused && recordFocused && isPoppingLastEntry(currentFocused, recordFocused)) {
++        // Ignore leading custom entries (e.g. reveal padding) so the navigator whose history changed is found below them
++        const [currentFocused, recordFocused] = findMatchingState(currentState, record.state, getHistoryLengthWithoutLeadingCustomEntries);
 +        // Custom string history entries (e.g. modal back-guards) aren't routes, so no router can pop them with GO_BACK.
 +        // Reset to the record's state instead, which drops the custom entry.
 +        const isPoppingCustomHistoryEntry = typeof currentFocused?.history?.at(-1) === 'string';
 +        if (previousIndex - index === 1 && currentFocused && recordFocused && !isPoppingCustomHistoryEntry && isPoppingLastEntry(currentFocused, recordFocused)) {
            const pending = pendingPopStateDeltaRef.current;
-
+ 
            // If we detect that the state change is popping the last entry
            // Dispatch a back action instead of resetting to the state
            // This makes sure changes to history state since the entry was added don't get lost
@@ -159,7 +199,8 @@ index af0cd61..2805780 100644
 +          dispatch({...CommonActions.goBack(), target: currentFocused.key},
            // Stack on any delta from a previous `popstate` that hasn't committed yet
            pending === 'replace' ? 'replace' : (pending ?? 0) - 1);
-@@ -411,6 +454,9 @@ export function useLinking(ref, {
+         } else {
+@@ -411,6 +467,9 @@ export function useLinking(ref, {
          const historyDelta = getHistoryLength(focusedState) - getHistoryLength(previousFocusedState) - (
          // Subtract the delta already applied by the browser to sync only the remaining changes
          pendingPopStateDelta ?? 0);
@@ -169,7 +210,7 @@ index af0cd61..2805780 100644
          if (historyDelta > 0) {
            // If history length is increased, we should pushState
            // Note that path might not actually change here, for example, drawer open should pushState
-@@ -422,7 +468,8 @@ export function useLinking(ref, {
+@@ -422,7 +481,8 @@ export function useLinking(ref, {
            // If history length is decreased, i.e. entries were removed, we want to go back
  
            const nextIndex = history.backIndex({
@@ -179,7 +220,7 @@ index af0cd61..2805780 100644
            });
            const currentIndex = history.index;
            try {
-@@ -435,7 +482,18 @@ export function useLinking(ref, {
+@@ -435,7 +495,18 @@ export function useLinking(ref, {
                // We couldn't find an existing entry to go back to, so we'll go back by the delta
                // This won't be correct if multiple routes were pushed in one go before
                // Usually this shouldn't happen and this is a fallback for that
@@ -199,7 +240,7 @@ index af0cd61..2805780 100644
              }
  
              // Store the updated state as well as fix the path if incorrect
-@@ -448,10 +506,26 @@ export function useLinking(ref, {
+@@ -448,10 +519,26 @@ export function useLinking(ref, {
            }
          } else {
            // If history length is unchanged, we want to replaceState
