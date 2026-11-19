@@ -1,12 +1,18 @@
 import {getEnvironmentURL} from '@libs/Environment/Environment';
 import Navigation from '@libs/Navigation/Navigation';
 
+import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 
 import isSearchTopmostFullScreenRoute from './isSearchTopmostFullScreenRoute';
 
-let environmentURL: string;
+let environmentURL: string | undefined;
 getEnvironmentURL().then((url: string) => (environmentURL = url));
+
+// The environment URL resolves asynchronously, so fall back to the production origin until it does to avoid building "undefined/..." links.
+function getBaseURL(): string {
+    return environmentURL ?? CONST.NEW_EXPENSIFY_URL;
+}
 
 // Static part of the search report path (everything before the first route param), used to detect sibling search-report routes.
 const SEARCH_REPORT_ROUTE_PREFIX = ROUTES.SEARCH_REPORT.route.slice(0, ROUTES.SEARCH_REPORT.route.indexOf(':'));
@@ -18,11 +24,11 @@ const SEARCH_REPORT_ROUTE_PREFIX = ROUTES.SEARCH_REPORT.route.slice(0, ROUTES.SE
  */
 function getReportURLForCurrentContext(reportID: string | undefined): string {
     if (!reportID) {
-        return `${environmentURL}/r/`;
+        return `${getBaseURL()}/r/`;
     }
     const isInSearchContext = isSearchTopmostFullScreenRoute();
     if (!isInSearchContext) {
-        return `${environmentURL}/${ROUTES.REPORT_WITH_ID.getRoute(reportID)}`;
+        return `${getBaseURL()}/${ROUTES.REPORT_WITH_ID.getRoute(reportID)}`;
     }
 
     // Navigation can return routes with a leading slash or missing when still mounting.
@@ -71,7 +77,7 @@ function getReportURLForCurrentContext(reportID: string | undefined): string {
     }
 
     const relativePath = ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID, backTo: backToRoute});
-    return `${environmentURL}/${relativePath}`;
+    return `${getBaseURL()}/${relativePath}`;
 }
 
 export default getReportURLForCurrentContext;
