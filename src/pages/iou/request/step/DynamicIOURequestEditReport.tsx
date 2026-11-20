@@ -10,6 +10,7 @@ import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useHasPerDiemTransactions from '@hooks/useHasPerDiemTransactions';
 import useHydrateReportsFromSnapshot from '@hooks/useHydrateReportsFromSnapshot';
+import useMergeReportsSuggestion from '@hooks/useMergeReportsSuggestion';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import {useGetPersonalDetailsByLogin} from '@hooks/usePersonalDetailByLogin';
@@ -21,6 +22,7 @@ import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {changeTransactionsReport} from '@libs/actions/Transaction';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
+import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import setNavigationActionToMicrotaskQueue from '@libs/Navigation/helpers/setNavigationActionToMicrotaskQueue';
 import Navigation from '@libs/Navigation/Navigation';
 import {getPersonalDetailsForAccountID, hasViolations as hasViolationsReportUtils} from '@libs/ReportUtils';
@@ -106,12 +108,9 @@ function DynamicIOURequestEditReport({route}: DynamicIOURequestEditReportProps) 
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
     const {getCurrencyDecimals, getCurrencySymbol} = useCurrencyListActions();
     const getPersonalDetailsByLogin = useGetPersonalDetailsByLogin();
-    const selectReport = (item: TransactionGroupListItem, report?: OnyxEntry<Report>) => {
-        if (transactionIDs.length === 0 || item.value === reportID) {
-            Navigation.dismissToSuperWideRHP();
-            return;
-        }
+    const {suggestMergeBeforeMove} = useMergeReportsSuggestion();
 
+    const moveToReport = (item: TransactionGroupListItem, report?: OnyxEntry<Report>) => {
         const newReport = report ?? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${item.value}`];
         const policyTagList = item?.policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
         const reportsForCall = newReport?.reportID ? {[`${ONYXKEYS.COLLECTION.REPORT}${newReport.reportID}`]: newReport, ...reports} : reports;
@@ -146,6 +145,36 @@ function DynamicIOURequestEditReport({route}: DynamicIOURequestEditReportProps) 
         });
 
         Navigation.dismissToSuperWideRHP();
+    };
+
+    const selectReport = (item: TransactionGroupListItem, report?: OnyxEntry<Report>) => {
+        if (transactionIDs.length === 0 || item.value === reportID) {
+            Navigation.dismissToSuperWideRHP();
+            return;
+        }
+
+        suggestMergeBeforeMove({
+            sourceReportID: reportID,
+            destinationReportID: item.value,
+            selectedTransactions: transactions,
+            onMove: () => moveToReport(item, report),
+            onMerge: (destinationReportID) => {
+                turnOffMobileSelectionMode();
+                clearSelectedTransactions(true);
+                // The source report is deleted by the merge, so open the merged report instead
+                Navigation.dismissModal({
+                    afterTransition: () => {
+                        Navigation.setNavigationActionToMicrotaskQueue(() => {
+                            Navigation.navigate(
+                                isSearchTopmostFullScreenRoute()
+                                    ? ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: destinationReportID})
+                                    : ROUTES.REPORT_WITH_ID.getRoute(destinationReportID),
+                            );
+                        });
+                    },
+                });
+            },
+        });
     };
 
     const removeFromReport = () => {

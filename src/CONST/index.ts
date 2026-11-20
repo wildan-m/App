@@ -10371,6 +10371,7 @@ const CONST = {
 
     INBOX_TAB_STALE_UNREAD_MONTHS: 3,
     CHANGE_POLICY_TRAINING_MODAL: 'changePolicyModal',
+    MERGE_REPORTS_SUGGESTION_MODAL: 'mergeReportsSuggestionModal',
     AGENTS_RULES_BANNER: 'agentsRulesBanner',
     NEW_WORKSPACE_ROLES_BANNER: 'newWorkspaceRolesBanner',
     WISE_GLOBAL_REIMBURSEMENTS_WALLET_BANNER: 'wiseGlobalReimbursementsWalletBanner',

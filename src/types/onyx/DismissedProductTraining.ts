@@ -68,6 +68,11 @@ type DismissedProductTraining = {
     [CONST.CHANGE_POLICY_TRAINING_MODAL]: DismissedProductTrainingElement;
 
     /**
+     * When user is shown the suggestion to merge reports instead of moving every expense off a report, we store the timestamp here.
+     */
+    [CONST.MERGE_REPORTS_SUGGESTION_MODAL]: DismissedProductTrainingElement;
+
+    /**
      * When user dismisses the agents rules promo banner, we store the timestamp here.
      */
     [CONST.AGENTS_RULES_BANNER]: DismissedProductTrainingElement;

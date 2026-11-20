@@ -3864,6 +3864,10 @@ const SENTRY_LABEL = {
     HOLD_SUBMITTER_EDUCATIONAL_MODAL: {
         CONFIRM_BUTTON: 'HoldSubmitterEducationalModal-ConfirmButton',
     },
+    MERGE_REPORTS_SUGGESTION_MODAL: {
+        MERGE_BUTTON: 'MergeReportsSuggestionModal-MergeButton',
+        JUST_MOVE_BUTTON: 'MergeReportsSuggestionModal-JustMoveButton',
+    },
     AVATAR_PAGE_FOOTER: {
         SAVE_BUTTON: 'AvatarPageFooter-SaveButton',
     },

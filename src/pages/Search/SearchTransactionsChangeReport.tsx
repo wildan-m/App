@@ -11,6 +11,7 @@ import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useHasPerDiemTransactions from '@hooks/useHasPerDiemTransactions';
 import useHydrateReportsFromSnapshot from '@hooks/useHydrateReportsFromSnapshot';
 import useLoadSearchCardData from '@hooks/useLoadSearchCardData';
+import useMergeReportsSuggestion from '@hooks/useMergeReportsSuggestion';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
@@ -56,7 +57,7 @@ function SearchTransactionsChangeReport() {
     const delegateAccountID = useDelegateAccountID();
     const {clearSelectedTransactions} = useSearchSelectionActions();
     const {currentSearchResults} = useSearchResultsContext();
-    const {currentSearchQueryJSON} = useSearchQueryContext();
+    const {currentSearchQueryJSON, currentSearchHash} = useSearchQueryContext();
     const selectedTransactionsKeys = Object.keys(selectedTransactions);
     const {isOffline} = useNetwork();
     const {showOfflineModal} = useAlertModals();
@@ -158,6 +159,8 @@ function SearchTransactionsChangeReport() {
         }
     }
     const hasMultipleSubmitters = ownerAccountIDs.size > 1;
+
+    const {suggestMergeBeforeMove} = useMergeReportsSuggestion();
 
     useHydrateReportsFromSnapshot(currentSearchResults, allReports);
 
@@ -274,15 +277,7 @@ function SearchTransactionsChangeReport() {
         handleCreateReport();
     };
 
-    const selectReport = (item: TransactionGroupListItem) => {
-        if (selectedTransactionsKeys.length === 0) {
-            return;
-        }
-        if (shouldBlockOfflineAllMatchingMove()) {
-            showOfflineModal();
-            return;
-        }
-
+    const moveToReport = (item: TransactionGroupListItem) => {
         const destinationReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${item.value}`];
         const policyTagList = item?.policyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${item.policyID}`] : {};
         const reportsForCall = destinationReport?.reportID
@@ -317,6 +312,40 @@ function SearchTransactionsChangeReport() {
             personalDetailsByLogins: getPersonalDetailsByLogin(),
         });
         Navigation.goBack(undefined, {afterTransition: clearSelectedTransactions});
+    };
+
+    const selectReport = (item: TransactionGroupListItem) => {
+        if (selectedTransactionsKeys.length === 0) {
+            return;
+        }
+        if (shouldBlockOfflineAllMatchingMove()) {
+            showOfflineModal();
+            return;
+        }
+
+        // A move of all matching items can include expenses that are not loaded here, so only a plain selection can become a merge
+        if (allMatchingQueryParams.jsonQuery) {
+            moveToReport(item);
+            return;
+        }
+
+        suggestMergeBeforeMove({
+            sourceReportID: selectedReportID,
+            destinationReportID: item.value,
+            selectedTransactions: transactions,
+            hash: currentSearchHash,
+            onMove: () => moveToReport(item),
+            onMerge: (destinationReportID) => {
+                Navigation.dismissModal({
+                    afterTransition: () => {
+                        clearSelectedTransactions(undefined, true);
+                        Navigation.setNavigationActionToMicrotaskQueue(() => {
+                            Navigation.navigate(ROUTES.SEARCH_MONEY_REQUEST_REPORT.getRoute({reportID: destinationReportID, backTo: Navigation.getActiveRoute()}));
+                        });
+                    },
+                });
+            },
+        });
     };
 
     const autoReport = () => {
