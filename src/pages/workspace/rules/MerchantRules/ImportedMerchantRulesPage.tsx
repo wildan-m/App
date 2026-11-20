@@ -498,4 +498,4 @@ function ImportedMerchantRulesPage({route}: ImportedMerchantRulesPageProps) {
 }
 
 export default ImportedMerchantRulesPage;
-export {buildImportedCategoryLookup, buildImportedVendorLookup, normalizeImportedTag, parseSpreadsheetRules, willImportShortCircuitLocally};
+export {buildImportedCategoryLookup, buildImportedVendorLookup, getRuleContentKey, normalizeImportedTag, parseSpreadsheetRules, willImportShortCircuitLocally};
