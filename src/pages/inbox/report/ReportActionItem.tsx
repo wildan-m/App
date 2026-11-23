@@ -388,10 +388,18 @@ function ReportActionItem({
     // Hide the message if it is being moderated for a higher offense, or is hidden by a moderator
     // Removed messages should not be shown anyway and should not need this flow
     const latestDecision = getReportActionMessage(action)?.moderationDecision?.decision ?? '';
+    const handledModerationDecisionRef = useRef<{reportActionID: string; decision: string} | null>(null);
     useEffect(() => {
         if (action.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT) {
             return;
         }
+
+        // Only re-apply visibility when the decision changes, so updates like reactions don't re-hide a message the user revealed
+        const handledDecision = handledModerationDecisionRef.current;
+        if (handledDecision?.reportActionID === action.reportActionID && handledDecision.decision === latestDecision) {
+            return;
+        }
+        handledModerationDecisionRef.current = {reportActionID: action.reportActionID, decision: latestDecision};
 
         // Hide reveal message button and show the message if latestDecision is changed to empty
         if (!latestDecision) {
