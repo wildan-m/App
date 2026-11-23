@@ -134,3 +134,10 @@
 - Upstream PR/issue: not reported yet.
 - E/App issue: [#107266](https://github.com/Expensify/App/issues/107266)
 - PR introducing patch: [#107282](https://github.com/Expensify/App/pull/107282)
+
+### [react-native-screens+4.28.0+011+defer-reentrant-tab-selection.patch](react-native-screens+4.28.0+011+defer-reentrant-tab-selection.patch)
+
+- Reason: On Android, the app crashed with `IllegalStateException: FragmentManager is already executing transactions` when a queued tab-selection update was applied while the FragmentManager was dispatching a lifecycle state (Sentry APP-PHC, hit on activity start on the Home screen). `TabsScreenFragment` emits its appear/disappear events from `onStart`/`onResume`/`onPause`/`onStop`, which run inside `FragmentManager.dispatchStateChange`, and Reanimated can process such an event synchronously and flush Fabric mount updates on the spot. That flush reaches `TabsHost.didMountItems` → `TabsContainer.flushPendingUpdates`, which applies a pending tab selection with `commitNowAllowingStateLoss()`, re-entering the FragmentManager mid-dispatch. The patch marks the container while one of its tab fragments is emitting a lifecycle event and makes `flushPendingUpdates` defer in that window: the pending request and invalidation flags are kept and the flush is re-posted to the main queue once, so the same update runs right after the dispatch completes, with attachment re-validated and the existing staleness arbitration deciding as before.
+- Upstream PR/issue: not reported yet. The 4.x tabs code no longer exists on upstream `main` (restructured for the next major), so this belongs with the maintainers as a report against the new architecture.
+- E/App issue: [#107765](https://github.com/Expensify/App/issues/107765)
+- PR introducing patch: TBD
