@@ -74,7 +74,7 @@ function CardActivatedPage() {
             <HeaderWithBackButton onBackButtonPress={dismiss} />
             <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph5]}>
                 <Animated.View style={[{width: variables.cardPreviewWidth, height: variables.cardPreviewHeight}, cardScaleAnimatedStyle]}>
-                    <Animated.View style={[styles.pAbsolute, styles.h100, styles.w100, styles.walletCard, {backfaceVisibility: 'hidden'}, frontFaceAnimatedStyle]}>
+                    <Animated.View style={[styles.walletCard, styles.pAbsolute, styles.t0, styles.l0, styles.h100, styles.w100, {backfaceVisibility: 'hidden'}, frontFaceAnimatedStyle]}>
                         <ImageSVG
                             contentFit="contain"
                             src={lazyIllustrations.ExpensifyCardImage}
@@ -85,7 +85,16 @@ function CardActivatedPage() {
                     </Animated.View>
                     {/* Placeholder back-of-card art until the design export lands */}
                     <Animated.View
-                        style={[styles.pAbsolute, styles.h100, styles.w100, styles.walletCard, {backfaceVisibility: 'hidden', backgroundColor: colors.green800}, backFaceAnimatedStyle]}
+                        style={[
+                            styles.walletCard,
+                            styles.pAbsolute,
+                            styles.t0,
+                            styles.l0,
+                            styles.h100,
+                            styles.w100,
+                            {backfaceVisibility: 'hidden', backgroundColor: colors.green800},
+                            backFaceAnimatedStyle,
+                        ]}
                     >
                         <View style={[styles.w100, {height: MAGSTRIPE_HEIGHT, marginTop: MAGSTRIPE_TOP_OFFSET, backgroundColor: colors.green700}]} />
                     </Animated.View>
