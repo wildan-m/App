@@ -580,7 +580,7 @@ function removeMembers(policy: OnyxEntry<Policy>, selectedMemberEmails: string[]
     if (!isEmptyObject(policy?.primaryLoginsInvited ?? {})) {
         // Take the current policy members and remove them optimistically
         const employeeListEmails = Object.keys(policy?.employeeList ?? {});
-        const remainingLogins = employeeListEmails.filter((email) => !selectedMemberEmails.includes(email));
+        const remainingLogins = employeeListEmails.filter((email) => !selectedMemberEmailsWithDuplicates.includes(email));
         const invitedPrimaryToSecondaryLogins: Record<string, string> = {};
 
         if (policy?.primaryLoginsInvited) {
@@ -624,7 +624,7 @@ function removeMembers(policy: OnyxEntry<Policy>, selectedMemberEmails: string[]
     // }
 
     const params: DeleteMembersFromWorkspaceParams = {
-        emailList: selectedMemberEmails.join(','),
+        emailList: selectedMemberEmailsWithDuplicates.join(','),
         policyID,
     };
 

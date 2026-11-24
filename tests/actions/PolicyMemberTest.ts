@@ -1442,6 +1442,9 @@ describe('actions/PolicyMember', () => {
             expect(employeeList?.[primaryEmail]).toBeUndefined();
             expect(employeeList?.[secondaryEmail]).toBeUndefined();
             expect(employeeList?.[ownerEmail]).toBeDefined();
+
+            // The request must ask the server to remove both paired logins, otherwise the paired login is restored on the next policy sync.
+            TestHelper.expectAPICommandToHaveBeenCalledWith(WRITE_COMMANDS.DELETE_MEMBERS_FROM_WORKSPACE, 0, {emailList: `${primaryEmail},${secondaryEmail}`, policyID});
         });
     });
 
