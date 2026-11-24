@@ -56,16 +56,21 @@ function ActivatePhysicalCardPageBase({cardID = '', navigateBackTo, cardDetailsP
     const activateCardCodeInputRef = useRef<ValidateCodeInputHandle>(null);
 
     /**
-     * If state of the card is CONST.EXPENSIFY_CARD.STATE.OPEN, return to the card details screen.
+     * If state of the card is CONST.EXPENSIFY_CARD.STATE.OPEN, show the activation success screen.
      */
     useEffect(() => {
         if (inactiveCard?.state !== CONST.EXPENSIFY_CARD.STATE.OPEN || inactiveCard?.isLoading) {
             return;
         }
 
-        // Collapse the activate flow back onto the existing card route instead of pushing a new one, so the user is not left
-        // with a duplicate card details screen and a stale route to back through.
-        Navigation.goBack(cardDetailsPath ?? createDynamicRoute(DYNAMIC_ROUTES.WALLET_DOMAIN_CARD.getRoute(cardID), ROUTES.SETTINGS_WALLET), {compareParams: false});
+        // Replace the activation form with the success screen so backing out never returns to the form.
+        Navigation.navigate(
+            createDynamicRoute(
+                DYNAMIC_ROUTES.WALLET_CARD_ACTIVATED.getRoute(cardID),
+                cardDetailsPath ?? createDynamicRoute(DYNAMIC_ROUTES.WALLET_DOMAIN_CARD.getRoute(cardID), ROUTES.SETTINGS_WALLET),
+            ),
+            {forceReplace: true},
+        );
     }, [cardID, cardList, inactiveCard?.isLoading, inactiveCard?.state, cardDetailsPath]);
 
     useEffect(() => {

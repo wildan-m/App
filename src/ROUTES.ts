@@ -1683,6 +1683,11 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.SETTINGS.WALLET.DYNAMIC_DOMAIN_CARD, SCREENS.DOMAIN_CARD.DOMAIN_CARD_DETAIL],
         getRoute: (cardID: string) => `activate/${cardID}` as const,
     },
+    WALLET_CARD_ACTIVATED: {
+        path: 'activated/:cardID',
+        entryScreens: [SCREENS.SETTINGS.WALLET.DYNAMIC_DOMAIN_CARD, SCREENS.DOMAIN_CARD.DOMAIN_CARD_DETAIL],
+        getRoute: (cardID: string) => `activated/${cardID}` as const,
+    },
     WALLET_CARD_REVEAL_VALIDATE_CODE: {
         path: 'reveal-validate-code/:cardID',
         entryScreens: [SCREENS.SETTINGS.WALLET.DYNAMIC_DOMAIN_CARD],

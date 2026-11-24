@@ -3867,6 +3867,12 @@ const translations = {
             thatDidNotMatch: "That didn't match the last 4 digits on your card. Please try again.",
         },
     },
+    cardActivatedPage: {
+        // @context Celebratory heading shown on the success screen right after a physical Expensify Card is activated
+        youreAllSet: "You're all set!",
+        // @context Supporting text under the heading on the card activation success screen; keep "Expensify Card" untranslated
+        cardReadyToUse: 'Your Expensify Card is ready to use.',
+    },
     getPhysicalCard: {
         header: 'Get physical card',
         nameMessage: 'Enter your first and last name, as this will be shown on your card.',

@@ -478,6 +478,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.SETTINGS.WALLET.DYNAMIC_REPORT_VIRTUAL_CARD_FRAUD_CONFIRMATION]: () =>
         require<ReactComponentModule>('../../../../pages/settings/Wallet/ReportVirtualCardFraudConfirmationPage').default,
     [SCREENS.SETTINGS.WALLET.DYNAMIC_CARD_ACTIVATE]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/ActivatePhysicalCardPage').default,
+    [SCREENS.SETTINGS.WALLET.DYNAMIC_CARD_ACTIVATED]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/CardActivatedPage').default,
     [SCREENS.SETTINGS.WALLET.CARD_ADD_TO_DIGITAL_WALLET]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/AddCardToDigitalWalletPage').default,
     [SCREENS.SETTINGS.WALLET.CARD_ADDED_TO_WALLET]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/CardAddedToWalletPage').default,
     [SCREENS.SETTINGS.WALLET.DYNAMIC_CARD_CHANGE_PIN]: () => require<ReactComponentModule>('../../../../pages/settings/Wallet/ExpensifyCardPage/ChangePINPage').default,

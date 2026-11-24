@@ -114,6 +114,9 @@ type AccountSettingsParamList = {
     [SCREENS.SETTINGS.WALLET.DYNAMIC_CARD_ACTIVATE]: {
         cardID: string;
     };
+    [SCREENS.SETTINGS.WALLET.DYNAMIC_CARD_ACTIVATED]: {
+        cardID: string;
+    };
     [SCREENS.SETTINGS.WALLET.CARD_ADDED_TO_WALLET]: {
         /** cardID of selected card */
         cardID: string;
