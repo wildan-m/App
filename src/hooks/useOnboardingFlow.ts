@@ -2,6 +2,7 @@ import {useInitialURLState} from '@components/InitialURLContextProvider';
 
 import AccountUtils from '@libs/AccountUtils';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
+import isJoinWorkspaceTaskPath, {isOnboardingPath} from '@libs/Navigation/helpers/isJoinWorkspaceTaskPath';
 import Navigation from '@libs/Navigation/Navigation';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {isLoggingInAsNewUser} from '@libs/SessionUtils';
@@ -108,6 +109,21 @@ function useOnboardingFlowRouter() {
                     // Make sure hybrid app onboarding is completed and will not start startOnboardingFlow for users that switched from OldDot.
                     if (isHybridAppOnboardingCompleted === false) {
                         completeHybridAppOnboarding();
+                        return;
+                    }
+                }
+
+                // A session restored onto an onboarding URL (e.g. a stale tab reloaded by a forced upgrade) keeps the flow
+                // open when fresh data later reports it completed on another device: NavigationRoot's redirect only runs at
+                // mount with the cached value and OnboardingGuard only evaluates navigation actions. An empty local purpose
+                // means the flow is not running on this device, so this cannot fire mid-completion, where the completed flag
+                // flips optimistically before navigateAfterOnboarding runs.
+                if (isOnboardingCompleted && !onboardingPurposeSelected) {
+                    const activeRoute = Navigation.getActiveRoute();
+                    if (isOnboardingPath(activeRoute) && !isJoinWorkspaceTaskPath(activeRoute)) {
+                        Navigation.isNavigationReady().then(() => {
+                            Navigation.dismissModal();
+                        });
                         return;
                     }
                 }
