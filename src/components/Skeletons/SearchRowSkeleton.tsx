@@ -1,4 +1,5 @@
 import useNavigationBarWidth from '@components/Navigation/FlatNavigationBar/useNavigationBarWidth';
+import SkeletonCircle from '@components/SkeletonCircle';
 import SkeletonRect from '@components/SkeletonRect';
 
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -16,7 +17,6 @@ import type {LayoutChangeEvent, StyleProp, ViewStyle} from 'react-native';
 
 import React from 'react';
 import {View} from 'react-native';
-import {Circle} from 'react-native-svg';
 
 import ItemListSkeletonView from './ItemListSkeletonView';
 
@@ -83,7 +83,7 @@ function SearchRowSkeleton({
                     fixedNumItems={fixedNumItems}
                     renderSkeletonItem={() => (
                         <>
-                            <Circle
+                            <SkeletonCircle
                                 cx={24}
                                 cy={24}
                                 r={8}

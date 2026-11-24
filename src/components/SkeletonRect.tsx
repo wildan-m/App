@@ -1,21 +1,33 @@
-import type {ComponentProps} from 'react';
+import SkeletonFillContext from '@components/SkeletonViewContentLoader/SkeletonFillContext';
+import toDimensionValue from '@components/SkeletonViewContentLoader/toDimensionValue';
 
-import React from 'react';
-import {Rect} from 'react-native-svg';
+import type {ViewStyle} from 'react-native';
 
-// react-native-svg only exports `RectProps` from its native entry, so on web the props come from the component itself.
-type RectProps = ComponentProps<typeof Rect>;
+import React, {useContext} from 'react';
+import {View} from 'react-native';
 
 const BORDER_RADIUS_SMALL = 2; // text bars (height <= 8)
 const BORDER_RADIUS_MEDIUM = 4; // content blocks (height > 8)
 const HEIGHT_THRESHOLD = 8;
 
-type SkeletonRectProps = Omit<RectProps, 'rx' | 'ry' | 'x' | 'y'> & {
-    /** Sets both rx and ry. Auto-derived from height when omitted. */
+// SVG-style dimension kept for drop-in compatibility: a number, a numeric string or a percentage string
+type SkeletonDimension = number | string;
+
+type SkeletonRectProps = {
+    /** Width of the bar; percentages resolve against the skeleton canvas */
+    width?: SkeletonDimension;
+
+    /** Height of the bar */
+    height?: SkeletonDimension;
+
+    /** Translate transforms positioning the bar on the canvas */
+    transform?: ViewStyle['transform'];
+
+    /** Sets the corner radius. Auto-derived from height when omitted. */
     borderRadius?: number;
 };
 
-function getDefaultRadius(height: RectProps['height']): number {
+function getDefaultRadius(height: SkeletonDimension | undefined): number {
     const num = typeof height === 'number' ? height : parseFloat(String(height));
     if (Number.isNaN(num)) {
         return BORDER_RADIUS_MEDIUM;
@@ -23,14 +35,21 @@ function getDefaultRadius(height: RectProps['height']): number {
     return num <= HEIGHT_THRESHOLD ? BORDER_RADIUS_SMALL : BORDER_RADIUS_MEDIUM;
 }
 
-function SkeletonRect({borderRadius, height, ...rest}: SkeletonRectProps) {
+function SkeletonRect({width, height, transform, borderRadius}: SkeletonRectProps) {
+    const fill = useContext(SkeletonFillContext);
     const radius = borderRadius ?? getDefaultRadius(height);
     return (
-        <Rect
-            {...rest}
-            height={height}
-            rx={radius}
-            ry={radius}
+        <View
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: toDimensionValue(width),
+                height: toDimensionValue(height),
+                borderRadius: radius,
+                backgroundColor: fill,
+                transform,
+            }}
         />
     );
 }

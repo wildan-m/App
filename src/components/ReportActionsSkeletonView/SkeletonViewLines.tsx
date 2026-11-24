@@ -1,3 +1,4 @@
+import SkeletonCircle from '@components/SkeletonCircle';
 import SkeletonRect from '@components/SkeletonRect';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 
@@ -7,7 +8,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 
 import React from 'react';
-import {Circle} from 'react-native-svg';
 
 type SkeletonViewLinesProps = {
     /** Number of rows to show in Skeleton UI block */
@@ -27,7 +27,7 @@ function SkeletonViewLines({numberOfRows, shouldAnimate = true}: SkeletonViewLin
             speed={CONST.TIMING.SKELETON_ANIMATION_SPEED}
             style={styles.mr5}
         >
-            <Circle
+            <SkeletonCircle
                 cx="40"
                 cy="26"
                 r="20"

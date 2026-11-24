@@ -1,3 +1,4 @@
+import SkeletonCircle from '@components/SkeletonCircle';
 import SkeletonRect from '@components/SkeletonRect';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 
@@ -14,7 +15,6 @@ import type {ValueOf} from 'type-fest';
 
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Circle} from 'react-native-svg';
 
 const BAR_HEIGHT = 8;
 const NAME_BAR_WIDTH_RATIO = 0.45;
@@ -81,7 +81,7 @@ function AccountSwitcherSkeletonView({
                     width={shouldStackHeader ? stackedWidth : width}
                     height={shouldStackHeader ? stackedHeight : avatarPlaceholderSize}
                 >
-                    <Circle
+                    <SkeletonCircle
                         cx={shouldStackHeader ? stackedWidth / 2 : startPositionX}
                         cy={avatarPlaceholderRadius}
                         r={avatarPlaceholderRadius}

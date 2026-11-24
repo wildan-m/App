@@ -1,3 +1,4 @@
+import SkeletonCircle from '@components/SkeletonCircle';
 import SkeletonRect from '@components/SkeletonRect';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 
@@ -6,7 +7,6 @@ import useTheme from '@hooks/useTheme';
 import variables from '@styles/variables';
 
 import React from 'react';
-import {Circle} from 'react-native-svg';
 
 const ICON_CENTER = variables.iconSizeXLarge / 2;
 
@@ -20,7 +20,7 @@ function ReportHistoryItemSkeleton() {
             backgroundColor={theme.skeletonLHNIn}
             foregroundColor={theme.skeletonLHNOut}
         >
-            <Circle
+            <SkeletonCircle
                 cx={ICON_CENTER}
                 cy={ICON_CENTER}
                 r={variables.iconSizeSemiSmall / 2}

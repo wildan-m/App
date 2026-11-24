@@ -6,8 +6,8 @@ import CONST from '@src/CONST';
 import type {ValueOf} from 'type-fest';
 
 import React from 'react';
-import {Circle} from 'react-native-svg';
 
+import SkeletonCircle from './SkeletonCircle';
 import SkeletonViewContentLoader from './SkeletonViewContentLoader';
 
 type AvatarSkeletonProps = {
@@ -28,7 +28,7 @@ function AvatarSkeleton({size = CONST.AVATAR_SIZE.SMALL}: AvatarSkeletonProps) {
             backgroundColor={theme.skeletonLHNIn}
             foregroundColor={theme.skeletonLHNOut}
         >
-            <Circle
+            <SkeletonCircle
                 cx={skeletonCircleRadius}
                 cy={skeletonCircleRadius}
                 r={skeletonCircleRadius}

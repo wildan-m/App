@@ -5,8 +5,8 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import React from 'react';
-import {Circle} from 'react-native-svg';
 
+import SkeletonCircle from './SkeletonCircle';
 import SkeletonRect from './SkeletonRect';
 import SkeletonViewContentLoader from './SkeletonViewContentLoader';
 
@@ -32,7 +32,7 @@ function ReportHeaderTitleSkeleton({shouldAnimate = true}: ReportHeaderTitleSkel
             backgroundColor={theme.skeletonLHNIn}
             foregroundColor={theme.skeletonLHNOut}
         >
-            <Circle
+            <SkeletonCircle
                 cx={radius}
                 cy={circleY}
                 r={radius}

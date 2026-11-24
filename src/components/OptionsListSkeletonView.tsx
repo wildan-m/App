@@ -3,8 +3,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import type {LayoutChangeEvent} from 'react-native';
 
 import React from 'react';
-import {Circle} from 'react-native-svg';
 
+import SkeletonCircle from './SkeletonCircle';
 import SkeletonRect from './SkeletonRect';
 import ItemListSkeletonView from './Skeletons/ItemListSkeletonView';
 
@@ -48,7 +48,7 @@ function OptionsListSkeletonView({shouldAnimate = true, shouldStyleAsTable = fal
 
                 return (
                     <>
-                        <Circle
+                        <SkeletonCircle
                             cx={shouldStyleAsTable ? '36' : '40'}
                             cy="32"
                             r="20"
