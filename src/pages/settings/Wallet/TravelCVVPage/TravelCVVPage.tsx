@@ -16,13 +16,15 @@ import useThrottledButtonState from '@hooks/useThrottledButtonState';
 
 import Clipboard from '@libs/Clipboard';
 import Navigation from '@libs/Navigation/Navigation';
+import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
-import {useNavigationState} from '@react-navigation/native';
+import {useNavigation, useNavigationState} from '@react-navigation/native';
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 
@@ -35,6 +37,7 @@ import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider
  */
 function TravelCVVPage() {
     const styles = useThemeStyles();
+    const navigation = useNavigation<PlatformStackNavigationProp<SettingsNavigatorParamList>>();
     const [isCopyButtonActive, setCopyButtonInactive] = useThrottledButtonState();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
@@ -93,8 +96,9 @@ function TravelCVVPage() {
             return;
         }
         hasAutoNavigatedRef.current = true;
-        Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [cvv, isSignedInAsDelegate, isOffline, isAccountLocked, isVerifyAccountInStack]);
+        // Navigate through this screen's own navigator, the root state may not contain this modal stack yet on first mount.
+        navigation.navigate(SCREENS.SETTINGS.WALLET.TRAVEL_CVV_VERIFY_ACCOUNT);
+    }, [navigation, cvv, isSignedInAsDelegate, isOffline, isAccountLocked, isVerifyAccountInStack]);
 
     const handleRevealDetailsPress = () => {
         if (isAccountLocked) {
