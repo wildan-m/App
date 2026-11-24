@@ -5,6 +5,7 @@ import Text from '@components/Text';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteCollectionAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -35,6 +36,7 @@ function NetSuiteCollectionAccountSelectPage({policy}: WithPolicyConnectionsProp
 
     const config = policy?.connections?.netsuite?.options.config;
     const netsuiteCollectionAccountOptions: SelectorType[] = getNetSuiteCollectionAccountOptions(policy ?? undefined, config?.collectionAccount);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteCollectionAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteCollectionAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -69,12 +71,14 @@ function NetSuiteCollectionAccountSelectPage({policy}: WithPolicyConnectionsProp
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteCollectionAccountSelectPage"
             headerContent={headerContent}
-            data={netsuiteCollectionAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateCollectionAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_ADVANCED.getRoute(policyID))}
             title="workspace.netsuite.advancedConfig.collectionsAccount"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={config?.reimbursableExpensesExportDestination === CONST.NETSUITE_EXPORT_DESTINATION.JOURNAL_ENTRY}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.COLLECTION_ACCOUNT], config?.pendingFields)}

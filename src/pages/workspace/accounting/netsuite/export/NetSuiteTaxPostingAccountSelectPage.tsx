@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import usePermissions from '@hooks/usePermissions';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteTaxPostingAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -42,6 +43,7 @@ function NetSuiteTaxPostingAccountSelectPage({policy}: WithPolicyConnectionsProp
     const selectedSubsidiary = (subsidiaryList ?? []).find((subsidiary) => subsidiary.internalID === config?.subsidiaryID);
 
     const netsuiteTaxAccountOptions: SelectorType[] = getNetSuiteTaxAccountOptions(policy ?? undefined, selectedSubsidiary?.country, config?.taxPostingAccount);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteTaxAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteTaxAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -69,12 +71,14 @@ function NetSuiteTaxPostingAccountSelectPage({policy}: WithPolicyConnectionsProp
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteTaxPostingAccountSelectPage"
-            data={netsuiteTaxAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateTaxAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={() => Navigation.goBack(netSuiteExportBackPath)}
             title="workspace.netsuite.journalEntriesTaxPostingAccount"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={!!config?.suiteTaxEnabled || !config?.syncOptions.syncTax || !canUseTaxNetSuite(isBetaEnabled(CONST.BETAS.NETSUITE_USA_TAX), selectedSubsidiary?.country)}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.TAX_POSTING_ACCOUNT], config?.pendingFields)}

@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteDefaultVendor} from '@libs/actions/connections/NetSuiteCommands';
@@ -52,6 +53,7 @@ function DynamicNetSuiteExportExpensesVendorSelectPage({policy}: WithPolicyConne
     };
     const shouldShowClearOption = !!config?.defaultVendor || vendorOptions.length > 0;
     const netsuiteVendorOptions: SelectorType[] = shouldShowClearOption ? [clearOption, ...vendorOptions] : vendorOptions;
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteVendorOptions, translate('common.noResultsFound'), true);
 
     const initiallyFocusedOptionKey = netsuiteVendorOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -87,12 +89,15 @@ function DynamicNetSuiteExportExpensesVendorSelectPage({policy}: WithPolicyConne
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteExportExpensesVendorSelectPage"
-            data={netsuiteVendorOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateDefaultVendor}
+            shouldSingleExecuteRowSelect
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={goBack}
             title="workspace.accounting.defaultVendor"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={shouldHideReimbursableDefaultVendor(isReimbursable, config)}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.DEFAULT_VENDOR], config?.pendingFields)}

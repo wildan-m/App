@@ -4,6 +4,7 @@ import SelectionScreen from '@components/SelectionScreen';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import type {AccessVariant} from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -56,6 +57,7 @@ function TravelBillingPayableAccountSelectPage({
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
+    const {filteredData, textInputOptions} = useSelectionListSearch(data, translate('common.noResultsFound'));
 
     const listEmptyContent = (
         <BlockingView
@@ -76,11 +78,13 @@ function TravelBillingPayableAccountSelectPage({
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName={displayName}
             title={title}
-            data={data}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={onSelect}
             shouldSingleExecuteRowSelect
             initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={connectionName}
             onBackButtonPress={onBack}
             pendingAction={pendingAction}

@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteInvoiceItem} from '@libs/actions/connections/NetSuiteCommands';
@@ -34,6 +35,7 @@ function DynamicNetSuiteInvoiceItemSelectPage({policy}: WithPolicyConnectionsPro
     const config = policy?.connections?.netsuite?.options.config;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_NETSUITE_INVOICE_ITEM_SELECT.path);
     const netsuiteInvoiceItemOptions: SelectorType[] = getNetSuiteInvoiceItemOptions(policy ?? undefined, config?.invoiceItem);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteInvoiceItemOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteInvoiceItemOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -65,12 +67,14 @@ function DynamicNetSuiteInvoiceItemSelectPage({policy}: WithPolicyConnectionsPro
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="DynamicNetSuiteInvoiceItemSelectPage"
-            data={netsuiteInvoiceItemOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateInvoiceItem}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={goBack}
             title="workspace.netsuite.invoiceItem.label"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={config?.invoiceItemPreference !== CONST.NETSUITE_INVOICE_ITEM_PREFERENCE.SELECT}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.INVOICE_ITEM], config?.pendingFields)}

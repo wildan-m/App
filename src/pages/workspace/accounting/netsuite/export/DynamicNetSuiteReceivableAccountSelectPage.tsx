@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteReceivableAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -33,6 +34,7 @@ function DynamicNetSuiteReceivableAccountSelectPage({policy}: WithPolicyConnecti
     const config = policy?.connections?.netsuite?.options.config;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_NETSUITE_RECEIVABLE_ACCOUNT_SELECT.path);
     const netsuiteReceivableAccountOptions: SelectorType[] = getNetSuiteReceivableAccountOptions(policy ?? undefined, config?.receivableAccount);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteReceivableAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteReceivableAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -64,12 +66,14 @@ function DynamicNetSuiteReceivableAccountSelectPage({policy}: WithPolicyConnecti
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteReceivableAccountSelectPage"
-            data={netsuiteReceivableAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateReceivableAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={goBack}
             title="workspace.netsuite.exportInvoices"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.RECEIVABLE_ACCOUNT], config?.pendingFields)}
             errors={getLatestErrorField(config, CONST.NETSUITE_CONFIG.RECEIVABLE_ACCOUNT)}

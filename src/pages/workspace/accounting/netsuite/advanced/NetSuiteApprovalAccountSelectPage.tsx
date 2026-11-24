@@ -5,6 +5,7 @@ import Text from '@components/Text';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteApprovalAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -35,6 +36,7 @@ function NetSuiteApprovalAccountSelectPage({policy}: WithPolicyConnectionsProps)
 
     const config = policy?.connections?.netsuite?.options.config;
     const netsuiteApprovalAccountOptions: SelectorType[] = getNetSuiteApprovalAccountOptions(policy ?? undefined, config?.approvalAccount, translate);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteApprovalAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteApprovalAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -70,12 +72,14 @@ function NetSuiteApprovalAccountSelectPage({policy}: WithPolicyConnectionsProps)
             displayName="NetSuiteApprovalAccountSelectPage"
             headerContent={headerContent}
             titleNumberOfLines={2}
-            data={netsuiteApprovalAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateCollectionAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_ADVANCED.getRoute(policyID))}
             title="workspace.netsuite.advancedConfig.approvalAccount"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.APPROVAL_ACCOUNT], config?.pendingFields)}
             errors={getLatestErrorField(config, CONST.NETSUITE_CONFIG.APPROVAL_ACCOUNT)}

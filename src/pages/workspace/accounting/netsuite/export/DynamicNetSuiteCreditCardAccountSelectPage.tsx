@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteCreditCardAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -39,6 +40,7 @@ function DynamicNetSuiteCreditCardAccountSelectPage({policy}: WithPolicyConnecti
     const currentSettingName = CONST.NETSUITE_CONFIG.CREDIT_CARD_ACCOUNT;
     const currentCreditCardAccountID = config?.creditCardAccount ?? CONST.NETSUITE_PAYABLE_ACCOUNT_DEFAULT_VALUE;
     const creditCardAccountOptions: SelectorType[] = getNetSuiteCreditCardAccountOptions(policy ?? undefined, currentCreditCardAccountID);
+    const {filteredData, textInputOptions} = useSelectionListSearch(creditCardAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = creditCardAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -68,7 +70,8 @@ function DynamicNetSuiteCreditCardAccountSelectPage({policy}: WithPolicyConnecti
         <SelectionScreen
             displayName="DynamicNetSuiteCreditCardAccountSelectPage"
             title="workspace.netsuite.creditCardAccount"
-            data={creditCardAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateCreditCardAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             policyID={policyID}
@@ -82,6 +85,7 @@ function DynamicNetSuiteCreditCardAccountSelectPage({policy}: WithPolicyConnecti
             errorRowStyles={[styles.ph5, styles.pv3]}
             onClose={() => clearNetSuiteErrorField(policyID, currentSettingName)}
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
         />
     );
 }

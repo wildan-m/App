@@ -5,6 +5,7 @@ import Text from '@components/Text';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteSubsidiary} from '@libs/actions/connections/NetSuiteCommands';
@@ -43,6 +44,7 @@ function NetSuiteSubsidiarySelector({policy}: WithPolicyConnectionsProps) {
             isSelected: subsidiary.name === currentSubsidiaryName,
             value: subsidiary.name,
         })) ?? [];
+    const {filteredData, textInputOptions} = useSelectionListSearch(subsidiaryListSections, translate('common.noResultsFound'));
 
     const updateSubsidiary = ({keyForList, value}: SelectorType) => {
         if (!keyForList || keyForList === currentSubsidiaryID) {
@@ -86,7 +88,8 @@ function NetSuiteSubsidiarySelector({policy}: WithPolicyConnectionsProps) {
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteSubsidiarySelector"
-            data={subsidiaryListSections}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             onSelectRow={updateSubsidiary}
             initiallyFocusedOptionKey={netsuiteConfig?.subsidiaryID ?? subsidiaryListSections?.at(0)?.keyForList}
@@ -94,6 +97,7 @@ function NetSuiteSubsidiarySelector({policy}: WithPolicyConnectionsProps) {
             onBackButtonPress={() => Navigation.goBack()}
             title="workspace.netsuite.subsidiary"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.SUBSIDIARY], netsuiteConfig?.pendingFields)}
             errors={getLatestErrorField(netsuiteConfig ?? {}, CONST.NETSUITE_CONFIG.SUBSIDIARY)}
             errorRowStyles={[styles.ph5, styles.pv3]}

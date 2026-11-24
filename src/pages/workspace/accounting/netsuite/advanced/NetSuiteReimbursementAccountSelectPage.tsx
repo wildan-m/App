@@ -5,6 +5,7 @@ import Text from '@components/Text';
 
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuiteReimbursementAccountID} from '@libs/actions/connections/NetSuiteCommands';
@@ -35,6 +36,7 @@ function NetSuiteReimbursementAccountSelectPage({policy}: WithPolicyConnectionsP
 
     const config = policy?.connections?.netsuite?.options.config;
     const netsuiteReimbursableAccountOptions: SelectorType[] = getNetSuiteReimbursableAccountOptions(policy ?? undefined, config?.reimbursementAccountID);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuiteReimbursableAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuiteReimbursableAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -69,12 +71,14 @@ function NetSuiteReimbursementAccountSelectPage({policy}: WithPolicyConnectionsP
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteReimbursementAccountSelectPage"
             headerContent={headerContent}
-            data={netsuiteReimbursableAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updateReimbursementAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_ADVANCED.getRoute(policyID))}
             title="workspace.netsuite.advancedConfig.reimbursementsAccount"
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={config?.reimbursableExpensesExportDestination === CONST.NETSUITE_EXPORT_DESTINATION.JOURNAL_ENTRY}
             pendingAction={settingsPendingAction([CONST.NETSUITE_CONFIG.REIMBURSEMENT_ACCOUNT_ID], config?.pendingFields)}

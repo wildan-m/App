@@ -5,6 +5,7 @@ import SelectionScreen from '@components/SelectionScreen';
 import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useSelectionListSearch from '@hooks/useSelectionListSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import {updateNetSuitePayableAcct, updateNetSuiteReimbursablePayableAccount} from '@libs/actions/connections/NetSuiteCommands';
@@ -45,6 +46,7 @@ function DynamicNetSuiteExportExpensesPayableAccountSelectPage({policy}: WithPol
     const currentSettingName = isReimbursable ? CONST.NETSUITE_CONFIG.REIMBURSABLE_PAYABLE_ACCOUNT : CONST.NETSUITE_CONFIG.PAYABLE_ACCT;
     const currentPayableAccountID = config?.[currentSettingName] ?? CONST.NETSUITE_PAYABLE_ACCOUNT_DEFAULT_VALUE;
     const netsuitePayableAccountOptions: SelectorType[] = getNetSuitePayableAccountOptions(policy ?? undefined, currentPayableAccountID);
+    const {filteredData, textInputOptions} = useSelectionListSearch(netsuitePayableAccountOptions, translate('common.noResultsFound'));
 
     const initiallyFocusedOptionKey = netsuitePayableAccountOptions?.find((mode) => mode.isSelected)?.keyForList;
 
@@ -80,12 +82,14 @@ function DynamicNetSuiteExportExpensesPayableAccountSelectPage({policy}: WithPol
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="NetSuiteExportExpensesPayableAccountSelectPage"
-            data={netsuitePayableAccountOptions}
+            data={filteredData}
+            textInputOptions={textInputOptions}
             onSelectRow={updatePayableAccount}
             initiallyFocusedOptionKey={initiallyFocusedOptionKey}
             onBackButtonPress={goBack}
             title={isReimbursable ? 'workspace.netsuite.reimbursableJournalPostingAccount' : 'workspace.netsuite.nonReimbursableJournalPostingAccount'}
             listEmptyContent={listEmptyContent}
+            shouldShowListEmptyContent={!textInputOptions.value}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.NETSUITE}
             shouldBeBlocked={
                 isReimbursable
