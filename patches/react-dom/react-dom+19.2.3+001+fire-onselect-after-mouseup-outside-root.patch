@@ -1,0 +1,60 @@
+diff --git a/node_modules/react-dom/cjs/react-dom-client.development.js b/node_modules/react-dom/cjs/react-dom-client.development.js
+index 771ecad..0ae398a 100644
+--- a/node_modules/react-dom/cjs/react-dom-client.development.js
++++ b/node_modules/react-dom/cjs/react-dom-client.development.js
+@@ -19222,7 +19222,9 @@
+         null === ownerDocument ||
+           ownerDocument[listeningMarker] ||
+           ((ownerDocument[listeningMarker] = !0),
+-          listenToNativeEvent("selectionchange", !1, ownerDocument));
++          listenToNativeEvent("selectionchange", !1, ownerDocument),
++          // A mouseup outside every root must still reach SelectEventPlugin, or onSelect stays off after a drag released outside the page.
++          listenToNativeEvent("mouseup", !1, ownerDocument));
+       }
+     }
+     function addTrappedEventListener(
+diff --git a/node_modules/react-dom/cjs/react-dom-client.production.js b/node_modules/react-dom/cjs/react-dom-client.production.js
+index ee02bbd..c703f06 100644
+--- a/node_modules/react-dom/cjs/react-dom-client.production.js
++++ b/node_modules/react-dom/cjs/react-dom-client.production.js
+@@ -12361,7 +12361,9 @@ function listenToAllSupportedEvents(rootContainerElement) {
+     null === ownerDocument ||
+       ownerDocument[listeningMarker] ||
+       ((ownerDocument[listeningMarker] = !0),
+-      listenToNativeEvent("selectionchange", !1, ownerDocument));
++      listenToNativeEvent("selectionchange", !1, ownerDocument),
++      // A mouseup outside every root must still reach SelectEventPlugin, or onSelect stays off after a drag released outside the page.
++      listenToNativeEvent("mouseup", !1, ownerDocument));
+   }
+ }
+ function addTrappedEventListener(
+diff --git a/node_modules/react-dom/cjs/react-dom-profiling.development.js b/node_modules/react-dom/cjs/react-dom-profiling.development.js
+index c8b583c..ff6e592 100644
+--- a/node_modules/react-dom/cjs/react-dom-profiling.development.js
++++ b/node_modules/react-dom/cjs/react-dom-profiling.development.js
+@@ -19230,7 +19230,9 @@
+         null === ownerDocument ||
+           ownerDocument[listeningMarker] ||
+           ((ownerDocument[listeningMarker] = !0),
+-          listenToNativeEvent("selectionchange", !1, ownerDocument));
++          listenToNativeEvent("selectionchange", !1, ownerDocument),
++          // A mouseup outside every root must still reach SelectEventPlugin, or onSelect stays off after a drag released outside the page.
++          listenToNativeEvent("mouseup", !1, ownerDocument));
+       }
+     }
+     function addTrappedEventListener(
+diff --git a/node_modules/react-dom/cjs/react-dom-profiling.profiling.js b/node_modules/react-dom/cjs/react-dom-profiling.profiling.js
+index 1639385..05b7fd8 100644
+--- a/node_modules/react-dom/cjs/react-dom-profiling.profiling.js
++++ b/node_modules/react-dom/cjs/react-dom-profiling.profiling.js
+@@ -14189,7 +14189,9 @@ function listenToAllSupportedEvents(rootContainerElement) {
+     null === ownerDocument ||
+       ownerDocument[listeningMarker] ||
+       ((ownerDocument[listeningMarker] = !0),
+-      listenToNativeEvent("selectionchange", !1, ownerDocument));
++      listenToNativeEvent("selectionchange", !1, ownerDocument),
++      // A mouseup outside every root must still reach SelectEventPlugin, or onSelect stays off after a drag released outside the page.
++      listenToNativeEvent("mouseup", !1, ownerDocument));
+   }
+ }
+ function addTrappedEventListener(
