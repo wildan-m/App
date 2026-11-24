@@ -64,12 +64,9 @@ function IOURequestStepPerDiemWorkspace({route, navigation, transaction}: IOUReq
         }
 
         const perDiemUnit = getPerDiemCustomUnit(policy);
-        if (!perDiemUnit && policy?.id) {
-            fetchPerDiemRates(policy.id);
-        }
-
-        const canDestinationResolvePolicy = !!perDiemUnit || (!!targetReport.policyID && targetReport.policyID !== CONST.POLICY.ID_FAKE);
-        if (!canDestinationResolvePolicy) {
+        if (!perDiemUnit) {
+            // Wait in the tab until the rates load, the effect below resumes selection once they arrive
+            fetchPerDiemRates(policy?.id);
             setPendingPolicyID(policy?.id);
             return;
         }
@@ -89,8 +86,8 @@ function IOURequestStepPerDiemWorkspace({route, navigation, transaction}: IOUReq
                 },
             ]);
         }
-        setCustomUnitID(transactionID, perDiemUnit?.customUnitID ?? CONST.CUSTOM_UNITS.FAKE_P2P_ID);
-        setMoneyRequestCategory(transactionID, perDiemUnit?.defaultCategory ?? '', undefined);
+        setCustomUnitID(transactionID, perDiemUnit.customUnitID);
+        setMoneyRequestCategory(transactionID, perDiemUnit.defaultCategory ?? '', undefined);
 
         Navigation.navigate(
             createDynamicRoute(DYNAMIC_ROUTES.MONEY_REQUEST_STEP_DESTINATION.path, ROUTES.MONEY_REQUEST_CREATE.getRoute(action, targetIouType, transactionID, targetReport.reportID)),
