@@ -47,12 +47,17 @@ function CardActivatedPage() {
         textOpacity.set(withDelay(CARD_ROTATION_DURATION + TEXT_FADE_DELAY, withTiming(1, {duration: TEXT_FADE_DURATION, easing: TEXT_EASING})));
     }, [rotationProgress, textOpacity]);
 
-    const cardAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [
-            {perspective: CARD_PERSPECTIVE},
-            {rotateY: `${interpolate(rotationProgress.get(), [0, 1], [0, CARD_FINAL_ROTATION_DEG])}deg`},
-            {scale: interpolate(rotationProgress.get(), [0, 1], [CARD_INITIAL_SCALE, 1])},
-        ],
+    const cardScaleAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{scale: interpolate(rotationProgress.get(), [0, 1], [CARD_INITIAL_SCALE, 1])}],
+    }));
+
+    // Each face carries its own rotation because the web renderer flattens nested 3D transforms, so a rotation on the shared parent would not hide either face's backface.
+    const frontFaceAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{perspective: CARD_PERSPECTIVE}, {rotateY: `${interpolate(rotationProgress.get(), [0, 1], [0, CARD_FINAL_ROTATION_DEG])}deg`}],
+    }));
+
+    const backFaceAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{perspective: CARD_PERSPECTIVE}, {rotateY: `${interpolate(rotationProgress.get(), [0, 1], [180, CARD_FINAL_ROTATION_DEG + 180])}deg`}],
     }));
 
     const textAnimatedStyle = useAnimatedStyle(() => ({
@@ -68,8 +73,8 @@ function CardActivatedPage() {
         >
             <HeaderWithBackButton onBackButtonPress={dismiss} />
             <View style={[styles.flex1, styles.alignItemsCenter, styles.justifyContentCenter, styles.ph5]}>
-                <Animated.View style={[{width: variables.cardPreviewWidth, height: variables.cardPreviewHeight}, cardAnimatedStyle]}>
-                    <View style={[styles.pAbsolute, styles.h100, styles.w100, styles.walletCard, {backfaceVisibility: 'hidden'}]}>
+                <Animated.View style={[{width: variables.cardPreviewWidth, height: variables.cardPreviewHeight}, cardScaleAnimatedStyle]}>
+                    <Animated.View style={[styles.pAbsolute, styles.h100, styles.w100, styles.walletCard, {backfaceVisibility: 'hidden'}, frontFaceAnimatedStyle]}>
                         <ImageSVG
                             contentFit="contain"
                             src={lazyIllustrations.ExpensifyCardImage}
@@ -77,19 +82,13 @@ function CardActivatedPage() {
                             height={variables.cardPreviewHeight}
                             width={variables.cardPreviewWidth}
                         />
-                    </View>
+                    </Animated.View>
                     {/* Placeholder back-of-card art until the design export lands */}
-                    <View
-                        style={[
-                            styles.pAbsolute,
-                            styles.h100,
-                            styles.w100,
-                            styles.walletCard,
-                            {backfaceVisibility: 'hidden', backgroundColor: colors.green800, transform: [{rotateY: '180deg'}]},
-                        ]}
+                    <Animated.View
+                        style={[styles.pAbsolute, styles.h100, styles.w100, styles.walletCard, {backfaceVisibility: 'hidden', backgroundColor: colors.green800}, backFaceAnimatedStyle]}
                     >
                         <View style={[styles.w100, {height: MAGSTRIPE_HEIGHT, marginTop: MAGSTRIPE_TOP_OFFSET, backgroundColor: colors.green700}]} />
-                    </View>
+                    </Animated.View>
                 </Animated.View>
                 <Animated.View style={[styles.alignItemsCenter, styles.mt8, textAnimatedStyle]}>
                     <Text
