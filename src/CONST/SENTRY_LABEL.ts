@@ -772,6 +772,7 @@ const SENTRY_LABEL = {
             TRIPS: 'Search-TypeMenuItem-Trips',
         },
         SAVED_SEARCH_MENU_ITEM: 'Search-SavedSearchMenuItem',
+        MONTH_END_CLOSE_ROW: 'Search-MonthEndCloseRow',
         SAVE_VIEW_BUTTON: 'Search-SaveViewButton',
         RESET_FILTERS_BUTTON: 'Search-ResetFiltersButton',
         RESET_DISPLAY_BUTTON: 'Search-ResetDisplayButton',

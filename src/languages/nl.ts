@@ -11482,6 +11482,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             violationsBySubmitter: 'Overtredingen door indiener',
             travel: 'Reizen',
             trips: 'Reizen',
+            monthEndClose: 'Maandafsluiting einde maand',
         },
         mergeReports: {
             title: 'Rapporten samenvoegen',

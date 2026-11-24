@@ -11566,6 +11566,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             violationsBySubmitter: 'Verstöße durch Einreichende',
             travel: 'Reisen',
             trips: 'Reisen',
+            monthEndClose: 'Monatsabschluss',
         },
         mergeReports: {
             title: 'Berichte zusammenführen',

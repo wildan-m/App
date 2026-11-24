@@ -11596,6 +11596,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             violationsBySubmitter: 'Infractions par déclarant',
             travel: 'Voyage',
             trips: 'Voyages',
+            monthEndClose: 'Clôture de fin de mois',
         },
         mergeReports: {
             title: 'Fusionner des notes de frais',

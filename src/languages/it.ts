@@ -11514,6 +11514,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             violationsBySubmitter: 'Violazioni da parte dell’autore dell’invio',
             travel: 'Viaggi',
             trips: 'Viaggi',
+            monthEndClose: 'Chiusura di fine mese',
         },
         mergeReports: {
             title: 'Unisci report',

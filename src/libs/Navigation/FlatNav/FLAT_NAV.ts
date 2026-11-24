@@ -15,6 +15,10 @@ const FLAT_NAV = {
     ITEM_TYPE: {
         CANNED_SEARCH: 'cannedSearch',
         SAVED_SEARCH: 'savedSearch',
+        PAGE: 'page',
+    },
+    PAGE: {
+        MONTH_END_CLOSE: 'monthEndClose',
     },
 } as const;
 

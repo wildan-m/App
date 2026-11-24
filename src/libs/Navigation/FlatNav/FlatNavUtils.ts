@@ -24,6 +24,7 @@ import type {
     FlatNavSectionID,
     FlatNavSubnavGroup,
     FlatNavSubnavGroupDefinition,
+    FlatNavSubnavRow,
     FlatNavSubnavRowHeights,
 } from './types';
 
@@ -199,6 +200,11 @@ const FLAT_NAV_SUBNAV_GROUP_DEFINITIONS: readonly FlatNavSubnavGroupDefinition[]
         id: FLAT_NAV.SUBNAV_GROUP.ACCOUNTING,
         translationPath: 'search.tabs.accounting',
         sectionIDs: [FLAT_NAV.SECTION.ACCOUNTING],
+        collapsedPage: {
+            key: FLAT_NAV.PAGE.MONTH_END_CLOSE,
+            translationPath: 'search.tabs.monthEndClose',
+            sentryLabel: CONST.SENTRY_LABEL.SEARCH.MONTH_END_CLOSE_ROW,
+        },
     },
     {
         id: FLAT_NAV.SUBNAV_GROUP.TRAVEL,
@@ -219,6 +225,28 @@ type BuildFlatNavSubnavGroupsParams = {
     isOffline: boolean;
 };
 
+/**
+ * The single row a collapsed group draws instead of its searches, such as Accounting's Month end close. It opens its
+ * first member and carries the todo badge of the one section the group lists, which already sums the members.
+ */
+function buildFlatNavCollapsedPageItem(definition: FlatNavSubnavGroupDefinition, items: FlatNavItem[], sections: FlatNavSection[]): FlatNavSubnavRow[] {
+    const collapsedPage = definition.collapsedPage;
+    const memberItems = items.filter((item): item is FlatNavCannedSearchItem => item.type === FLAT_NAV.ITEM_TYPE.CANNED_SEARCH);
+    if (!collapsedPage || memberItems.length === 0) {
+        return [];
+    }
+    return [
+        {
+            type: FLAT_NAV.ITEM_TYPE.PAGE,
+            key: collapsedPage.key,
+            translationPath: collapsedPage.translationPath,
+            sentryLabel: collapsedPage.sentryLabel,
+            memberItems,
+            badgeText: sections.find((section) => section.id === definition.sectionIDs.at(0))?.badgeText,
+        },
+    ];
+}
+
 /** Arranges the visible sections under the headers of the Spend subnav. A header with nothing under it is left out. */
 function buildFlatNavSubnavGroups({sections, isOffline}: BuildFlatNavSubnavGroupsParams): FlatNavSubnavGroup[] {
     const groups: FlatNavSubnavGroup[] = [];
@@ -230,15 +258,45 @@ function buildFlatNavSubnavGroups({sections, isOffline}: BuildFlatNavSubnavGroup
                 item.type === FLAT_NAV.ITEM_TYPE.CANNED_SEARCH && definition.shouldUseSpendColumnLabels ? {...item, translationPath: item.spendColumnTranslationPath} : item,
             );
 
-        if (items.length > 0) {
+        const rows: FlatNavSubnavRow[] = definition.collapsedPage ? buildFlatNavCollapsedPageItem(definition, items, sections) : items;
+        if (rows.length > 0) {
             groups.push({
                 id: definition.id,
                 translationPath: definition.translationPath,
-                items,
+                items: rows,
             });
         }
     }
     return groups;
+}
+
+/** Whether a subnav row is the active one. A page row is active whenever any search it fronts is. */
+function isFlatNavSubnavRowSelected(row: FlatNavSubnavRow, activeItemKey: SearchKey | undefined): boolean {
+    if (row.type === FLAT_NAV.ITEM_TYPE.PAGE) {
+        return row.memberItems.some((memberItem) => memberItem.key === activeItemKey);
+    }
+    return row.key === activeItemKey;
+}
+
+/** The collapsed page a search sits behind, whether or not its section is visible. Undefined when its group draws plain search rows. */
+function getFlatNavCollapsedPageForSearchKey(searchKey: SearchKey | undefined): FlatNavSubnavGroupDefinition['collapsedPage'] {
+    const sectionID = getFlatNavSectionIDForSearchKey(searchKey);
+    if (!sectionID) {
+        return undefined;
+    }
+    return FLAT_NAV_SUBNAV_GROUP_DEFINITIONS.find((definition) => definition.collapsedPage && definition.sectionIDs.includes(sectionID))?.collapsedPage;
+}
+
+/** The visible searches the collapsed page of a search fronts as tabs, in render order. Empty when the search has no collapsed page or none is visible. */
+function getFlatNavCollapsedPageMemberItems(sections: FlatNavSection[], searchKey: SearchKey | undefined): FlatNavCannedSearchItem[] {
+    const sectionID = getFlatNavSectionIDForSearchKey(searchKey);
+    const definition = sectionID ? FLAT_NAV_SUBNAV_GROUP_DEFINITIONS.find((groupDefinition) => groupDefinition.collapsedPage && groupDefinition.sectionIDs.includes(sectionID)) : undefined;
+    if (!definition) {
+        return [];
+    }
+    return definition.sectionIDs
+        .flatMap((id) => sections.find((section) => section.id === id)?.items ?? [])
+        .filter((item): item is FlatNavCannedSearchItem => item.type === FLAT_NAV.ITEM_TYPE.CANNED_SEARCH);
 }
 
 /**
@@ -253,7 +311,7 @@ function getFlatNavSubnavMarkerTop(groups: FlatNavSubnavGroup[], activeItemKey: 
     for (const group of groups) {
         rowTop += rowHeights.header;
         for (const item of group.items) {
-            if (item.key === activeItemKey) {
+            if (isFlatNavSubnavRowSelected(item, activeItemKey)) {
                 return rowTop + (rowHeights.item - rowHeights.marker) / 2;
             }
             rowTop += rowHeights.item;
@@ -267,9 +325,12 @@ export {
     buildFlatNavSubnavGroups,
     FLAT_NAV_SECTION_DEFINITIONS,
     getActiveFlatNavItem,
+    getFlatNavCollapsedPageForSearchKey,
+    getFlatNavCollapsedPageMemberItems,
     getFlatNavSectionBadgeText,
     getFlatNavSectionDefaultItem,
     getFlatNavSectionIDForSearchKey,
     getFlatNavSubnavMarkerTop,
+    isFlatNavSubnavRowSelected,
 };
 export type {BuildFlatNavSectionsParams};

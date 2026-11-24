@@ -11321,6 +11321,7 @@ ${reportName}`,
             violationsBySubmitter: '申請者による違反',
             travel: '出張',
             trips: '出張',
+            monthEndClose: '月次決算締め',
         },
         mergeReports: {
             title: 'レポートをマージする',

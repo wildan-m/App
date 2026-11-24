@@ -3,6 +3,7 @@ import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import type {SearchTypeMenuItem} from '@libs/SearchUIUtils';
 
 import CONST from '@src/CONST';
+import type {TranslationPaths} from '@src/languages/types';
 import type {SaveSearchItem} from '@src/types/onyx/SaveSearch';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 
@@ -17,6 +18,9 @@ type SearchPageHeaderTitleDeps = {
 
     /** The matched suggested-search menu item, if any */
     selectedItem: SearchTypeMenuItem | undefined;
+
+    /** Label of the collapsed page the search sits behind, when flat nav fronts it with tabs, e.g. "Month end close" */
+    collapsedPageTranslationPath?: TranslationPaths;
 };
 
 /**
@@ -26,14 +30,19 @@ type SearchPageHeaderTitleDeps = {
  *   b. the matched suggested-search label, then the data-type fallbacks (task / trip / invoice / chat),
  *   c. the generic "Spend" fallback.
  */
-function getSearchPageHeaderTitle({translate, type, activeSavedSearch, selectedItem}: SearchPageHeaderTitleDeps): string {
+function getSearchPageHeaderTitle({translate, type, activeSavedSearch, selectedItem, collapsedPageTranslationPath}: SearchPageHeaderTitleDeps): string {
     // a. Active saved search display name. `name` is a display string, not a translation key, so it's used directly
     // (matching the LHN, which renders `item.name` for the `name !== query` case).
     if (activeSavedSearch?.name) {
         return activeSavedSearch.name;
     }
 
-    // b. Matched suggested search.
+    // b. The collapsed page fronting the search: its searches are tabs of one page, so they all read as that page.
+    if (collapsedPageTranslationPath) {
+        return translate(collapsedPageTranslationPath);
+    }
+
+    // b (cont.). Matched suggested search.
     if (selectedItem) {
         return translate(selectedItem.translationPath);
     }

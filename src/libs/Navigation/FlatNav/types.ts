@@ -7,6 +7,7 @@ import type {getSavedSearchIconName} from '@libs/SearchUIUtils';
 import type CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
+import type {SentryLabel} from '@src/types/utils/SentryLabel';
 
 import type {ValueOf} from 'type-fest';
 
@@ -78,6 +79,28 @@ type FlatNavSavedSearchItem = {
 
 type FlatNavItem = FlatNavCannedSearchItem | FlatNavSavedSearchItem;
 
+/** Identifier of a page row that fronts several searches, such as Month end close. Not a search key. */
+type FlatNavPageKey = ValueOf<typeof FLAT_NAV.PAGE>;
+
+/** A subnav row standing in for the searches of its group, which the page it opens shows as tabs */
+type FlatNavPageItem = {
+    type: typeof FLAT_NAV.ITEM_TYPE.PAGE;
+    key: FlatNavPageKey;
+
+    /** Translation key of the row label and the title of the page */
+    translationPath: TranslationPaths;
+    sentryLabel: SentryLabel;
+
+    /** The visible searches the page fronts, in render order. Never empty, because the row is dropped with them. */
+    memberItems: FlatNavCannedSearchItem[];
+
+    /** Todo count of all the members together, like the badge of their section. Undefined when there is none. */
+    badgeText?: string;
+};
+
+/** A row of the subnav: a search, or a page fronting several of them */
+type FlatNavSubnavRow = FlatNavItem | FlatNavPageItem;
+
 /** A section the user can see, holding only the items they can see */
 type FlatNavSection = {
     id: FlatNavSectionID;
@@ -110,13 +133,20 @@ type FlatNavSubnavGroupDefinition = {
 
     /** Whether canned searches read as in the Spend column, where the wording of their own section would not fit */
     shouldUseSpendColumnLabels?: boolean;
+
+    /** When set, the group's visible searches collapse into one page row that fronts them as tabs, as Accounting's Month end close */
+    collapsedPage?: {
+        key: FlatNavPageKey;
+        translationPath: TranslationPaths;
+        sentryLabel: SentryLabel;
+    };
 };
 
-/** A header with the searches under it, as the subnav draws them */
+/** A header with the rows under it, as the subnav draws them */
 type FlatNavSubnavGroup = {
     id: FlatNavSubnavGroupID;
     translationPath: TranslationPaths;
-    items: FlatNavItem[];
+    items: FlatNavSubnavRow[];
 };
 
 /** Heights of the subnav's rows, which are fixed so the marker's position can be worked out without measuring */
@@ -131,6 +161,8 @@ export type {
     FlatNavCannedSearchItem,
     FlatNavCannedSearchKey,
     FlatNavItem,
+    FlatNavPageItem,
+    FlatNavPageKey,
     FlatNavSavedSearchIconName,
     FlatNavSavedSearchItem,
     FlatNavSection,
@@ -138,5 +170,6 @@ export type {
     FlatNavSectionID,
     FlatNavSubnavGroup,
     FlatNavSubnavGroupDefinition,
+    FlatNavSubnavRow,
     FlatNavSubnavRowHeights,
 };

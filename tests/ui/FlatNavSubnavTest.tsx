@@ -8,7 +8,7 @@ import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 
 import FLAT_NAV from '@libs/Navigation/FlatNav/FLAT_NAV';
-import type {ActiveFlatNavItem, FlatNavCannedSearchItem, FlatNavItem, FlatNavSavedSearchItem, FlatNavSubnavGroup} from '@libs/Navigation/FlatNav/types';
+import type {ActiveFlatNavItem, FlatNavCannedSearchItem, FlatNavSavedSearchItem, FlatNavSubnavGroup, FlatNavSubnavRow} from '@libs/Navigation/FlatNav/types';
 import {savedSearchIDToSearchKey} from '@libs/SearchKeyUtils';
 
 import variables from '@styles/variables';
@@ -106,7 +106,7 @@ type RenderSubnavParams = {
     groups?: FlatNavSubnavGroup[];
     activeItem?: ActiveFlatNavItem;
     isVisible?: boolean;
-    onItemPress?: (item: FlatNavItem) => void;
+    onItemPress?: (item: FlatNavSubnavRow) => void;
 };
 
 function SubnavUnderTest({groups = [EXPENSE_REPORTS_GROUP], activeItem, isVisible = true, onItemPress = jest.fn()}: RenderSubnavParams) {

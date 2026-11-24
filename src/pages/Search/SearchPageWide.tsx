@@ -7,6 +7,7 @@ import SearchBulkActionsBarWide from '@components/Search/SearchBulkActionsBarWid
 import {useSearchQueryContext, useSearchSelectionContext} from '@components/Search/SearchContext';
 import SearchLoadingSkeleton from '@components/Search/SearchLoadingSkeleton';
 import SearchActionsBarWide from '@components/Search/SearchPageHeader/SearchActionsBarWide';
+import SearchCollapsedPageTabs from '@components/Search/SearchPageHeader/SearchCollapsedPageTabs';
 import SearchPageHeaderWide from '@components/Search/SearchPageHeader/SearchPageHeaderWide';
 import SearchSelectionFooter from '@components/Search/SearchSelectionFooter';
 import SearchWithNavigationDeferredMount from '@components/Search/SearchWithNavigationDeferredMount';
@@ -128,6 +129,7 @@ function SearchPageWide({
                         {!!queryJSON && !!contentQueryJSON && (
                             <>
                                 <SearchPageHeaderWide queryJSON={queryJSON} />
+                                <SearchCollapsedPageTabs />
                                 <SearchActionsBarWide
                                     queryJSON={queryJSON}
                                     searchResults={searchResults}

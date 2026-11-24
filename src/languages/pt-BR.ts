@@ -11492,6 +11492,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             violationsBySubmitter: 'Violações por quem enviou',
             travel: 'Viagem',
             trips: 'Viagens',
+            monthEndClose: 'Fechamento de fim de mês',
         },
         mergeReports: {
             title: 'Mesclar relatórios',

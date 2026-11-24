@@ -11039,6 +11039,7 @@ ${reportName}`,
             violationsBySubmitter: '提交人违规',
             travel: '差旅',
             trips: '行程',
+            monthEndClose: '月末结账',
         },
         mergeReports: {
             title: '合并报表',

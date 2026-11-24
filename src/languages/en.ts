@@ -11536,6 +11536,8 @@ const translations = {
             unapprovedCard: 'Card accruals',
             statements: 'Card statements',
             reconciliation: 'Bank reconciliation',
+            // @context Name of the accounting page grouping the month-end closing searches; "close" is the accounting period-closing process, not a verb for dismissing something.
+            monthEndClose: 'Month end close',
             insights: 'Insights',
             topSpenders: 'Top spenders',
             topCategories: 'Top categories',

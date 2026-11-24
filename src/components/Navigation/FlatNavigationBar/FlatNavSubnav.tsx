@@ -8,8 +8,8 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 
 import FLAT_NAV from '@libs/Navigation/FlatNav/FLAT_NAV';
-import {getFlatNavSubnavMarkerTop} from '@libs/Navigation/FlatNav/FlatNavUtils';
-import type {ActiveFlatNavItem, FlatNavItem, FlatNavSubnavGroup} from '@libs/Navigation/FlatNav/types';
+import {getFlatNavSubnavMarkerTop, isFlatNavSubnavRowSelected} from '@libs/Navigation/FlatNav/FlatNavUtils';
+import type {ActiveFlatNavItem, FlatNavSubnavGroup, FlatNavSubnavRow} from '@libs/Navigation/FlatNav/types';
 import {getSearchTypeMenuItemSentryLabel} from '@libs/SearchUIUtils';
 
 import variables from '@styles/variables';
@@ -39,7 +39,7 @@ type FlatNavSubnavProps = {
     /** Whether the subnav is open. It closes without unmounting, which lets it animate. */
     isVisible: boolean;
 
-    onItemPress: (item: FlatNavItem) => void;
+    onItemPress: (item: FlatNavSubnavRow) => void;
 };
 
 function FlatNavSubnav({groups, activeItem, isVisible, onItemPress}: FlatNavSubnavProps) {
@@ -75,7 +75,7 @@ function FlatNavSubnav({groups, activeItem, isVisible, onItemPress}: FlatNavSubn
                             </Text>
                         </View>
                         {group.items.map((item) => {
-                            const isSelected = item.key === activeItemKey;
+                            const isSelected = isFlatNavSubnavRowSelected(item, activeItemKey);
                             if (item.type === FLAT_NAV.ITEM_TYPE.SAVED_SEARCH) {
                                 return (
                                     <FlatNavSavedSearchSubnavItem
@@ -91,7 +91,7 @@ function FlatNavSubnav({groups, activeItem, isVisible, onItemPress}: FlatNavSubn
                                     <FlatNavSubnavItem.Link
                                         label={translate(item.translationPath)}
                                         isSelected={isSelected}
-                                        sentryLabel={getSearchTypeMenuItemSentryLabel(item.key)}
+                                        sentryLabel={item.type === FLAT_NAV.ITEM_TYPE.PAGE ? item.sentryLabel : getSearchTypeMenuItemSentryLabel(item.key)}
                                         onPress={() => onItemPress(item)}
                                     >
                                         {!!item.badgeText && <FlatNavSubnavItem.Badge text={item.badgeText} />}

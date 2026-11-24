@@ -7,10 +7,13 @@ import {
     buildFlatNavSubnavGroups,
     FLAT_NAV_SECTION_DEFINITIONS,
     getActiveFlatNavItem,
+    getFlatNavCollapsedPageForSearchKey,
+    getFlatNavCollapsedPageMemberItems,
     getFlatNavSectionBadgeText,
     getFlatNavSectionDefaultItem,
     getFlatNavSectionIDForSearchKey,
     getFlatNavSubnavMarkerTop,
+    isFlatNavSubnavRowSelected,
 } from '@libs/Navigation/FlatNav/FlatNavUtils';
 import type {FlatNavSavedSearchItem, FlatNavSection} from '@libs/Navigation/FlatNav/types';
 import type {SearchKey} from '@libs/SearchKeyUtils';
@@ -636,6 +639,108 @@ describe('FlatNavUtils', () => {
             // Then there is nothing to mark
             expect(getFlatNavSubnavMarkerTop(groups, undefined, rowHeights)).toBeUndefined();
             expect(getFlatNavSubnavMarkerTop(groups, savedSearchIDToSearchKey('404'), rowHeights)).toBeUndefined();
+        });
+    });
+
+    describe('Month end close collapsed page', () => {
+        const rowHeights = {
+            header: variables.flatNavigationBarSubnavHeaderHeight,
+            item: variables.flatNavigationBarSubnavItemHeight,
+            marker: variables.flatNavigationBarSubnavMarkerHeight,
+        };
+
+        function buildAccountingSections() {
+            return buildFlatNavSections({
+                typeMenuSections: createTypeMenuSections([SEARCH_KEYS.EXPENSES, SEARCH_KEYS.REPORTS, SEARCH_KEYS.EXPORT, SEARCH_KEYS.STATEMENTS]),
+                savedSearchItems: [],
+                todoCounts: createTodoCounts({[SEARCH_KEYS.EXPORT]: 4}),
+            });
+        }
+
+        function getAccountingRow() {
+            const groups = buildFlatNavSubnavGroups({sections: buildAccountingSections(), isOffline: false});
+            const row = groups.find((group) => group.id === FLAT_NAV.SUBNAV_GROUP.ACCOUNTING)?.items.at(0);
+            if (!row) {
+                throw new Error('Expected the Accounting group to hold the collapsed row');
+            }
+            return row;
+        }
+
+        it('should collapse the visible Accounting searches into one Month end close row', () => {
+            // Given sections where two Accounting searches are visible
+            // When they are arranged under the subnav headers
+            const groups = buildFlatNavSubnavGroups({sections: buildAccountingSections(), isOffline: false});
+            const accountingGroup = groups.find((group) => group.id === FLAT_NAV.SUBNAV_GROUP.ACCOUNTING);
+
+            // Then the group holds one page row fronting those searches in definition order, with the section's summed badge
+            expect(accountingGroup?.items).toHaveLength(1);
+            const row = accountingGroup?.items.at(0);
+            expect(row).toMatchObject({
+                type: FLAT_NAV.ITEM_TYPE.PAGE,
+                key: FLAT_NAV.PAGE.MONTH_END_CLOSE,
+                translationPath: 'search.tabs.monthEndClose',
+                badgeText: '4',
+            });
+            expect(row?.type === FLAT_NAV.ITEM_TYPE.PAGE && row.memberItems.map((item) => item.key)).toEqual([SEARCH_KEYS.EXPORT, SEARCH_KEYS.STATEMENTS]);
+        });
+
+        it('should leave the Accounting group out when none of its searches is visible', () => {
+            // Given sections without any Accounting search
+            const sections = buildFlatNavSections({
+                typeMenuSections: createTypeMenuSections([SEARCH_KEYS.EXPENSES, SEARCH_KEYS.REPORTS]),
+                savedSearchItems: [],
+                todoCounts: createTodoCounts(),
+            });
+
+            // When they are arranged under the subnav headers
+            const groups = buildFlatNavSubnavGroups({sections, isOffline: false});
+
+            // Then there is no Month end close row to draw
+            expect(groups.find((group) => group.id === FLAT_NAV.SUBNAV_GROUP.ACCOUNTING)).toBeUndefined();
+        });
+
+        it('should mark the row selected for every search it fronts and for no other', () => {
+            // Given the collapsed Accounting row
+            const row = getAccountingRow();
+
+            // When we check its member keys and a key of another section
+            // Then only the members select it, so each accounting search highlights Month end close
+            expect(isFlatNavSubnavRowSelected(row, SEARCH_KEYS.EXPORT)).toBe(true);
+            expect(isFlatNavSubnavRowSelected(row, SEARCH_KEYS.STATEMENTS)).toBe(true);
+            expect(isFlatNavSubnavRowSelected(row, SEARCH_KEYS.EXPENSES)).toBe(false);
+            expect(isFlatNavSubnavRowSelected(row, undefined)).toBe(false);
+        });
+
+        it('should place the marker on the same row for every member search', () => {
+            // Given the groups with the collapsed Accounting row
+            const groups = buildFlatNavSubnavGroups({sections: buildAccountingSections(), isOffline: false});
+
+            // When the marker is placed for two different member searches
+            // Then both land on the single collapsed row
+            const exportTop = getFlatNavSubnavMarkerTop(groups, SEARCH_KEYS.EXPORT, rowHeights);
+            expect(exportTop).toBeDefined();
+            expect(getFlatNavSubnavMarkerTop(groups, SEARCH_KEYS.STATEMENTS, rowHeights)).toBe(exportTop);
+        });
+
+        it('should resolve the collapsed page of an accounting search only', () => {
+            // Given the accounting keys, a key of another section, a saved search key and no key
+            // When we look up their collapsed page
+            // Then only the accounting searches sit behind Month end close
+            expect(getFlatNavCollapsedPageForSearchKey(SEARCH_KEYS.EXPORT)?.key).toBe(FLAT_NAV.PAGE.MONTH_END_CLOSE);
+            expect(getFlatNavCollapsedPageForSearchKey(SEARCH_KEYS.RECONCILIATION)?.translationPath).toBe('search.tabs.monthEndClose');
+            expect(getFlatNavCollapsedPageForSearchKey(SEARCH_KEYS.EXPENSES)).toBeUndefined();
+            expect(getFlatNavCollapsedPageForSearchKey(savedSearchIDToSearchKey('1'))).toBeUndefined();
+            expect(getFlatNavCollapsedPageForSearchKey(undefined)).toBeUndefined();
+        });
+
+        it('should list the visible members of the collapsed page in definition order', () => {
+            // Given sections where two Accounting searches are visible
+            const sections = buildAccountingSections();
+
+            // When we list the members for one of them, and for a search without a collapsed page
+            // Then the members are the visible accounting searches, and the other search has none
+            expect(getFlatNavCollapsedPageMemberItems(sections, SEARCH_KEYS.STATEMENTS).map((item) => item.key)).toEqual([SEARCH_KEYS.EXPORT, SEARCH_KEYS.STATEMENTS]);
+            expect(getFlatNavCollapsedPageMemberItems(sections, SEARCH_KEYS.EXPENSES)).toEqual([]);
         });
     });
 });

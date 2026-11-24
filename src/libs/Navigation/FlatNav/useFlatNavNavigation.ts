@@ -6,7 +6,7 @@ import {navigateToFlatNavItem, navigateToFlatNavSection} from '@libs/SearchNavig
 
 import ONYXKEYS from '@src/ONYXKEYS';
 
-import type {FlatNavItem, FlatNavSection} from './types';
+import type {FlatNavSection, FlatNavSubnavRow} from './types';
 
 /**
  * Handlers that open a flat nav item or section on the query the user last left it with. Anonymous-user interception
@@ -16,7 +16,7 @@ function useFlatNavNavigation() {
     const [searchFilters] = useOnyx(ONYXKEYS.SEARCH_FILTERS);
     const {clearSelectedTransactions} = useSearchSelectionActions();
 
-    const navigateToItem = (item: FlatNavItem) => navigateToFlatNavItem(item, searchFilters, clearSelectedTransactions);
+    const navigateToItem = (item: FlatNavSubnavRow) => navigateToFlatNavItem(item, searchFilters, clearSelectedTransactions);
     const navigateToSection = (section: FlatNavSection) => navigateToFlatNavSection(section, searchFilters, clearSelectedTransactions);
 
     return {navigateToItem, navigateToSection};

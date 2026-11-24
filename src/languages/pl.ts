@@ -11529,6 +11529,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             violationsBySubmitter: 'Naruszenia przez zgłaszającego',
             travel: 'Podróże',
             trips: 'Podróże',
+            monthEndClose: 'Zamknięcie miesiąca',
         },
         mergeReports: {
             title: 'Połącz raporty',

@@ -4,7 +4,7 @@ import type {SearchFilters} from '@src/types/onyx';
 
 import type {OnyxEntry} from 'react-native-onyx';
 
-import type {FlatNavItem, FlatNavSection} from './Navigation/FlatNav/types';
+import type {FlatNavSection, FlatNavSubnavRow} from './Navigation/FlatNav/types';
 import type {SearchKey} from './SearchKeyUtils';
 
 import {setSearchContext} from './actions/Search';
@@ -36,8 +36,17 @@ function navigateToSearch({query, searchKey, name}: {query: string; searchKey?: 
     Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query, name, searchKey}));
 }
 
-/** Opens a flat nav item on the query the user last left it with. */
-function navigateToFlatNavItem(item: FlatNavItem, searchFilters: OnyxEntry<SearchFilters>, clearSelectedTransactions: () => void) {
+/** Opens a flat nav row on the query the user last left it with. A page row opens its first member, the way its section's row does. */
+function navigateToFlatNavItem(item: FlatNavSubnavRow, searchFilters: OnyxEntry<SearchFilters>, clearSelectedTransactions: () => void) {
+    if (item.type === FLAT_NAV.ITEM_TYPE.PAGE) {
+        const firstMemberItem = item.memberItems.at(0);
+        if (!firstMemberItem) {
+            return;
+        }
+        navigateToFlatNavItem(firstMemberItem, searchFilters, clearSelectedTransactions);
+        return;
+    }
+
     const lastSearchQuery = getLastSearchQuery(searchFilters, item.key);
 
     if (item.type === FLAT_NAV.ITEM_TYPE.CANNED_SEARCH) {
