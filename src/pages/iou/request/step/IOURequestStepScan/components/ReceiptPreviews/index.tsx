@@ -97,7 +97,7 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false, 
     const styles = useThemeStyles();
     const theme = useTheme();
     const isPreviewsVisible = useSharedValue(false);
-    const {previewsSize, previewItemSize, initialReceiptsAmount} = useReceiptPreviewsSizes(isInLandscapeMode);
+    const {previewsSize, previewItemSize, initialReceiptsAmount, bottomInsetPadding} = useReceiptPreviewsSizes(isInLandscapeMode);
 
     const optimisticTransactionsReceipts = useTransactionDraftReceipts();
     const receipts = (() => {
@@ -158,7 +158,7 @@ function ReceiptPreviews({submit, isMultiScanEnabled, isCapturingPhoto = false, 
 
     return (
         <Animated.View style={slideInStyle}>
-            <View style={isInLandscapeMode ? styles.pb4 : styles.pr4}>
+            <View style={isInLandscapeMode ? styles.pb4 : [styles.pr4, {paddingBottom: bottomInsetPadding}]}>
                 <FlatList
                     ref={flatListRef}
                     data={receipts}
