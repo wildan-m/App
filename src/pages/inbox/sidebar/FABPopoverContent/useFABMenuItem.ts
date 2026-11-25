@@ -1,7 +1,9 @@
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
+import useThemeStyles from '@hooks/useThemeStyles';
 
-import type {ViewStyle} from 'react-native';
+import type {StyleProp, ViewStyle} from 'react-native';
 
 import {useLayoutEffect} from 'react';
 
@@ -10,7 +12,7 @@ import {useFABMenuContext} from './FABMenuContext';
 type FABMenuItemResult = {
     itemIndex: number;
     isFocused: boolean;
-    wrapperStyle: ViewStyle;
+    wrapperStyle: StyleProp<ViewStyle>;
     setFocusedIndex: (index: number) => void;
     onItemPress: (onSelected: () => void, options?: {shouldCallAfterModalHide?: boolean}) => void;
 };
@@ -25,6 +27,8 @@ function useFABMenuItem(itemId: string, isVisible = true): FABMenuItemResult {
     const {registerItem, unregisterItem, registeredItems, focusedIndex, setFocusedIndex, onItemPress} = useFABMenuContext();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
+    const styles = useThemeStyles();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     useLayoutEffect(() => {
         if (!isVisible) {
@@ -36,7 +40,11 @@ function useFABMenuItem(itemId: string, isVisible = true): FABMenuItemResult {
 
     const itemIndex = registeredItems.indexOf(itemId);
     const isFocused = focusedIndex !== -1 && focusedIndex === itemIndex;
-    const wrapperStyle = StyleUtils.getItemBackgroundColorStyle(false, isFocused, false, theme.activeComponentBG, theme.hoverComponentBG);
+    const wrapperStyle: StyleProp<ViewStyle> = [
+        StyleUtils.getItemBackgroundColorStyle(false, isFocused, false, theme.activeComponentBG, theme.hoverComponentBG),
+        // On wide layouts the compact popover style already fixes rows at 52px; narrow layouts get the 64px row from the design instead
+        shouldUseNarrowLayout && styles.createMenuRowNarrow,
+    ];
 
     return {itemIndex, isFocused, wrapperStyle, setFocusedIndex, onItemPress};
 }

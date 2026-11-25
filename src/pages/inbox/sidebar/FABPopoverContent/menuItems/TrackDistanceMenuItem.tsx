@@ -45,6 +45,7 @@ function TrackDistanceMenuItem({reportID}: TrackDistanceMenuItemProps) {
             itemId={ITEM_ID}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.TRACK_DISTANCE}
             icon={icons.Location}
+            tile="distance"
             title={translate('iou.trackDistance')}
             onPress={() =>
                 interceptAnonymousUser(() => {

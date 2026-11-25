@@ -145,6 +145,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         iconWidth?: number;
         iconHeight?: number;
 
+        /** Fixed square size for the icon container, replacing the avatar-based width and the compact popover icon width. */
+        iconContainerSize?: number;
+
         /** Any additional styles to pass to the icon container. */
         iconStyles?: StyleProp<ViewStyle>;
 
@@ -422,6 +425,7 @@ function MenuItem({
     isSecondaryIconHoverable = false,
     iconWidth,
     iconHeight,
+    iconContainerSize,
     iconStyles,
     fallbackIcon,
     shouldShowTitleIcon = false,
@@ -541,7 +545,7 @@ function MenuItem({
     const deviceHasHoverSupport = hasHoverSupport();
     const isCompactMenu = useIsCompactMenu();
     const isCompactPopoverItem = isCompactMenu && !isSmallScreenWidth && !shouldIgnoreCompactStyle;
-    const compactIconStyle = isCompactPopoverItem && iconType === CONST.ICON_TYPE_ICON && {width: variables.iconSizeNormal};
+    const compactIconStyle = isCompactPopoverItem && iconType === CONST.ICON_TYPE_ICON && !iconContainerSize && {width: variables.iconSizeNormal};
     const isCompact = viewMode === CONST.OPTION_MODE.COMPACT;
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
     let descriptionVerticalMargin: ViewStyle = styles.mt1;
@@ -820,7 +824,12 @@ function MenuItem({
                                                             style={[
                                                                 styles.popoverMenuIcon,
                                                                 iconStyles,
-                                                                shouldIconUseAutoWidthStyle ? styles.wAuto : StyleUtils.getAvatarWidthStyle(avatarSize),
+                                                                // eslint-disable-next-line no-nested-ternary
+                                                                shouldIconUseAutoWidthStyle
+                                                                    ? styles.wAuto
+                                                                    : iconContainerSize
+                                                                      ? StyleUtils.getWidthAndHeightStyle(iconContainerSize, iconContainerSize)
+                                                                      : StyleUtils.getAvatarWidthStyle(avatarSize),
                                                                 compactIconStyle,
                                                             ]}
                                                         >

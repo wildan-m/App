@@ -218,6 +218,37 @@ const lightTheme = {
         },
     },
 
+    createMenuTile: {
+        expense: {
+            backgroundColor: colors.green200,
+            fill: colors.green700,
+        },
+        report: {
+            backgroundColor: colors.blue200,
+            fill: colors.blue700,
+        },
+        distance: {
+            backgroundColor: colors.pink200,
+            fill: colors.pink700,
+        },
+        chat: {
+            backgroundColor: colors.yellow200,
+            fill: colors.yellow600,
+        },
+        invoice: {
+            backgroundColor: colors.ice200,
+            fill: colors.ice700,
+        },
+        travel: {
+            backgroundColor: colors.tangerine200,
+            fill: colors.tangerine700,
+        },
+        scanReceipt: {
+            backgroundColor: colors.green200,
+            fill: colors.green700,
+        },
+    },
+
     statusBarStyle: CONST.STATUS_BAR_STYLE.DARK_CONTENT,
     navigationBarButtonsStyle: CONST.NAVIGATION_BAR_BUTTONS_STYLE.DARK,
     translucentNavigationBarBackgroundColor: `${colors.productLight100}CD`, // CD is 80% opacity (80% of 0xFF)

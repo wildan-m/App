@@ -86,6 +86,7 @@ function CreateReportMenuItem() {
             isVisible={isVisible}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.CREATE_REPORT}
             icon={icons.Document}
+            tile="report"
             title={translate('report.newReport.createReport')}
             onPress={createReport}
             shouldCallAfterModalHide={shouldUseNarrowLayout}

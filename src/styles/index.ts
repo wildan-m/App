@@ -2283,6 +2283,19 @@ const staticStyles = (theme: ThemeColors) =>
             paddingVertical: variables.componentBorderRadiusLarge,
         },
 
+        createMenuIconTile: {
+            width: variables.createMenuIconTileSize,
+            height: variables.createMenuIconTileSize,
+            borderRadius: variables.componentBorderRadiusNormal,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+
+        createMenuRowNarrow: {
+            minHeight: variables.optionRowHeight,
+            alignItems: 'center',
+        },
+
         compactPopoverMenuItemBase: compactPopoverMenuItemBaseStyle,
 
         compactPopoverMenuItem: {

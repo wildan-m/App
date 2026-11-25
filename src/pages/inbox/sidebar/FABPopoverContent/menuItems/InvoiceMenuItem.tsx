@@ -44,6 +44,7 @@ function InvoiceMenuItem({reportID}: InvoiceMenuItemProps) {
             isVisible={canSendInvoice}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.SEND_INVOICE}
             icon={icons.InvoiceGeneric}
+            tile="invoice"
             title={translate('workspace.invoices.sendInvoice')}
             onPress={() =>
                 interceptAnonymousUser(() => {

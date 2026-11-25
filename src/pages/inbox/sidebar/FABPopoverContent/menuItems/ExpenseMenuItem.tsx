@@ -34,6 +34,7 @@ function ExpenseMenuItem({reportID}: ExpenseMenuItemProps) {
             itemId={ITEM_ID}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.CREATE_EXPENSE}
             icon={getIconForAction(CONST.IOU.TYPE.CREATE, icons)}
+            tile="expense"
             title={translate('iou.createExpense')}
             onPress={() =>
                 interceptAnonymousUser(() => {

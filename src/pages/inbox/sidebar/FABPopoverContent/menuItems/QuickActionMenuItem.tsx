@@ -169,6 +169,7 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
                 }}
                 shouldTeleportPortalToModalLayer
                 icon={getQuickActionIcon(icons, quickAction?.action)}
+                tile="scanReceipt"
                 title={quickActionTitle}
                 rightIconAccountID={quickActionAvatars.at(0)?.id ?? CONST.DEFAULT_NUMBER_ID}
                 description={quickActionSubtitle}
@@ -217,6 +218,7 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
             }}
             shouldTeleportPortalToModalLayer
             icon={icons.ReceiptScan}
+            tile="scanReceipt"
             title={translate('quickAction.scanReceipt')}
             description={getReportName(policyChatForActivePolicy, derivedPolicyChatReportName)}
             rightIconReportID={policyChatForActivePolicy?.reportID}

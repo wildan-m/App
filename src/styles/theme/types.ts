@@ -145,6 +145,14 @@ type ThemeColors = {
         }
     >;
 
+    createMenuTile: Record<
+        'expense' | 'report' | 'distance' | 'chat' | 'invoice' | 'travel' | 'scanReceipt',
+        {
+            backgroundColor: Color;
+            fill: Color;
+        }
+    >;
+
     PAGE_THEMES: Record<string, {backgroundColor: Color; statusBarStyle: StatusBarStyle}>;
 
     // Status bar and scroll bars need to adapt their theme based on the active user theme for good contrast

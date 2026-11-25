@@ -31,6 +31,7 @@ function NewChatMenuItem() {
             itemId={ITEM_ID}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.START_CHAT}
             icon={icons.ChatBubble}
+            tile="chat"
             title={translate('sidebarScreen.fabNewChat')}
             onPress={() => {
                 // Support agents cannot create chats on a user's behalf, so block before the selector opens.

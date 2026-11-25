@@ -68,6 +68,7 @@ function TravelMenuItem() {
             isVisible={isVisible}
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.BOOK_TRAVEL}
             icon={icons.Suitcase}
+            tile="travel"
             title={translate('travel.bookTravel')}
             iconRight={isTravelEnabled && shouldOpenTravelDotLinkWeb() ? icons.NewWindow : undefined}
             shouldShowRightIcon={!!(isTravelEnabled && shouldOpenTravelDotLinkWeb())}

@@ -115,6 +115,7 @@ export default {
     iconSizeSemiSmall: 14,
     iconSizeSmall: 16,
     iconSizeMedium: 18,
+    createMenuIconTileSize: 32,
     iconSizeNormal: 20,
     iconSizeLarge: 24,
     iconSizeXLarge: 28,
