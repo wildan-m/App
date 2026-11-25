@@ -1,0 +1,153 @@
+diff --git a/node_modules/react-native-keyboard-controller/src/components/KeyboardAvoidingView/hooks.ts b/node_modules/react-native-keyboard-controller/src/components/KeyboardAvoidingView/hooks.ts
+index 64bfa65..2af246c 100644
+--- a/node_modules/react-native-keyboard-controller/src/components/KeyboardAvoidingView/hooks.ts
++++ b/node_modules/react-native-keyboard-controller/src/components/KeyboardAvoidingView/hooks.ts
+@@ -1,33 +1,27 @@
+-import { useLayoutEffect } from "react";
+ import { Platform } from "react-native";
+ import { useSharedValue } from "react-native-reanimated";
+ 
+-import { useKeyboardContext } from "../../context";
+ import { useKeyboardHandler } from "../../hooks";
+ 
+ const OS = Platform.OS;
+ 
+ export const useKeyboardAnimation = () => {
+-  const { reanimated } = useKeyboardContext();
+-
+   const heightWhenOpened = useSharedValue(0);
+   const height = useSharedValue(0);
+   const progress = useSharedValue(0);
+   const isClosed = useSharedValue(true);
+ 
+-  useLayoutEffect(() => {
+-    const initialHeight = -reanimated.height.value;
+-    const initialProgress = reanimated.progress.value;
+-
+-    // eslint-disable-next-line react-compiler/react-compiler
+-    heightWhenOpened.value = initialHeight;
+-    height.value = initialHeight;
+-    progress.value = initialProgress;
+-    isClosed.value = initialProgress === 0;
+-  }, []);
+-
+   useKeyboardHandler(
+     {
++      onSync: (e) => {
++        "worklet";
++
++        // eslint-disable-next-line react-compiler/react-compiler
++        heightWhenOpened.value = e.height;
++        height.value = e.height;
++        progress.value = e.progress;
++        isClosed.value = e.progress === 0;
++      },
+       onStart: (e) => {
+         "worklet";
+ 
+@@ -53,6 +47,11 @@ export const useKeyboardAnimation = () => {
+ 
+         isClosed.value = e.height === 0;
+ 
++        // `onStart` is not received if the view was mounted during keyboard appearance
++        if (e.height > 0) {
++          heightWhenOpened.value = e.height;
++        }
++
+         height.value = e.height;
+         progress.value = e.progress;
+       },
+@@ -63,18 +62,18 @@ export const useKeyboardAnimation = () => {
+   return { height, progress, heightWhenOpened, isClosed };
+ };
+ export const useTranslateAnimation = () => {
+-  const { reanimated } = useKeyboardContext();
+-
+   const padding = useSharedValue(0);
+   const translate = useSharedValue(0);
+ 
+-  useLayoutEffect(() => {
+-    // eslint-disable-next-line react-compiler/react-compiler
+-    padding.value = reanimated.progress.value;
+-  }, []);
+-
+   useKeyboardHandler(
+     {
++      onSync: (e) => {
++        "worklet";
++
++        // eslint-disable-next-line react-compiler/react-compiler
++        padding.value = e.progress;
++        translate.value = e.progress;
++      },
+       onStart: (e) => {
+         "worklet";
+ 
+diff --git a/node_modules/react-native-keyboard-controller/src/hooks/index.ts b/node_modules/react-native-keyboard-controller/src/hooks/index.ts
+index 5e458ea..f5266e7 100644
+--- a/node_modules/react-native-keyboard-controller/src/hooks/index.ts
++++ b/node_modules/react-native-keyboard-controller/src/hooks/index.ts
+@@ -1,5 +1,5 @@
+ import { useEffect, useLayoutEffect } from "react";
+-import { useEvent, useHandler } from "react-native-reanimated";
++import { runOnUI, useEvent, useHandler } from "react-native-reanimated";
+ 
+ import { AndroidSoftInputModes } from "../constants";
+ import { useKeyboardContext } from "../context";
+@@ -153,6 +153,28 @@ export function useGenericKeyboardHandler(
+ 
+     return () => cleanup();
+   }, deps);
++
++  // events dispatched while the handler was not attached (before the mount or while the screen
++  // was frozen) are not delivered to it, so the state that the keyboard has now is reported
++  // separately. Changed `deps` don't make the handler miss events, hence a separate effect
++  useLayoutEffect(() => {
++    const { onSync } = handler;
++    const { layout } = context;
++    const { height, progress } = context.reanimated;
++
++    if (onSync) {
++      runOnUI(() => {
++        "worklet";
++
++        onSync({
++          height: Math.abs(height.value),
++          progress: progress.value,
++          duration: 0,
++          target: layout.value?.target ?? -1,
++        });
++      })();
++    }
++  }, []);
+ }
+ 
+ /**
+diff --git a/node_modules/react-native-keyboard-controller/src/types/hooks.ts b/node_modules/react-native-keyboard-controller/src/types/hooks.ts
+index 850b9b2..f9dfb12 100644
+--- a/node_modules/react-native-keyboard-controller/src/types/hooks.ts
++++ b/node_modules/react-native-keyboard-controller/src/types/hooks.ts
+@@ -150,6 +150,23 @@ export type FocusedInputSelectionHandlerHook<TContext, Event> = (
+ // package types
+ export type Handlers<T> = Record<string, T | undefined>;
+ export type KeyboardHandler = Partial<{
++  /**
++   * A callback that gets invoked after the handler is attached: when a component is mounted
++   * and when a frozen screen becomes active again. The event contains CURRENT state of the
++   * keyboard, tag of the currently focused input and `duration` equal to `0`. Events dispatched
++   * while the handler was not attached are not delivered, so use it for initializing values
++   * that other callbacks update.
++   *
++   * @example
++   * ```ts
++   * onSync: (e) => {
++   *   "worklet";
++   *
++   *   const isKeyboardShown = e.progress === 1;
++   * }
++   * ```
++   */
++  onSync: (e: NativeEvent) => void;
+   /**
+    * A callback that gets invoked when keyboard starts its movement.
+    * The event contains DESTINATION values.
