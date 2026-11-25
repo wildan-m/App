@@ -23,6 +23,7 @@ import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
 import useEndSubmitNavigationSpans from '@hooks/useEndSubmitNavigationSpans';
 import {useLoadingBarVisibility} from '@hooks/useInFlightRequests';
 import useIsMobileWebLandscape from '@hooks/useIsMobileWebLandscape';
+import useKeyboardState from '@hooks/useKeyboardState';
 import useLayoutSpacing from '@hooks/useLayoutSpacing';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -112,6 +113,7 @@ function SearchPageNarrow({
     const {pageGutterMargin} = useLayoutSpacing();
     const tabRootScreenWrapperProps = useTabRootScreenWrapperProps(NAVIGATION_TABS.SEARCH);
     const tabBarCoveredHeight = useTabBarCoveredHeight();
+    const {isKeyboardShown} = useKeyboardState();
     // The footer is shown and hidden by its own selection state, so its height is read from layout.
     const [footerHeight, setFooterHeight] = useState(0);
     const StyleUtils = useStyleUtils();
@@ -462,7 +464,8 @@ function SearchPageNarrow({
                         >
                             <SearchSelectionFooter
                                 searchResults={searchResults}
-                                style={styles.tabRootFooter(tabBarCoveredHeight)}
+                                // The keyboard covers the tab bar, so the footer sits directly on the keyboard while it is shown.
+                                style={styles.tabRootFooter(isKeyboardShown ? 0 : tabBarCoveredHeight)}
                             />
                         </View>
                     </View>
