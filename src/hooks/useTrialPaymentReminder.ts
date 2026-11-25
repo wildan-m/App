@@ -13,13 +13,17 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 import type {ValueOf} from 'type-fest';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useSyncExternalStore} from 'react';
+import {AppState} from 'react-native';
 
 import useOnyx from './useOnyx';
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const ONE_MINUTE_MS = 60 * 1000;
 const TWENTY_FOUR_HOURS_IN_SECONDS = 24 * 60 * 60;
+
+/** Returning to the foreground after at least this long in the background starts a new session */
+const NEW_SESSION_BACKGROUND_THRESHOLD_MS = 30 * 60 * 1000;
 
 /** Onyx values not yet resolved */
 const READINESS_LOADING = 'loading';
@@ -73,6 +77,56 @@ function getTrialStartupGraceRemainingMs(firstDayFreeTrial: string): number {
         return 0;
     }
     return Math.max(trialStartMs + FIVE_MINUTES_MS - Date.now(), 0);
+}
+
+/**
+ * A session starts when the JS context starts (page load on web, process launch on native) and again whenever
+ * the app returns to the foreground after a prolonged background period.
+ */
+let currentSessionStartMs = Date.now();
+let backgroundedAtMs: number | null = null;
+const sessionStartListeners = new Set<() => void>();
+
+AppState.addEventListener('change', (nextAppState) => {
+    if (nextAppState !== 'active') {
+        backgroundedAtMs ??= Date.now();
+        return;
+    }
+    const now = Date.now();
+    if (backgroundedAtMs !== null && now - backgroundedAtMs >= NEW_SESSION_BACKGROUND_THRESHOLD_MS) {
+        currentSessionStartMs = now;
+        for (const listener of sessionStartListeners) {
+            listener();
+        }
+    }
+    backgroundedAtMs = null;
+});
+
+function subscribeToSessionStart(listener: () => void) {
+    sessionStartListeners.add(listener);
+    return () => {
+        sessionStartListeners.delete(listener);
+    };
+}
+
+function getCurrentSessionStartMs() {
+    return currentSessionStartMs;
+}
+
+/**
+ * The user's first session is the one in which their free trial began, so the trial started during the current
+ * session only when its start time is at or after the session start. A one-minute tolerance absorbs clock skew
+ * between the server-written trial start and the device clock.
+ */
+function didTrialStartDuringSession(firstDayFreeTrial: string | undefined, sessionStartMs: number): boolean {
+    if (!firstDayFreeTrial) {
+        return false;
+    }
+    const trialStartMs = new Date(`${firstDayFreeTrial}Z`).getTime();
+    if (!Number.isFinite(trialStartMs)) {
+        return false;
+    }
+    return trialStartMs >= sessionStartMs - ONE_MINUTE_MS;
 }
 
 /**
@@ -155,6 +209,7 @@ function useTrialPaymentReminder() {
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: (session) => session?.accountID});
     const [hasLoadedApp] = useOnyx(ONYXKEYS.HAS_LOADED_APP);
+    const sessionStartMs = useSyncExternalStore(subscribeToSessionStart, getCurrentSessionStartMs, getCurrentSessionStartMs);
 
     const [readinessState, setReadinessState] = useState<ReadinessState>(READINESS_STATE.LOADING);
 
@@ -228,6 +283,7 @@ function useTrialPaymentReminder() {
         !isLoadingOnyxValue(billingFundIDResult) &&
         !doesUserHavePaymentCardAdded(billingFundID) &&
         readinessState === READINESS_STATE.READY &&
+        !didTrialStartDuringSession(firstDayFreeTrial, sessionStartMs) &&
         getOwnedPaidPolicies(policies, currentUserAccountID).some((policy) => !isPendingDeletePolicy(policy)) &&
         !isLoadingOnyxValue(dismissedTimestampResult) &&
         !!currentVariation;
