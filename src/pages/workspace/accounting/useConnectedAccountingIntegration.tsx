@@ -266,7 +266,24 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
         openPolicyExpensifyCardsPage(policyID, workspaceAccountID);
     }, [policyID, policy?.areExpensifyCardsEnabled, workspaceAccountID]);
 
-    const getIntegrationSpecificMenuItems = () => {
+    const getIntegrationSpecificMenuItems = (): MenuItemData[] => {
+        // The selected subsidiary or entity can be what breaks a sync, so only an authentication error hides its row.
+        // Zoho Books' organization row was built to stay through every failed sync, so it is kept even then.
+        const shouldShowEntityRow = !hasAuthError || connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS;
+        const buildEntityRow = (row: MenuItemData): MenuItemData[] => (shouldShowEntityRow ? [row] : []);
+        // Non-secret identifier rows survive an authentication error, since that is when an admin needs to know which account to fix.
+        const buildIdentifierRow = (description: string, value: string | undefined): MenuItemData[] =>
+            value
+                ? [
+                      {
+                          description,
+                          title: value,
+                          titleStyle: styles.fontWeightNormal,
+                          shouldShowDescriptionOnTop: true,
+                          interactive: false,
+                      },
+                  ]
+                : [];
         const sageIntacctEntityList = policy?.connections?.intacct?.data?.entities ?? [];
         const netSuiteSubsidiaryList = policy?.connections?.netsuite?.options?.data?.subsidiaryList ?? [];
         const rilletSubsidiaryList = policy?.connections?.rillet?.data?.subsidiaries;
@@ -284,8 +301,8 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
         switch (connectedIntegration) {
             case CONST.POLICY.CONNECTIONS.NAME.XERO:
                 return !policy?.connections?.xero?.data?.tenants
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.xero.organization'),
                           sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.XERO,
                           iconRight: icons.ArrowRight,
@@ -304,83 +321,98 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
                           brickRoadIndicator: areSettingsInErrorFields([CONST.XERO_CONFIG.TENANT_ID], policy?.connections?.xero?.config?.errorFields)
                               ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR
                               : undefined,
-                      };
+                      });
             case CONST.POLICY.CONNECTIONS.NAME.NETSUITE:
-                return !policy?.connections?.netsuite?.options?.config?.subsidiary
-                    ? {}
-                    : {
-                          description: translate('workspace.netsuite.subsidiary'),
-                          sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.NETSUITE,
-                          iconRight: icons.ArrowRight,
-                          title: policy?.connections?.netsuite?.options?.config?.subsidiary ?? '',
-                          titleStyle: styles.fontWeightNormal,
-                          shouldShowRightIcon: canWriteAccounting && netSuiteSubsidiaryList?.length > 1,
-                          shouldShowDescriptionOnTop: true,
-                          interactive: canWriteAccounting,
-                          pendingAction: policy?.connections?.netsuite?.options?.config?.pendingFields?.subsidiary,
-                          brickRoadIndicator: policy?.connections?.netsuite?.options?.config?.errorFields?.subsidiary ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                          onPress:
-                              canWriteAccounting && netSuiteSubsidiaryList?.length > 1
-                                  ? () => {
-                                        Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_SUBSIDIARY_SELECTOR.getRoute(policyID));
-                                    }
-                                  : undefined,
-                      };
+                return [
+                    ...(!policy?.connections?.netsuite?.options?.config?.subsidiary
+                        ? []
+                        : buildEntityRow({
+                              description: translate('workspace.netsuite.subsidiary'),
+                              sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.NETSUITE,
+                              iconRight: icons.ArrowRight,
+                              title: policy?.connections?.netsuite?.options?.config?.subsidiary ?? '',
+                              titleStyle: styles.fontWeightNormal,
+                              shouldShowRightIcon: canWriteAccounting && netSuiteSubsidiaryList?.length > 1,
+                              shouldShowDescriptionOnTop: true,
+                              interactive: canWriteAccounting,
+                              pendingAction: policy?.connections?.netsuite?.options?.config?.pendingFields?.subsidiary,
+                              brickRoadIndicator: policy?.connections?.netsuite?.options?.config?.errorFields?.subsidiary ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                              onPress:
+                                  canWriteAccounting && netSuiteSubsidiaryList?.length > 1
+                                      ? () => {
+                                            Navigation.navigate(ROUTES.POLICY_ACCOUNTING_NETSUITE_SUBSIDIARY_SELECTOR.getRoute(policyID));
+                                        }
+                                      : undefined,
+                          })),
+                    ...buildIdentifierRow(translate('common.accountID'), policy?.connections?.netsuite?.accountID),
+                ];
             case CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT:
-                return !sageIntacctEntityList.length
-                    ? {}
-                    : {
-                          description: translate('workspace.intacct.entity'),
-                          sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.SAGE_INTACCT,
-                          iconRight: icons.ArrowRight,
-                          title: getCurrentSageIntacctEntityName(policy, translate('workspace.common.topLevel')),
-                          titleStyle: styles.fontWeightNormal,
-                          shouldShowRightIcon: canWriteAccounting,
-                          shouldShowDescriptionOnTop: true,
-                          interactive: canWriteAccounting,
-                          pendingAction: policy?.connections?.intacct?.config?.pendingFields?.entity,
-                          brickRoadIndicator: policy?.connections?.intacct?.config?.errorFields?.entity ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                          onPress: canWriteAccounting ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_ENTITY.getRoute(policyID)) : undefined,
-                      };
+                return [
+                    ...(!sageIntacctEntityList.length
+                        ? []
+                        : buildEntityRow({
+                              description: translate('workspace.intacct.entity'),
+                              sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.SAGE_INTACCT,
+                              iconRight: icons.ArrowRight,
+                              title: getCurrentSageIntacctEntityName(policy, translate('workspace.common.topLevel')),
+                              titleStyle: styles.fontWeightNormal,
+                              shouldShowRightIcon: canWriteAccounting,
+                              shouldShowDescriptionOnTop: true,
+                              interactive: canWriteAccounting,
+                              pendingAction: policy?.connections?.intacct?.config?.pendingFields?.entity,
+                              brickRoadIndicator: policy?.connections?.intacct?.config?.errorFields?.entity ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                              onPress: canWriteAccounting ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_ENTITY.getRoute(policyID)) : undefined,
+                          })),
+                    ...buildIdentifierRow(translate('common.companyID'), policy?.connections?.intacct?.config?.credentials?.companyID),
+                    ...buildIdentifierRow(translate('common.userID'), policy?.connections?.intacct?.config?.credentials?.userID),
+                ];
             case CONST.POLICY.CONNECTIONS.NAME.QBO:
-                return !policy?.connections?.quickbooksOnline?.config?.companyName
-                    ? {}
-                    : {
-                          description: translate(isConnectedToIntuitEnterpriseSuite ? 'workspace.qbo.entity' : 'workspace.qbo.connectedTo'),
-                          sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.QBO,
-                          iconRight: isConnectedToIntuitEnterpriseSuite ? icons.ArrowRight : undefined,
-                          title: policy?.connections?.quickbooksOnline?.config?.companyName,
-                          titleStyle: styles.fontWeightNormal,
-                          shouldShowRightIcon: isConnectedToIntuitEnterpriseSuite && canWriteAccounting,
-                          shouldShowDescriptionOnTop: true,
-                          interactive: isConnectedToIntuitEnterpriseSuite && canWriteAccounting,
-                          pendingAction: policy?.connections?.quickbooksOnline?.config?.pendingFields?.realmId,
-                          brickRoadIndicator: policy?.connections?.quickbooksOnline?.config?.errorFields?.realmId ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                          onPress:
-                              isConnectedToIntuitEnterpriseSuite && canWriteAccounting && policyID
-                                  ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_INTUIT_ENTERPRISE_SUITE_ENTITY_SELECTOR.getRoute(policyID))
-                                  : undefined,
-                      };
+                return [
+                    ...(!policy?.connections?.quickbooksOnline?.config?.companyName
+                        ? []
+                        : buildEntityRow({
+                              description: translate(isConnectedToIntuitEnterpriseSuite ? 'workspace.qbo.entity' : 'workspace.qbo.connectedTo'),
+                              sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.QBO,
+                              iconRight: isConnectedToIntuitEnterpriseSuite ? icons.ArrowRight : undefined,
+                              title: policy?.connections?.quickbooksOnline?.config?.companyName,
+                              titleStyle: styles.fontWeightNormal,
+                              shouldShowRightIcon: isConnectedToIntuitEnterpriseSuite && canWriteAccounting,
+                              shouldShowDescriptionOnTop: true,
+                              interactive: isConnectedToIntuitEnterpriseSuite && canWriteAccounting,
+                              pendingAction: policy?.connections?.quickbooksOnline?.config?.pendingFields?.realmId,
+                              brickRoadIndicator: policy?.connections?.quickbooksOnline?.config?.errorFields?.realmId ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                              onPress:
+                                  isConnectedToIntuitEnterpriseSuite && canWriteAccounting && policyID
+                                      ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_INTUIT_ENTERPRISE_SUITE_ENTITY_SELECTOR.getRoute(policyID))
+                                      : undefined,
+                          })),
+                    ...buildIdentifierRow(translate('common.companyID'), policy?.connections?.quickbooksOnline?.config?.realmId),
+                ];
+            case CONST.POLICY.CONNECTIONS.NAME.QBD:
+                return buildIdentifierRow(translate('workspace.qbd.companyFile'), policy?.connections?.quickbooksDesktop?.config?.credentials?.companyFileName);
             case CONST.POLICY.CONNECTIONS.NAME.CERTINIA:
-                return !isCertiniaFFAConnection(certiniaConfig)
-                    ? {}
-                    : {
-                          description: translate('workspace.certinia.company'),
-                          sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.CERTINIA,
-                          iconRight: icons.ArrowRight,
-                          title: selectedCertiniaCompany?.name ?? certiniaCompanyID ?? translate('common.none'),
-                          titleStyle: styles.fontWeightNormal,
-                          shouldShowRightIcon: canWriteAccounting,
-                          shouldShowDescriptionOnTop: true,
-                          interactive: canWriteAccounting,
-                          pendingAction: settingsPendingAction([certiniaCompanyField], certiniaConfig?.pendingFields),
-                          brickRoadIndicator: areSettingsInErrorFields([certiniaCompanyField], certiniaConfig?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                          onPress: canWriteAccounting ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_COMPANY_SELECTOR.getRoute(policyID)) : undefined,
-                      };
+                return [
+                    ...(!isCertiniaFFAConnection(certiniaConfig)
+                        ? []
+                        : buildEntityRow({
+                              description: translate('workspace.certinia.company'),
+                              sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.CERTINIA,
+                              iconRight: icons.ArrowRight,
+                              title: selectedCertiniaCompany?.name ?? certiniaCompanyID ?? translate('common.none'),
+                              titleStyle: styles.fontWeightNormal,
+                              shouldShowRightIcon: canWriteAccounting,
+                              shouldShowDescriptionOnTop: true,
+                              interactive: canWriteAccounting,
+                              pendingAction: settingsPendingAction([certiniaCompanyField], certiniaConfig?.pendingFields),
+                              brickRoadIndicator: areSettingsInErrorFields([certiniaCompanyField], certiniaConfig?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                              onPress: canWriteAccounting ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CERTINIA_COMPANY_SELECTOR.getRoute(policyID)) : undefined,
+                          })),
+                    ...buildIdentifierRow(translate('workspace.certinia.salesforceInstanceUrl'), certiniaConfig?.credentials?.enterpriseUrl),
+                ];
             case CONST.POLICY.CONNECTIONS.NAME.RILLET:
                 return !rilletSubsidiaryList?.length
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.rillet.entity'),
                           sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.RILLET,
                           iconRight: icons.ArrowRight,
@@ -395,11 +427,11 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
                               policyID && canWriteAccounting && rilletSubsidiaryList && rilletSubsidiaryList.length > 1
                                   ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_RILLET_SUBSIDIARY_SELECTOR.getRoute(policyID))
                                   : undefined,
-                      };
+                      });
             case CONST.POLICY.CONNECTIONS.NAME.DUALENTRY:
                 return !dualEntryCompanyList?.length
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.dualEntry.company'),
                           sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.DUAL_ENTRY,
                           iconRight: icons.ArrowRight,
@@ -414,11 +446,11 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
                               policyID && canWriteAccounting && dualEntryCompanyList && dualEntryCompanyList.length > 1
                                   ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_DUALENTRY_SUBSIDIARY_SELECTOR.getRoute(policyID))
                                   : undefined,
-                      };
+                      });
             case CONST.POLICY.CONNECTIONS.NAME.CAMPFIRE:
                 return !campfireSubsidiaryList?.length
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.campfire.entity'),
                           sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.CAMPFIRE,
                           iconRight: icons.ArrowRight,
@@ -433,30 +465,33 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
                               policyID && canWriteAccounting && campfireSubsidiaryList && campfireSubsidiaryList.length > 1
                                   ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_CAMPFIRE_SUBSIDIARY_SELECTOR.getRoute(policyID))
                                   : undefined,
-                      };
+                      });
             case CONST.POLICY.CONNECTIONS.NAME.BUSINESS_CENTRAL:
-                return !businessCentralCompanyList?.length
-                    ? {}
-                    : {
-                          description: translate('workspace.businessCentral.subsidiary'),
-                          sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.BUSINESS_CENTRAL,
-                          iconRight: icons.ArrowRight,
-                          title: businessCentralCompanyList.find((company) => company.id === policy?.connections?.businessCentral?.config?.companyID)?.displayName ?? '',
-                          titleStyle: styles.fontWeightNormal,
-                          shouldShowRightIcon: canWriteAccounting && businessCentralCompanyList.length > 1,
-                          shouldShowDescriptionOnTop: true,
-                          interactive: canWriteAccounting,
-                          pendingAction: policy?.connections?.businessCentral?.config.pendingFields?.companyID,
-                          brickRoadIndicator: policy?.connections?.businessCentral?.config.errorFields?.companyID ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
-                          onPress:
-                              policyID && canWriteAccounting && businessCentralCompanyList.length > 1
-                                  ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_BUSINESS_CENTRAL_COMPANY_SELECTOR.getRoute(policyID))
-                                  : undefined,
-                      };
+                return [
+                    ...(!businessCentralCompanyList?.length
+                        ? []
+                        : buildEntityRow({
+                              description: translate('workspace.businessCentral.subsidiary'),
+                              sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.BUSINESS_CENTRAL,
+                              iconRight: icons.ArrowRight,
+                              title: businessCentralCompanyList.find((company) => company.id === policy?.connections?.businessCentral?.config?.companyID)?.displayName ?? '',
+                              titleStyle: styles.fontWeightNormal,
+                              shouldShowRightIcon: canWriteAccounting && businessCentralCompanyList.length > 1,
+                              shouldShowDescriptionOnTop: true,
+                              interactive: canWriteAccounting,
+                              pendingAction: policy?.connections?.businessCentral?.config.pendingFields?.companyID,
+                              brickRoadIndicator: policy?.connections?.businessCentral?.config.errorFields?.companyID ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+                              onPress:
+                                  policyID && canWriteAccounting && businessCentralCompanyList.length > 1
+                                      ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_BUSINESS_CENTRAL_COMPANY_SELECTOR.getRoute(policyID))
+                                      : undefined,
+                          })),
+                    ...buildIdentifierRow(translate('common.environmentName'), policy?.connections?.businessCentral?.config?.credentials?.environmentName),
+                ];
             case CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS:
                 return !zohoBooksOrganizationList?.length
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.zohoBooks.organization'),
                           sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.CONNECTIONS.ACCOUNTING_ENTITY_ROW.ZOHO_BOOKS,
                           iconRight: icons.ArrowRight,
@@ -474,26 +509,24 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
                               policyID && canWriteAccounting && zohoBooksOrganizationList.length > 1
                                   ? () => Navigation.navigate(ROUTES.POLICY_ACCOUNTING_ZOHO_BOOKS_ORGANIZATION_SELECTOR.getRoute(policyID))
                                   : undefined,
-                      };
+                      });
             case CONST.POLICY.CONNECTIONS.NAME.DIGITS:
                 // A Digits sign-in covers exactly one company, so there is nothing to pick here. Another company needs a new sign-in.
                 return !digitsCompanyName
-                    ? {}
-                    : {
+                    ? []
+                    : buildEntityRow({
                           description: translate('workspace.digits.entity'),
                           title: digitsCompanyName,
                           titleStyle: styles.fontWeightNormal,
                           shouldShowDescriptionOnTop: true,
                           interactive: false,
-                      };
+                      });
 
             default:
-                return undefined;
+                return [];
         }
     };
     const integrationSpecificMenuItems = getIntegrationSpecificMenuItems();
-    // Zoho Books' organization row was built to stay through every failed sync, so the authentication rule below leaves it unchanged.
-    const shouldKeepIntegrationSpecificMenuItemOnAuthError = connectedIntegration === CONST.POLICY.CONNECTIONS.NAME.ZOHO_BOOKS;
 
     const getConnectionDetails = () => {
         if (!connectedIntegration || !policyID) {
@@ -574,11 +607,8 @@ function useConnectedAccountingIntegration(policy: OnyxEntry<Policy>, {onDisconn
               ]
             : [];
 
-        // The selected subsidiary or entity can be what breaks a sync, so only an authentication error hides its row.
         const settingsMenuItems: MenuItemData[] = [
-            ...(isEmptyObject(integrationSpecificMenuItems) || (hasAuthError && !shouldKeepIntegrationSpecificMenuItemOnAuthError) || !hasAccountingConnection
-                ? []
-                : [integrationSpecificMenuItems]),
+            ...(hasAccountingConnection ? integrationSpecificMenuItems : []),
             ...(!hasAccountingConnection || !isConnectionVerified ? [] : configurationOptions),
         ];
         return {icon: integrationData?.icon, title: integrationData?.title, connectionMessage, settingsMenuItems};

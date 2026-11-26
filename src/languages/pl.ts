@@ -603,6 +603,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Kwota',
         submitter: 'Zgłaszający',
+        accountID: 'Identyfikator konta',
     },
     socials: {
         podcast: 'Śledź nas na Podcast',
@@ -5734,6 +5735,8 @@ ${amount} dla ${merchant} - ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Dostosuj wyszukiwanie lub <a href="#">zaproponuj integrację</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Wszystko połączone',
             allConnectedPrompt: '<muted-text><centered-text>Wszystko tutaj jest już połączone. Możesz też <a href="#">zaproponować integrację</a>.</centered-text></muted-text>',
+            activeConnections: 'Aktywne połączenia',
+            otherConnections: 'Inne połączenia',
         },
         receiptPartners: {
             uber: {
@@ -5909,6 +5912,7 @@ ${amount} dla ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Dodaj proszę dostawców w QuickBooks Desktop i zsynchronizuj połączenie ponownie',
+            companyFile: 'Plik firmowy',
         },
         qbo: {
             connectedTo: 'Połączono z',
@@ -6310,6 +6314,7 @@ ${amount} dla ${merchant} - ${date}`,
                 'Kiedy twoja firma pokrywa koszt przewalutowania przy płatności dokonanej za granicą, dodamy ten koszt do faktury do zapłaty jako pozycję zaksięgowaną na to konto.',
             noExpenseAccountsFound: 'Nie znaleziono kont',
             noExpenseAccountsFoundDescription: 'Po dodaniu kont księgi głównej w Certinia zsynchronizuj ponownie połączenie.',
+            salesforceInstanceUrl: 'Adres URL instancji Salesforce',
         },
         netsuite: {
             subsidiary: 'Spółka zależna',

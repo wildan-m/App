@@ -587,6 +587,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: '金额',
         submitter: '提交人',
+        accountID: '账户 ID',
     },
     socials: {
         podcast: '在播客上关注我们',
@@ -5511,6 +5512,8 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             noResultsPrompt: '<muted-text><centered-text>请调整您的搜索条件或<a href="#">建议一个集成</a>。</centered-text></muted-text>',
             allConnectedTitle: '全部已连接',
             allConnectedPrompt: '<muted-text><centered-text>这里的一切都已连接完成。您也可以<a href="#">建议一个集成</a>。</centered-text></muted-text>',
+            activeConnections: '活动连接',
+            otherConnections: '其他连接',
         },
         receiptPartners: {
             uber: {
@@ -5678,6 +5681,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
                 },
             },
             noVendorsFoundDescription: '请在 QuickBooks Desktop 中添加供应商，然后再次同步连接',
+            companyFile: '公司文件',
         },
         qbo: {
             connectedTo: '已连接到',
@@ -6053,6 +6057,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             fxExpenseAccountDescription: '当您的公司承担一笔境外付款的货币兑换成本时，我们会将该成本作为一行添加到应付发票中，并记入此科目。',
             noExpenseAccountsFound: '未找到账户',
             noExpenseAccountsFoundDescription: '在 Certinia 中添加总账科目后，请再次同步连接。',
+            salesforceInstanceUrl: 'Salesforce 实例 URL',
         },
         netsuite: {
             subsidiary: '子公司',

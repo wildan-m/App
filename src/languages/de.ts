@@ -593,6 +593,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Betrag',
         submitter: 'Einreicher',
+        accountID: 'Konto-ID',
     },
     socials: {
         podcast: 'Folgen Sie uns auf Podcast',
@@ -5722,6 +5723,8 @@ ${amount} für ${merchant} – ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Bitte passen Sie Ihre Suche an oder <a href="#">schlagen Sie eine Integration vor</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Sie sind vollständig verbunden',
             allConnectedPrompt: '<muted-text><centered-text>Hier ist bereits alles verbunden. Sie können auch <a href="#">eine Integration vorschlagen</a>.</centered-text></muted-text>',
+            activeConnections: 'Aktive Verbindungen',
+            otherConnections: 'Weitere Verbindungen',
         },
         receiptPartners: {
             uber: {
@@ -5901,6 +5904,7 @@ ${amount} für ${merchant} – ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Bitte fügen Sie Lieferanten in QuickBooks Desktop hinzu und synchronisieren Sie die Verbindung erneut',
+            companyFile: 'Firmendatei',
         },
         qbo: {
             connectedTo: 'Verbunden mit',
@@ -6307,6 +6311,7 @@ ${amount} für ${merchant} – ${date}`,
                 'Wenn Ihr Unternehmen die Kosten für die Währungsumrechnung bei einer im Ausland getätigten Zahlung übernimmt, fügen wir diese Kosten der Verbindlichkeitsrechnung als Position hinzu, die diesem Konto zugeordnet ist.',
             noExpenseAccountsFound: 'Keine Konten gefunden',
             noExpenseAccountsFoundDescription: 'Bitte synchronisieren Sie die Verbindung erneut, nachdem Hauptbuchkonten in Certinia hinzugefügt wurden.',
+            salesforceInstanceUrl: 'Salesforce-Instanz-URL',
         },
         netsuite: {
             subsidiary: 'Tochtergesellschaft',

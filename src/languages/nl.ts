@@ -592,6 +592,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Bedrag',
         submitter: 'Indiener',
+        accountID: 'Account-ID',
     },
     socials: {
         podcast: 'Volg ons op Podcast',
@@ -5687,6 +5688,8 @@ ${amount} voor ${merchant} - ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Pas je zoekopdracht aan of <a href="#">stel een integratie voor</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Je bent helemaal verbonden',
             allConnectedPrompt: '<muted-text><centered-text>Alles hier is al verbonden. Je kunt ook <a href="#">een integratie voorstellen</a>.</centered-text></muted-text>',
+            activeConnections: 'Actieve verbindingen',
+            otherConnections: 'Andere verbindingen',
         },
         receiptPartners: {
             uber: {
@@ -5862,6 +5865,7 @@ ${amount} voor ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Voeg leveranciers toe in QuickBooks Desktop en synchroniseer de verbinding daarna opnieuw',
+            companyFile: 'Bedrijfsbestand',
         },
         qbo: {
             connectedTo: 'Verbonden met',
@@ -6264,6 +6268,7 @@ ${amount} voor ${merchant} - ${date}`,
                 'Wanneer je bedrijf de kosten voor valutaomrekening dekt voor een betaling in het buitenland, voegen we die kosten toe aan de te betalen factuur als een regel die op deze rekening wordt geboekt.',
             noExpenseAccountsFound: 'Geen accounts gevonden',
             noExpenseAccountsFoundDescription: 'Synchroniseer de verbinding opnieuw nadat de grootboekrekeningen in Certinia zijn toegevoegd.',
+            salesforceInstanceUrl: 'Salesforce-instance-URL',
         },
         netsuite: {
             subsidiary: 'Dochteronderneming',

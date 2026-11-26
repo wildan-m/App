@@ -591,6 +591,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Valor',
         submitter: 'Remetente',
+        accountID: 'ID da conta',
     },
     socials: {
         podcast: 'Siga-nos no Podcast',
@@ -5692,6 +5693,8 @@ ${amount} para ${merchant} - ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Ajuste sua pesquisa ou <a href="#">sugira uma integração</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Tudo conectado',
             allConnectedPrompt: '<muted-text><centered-text>Tudo aqui já está conectado. Você também pode <a href="#">sugerir uma integração</a>.</centered-text></muted-text>',
+            activeConnections: 'Conexões ativas',
+            otherConnections: 'Outras conexões',
         },
         receiptPartners: {
             uber: {
@@ -5869,6 +5872,7 @@ ${amount} para ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Adicione fornecedores no QuickBooks Desktop e sincronize a conexão novamente',
+            companyFile: 'Arquivo da empresa',
         },
         qbo: {
             connectedTo: 'Conectado a',
@@ -6271,6 +6275,7 @@ ${amount} para ${merchant} - ${date}`,
                 'Quando sua empresa cobrir o custo de conversão de moeda em um pagamento feito no exterior, adicionaremos esse custo à fatura a pagar como uma linha lançada nesta conta.',
             noExpenseAccountsFound: 'Nenhuma conta encontrada',
             noExpenseAccountsFoundDescription: 'Sincronize a conexão novamente depois que as Contas de Razão Geral forem adicionadas no Certinia.',
+            salesforceInstanceUrl: 'URL da instância do Salesforce',
         },
         netsuite: {
             subsidiary: 'Subsidiária',

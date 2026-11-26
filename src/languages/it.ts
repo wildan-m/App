@@ -592,6 +592,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Importo',
         submitter: 'Mittente',
+        accountID: 'ID conto',
     },
     socials: {
         podcast: 'Seguici su Podcast',
@@ -5689,6 +5690,8 @@ ${amount} per ${merchant} - ${date}`,
             noResultsPrompt: `<muted-text><centered-text>Modifica la tua ricerca oppure <a href="#">suggerisci un'integrazione</a>.</centered-text></muted-text>`,
             allConnectedTitle: 'Sei tutto connesso',
             allConnectedPrompt: `<muted-text><centered-text>Qui è già tutto collegato. Puoi anche <a href="#">suggerire un'integrazione</a>.</centered-text></muted-text>`,
+            activeConnections: 'Connessioni attive',
+            otherConnections: 'Altre connessioni',
         },
         receiptPartners: {
             uber: {
@@ -5867,6 +5870,7 @@ ${amount} per ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Aggiungi i fornitori in QuickBooks Desktop e sincronizza di nuovo la connessione',
+            companyFile: 'File aziendale',
         },
         qbo: {
             connectedTo: 'Collegato a',
@@ -6269,6 +6273,7 @@ ${amount} per ${merchant} - ${date}`,
                 'Quando la tua azienda copre il costo di conversione valuta su un pagamento effettuato all’estero, aggiungeremo tale costo alla Fattura da pagare come voce contabilizzata su questo conto.',
             noExpenseAccountsFound: 'Nessun conto trovato',
             noExpenseAccountsFoundDescription: 'Sincronizza di nuovo la connessione dopo che i conti del libro mastro generale sono stati aggiunti in Certinia.',
+            salesforceInstanceUrl: 'URL istanza Salesforce',
         },
         netsuite: {
             subsidiary: 'Filiale',

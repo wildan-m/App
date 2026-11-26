@@ -589,6 +589,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Ποσό',
         submitter: 'Υποβάλλων',
+        accountID: 'Αναγνωριστικό λογαριασμού',
     },
     socials: {
         podcast: 'Ακολουθήστε μας στο Podcast',
@@ -5802,6 +5803,8 @@ ${amount} για ${merchant} - ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Παρακαλούμε προσαρμόστε την αναζήτησή σας ή <a href="#">προτείνετε μια ενσωμάτωση</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Έχετε συνδεθεί πλήρως',
             allConnectedPrompt: '<muted-text><centered-text>Όλα εδώ είναι ήδη συνδεδεμένα. Μπορείτε επίσης να <a href="#">προτείνετε μια ενσωμάτωση</a>.</centered-text></muted-text>',
+            activeConnections: 'Ενεργές συνδέσεις',
+            otherConnections: 'Άλλες συνδέσεις',
         },
         receiptPartners: {
             uber: {
@@ -5980,6 +5983,7 @@ ${amount} για ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Παρακαλούμε προσθέστε προμηθευτές στο QuickBooks Desktop και συγχρονίστε ξανά τη σύνδεση',
+            companyFile: 'Αρχείο εταιρείας',
         },
         qbo: {
             connectedTo: 'Συνδεδεμένο με',
@@ -6397,6 +6401,7 @@ ${amount} για ${merchant} - ${date}`,
                 'Όταν η εταιρεία σας καλύπτει το κόστος μετατροπής νομίσματος για μια πληρωμή που έγινε στο εξωτερικό, θα προσθέσουμε αυτό το κόστος στο πληρωτέο τιμολόγιο ως γραμμή που κωδικοποιείται σε αυτόν τον λογαριασμό.',
             noExpenseAccountsFound: 'Δεν βρέθηκαν λογαριασμοί',
             noExpenseAccountsFoundDescription: 'Παρακαλούμε συγχρονίστε ξανά τη σύνδεση αφού προστεθούν οι λογαριασμοί γενικής λογιστικής στο Certinia.',
+            salesforceInstanceUrl: 'Διεύθυνση URL παρουσίας Salesforce',
         },
         netsuite: {
             subsidiary: 'Θυγατρική',

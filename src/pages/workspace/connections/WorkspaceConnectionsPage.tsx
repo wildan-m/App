@@ -325,13 +325,25 @@ function WorkspaceConnectionsPage({policy}: WithPolicyConnectionsProps) {
                 />
                 {connectedListings.length > 0 && (
                     <View style={styles.mb4}>
+                        <Text
+                            variant="textStrong"
+                            style={styles.mb3}
+                        >
+                            {translate('workspace.connections.activeConnections')}
+                        </Text>
                         <ConnectionsGrid
                             listings={connectedListings}
                             policyID={policyID}
                         />
                     </View>
                 )}
-                <View style={[connectedListings.length > 0 ? styles.mt6 : styles.mt3, !shouldUseSingleColumn && [styles.flexRow, styles.alignItemsCenter, styles.gap5]]}>
+                <Text
+                    variant="textStrong"
+                    style={connectedListings.length > 0 ? styles.mt6 : styles.mt3}
+                >
+                    {translate('workspace.connections.otherConnections')}
+                </Text>
+                <View style={[styles.mt3, !shouldUseSingleColumn && [styles.flexRow, styles.alignItemsCenter, styles.gap5]]}>
                     <View style={[styles.flex1, styles.flexRow, shouldUseNarrowLayout && styles.mhn5]}>
                         <TabSelectorContextProvider activeTabKey={selectedTab}>
                             <TabSelectorBase

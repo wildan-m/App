@@ -592,6 +592,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: 'Montant',
         submitter: 'Déclarant',
+        accountID: 'ID du compte',
     },
     socials: {
         podcast: 'Suivez-nous sur Podcast',
@@ -5729,6 +5730,8 @@ ${amount} pour ${merchant} - ${date}`,
             noResultsPrompt: '<muted-text><centered-text>Veuillez modifier votre recherche ou <a href="#">suggérer une intégration</a>.</centered-text></muted-text>',
             allConnectedTitle: 'Vous êtes entièrement connecté',
             allConnectedPrompt: '<muted-text><centered-text>Tout est déjà connecté ici. Vous pouvez aussi <a href="#">suggérer une intégration</a>.</centered-text></muted-text>',
+            activeConnections: 'Connexions actives',
+            otherConnections: 'Autres connexions',
         },
         receiptPartners: {
             uber: {
@@ -5908,6 +5911,7 @@ ${amount} pour ${merchant} - ${date}`,
                 },
             },
             noVendorsFoundDescription: 'Veuillez ajouter des fournisseurs dans QuickBooks Desktop et synchroniser à nouveau la connexion',
+            companyFile: 'Fichier d’entreprise',
         },
         qbo: {
             connectedTo: 'Connecté à',
@@ -6314,6 +6318,7 @@ ${amount} pour ${merchant} - ${date}`,
                 'Lorsque votre entreprise prend en charge les frais de conversion de devise sur un paiement effectué à l’étranger, nous ajouterons ces frais à la facture à payer en tant que ligne imputée à ce compte.',
             noExpenseAccountsFound: 'Aucun compte trouvé',
             noExpenseAccountsFoundDescription: 'Veuillez synchroniser à nouveau la connexion après l’ajout des comptes du grand livre général dans Certinia.',
+            salesforceInstanceUrl: 'URL de l’instance Salesforce',
         },
         netsuite: {
             subsidiary: 'Filiale',

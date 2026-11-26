@@ -480,6 +480,8 @@ const translations = {
         downgradeWorkspace: 'Downgrade workspace',
         companyID: 'Company ID',
         userID: 'User ID',
+        // @context identifier of an account in an external accounting system, not a monetary account
+        accountID: 'Account ID',
         tenantID: 'Tenant ID',
         environmentName: 'Environment name',
         clientID: 'Client ID',
@@ -5948,6 +5950,8 @@ const translations = {
                 [CONST.TAB.CONNECTIONS.AI]: 'AI & MCP',
             },
             findConnections: 'Find connections',
+            activeConnections: 'Active connections',
+            otherConnections: 'Other connections',
             configure: 'Configure',
             fix: 'Fix',
             active: 'Active',
@@ -6028,6 +6032,8 @@ const translations = {
             missingPerDiemUnit: "Per diem isn't set up correctly on this workspace. Please reach out to Concierge for help.",
         },
         qbd: {
+            // @context the QuickBooks Desktop data file a workspace is connected to
+            companyFile: 'Company file',
             exportOutOfPocketExpensesDescription: 'Set how out-of-pocket expenses export to QuickBooks Desktop.',
             exportOutOfPocketExpensesCheckToggle: 'Mark checks as “print later”',
             exportDescription: 'Configure how Expensify data exports to QuickBooks Desktop.',
@@ -6443,6 +6449,8 @@ const translations = {
             titleFFA: 'Certinia (FFA)',
             titlePSA: 'Certinia (PSA)',
             company: 'Company',
+            // @context keep "Salesforce" untranslated, it is a product name
+            salesforceInstanceUrl: 'Salesforce instance URL',
             autoSyncDescription: 'Expensify will automatically sync with Certinia every day.',
             syncReimbursedReportsDescription: 'With this option enabled, anytime a Payable Invoice is paid in FFA, the related Expensify report will be automatically marked as reimbursed.',
             taxNonBillable: 'Export tax as non-billable',

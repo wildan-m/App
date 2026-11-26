@@ -591,6 +591,7 @@ const translations: TranslationDeepObject<typeof en> = {
         }),
         amount: '金額',
         submitter: '申請者',
+        accountID: 'アカウント ID',
     },
     socials: {
         podcast: 'ポッドキャストでフォロー',
@@ -5641,6 +5642,8 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             noResultsPrompt: '<muted-text><centered-text>検索条件を調整するか、<a href="#">連携を提案</a>してください。</centered-text></muted-text>',
             allConnectedTitle: 'すべて接続されました',
             allConnectedPrompt: '<muted-text><centered-text>ここにあるものはすべてすでに連携されています。<a href="#">連携を提案</a>することもできます。</centered-text></muted-text>',
+            activeConnections: 'アクティブな接続',
+            otherConnections: 'その他の接続',
         },
         receiptPartners: {
             uber: {
@@ -5815,6 +5818,7 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
                 },
             },
             noVendorsFoundDescription: 'QuickBooks Desktop にベンダーを追加して、接続をもう一度同期してください',
+            companyFile: '会社ファイル',
         },
         qbo: {
             connectedTo: '接続先',
@@ -6202,6 +6206,7 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             fxExpenseAccountDescription: '海外での支払いに対する通貨換算コストを会社が負担する場合、そのコストをこの勘定科目でコード化した明細行として、買掛請求書に追加します。',
             noExpenseAccountsFound: 'アカウントが見つかりません',
             noExpenseAccountsFoundDescription: 'Certinia で総勘定元帳勘定科目を追加した後に、接続を再同期してください。',
+            salesforceInstanceUrl: 'Salesforce インスタンス URL',
         },
         netsuite: {
             subsidiary: '子会社',

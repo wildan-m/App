@@ -3582,6 +3582,12 @@ type QBDConnectionConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
     {
         apiProvider: string;
 
+        /** Credentials identifying the QuickBooks Desktop company the workspace syncs with */
+        credentials?: {
+            /** Name of the connected QuickBooks Desktop company file */
+            companyFileName?: string;
+        };
+
         /** Configuration of automatic synchronization from QuickBooks Desktop to the app */
         autoSync: {
             /** Job ID of the synchronization */
