@@ -12664,8 +12664,16 @@ function navigateToLinkedReportAction(
         const rhpIndex = rhpState?.index ?? (rhpState?.routes.length ? rhpState.routes.length - 1 : -1);
         const routeBelow = rhpIndex > 0 ? rhpState?.routes.at(rhpIndex - 1) : undefined;
         const routeBelowParams = routeBelow?.params as {reportID?: string} | undefined;
+        const routeBelowReportID = routeBelowParams?.reportID;
 
-        if (routeBelow?.key && routeBelowParams?.reportID === ancestor.report.reportID) {
+        // A one-expense report opened from Search shows its transaction thread inline, so the screen below already displays the ancestor thread
+        const isRouteBelowOneTransactionReportOfAncestor =
+            !!routeBelowReportID &&
+            isReportTransactionThread(ancestor.report) &&
+            ancestor.report.parentReportID === routeBelowReportID &&
+            isOneTransactionReport(getReportOrDraftReport({reportID: routeBelowReportID}));
+
+        if (routeBelow?.key && (routeBelowReportID === ancestor.report.reportID || isRouteBelowOneTransactionReportOfAncestor)) {
             Navigation.setParams({reportActionID: ancestor.reportAction.reportActionID}, routeBelow.key, rhpState?.key);
             Navigation.goBack();
             return;
